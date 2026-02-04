@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "homeDesc": "Haupt-Dashboard",
+    "fits": "Passungsrechner",
+    "handbook": "Ingenieur-Handbuch",
+    "library": "Modulbibliothek",
+    "available": "Module verfügbar",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "Profilgewichtsrechner",
+      "desc": "Masse & Kostenschätzung"
+    },
+    "fits": {
+      "title": "Passungsrechner",
+      "desc": "ISO 286 Welle/Bohrung"
+    },
+    "gears": {
+      "title": "Zahnradrechner",
+      "desc": "Stirn- & Schrägverzahnung"
+    },
+    "strength": {
+      "title": "Festigkeitsrechner",
+      "desc": "Spannungsanalyse (Mohr)"
+    },
+    "bearings": {
+      "title": "Lagerlebensdauer (L10)",
+      "desc": "Lebensdauererwartung"
+    },
+    "welding": {
+      "title": "Schweißwärme",
+      "desc": "Prozessparameter"
+    },
+    "sheetMetal": {
+      "title": "Blechbearbeitung",
+      "desc": "Biegekraft"
+    },
+    "pumps": {
+      "title": "Pumpenrechner",
+      "desc": "Leistung & NPSH"
+    },
+    "fasteners": {
+      "title": "Verbindungselemente",
+      "desc": "ISO Metrisches Gewinde"
+    },
+    "converter": {
+      "title": "Umrechner",
+      "desc": "Einheiten & Leistung"
+    },
+    "handbook": {
+      "title": "Handbuch",
+      "desc": "Lagertabellen, ISO-Toleranzen, G-Code."
+    }
+  },
+  "common": {
+    "calculate": "Berechnen",
+    "result": "Ergebnis",
+    "inputs": "Eingaben",
+    "dimensions": "Abmessungen",
+    "hole": "Bohrung",
+    "shaft": "Welle",
+    "min": "Min",
+    "max": "Max",
+    "nominalDia": "Nennmaß",
+    "explanation": "Detaillierte Erklärung",
+    "toleranceValues": "Toleranzwerte",
+    "mountingCalc": "Montageberechnungen",
+    "pressure": "Fugendruck",
+    "force": "Einpresskraft",
+    "torque": "Übertragbares Moment",
+    "metric": "Metrisch",
+    "imperial": "Zoll",
+    "from": "Eingang",
+    "to": "Ausgang",
+    "language": "Sprache",
+    "calcTool": "Rechner-Tool",
+    "formula": "Berechnungsformel",
+    "totalWeight": "Gesamtgewicht",
+    "ratio": "Verhältnis",
+    "stress": "Spannung",
+    "beam": "Balken",
+    "cantilever": "Freiträger",
+    "simple": "Einfach gelagert",
+    "share": "Berechnung teilen",
+    "copied": "Kopiert!",
+    "loadGeometry": "Last & Geometrie",
+    "beamParams": "Balkenparameter",
+    "calculatedStress": "Berechnete Spannung",
+    "maxDeflection": "Max. Durchbiegung",
+    "safetyFactor": "Sicherheitsfaktor",
+    "centerDist": "Achsabstand (awt)",
+    "outputSpeed": "Abtriebsdrehzahl"
+  },
+  "dimensions": {
+    "width": "Breite",
+    "height": "Höhe",
+    "thickness": "Dicke",
+    "wallThickness": "Wandstärke",
+    "outerDiameter": "Außendurchmesser",
+    "diameter": "Durchmesser",
+    "length": "Länge"
+  },
+  "aluminum": {
+    "title": "Aluminium Gewichtsrechner",
+    "shapes": {
+      "box": "Rechteckrohr",
+      "sheet": "Blech / Platte",
+      "pipe": "Rundrohr",
+      "bar": "Vollstab"
+    },
+    "theory": {
+      "densityTitle": "Dichte (ρ)",
+      "densityDesc": "Dichte ist Masse pro Volumeneinheit. Legierungen variieren je nach Elementen leicht.",
+      "series1000": "1000er Serie (Rein): ~2.70 g/cm³",
+      "series6000": "6000er Serie (Mg+Si): ~2.70 g/cm³",
+      "series7000": "7000er Serie (Zn): ~2.81 g/cm³ (Schwer)",
+      "formula": "Masse = Volumen × Dichte",
+      "plateFormula": "Platte: Länge × Breite × Dicke × ρ"
+    },
+    "disclaimer": "Berechnungen basieren auf theoretischer Dichte (~2.70 g/cm³). Tatsächliches Gewicht kann fertigungsbedingt (ASTM B221) um ±5% variieren.",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "Materialwissenschaftlicher Leitfaden"
+  },
+  "fit": {
+    "title": "Passungsrechner",
+    "subtitle": "ISO-Toleranzsystem und Passungen",
+    "tabs": {
+      "standard": "Standardpassungen",
+      "manual": "Manuelle Toleranz"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "Gleitpassung",
+        "desc": "Von Hand montierbar, geschmiert"
+      },
+      "h7g6": {
+        "name": "Laufpassung",
+        "desc": "Für rotierende Teile"
+      },
+      "h7f7": {
+        "name": "Laufpassung (Weit)",
+        "desc": "Großes Spiel"
+      },
+      "h7k6": {
+        "name": "Übergangspassung",
+        "desc": "Leichte Überdeckung/Spiel"
+      },
+      "h7m6": {
+        "name": "Übergangspassung",
+        "desc": "Meist leichte Überdeckung"
+      },
+      "h7n6": {
+        "name": "Übergangspassung",
+        "desc": "Tendenz zur Überdeckung"
+      },
+      "h7p6": {
+        "name": "Leichte Presspassung",
+        "desc": "Montage mit Hammer"
+      },
+      "h7r6": {
+        "name": "Presspassung",
+        "desc": "Hydraulikpresse erforderlich"
+      },
+      "h7s6": {
+        "name": "Schwere Presspassung",
+        "desc": "Warmaufziehen/Unterkühlen"
+      }
+    },
+    "inputs": {
+      "nominalSize": "Nennmaß",
+      "fitLength": "Fugenlänge",
+      "elasticModulus": "E-Modul",
+      "frictionCoeff": "Reibwert (μ)"
+    },
+    "results": {
+      "fitType": "Passungsart",
+      "clearanceAmount": "Spiel",
+      "interferenceAmount": "Übermaß",
+      "clearance": "Spiel",
+      "transition": "Übergang",
+      "interference": "Übermaß"
+    }
+  },
+  "gear": {
+    "title": "Zahnradrechner",
+    "subtitle": "Stirnrad, Schrägverzahnt & Kegelrad",
+    "types": {
+      "spur": "Stirnrad (Gerade)",
+      "helical": "Schrägverzahnt",
+      "bevel": "Kegelrad",
+      "worm": "Schneckenrad"
+    },
+    "inputs": {
+      "module": "Modul (m)",
+      "pressureAngle": "Eingriffswinkel",
+      "pinionTeeth": "Z1 (Ritzel)",
+      "gearTeeth": "Z2 (Rad)",
+      "helixAngle": "Schrägungswinkel",
+      "faceWidth": "Zahnbreite",
+      "power": "Leistung (kW)",
+      "rpm": "Drehzahl (U/min)"
+    },
+    "results": {
+      "calculatedTorque": "Drehmoment",
+      "transmissionRatio": "Übersetzung",
+      "pitchDiameter": "Teilkreisdurchmesser",
+      "forcesAndStress": "Kräfte & Spannung"
+    }
+  },
+  "strength": {
+    "title": "Festigkeitsrechner",
+    "subtitle": "Spannungsanalyse & Mohr'scher Kreis",
+    "inputs": {
+      "sigmaX": "Sigma X (σx)",
+      "sigmaY": "Sigma Y (σy)",
+      "tauXY": "Tau XY (τxy)",
+      "theta": "Winkel (θ)"
+    },
+    "results": {
+      "principalStresses": "Hauptspannungen",
+      "maxShear": "Max. Schubspannung (τmax)",
+      "vonMises": "Von Mises",
+      "transformed": "Transformierter Zustand"
+    }
+  },
+  "bearing": {
+    "title": "Lagerlebensdauer",
+    "subtitle": "L10 Lebensdauer & Lastanalyse",
+    "inputs": {
+      "series": "Serie",
+      "code": "Lagerkurzzeichen",
+      "radialLoad": "Radiallast (Fr)",
+      "axialLoad": "Axiallast (Fa)",
+      "rpm": "Drehzahl (U/min)",
+      "reliability": "Zuverlässigkeit"
+    },
+    "results": {
+      "lifeHours": "L10 Lebensdauer (h)",
+      "lifeRevs": "L10 Lebensdauer (M Umdr.)",
+      "equivalentLoad": "Äquivalente Last (P)",
+      "staticSafety": "Statische Sicherheit (s0)"
+    }
+  },
+  "welding": {
+    "title": "Schweißrechner",
+    "subtitle": "Wärmeeintrag & Spannungsanalyse",
+    "inputs": {
+      "method": "Verfahren",
+      "type": "Nahtart",
+      "current": "Strom (I)",
+      "voltage": "Spannung (V)",
+      "speed": "Geschwindigkeit (v)",
+      "legSize": "Nahtdicke (a)",
+      "thickness": "Blechdicke (t)",
+      "length": "Länge (L)",
+      "load": "Last (F)"
+    },
+    "results": {
+      "heatInput": "Streckenenergie",
+      "stress": "Spannung",
+      "safetyFactor": "Sicherheitsfaktor",
+      "efficiency": "Wirkungsgrad (η)"
+    },
+    "types": {
+      "fillet": "Kehlnaht",
+      "butt": "Stumpfnaht",
+      "doubleFillet": "Doppelkehlnaht"
+    }
+  },
+  "sheetMetal": {
+    "title": "Blechbearbeitung",
+    "subtitle": "Biegekraft & Zuschnitt",
+    "inputs": {
+      "material": "Material",
+      "thickness": "Dicke (t)",
+      "angle": "Biegewinkel (α)",
+      "radius": "Innenradius (ri)",
+      "length": "Biegelänge (L)",
+      "vOpening": "Matrizenweite (V)",
+      "flange1": "Schenkel A",
+      "flange2": "Schenkel B",
+      "kFactor": "K-Faktor"
+    },
+    "results": {
+      "force": "Erforderliche Kraft",
+      "flatLength": "Zuschnittslänge",
+      "bendAllowance": "Biegezugabe (BA)",
+      "bendDeduction": "Biegeverkürzung (BD)",
+      "recV": "Empf. Matrizenweite"
+    }
+  },
+  "pump": {
+    "title": "Pumpenrechner",
+    "subtitle": "Hydraulische Leistung & NPSH",
+    "inputs": {
+      "flow": "Förderstrom (Q)",
+      "head": "Förderhöhe (H)",
+      "rpm": "Drehzahl",
+      "eff": "Wirkungsgrad (η)",
+      "density": "Dichte (ρ)",
+      "npsh": "NPSH Verfügbar"
+    },
+    "results": {
+      "hydPower": "Hydraulische Leistung",
+      "shaftPower": "Wellenleistung",
+      "specSpeed": "Spezifische Drehzahl (ns)",
+      "type": "Pumpentyp",
+      "flowVelocity": "Strömungsgeschwindigkeit",
+      "reynolds": "Reynolds-Zahl"
+    },
+    "types": {
+      "radial": "Radial",
+      "mixed": "Halbaxial",
+      "axial": "Axial"
+    }
+  },
+  "fastener": {
+    "title": "Verbindungselemente",
+    "subtitle": "Metrisches ISO-Gewinde",
+    "inputs": {
+      "size": "Gewindegröße (M)",
+      "pitch": "Steigung (P)",
+      "class": "Tol. Klasse"
+    },
+    "results": {
+      "tapDrill": "Kernlochbohrer",
+      "majorDia": "Außendurchmesser (d)",
+      "minorDia": "Kerndurchmesser (d1)",
+      "pitchDia": "Flankendurchmesser (d2)",
+      "clearingDrill": "Durchgangsloch",
+      "tensileArea": "Spannungsquerschnitt (As)"
+    }
+  },
+  "converter": {
+    "title": "Einheitenumrechner",
+    "categories": {
+      "length": "Länge",
+      "weight": "Gewicht",
+      "pressure": "Druck",
+      "power": "Leistung"
+    }
+  },
+  "driveTrain": {
+    "title": "Antriebsstrang-Designer",
+    "subtitle": "Motor • Getriebe • Lastanalyse",
+    "primeMover": "1. Antriebsmaschine (IEC)",
+    "application": "2. Anwendungsfaktor",
+    "transmission": "3. Getriebeauslegung",
+    "analysis": "4. Ingenieuranalyse",
+    "manufacturing": "4a. Prüfdaten (M / Wk)",
+    "engineering": "4b. Festigkeitsberechnung"
+  },
+  "motor": {
+    "nominalPower": "Nennleistung",
+    "speedPoles": "Drehzahl (Pole)",
+    "nominalTorque": "Nennmoment",
+    "efficiency": "Wirkungsgrad",
+    "inputPower": "Eingangs-P",
+    "ratio": "Verhältnis",
+    "torqueOut": "Ausgangsmoment"
+  },
+  "manufacturing": {
+    "profileMod": "Profilverschiebung (x)",
+    "shiftCoeff": "Verschiebungsfaktor",
+    "checkPin": "Prüfstiftdurchmesser",
+    "overPins": "Diametralmaß (M)",
+    "baseTangent": "Zahnweite (Wk)",
+    "pinion": "Ritzel",
+    "gear": "Rad",
+    "teeth": "Zähne"
+  },
+  "safety": {
+    "loadFactors": "Lastfaktoren",
+    "tangentialForce": "Tangentialkraft (Ft)",
+    "radialForce": "Radialkraft (Fr)",
+    "axialForce": "Axialkraft (Fa)",
+    "safetyEst": "Sicherheitsabschätzung (ISO 6336 Basis)",
+    "bendingSafety": "Zahnfußsicherheit (SF)",
+    "pittingSafety": "Grübchensicherheit (SH)",
+    "stress": "Spannung",
+    "contactStress": "Hertzsche Pressung",
+    "limit": "Grenze",
+    "serviceFactor": "Betriebsfaktor (KA)",
+    "safetyWarning": "Sicherheitsfaktoren sind Schätzungen basierend auf vereinfachten Lewis-Formeln. Für kritische Anwendungen wird eine Analyse nach ISO 6336 oder AGMA 2001 empfohlen."
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "Branchennachrichten",
+    "subtitle": "Ingenieurwesen, Metallurgie & Marktupdates",
+    "breaking": "Eilmeldung",
+    "readMore": "Ganzen Artikel lesen",
+    "loading": "Lade Feed..."
+  },
+  "project": {
+    "title": "Projektangebot",
+    "manager": "Projektmanager",
+    "grid": "Datentabelle",
+    "nesting": "Verschachtelungsoptimierung",
+    "exportPdf": "PDF Export",
+    "clear": "Löschen",
+    "empty": "Liste leer. Artikel vom Rechner hinzufügen.",
+    "settings": "Optimierungseinstellungen",
+    "rawLength": "Rohlänge",
+    "bladeWidth": "Sägebreite",
+    "calculate": "Schnitte berechnen",
+    "totalBars": "Stangen gesamt",
+    "efficiency": "Effizienz",
+    "waste": "Gesamtverschnitt",
+    "rem": "Rest"
+  },
+  "nesting": {
+    "title": "Schnittoptimierung",
+    "subtitle": "1D Lineare Verschachtelung",
+    "stockLength": "Stangenlänge",
+    "kerf": "Sägebreite (Schnittfuge)",
+    "trimStart": "Anfangsschnitt",
+    "trimEnd": "Endschnitt",
+    "addPart": "Teil hinzufügen",
+    "removePart": "Entfernen",
+    "calculate": "Optimieren",
+    "partLabel": "Bezeichnung",
+    "partLength": "Länge",
+    "partQty": "Menge",
+    "barsUsed": "Stangen verwendet",
+    "efficiency": "Materialeffizienz",
+    "totalWaste": "Gesamtverschnitt",
+    "algorithm": "Algorithmus",
+    "noResults": "Teile hinzufügen und Optimieren klicken"
+  },
+  "nesting2d": {
+    "title": "2D Verschachtelung",
+    "subtitle": "Echte Form Verschachtelung",
+    "dropSvg": "SVG-Dateien hier ablegen oder klicken zum Hochladen",
+    "sheetWidth": "Blechbreite",
+    "sheetHeight": "Blechhöhe",
+    "spacing": "Teileabstand",
+    "rotation": "Rotationsschritt",
+    "optimize": "Optimieren",
+    "exportDxf": "DXF Exportieren",
+    "sheets": "Bleche",
+    "efficiency": "Effizienz",
+    "waste": "Verschnitt",
+    "parts": "Teile",
+    "unplaced": "Nicht platzierte Teile"
+  }
+}

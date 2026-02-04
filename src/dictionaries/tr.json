@@ -1,0 +1,506 @@
+{
+    "nav": {
+        "home": "Anasayfa",
+        "homeDesc": "Ana Kontrol Paneli",
+        "fits": "Tolerans Hesaplayıcı",
+        "handbook": "Mühendis El Kitabı",
+        "library": "Modül Kütüphanesi",
+        "available": "Mevcut Modül",
+        "news": "Haberler"
+    },
+    "modules": {
+        "aluminum": {
+            "title": "Genel Malzeme Profil Hesabı",
+            "desc": "Kütle & Maliyet Tahmini"
+        },
+        "fits": {
+            "title": "Geçme & Toleranslar",
+            "desc": "ISO 286 Mil/Delik"
+        },
+        "gears": {
+            "title": "Dişli Hesaplayıcı",
+            "desc": "Düz & Helisel Geometri"
+        },
+        "strength": {
+            "title": "Mukavemet (Mohr)",
+            "desc": "Gerilme Analizi"
+        },
+        "bearings": {
+            "title": "Rulman Ömrü (L10)",
+            "desc": "Ömür Beklentisi"
+        },
+        "welding": {
+            "title": "Kaynak Isı Girdisi",
+            "desc": "Proses Girdileri"
+        },
+        "sheetMetal": {
+            "title": "Sac Metal Büküm",
+            "desc": "Bükme Kuvveti"
+        },
+        "pumps": {
+            "title": "Pompa Hesabı",
+            "desc": "Güç & NPSH"
+        },
+        "fasteners": {
+            "title": "Bağlantı Elemanları",
+            "desc": "ISO Metrik Diş"
+        },
+        "converter": {
+            "title": "Birim Çevirici",
+            "desc": "Birimler & Güç"
+        },
+        "handbook": {
+            "title": "El Kitabı",
+            "desc": "Rulman tabloları, ISO Toleranslar, G-Code referansı."
+        }
+    },
+    "common": {
+        "calculate": "Ağırlık Hesapla",
+        "result": "Sonuç",
+        "inputs": "Girdiler",
+        "dimensions": "Boyutlar",
+        "hole": "Delik",
+        "shaft": "Mil",
+        "min": "Min",
+        "max": "Maks",
+        "nominalDia": "Nominal Çap",
+        "explanation": "Detaylı Açıklama",
+        "toleranceValues": "Tolerans Değerleri",
+        "mountingCalc": "Montaj Hesapları",
+        "pressure": "Arayüz Basıncı",
+        "force": "Çakma Kuvveti",
+        "torque": "Aktarılabilir Tork",
+        "metric": "Metrik",
+        "imperial": "İnç",
+        "from": "Giriş",
+        "to": "Çıkış",
+        "language": "Dil",
+        "calcTool": "Hesaplama Aracı",
+        "formula": "Hesap Formülü",
+        "totalWeight": "Toplam Ağırlık",
+        "ratio": "Oran",
+        "stress": "Gerilme",
+        "beam": "Kiriş",
+        "cantilever": "Ankastre",
+        "simple": "Basit Mesnetli",
+        "share": "Hesaplamayı Paylaş",
+        "copied": "Kopyalandı!",
+        "loadGeometry": "Yük & Geometri",
+        "beamParams": "Kiriş Parametreleri",
+        "calculatedStress": "Hesaplanan Gerilme",
+        "maxDeflection": "Maksimum Sehim",
+        "safetyFactor": "Güvenlik Faktörü",
+        "centerDist": "Eksen Aralığı (awt)",
+        "outputSpeed": "Çıkış Hızı"
+    },
+    "dimensions": {
+        "width": "Genişlik",
+        "height": "Yükseklik",
+        "thickness": "Kalınlık",
+        "wallThickness": "Et Kalınlığı",
+        "outerDiameter": "Dış Çap",
+        "diameter": "Çap",
+        "length": "Uzunluk"
+    },
+    "aluminum": {
+        "title": "Genel Malzeme Profil Hesabı",
+        "shapes": {
+            "box": "Kutu Profil",
+            "sheet": "Sac / Levha",
+            "pipe": "Yuvarlak Boru",
+            "bar": "Dolu Çubuk"
+        },
+        "theory": {
+            "densityTitle": "Yoğunluk (ρ)",
+            "densityDesc": "Yoğunluk birim hacimdeki kütledir. Farklı alaşımlar içeriğe göre değişebilir.",
+            "series1000": "1000 Serisi (Saf): ~2.70 g/cm³",
+            "series6000": "6000 Serisi (Mg+Si): ~2.70 g/cm³",
+            "series7000": "7000 Serisi (Zn): ~2.81 g/cm³ (Ağır)",
+            "formula": "Kütle = Hacim × Yoğunluk",
+            "plateFormula": "Plaka: Uzunluk × Genişlik × Kalınlık × ρ"
+        },
+        "disclaimer": "Hesaplamalar teorik yoğunluğa (~2.70 g/cm³) dayanır. Gerçek ağırlık üretim toleranslarına (ASTM B221) göre ±%5 değişebilir.",
+        "projectList": {
+            "title": "Proje Listesi (BOM)",
+            "add": "Listeye Ekle",
+            "clear": "Listeyi Temizle",
+            "empty": "Liste boş.",
+            "totalWeight": "Genel Toplam Ağırlık",
+            "totalCost": "Toplam Maliyet",
+            "columns": {
+                "id": "#",
+                "desc": "Malzeme / Boyut",
+                "qty": "Adet",
+                "unitWeight": "Birim Ağ.",
+                "totalWeight": "Top. Ağ.",
+                "actions": "İşlem"
+            }
+        },
+        "costData": {
+            "pricePerKg": "Birim Fiyat (/kg)",
+            "estimatedCost": "Tahmini Maliyet"
+        },
+        "engineering": {
+            "title": "Mühendislik Analizi",
+            "surfaceArea": "Yüzey Alanı (Boya)",
+            "mechProps": "Mekanik Özellikler",
+            "yield": "Akma Mukavemeti",
+            "tensile": "Çekme Mukavemeti",
+            "hardness": "Sertlik",
+            "weldability": "Kaynaklanabilirlik",
+            "sectionProps": "Statik Kesit Değerleri",
+            "inertia": "Atalet Momenti",
+            "modulus": "Mukavemet Momenti",
+            "radius": "Jiresyon Çapı"
+        },
+        "simulation": {
+            "title": "Kiriş Sehim Analizi",
+            "open": "Simülatörü Aç",
+            "close": "Kapat",
+            "length": "Kiriş Boyu (L)",
+            "load": "Yük (F)",
+            "support": "Mesnet Tipi",
+            "simple": "Basit Mesnet (Simple)",
+            "cantilever": "Ankastre (Cantilever)",
+            "result": "Maksimum Sehim",
+            "safe": "GÜVENLİ",
+            "unsafe": "GÜVENSİZ (1/300 Limit)",
+            "warning": "Uyarı: Bu sadece basit bir tahmindir. Kritik yükler için FEA analizi yapın."
+        },
+        "export": {
+            "pdf": "PDF Teklif İndir",
+            "dxf": "DXF (CAD) İndir"
+        }
+    },
+    "handbook": {
+        "title": "Malzeme Bilim Rehberi"
+    },
+    "fit": {
+        "title": "Tolerans Hesaplayıcı",
+        "subtitle": "ISO tolerans sistemi ve geçmeler",
+        "tabs": {
+            "standard": "Standart Geçmeler",
+            "manual": "Manuel Tolerans"
+        },
+        "fitTypes": {
+            "h7h6": {
+                "name": "Kaygan Geçme",
+                "desc": "Elle monte edilebilir, yağlı"
+            },
+            "h7g6": {
+                "name": "Hareketli Geçme",
+                "desc": "Dönen parçalar için"
+            },
+            "h7f7": {
+                "name": "Bol Hareketli",
+                "desc": "Geniş boşluklu"
+            },
+            "h7k6": {
+                "name": "Ara Geçme",
+                "desc": "Hafif sıkı/boşluklu"
+            },
+            "h7m6": {
+                "name": "Ara Geçme",
+                "desc": "Genellikle hafif sıkı"
+            },
+            "h7n6": {
+                "name": "Ara Geçme",
+                "desc": "Sıkı geçme eğilimli"
+            },
+            "h7p6": {
+                "name": "Hafif Sıkı Geçme",
+                "desc": "Çekiçle montaj"
+            },
+            "h7r6": {
+                "name": "Sıkı Geçme",
+                "desc": "Hidrolik pres gerekir"
+            },
+            "h7s6": {
+                "name": "Ağır Sıkı Geçme",
+                "desc": "Isıtma/Soğutma gerekir"
+            }
+        },
+        "inputs": {
+            "nominalSize": "Nominal Ölçü",
+            "fitLength": "Geçme Boyu",
+            "elasticModulus": "Elastisite Modülü",
+            "frictionCoeff": "Sürtünme (μ)"
+        },
+        "results": {
+            "fitType": "Geçme Tipi",
+            "clearanceAmount": "Boşluk Miktarı",
+            "interferenceAmount": "Sıkılık Miktarı",
+            "clearance": "Boşluk",
+            "transition": "Ara Geçme",
+            "interference": "Sıkılık"
+        }
+    },
+    "gear": {
+        "title": "Dişli Hesaplayıcı",
+        "subtitle": "Düz, Helis ve Konik Dişli Geometrisi",
+        "types": {
+            "spur": "Düz Dişli",
+            "helical": "Helisel Dişli",
+            "bevel": "Konik Dişli",
+            "worm": "Sonsuz Vida"
+        },
+        "inputs": {
+            "module": "Modül (m)",
+            "pressureAngle": "Kavrama Açısı",
+            "pinionTeeth": "Z1 (Pinyon)",
+            "gearTeeth": "Z2 (Çark)",
+            "helixAngle": "Helis Açısı",
+            "faceWidth": "Diş Genişliği",
+            "power": "Güç (kW)",
+            "rpm": "Hız (Devir)"
+        },
+        "results": {
+            "calculatedTorque": "Tork",
+            "transmissionRatio": "Çevrim Oranı",
+            "pitchDiameter": "Bölüm Dairesi",
+            "forcesAndStress": "Kuvvetler & Gerilme"
+        }
+    },
+    "driveTrain": {
+        "title": "Güç Aktarım Tasarımcısı",
+        "subtitle": "Motor • Transmisyon • Yük Analizi",
+        "primeMover": "1. Tahrik Ünitesi (IEC)",
+        "application": "2. Uygulama Yükü",
+        "transmission": "3. Transmisyon Tasarımı",
+        "analysis": "4. Mühendislik Analizi",
+        "manufacturing": "4a. İmalat Verileri (M / Wk)",
+        "engineering": "4b. Mühendislik Analizi"
+    },
+    "motor": {
+        "nominalPower": "Nominal Güç",
+        "speedPoles": "Hız (Kutup)",
+        "nominalTorque": "Nominal Tork",
+        "efficiency": "Verimlilik",
+        "inputPower": "Giriş P",
+        "ratio": "Oran",
+        "torqueOut": "Çıkış Torku"
+    },
+    "manufacturing": {
+        "profileMod": "Profil Kaydırma (x)",
+        "shiftCoeff": "Kaydırma Katsayısı",
+        "checkPin": "Kontrol Pim Çapı",
+        "overPins": "Pim Üstü Çap (M)",
+        "baseTangent": "W Ölçüsü (Wk)",
+        "pinion": "Pinyon",
+        "gear": "Çark",
+        "teeth": "diş"
+    },
+    "safety": {
+        "loadFactors": "Yük Faktörleri",
+        "tangentialForce": "Teğetsel Kuvvet (Ft)",
+        "radialForce": "Radyal Kuvvet (Fr)",
+        "axialForce": "Eksenel Kuvvet (Fa)",
+        "safetyEst": "Emniyet Tahmini (ISO 6336 Bazlı)",
+        "bendingSafety": "Eğilme Emniyeti (SF)",
+        "pittingSafety": "Yüzey Emniyeti (SH)",
+        "stress": "Gerilme",
+        "contactStress": "Temas Basıncı",
+        "limit": "Limit",
+        "serviceFactor": "Servis Faktörü (KA)",
+        "safetyWarning": "Emniyet faktörleri basitleştirilmiş Lewis ve Hertzian temas gerilmelerine dayalıdır. Kritik uygulamalar için Standart ISO 6336 veya AGMA 2001 analizi önerilir."
+    },
+    "strength": {
+        "title": "Mukavemet Hesaplayıcı",
+        "subtitle": "Gerilme Analizi & Mohr Çemberi",
+        "inputs": {
+            "sigmaX": "Sigma X (σx)",
+            "sigmaY": "Sigma Y (σy)",
+            "tauXY": "Tau XY (τxy)",
+            "theta": "Açı (θ)"
+        },
+        "results": {
+            "principalStresses": "Asal Gerilmeler",
+            "maxShear": "Maks Kayma (τmax)",
+            "vonMises": "Von Mises",
+            "transformed": "Dönüştürülmüş Durum"
+        }
+    },
+    "bearing": {
+        "title": "Rulman Ömür Hesabı",
+        "subtitle": "L10 Ömrü & Yük Analizi",
+        "inputs": {
+            "series": "Seri",
+            "code": "Rulman Kodu",
+            "radialLoad": "Radyal Yük (Fr)",
+            "axialLoad": "Eksenel Yük (Fa)",
+            "rpm": "Hız (Devir)",
+            "reliability": "Güvenilirlik"
+        },
+        "results": {
+            "lifeHours": "L10 Ömrü (Saat)",
+            "lifeRevs": "L10 Ömrü (M Devir)",
+            "equivalentLoad": "Eşdeğer Yük (P)",
+            "staticSafety": "Statik Emniyet (s0)"
+        }
+    },
+    "welding": {
+        "title": "Kaynak Hesaplayıcı",
+        "subtitle": "Isı Girdisi & Gerilme Analizi",
+        "inputs": {
+            "method": "Yöntem",
+            "type": "Birleştirme Tipi",
+            "current": "Akım (I)",
+            "voltage": "Voltaj (V)",
+            "speed": "Hız (v)",
+            "legSize": "Kaynak Dikişi (a)",
+            "thickness": "Kalınlık (t)",
+            "length": "Uzunluk (L)",
+            "load": "Yük (F)"
+        },
+        "results": {
+            "heatInput": "Isı Girdisi",
+            "stress": "Gerilme",
+            "safetyFactor": "Emniyet Faktörü",
+            "efficiency": "Verimlilik (η)"
+        },
+        "types": {
+            "fillet": "Köşe Kaynağı",
+            "butt": "Alın Kaynağı",
+            "doubleFillet": "Çift Köşe"
+        }
+    },
+    "sheetMetal": {
+        "title": "Sac İşleme Hesabı",
+        "subtitle": "Bükme Kuvveti & Açınım",
+        "inputs": {
+            "material": "Malzeme",
+            "thickness": "Kalınlık (t)",
+            "angle": "Büküm Açısı (α)",
+            "radius": "İç Yarıçap (ri)",
+            "length": "Büküm Boyu (L)",
+            "vOpening": "V-Kalıp Açıklığı (V)",
+            "flange1": "Flanş A",
+            "flange2": "Flanş B",
+            "kFactor": "K-Faktörü"
+        },
+        "results": {
+            "force": "Gerekli Tonaj",
+            "flatLength": "Açınım Boyu",
+            "bendAllowance": "Büküm Payı (BA)",
+            "bendDeduction": "Büküm Düşümü (BD)",
+            "recV": "Önerilen V-Kalıp"
+        }
+    },
+    "pump": {
+        "title": "Pompa Hesaplayıcı",
+        "subtitle": "Hidrolik Güç & NPSH",
+        "inputs": {
+            "flow": "Debi (Q)",
+            "head": "Basma Yüksekliği (H)",
+            "rpm": "Hız (Devir)",
+            "eff": "Verimlilik (η)",
+            "density": "Yoğunluk (ρ)",
+            "npsh": "NPSH Kullanılabilir"
+        },
+        "results": {
+            "hydPower": "Hidrolik Güç",
+            "shaftPower": "Mil Gücü",
+            "specSpeed": "Özgül Hız (ns)",
+            "type": "Pompa Tipi",
+            "flowVelocity": "Akış Hızı",
+            "reynolds": "Reynolds Sayısı"
+        },
+        "types": {
+            "radial": "Radyal Akış",
+            "mixed": "Karışık Akış",
+            "axial": "Eksenel Akış"
+        }
+    },
+    "fastener": {
+        "title": "Bağlantı Elemanları",
+        "subtitle": "Metrik ISO Diş Verileri",
+        "inputs": {
+            "size": "Diş Ölçüsü (M)",
+            "pitch": "Hatve (P)",
+            "class": "Tol. Sınıfı"
+        },
+        "results": {
+            "tapDrill": "Matkap Çapı",
+            "majorDia": "Diş Üstü Çapı (d)",
+            "minorDia": "Diş Dibi Çapı (d1)",
+            "pitchDia": "Bölüm Dairesi (d2)",
+            "clearingDrill": "Geçiş Deliği",
+            "tensileArea": "Gerilme Alanı (As)"
+        }
+    },
+    "converter": {
+        "title": "Birim Çevirici",
+        "categories": {
+            "length": "Uzunluk",
+            "weight": "Ağırlık",
+            "pressure": "Basınç",
+            "power": "Güç"
+        }
+    },
+    "market": {
+        "title": "Piyasa Verileri",
+        "aluminum": "LME Alüminyum",
+        "copper": "LME Bakır",
+        "live": "CANLI",
+        "useLivePrice": "Canlı Fiyat Kullan"
+    },
+    "news": {
+        "title": "Endüstri Gündemi",
+        "subtitle": "Mühendislik, Metalurji ve Piyasa Haberleri",
+        "breaking": "Son Dakika",
+        "readMore": "Haberi Oku",
+        "loading": "Yükleniyor..."
+    },
+    "project": {
+        "title": "Proje Teklifi",
+        "manager": "Proje Yöneticisi",
+        "grid": "Veri Tablosu",
+        "nesting": "Fire/Kesim Optimizasyonu",
+        "exportPdf": "PDF İndir",
+        "clear": "Temizle",
+        "empty": "Liste boş. Hesaplayıcıdan ürün ekleyin.",
+        "settings": "Optimizasyon Ayarları",
+        "rawLength": "Ham Boy",
+        "bladeWidth": "Testere Payı",
+        "calculate": "Kesim Hesapla",
+        "totalBars": "Toplam Profil",
+        "efficiency": "Verimlilik",
+        "waste": "Toplam File",
+        "rem": "Artan"
+    },
+    "nesting": {
+        "title": "Kesim Optimizasyonu",
+        "subtitle": "1D Doğrusal Yerleşim",
+        "stockLength": "Stok Boyu",
+        "kerf": "Testere Payı (Kerf)",
+        "trimStart": "Baş Kesim",
+        "trimEnd": "Son Kesim",
+        "addPart": "Parça Ekle",
+        "removePart": "Kaldır",
+        "calculate": "Optimize Et",
+        "partLabel": "Etiket",
+        "partLength": "Uzunluk",
+        "partQty": "Adet",
+        "barsUsed": "Kullanılan Profil",
+        "efficiency": "Malzeme Verimi",
+        "totalWaste": "Toplam Fire",
+        "algorithm": "Algoritma",
+        "noResults": "Parça ekleyin ve sonuçları görmek için Optimize Et'e tıklayın"
+    },
+    "nesting2d": {
+        "title": "2D Yerleşim",
+        "subtitle": "Gerçek Şekil Yerleşimi",
+        "dropSvg": "SVG dosyalarını buraya sürükleyin veya yüklemek için tıklayın",
+        "sheetWidth": "Levha Genişliği",
+        "sheetHeight": "Levha Yüksekliği",
+        "spacing": "Parça Aralığı",
+        "rotation": "Döndürme Adımı",
+        "optimize": "Optimize Et",
+        "exportDxf": "DXF İndir",
+        "sheets": "Levha",
+        "efficiency": "Verimlilik",
+        "waste": "Fire",
+        "parts": "Parçalar",
+        "unplaced": "Yerleştirilemeyen parçalar"
+    }
+}

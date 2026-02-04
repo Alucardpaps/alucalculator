@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "首页",
+    "homeDesc": "仪表板",
+    "fits": "公差配合",
+    "handbook": "工程师手册",
+    "library": "模块库",
+    "available": "可用模块",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "型材重量计算器",
+      "desc": "质量与成本估算"
+    },
+    "fits": {
+      "title": "公差配合",
+      "desc": "ISO 286 轴/孔"
+    },
+    "gears": {
+      "title": "齿轮计算器",
+      "desc": "直齿轮与斜齿轮几何"
+    },
+    "strength": {
+      "title": "强度计算 (Mohr)",
+      "desc": "应力分析"
+    },
+    "bearings": {
+      "title": "轴承寿命 (L10)",
+      "desc": "预期寿命"
+    },
+    "welding": {
+      "title": "焊接热输入",
+      "desc": "工艺参数"
+    },
+    "sheetMetal": {
+      "title": "钣金计算",
+      "desc": "折弯力"
+    },
+    "pumps": {
+      "title": "泵计算器",
+      "desc": "功率与 NPSH"
+    },
+    "fasteners": {
+      "title": "紧固件",
+      "desc": "ISO 公制螺纹"
+    },
+    "converter": {
+      "title": "单位转换器",
+      "desc": "单位与功率"
+    },
+    "handbook": {
+      "title": "工程师手册",
+      "desc": "轴承表、公差、G代码。"
+    }
+  },
+  "common": {
+    "calculate": "计算",
+    "result": "结果",
+    "inputs": "输入",
+    "dimensions": "尺寸",
+    "hole": "孔",
+    "shaft": "轴",
+    "min": "最小",
+    "max": "最大",
+    "nominalDia": "公称直径",
+    "explanation": "详细说明",
+    "toleranceValues": "公差值",
+    "mountingCalc": "装配计算",
+    "pressure": "接触压力",
+    "force": "压入力",
+    "torque": "传递扭矩",
+    "metric": "公制",
+    "imperial": "英制",
+    "from": "从",
+    "to": "到",
+    "language": "语言",
+    "calcTool": "计算工具",
+    "formula": "计算公式",
+    "totalWeight": "总重量",
+    "ratio": "比率",
+    "stress": "应力",
+    "beam": "梁",
+    "cantilever": "悬臂梁",
+    "simple": "简支梁",
+    "share": "分享计算",
+    "copied": "已复制！",
+    "loadGeometry": "载荷与几何",
+    "beamParams": "梁参数",
+    "calculatedStress": "计算应力",
+    "maxDeflection": "最大挠度",
+    "safetyFactor": "安全系数",
+    "centerDist": "中心距 (awt)",
+    "outputSpeed": "输出速度"
+  },
+  "dimensions": {
+    "width": "宽度",
+    "height": "高度",
+    "thickness": "厚度",
+    "wallThickness": "壁厚",
+    "outerDiameter": "外径",
+    "diameter": "直径",
+    "length": "长度"
+  },
+  "aluminum": {
+    "title": "铝重量计算器",
+    "shapes": {
+      "box": "方管",
+      "sheet": "板 / 板材",
+      "pipe": "圆管",
+      "bar": "圆棒"
+    },
+    "theory": {
+      "densityTitle": "密度 (ρ)",
+      "densityDesc": "密度是单位体积的质量。不同铝合金因成分不同略有差异。",
+      "series1000": "1000系列 (纯铝): ~2.70 g/cm³",
+      "series6000": "6000系列 (Mg+Si): ~2.70 g/cm³",
+      "series7000": "7000系列 (Zn): ~2.81 g/cm³ (重)",
+      "formula": "质量 = 体积 × 密度",
+      "plateFormula": "板材: 长度 × 宽度 × 厚度 × ρ"
+    },
+    "disclaimer": "基于理论密度 (~2.70 g/cm³)。实际重量根据生产公差 (ASTM B221) 可能有 ±5% 偏差。",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "材料科学指南"
+  },
+  "fit": {
+    "title": "配合计算器",
+    "subtitle": "ISO 公差配合",
+    "tabs": {
+      "standard": "标准配合",
+      "manual": "手动公差"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "间隙配合",
+        "desc": "手工装配"
+      },
+      "h7g6": {
+        "name": "转动配合",
+        "desc": "旋转件"
+      },
+      "h7f7": {
+        "name": "松动配合",
+        "desc": "大间隙"
+      },
+      "h7k6": {
+        "name": "过渡配合",
+        "desc": "轻微干涉或间隙"
+      },
+      "h7m6": {
+        "name": "过渡配合",
+        "desc": "通常轻微干涉"
+      },
+      "h7n6": {
+        "name": "过渡配合",
+        "desc": "倾向干涉"
+      },
+      "h7p6": {
+        "name": "轻过盈配合",
+        "desc": "锤击装配"
+      },
+      "h7r6": {
+        "name": "过盈配合",
+        "desc": "需压力机"
+      },
+      "h7s6": {
+        "name": "重过盈配合",
+        "desc": "热/冷装配"
+      }
+    },
+    "inputs": {
+      "nominalSize": "公称尺寸",
+      "fitLength": "配合长度",
+      "elasticModulus": "弹性模量",
+      "frictionCoeff": "摩擦系数 (μ)"
+    },
+    "results": {
+      "fitType": "配合类型",
+      "clearanceAmount": "间隙量",
+      "interferenceAmount": "过盈量",
+      "clearance": "间隙",
+      "transition": "过渡",
+      "interference": "过盈"
+    }
+  },
+  "gear": {
+    "title": "齿轮计算器",
+    "subtitle": "圆柱齿轮、锥齿轮",
+    "types": {
+      "spur": "直齿轮",
+      "helical": "斜齿轮",
+      "bevel": "锥齿轮",
+      "worm": "蜗轮蜗杆"
+    },
+    "inputs": {
+      "module": "模数 (m)",
+      "pressureAngle": "压力角",
+      "pinionTeeth": "Z1 (小齿轮)",
+      "gearTeeth": "Z2 (大齿轮)",
+      "helixAngle": "螺旋角",
+      "faceWidth": "齿宽",
+      "power": "功率 (kW)",
+      "rpm": "转速 (rpm)"
+    },
+    "results": {
+      "calculatedTorque": "扭矩",
+      "transmissionRatio": "传动比",
+      "pitchDiameter": "分度圆直径",
+      "forcesAndStress": "受力与应力"
+    }
+  },
+  "strength": {
+    "title": "材料力学",
+    "subtitle": "应力分析 & 莫尔圆",
+    "inputs": {
+      "sigmaX": "Sigma X (σx)",
+      "sigmaY": "Sigma Y (σy)",
+      "tauXY": "Tau XY (τxy)",
+      "theta": "角度 (θ)"
+    },
+    "results": {
+      "principalStresses": "主应力",
+      "maxShear": "最大切应力 (τmax)",
+      "vonMises": "Von Mises",
+      "transformed": "变换状态"
+    }
+  },
+  "bearing": {
+    "title": "轴承寿命",
+    "subtitle": "L10 寿命与载荷",
+    "inputs": {
+      "series": "系列",
+      "code": "轴承代号",
+      "radialLoad": "径向载荷 (Fr)",
+      "axialLoad": "轴向载荷 (Fa)",
+      "rpm": "转速 (rpm)",
+      "reliability": "可靠性"
+    },
+    "results": {
+      "lifeHours": "L10 寿命 (小时)",
+      "lifeRevs": "L10 寿命 (百万转)",
+      "equivalentLoad": "当量载荷 (P)",
+      "staticSafety": "静安全系数 (s0)"
+    }
+  },
+  "welding": {
+    "title": "焊接计算",
+    "subtitle": "热输入与应力",
+    "inputs": {
+      "method": "方法",
+      "type": "接头类型",
+      "current": "电流 (I)",
+      "voltage": "电压 (V)",
+      "speed": "速度 (v)",
+      "legSize": "焊脚尺寸 (a)",
+      "thickness": "厚度 (t)",
+      "length": "长度 (L)",
+      "load": "载荷 (F)"
+    },
+    "results": {
+      "heatInput": "热输入",
+      "stress": "应力",
+      "safetyFactor": "安全系数",
+      "efficiency": "效率 (η)"
+    },
+    "types": {
+      "fillet": "角焊缝",
+      "butt": "对接焊缝",
+      "doubleFillet": "双面角焊缝"
+    }
+  },
+  "sheetMetal": {
+    "title": "钣金计算",
+    "subtitle": "折弯力与展开",
+    "inputs": {
+      "material": "材料",
+      "thickness": "厚度 (t)",
+      "angle": "折弯角度 (α)",
+      "radius": "内半径 (ri)",
+      "length": "折弯长度 (L)",
+      "vOpening": "V槽宽度 (V)",
+      "flange1": "翼缘 A",
+      "flange2": "翼缘 B",
+      "kFactor": "K因子"
+    },
+    "results": {
+      "force": "所需压力",
+      "flatLength": "展开长度",
+      "bendAllowance": "折弯补偿 (BA)",
+      "bendDeduction": "折弯扣除 (BD)",
+      "recV": "推荐 V槽"
+    }
+  },
+  "pump": {
+    "title": "泵计算器",
+    "subtitle": "水功率与 NPSH",
+    "inputs": {
+      "flow": "流量 (Q)",
+      "head": "扬程 (H)",
+      "rpm": "转速",
+      "eff": "效率 (η)",
+      "density": "密度 (ρ)",
+      "npsh": "有效 NPSH"
+    },
+    "results": {
+      "hydPower": "水功率",
+      "shaftPower": "轴功率",
+      "specSpeed": "比转速 (ns)",
+      "type": "类型",
+      "flowVelocity": "流速",
+      "reynolds": "雷诺数"
+    },
+    "types": {
+      "radial": "离心泵",
+      "mixed": "混流泵",
+      "axial": "轴流泵"
+    }
+  },
+  "fastener": {
+    "title": "紧固件",
+    "subtitle": "公制 ISO 螺纹",
+    "inputs": {
+      "size": "尺寸 (M)",
+      "pitch": "螺距 (P)",
+      "class": "公差等级"
+    },
+    "results": {
+      "tapDrill": "底孔钻头",
+      "majorDia": "大径 (d)",
+      "minorDia": "小径 (d1)",
+      "pitchDia": "中径 (d2)",
+      "clearingDrill": "通孔",
+      "tensileArea": "应力截面积 (As)"
+    }
+  },
+  "converter": {
+    "title": "单位转换",
+    "categories": {
+      "length": "长度",
+      "weight": "重量",
+      "pressure": "压力",
+      "power": "功率"
+    }
+  },
+  "driveTrain": {
+    "title": "动力传动设计",
+    "subtitle": "电机 • 变速箱 • 负载",
+    "primeMover": "1. 原动机 (IEC)",
+    "application": "2. 工况系数",
+    "transmission": "3. 传动设计",
+    "analysis": "4. 工程分析",
+    "manufacturing": "4a. 检验数据 (M / Wk)",
+    "engineering": "4b. 强度分析"
+  },
+  "motor": {
+    "nominalPower": "额定功率",
+    "speedPoles": "转速 (极数)",
+    "nominalTorque": "额定扭矩",
+    "efficiency": "效率",
+    "inputPower": "输入 P",
+    "ratio": "比率",
+    "torqueOut": "输出扭矩"
+  },
+  "manufacturing": {
+    "profileMod": "变位系数 (x)",
+    "shiftCoeff": "变位系数",
+    "checkPin": "量针直径",
+    "overPins": "跨棒距 (M)",
+    "baseTangent": "公法线长度 (Wk)",
+    "pinion": "小齿轮",
+    "gear": "大齿轮",
+    "teeth": "跨齿数"
+  },
+  "safety": {
+    "loadFactors": "载荷系数",
+    "tangentialForce": "切向力 (Ft)",
+    "radialForce": "径向力 (Fr)",
+    "axialForce": "轴向力 (Fa)",
+    "safetyEst": "安全估算 (ISO 6336)",
+    "bendingSafety": "弯曲安全系数 (SF)",
+    "pittingSafety": "接触安全系数 (SH)",
+    "stress": "应力",
+    "contactStress": "接触应力",
+    "limit": "极限",
+    "serviceFactor": "使用系数 (KA)",
+    "safetyWarning": "安全系数基于简化公式估算。对于关键应用，建议使用 ISO 6336 或 AGMA 2001 标准分析。"
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "行业新闻",
+    "subtitle": "工程、冶金和市场更新",
+    "breaking": "突发新闻",
+    "readMore": "阅读全文",
+    "loading": "加载中..."
+  },
+  "project": {
+    "title": "项目报价",
+    "manager": "项目管理",
+    "grid": "数据表",
+    "nesting": "切割优化",
+    "exportPdf": "导出PDF",
+    "clear": "清除",
+    "empty": "列表为空。",
+    "settings": "设置",
+    "rawLength": "原材料长度",
+    "bladeWidth": "锯片宽度",
+    "calculate": "计算切割",
+    "totalBars": "总棒数",
+    "efficiency": "效率",
+    "waste": "总废料",
+    "rem": "余料"
+  },
+  "nesting": {
+    "title": "切割优化器",
+    "subtitle": "1D 线性排料",
+    "stockLength": "原材长度",
+    "kerf": "锯缝宽度 (Kerf)",
+    "trimStart": "起始修剪",
+    "trimEnd": "结束修剪",
+    "addPart": "添加零件",
+    "removePart": "移除",
+    "calculate": "优化切割",
+    "partLabel": "标签",
+    "partLength": "长度",
+    "partQty": "数量",
+    "barsUsed": "使用的型材",
+    "efficiency": "材料效率",
+    "totalWaste": "总废料",
+    "algorithm": "算法",
+    "noResults": "添加零件并点击优化查看结果"
+  },
+  "nesting2d": {
+    "title": "2D 套料",
+    "subtitle": "真实形状套料",
+    "dropSvg": "将SVG文件拖放到此处或点击上传",
+    "sheetWidth": "板材宽度",
+    "sheetHeight": "板材高度",
+    "spacing": "零件间距",
+    "rotation": "旋转步长",
+    "optimize": "优化",
+    "exportDxf": "导出DXF",
+    "sheets": "板材",
+    "efficiency": "效率",
+    "waste": "废料",
+    "parts": "零件",
+    "unplaced": "未放置的零件"
+  }
+}

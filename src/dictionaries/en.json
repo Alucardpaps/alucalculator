@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "Home",
+    "homeDesc": "Main Dashboard",
+    "fits": "Fit Calculator",
+    "handbook": "Engineer's Handbook",
+    "library": "Module Library",
+    "available": "Modules Available",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "Profile Weight Calculator",
+      "desc": "Mass & Cost Estimation"
+    },
+    "fits": {
+      "title": "Fits & Tolerances",
+      "desc": "ISO 286 Shaft/Hole"
+    },
+    "gears": {
+      "title": "Gear Calculator",
+      "desc": "Spur & Helical Geometry"
+    },
+    "strength": {
+      "title": "Strength (Mohr)",
+      "desc": "Stress Analysis"
+    },
+    "bearings": {
+      "title": "Bearings (L10)",
+      "desc": "Life Expectancy"
+    },
+    "welding": {
+      "title": "Welding Heat",
+      "desc": "Process Inputs"
+    },
+    "sheetMetal": {
+      "title": "Sheet Metal",
+      "desc": "Bending Force"
+    },
+    "pumps": {
+      "title": "Pumps",
+      "desc": "Power & NPSH"
+    },
+    "fasteners": {
+      "title": "Fasteners",
+      "desc": "ISO Metric Threads"
+    },
+    "converter": {
+      "title": "Converter",
+      "desc": "Units & Power"
+    },
+    "handbook": {
+      "title": "Handbook",
+      "desc": "Bearing tables, ISO Tolerances, G-Code reference."
+    }
+  },
+  "common": {
+    "calculate": "Calculate Weight",
+    "result": "Result",
+    "inputs": "Inputs",
+    "dimensions": "Dimensions",
+    "hole": "Hole",
+    "shaft": "Shaft",
+    "min": "Min",
+    "max": "Max",
+    "nominalDia": "Nominal Diameter",
+    "explanation": "Detailed Explanation",
+    "toleranceValues": "Tolerance Values",
+    "mountingCalc": "Mounting Calculations",
+    "pressure": "Interface Pressure",
+    "force": "Push Force",
+    "torque": "Transmittable Torque",
+    "metric": "Metric",
+    "imperial": "Imperial",
+    "from": "From",
+    "to": "To",
+    "language": "Language",
+    "calcTool": "Calculator Tool",
+    "formula": "Calculation Formula",
+    "totalWeight": "Total Weight",
+    "ratio": "Ratio",
+    "stress": "Stress",
+    "beam": "Beam",
+    "cantilever": "Cantilever",
+    "simple": "Simple Supported",
+    "share": "Share Calculation",
+    "copied": "Copied!",
+    "loadGeometry": "Load & Geometry",
+    "beamParams": "Beam Parameters",
+    "calculatedStress": "Calculated Stress",
+    "maxDeflection": "Max Deflection",
+    "safetyFactor": "Safety Factor",
+    "centerDist": "Center Dist (awt)",
+    "outputSpeed": "Output Speed"
+  },
+  "dimensions": {
+    "width": "Width",
+    "height": "Height",
+    "thickness": "Thickness",
+    "wallThickness": "Wall Thickness",
+    "outerDiameter": "Outer Diameter",
+    "diameter": "Diameter",
+    "length": "Length"
+  },
+  "aluminum": {
+    "title": "Aluminum Weight Calculator",
+    "shapes": {
+      "box": "Box Profile",
+      "sheet": "Sheet / Plate",
+      "pipe": "Round Tube",
+      "bar": "Solid Bar"
+    },
+    "theory": {
+      "densityTitle": "Density (ρ)",
+      "densityDesc": "Density is mass per unit volume. Different series of Aluminum have slightly different densities due to alloying elements.",
+      "series1000": "1000 Series (Pure): ~2.70 g/cm³",
+      "series6000": "6000 Series (Mg+Si): ~2.70 g/cm³",
+      "series7000": "7000 Series (Zn): ~2.81 g/cm³ (Heavier)",
+      "formula": "Mass = Volume × Density",
+      "plateFormula": "For a plate: Length × Width × Thickness × ρ"
+    },
+    "disclaimer": "Calculations are based on theoretical density (~2.70 g/cm³). Actual weight may vary by ±5% based on production tolerances (ASTM B221). Use valid numerical inputs for best results.",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "Material Science Guide"
+  },
+  "fit": {
+    "title": "Fit Calculator",
+    "subtitle": "ISO tolerance system and interference",
+    "tabs": {
+      "standard": "Standard Fits",
+      "manual": "Manual Tolerance"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "Sliding Fit",
+        "desc": "Sliding by hand, lubricated"
+      },
+      "h7g6": {
+        "name": "Running Fit",
+        "desc": "For rotating parts"
+      },
+      "h7f7": {
+        "name": "Free Running Fit",
+        "desc": "Large clearance"
+      },
+      "h7k6": {
+        "name": "Transition Fit",
+        "desc": "Slight interference/clearance"
+      },
+      "h7m6": {
+        "name": "Transition Fit",
+        "desc": "Usually slight interference"
+      },
+      "h7n6": {
+        "name": "Transition Fit",
+        "desc": "Interference tendency"
+      },
+      "h7p6": {
+        "name": "Light Press Fit",
+        "desc": "Light hammer mount"
+      },
+      "h7r6": {
+        "name": "Press Fit",
+        "desc": "Hydraulic press required"
+      },
+      "h7s6": {
+        "name": "Heavy Press Fit",
+        "desc": "Heat/cold assembly"
+      }
+    },
+    "inputs": {
+      "nominalSize": "Nominal Size",
+      "fitLength": "Fit Length",
+      "elasticModulus": "E Modulus",
+      "frictionCoeff": "Friction (μ)"
+    },
+    "results": {
+      "fitType": "Fit Type",
+      "clearanceAmount": "Clearance Amount",
+      "interferenceAmount": "Interference Amount",
+      "clearance": "Clearance",
+      "transition": "Transition",
+      "interference": "Interference"
+    }
+  },
+  "gear": {
+    "title": "Gear Calculator",
+    "subtitle": "Spur, Helical and Bevel Gear Geometry",
+    "types": {
+      "spur": "Spur Gear",
+      "helical": "Helical Gear",
+      "bevel": "Bevel Gear",
+      "worm": "Worm Gear"
+    },
+    "inputs": {
+      "module": "Module (m)",
+      "pressureAngle": "Pressure Angle",
+      "pinionTeeth": "Z1 (Pinion)",
+      "gearTeeth": "Z2 (Gear)",
+      "helixAngle": "Helix Angle",
+      "faceWidth": "Face Width",
+      "power": "Power (kW)",
+      "rpm": "Speed (RPM)"
+    },
+    "results": {
+      "calculatedTorque": "Torque",
+      "transmissionRatio": "Ratio",
+      "pitchDiameter": "Pitch Dia",
+      "forcesAndStress": "Forces & Stress"
+    }
+  },
+  "strength": {
+    "title": "Strength Calculator",
+    "subtitle": "Stress Analysis & Mohr's Circle",
+    "inputs": {
+      "sigmaX": "Sigma X (σx)",
+      "sigmaY": "Sigma Y (σy)",
+      "tauXY": "Tau XY (τxy)",
+      "theta": "Angle (θ)"
+    },
+    "results": {
+      "principalStresses": "Principal Stresses",
+      "maxShear": "Max Shear (τmax)",
+      "vonMises": "Von Mises",
+      "transformed": "Transformed State"
+    }
+  },
+  "bearing": {
+    "title": "Bearing Life Calc",
+    "subtitle": "L10 Life & Load Analysis",
+    "inputs": {
+      "series": "Series",
+      "code": "Bearing Code",
+      "radialLoad": "Radial Load (Fr)",
+      "axialLoad": "Axial Load (Fa)",
+      "rpm": "Speed (RPM)",
+      "reliability": "Reliability"
+    },
+    "results": {
+      "lifeHours": "L10 Life (Hours)",
+      "lifeRevs": "L10 Life (M Revs)",
+      "equivalentLoad": "Equiv. Load (P)",
+      "staticSafety": "Static Safety (s0)"
+    }
+  },
+  "welding": {
+    "title": "Welding Calculator",
+    "subtitle": "Heat Input & Stress Analysis",
+    "inputs": {
+      "method": "Method",
+      "type": "Joint Type",
+      "current": "Current (I)",
+      "voltage": "Voltage (V)",
+      "speed": "Speed (v)",
+      "legSize": "Leg Size (a)",
+      "thickness": "Thickness (t)",
+      "length": "Length (L)",
+      "load": "Load (F)"
+    },
+    "results": {
+      "heatInput": "Heat Input",
+      "stress": "Stress",
+      "safetyFactor": "Safety Factor",
+      "efficiency": "Efficiency (η)"
+    },
+    "types": {
+      "fillet": "Fillet Weld",
+      "butt": "Butt Weld",
+      "doubleFillet": "Double Fillet"
+    }
+  },
+  "sheetMetal": {
+    "title": "Sheet Metal Calc",
+    "subtitle": "Bending Force & Flat Pattern",
+    "inputs": {
+      "material": "Material",
+      "thickness": "Thickness (t)",
+      "angle": "Bend Angle (α)",
+      "radius": "Inner Radius (ri)",
+      "length": "Bend Length (L)",
+      "vOpening": "V-Die Opening (V)",
+      "flange1": "Flange A",
+      "flange2": "Flange B",
+      "kFactor": "K-Factor"
+    },
+    "results": {
+      "force": "Required Force",
+      "flatLength": "Flat Length",
+      "bendAllowance": "Bend Allowance (BA)",
+      "bendDeduction": "Bend Deduction (BD)",
+      "recV": "Rec. V-Die"
+    }
+  },
+  "pump": {
+    "title": "Pump Calculator",
+    "subtitle": "Hydraulic Power & NPSH",
+    "inputs": {
+      "flow": "Flow Rate (Q)",
+      "head": "Head (H)",
+      "rpm": "Speed (RPM)",
+      "eff": "Efficiency (η)",
+      "density": "Density (ρ)",
+      "npsh": "NPSH Available"
+    },
+    "results": {
+      "hydPower": "Hydraulic Power",
+      "shaftPower": "Shaft Power",
+      "specSpeed": "Specific Speed (ns)",
+      "type": "Pump Type",
+      "flowVelocity": "Flow Velocity",
+      "reynolds": "Reynolds Number"
+    },
+    "types": {
+      "radial": "Radial Flow",
+      "mixed": "Mixed Flow",
+      "axial": "Axial Flow"
+    }
+  },
+  "fastener": {
+    "title": "Fasteners & Threads",
+    "subtitle": "Metric ISO Thread Data",
+    "inputs": {
+      "size": "Thread Size (M)",
+      "pitch": "Pitch (P)",
+      "class": "Tol. Class"
+    },
+    "results": {
+      "tapDrill": "Tap Drill Size",
+      "majorDia": "Major Dia (d)",
+      "minorDia": "Minor Dia (d1)",
+      "pitchDia": "Pitch Dia (d2)",
+      "clearingDrill": "Clearance Hole",
+      "tensileArea": "Stress Area (As)"
+    }
+  },
+  "converter": {
+    "title": "Unit Converter",
+    "categories": {
+      "length": "Length",
+      "weight": "Weight",
+      "pressure": "Pressure",
+      "power": "Power"
+    }
+  },
+  "driveTrain": {
+    "title": "Drive Train Designer",
+    "subtitle": "Motor • Transmission • Load Analysis",
+    "primeMover": "1. Prime Mover (IEC)",
+    "application": "2. Application Load",
+    "transmission": "3. Transmission Design",
+    "analysis": "4. Engineering Analysis",
+    "manufacturing": "4a. Inspection Data (M / Wk)",
+    "engineering": "4b. Engineering Analysis"
+  },
+  "motor": {
+    "nominalPower": "Nominal Power",
+    "speedPoles": "Speed (Poles)",
+    "nominalTorque": "Nominal Torque",
+    "efficiency": "Efficiency",
+    "inputPower": "Input P",
+    "ratio": "Ratio",
+    "torqueOut": "Torque Out"
+  },
+  "manufacturing": {
+    "profileMod": "Profile Modification (x)",
+    "shiftCoeff": "Shift Coeff",
+    "checkPin": "Check Pin Diameter",
+    "overPins": "Measurement Over Pins (M)",
+    "baseTangent": "Base Tangent Length (Wk)",
+    "pinion": "Pinion",
+    "gear": "Gear",
+    "teeth": "teeth"
+  },
+  "safety": {
+    "loadFactors": "Load Factors",
+    "tangentialForce": "Tangential Force (Ft)",
+    "radialForce": "Radial Force (Fr)",
+    "axialForce": "Axial Force (Fa)",
+    "safetyEst": "Safety Estimation (ISO 6336 Base)",
+    "bendingSafety": "Bending Safety (SF)",
+    "pittingSafety": "Pitting Safety (SH)",
+    "stress": "Stress",
+    "contactStress": "Contact Stress",
+    "limit": "Limit",
+    "serviceFactor": "Service Factor (KA)",
+    "safetyWarning": "Safety factors are estimates based on simplified Lewis forms and Hertzian contact stress. Standard ISO 6336 or AGMA 2001 analysis recommended for critical applications."
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "Industry News",
+    "subtitle": "Engineering, Metallurgy & Market Updates",
+    "breaking": "Breaking News",
+    "readMore": "Read Full Story",
+    "loading": "Loading Feed..."
+  },
+  "project": {
+    "title": "Project Quote",
+    "manager": "Project Manager",
+    "grid": "Data Grid",
+    "nesting": "Nesting Optimization",
+    "exportPdf": "Export PDF",
+    "clear": "Clear",
+    "empty": "Project list is empty. Add items from calculator.",
+    "settings": "Optimization Settings",
+    "rawLength": "Raw Length",
+    "bladeWidth": "Blade Width",
+    "calculate": "Calculate Cuts",
+    "totalBars": "Total Bars",
+    "efficiency": "Efficiency",
+    "waste": "Total Waste",
+    "rem": "Rem"
+  },
+  "nesting": {
+    "title": "Cutting Optimizer",
+    "subtitle": "1D Linear Nesting",
+    "stockLength": "Stock Length",
+    "kerf": "Blade Width (Kerf)",
+    "trimStart": "Trim Start",
+    "trimEnd": "Trim End",
+    "addPart": "Add Part",
+    "removePart": "Remove",
+    "calculate": "Optimize Cuts",
+    "partLabel": "Label",
+    "partLength": "Length",
+    "partQty": "Quantity",
+    "barsUsed": "Bars Used",
+    "efficiency": "Material Efficiency",
+    "totalWaste": "Total Waste",
+    "algorithm": "Algorithm",
+    "noResults": "Add parts and click Optimize to see results"
+  },
+  "nesting2d": {
+    "title": "2D Nesting",
+    "subtitle": "True Shape Nesting",
+    "dropSvg": "Drop SVG files here or click to upload",
+    "sheetWidth": "Sheet Width",
+    "sheetHeight": "Sheet Height",
+    "spacing": "Part Spacing",
+    "rotation": "Rotation Step",
+    "optimize": "Optimize",
+    "exportDxf": "Export DXF",
+    "sheets": "Sheets",
+    "efficiency": "Efficiency",
+    "waste": "Waste",
+    "parts": "Parts",
+    "unplaced": "Unplaced parts"
+  }
+}

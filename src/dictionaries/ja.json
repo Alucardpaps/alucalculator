@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "homeDesc": "ダッシュボード",
+    "fits": "はめあい計算",
+    "handbook": "技術便覧",
+    "library": "モジュールライブラリ",
+    "available": "利用可能モジュール",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "プロファイル重量計算機",
+      "desc": "質量とコスト見積もり"
+    },
+    "fits": {
+      "title": "公差とはめあい",
+      "desc": "ISO 286 軸/穴"
+    },
+    "gears": {
+      "title": "歯車計算機",
+      "desc": "平歯車・はすば歯車"
+    },
+    "strength": {
+      "title": "材料力学 (モール円)",
+      "desc": "応力解析"
+    },
+    "bearings": {
+      "title": "軸受寿命 (L10)",
+      "desc": "寿命予測"
+    },
+    "welding": {
+      "title": "溶接熱入力",
+      "desc": "プロセス入力"
+    },
+    "sheetMetal": {
+      "title": "板金曲げ",
+      "desc": "曲げ加圧力"
+    },
+    "pumps": {
+      "title": "ポンプ",
+      "desc": "動力とNPSH"
+    },
+    "fasteners": {
+      "title": "ねじ・締結",
+      "desc": "ISOメートルねじ"
+    },
+    "converter": {
+      "title": "単位変換",
+      "desc": "単位と動力"
+    },
+    "handbook": {
+      "title": "便覧",
+      "desc": "軸受表、公差、Gコード他"
+    }
+  },
+  "common": {
+    "calculate": "計算する",
+    "result": "結果",
+    "inputs": "入力",
+    "dimensions": "寸法",
+    "hole": "穴",
+    "shaft": "軸",
+    "min": "最小",
+    "max": "最大",
+    "nominalDia": "呼び径",
+    "explanation": "解説",
+    "toleranceValues": "公差値",
+    "mountingCalc": "取付計算",
+    "pressure": "面圧",
+    "force": "圧入力",
+    "torque": "伝達トルク",
+    "metric": "メートル法",
+    "imperial": "ヤード・ポンド法",
+    "from": "入力",
+    "to": "出力",
+    "language": "言語",
+    "calcTool": "計算ツール",
+    "formula": "計算式",
+    "totalWeight": "総重量",
+    "ratio": "比率",
+    "stress": "応力",
+    "beam": "梁",
+    "cantilever": "片持ち梁",
+    "simple": "単純支持",
+    "share": "計算結果を共有",
+    "copied": "コピーしました！",
+    "loadGeometry": "荷重と形状",
+    "beamParams": "梁パラメータ",
+    "calculatedStress": "計算応力",
+    "maxDeflection": "最大たわみ",
+    "safetyFactor": "安全率",
+    "centerDist": "中心距離 (awt)",
+    "outputSpeed": "出力速度"
+  },
+  "dimensions": {
+    "width": "幅",
+    "height": "高さ",
+    "thickness": "厚さ",
+    "wallThickness": "肉厚",
+    "outerDiameter": "外径",
+    "diameter": "直径",
+    "length": "長さ"
+  },
+  "aluminum": {
+    "title": "アルミ重量計算",
+    "shapes": {
+      "box": "角パイプ",
+      "sheet": "板 / プレート",
+      "pipe": "丸パイプ",
+      "bar": "丸棒"
+    },
+    "theory": {
+      "densityTitle": "密度 (ρ)",
+      "densityDesc": "密度は単位体積あたりの質量です。合金成分によりわずかに異なります。",
+      "series1000": "1000系 (純アルミ): ~2.70 g/cm³",
+      "series6000": "6000系 (Mg+Si): ~2.70 g/cm³",
+      "series7000": "7000系 (Zn): ~2.81 g/cm³ (重い)",
+      "formula": "質量 = 体積 × 密度",
+      "plateFormula": "平板: 長さ × 幅 × 厚さ × 密度"
+    },
+    "disclaimer": "計算は理論密度 (~2.70 g/cm³) に基づきます。実重量は製造公差 (ASTM B221) により±5%変動する可能性があります。",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "材料工学ガイド"
+  },
+  "fit": {
+    "title": "はめあい計算",
+    "subtitle": "ISO公差とはめあい",
+    "tabs": {
+      "standard": "標準はめあい",
+      "manual": "任意公差"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "すきまばめ",
+        "desc": "手組可能"
+      },
+      "h7g6": {
+        "name": "回転ばめ",
+        "desc": "回転部用"
+      },
+      "h7f7": {
+        "name": "遊合ばめ",
+        "desc": "大きなすきま"
+      },
+      "h7k6": {
+        "name": "中間ばめ",
+        "desc": "軽微な干渉"
+      },
+      "h7m6": {
+        "name": "中間ばめ",
+        "desc": "干渉寄り"
+      },
+      "h7n6": {
+        "name": "中間ばめ",
+        "desc": "圧入寄り"
+      },
+      "h7p6": {
+        "name": "軽圧入",
+        "desc": "ハンマー組立"
+      },
+      "h7r6": {
+        "name": "圧入",
+        "desc": "プレス必要"
+      },
+      "h7s6": {
+        "name": "焼ばめ",
+        "desc": "加熱必要"
+      }
+    },
+    "inputs": {
+      "nominalSize": "呼び寸法",
+      "fitLength": "はめあい長さ",
+      "elasticModulus": "ヤング率",
+      "frictionCoeff": "摩擦係数 (μ)"
+    },
+    "results": {
+      "fitType": "はめあい種類",
+      "clearanceAmount": "すきま量",
+      "interferenceAmount": "しめしろ量",
+      "clearance": "すきま",
+      "transition": "中間",
+      "interference": "しめしろ"
+    }
+  },
+  "gear": {
+    "title": "歯車計算",
+    "subtitle": "平歯車・はすば・かさ歯車",
+    "types": {
+      "spur": "平歯車",
+      "helical": "はすば歯車",
+      "bevel": "かさ歯車",
+      "worm": "ウォーム"
+    },
+    "inputs": {
+      "module": "モジュール (m)",
+      "pressureAngle": "圧力角",
+      "pinionTeeth": "Z1 (小歯車)",
+      "gearTeeth": "Z2 (大歯車)",
+      "helixAngle": "ねじれ角",
+      "faceWidth": "歯幅",
+      "power": "動力 (kW)",
+      "rpm": "回転数 (rpm)"
+    },
+    "results": {
+      "calculatedTorque": "トルク",
+      "transmissionRatio": "減速比",
+      "pitchDiameter": "基準円直径",
+      "forcesAndStress": "荷重と応力"
+    }
+  },
+  "strength": {
+    "title": "材料力学",
+    "subtitle": "応力解析 & モールの応力円",
+    "inputs": {
+      "sigmaX": "シグマ X (σx)",
+      "sigmaY": "シグマ Y (σy)",
+      "tauXY": "タウ XY (τxy)",
+      "theta": "角度 (θ)"
+    },
+    "results": {
+      "principalStresses": "主応力",
+      "maxShear": "最大せん断 (τmax)",
+      "vonMises": "ミーゼス応力",
+      "transformed": "変換応力"
+    }
+  },
+  "bearing": {
+    "title": "軸受寿命",
+    "subtitle": "L10寿命と荷重",
+    "inputs": {
+      "series": "シリーズ",
+      "code": "呼び番号",
+      "radialLoad": "ラジアル荷重 (Fr)",
+      "axialLoad": "アキシアル荷重 (Fa)",
+      "rpm": "回転数 (rpm)",
+      "reliability": "信頼度"
+    },
+    "results": {
+      "lifeHours": "L10寿命 (時間)",
+      "lifeRevs": "L10寿命 (百万回転)",
+      "equivalentLoad": "等価荷重 (P)",
+      "staticSafety": "静的安全係数 (s0)"
+    }
+  },
+  "welding": {
+    "title": "溶接計算",
+    "subtitle": "入熱と応力",
+    "inputs": {
+      "method": "溶接法",
+      "type": "継手形状",
+      "current": "電流 (I)",
+      "voltage": "電圧 (V)",
+      "speed": "速度 (v)",
+      "legSize": "脚長 (a)",
+      "thickness": "板厚 (t)",
+      "length": "長さ (L)",
+      "load": "荷重 (F)"
+    },
+    "results": {
+      "heatInput": "入熱量",
+      "stress": "応力",
+      "safetyFactor": "安全率",
+      "efficiency": "効率 (η)"
+    },
+    "types": {
+      "fillet": "すみ肉",
+      "butt": "突き合わせ",
+      "doubleFillet": "両側すみ肉"
+    }
+  },
+  "sheetMetal": {
+    "title": "板金計算",
+    "subtitle": "曲げ加圧力と展開",
+    "inputs": {
+      "material": "材質",
+      "thickness": "板厚 (t)",
+      "angle": "曲げ角度 (α)",
+      "radius": "内R (ri)",
+      "length": "曲げ長さ (L)",
+      "vOpening": "V幅 (V)",
+      "flange1": "フランジ A",
+      "flange2": "フランジ B",
+      "kFactor": "Kファクタ"
+    },
+    "results": {
+      "force": "必要加圧力",
+      "flatLength": "展開長",
+      "bendAllowance": "ベンドアローワンス (BA)",
+      "bendDeduction": "ベンドデダクション (BD)",
+      "recV": "推奨V幅"
+    }
+  },
+  "pump": {
+    "title": "ポンプ計算",
+    "subtitle": "水動力とNPSH",
+    "inputs": {
+      "flow": "流量 (Q)",
+      "head": "揚程 (H)",
+      "rpm": "回転数",
+      "eff": "効率 (η)",
+      "density": "密度 (ρ)",
+      "npsh": "有効NPSH"
+    },
+    "results": {
+      "hydPower": "水動力",
+      "shaftPower": "軸動力",
+      "specSpeed": "比速度 (ns)",
+      "type": "形式",
+      "flowVelocity": "流速",
+      "reynolds": "レイノルズ数"
+    },
+    "types": {
+      "radial": "遠心",
+      "mixed": "斜流",
+      "axial": "軸流"
+    }
+  },
+  "fastener": {
+    "title": "ねじ",
+    "subtitle": "メートル並目ねじ",
+    "inputs": {
+      "size": "サイズ (M)",
+      "pitch": "ピッチ (P)",
+      "class": "等級"
+    },
+    "results": {
+      "tapDrill": "下穴径",
+      "majorDia": "外径 (d)",
+      "minorDia": "谷の径 (d1)",
+      "pitchDia": "有効径 (d2)",
+      "clearingDrill": "バカ穴径",
+      "tensileArea": "有効断面積 (As)"
+    }
+  },
+  "converter": {
+    "title": "単位変換",
+    "categories": {
+      "length": "長さ",
+      "weight": "重量",
+      "pressure": "圧力",
+      "power": "動力"
+    }
+  },
+  "driveTrain": {
+    "title": "駆動系設計",
+    "subtitle": "モータ • 減速機 • 負荷",
+    "primeMover": "1. 原動機 (IEC)",
+    "application": "2. 使用係数",
+    "transmission": "3. 歯車設計",
+    "analysis": "4. 工学解析",
+    "manufacturing": "4a. 検査データ (M / Wk)",
+    "engineering": "4b. 強度計算"
+  },
+  "motor": {
+    "nominalPower": "定格出力",
+    "speedPoles": "回転数 (極数)",
+    "nominalTorque": "定格トルク",
+    "efficiency": "効率",
+    "inputPower": "入力P",
+    "ratio": "比率",
+    "torqueOut": "出力トルク"
+  },
+  "manufacturing": {
+    "profileMod": "転位係数 (x)",
+    "shiftCoeff": "転位係数",
+    "checkPin": "ピン径",
+    "overPins": "オーバーピン径 (M)",
+    "baseTangent": "またぎ歯厚 (Wk)",
+    "pinion": "ピニオン",
+    "gear": "ギヤ",
+    "teeth": "枚またぎ"
+  },
+  "safety": {
+    "loadFactors": "荷重係数",
+    "tangentialForce": "接線力 (Ft)",
+    "radialForce": "半径方向力 (Fr)",
+    "axialForce": "スラスト力 (Fa)",
+    "safetyEst": "安全率推定 (ISO 6336)",
+    "bendingSafety": "曲げ安全率 (SF)",
+    "pittingSafety": "面圧安全率 (SH)",
+    "stress": "応力",
+    "contactStress": "接触面圧",
+    "limit": "限度",
+    "serviceFactor": "使用係数 (KA)",
+    "safetyWarning": "安全率は簡易計算です。重要部品にはISO 6336またはAGMA 2001の詳細計算を推奨します。"
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "業界ニュース",
+    "subtitle": "エンジニアリング、冶金、市場の最新情報",
+    "breaking": "ニュース速報",
+    "readMore": "全文を読む",
+    "loading": "読み込み中..."
+  },
+  "project": {
+    "title": "Project Quote",
+    "manager": "Project Manager",
+    "grid": "Data Grid",
+    "nesting": "Nesting Optimization",
+    "exportPdf": "Export PDF",
+    "clear": "Clear",
+    "empty": "Project list is empty. Add items from calculator.",
+    "settings": "Optimization Settings",
+    "rawLength": "Raw Length",
+    "bladeWidth": "Blade Width",
+    "calculate": "Calculate Cuts",
+    "totalBars": "Total Bars",
+    "efficiency": "Efficiency",
+    "waste": "Total Waste",
+    "rem": "Rem"
+  },
+  "nesting": {
+    "title": "カッティング最適化",
+    "subtitle": "1D線形ネスティング",
+    "stockLength": "ストック長",
+    "kerf": "ブレード幅 (切り代)",
+    "trimStart": "トリム開始",
+    "trimEnd": "トリム終了",
+    "addPart": "部品を追加",
+    "removePart": "削除",
+    "calculate": "切断を最適化",
+    "partLabel": "ラベル",
+    "partLength": "長さ",
+    "partQty": "数量",
+    "barsUsed": "使用されたバー",
+    "efficiency": "材料効率",
+    "totalWaste": "総廃棄物",
+    "algorithm": "アルゴリズム",
+    "noResults": "部品を追加して、最適化をクリックしてください"
+  },
+  "nesting2d": {
+    "title": "2D ネスティング",
+    "subtitle": "トゥルーシェイプ ネスティング",
+    "dropSvg": "ここにSVGファイルをドロップまたはクリック",
+    "sheetWidth": "シート幅",
+    "sheetHeight": "シート高さ",
+    "spacing": "部品間隔",
+    "rotation": "回転ステップ",
+    "optimize": "最適化",
+    "exportDxf": "DXFエクスポート",
+    "sheets": "シート",
+    "efficiency": "効率",
+    "waste": "無駄",
+    "parts": "部品",
+    "unplaced": "未配置の部品"
+  }
+}

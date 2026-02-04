@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Core Brand Colors */
+  --color-brand-blue: #0A2342;
+  --color-brand-orange: #FF5722;
+  --color-brand-yellow: #FFC107;
+
+  /* Surface Colors (Light/Dark) */
+  --color-surface-50: #F8FAFC;
+  --color-surface-100: #F1F5F9;
+  --color-surface-200: #E2E8F0;
+  --color-surface-300: #CBD5E1;
+  --color-surface-400: #94A3B8;
+  --color-surface-500: #64748B;
+  --color-surface-600: #475569;
+  --color-surface-700: #334155;
+  --color-surface-800: #1E293B;
+  --color-surface-900: #0F172A;
+  --color-surface-950: #020617;
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Shared Backgrounds */
+  --background-image-blueprint: linear-gradient(to right, #E2E8F0 1px, transparent 1px), linear-gradient(to bottom, #E2E8F0 1px, transparent 1px);
+  --background-image-blueprint-dark: linear-gradient(to right, #1E293B 1px, transparent 1px), linear-gradient(to bottom, #1E293B 1px, transparent 1px);
+}
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: var(--color-surface-50);
+  background-image:
+    linear-gradient(to bottom, transparent, var(--color-surface-50) 80%),
+    radial-gradient(circle at 50% 0%, rgba(10, 35, 66, 0.05), transparent 60%);
+}
+
+:is(.dark body) {
+  --foreground-rgb: 241, 245, 249;
+  background-color: var(--color-surface-950);
+  background-image:
+    linear-gradient(to bottom, transparent, var(--color-surface-950) 80%),
+    radial-gradient(circle at 50% 0%, rgba(255, 87, 34, 0.05), transparent 60%);
+}
+
+@layer components {
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-brand-orange text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-brand-orange/20 hover:shadow-brand-orange/40 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-50 font-bold py-3 px-6 rounded-xl hover:bg-surface-200 dark:hover:bg-surface-700 transition-all uppercase tracking-wider text-sm flex items-center justify-center gap-2;
+  }
+
+  /* Inputs */
+  .input-tech {
+    @apply w-full bg-white dark:bg-surface-900 border-2 border-surface-200 dark:border-surface-800 rounded-xl p-3 text-surface-900 dark:text-surface-50 font-mono text-base focus:outline-none focus:border-brand-blue dark:focus:border-brand-orange focus:ring-1 focus:ring-brand-blue dark:focus:ring-brand-orange transition-all disabled:bg-surface-50 disabled:text-surface-300;
+  }
+
+  /* Cards */
+  .card-tech {
+    @apply bg-white dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl shadow-sm p-6 relative overflow-hidden;
+  }
+
+  /* Labels */
+  .field-label {
+    @apply block text-[10px] font-black text-surface-500 dark:text-surface-400 uppercase tracking-widest mb-2 font-sans;
+  }
+
+  /* Calculator Specific Utils */
+  .calc-btn {
+    @apply w-full h-full rounded-lg font-bold flex items-center justify-center active:shadow-none active:translate-y-[2px] active:border-t-2 active:border-black/5 transition-all select-none;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .calc-btn-func {
+    @apply bg-surface-800 hover:bg-surface-700 text-white text-xs;
+  }
+
+  .calc-btn-num {
+    @apply bg-white hover:bg-surface-50 text-surface-900 text-lg;
+  }
+
+  .calc-btn-accent {
+    @apply bg-brand-orange hover:bg-brand-orange/90 text-white;
+  }
+}

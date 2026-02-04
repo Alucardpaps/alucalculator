@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "homeDesc": "Tablero Principal",
+    "fits": "Ajustes ISO",
+    "handbook": "Manual del Ingeniero",
+    "library": "Biblioteca de Módulos",
+    "available": "Módulos Disponibles",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "Calculadora de Perfiles",
+      "desc": "Masa y Costes"
+    },
+    "fits": {
+      "title": "Ajustes y Tolerancias",
+      "desc": "ISO 286 Eje/Agujero"
+    },
+    "gears": {
+      "title": "Calculadora Engranajes",
+      "desc": "Geometría Recto/Helicoidal"
+    },
+    "strength": {
+      "title": "Resistencia (Mohr)",
+      "desc": "Análisis de Esfuerzos"
+    },
+    "bearings": {
+      "title": "Rodamientos (L10)",
+      "desc": "Expectativa de Vida"
+    },
+    "welding": {
+      "title": "Calor de Soldadura",
+      "desc": "Entradas de Proceso"
+    },
+    "sheetMetal": {
+      "title": "Chapa Metálica",
+      "desc": "Fuerza de Doblado"
+    },
+    "pumps": {
+      "title": "Bombas",
+      "desc": "Potencia y NPSH"
+    },
+    "fasteners": {
+      "title": "Sujetadores",
+      "desc": "Roscas Métricas ISO"
+    },
+    "converter": {
+      "title": "Conversor",
+      "desc": "Unidades y Potencia"
+    },
+    "handbook": {
+      "title": "Manual",
+      "desc": "Tablas rodamientos, ISO, G-Code."
+    }
+  },
+  "common": {
+    "calculate": "Calcular",
+    "result": "Resultado",
+    "inputs": "Entradas",
+    "dimensions": "Dimensiones",
+    "hole": "Agujero",
+    "shaft": "Eje",
+    "min": "Mín",
+    "max": "Máx",
+    "nominalDia": "Diámetro Nominal",
+    "explanation": "Explicación",
+    "toleranceValues": "Valores de Tolerancia",
+    "mountingCalc": "Cálculos de Montaje",
+    "pressure": "Presión de Contacto",
+    "force": "Fuerza de Montaje",
+    "torque": "Par Transmisible",
+    "metric": "Métrico",
+    "imperial": "Imperial",
+    "from": "De",
+    "to": "A",
+    "language": "Idioma",
+    "calcTool": "Herramienta",
+    "formula": "Fórmula",
+    "totalWeight": "Peso Total",
+    "ratio": "Relación",
+    "stress": "Esfuerzo",
+    "beam": "Viga",
+    "cantilever": "Voladizo",
+    "simple": "Apoyo Simple",
+    "share": "Compartir",
+    "copied": "¡Copiado!",
+    "loadGeometry": "Carga y Geometría",
+    "beamParams": "Parámetros de Viga",
+    "calculatedStress": "Esfuerzo Calculado",
+    "maxDeflection": "Deflexión Máx",
+    "safetyFactor": "Factor de Seguridad",
+    "centerDist": "Distancia entre Centros",
+    "outputSpeed": "Velocidad de Salida"
+  },
+  "dimensions": {
+    "width": "Anchura",
+    "height": "Altura",
+    "thickness": "Espesor",
+    "wallThickness": "Espesor Pared",
+    "outerDiameter": "Ø Exterior",
+    "diameter": "Diámetro",
+    "length": "Longitud"
+  },
+  "aluminum": {
+    "title": "Calculadora Peso Aluminio",
+    "shapes": {
+      "box": "Tubo Rectangular",
+      "sheet": "Chapa / Placa",
+      "pipe": "Tubo Redondo",
+      "bar": "Barra Maciza"
+    },
+    "theory": {
+      "densityTitle": "Densidad (ρ)",
+      "densityDesc": "La densidad es masa por unidad de volumen. Varía según la aleación.",
+      "series1000": "Serie 1000 (Puro): ~2.70 g/cm³",
+      "series6000": "Serie 6000 (Mg+Si): ~2.70 g/cm³",
+      "series7000": "Serie 7000 (Zn): ~2.81 g/cm³ (Pesado)",
+      "formula": "Masa = Volumen × Densidad",
+      "plateFormula": "Placa: Largo × Ancho × Espesor × ρ"
+    },
+    "disclaimer": "Basado en densidad teórica (~2.70 g/cm³). Peso real ±5% según tolerancias (ASTM B221).",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "Ciencia de Materiales"
+  },
+  "fit": {
+    "title": "Calculadora de Ajustes",
+    "subtitle": "Tolerancias ISO",
+    "tabs": {
+      "standard": "Estándar",
+      "manual": "Manual"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "Deslizante",
+        "desc": "Montaje manual, lubricado"
+      },
+      "h7g6": {
+        "name": "Giratorio",
+        "desc": "Para piezas giratorias"
+      },
+      "h7f7": {
+        "name": "Libre",
+        "desc": "Juego amplio"
+      },
+      "h7k6": {
+        "name": "Transición",
+        "desc": "Juego/Interferencia leve"
+      },
+      "h7m6": {
+        "name": "Transición",
+        "desc": "Interferencia leve usualmente"
+      },
+      "h7n6": {
+        "name": "Transición",
+        "desc": "Tendencia a interferencia"
+      },
+      "h7p6": {
+        "name": "Prensado Ligero",
+        "desc": "Montaje con mazo"
+      },
+      "h7r6": {
+        "name": "Prensado Medio",
+        "desc": "Requiere prensa"
+      },
+      "h7s6": {
+        "name": "Prensado Fuerte",
+        "desc": "Requiere calor/frío"
+      }
+    },
+    "inputs": {
+      "nominalSize": "Medida Nominal",
+      "fitLength": "Longitud de Ajuste",
+      "elasticModulus": "Módulo Elástico",
+      "frictionCoeff": "Fricción (μ)"
+    },
+    "results": {
+      "fitType": "Tipo de Ajuste",
+      "clearanceAmount": "Juego",
+      "interferenceAmount": "Interferencia",
+      "clearance": "Juego",
+      "transition": "Transición",
+      "interference": "Interferencia"
+    }
+  },
+  "gear": {
+    "title": "Cálculo de Engranajes",
+    "subtitle": "Recto, Helicoidal, Cónico",
+    "types": {
+      "spur": "Recto",
+      "helical": "Helicoidal",
+      "bevel": "Cónico",
+      "worm": "Sinfín"
+    },
+    "inputs": {
+      "module": "Módulo (m)",
+      "pressureAngle": "Ángulo de Presión",
+      "pinionTeeth": "Z1 (Piñón)",
+      "gearTeeth": "Z2 (Rueda)",
+      "helixAngle": "Ángulo de Hélice",
+      "faceWidth": "Ancho de Cara",
+      "power": "Potencia (kW)",
+      "rpm": "Velocidad (RPM)"
+    },
+    "results": {
+      "calculatedTorque": "Par Torsor",
+      "transmissionRatio": "Relación",
+      "pitchDiameter": "Diámetro Primitivo",
+      "forcesAndStress": "Fuerzas y Esfuerzos"
+    }
+  },
+  "strength": {
+    "title": "Resistencia Materiales",
+    "subtitle": "Círculo de Mohr",
+    "inputs": {
+      "sigmaX": "Sigma X (σx)",
+      "sigmaY": "Sigma Y (σy)",
+      "tauXY": "Tau XY (τxy)",
+      "theta": "Ángulo (θ)"
+    },
+    "results": {
+      "principalStresses": "Esfuerzos Principales",
+      "maxShear": "Cortante Máx (τmax)",
+      "vonMises": "Von Mises",
+      "transformed": "Estado Transformado"
+    }
+  },
+  "bearing": {
+    "title": "Vida de Rodamientos",
+    "subtitle": "Vida L10 y Cargas",
+    "inputs": {
+      "series": "Serie",
+      "code": "Código",
+      "radialLoad": "Carga Radial (Fr)",
+      "axialLoad": "Carga Axial (Fa)",
+      "rpm": "Velocidad (RPM)",
+      "reliability": "Fiabilidad"
+    },
+    "results": {
+      "lifeHours": "Vida L10 (Horas)",
+      "lifeRevs": "Vida L10 (M Revs)",
+      "equivalentLoad": "Carga Equiv. (P)",
+      "staticSafety": "Seguridad Estática (s0)"
+    }
+  },
+  "welding": {
+    "title": "Cálculo de Soldadura",
+    "subtitle": "Calor y Esfuerzos",
+    "inputs": {
+      "method": "Método",
+      "type": "Tipo de Junta",
+      "current": "Corriente (I)",
+      "voltage": "Voltaje (V)",
+      "speed": "Velocidad (v)",
+      "legSize": "Garganta (a)",
+      "thickness": "Espesor (t)",
+      "length": "Longitud (L)",
+      "load": "Carga (F)"
+    },
+    "results": {
+      "heatInput": "Entrada Calor",
+      "stress": "Esfuerzo",
+      "safetyFactor": "Seg. Factor",
+      "efficiency": "Eficiencia (η)"
+    },
+    "types": {
+      "fillet": "Filete",
+      "butt": "Tope",
+      "doubleFillet": "Doble Filete"
+    }
+  },
+  "sheetMetal": {
+    "title": "Chapa Metálica",
+    "subtitle": "Doblado y Desarrollo",
+    "inputs": {
+      "material": "Material",
+      "thickness": "Espesor (t)",
+      "angle": "Ángulo (α)",
+      "radius": "Radio Int. (ri)",
+      "length": "Longitud (L)",
+      "vOpening": "Apertura V (V)",
+      "flange1": "Ala A",
+      "flange2": "Ala B",
+      "kFactor": "Factor K"
+    },
+    "results": {
+      "force": "Fuerza Req.",
+      "flatLength": "Longitud Plana",
+      "bendAllowance": "Compensación (BA)",
+      "bendDeduction": "Deducción (BD)",
+      "recV": "V Recomendada"
+    }
+  },
+  "pump": {
+    "title": "Bombas",
+    "subtitle": "Potencia y NPSH",
+    "inputs": {
+      "flow": "Caudal (Q)",
+      "head": "Altura (H)",
+      "rpm": "Velocidad",
+      "eff": "Eficiencia (η)",
+      "density": "Densidad (ρ)",
+      "npsh": "NPSH Disp."
+    },
+    "results": {
+      "hydPower": "Potencia Hidr.",
+      "shaftPower": "Potencia Eje",
+      "specSpeed": "Vel. Específica (ns)",
+      "type": "Tipo",
+      "flowVelocity": "Vel. Flujo",
+      "reynolds": "Reynolds"
+    },
+    "types": {
+      "radial": "Radial",
+      "mixed": "Mixto",
+      "axial": "Axial"
+    }
+  },
+  "fastener": {
+    "title": "Sujetadores",
+    "subtitle": "Roscas Métricas ISO",
+    "inputs": {
+      "size": "Tamaño (M)",
+      "pitch": "Paso (P)",
+      "class": "Clase"
+    },
+    "results": {
+      "tapDrill": "Broca",
+      "majorDia": "Diámetro Mayor (d)",
+      "minorDia": "Diámetro Menor (d1)",
+      "pitchDia": "Diámetro Paso (d2)",
+      "clearingDrill": "Agujero Pasante",
+      "tensileArea": "Área Esfuerzo (As)"
+    }
+  },
+  "converter": {
+    "title": "Conversor",
+    "categories": {
+      "length": "Longitud",
+      "weight": "Peso",
+      "pressure": "Presión",
+      "power": "Potencia"
+    }
+  },
+  "driveTrain": {
+    "title": "Diseñador de Transmisión",
+    "subtitle": "Motor • Caja • Carga",
+    "primeMover": "1. Motor Principal (IEC)",
+    "application": "2. Factor de Servicio",
+    "transmission": "3. Diseño de Transmisión",
+    "analysis": "4. Análisis de Ingeniería",
+    "manufacturing": "4a. Datos de Inspección",
+    "engineering": "4b. Análisis de Esfuerzos"
+  },
+  "motor": {
+    "nominalPower": "Potencia",
+    "speedPoles": "Velocidad (Polos)",
+    "nominalTorque": "Par Nominal",
+    "efficiency": "Eficiencia",
+    "inputPower": "P. Entrada",
+    "ratio": "Relación",
+    "torqueOut": "Par Salida"
+  },
+  "manufacturing": {
+    "profileMod": "Corrección de Perfil (x)",
+    "shiftCoeff": "Coef. Corrección",
+    "checkPin": "Diámetro de Pin",
+    "overPins": "Medida Sobre Pines (M)",
+    "baseTangent": "Longitud Tangente (Wk)",
+    "pinion": "Piñón",
+    "gear": "Rueda",
+    "teeth": "dientes"
+  },
+  "safety": {
+    "loadFactors": "Factores de Carga",
+    "tangentialForce": "Fuerza Tangencial (Ft)",
+    "radialForce": "Fuerza Radial (Fr)",
+    "axialForce": "Fuerza Axial (Fa)",
+    "safetyEst": "Estimación Seguridad (ISO 6336)",
+    "bendingSafety": "Seguridad Flexión (SF)",
+    "pittingSafety": "Seguridad Picadura (SH)",
+    "stress": "Esfuerzo",
+    "contactStress": "Presión de Contacto",
+    "limit": "Límite",
+    "serviceFactor": "Factor Servicio (KA)",
+    "safetyWarning": "Los factores de seguridad son estimaciones. Para aplicaciones críticas, use ISO 6336 o AGMA 2001."
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "Noticias de la Industria",
+    "subtitle": "Ingeniería, Metalurgia y Actualizaciones de Mercado",
+    "breaking": "Última Hora",
+    "readMore": "Leer Historia Completa",
+    "loading": "Cargando..."
+  },
+  "project": {
+    "title": "Presupuesto",
+    "manager": "Gestor de Proyecto",
+    "grid": "Tabla de Datos",
+    "nesting": "Optimización de Corte",
+    "exportPdf": "Exportar PDF",
+    "clear": "Limpiar",
+    "empty": "Lista vacía.",
+    "settings": "Configuración",
+    "rawLength": "Longitud Bruta",
+    "bladeWidth": "Ancho de Sierra",
+    "calculate": "Calcular Cortes",
+    "totalBars": "Barras Totales",
+    "efficiency": "Eficiencia",
+    "waste": "Desperdicio Total",
+    "rem": "Resto"
+  },
+  "nesting": {
+    "title": "Optimizador de Corte",
+    "subtitle": "Anidado Lineal 1D",
+    "stockLength": "Longitud de Stock",
+    "kerf": "Ancho de Corte (Kerf)",
+    "trimStart": "Recorte Inicio",
+    "trimEnd": "Recorte Final",
+    "addPart": "Agregar Pieza",
+    "removePart": "Eliminar",
+    "calculate": "Optimizar Cortes",
+    "partLabel": "Etiqueta",
+    "partLength": "Longitud",
+    "partQty": "Cantidad",
+    "barsUsed": "Barras Usadas",
+    "efficiency": "Eficiencia Material",
+    "totalWaste": "Desperdicio Total",
+    "algorithm": "Algoritmo",
+    "noResults": "Agregue piezas y haga clic en Optimizar"
+  },
+  "nesting2d": {
+    "title": "Anidado 2D",
+    "subtitle": "Optimización de Forma Real",
+    "dropSvg": "Arrastre archivos SVG aquí o haga clic para cargar",
+    "sheetWidth": "Ancho de Hoja",
+    "sheetHeight": "Alto de Hoja",
+    "spacing": "Espaciado de Piezas",
+    "rotation": "Paso de Rotación",
+    "optimize": "Optimizar",
+    "exportDxf": "Exportar DXF",
+    "sheets": "Hojas",
+    "efficiency": "Eficiencia",
+    "waste": "Desperdicio",
+    "parts": "Piezas",
+    "unplaced": "Piezas no colocadas"
+  }
+}

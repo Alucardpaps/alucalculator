@@ -1,0 +1,506 @@
+{
+  "nav": {
+    "home": "Главная",
+    "homeDesc": "Панель управления",
+    "fits": "Допуски и посадки",
+    "handbook": "Справочник",
+    "library": "Библиотека Модулей",
+    "available": "Доступно Модулей",
+    "news": "Industry News"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "Калькулятор Профилей",
+      "desc": "Расчет массы и стоимости"
+    },
+    "fits": {
+      "title": "Допуски и Посадки",
+      "desc": "ISO 286 Вал/Отверстие"
+    },
+    "gears": {
+      "title": "Зубчатые Колеса",
+      "desc": "Цилиндрические/Косозубые"
+    },
+    "strength": {
+      "title": "Сопромат (Круг Мора)",
+      "desc": "Анализ Напряжений"
+    },
+    "bearings": {
+      "title": "Подшипники (L10)",
+      "desc": "Расчет Ресурса"
+    },
+    "welding": {
+      "title": "Сварка",
+      "desc": "Тепловложения"
+    },
+    "sheetMetal": {
+      "title": "Листовой Металл",
+      "desc": "Усилие Гибки"
+    },
+    "pumps": {
+      "title": "Насосы",
+      "desc": "Мощность и NPSH"
+    },
+    "fasteners": {
+      "title": "Крепеж",
+      "desc": "Метрическая Резьба"
+    },
+    "converter": {
+      "title": "Конвертер",
+      "desc": "Единицы и Мощность"
+    },
+    "handbook": {
+      "title": "Справочник",
+      "desc": "Таблицы, Допуски, G-Kод."
+    }
+  },
+  "common": {
+    "calculate": "Рассчитать",
+    "result": "Результат",
+    "inputs": "Входные данные",
+    "dimensions": "Размеры",
+    "hole": "Отверстие",
+    "shaft": "Вал",
+    "min": "Мин",
+    "max": "Макс",
+    "nominalDia": "Номинальный диаметр",
+    "explanation": "Пояснение",
+    "toleranceValues": "Значения полей допусков",
+    "mountingCalc": "Расчет монтажа",
+    "pressure": "Давление в стыке",
+    "force": "Усилие запрессовки",
+    "torque": "Передаваемый момент",
+    "metric": "Метрическая",
+    "imperial": "Дюймовая",
+    "from": "Из",
+    "to": "В",
+    "language": "Язык",
+    "calcTool": "Калькулятор",
+    "formula": "Формула",
+    "totalWeight": "Общий вес",
+    "ratio": "Отношение",
+    "stress": "Напряжение",
+    "beam": "Балка",
+    "cantilever": "Консоль",
+    "simple": "Шарнирная опора",
+    "share": "Поделиться",
+    "copied": "Скопировано!",
+    "loadGeometry": "Нагрузка и Геометрия",
+    "beamParams": "Параметры Балки",
+    "calculatedStress": "Расчетное Напряжение",
+    "maxDeflection": "Макс. Прогиб",
+    "safetyFactor": "Коэффициент Запаса",
+    "centerDist": "Межосевое Расстояние",
+    "outputSpeed": "Выходная Скорость"
+  },
+  "dimensions": {
+    "width": "Ширина",
+    "height": "Высота",
+    "thickness": "Толщина",
+    "wallThickness": "Стенка",
+    "outerDiameter": "Нар. диаметр",
+    "diameter": "Диаметр",
+    "length": "Длина"
+  },
+  "aluminum": {
+    "title": "Калькулятор веса Al",
+    "shapes": {
+      "box": "Квадратная труба",
+      "sheet": "Лист / Плита",
+      "pipe": "Круглая труба",
+      "bar": "Кругляк"
+    },
+    "theory": {
+      "densityTitle": "Плотность (ρ)",
+      "densityDesc": "Плотность - это масса на единицу объема. Зависит от сплава.",
+      "series1000": "Серия 1000 (Чистый): ~2.70 г/см³",
+      "series6000": "Серия 6000 (Mg+Si): ~2.70 г/см³",
+      "series7000": "Серия 7000 (Zn): ~2.81 г/см³ (Тяжелый)",
+      "formula": "Масса = Объем × Плотность",
+      "plateFormula": "Плита: Длина × Ширина × Толщина × ρ"
+    },
+    "disclaimer": "Расчет по теор. плотности (~2.70 г/см³). Реал. вес ±5% (допуски ASTM B221).",
+    "projectList": {
+      "title": "Project List (BOM)",
+      "add": "Add to List",
+      "clear": "Clear List",
+      "empty": "List is empty.",
+      "totalWeight": "Grand Total Weight",
+      "totalCost": "Total Project Cost",
+      "columns": {
+        "id": "#",
+        "desc": "Material / Dim",
+        "qty": "Qty",
+        "unitWeight": "Unit W.",
+        "totalWeight": "Total W.",
+        "actions": "Action"
+      }
+    },
+    "costData": {
+      "pricePerKg": "Price per Unit (/kg)",
+      "estimatedCost": "Est. Cost"
+    },
+    "engineering": {
+      "title": "Engineering Analysis",
+      "surfaceArea": "Surface Area (Paint)",
+      "mechProps": "Mechanical Properties",
+      "yield": "Yield Strength",
+      "tensile": "Tensile Strength",
+      "hardness": "Hardness",
+      "weldability": "Weldability",
+      "sectionProps": "Section Properties",
+      "inertia": "Moment of Inertia",
+      "modulus": "Section Modulus",
+      "radius": "Radius of Gyration"
+    },
+    "simulation": {
+      "title": "Beam Deflection Sim",
+      "open": "Open Simulator",
+      "close": "Close",
+      "length": "Beam Length (L)",
+      "load": "Load (F)",
+      "support": "Support Type",
+      "simple": "Simple Support",
+      "cantilever": "Cantilever",
+      "result": "Max Deflection",
+      "safe": "SAFE",
+      "unsafe": "UNSAFE (>L/300)",
+      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+    },
+    "export": {
+      "pdf": "Download Quote (PDF)",
+      "dxf": "Download DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "Материаловедение"
+  },
+  "fit": {
+    "title": "Калькулятор посадок",
+    "subtitle": "Система допусков ISO",
+    "tabs": {
+      "standard": "Стандартные",
+      "manual": "Ручной ввод"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "Скользящая посадка",
+        "desc": "Сборка вручную, смазка"
+      },
+      "h7g6": {
+        "name": "Посадка движения",
+        "desc": "Вращающиеся детали"
+      },
+      "h7f7": {
+        "name": "Ходовая посадка",
+        "desc": "Большой зазор"
+      },
+      "h7k6": {
+        "name": "Переходная посадка",
+        "desc": "Легкий натяг/зазор"
+      },
+      "h7m6": {
+        "name": "Переходная посадка",
+        "desc": "Обычно легкий натяг"
+      },
+      "h7n6": {
+        "name": "Переходная посадка",
+        "desc": "Склонность к натягу"
+      },
+      "h7p6": {
+        "name": "Легкопрессовая",
+        "desc": "Сборка молотком"
+      },
+      "h7r6": {
+        "name": "Прессовая",
+        "desc": "Требуется пресс"
+      },
+      "h7s6": {
+        "name": "Горячепрессовая",
+        "desc": "Нагрев/Охлаждение"
+      }
+    },
+    "inputs": {
+      "nominalSize": "Номинальный размер",
+      "fitLength": "Длина соединения",
+      "elasticModulus": "Модуль упругости",
+      "frictionCoeff": "Коэфф. трения (μ)"
+    },
+    "results": {
+      "fitType": "Тип посадки",
+      "clearanceAmount": "Зазор",
+      "interferenceAmount": "Натяг",
+      "clearance": "Зазор",
+      "transition": "Переходная",
+      "interference": "Натяг"
+    }
+  },
+  "gear": {
+    "title": "Расчет зубчатых передач",
+    "subtitle": "Цилиндрические и конические",
+    "types": {
+      "spur": "Прямозубая",
+      "helical": "Косозубая",
+      "bevel": "Коническая",
+      "worm": "Червячная"
+    },
+    "inputs": {
+      "module": "Модуль (m)",
+      "pressureAngle": "Угол профиля",
+      "pinionTeeth": "Z1 (Шестерня)",
+      "gearTeeth": "Z2 (Колесо)",
+      "helixAngle": "Угол наклона",
+      "faceWidth": "Ширина венца",
+      "power": "Мощность (кВт)",
+      "rpm": "Скорость (об/мин)"
+    },
+    "results": {
+      "calculatedTorque": "Крутящий момент",
+      "transmissionRatio": "Передаточное число",
+      "pitchDiameter": "Делительный диаметр",
+      "forcesAndStress": "Силы и Напряжения"
+    }
+  },
+  "strength": {
+    "title": "Сопромат",
+    "subtitle": "Круг Мора",
+    "inputs": {
+      "sigmaX": "Сигма X (σx)",
+      "sigmaY": "Сигма Y (σy)",
+      "tauXY": "Тау XY (τxy)",
+      "theta": "Угол (θ)"
+    },
+    "results": {
+      "principalStresses": "Главные напряжения",
+      "maxShear": "Макс. касательные (τmax)",
+      "vonMises": "По Мизесу",
+      "transformed": "Повернутое состояние"
+    }
+  },
+  "bearing": {
+    "title": "Ресурс подшипников",
+    "subtitle": "Ресурс L10 и Нагрузки",
+    "inputs": {
+      "series": "Серия",
+      "code": "Обозначение",
+      "radialLoad": "Радиальная нагр. (Fr)",
+      "axialLoad": "Осевая нагр. (Fa)",
+      "rpm": "Скорость (об/мин)",
+      "reliability": "Надежность"
+    },
+    "results": {
+      "lifeHours": "Ресурс L10 (Часы)",
+      "lifeRevs": "Ресурс L10 (млн об.)",
+      "equivalentLoad": "Эквив. нагрузка (P)",
+      "staticSafety": "Стат. запас (s0)"
+    }
+  },
+  "welding": {
+    "title": "Сварные швы",
+    "subtitle": "Тепловложения и прочность",
+    "inputs": {
+      "method": "Метод",
+      "type": "Тип шва",
+      "current": "Ток (I)",
+      "voltage": "Напряжение (V)",
+      "speed": "Скорость (v)",
+      "legSize": "Катет (a)",
+      "thickness": "Толщина (t)",
+      "length": "Длина (L)",
+      "load": "Нагрузка (F)"
+    },
+    "results": {
+      "heatInput": "Погонная энергия",
+      "stress": "Напряжение",
+      "safetyFactor": "Запас прочности",
+      "efficiency": "КПД (η)"
+    },
+    "types": {
+      "fillet": "Угловой",
+      "butt": "Стыковой",
+      "doubleFillet": "Двойной угловой"
+    }
+  },
+  "sheetMetal": {
+    "title": "Листовой металл",
+    "subtitle": "Гибка и Развертка",
+    "inputs": {
+      "material": "Материал",
+      "thickness": "Толщина (t)",
+      "angle": "Угол гиба (α)",
+      "radius": "Внутр. радиус (ri)",
+      "length": "Длина гиба (L)",
+      "vOpening": "Раскрытие матрицы (V)",
+      "flange1": "Полка A",
+      "flange2": "Полка B",
+      "kFactor": "K-фактор"
+    },
+    "results": {
+      "force": "Усилие гибки",
+      "flatLength": "Длина развертки",
+      "bendAllowance": "Припуск на гибку (BA)",
+      "bendDeduction": "Уменьшение (BD)",
+      "recV": "Реком. матрица"
+    }
+  },
+  "pump": {
+    "title": "Насосы",
+    "subtitle": "Мощность и NPSH",
+    "inputs": {
+      "flow": "Подача (Q)",
+      "head": "Напор (H)",
+      "rpm": "Скорость",
+      "eff": "КПД (η)",
+      "density": "Плотность (ρ)",
+      "npsh": "NPSH расп."
+    },
+    "results": {
+      "hydPower": "Гидр. мощность",
+      "shaftPower": "Мощность на валу",
+      "specSpeed": "Коэфф. быстроходности (ns)",
+      "type": "Тип насоса",
+      "flowVelocity": "Скорость потока",
+      "reynolds": "Число Рейнольдса"
+    },
+    "types": {
+      "radial": "Центробежный",
+      "mixed": "Диагональный",
+      "axial": "Осевой"
+    }
+  },
+  "fastener": {
+    "title": "Крепеж",
+    "subtitle": "Метрическая резьба ISO",
+    "inputs": {
+      "size": "Размер (M)",
+      "pitch": "Шаг (P)",
+      "class": "Класс точн."
+    },
+    "results": {
+      "tapDrill": "Сверло под резьбу",
+      "majorDia": "Наружный диам. (d)",
+      "minorDia": "Внутренний диам. (d1)",
+      "pitchDia": "Средний диам. (d2)",
+      "clearingDrill": "Сквозное отверстие",
+      "tensileArea": "Площадь сечения (As)"
+    }
+  },
+  "converter": {
+    "title": "Конвертер",
+    "categories": {
+      "length": "Длина",
+      "weight": "Вес",
+      "pressure": "Давление",
+      "power": "Мощность"
+    }
+  },
+  "driveTrain": {
+    "title": "Проектирование Привода",
+    "subtitle": "Двигатель • Редуктор • Нагрузка",
+    "primeMover": "1. Двигатель (IEC)",
+    "application": "2. Коэфф. эксплуатации",
+    "transmission": "3. Зубчатая передача",
+    "analysis": "4. Инженерный анализ",
+    "manufacturing": "4a. Контрольные данные (M / Wk)",
+    "engineering": "4b. Расчет на прочность"
+  },
+  "motor": {
+    "nominalPower": "Мощность",
+    "speedPoles": "Скорость (Полюса)",
+    "nominalTorque": "Ном. момент",
+    "efficiency": "КПД",
+    "inputPower": "Входная P",
+    "ratio": "Отношение",
+    "torqueOut": "Выходной момент"
+  },
+  "manufacturing": {
+    "profileMod": "Смещение профиля (x)",
+    "shiftCoeff": "Коэфф. смещения",
+    "checkPin": "Диаметр ролика",
+    "overPins": "Размер по роликам (M)",
+    "baseTangent": "Длина общей нормали (Wk)",
+    "pinion": "Шестерня",
+    "gear": "Колесо",
+    "teeth": "зубьев"
+  },
+  "safety": {
+    "loadFactors": "Коэффициенты нагрузки",
+    "tangentialForce": "Окружная сила (Ft)",
+    "radialForce": "Радиальная сила (Fr)",
+    "axialForce": "Осевая сила (Fa)",
+    "safetyEst": "Оценка прочности (ISO 6336)",
+    "bendingSafety": "Изгибная прочность (SF)",
+    "pittingSafety": "Контактная прочность (SH)",
+    "stress": "Напряжение",
+    "contactStress": "Контактное напряж.",
+    "limit": "Предел",
+    "serviceFactor": "Коэфф. сервиса (KA)",
+    "safetyWarning": "Коэффициенты запаса являются оценочными. Для ответственных узлов используйте расчет по ISO 6336 или ГОСТ 21354."
+  },
+  "market": {
+    "title": "Market Data",
+    "aluminum": "LME Aluminum",
+    "copper": "LME Copper",
+    "live": "LIVE",
+    "useLivePrice": "Use Live Price"
+  },
+  "news": {
+    "title": "Новости Промышленности",
+    "subtitle": "Инженерия, Металлургия и Обновления Рынка",
+    "breaking": "Срочные Новости",
+    "readMore": "Читать Полностью",
+    "loading": "Загрузка..."
+  },
+  "project": {
+    "title": "Смета",
+    "manager": "Менеджер",
+    "grid": "Таблица",
+    "nesting": "Оптимизация Раскроя",
+    "exportPdf": "Экспорт PDF",
+    "clear": "Очистить",
+    "empty": "Список пуст.",
+    "settings": "Настройки",
+    "rawLength": "Исходная Длина",
+    "bladeWidth": "Ширина Пропила",
+    "calculate": "Рассчитать",
+    "totalBars": "Всего Заготовок",
+    "efficiency": "Эффективность",
+    "waste": "Общий Отход",
+    "rem": "Остаток"
+  },
+  "nesting": {
+    "title": "Оптимизатор Раскроя",
+    "subtitle": "1D Линейный Раскрой",
+    "stockLength": "Длина Заготовки",
+    "kerf": "Ширина Реза (Пропил)",
+    "trimStart": "Подрезка Начала",
+    "trimEnd": "Подрезка Конца",
+    "addPart": "Добавить Деталь",
+    "removePart": "Удалить",
+    "calculate": "Оптимизировать",
+    "partLabel": "Метка",
+    "partLength": "Длина",
+    "partQty": "Количество",
+    "barsUsed": "Использовано Профилей",
+    "efficiency": "Эффективность Материала",
+    "totalWaste": "Всего Отходов",
+    "algorithm": "Алгоритм",
+    "noResults": "Добавьте детали и нажмите Оптимизировать"
+  },
+  "nesting2d": {
+    "title": "2D Раскрой",
+    "subtitle": "Фигурный Раскрой",
+    "dropSvg": "Перетащите SVG файлы сюда",
+    "sheetWidth": "Ширина Листа",
+    "sheetHeight": "Высота Листа",
+    "spacing": "Интервал Деталей",
+    "rotation": "Шаг Вращения",
+    "optimize": "Оптимизировать",
+    "exportDxf": "Экспорт DXF",
+    "sheets": "Листы",
+    "efficiency": "Эффективность",
+    "waste": "Отходы",
+    "parts": "Детали",
+    "unplaced": "Неразмещенные детали"
+  }
+}
