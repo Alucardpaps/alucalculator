@@ -1,0 +1,21 @@
+name: Hostinger'a Dağıt
+on:
+  push:
+    branches:
+      - main  # Kodlarını main branch'ine attığında çalışır
+
+jobs:
+  web-deploy:
+    name: Dosyaları Gönder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v3
+
+      - name: FTP ile Yükle
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./public_html/  # Dosyaların yükleneceği klasör
