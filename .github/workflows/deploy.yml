@@ -29,5 +29,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./out/      # Next.js export çıktısı
+          port: 21
+          try-implicit-tls: false # Hostinger bazen düz FTP gerektirebilir
+          local-dir: ./out/      # Next.js build çıktısı
           server-dir: ./public_html/
