@@ -217,6 +217,7 @@ export const ModuleGrid = ({ lang, dict }: { lang: string, dict: any }) => {
                 const Icon = m.icon;
                 return (
                     <Link
+                        prefetch={false}
                         key={m.id}
                         href={`/${lang}${m.path}`}
                         className="group relative overflow-hidden bg-white dark:bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"

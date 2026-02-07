@@ -1,4 +1,4 @@
-import 'server-only'
+// import 'server-only'
 import type { Locale } from './i18n-config';
 import { dictionary } from './locales/dictionary';
 import { extractLocale, type SupportedLocale } from './locales/types';

@@ -43,7 +43,16 @@ export const TechnicalDrawing = ({ mode = 'shape', shape = 'box', fitType, activ
         );
     }
 
-    //Styles for lines...
+    // === STANDARD PROFILES (2D ONLY) ===
+    // These are controlled by the parent module (AluminumModule) which handles the 3D toggle externally.
+    const standardProfiles = ['box', 'sheet', 'pipe', 'bar', 'angle', 'beam', 'channel', 'tee', 'hex'];
+    if (mode === 'shape' && shape && standardProfiles.includes(shape)) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <BlueprintView shape={shape} inputs={data} />
+            </div>
+        );
+    }
     const subtleStr = "stroke-slate-200 stroke-[1]"; // Hidden data lines
     const mainStr = "stroke-slate-800 stroke-[2] fill-none"; // Main outline
     const highlightStr = "stroke-ind-orange stroke-[4] drop-shadow-md transition-all duration-300"; // Active dimension

@@ -15,7 +15,7 @@ import {
     type ModuleInstanceId,
     type VariableId,
     type ModuleVariable
-} from '@/stores/projectStore';
+} from '@/store/projectStore';
 
 interface VariableLinkSelectorProps {
     /** Current module's ID */

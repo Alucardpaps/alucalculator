@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "modules": "Modules",
+    "settings": "Paramètres",
     "homeDesc": "Tableau de Bord",
     "fits": "Calculateur d'Ajustement",
     "handbook": "Manuel de l'Ingénieur",
@@ -56,9 +59,28 @@
   },
   "common": {
     "calculate": "Calculer",
-    "result": "Résultat",
+    "reset": "Réinitialiser",
     "inputs": "Entrées",
+    "results": "Résultats",
     "dimensions": "Dimensions",
+    "material": "Matériau",
+    "weight": "Poids",
+    "cost": "Coût",
+    "unitPrice": "Prix unitaire",
+    "quantity": "Quantité",
+    "total": "Total",
+    "save": "Enregistrer",
+    "export": "Exporter",
+    "generatedBy": "Généré par AluCalc OS",
+    "design": "Conception",
+    "view2d": "Vue 2D",
+    "view3d": "Vue 3D",
+    "designParams": "Paramètres de conception",
+    "analysisResults": "Résultats d'analyse",
+    "prodNotes": "Notes de production",
+    "unitWeight": "Poids unitaire",
+    "totalWeight": "Poids total",
+    "result": "Résultat",
     "hole": "Alésage",
     "shaft": "Arbre",
     "min": "Min",
@@ -77,7 +99,6 @@
     "language": "Langue",
     "calcTool": "Outil de Calcul",
     "formula": "Formule",
-    "totalWeight": "Poids Total",
     "ratio": "Rapport",
     "stress": "Contrainte",
     "beam": "Poutre",
@@ -103,12 +124,27 @@
     "length": "Longueur"
   },
   "aluminum": {
-    "title": "Calculateur Poids Alu",
+    "title": "Calculateur de poids de profil",
     "shapes": {
-      "box": "Tube Carré/Rect.",
-      "sheet": "Tôle / Plaque",
-      "pipe": "Tube Rond",
-      "bar": "Barre Pleine"
+      "box": "Profilé caisson",
+      "sheet": "Feuille / Plaque",
+      "pipe": "Tube rond",
+      "bar": "Barre pleine",
+      "angle": "Cornière (L)",
+      "beam": "Poutre (I/H)",
+      "channel": "Profilé U",
+      "tee": "Profilé T",
+      "hex": "Barre hexagonale"
+    },
+    "params": {
+      "width": "Largeur (A)",
+      "height": "Hauteur (B)",
+      "thickness": "Épaisseur (t)",
+      "wall": "Paroi (t)",
+      "diameter": "Diamètre (D)",
+      "length": "Longueur",
+      "web": "Âme (tw)",
+      "flange": "Semelle (tf)"
     },
     "theory": {
       "densityTitle": "Masse Volumique (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "Angle de pliage",
+    "innerRadius": "Rayon intérieur",
+    "bendLength": "Longueur de pli",
+    "kFactor": "Facteur K",
     "title": "Tôlerie",
     "subtitle": "Pliage & Déplié",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "Chute",
     "parts": "Pièces",
     "unplaced": "Pièces non placées"
+  },
+  "gears": {
+    "title": "Calculateur d'engrenages",
+    "module": "Module (m)",
+    "teeth": "Dents (z)",
+    "pressureAngle": "Angle de pression",
+    "helixAngle": "Angle d'hélice",
+    "faceWidth": "Largeur de face",
+    "addendum": "Saillie (ha)",
+    "dedendum": "Creux (hf)",
+    "circularPitch": "Pas primitif (p)",
+    "recFaceWidth": "Larg. recomm. (6m-10m)"
+  },
+  "science": {
+    "title": "Tableau périodique",
+    "meltingPoint": "Point de fusion",
+    "boilingPoint": "Point d'ébullition",
+    "discoveredBy": "Découvert par",
+    "categories": {
+      "alkali metal": "Métal alcalin",
+      "alkaline earth metal": "Alcalino-terreux",
+      "transition metal": "Métal de transition",
+      "noble gas": "Gaz noble",
+      "halogen": "Halogène",
+      "metalloid": "Métalloïde",
+      "nonmetal": "Non-métal",
+      "lanthanide": "Lanthanide",
+      "actinide": "Actinide"
+    }
+  },
+  "materials": {
+    "aluminum": "Aluminium",
+    "steel": "Acier",
+    "stainless": "Acier inoxydable",
+    "plastic": "Plastique",
+    "nonferrous": "Non ferreux",
+    "superalloy": "Superalliage"
+  },
+  "civil": {
+    "title": "Armature béton",
+    "requiredAs": "As requis",
+    "actualAs": "As réel",
+    "effectiveD": "d effectif"
+  },
+  "electrical": {
+    "title": "Chute de tension",
+    "powerFactor": "Facteur de puissance",
+    "cableRes": "Résistance câble",
+    "powerLoss": "Perte de puissance",
+    "recSize": "Taille recomm."
+  },
+  "reducer": {
+    "inputPower": "Puissance d'entrée",
+    "ambientTemp": "Temp. ambiante"
+  },
+  "cutting": {
+    "stockLength": "Longueur stock",
+    "bladeKerf": "Trait de scie",
+    "trimStart": "Coupe début",
+    "trimEnd": "Coupe fin"
   }
 }

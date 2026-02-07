@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Главная",
+    "dashboard": "Панель",
+    "modules": "Модули",
+    "settings": "Настройки",
     "homeDesc": "Панель управления",
     "fits": "Допуски и посадки",
     "handbook": "Справочник",
@@ -56,9 +59,28 @@
   },
   "common": {
     "calculate": "Рассчитать",
-    "result": "Результат",
-    "inputs": "Входные данные",
+    "reset": "Сброс",
+    "inputs": "Ввод",
+    "results": "Результаты",
     "dimensions": "Размеры",
+    "material": "Материал",
+    "weight": "Вес",
+    "cost": "Стоимость",
+    "unitPrice": "Цена за ед.",
+    "quantity": "Количество",
+    "total": "Итого",
+    "save": "Сохранить",
+    "export": "Экспорт",
+    "generatedBy": "Создано в AluCalc OS",
+    "design": "Дизайн",
+    "view2d": "2D Вид",
+    "view3d": "3D Вид",
+    "designParams": "Параметры дизайна",
+    "analysisResults": "Результаты анализа",
+    "prodNotes": "Производственные заметки",
+    "unitWeight": "Удельный вес",
+    "totalWeight": "Общий вес",
+    "result": "Результат",
     "hole": "Отверстие",
     "shaft": "Вал",
     "min": "Мин",
@@ -77,7 +99,6 @@
     "language": "Язык",
     "calcTool": "Калькулятор",
     "formula": "Формула",
-    "totalWeight": "Общий вес",
     "ratio": "Отношение",
     "stress": "Напряжение",
     "beam": "Балка",
@@ -103,12 +124,27 @@
     "length": "Длина"
   },
   "aluminum": {
-    "title": "Калькулятор веса Al",
+    "title": "Калькулятор веса профиля",
     "shapes": {
-      "box": "Квадратная труба",
+      "box": "Коробчатый профиль",
       "sheet": "Лист / Плита",
       "pipe": "Круглая труба",
-      "bar": "Кругляк"
+      "bar": "Сплошной пруток",
+      "angle": "Уголок (L)",
+      "beam": "Балка (I/H)",
+      "channel": "Швеллер (U)",
+      "tee": "Тавр",
+      "hex": "Шестигранник"
+    },
+    "params": {
+      "width": "Ширина (A)",
+      "height": "Высота (B)",
+      "thickness": "Толщина (t)",
+      "wall": "Стенка (t)",
+      "diameter": "Диаметр (D)",
+      "length": "Длина",
+      "web": "Стенка (tw)",
+      "flange": "Полка (tf)"
     },
     "theory": {
       "densityTitle": "Плотность (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "Угол гиба",
+    "innerRadius": "Внутренний радиус",
+    "bendLength": "Длина гиба",
+    "kFactor": "K-фактор",
     "title": "Листовой металл",
     "subtitle": "Гибка и Развертка",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "Отходы",
     "parts": "Детали",
     "unplaced": "Неразмещенные детали"
+  },
+  "gears": {
+    "title": "Калькулятор шестерен",
+    "module": "Модуль (m)",
+    "teeth": "Зубья (z)",
+    "pressureAngle": "Угол давления",
+    "helixAngle": "Угол наклона",
+    "faceWidth": "Ширина венца",
+    "addendum": "Высота головки (ha)",
+    "dedendum": "Высота ножки (hf)",
+    "circularPitch": "Шаг (p)",
+    "recFaceWidth": "Рек. ширина (6m-10m)"
+  },
+  "science": {
+    "title": "Периодическая таблица",
+    "meltingPoint": "Точка плавления",
+    "boilingPoint": "Точка кипения",
+    "discoveredBy": "Открыт",
+    "categories": {
+      "alkali metal": "Щелочной металл",
+      "alkaline earth metal": "Щёлочноземельный металл",
+      "transition metal": "Переходный металл",
+      "noble gas": "Благородный газ",
+      "halogen": "Галоген",
+      "metalloid": "Металлоид",
+      "nonmetal": "Неметалл",
+      "lanthanide": "Лантаноид",
+      "actinide": "Актиноид"
+    }
+  },
+  "materials": {
+    "aluminum": "Алюминий",
+    "steel": "Сталь",
+    "stainless": "Нержавеющая сталь",
+    "plastic": "Пластик",
+    "nonferrous": "Цветные металлы",
+    "superalloy": "Суперсплав"
+  },
+  "civil": {
+    "title": "Арматура бетона",
+    "requiredAs": "Требуемая As",
+    "actualAs": "Фактическая As",
+    "effectiveD": "Эффективная d"
+  },
+  "electrical": {
+    "title": "Падение напряжения",
+    "powerFactor": "Коэффициент мощности",
+    "cableRes": "Сопротивление кабеля",
+    "powerLoss": "Потеря мощности",
+    "recSize": "Рек. размер"
+  },
+  "reducer": {
+    "inputPower": "Входная мощность",
+    "ambientTemp": "Темп. окр. среды"
+  },
+  "cutting": {
+    "stockLength": "Длина заготовки",
+    "bladeKerf": "Ширина пропила",
+    "trimStart": "Обрезка начала",
+    "trimEnd": "Обрезка конца"
   }
 }

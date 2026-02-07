@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "ホーム",
+    "dashboard": "ダッシュボード",
+    "modules": "モジュール",
+    "settings": "設定",
     "homeDesc": "ダッシュボード",
     "fits": "はめあい計算",
     "handbook": "技術便覧",
@@ -55,10 +58,29 @@
     }
   },
   "common": {
-    "calculate": "計算する",
-    "result": "結果",
+    "calculate": "計算",
+    "reset": "リセット",
     "inputs": "入力",
+    "results": "結果",
     "dimensions": "寸法",
+    "material": "材料",
+    "weight": "重量",
+    "cost": "コスト",
+    "unitPrice": "単価",
+    "quantity": "数量",
+    "total": "合計",
+    "save": "保存",
+    "export": "エクスポート",
+    "generatedBy": "AluCalc OSで生成",
+    "design": "デザイン",
+    "view2d": "2D表示",
+    "view3d": "3D表示",
+    "designParams": "設計パラメータ",
+    "analysisResults": "分析結果",
+    "prodNotes": "生産メモ",
+    "unitWeight": "単位重量",
+    "totalWeight": "総重量",
+    "result": "結果",
     "hole": "穴",
     "shaft": "軸",
     "min": "最小",
@@ -77,7 +99,6 @@
     "language": "言語",
     "calcTool": "計算ツール",
     "formula": "計算式",
-    "totalWeight": "総重量",
     "ratio": "比率",
     "stress": "応力",
     "beam": "梁",
@@ -103,12 +124,27 @@
     "length": "長さ"
   },
   "aluminum": {
-    "title": "アルミ重量計算",
+    "title": "プロファイル重量計算機",
     "shapes": {
-      "box": "角パイプ",
-      "sheet": "板 / プレート",
+      "box": "ボックスプロファイル",
+      "sheet": "シート / プレート",
       "pipe": "丸パイプ",
-      "bar": "丸棒"
+      "bar": "丸棒",
+      "angle": "アングル (L)",
+      "beam": "ビーム (I/H)",
+      "channel": "チャンネル (U)",
+      "tee": "T型鋼",
+      "hex": "六角棒"
+    },
+    "params": {
+      "width": "幅 (A)",
+      "height": "高さ (B)",
+      "thickness": "厚さ (t)",
+      "wall": "肉厚 (t)",
+      "diameter": "直径 (D)",
+      "length": "長さ",
+      "web": "ウェブ (tw)",
+      "flange": "フランジ (tf)"
     },
     "theory": {
       "densityTitle": "密度 (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "曲げ角度",
+    "innerRadius": "内半径",
+    "bendLength": "曲げ長さ",
+    "kFactor": "Kファクター",
     "title": "板金計算",
     "subtitle": "曲げ加圧力と展開",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "無駄",
     "parts": "部品",
     "unplaced": "未配置の部品"
+  },
+  "gears": {
+    "title": "歯車計算機",
+    "module": "モジュール (m)",
+    "teeth": "歯数 (z)",
+    "pressureAngle": "圧力角",
+    "helixAngle": "ねじれ角",
+    "faceWidth": "歯幅",
+    "addendum": "歯末のたけ (ha)",
+    "dedendum": "歯元のたけ (hf)",
+    "circularPitch": "円ピッチ (p)",
+    "recFaceWidth": "推奨歯幅 (6m-10m)"
+  },
+  "science": {
+    "title": "周期表",
+    "meltingPoint": "融点",
+    "boilingPoint": "沸点",
+    "discoveredBy": "発見者",
+    "categories": {
+      "alkali metal": "アルカリ金属",
+      "alkaline earth metal": "アルカリ土類金属",
+      "transition metal": "遷移金属",
+      "noble gas": "希ガス",
+      "halogen": "ハロゲン",
+      "metalloid": "半金属",
+      "nonmetal": "非金属",
+      "lanthanide": "ランタノイド",
+      "actinide": "アクチノイド"
+    }
+  },
+  "materials": {
+    "aluminum": "アルミニウム",
+    "steel": "鋼",
+    "stainless": "ステンレス鋼",
+    "plastic": "プラスチック",
+    "nonferrous": "非鉄金属",
+    "superalloy": "超合金"
+  },
+  "civil": {
+    "title": "コンクリート補強",
+    "requiredAs": "必要 As",
+    "actualAs": "実 As",
+    "effectiveD": "有効 d"
+  },
+  "electrical": {
+    "title": "電圧降下",
+    "powerFactor": "力率",
+    "cableRes": "ケーブル抵抗",
+    "powerLoss": "電力損失",
+    "recSize": "推奨サイズ"
+  },
+  "reducer": {
+    "inputPower": "入力電力",
+    "ambientTemp": "周囲温度"
+  },
+  "cutting": {
+    "stockLength": "在庫長さ",
+    "bladeKerf": "切り幅",
+    "trimStart": "端切り（始）",
+    "trimEnd": "端切り（終）"
   }
 }

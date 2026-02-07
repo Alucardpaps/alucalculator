@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "首页",
+    "dashboard": "仪表板",
+    "modules": "模块",
+    "settings": "设置",
     "homeDesc": "仪表板",
     "fits": "公差配合",
     "handbook": "工程师手册",
@@ -56,9 +59,28 @@
   },
   "common": {
     "calculate": "计算",
-    "result": "结果",
+    "reset": "重置",
     "inputs": "输入",
+    "results": "结果",
     "dimensions": "尺寸",
+    "material": "材料",
+    "weight": "重量",
+    "cost": "成本",
+    "unitPrice": "单价",
+    "quantity": "数量",
+    "total": "总计",
+    "save": "保存",
+    "export": "导出",
+    "generatedBy": "由AluCalc OS生成",
+    "design": "设计",
+    "view2d": "2D视图",
+    "view3d": "3D视图",
+    "designParams": "设计参数",
+    "analysisResults": "分析结果",
+    "prodNotes": "生产说明",
+    "unitWeight": "单位重量",
+    "totalWeight": "总重量",
+    "result": "结果",
     "hole": "孔",
     "shaft": "轴",
     "min": "最小",
@@ -77,7 +99,6 @@
     "language": "语言",
     "calcTool": "计算工具",
     "formula": "计算公式",
-    "totalWeight": "总重量",
     "ratio": "比率",
     "stress": "应力",
     "beam": "梁",
@@ -103,12 +124,27 @@
     "length": "长度"
   },
   "aluminum": {
-    "title": "铝重量计算器",
+    "title": "型材重量计算器",
     "shapes": {
-      "box": "方管",
-      "sheet": "板 / 板材",
+      "box": "箱型材",
+      "sheet": "板材",
       "pipe": "圆管",
-      "bar": "圆棒"
+      "bar": "实心棒",
+      "angle": "角钢 (L)",
+      "beam": "工字钢 (I/H)",
+      "channel": "槽钢 (U)",
+      "tee": "T型钢",
+      "hex": "六角棒"
+    },
+    "params": {
+      "width": "宽度 (A)",
+      "height": "高度 (B)",
+      "thickness": "厚度 (t)",
+      "wall": "壁厚 (t)",
+      "diameter": "直径 (D)",
+      "length": "长度",
+      "web": "腹板 (tw)",
+      "flange": "翼缘 (tf)"
     },
     "theory": {
       "densityTitle": "密度 (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "弯曲角度",
+    "innerRadius": "内半径",
+    "bendLength": "弯曲长度",
+    "kFactor": "K因子",
     "title": "钣金计算",
     "subtitle": "折弯力与展开",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "废料",
     "parts": "零件",
     "unplaced": "未放置的零件"
+  },
+  "gears": {
+    "title": "齿轮计算器",
+    "module": "模数 (m)",
+    "teeth": "齿数 (z)",
+    "pressureAngle": "压力角",
+    "helixAngle": "螺旋角",
+    "faceWidth": "齿宽",
+    "addendum": "齿顶高 (ha)",
+    "dedendum": "齿根高 (hf)",
+    "circularPitch": "周节 (p)",
+    "recFaceWidth": "推荐齿宽 (6m-10m)"
+  },
+  "science": {
+    "title": "元素周期表",
+    "meltingPoint": "熔点",
+    "boilingPoint": "沸点",
+    "discoveredBy": "发现者",
+    "categories": {
+      "alkali metal": "碱金属",
+      "alkaline earth metal": "碱土金属",
+      "transition metal": "过渡金属",
+      "noble gas": "稀有气体",
+      "halogen": "卤素",
+      "metalloid": "类金属",
+      "nonmetal": "非金属",
+      "lanthanide": "镧系元素",
+      "actinide": "锕系元素"
+    }
+  },
+  "materials": {
+    "aluminum": "铝",
+    "steel": "钢",
+    "stainless": "不锈钢",
+    "plastic": "塑料",
+    "nonferrous": "有色金属",
+    "superalloy": "高温合金"
+  },
+  "civil": {
+    "title": "混凝土钢筋",
+    "requiredAs": "所需 As",
+    "actualAs": "实际 As",
+    "effectiveD": "有效 d"
+  },
+  "electrical": {
+    "title": "电压降",
+    "powerFactor": "功率因数",
+    "cableRes": "电缆电阻",
+    "powerLoss": "功率损耗",
+    "recSize": "推荐尺寸"
+  },
+  "reducer": {
+    "inputPower": "输入功率",
+    "ambientTemp": "环境温度"
+  },
+  "cutting": {
+    "stockLength": "库存长度",
+    "bladeKerf": "锯缝宽度",
+    "trimStart": "端头切除",
+    "trimEnd": "端尾切除"
   }
 }

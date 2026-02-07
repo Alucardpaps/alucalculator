@@ -52,7 +52,7 @@ export default function ConverterPageClient({ dict }: { dict: any }) {
             <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-100">
                 <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100">
                     <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><ArrowRightLeft /></div>
-                    <h1 className="text-2xl font-bold text-slate-800">{dict.converter.title}</h1>
+                    <h1 className="text-2xl font-bold text-slate-800">{dict?.converter?.title || 'Unit Converter'}</h1>
                 </div>
 
                 {/* Category Tabs */}
@@ -68,7 +68,7 @@ export default function ConverterPageClient({ dict }: { dict: any }) {
                             className={`px-4 py-2 rounded-lg font-bold capitalize flex items-center gap-2 transition-all ${category === k ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                         >
                             {/* @ts-ignore */}
-                            {dict.converter.categories[k]}
+                            {dict?.converter?.categories?.[k] || k}
                         </button>
                     ))}
                 </div>

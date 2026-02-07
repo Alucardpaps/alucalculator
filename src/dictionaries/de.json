@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Startseite",
+    "dashboard": "Dashboard",
+    "modules": "Module",
+    "settings": "Einstellungen",
     "homeDesc": "Haupt-Dashboard",
     "fits": "Passungsrechner",
     "handbook": "Ingenieur-Handbuch",
@@ -56,9 +59,28 @@
   },
   "common": {
     "calculate": "Berechnen",
-    "result": "Ergebnis",
+    "reset": "Zurücksetzen",
     "inputs": "Eingaben",
+    "results": "Ergebnisse",
     "dimensions": "Abmessungen",
+    "material": "Material",
+    "weight": "Gewicht",
+    "cost": "Kosten",
+    "unitPrice": "Stückpreis",
+    "quantity": "Menge",
+    "total": "Gesamt",
+    "save": "Speichern",
+    "export": "Exportieren",
+    "generatedBy": "Generiert von AluCalc OS",
+    "design": "Entwurf",
+    "view2d": "2D-Ansicht",
+    "view3d": "3D-Ansicht",
+    "designParams": "Entwurfsparameter",
+    "analysisResults": "Analyseergebnisse",
+    "prodNotes": "Produktionsnotizen",
+    "unitWeight": "Einheitsgewicht",
+    "totalWeight": "Gesamtgewicht",
+    "result": "Ergebnis",
     "hole": "Bohrung",
     "shaft": "Welle",
     "min": "Min",
@@ -77,7 +99,6 @@
     "language": "Sprache",
     "calcTool": "Rechner-Tool",
     "formula": "Berechnungsformel",
-    "totalWeight": "Gesamtgewicht",
     "ratio": "Verhältnis",
     "stress": "Spannung",
     "beam": "Balken",
@@ -103,12 +124,27 @@
     "length": "Länge"
   },
   "aluminum": {
-    "title": "Aluminium Gewichtsrechner",
+    "title": "Profilgewichtsrechner",
     "shapes": {
-      "box": "Rechteckrohr",
+      "box": "Kastenprofil",
       "sheet": "Blech / Platte",
       "pipe": "Rundrohr",
-      "bar": "Vollstab"
+      "bar": "Vollstab",
+      "angle": "Winkel (L)",
+      "beam": "Träger (I/H)",
+      "channel": "U-Profil",
+      "tee": "T-Profil",
+      "hex": "Sechskantstab"
+    },
+    "params": {
+      "width": "Breite (A)",
+      "height": "Höhe (B)",
+      "thickness": "Dicke (t)",
+      "wall": "Wandstärke (t)",
+      "diameter": "Durchmesser (D)",
+      "length": "Länge",
+      "web": "Steg (tw)",
+      "flange": "Flansch (tf)"
     },
     "theory": {
       "densityTitle": "Dichte (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "Biegewinkel",
+    "innerRadius": "Innenradius",
+    "bendLength": "Biegelänge",
+    "kFactor": "K-Faktor",
     "title": "Blechbearbeitung",
     "subtitle": "Biegekraft & Zuschnitt",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "Verschnitt",
     "parts": "Teile",
     "unplaced": "Nicht platzierte Teile"
+  },
+  "gears": {
+    "title": "Zahnradrechner",
+    "module": "Modul (m)",
+    "teeth": "Zähne (z)",
+    "pressureAngle": "Eingriffswinkel",
+    "helixAngle": "Schrägungswinkel",
+    "faceWidth": "Zahnbreite",
+    "addendum": "Kopfhöhe (ha)",
+    "dedendum": "Fußhöhe (hf)",
+    "circularPitch": "Teilung (p)",
+    "recFaceWidth": "Empf. Breite (6m-10m)"
+  },
+  "science": {
+    "title": "Periodensystem",
+    "meltingPoint": "Schmelzpunkt",
+    "boilingPoint": "Siedepunkt",
+    "discoveredBy": "Entdeckt von",
+    "categories": {
+      "alkali metal": "Alkalimetall",
+      "alkaline earth metal": "Erdalkalimetall",
+      "transition metal": "Übergangsmetall",
+      "noble gas": "Edelgas",
+      "halogen": "Halogen",
+      "metalloid": "Halbmetall",
+      "nonmetal": "Nichtmetall",
+      "lanthanide": "Lanthanoid",
+      "actinide": "Actinoid"
+    }
+  },
+  "materials": {
+    "aluminum": "Aluminium",
+    "steel": "Stahl",
+    "stainless": "Edelstahl",
+    "plastic": "Kunststoff",
+    "nonferrous": "Nichteisen",
+    "superalloy": "Superlegierung"
+  },
+  "civil": {
+    "title": "Betonbewehrung",
+    "requiredAs": "Erford. As",
+    "actualAs": "Vorh. As",
+    "effectiveD": "Effektives d"
+  },
+  "electrical": {
+    "title": "Spannungsabfall",
+    "powerFactor": "Leistungsfaktor",
+    "cableRes": "Kabelwiderstand",
+    "powerLoss": "Verlustleistung",
+    "recSize": "Empf. Größe"
+  },
+  "reducer": {
+    "inputPower": "Eingangsleistung",
+    "ambientTemp": "Umgebungstemp."
+  },
+  "cutting": {
+    "stockLength": "Lagerlänge",
+    "bladeKerf": "Schnittbreite",
+    "trimStart": "Anschnitt",
+    "trimEnd": "Abschnitt"
   }
 }

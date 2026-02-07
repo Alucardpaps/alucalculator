@@ -26,21 +26,23 @@ import {
     useProjectStore,
     selectCurrentProject,
     selectModuleOrder,
-    selectSavedProjects,
-    type ModuleType
-} from '@/stores/projectStore';
+    selectSavedProjects
+} from '@/store/projectStore';
+import { type ModuleType } from '@/config/modules';
 
 const MODULE_OPTIONS: { type: ModuleType; label: string; icon: string }[] = [
-    { type: 'gear-calculator', label: 'Gear Calculator', icon: '⚙️' },
-    { type: 'bearing-life', label: 'Bearing Life (L10)', icon: '🔘' },
-    { type: 'aluminum-profile', label: 'Aluminum Profile', icon: '📐' },
-    { type: 'fit-calculator', label: 'Fit & Tolerance', icon: '🎯' },
-    { type: 'strength-mohr', label: 'Strength (Mohr)', icon: '💪' },
-    { type: 'welding-heat', label: 'Welding Heat', icon: '🔥' },
+    { type: 'gears-bearings', label: 'Gears & Bearings', icon: '⚙️' },
+    { type: 'bearings', label: 'Bearing Life (L10)', icon: '🔘' },
+    { type: 'profile-weight', label: 'Aluminum Profile', icon: '📐' },
+    { type: 'fits-tolerances', label: 'Fit & Tolerance', icon: '🎯' }, // fits-tolerances
+    { type: 'strength-analysis', label: 'Strength Analysis', icon: '💪' }, // strength-analysis
+    { type: 'welding', label: 'Welding', icon: '🔥' },
     { type: 'sheet-metal', label: 'Sheet Metal Bend', icon: '📄' },
-    { type: 'pump-calculator', label: 'Pump Calculator', icon: '💧' },
-    { type: 'fastener-thread', label: 'Fastener/Thread', icon: '🔩' },
-    { type: 'unit-converter', label: 'Unit Converter', icon: '🔄' },
+    { type: 'pumps', label: 'Pump Calculator', icon: '💧' },
+    { type: 'fasteners', label: 'Fastener/Thread', icon: '🔩' },
+    { type: 'unit-converter', label: 'Unit Converter', icon: '🔄' }, // unit-converter
+    { type: 'calculator', label: 'Scientific Calculator', icon: '🧮' },
+    { type: 'materials-db', label: 'Materials Database', icon: '📚' },
 ];
 
 interface ModuleWorkspaceProps {

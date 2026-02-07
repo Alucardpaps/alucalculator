@@ -1,6 +1,9 @@
 {
   "nav": {
     "home": "Início",
+    "dashboard": "Painel",
+    "modules": "Módulos",
+    "settings": "Configurações",
     "homeDesc": "Painel Principal",
     "fits": "Ajustes e Tolerâncias",
     "handbook": "Manual do Engenheiro",
@@ -56,9 +59,28 @@
   },
   "common": {
     "calculate": "Calcular",
-    "result": "Resultado",
+    "reset": "Redefinir",
     "inputs": "Entradas",
+    "results": "Resultados",
     "dimensions": "Dimensões",
+    "material": "Material",
+    "weight": "Peso",
+    "cost": "Custo",
+    "unitPrice": "Preço unitário",
+    "quantity": "Quantidade",
+    "total": "Total",
+    "save": "Salvar",
+    "export": "Exportar",
+    "generatedBy": "Gerado por AluCalc OS",
+    "design": "Design",
+    "view2d": "Vista 2D",
+    "view3d": "Vista 3D",
+    "designParams": "Parâmetros de projeto",
+    "analysisResults": "Resultados da análise",
+    "prodNotes": "Notas de produção",
+    "unitWeight": "Peso unitário",
+    "totalWeight": "Peso total",
+    "result": "Resultado",
     "hole": "Furo",
     "shaft": "Eixo",
     "min": "Mín",
@@ -77,7 +99,6 @@
     "language": "Idioma",
     "calcTool": "Ferramenta",
     "formula": "Fórmula",
-    "totalWeight": "Peso Total",
     "ratio": "Razão",
     "stress": "Tensão",
     "beam": "Viga",
@@ -103,12 +124,27 @@
     "length": "Comprimento"
   },
   "aluminum": {
-    "title": "Calculadora Peso Alumínio",
+    "title": "Calculadora de peso de perfil",
     "shapes": {
-      "box": "Tubo Quadrado",
+      "box": "Perfil caixa",
       "sheet": "Chapa / Placa",
-      "pipe": "Tubo Redondo",
-      "bar": "Barra Maciça"
+      "pipe": "Tubo redondo",
+      "bar": "Barra sólida",
+      "angle": "Cantoneira (L)",
+      "beam": "Viga (I/H)",
+      "channel": "Perfil U",
+      "tee": "Perfil T",
+      "hex": "Barra sextavada"
+    },
+    "params": {
+      "width": "Largura (A)",
+      "height": "Altura (B)",
+      "thickness": "Espessura (t)",
+      "wall": "Parede (t)",
+      "diameter": "Diâmetro (D)",
+      "length": "Comprimento",
+      "web": "Alma (tw)",
+      "flange": "Mesa (tf)"
     },
     "theory": {
       "densityTitle": "Densidade (ρ)",
@@ -322,6 +358,10 @@
     }
   },
   "sheetMetal": {
+    "bendAngle": "Ângulo de dobra",
+    "innerRadius": "Raio interno",
+    "bendLength": "Comprimento de dobra",
+    "kFactor": "Fator K",
     "title": "Chapas",
     "subtitle": "Dobra e Desenvolvimento",
     "inputs": {
@@ -502,5 +542,65 @@
     "waste": "Perda",
     "parts": "Peças",
     "unplaced": "Peças não alocadas"
+  },
+  "gears": {
+    "title": "Calculadora de engrenagens",
+    "module": "Módulo (m)",
+    "teeth": "Dentes (z)",
+    "pressureAngle": "Ângulo de pressão",
+    "helixAngle": "Ângulo de hélice",
+    "faceWidth": "Largura da face",
+    "addendum": "Adendo (ha)",
+    "dedendum": "Dedendo (hf)",
+    "circularPitch": "Passo circular (p)",
+    "recFaceWidth": "Larg. rec. (6m-10m)"
+  },
+  "science": {
+    "title": "Tabela periódica",
+    "meltingPoint": "Ponto de fusão",
+    "boilingPoint": "Ponto de ebulição",
+    "discoveredBy": "Descoberto por",
+    "categories": {
+      "alkali metal": "Metal alcalino",
+      "alkaline earth metal": "Alcalino-terroso",
+      "transition metal": "Metal de transição",
+      "noble gas": "Gás nobre",
+      "halogen": "Halogênio",
+      "metalloid": "Metalóide",
+      "nonmetal": "Não-metal",
+      "lanthanide": "Lantanídeo",
+      "actinide": "Actinídeo"
+    }
+  },
+  "materials": {
+    "aluminum": "Alumínio",
+    "steel": "Aço",
+    "stainless": "Aço inoxidável",
+    "plastic": "Plástico",
+    "nonferrous": "Não ferroso",
+    "superalloy": "Superliga"
+  },
+  "civil": {
+    "title": "Armadura de concreto",
+    "requiredAs": "As necessário",
+    "actualAs": "As real",
+    "effectiveD": "d efetivo"
+  },
+  "electrical": {
+    "title": "Queda de tensão",
+    "powerFactor": "Fator de potência",
+    "cableRes": "Resistência cabo",
+    "powerLoss": "Perda de potência",
+    "recSize": "Tamanho recom."
+  },
+  "reducer": {
+    "inputPower": "Potência de entrada",
+    "ambientTemp": "Temp. ambiente"
+  },
+  "cutting": {
+    "stockLength": "Comp. estoque",
+    "bladeKerf": "Espessura corte",
+    "trimStart": "Corte inicial",
+    "trimEnd": "Corte final"
   }
 }

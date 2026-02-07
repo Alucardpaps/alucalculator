@@ -8,12 +8,17 @@ import { TechnicalDrawing } from "@/components/TechnicalDrawing";
 import { TheorySection } from "@/components/TheorySection";
 import { Plus, Box, Layers, Circle, Cylinder, ArrowRightLeft, Zap, Download, Triangle, Tally1, LayoutTemplate, Diamond, Baseline, Calculator } from 'lucide-react'; // Added icons
 import { ProjectManager } from '@/components/ProjectManager';
-import { MarketService } from "@/services/MarketService";
-import { DxfService } from "@/services/DxfService";
+import { MarketService } from "@/logic/MarketService";
+import { DxfService } from "@/logic/DxfService";
 import { AdvancedCalculator } from '@/components/AdvancedCalculator';
 import { STANDARD_PROFILES } from '@/data/standardProfiles';
+import { useUrlState } from '@/hooks/useUrlState';
 
 import { TechnicalDrawing3D } from "@/components/TechnicalDrawing3D";
+import { HistorySidebar } from "@/components/HistorySidebar";
+import { ComparisonBar } from "@/components/ComparisonBar";
+import { EngineeringWarnings } from "@/components/EngineeringWarnings";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProjectItem {
     id: string;
@@ -28,15 +33,62 @@ interface ProjectItem {
 }
 
 export default function AluminumPageClient({ lang, dict }: { lang: string, dict: any }) {
+    // URL State Management
+    const { getInitialState, updateUrl } = useUrlState();
+
+    // Parse URL params for initialization
+    const initialUrlParams = useMemo(() => {
+        const p = getInitialState();
+        return {
+            shape: p.s as MetalShape | undefined,
+            materialName: p.m,
+            customDensity: p.cd,
+            inputs: {
+                width: p.w,
+                height: p.h,
+                length: p.l,
+                thickness: p.t,
+                wallThickness: p.wt,
+                diameter: p.d,
+                webThickness: p.tw,
+                flangeThickness: p.tf
+            }
+        };
+    }, []); // Run once on mount
+
     // Calculators
     const {
         shape, setShape,
         unit, setUnit,
-        inputs, setInputs, // Added setInputs here
+        inputs, setInputs,
         updateInput,
         weight,
-        materialName, setMaterialName
-    } = useWeightCalculator();
+        materialName, setMaterialName,
+        customDensity, setCustomDensity
+    } = useWeightCalculator(initialUrlParams);
+
+    // Sync state back to URL (Debounced via useUrlState internal logic? No, useUrlState needs manual call)
+    // We'll use a local effect here to debounce the updates to URL
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            updateUrl({
+                s: shape,
+                m: materialName,
+                cd: customDensity,
+                // Only save non-empty inputs to keep URL clean
+                w: inputs.width,
+                h: inputs.height,
+                l: inputs.length,
+                t: inputs.thickness,
+                wt: inputs.wallThickness,
+                d: inputs.diameter,
+                tw: inputs.webThickness,
+                tf: inputs.flangeThickness
+            });
+        }, 1000); // 1s debounce for URL updates
+
+        return () => clearTimeout(timer);
+    }, [shape, materialName, customDensity, inputs, updateUrl]);
 
     const [projectList, setProjectList] = useState<ProjectItem[]>([]);
     const [useLivePrice, setUseLivePrice] = useState(false);
@@ -46,6 +98,9 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
     const [isStandardMode, setIsStandardMode] = useState(false);
     const [activeField, setActiveField] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('2D');
+
+    // Comparison State
+    const [comparisonBaseline, setComparisonBaseline] = useState<{ weight: number, cost: number, description: string } | null>(null);
 
     // --- STANDARD PROFILE HANDLER ---
     const handleStandardSelect = (series: string, name: string) => {
@@ -65,9 +120,24 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
 
 
     // Derive active material object
-    const activeMaterial = useMemo(() =>
-        MATERIALS_DB.find(m => m.name === materialName) || MATERIALS_DB[0],
-        [materialName]);
+    const activeMaterial = useMemo(() => {
+        if (materialName === 'Custom') {
+            return {
+                name: 'Custom Material',
+                category: 'Custom',
+                density: parseFloat(customDensity) || 0,
+                yield: 0,
+                tensile: 0,
+                hardness: 'N/A',
+                weldability: 'N/A',
+                machinability: 'N/A',
+                youngsModulus: 0,
+                poissonsRatio: 0.3,
+
+            }; // Mock object
+        }
+        return MATERIALS_DB.find(m => m.name === materialName) || MATERIALS_DB[0];
+    }, [materialName, customDensity]);
 
     // Constants
     const materials = MATERIALS_DB;
@@ -115,6 +185,45 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
 
     const unitPrice = useLivePrice ? liveData.price : manualPrice;
     const currency = useLivePrice ? liveData.currency : (dict.currency || '$');
+
+    // --- AUTO-HISTORY LOGIC ---
+    useEffect(() => {
+        if (weight <= 0) return;
+
+        const timer = setTimeout(() => {
+            try {
+                const stored = localStorage.getItem('calc_history');
+                const history = stored ? JSON.parse(stored) : [];
+
+                // Create description
+                let desc = `${getShapeLabel(shape)} - ${activeMaterial.name}`;
+                if (shape === 'box') desc += ` (${inputs.width}x${inputs.height}x${inputs.wallThickness})`;
+                else if (shape === 'bar') desc += ` (D:${inputs.diameter})`;
+                else desc += ` L:${inputs.length}`;
+
+                const newItem = {
+                    id: Date.now().toString(),
+                    description: desc,
+                    weight: `${weight.toFixed(3)} ${unit === 'metric' ? 'kg' : 'lbs'}`,
+                    timestamp: Date.now()
+                };
+
+                // Avoid duplicates (simple check: same weight and desc as last item)
+                if (history.length > 0) {
+                    const last = history[0];
+                    if (last.weight === newItem.weight && last.description === newItem.description) return;
+                }
+
+                const newHistory = [newItem, ...history].slice(0, 20);
+                localStorage.setItem('calc_history', JSON.stringify(newHistory));
+                window.dispatchEvent(new Event('storage-local-update'));
+            } catch (err) {
+                console.error("Auto-save failed", err);
+            }
+        }, 1500); // 1.5s debounce
+
+        return () => clearTimeout(timer);
+    }, [weight, shape, inputs, activeMaterial, unit]);
 
     // Actions
     const addToProjectList = () => {
@@ -171,6 +280,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
 
     return (
         <main className="min-h-screen bg-blueprint-grid flex flex-col items-center p-4 lg:p-12 font-sans overflow-x-hidden">
+            <HistorySidebar />
 
             {/* Standardized Dashboard Header */}
             <header className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center mb-8 bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-surface-200 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
@@ -210,17 +320,28 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                         <label className="field-label mb-4">Select Profile Shape</label>
                         <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                            {shapesConfig.map((s) => (
-                                <button
-                                    key={s.id}
-                                    onClick={() => setShape(s.id)}
-                                    className={`relative h-20 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 ${shape === s.id ? 'border-brand-orange bg-brand-orange/5 text-brand-orange shadow-md scale-105' : 'border-surface-200 hover:border-brand-blue/30 hover:bg-surface-50 text-surface-500'}`}
-                                >
-                                    <s.icon size={20} />
-                                    <span className="text-[10px] font-bold uppercase text-center leading-none">{s.label}</span>
-                                    {shape === s.id && <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brand-orange rounded-full animate-ping" />}
-                                </button>
-                            ))}
+                            <AnimatePresence mode="popLayout">
+                                {shapesConfig.map((s) => (
+                                    <motion.button
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                        key={s.id}
+                                        onClick={() => setShape(s.id)}
+                                        className={`relative h-20 rounded-xl border-2 transition-colors duration-200 flex flex-col items-center justify-center gap-1.5 ${shape === s.id ? 'border-brand-orange bg-brand-orange/5 text-brand-orange shadow-md z-10' : 'border-surface-200 hover:border-brand-blue/30 hover:bg-surface-50 text-surface-500'}`}
+                                    >
+                                        <s.icon size={20} />
+                                        <span className="text-[10px] font-bold uppercase text-center leading-none">{s.label}</span>
+                                        {shape === s.id && (
+                                            <motion.div
+                                                layoutId="active-dot"
+                                                className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brand-orange rounded-full"
+                                            />
+                                        )}
+                                    </motion.button>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
 
@@ -242,11 +363,26 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                             {materials.map(m => (
                                                 <option key={m.name} value={m.name}>{m.name}</option>
                                             ))}
+                                            <option value="Custom">✨ Custom (Specify Density)</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
                                     </div>
                                     <div className="mt-2 text-xs text-slate-400 flex justify-between font-mono">
-                                        <span>Density: {activeMaterial.density} g/cm³</span>
+                                        {materialName === 'Custom' ? (
+                                            <div className="flex items-center gap-2">
+                                                <span>Density:</span>
+                                                <input
+                                                    type="number"
+                                                    value={customDensity}
+                                                    onChange={(e) => setCustomDensity(e.target.value)}
+                                                    className="w-16 h-6 px-1 bg-white border border-slate-300 rounded text-slate-700 font-bold text-center"
+                                                    step="0.01"
+                                                />
+                                                <span>g/cm³</span>
+                                            </div>
+                                        ) : (
+                                            <span>Density: {activeMaterial.density} g/cm³</span>
+                                        )}
                                         <span className={useLivePrice ? "text-ind-orange font-bold animate-pulse" : ""}>
                                             {unitPrice > 0 ? `${currency}${unitPrice.toFixed(2)} /kg` : 'No Price'}
                                         </span>
@@ -376,6 +512,8 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                 </div>
                             </div>
 
+                            <EngineeringWarnings shape={shape} inputs={inputs} material={activeMaterial.category} />
+
                         </div>
                     </div>
                 </div>
@@ -423,7 +561,12 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                     </div>
 
                     {/* Weight Card */}
-                    <div className="bg-tech-blue text-white rounded-xl p-8 shadow-xl relative overflow-hidden">
+                    <motion.div
+                        key={weight} // Animate on weight change? Maybe too much.
+                        animate={{ scale: [1, 1.02, 1] }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-tech-blue text-white rounded-xl p-8 shadow-xl relative overflow-hidden"
+                    >
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                         <div className="absolute bottom-0 left-0 w-32 h-32 bg-ind-orange/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
@@ -457,6 +600,22 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                 {dict.aluminum.projectList.add}
                             </button>
                         </div>
+                    </motion.div>
+
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => {
+                                setComparisonBaseline({
+                                    weight: weight,
+                                    cost: weight * unitPrice,
+                                    description: `${activeMaterial.name} ${getShapeLabel(shape)}`
+                                });
+                            }}
+                            className="flex-1 py-3 bg-surface-100 hover:bg-surface-200 text-surface-600 font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                            <ArrowRightLeft size={18} />
+                            Compare
+                        </button>
                     </div>
 
                     {/* NEW PROJECT MANAGER */}
@@ -472,11 +631,23 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                 </div>
             </div>
 
+            <ComparisonBar
+                baseline={comparisonBaseline}
+                current={{
+                    weight: weight,
+                    cost: weight * unitPrice,
+                    description: `${activeMaterial.name} ${getShapeLabel(shape)}`
+                }}
+                unit={unit}
+                currency={currency}
+                onClear={() => setComparisonBaseline(null)}
+            />
+
             <div className="w-full max-w-7xl mt-12">
                 <TheorySection title={dict.handbook.title}>
                     <p className="text-sm text-slate-600 leading-relaxed">{dict.aluminum.theory.densityDesc}</p>
                 </TheorySection>
             </div>
-        </main>
+        </main >
     );
 }

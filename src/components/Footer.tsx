@@ -45,11 +45,11 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="text-amber-500 flex-shrink-0 mt-1" size={24} />
                             <div>
-                                <h4 className="text-white font-bold mb-1">BETA v1.0.0</h4>
+                                <h4 className="text-white font-bold mb-1">v4.0.0 Stable</h4>
                                 <p className="text-sm text-slate-400 leading-relaxed">
                                     {lang === 'tr'
-                                        ? "Bu yazılım henüz BETA aşamasındadır. Hesaplama sonuçları referans amaçlıdır. Nihai üretim ve mühendislik kararları öncesinde mutlaka uzman bir profesyonel tarafından kontrol edilmelidir."
-                                        : "This software is currently in BETA. Calculation results are for reference only. Final production and engineering decisions must be verified by a qualified professional."
+                                        ? "Bu yazılım v4.0.0 Stable sürümüdür. Hesaplama sonuçları referans amaçlıdır. Nihai üretim ve mühendislik kararları öncesinde mutlaka uzman bir profesyonel tarafından kontrol edilmelidir."
+                                        : "This software is v4.0.0 Stable. Calculation results are for reference only. Final production and engineering decisions must be verified by a qualified professional."
                                     }
                                 </p>
                             </div>

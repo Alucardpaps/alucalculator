@@ -7,22 +7,37 @@ export type MetalShape = 'box' | 'sheet' | 'pipe' | 'bar' | 'angle' | 'beam' | '
 // We default to Alu 6061-T6
 const DEFAULT_MATERIAL = MATERIALS_DB.find(m => m.name.includes('6061')) || MATERIALS_DB[0];
 
-export const useWeightCalculator = (defaultUnit: UnitSystem = 'metric') => {
-    const [unit, setUnit] = useState<UnitSystem>(defaultUnit);
-    const [shape, setShape] = useState<MetalShape>('box');
-    const [materialName, setMaterialName] = useState<string>(DEFAULT_MATERIAL.name);
+// Define initialization interface
+export interface CalculatorState {
+    shape?: MetalShape;
+    materialName?: string;
+    customDensity?: string;
+    unit?: UnitSystem;
+    inputs?: Partial<typeof DEFAULT_INPUTS>;
+}
+
+const DEFAULT_INPUTS = {
+    width: '',
+    height: '',
+    length: '',
+    thickness: '',
+    wallThickness: '',
+    diameter: '',
+    webThickness: '',
+    flangeThickness: '',
+    legLength: '',
+    rootRadius: '',
+};
+
+export const useWeightCalculator = (initialState: CalculatorState = {}, defaultUnit: UnitSystem = 'metric') => {
+    const [unit, setUnit] = useState<UnitSystem>(initialState.unit || defaultUnit);
+    const [shape, setShape] = useState<MetalShape>(initialState.shape || 'box');
+    const [materialName, setMaterialName] = useState<string>(initialState.materialName || DEFAULT_MATERIAL.name);
+    const [customDensity, setCustomDensity] = useState<string>(initialState.customDensity || '2.70');
 
     const [inputs, setInputs] = useState({
-        width: '',
-        height: '',
-        length: '',
-        thickness: '',
-        wallThickness: '',
-        diameter: '',
-        webThickness: '',
-        flangeThickness: '',
-        legLength: '', // For equal angles or just use width/height
-        rootRadius: '', // Added for visual fidelity (fillets)
+        ...DEFAULT_INPUTS,
+        ...initialState.inputs
     });
 
     const updateInput = (key: string, value: string) => {
@@ -31,9 +46,13 @@ export const useWeightCalculator = (defaultUnit: UnitSystem = 'metric') => {
 
     const weight = useMemo(() => {
         // Find material
-        const mat = MATERIALS_DB.find(m => m.name === materialName) || DEFAULT_MATERIAL;
-        // Density in g/cm³
-        const density = mat.density;
+        let density = 0;
+        if (materialName === 'Custom') {
+            density = parseFloat(customDensity) || 0;
+        } else {
+            const mat = MATERIALS_DB.find(m => m.name === materialName) || DEFAULT_MATERIAL;
+            density = mat.density;
+        }
 
         // Convert all inputs to mm for calculation
         // If imperial, input is inches. 1 inch = 25.4 mm
@@ -179,7 +198,7 @@ export const useWeightCalculator = (defaultUnit: UnitSystem = 'metric') => {
 
         return finalWeight;
 
-    }, [inputs, shape, unit, materialName]);
+    }, [inputs, shape, unit, materialName, customDensity]);
 
     return {
         inputs,
@@ -191,6 +210,8 @@ export const useWeightCalculator = (defaultUnit: UnitSystem = 'metric') => {
         shape,
         setShape,
         materialName,
-        setMaterialName
+        setMaterialName,
+        customDensity,
+        setCustomDensity
     };
 };

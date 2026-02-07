@@ -1,0 +1,106 @@
+{
+    "cutting_methods": {
+        "laser_fiber": {
+            "name": "Fiber Laser",
+            "default_kerf_mm": 0.20,
+            "thickness_adjustments": {
+                "1-3mm": 0.15,
+                "3-6mm": 0.20,
+                "6-12mm": 0.30,
+                "12-25mm": 0.40
+            },
+            "notes": "Fastest for thin sheets. Limited to ~25mm aluminum."
+        },
+        "laser_co2": {
+            "name": "CO2 Laser",
+            "default_kerf_mm": 0.35,
+            "thickness_adjustments": {
+                "1-3mm": 0.25,
+                "3-6mm": 0.35,
+                "6-12mm": 0.50
+            },
+            "notes": "Legacy technology. Higher operating cost than fiber."
+        },
+        "plasma_standard": {
+            "name": "Standard Plasma",
+            "default_kerf_mm": 2.50,
+            "thickness_adjustments": {
+                "3-6mm": 2.00,
+                "6-12mm": 2.50,
+                "12-25mm": 3.00,
+                "25-50mm": 4.00
+            },
+            "notes": "Cost-effective for thick plates. Rougher edge."
+        },
+        "plasma_hd": {
+            "name": "High Definition Plasma",
+            "default_kerf_mm": 1.50,
+            "thickness_adjustments": {
+                "3-6mm": 1.20,
+                "6-12mm": 1.50,
+                "12-25mm": 2.00,
+                "25-50mm": 2.50
+            },
+            "notes": "Better edge quality than standard plasma."
+        },
+        "waterjet": {
+            "name": "Waterjet",
+            "default_kerf_mm": 1.00,
+            "thickness_adjustments": {
+                "1-6mm": 0.80,
+                "6-25mm": 1.00,
+                "25-100mm": 1.20,
+                "100-200mm": 1.50
+            },
+            "notes": "No heat-affected zone. Any thickness. Slowest cutting speed."
+        },
+        "saw_band": {
+            "name": "Band Saw",
+            "default_kerf_mm": 3.00,
+            "thickness_adjustments": {
+                "all": 3.00
+            },
+            "notes": "Straight cuts only. Best for bar stock."
+        },
+        "saw_circular": {
+            "name": "Circular Saw",
+            "default_kerf_mm": 4.00,
+            "thickness_adjustments": {
+                "all": 4.00
+            },
+            "notes": "Fast straight cuts. Higher kerf than band saw."
+        },
+        "shear": {
+            "name": "Shear (Guillotine)",
+            "default_kerf_mm": 0.00,
+            "thickness_adjustments": {
+                "all": 0.00
+            },
+            "notes": "Zero kerf. Straight cuts only. Limited to ~6mm."
+        }
+    },
+    "nesting_efficiency": {
+        "rectangular_simple": {
+            "efficiency": 0.90,
+            "scrap_factor": 1.11
+        },
+        "rectangular_complex": {
+            "efficiency": 0.82,
+            "scrap_factor": 1.22
+        },
+        "circular_parts": {
+            "efficiency": 0.70,
+            "scrap_factor": 1.43
+        },
+        "irregular_shapes": {
+            "efficiency": 0.65,
+            "scrap_factor": 1.54
+        }
+    },
+    "standard_stock_lengths_mm": [
+        3000,
+        4000,
+        6000,
+        12000
+    ]
+}

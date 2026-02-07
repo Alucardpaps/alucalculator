@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { NewsService, NewsItem } from '@/services/NewsService';
+import { NewsService, NewsItem } from '@/logic/NewsService';
 import { Newspaper, ExternalLink } from 'lucide-react';
 
 export default function NewsPageClient({ lang, dict }: { lang: string, dict: any }) {

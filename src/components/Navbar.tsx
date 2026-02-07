@@ -81,7 +81,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
 
                     {/* Logo & Brand */}
                     <div className="flex items-center gap-8">
-                        <Link href={`/${lang}`} className="flex items-center gap-2 group">
+                        <Link prefetch={false} href={`/${lang}`} className="flex items-center gap-2 group">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:rotate-12 transition-transform">
                                 A
                             </div>
@@ -102,7 +102,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                         {/* Desktop Nav */}
                         <div className="hidden md:flex items-center gap-6">
                             {navLinks.map(link => (
-                                <Link
+                                <Link prefetch={false}
                                     key={link.path}
                                     href={`/${lang}${link.path}`}
                                     className={`text-sm font-bold hover:text-blue-600 transition-colors ${scrolled ? 'text-slate-600' : 'text-slate-800'}`}
@@ -126,7 +126,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                                 {dropdownOpen && (
                                     <div className="absolute top-full left-0 mt-4 w-[600px] bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-4 z-[100]">
                                         {modules.map((module) => (
-                                            <Link
+                                            <Link prefetch={false}
                                                 key={module.path}
                                                 href={`/${lang}${module.path}`}
                                                 className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors group"
@@ -178,7 +178,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                                         {['en', 'tr', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'ja', 'zh'].map((locale) => {
                                             const path = `/${locale}${typeof window !== 'undefined' ? window.location.pathname.replace(/^\/[a-z]{2}/, '') : ''}`;
                                             return (
-                                                <Link
+                                                <Link prefetch={false}
                                                     key={locale}
                                                     href={path}
                                                     className={`px-3 py-2 text-xs font-bold uppercase rounded-lg flex items-center justify-center transition-colors ${lang === locale ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-600'}`}
@@ -212,12 +212,12 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                             <Mail size={20} />
                         </a>
 
-                        <button
-                            onClick={() => alert("Pro features coming soon!")}
+                        <a
+                            href="mailto:sales@alucalculator.com"
                             className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
                         >
-                            Get Pro
-                        </button>
+                            Contact Sales
+                        </a>
                     </div>
 
                     {/* Mobile Toggle */}
@@ -238,7 +238,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                         </button>
 
                         {navLinks.map(l => (
-                            <Link
+                            <Link prefetch={false}
                                 key={l.path}
                                 href={`/${lang}${l.path}`}
                                 onClick={() => setMenuOpen(false)}
@@ -251,7 +251,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-4 mb-2">Modules</div>
                         <div className="grid grid-cols-2 gap-2">
                             {modules.map(m => (
-                                <Link
+                                <Link prefetch={false}
                                     key={m.path}
                                     href={`/${lang}${m.path}`}
                                     onClick={() => setMenuOpen(false)}

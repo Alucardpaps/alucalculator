@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { MarketService, MarketData } from '@/services/MarketService';
+import { MarketService, MarketData } from '@/logic/MarketService';
 import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 
 export const MarketTicker = ({ lang, dict }: { lang: string, dict: any }) => {
