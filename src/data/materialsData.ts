@@ -15,7 +15,7 @@ export const FITS_DB: FitsData[] = [
 export interface MaterialProp {
     category: string;
     name: string;
-    density: number;        // g/cm³
+    density: number;        // g/cm?
     yield: number;          // MPa
     tensile: number;        // MPa
     hardness: string;
@@ -23,12 +23,13 @@ export interface MaterialProp {
     machinability: string;
     // NEW: Engineering properties
     youngsModulus: number;  // GPa (E)
-    poissonsRatio: number;  // ν (dimensionless)
-    thermalCond?: number;   // W/(m·K) - thermal conductivity
-    thermalExp?: number;    // µm/(m·K) - coefficient of thermal expansion
+    poissonsRatio: number;  // ? (dimensionless)
+    thermalCond?: number;   // W/(m?K) - thermal conductivity
+    thermalExp?: number;    // ?m/(m?K) - coefficient of thermal expansion
     specificHeat?: number;  // J/(kg·K)
     elecResist?: number;    // µΩ·cm - electrical resistivity
     meltingPoint?: number;  // °C - melting point or range start
+    carbonContent?: number; // % - For Iron-Carbon Phase Diagram
 }
 
 export const MATERIALS_DB: MaterialProp[] = [
@@ -42,17 +43,25 @@ export const MATERIALS_DB: MaterialProp[] = [
     { category: 'Aluminum', name: 'Alu 7075-T6', density: 2.81, yield: 503, tensile: 572, hardness: '150 HB', weldability: 'Poor', machinability: 'Excellent', youngsModulus: 72, poissonsRatio: 0.33, thermalCond: 130, thermalExp: 23.4, specificHeat: 860, elecResist: 5.2, meltingPoint: 477 },
 
     // --- Steel ---
-    { category: 'Steel', name: 'AISI 1018 (Mild)', density: 7.87, yield: 370, tensile: 440, hardness: '126 HB', weldability: 'Excellent', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 51.9, thermalExp: 11.7, specificHeat: 486, elecResist: 15.9, meltingPoint: 1450 },
-    { category: 'Steel', name: 'AISI 1045 (Carbon)', density: 7.85, yield: 530, tensile: 625, hardness: '163 HB', weldability: 'Fair', machinability: 'Good', youngsModulus: 206, poissonsRatio: 0.29, thermalCond: 49.8, thermalExp: 11.3, specificHeat: 486, elecResist: 17.1, meltingPoint: 1410 },
-    { category: 'Steel', name: 'AISI 4140 (Cr-Mo)', density: 7.85, yield: 655, tensile: 850, hardness: '28-32 HRC', weldability: 'Difficult', machinability: 'Good', youngsModulus: 210, poissonsRatio: 0.29, thermalCond: 42.6, thermalExp: 12.3, specificHeat: 473, elecResist: 22.2, meltingPoint: 1416 },
-    { category: 'Steel', name: 'AISI 4340 (High St)', density: 7.85, yield: 710, tensile: 1110, hardness: '260 HB', weldability: 'Difficult', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 44.5, thermalExp: 12.3, specificHeat: 475, elecResist: 24.8, meltingPoint: 1427 },
+    { category: 'Steel', name: 'St37 (S235JR)', density: 7.85, yield: 235, tensile: 360, hardness: '120 HB', weldability: 'Excellent', machinability: 'Good', youngsModulus: 210, poissonsRatio: 0.30, thermalCond: 50, thermalExp: 12.0, specificHeat: 480, elecResist: 15, meltingPoint: 1420, carbonContent: 0.17 },
+    { category: 'Steel', name: 'St52 (S355J2)', density: 7.85, yield: 355, tensile: 510, hardness: '160 HB', weldability: 'Excellent', machinability: 'Good', youngsModulus: 210, poissonsRatio: 0.30, thermalCond: 50, thermalExp: 12.0, specificHeat: 480, elecResist: 15, meltingPoint: 1420, carbonContent: 0.22 },
+    { category: 'Steel', name: 'AISI 1018 (Mild)', density: 7.87, yield: 370, tensile: 440, hardness: '126 HB', weldability: 'Excellent', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 51.9, thermalExp: 11.7, specificHeat: 486, elecResist: 15.9, meltingPoint: 1450, carbonContent: 0.18 },
+    { category: 'Steel', name: 'AISI 1045 (Carbon)', density: 7.85, yield: 530, tensile: 625, hardness: '163 HB', weldability: 'Fair', machinability: 'Good', youngsModulus: 206, poissonsRatio: 0.29, thermalCond: 49.8, thermalExp: 11.3, specificHeat: 486, elecResist: 17.1, meltingPoint: 1410, carbonContent: 0.45 },
+    { category: 'Steel', name: 'C50 (Carbon)', density: 7.85, yield: 560, tensile: 650, hardness: '180 HB', weldability: 'Fair', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 48, thermalExp: 11.5, specificHeat: 480, elecResist: 18, meltingPoint: 1400, carbonContent: 0.50 },
+    { category: 'Steel', name: 'AISI 4140 (Cr-Mo)', density: 7.85, yield: 655, tensile: 850, hardness: '28-32 HRC', weldability: 'Difficult', machinability: 'Good', youngsModulus: 210, poissonsRatio: 0.29, thermalCond: 42.6, thermalExp: 12.3, specificHeat: 473, elecResist: 22.2, meltingPoint: 1416, carbonContent: 0.40 },
+    { category: 'Steel', name: 'AISI 4130 (Chromoly)', density: 7.85, yield: 460, tensile: 670, hardness: '197 HB', weldability: 'Good', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 42.7, thermalExp: 11.2, specificHeat: 477, elecResist: 22.3, meltingPoint: 1432, carbonContent: 0.30 },
+    { category: 'Steel', name: 'AISI 4340 (High St)', density: 7.85, yield: 710, tensile: 1110, hardness: '260 HB', weldability: 'Difficult', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 44.5, thermalExp: 12.3, specificHeat: 475, elecResist: 24.8, meltingPoint: 1427, carbonContent: 0.40 },
+    { category: 'Steel', name: '8620 (Case Hard.)', density: 7.85, yield: 360, tensile: 530, hardness: '149 HB', weldability: 'Excellent', machinability: 'Good', youngsModulus: 205, poissonsRatio: 0.29, thermalCond: 47, thermalExp: 12.1, specificHeat: 480, elecResist: 19, meltingPoint: 1450, carbonContent: 0.20 },
+    { category: 'Steel', name: '16MnCr5 (Sement.)', density: 7.85, yield: 440, tensile: 780, hardness: '170 HB', weldability: 'Good', machinability: 'Good', youngsModulus: 210, poissonsRatio: 0.29, thermalCond: 45, thermalExp: 12.0, specificHeat: 480, elecResist: 20, meltingPoint: 1420, carbonContent: 0.16 },
+    { category: 'Steel', name: 'AISI D2 (Tool Steel)', density: 7.70, yield: 1500, tensile: 1800, hardness: '58-62 HRC', weldability: 'Very Poor', machinability: 'Fair', youngsModulus: 210, poissonsRatio: 0.29, thermalCond: 20.0, thermalExp: 10.4, specificHeat: 460, elecResist: 42, meltingPoint: 1421, carbonContent: 1.5 },
+    { category: 'Steel', name: '1.2344 (H13 Hot)', density: 7.80, yield: 1200, tensile: 1500, hardness: '50-54 HRC', weldability: 'Poor', machinability: 'Fair', youngsModulus: 215, poissonsRatio: 0.29, thermalCond: 24, thermalExp: 11.0, specificHeat: 460, elecResist: 35, meltingPoint: 1450, carbonContent: 0.40 },
 
     // --- Stainless ---
-    { category: 'Stainless', name: 'SS 303 (Free)', density: 8.00, yield: 241, tensile: 621, hardness: '89 HRB', weldability: 'Poor', machinability: 'Excellent', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.2, thermalExp: 17.2, specificHeat: 500, elecResist: 72, meltingPoint: 1400 },
-    { category: 'Stainless', name: 'SS 304 (Std)', density: 8.00, yield: 215, tensile: 505, hardness: '70 HRB', weldability: 'Excellent', machinability: 'Fair', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.2, thermalExp: 17.3, specificHeat: 500, elecResist: 72, meltingPoint: 1400 },
-    { category: 'Stainless', name: 'SS 316 (Marine)', density: 8.00, yield: 205, tensile: 515, hardness: '79 HRB', weldability: 'Excellent', machinability: 'Fair', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.3, thermalExp: 16.0, specificHeat: 500, elecResist: 74, meltingPoint: 1375 },
-    { category: 'Stainless', name: 'SS 416 (Mart.)', density: 7.75, yield: 275, tensile: 517, hardness: '82 HRB', weldability: 'Poor', machinability: 'Good', youngsModulus: 200, poissonsRatio: 0.28, thermalCond: 24.9, thermalExp: 9.9, specificHeat: 460, elecResist: 57, meltingPoint: 1480 },
-    { category: 'Stainless', name: '17-4 PH (H900)', density: 7.80, yield: 1170, tensile: 1310, hardness: '44 HRC', weldability: 'Good', machinability: 'Fair', youngsModulus: 197, poissonsRatio: 0.27, thermalCond: 18.4, thermalExp: 10.8, specificHeat: 460, elecResist: 80, meltingPoint: 1400 },
+    { category: 'Stainless', name: 'SS 303 (Free)', density: 8.00, yield: 241, tensile: 621, hardness: '89 HRB', weldability: 'Poor', machinability: 'Excellent', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.2, thermalExp: 17.2, specificHeat: 500, elecResist: 72, meltingPoint: 1400, carbonContent: 0.15 },
+    { category: 'Stainless', name: 'SS 304 (Std)', density: 8.00, yield: 215, tensile: 505, hardness: '70 HRB', weldability: 'Excellent', machinability: 'Fair', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.2, thermalExp: 17.3, specificHeat: 500, elecResist: 72, meltingPoint: 1400, carbonContent: 0.08 },
+    { category: 'Stainless', name: 'SS 316 (Marine)', density: 8.00, yield: 205, tensile: 515, hardness: '79 HRB', weldability: 'Excellent', machinability: 'Fair', youngsModulus: 193, poissonsRatio: 0.29, thermalCond: 16.3, thermalExp: 16.0, specificHeat: 500, elecResist: 74, meltingPoint: 1375, carbonContent: 0.08 },
+    { category: 'Stainless', name: 'SS 416 (Mart.)', density: 7.75, yield: 275, tensile: 517, hardness: '82 HRB', weldability: 'Poor', machinability: 'Good', youngsModulus: 200, poissonsRatio: 0.28, thermalCond: 24.9, thermalExp: 9.9, specificHeat: 460, elecResist: 57, meltingPoint: 1480, carbonContent: 0.15 },
+    { category: 'Stainless', name: '17-4 PH (H900)', density: 7.80, yield: 1170, tensile: 1310, hardness: '44 HRC', weldability: 'Good', machinability: 'Fair', youngsModulus: 197, poissonsRatio: 0.27, thermalCond: 18.4, thermalExp: 10.8, specificHeat: 460, elecResist: 80, meltingPoint: 1400, carbonContent: 0.07 },
 
     // --- Non-Ferrous ---
     { category: 'Non-Ferrous', name: 'Brass (C360)', density: 8.50, yield: 310, tensile: 400, hardness: '60 HRB', weldability: 'Fair', machinability: 'Excellent', youngsModulus: 97, poissonsRatio: 0.34, thermalCond: 115, thermalExp: 20.5, specificHeat: 380, elecResist: 6.6, meltingPoint: 885 },

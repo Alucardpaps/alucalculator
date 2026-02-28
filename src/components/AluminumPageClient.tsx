@@ -6,13 +6,14 @@ import { useState, useEffect, useMemo } from "react";
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
 import { TheorySection } from "@/components/TheorySection";
-import { Plus, Box, Layers, Circle, Cylinder, ArrowRightLeft, Zap, Download, Triangle, Tally1, LayoutTemplate, Diamond, Baseline, Calculator } from 'lucide-react'; // Added icons
+import { Plus, Box, Layers, Circle, Cylinder, ArrowRightLeft, Zap, Download, Triangle, Tally1, LayoutTemplate, Diamond, Baseline, Calculator, LucideIcon } from 'lucide-react'; // Added icons
 import { ProjectManager } from '@/components/ProjectManager';
 import { MarketService } from "@/logic/MarketService";
 import { DxfService } from "@/logic/DxfService";
 import { AdvancedCalculator } from '@/components/AdvancedCalculator';
 import { STANDARD_PROFILES } from '@/data/standardProfiles';
 import { useUrlState } from '@/hooks/useUrlState';
+import { useCallback } from "react";
 
 import { TechnicalDrawing3D } from "@/components/TechnicalDrawing3D";
 import { HistorySidebar } from "@/components/HistorySidebar";
@@ -32,7 +33,7 @@ interface ProjectItem {
     cost: number;
 }
 
-export default function AluminumPageClient({ lang, dict }: { lang: string, dict: any }) {
+export default function AluminumPageClient({ lang, dict }: { lang: string, dict: Record<string, any> }) {
     // URL State Management
     const { getInitialState, updateUrl } = useUrlState();
 
@@ -54,7 +55,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                 flangeThickness: p.tf
             }
         };
-    }, []); // Run once on mount
+    }, [getInitialState]); // Run once on mount
 
     // Calculators
     const {
@@ -95,7 +96,6 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
     const [manualPrice, setManualPrice] = useState(3.5); // $/kg manual price
     const [liveData, setLiveData] = useState<{ price: number, currency: string }>({ price: 0, currency: '$' });
     const [showAdvancedCalc, setShowAdvancedCalc] = useState(false);
-    const [isStandardMode, setIsStandardMode] = useState(false);
     const [activeField, setActiveField] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('2D');
 
@@ -116,8 +116,6 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
             });
         }
     };
-
-
 
     // Derive active material object
     const activeMaterial = useMemo(() => {
@@ -143,7 +141,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
     const materials = MATERIALS_DB;
 
     // Shape Buttons Config
-    const shapesConfig: { id: MetalShape, label: string, icon: any }[] = [
+    const shapesConfig: { id: MetalShape, label: string, icon: LucideIcon }[] = useMemo(() => [
         { id: 'box', label: dict.aluminum.shapes.box || 'Box', icon: Box },
         { id: 'sheet', label: dict.aluminum.shapes.sheet || 'Sheet', icon: Layers },
         { id: 'pipe', label: dict.aluminum.shapes.pipe || 'Pipe', icon: Circle },
@@ -153,12 +151,12 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
         { id: 'channel', label: 'Channel', icon: Baseline }, // U-Channel visually
         { id: 'tee', label: 'T-Profile', icon: Tally1 },
         { id: 'hex', label: 'Hex Bar', icon: Diamond },
-    ];
+    ], [dict.aluminum.shapes.box, dict.aluminum.shapes.sheet, dict.aluminum.shapes.pipe, dict.aluminum.shapes.bar]);
 
     // Add fallback labels for i18n if missing keys
-    const getShapeLabel = (s: MetalShape) => {
+    const getShapeLabel = useCallback((s: MetalShape) => {
         return shapesConfig.find(sc => sc.id === s)?.label || s;
-    };
+    }, [shapesConfig]);
 
     // Live Price Logic
     useEffect(() => {
@@ -167,7 +165,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                 const baseLme = data.aluminum; // USD/ton
                 const lmeKg = baseLme / 1000;
                 // Mock alloy premium factors
-                const factorMap: any = {
+                const factorMap: Record<string, number> = {
                     '6061': 1.2, '6063': 1.1, '7075': 1.8, '5083': 1.3,
                     'Alu 1050': 1.05, 'Alu 2024': 1.4
                 };
@@ -264,19 +262,6 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
         const dxfContent = DxfService.generate(shape, inputsPayload);
         DxfService.download(`alucalculator_${shape}_${Date.now()}.dxf`, dxfContent);
     };
-
-    // Shared Inputs helper
-    const Input = ({ label, field }: { label: string, field: keyof typeof inputs }) => (
-        <CalculatorInput
-            label={label}
-            unit={unit === 'metric' ? 'mm' : 'in'}
-            value={inputs[field]}
-            onChange={(e: any) => updateInput(field, e.target.value)}
-            onFocus={() => handleFocus(field)}
-            onBlur={handleBlur}
-            active={activeField === field}
-        />
-    );
 
     return (
         <main className="min-h-screen bg-blueprint-grid flex flex-col items-center p-4 lg:p-12 font-sans overflow-x-hidden">
@@ -443,58 +428,250 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                             <div className="space-y-4">
                                 {shape === 'box' && (
                                     <>
-                                        <Input label={dict.dimensions.width} field="width" />
-                                        <Input label={dict.dimensions.height} field="height" />
-                                        <Input label={dict.dimensions.wallThickness} field="wallThickness" />
+                                        <CalculatorInput
+                                            label={dict.dimensions.width}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label={dict.dimensions.height}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.height}
+                                            onChange={(e: any) => updateInput('height', e.target.value)}
+                                            onFocus={() => handleFocus('height')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'height'}
+                                        />
+                                        <CalculatorInput
+                                            label={dict.dimensions.wallThickness}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.wallThickness}
+                                            onChange={(e: any) => updateInput('wallThickness', e.target.value)}
+                                            onFocus={() => handleFocus('wallThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'wallThickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'sheet' && (
                                     <>
-                                        <Input label={dict.dimensions.width} field="width" />
-                                        <Input label={dict.dimensions.thickness} field="thickness" />
+                                        <CalculatorInput
+                                            label={dict.dimensions.width}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label={dict.dimensions.thickness}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.thickness}
+                                            onChange={(e: any) => updateInput('thickness', e.target.value)}
+                                            onFocus={() => handleFocus('thickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'thickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'pipe' && (
                                     <>
-                                        <Input label={dict.dimensions.outerDiameter} field="diameter" />
-                                        <Input label={dict.dimensions.wallThickness} field="wallThickness" />
+                                        <CalculatorInput
+                                            label={dict.dimensions.outerDiameter}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.diameter}
+                                            onChange={(e: any) => updateInput('diameter', e.target.value)}
+                                            onFocus={() => handleFocus('diameter')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'diameter'}
+                                        />
+                                        <CalculatorInput
+                                            label={dict.dimensions.wallThickness}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.wallThickness}
+                                            onChange={(e: any) => updateInput('wallThickness', e.target.value)}
+                                            onFocus={() => handleFocus('wallThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'wallThickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'bar' && (
-                                    <Input label={dict.dimensions.diameter} field="diameter" />
+                                    <CalculatorInput
+                                        label={dict.dimensions.diameter}
+                                        unit={unit === 'metric' ? 'mm' : 'in'}
+                                        value={inputs.diameter}
+                                        onChange={(e: any) => updateInput('diameter', e.target.value)}
+                                        onFocus={() => handleFocus('diameter')}
+                                        onBlur={handleBlur}
+                                        active={activeField === 'diameter'}
+                                    />
                                 )}
                                 {shape === 'hex' && (
-                                    <Input label="Key Size (Flat-Flat)" field="diameter" />
+                                    <CalculatorInput
+                                        label="Key Size (Flat-Flat)"
+                                        unit={unit === 'metric' ? 'mm' : 'in'}
+                                        value={inputs.diameter}
+                                        onChange={(e: any) => updateInput('diameter', e.target.value)}
+                                        onFocus={() => handleFocus('diameter')}
+                                        onBlur={handleBlur}
+                                        active={activeField === 'diameter'}
+                                    />
                                 )}
                                 {shape === 'angle' && (
                                     <>
-                                        <Input label="Leg A (Width)" field="width" />
-                                        <Input label="Leg B (Height)" field="height" />
-                                        <Input label={dict.dimensions.thickness} field="thickness" />
+                                        <CalculatorInput
+                                            label="Leg A (Width)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label="Leg B (Height)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.height}
+                                            onChange={(e: any) => updateInput('height', e.target.value)}
+                                            onFocus={() => handleFocus('height')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'height'}
+                                        />
+                                        <CalculatorInput
+                                            label={dict.dimensions.thickness}
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.thickness}
+                                            onChange={(e: any) => updateInput('thickness', e.target.value)}
+                                            onFocus={() => handleFocus('thickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'thickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'beam' && (
                                     <>
-                                        <Input label="Height (H)" field="height" />
-                                        <Input label="Flange Width (B)" field="width" />
-                                        <Input label="Web Thickness (Tw)" field="webThickness" />
-                                        <Input label="Flange Thickness (Tf)" field="flangeThickness" />
+                                        <CalculatorInput
+                                            label="Height (H)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.height}
+                                            onChange={(e: any) => updateInput('height', e.target.value)}
+                                            onFocus={() => handleFocus('height')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'height'}
+                                        />
+                                        <CalculatorInput
+                                            label="Flange Width (B)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label="Web Thickness (Tw)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.webThickness}
+                                            onChange={(e: any) => updateInput('webThickness', e.target.value)}
+                                            onFocus={() => handleFocus('webThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'webThickness'}
+                                        />
+                                        <CalculatorInput
+                                            label="Flange Thickness (Tf)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.flangeThickness}
+                                            onChange={(e: any) => updateInput('flangeThickness', e.target.value)}
+                                            onFocus={() => handleFocus('flangeThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'flangeThickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'channel' && (
                                     <>
-                                        <Input label="Height (H)" field="height" />
-                                        <Input label="Width (B)" field="width" />
-                                        <Input label="Base Thickness (Tw)" field="webThickness" />
-                                        <Input label="Flange Thickness (Tf)" field="flangeThickness" />
+                                        <CalculatorInput
+                                            label="Height (H)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.height}
+                                            onChange={(e: any) => updateInput('height', e.target.value)}
+                                            onFocus={() => handleFocus('height')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'height'}
+                                        />
+                                        <CalculatorInput
+                                            label="Width (B)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label="Base Thickness (Tw)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.webThickness}
+                                            onChange={(e: any) => updateInput('webThickness', e.target.value)}
+                                            onFocus={() => handleFocus('webThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'webThickness'}
+                                        />
+                                        <CalculatorInput
+                                            label="Flange Thickness (Tf)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.flangeThickness}
+                                            onChange={(e: any) => updateInput('flangeThickness', e.target.value)}
+                                            onFocus={() => handleFocus('flangeThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'flangeThickness'}
+                                        />
                                     </>
                                 )}
                                 {shape === 'tee' && (
                                     <>
-                                        <Input label="Height (H)" field="height" />
-                                        <Input label="Width (B)" field="width" />
-                                        <Input label="Web Thickness (Tw)" field="webThickness" />
-                                        <Input label="Flange Thickness (Tf)" field="flangeThickness" />
+                                        <CalculatorInput
+                                            label="Height (H)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.height}
+                                            onChange={(e: any) => updateInput('height', e.target.value)}
+                                            onFocus={() => handleFocus('height')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'height'}
+                                        />
+                                        <CalculatorInput
+                                            label="Width (B)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.width}
+                                            onChange={(e: any) => updateInput('width', e.target.value)}
+                                            onFocus={() => handleFocus('width')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'width'}
+                                        />
+                                        <CalculatorInput
+                                            label="Web Thickness (Tw)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.webThickness}
+                                            onChange={(e: any) => updateInput('webThickness', e.target.value)}
+                                            onFocus={() => handleFocus('webThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'webThickness'}
+                                        />
+                                        <CalculatorInput
+                                            label="Flange Thickness (Tf)"
+                                            unit={unit === 'metric' ? 'mm' : 'in'}
+                                            value={inputs.flangeThickness}
+                                            onChange={(e: any) => updateInput('flangeThickness', e.target.value)}
+                                            onFocus={() => handleFocus('flangeThickness')}
+                                            onBlur={handleBlur}
+                                            active={activeField === 'flangeThickness'}
+                                        />
                                     </>
                                 )}
 
@@ -651,3 +828,4 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
         </main >
     );
 }
+

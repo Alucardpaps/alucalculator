@@ -1,10 +1,26 @@
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, Stage, PerspectiveCamera, Center, Environment } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Stage, Center, Environment } from "@react-three/drei";
+import * as THREE from 'three';
+import ClientOnly from "./ClientOnly";
 import { MetalShape } from "@/hooks/useWeightCalculator";
 import React, { useMemo } from "react";
-import * as THREE from "three";
+
+class CustomHelixCurve extends THREE.Curve<THREE.Vector3> {
+    constructor(public radius: number, public height: number, public turns: number, public taper: number = 0) {
+        super();
+    }
+    getPoint(t: number, optionalTarget = new THREE.Vector3()) {
+        const angle = 2 * Math.PI * t * this.turns;
+        // Taper Logic: Radius(t) = Base + (t-0.5)*H*Taper
+        const r = this.radius + (t - 0.5) * this.height * this.taper;
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
+        const z = this.height * t - (this.height / 2);
+        return optionalTarget.set(x, y, z);
+    }
+}
 
 interface TechnicalDrawing3DProps {
     shape: MetalShape | 'gear' | 'bearing' | 'fastener';
@@ -247,47 +263,49 @@ export const TechnicalDrawing3D = ({ shape, inputs }: TechnicalDrawing3DProps) =
     const [exportTrigger, setExportTrigger] = React.useState(0);
 
     return (
-        <div className="w-full h-full min-h-[300px] cursor-move bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl overflow-hidden relative group">
-            <Canvas shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
-                <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={40} />
-                <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
-                    <Center>
-                        {isStandardProfile && <StandardProfile inputs={inputs} shape={shape as MetalShape} material={material} />}
-                        {shape === 'gear' && <GearAssembly inputs={inputs} />}
-                        {shape === 'bearing' && <BearingAssembly inputs={inputs} />}
-                        {shape === 'fastener' && <FastenerAssembly inputs={inputs} />}
-                    </Center>
-                </Stage>
-                <OrbitControls autoRotate autoRotateSpeed={1} makeDefault />
-                <Environment preset="apartment" />
-                <ambientLight intensity={0.5} />
+        <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-slate-100 rounded-2xl animate-pulse" />}>
+            <div className="w-full h-full min-h-[300px] cursor-move bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl overflow-hidden relative group">
+                <Canvas shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
+                    <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={40} />
+                    <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
+                        <Center>
+                            {isStandardProfile && <StandardProfile inputs={inputs} shape={shape as MetalShape} material={material} />}
+                            {shape === 'gear' && <GearAssembly inputs={inputs} />}
+                            {shape === 'bearing' && <BearingAssembly inputs={inputs} />}
+                            {shape === 'fastener' && <FastenerAssembly inputs={inputs} />}
+                        </Center>
+                    </Stage>
+                    <OrbitControls autoRotate autoRotateSpeed={1} makeDefault />
+                    <Environment preset="apartment" />
+                    <ambientLight intensity={0.5} />
 
-                <SceneExporter trigger={exportTrigger} onExportEnd={() => setIsExporting(false)} />
-            </Canvas>
+                    <SceneExporter trigger={exportTrigger} onExportEnd={() => setIsExporting(false)} />
+                </Canvas>
 
-            <div className="absolute bottom-4 left-4 text-[10px] text-slate-400 font-mono pointer-events-none uppercase tracking-widest flex flex-col gap-1 transition-opacity group-hover:opacity-0">
-                <span>Interactive 3D View</span>
-                <span>{shape} Model</span>
+                <div className="absolute bottom-4 left-4 text-[10px] text-slate-400 font-mono pointer-events-none uppercase tracking-widest flex flex-col gap-1 transition-opacity group-hover:opacity-0">
+                    <span>Interactive 3D View</span>
+                    <span>{shape} Model</span>
+                </div>
+
+                {/* Download Button (Visible on Hover) */}
+                <button
+                    onClick={handleDownload}
+                    disabled={isExporting}
+                    className="absolute top-4 right-4 bg-white/90 hover:bg-white text-slate-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 disabled:opacity-50"
+                    title="Download 3D Model (GLTF)"
+                >
+                    {isExporting ? (
+                        <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                    )}
+                </button>
             </div>
-
-            {/* Download Button (Visible on Hover) */}
-            <button
-                onClick={handleDownload}
-                disabled={isExporting}
-                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-slate-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 disabled:opacity-50"
-                title="Download 3D Model (GLTF)"
-            >
-                {isExporting ? (
-                    <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                )}
-            </button>
-        </div>
+        </ClientOnly>
     );
 };
 
@@ -337,11 +355,13 @@ const StandardProfile = ({ inputs, shape, material }: { inputs: any, shape: Meta
         steps: 1
     }), [length]);
 
+    // OPTIMIZATION: Memoize geometry to prevent re-allocation on every render
+    const geometry = useMemo(() => new THREE.ExtrudeGeometry(profileShape, extrudeSettings), [profileShape, extrudeSettings]);
+    const edgesGeo = useMemo(() => new THREE.EdgesGeometry(geometry), [geometry]);
+
     return (
-        <mesh castShadow receiveShadow material={material} rotation={[0, 0, 0]}>
-            <extrudeGeometry args={[profileShape, extrudeSettings]} />
-            <lineSegments>
-                <edgesGeometry args={[new THREE.ExtrudeGeometry(profileShape, extrudeSettings)]} />
+        <mesh castShadow receiveShadow material={material} rotation={[0, 0, 0]} geometry={geometry}>
+            <lineSegments geometry={edgesGeo}>
                 <lineBasicMaterial color="#64748b" linewidth={1} />
             </lineSegments>
         </mesh>
@@ -399,11 +419,11 @@ const GearAssembly = ({ inputs }: { inputs: any }) => {
             return s;
         }, [teeth, radius]);
 
-        const extrudeSettings = { depth: width, bevelEnabled: true, bevelSize: 0.5, bevelThickness: 0.5 };
+        const extrudeSettings = useMemo(() => ({ depth: width, bevelEnabled: true, bevelSize: 0.5, bevelThickness: 0.5 }), [width]);
+        const geometry = useMemo(() => new THREE.ExtrudeGeometry(shape, extrudeSettings), [shape, extrudeSettings]);
 
         return (
-            <mesh rotation={[0, 0, 0]}>
-                <extrudeGeometry args={[shape, extrudeSettings]} />
+            <mesh rotation={[0, 0, 0]} geometry={geometry}>
                 <meshStandardMaterial color={color} metalness={0.7} roughness={0.3} />
             </mesh>
         )
@@ -442,61 +462,6 @@ const BearingAssembly = ({ inputs }: { inputs: any }) => {
     const elementSize = radialSpace * 0.6; // Diameter of rolling element
     const count = type === 'needle' ? 24 : type === 'roller' ? 12 : 10;
 
-    // --- RINGS ---
-    const OuterRing = () => {
-        const shape = useMemo(() => {
-            const s = new THREE.Shape();
-            s.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
-            const hole = new THREE.Path();
-            // Tapered needs conical inner face? Simplified to straight for now 
-            // unless we do sophisticated revolution geometry. Extrude is cylindrical.
-            // For Tapered, we might fake it or just show straight rings with angled rollers (common sim).
-            hole.absarc(0, 0, outerRadius - (type === 'needle' ? radialSpace * 0.1 : radialSpace * 0.2), 0, Math.PI * 2, true);
-            s.holes.push(hole);
-            return s;
-        }, [outerRadius, type, radialSpace]);
-        return (
-            <mesh>
-                <extrudeGeometry args={[shape, { depth: width, bevelEnabled: false }]} />
-                <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
-            </mesh>
-        );
-    }
-
-    const InnerRing = () => {
-        const shape = useMemo(() => {
-            const s = new THREE.Shape();
-            // Needle bearings often have very thin or no inner ring, but we'll render a thin one logic
-            const ringThick = type === 'needle' ? radialSpace * 0.1 : radialSpace * 0.2;
-            s.absarc(0, 0, innerRadius + ringThick, 0, Math.PI * 2, false);
-            const hole = new THREE.Path();
-            hole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
-            s.holes.push(hole);
-            return s;
-        }, [innerRadius, type, radialSpace]);
-        return (
-            <mesh>
-                <extrudeGeometry args={[shape, { depth: width, bevelEnabled: false }]} />
-                <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
-            </mesh>
-        );
-    }
-
-    // --- SEAL / CAGE (Visual) ---
-    // A generic cage ring to hold elements
-    const Cage = () => {
-        const r = avgRadius;
-        return (
-            <group position={[0, 0, width / 2]}>
-                <mesh rotation={[0, 0, 0]}>
-                    <torusGeometry args={[r, elementSize * 0.1, 4, 32]} />
-                    <meshStandardMaterial color="#b45309" metalness={0.5} roughness={0.5} /> {/* Brass/Polyamide Cage color */}
-                </mesh>
-            </group>
-        )
-    }
-
-    // --- ROLLING ELEMENTS ---
     const Elements = () => {
         return (
             <group position={[0, 0, width / 2]}>
@@ -516,20 +481,12 @@ const BearingAssembly = ({ inputs }: { inputs: any }) => {
                             )}
                             {(type === 'roller' || type === 'needle') && (
                                 <mesh rotation={[Math.PI / 2, 0, 0]}>
-                                    {/* Rotating 90deg X to align along Z of group? No.
-                                         Group is at (x,y), rotated by Z to face center.
-                                         Cylinder default is Y-up.
-                                         We want cylinder axis to be perpendicular to radius? 
-                                         Usually rollers axis is parallel to bearing axis (Z).
-                                         So we need cylinder along Z.
-                                         Rotation [Math.PI/2, 0, 0] aligns cylinder (Y) to Z.
-                                     */}
                                     <cylinderGeometry args={[elementSize / 2 * (type === 'needle' ? 0.6 : 0.9), elementSize / 2 * (type === 'needle' ? 0.6 : 0.9), width * 0.8, 16]} />
                                     <meshStandardMaterial color="#e2e8f0" metalness={0.9} roughness={0.1} />
                                 </mesh>
                             )}
                             {type === 'tapered' && (
-                                <group rotation={[Math.PI / 2, -0.1, 0]}> {/* Tilted */}
+                                <group rotation={[Math.PI / 2, -0.1, 0]}>
                                     <cylinderGeometry args={[elementSize / 2 * 0.7, elementSize / 2 * 1.1, width * 0.8, 16]} />
                                     <meshStandardMaterial color="#e2e8f0" metalness={0.9} roughness={0.1} />
                                 </group>
@@ -541,6 +498,55 @@ const BearingAssembly = ({ inputs }: { inputs: any }) => {
         )
     }
 
+    const OuterRing = () => {
+        const geometry = useMemo(() => {
+            const shape = new THREE.Shape();
+            shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
+            const hole = new THREE.Path();
+            hole.absarc(0, 0, outerRadius - (type === 'needle' ? radialSpace * 0.1 : radialSpace * 0.2), 0, Math.PI * 2, true);
+            shape.holes.push(hole);
+            const extrudeSettings = { depth: width, bevelEnabled: false };
+            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        }, [outerRadius, type, radialSpace, width]);
+
+        return (
+            <mesh geometry={geometry}>
+                <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
+            </mesh>
+        );
+    }
+
+    const InnerRing = () => {
+        const geometry = useMemo(() => {
+            const shape = new THREE.Shape();
+            const ringThick = type === 'needle' ? radialSpace * 0.1 : radialSpace * 0.2;
+            shape.absarc(0, 0, innerRadius + ringThick, 0, Math.PI * 2, false);
+            const hole = new THREE.Path();
+            hole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true);
+            shape.holes.push(hole);
+            const extrudeSettings = { depth: width, bevelEnabled: false };
+            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        }, [innerRadius, type, radialSpace, width]);
+
+        return (
+            <mesh geometry={geometry}>
+                <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
+            </mesh>
+        );
+    }
+
+    const Cage = () => {
+        const r = avgRadius;
+        return (
+            <group position={[0, 0, width / 2]}>
+                <mesh rotation={[0, 0, 0]}>
+                    <torusGeometry args={[r, elementSize * 0.1, 4, 32]} />
+                    <meshStandardMaterial color="#b45309" metalness={0.5} roughness={0.5} />
+                </mesh>
+            </group>
+        )
+    }
+
     return (
         <group>
             <OuterRing />
@@ -548,7 +554,7 @@ const BearingAssembly = ({ inputs }: { inputs: any }) => {
             <Elements />
             <Cage />
         </group>
-    )
+    );
 }
 
 // --- FASTENER ASSEMBLY ---
@@ -679,21 +685,23 @@ const FastenerAssembly = ({ inputs }: { inputs: any }) => {
         // Pass taper logic
         const taper = Math.abs(turns) > 0 ? taperRatio : 0;
 
-        const curve = useMemo(() => new HelixCurve(radius, length, turns, taper), [radius, length, turns, taper, HelixCurve]);
+        const curve = useMemo(() => new CustomHelixCurve(radius, length, turns, taper), [radius, length, turns, taper]);
 
         // Tube radius - Sharpened for machined look (teeth)
-        const tubeRadius = safePitch * 0.45;
+        const tubeRadius = useMemo(() => safePitch * 0.45, [safePitch]);
 
-        // Visual Fidelity: 
-        // NPT: 3 segments (V-Shape)
-        // BSPT: 12 segments (Rounded)
-        let radialSegments = 5;
-        if (isNPTFlag) radialSegments = 3;
-        if (isBSPTFlag) radialSegments = 12;
+        const tubeParams = useMemo(() => ({
+            tubularSegments: Math.floor(Math.abs(turns) * 16),
+            radialSegments: isNPTFlag ? 3 : (isBSPTFlag ? 12 : 5)
+        }), [turns, isNPTFlag, isBSPTFlag]);
+
+        const geometry = useMemo(() =>
+            new THREE.TubeGeometry(curve, tubeParams.tubularSegments, tubeRadius, tubeParams.radialSegments, false),
+            [curve, tubeParams, tubeRadius]
+        );
 
         return (
-            <mesh position={position} rotation={rotation as any}>
-                <tubeGeometry args={[curve, Math.floor(Math.abs(turns) * 16), tubeRadius, radialSegments, false]} />
+            <mesh position={position} rotation={rotation as any} geometry={geometry}>
                 <meshStandardMaterial
                     color={color}
                     metalness={0.7}

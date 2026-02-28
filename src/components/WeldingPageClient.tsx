@@ -20,8 +20,10 @@ import {
 } from "@/data/weldingData";
 import { SHAPE_INFO, ShapeType } from "@/utils/sectionProperties";
 import { AlertTriangle, CheckCircle, Flame, Thermometer, Zap, Box, Layers, Eye } from 'lucide-react';
+import { useI18nStore } from "@/store/i18nStore";
 
-export default function WeldingPageClient({ dict, lang }: { dict: any, lang: string }) {
+export default function WeldingPageClient() {
+    const { t, language } = useI18nStore();
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
     // Process & Joint Selection
@@ -54,8 +56,8 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
     const [material2Profile, setMaterial2Profile] = useState<ShapeType>('sheet');
     const [material1Color, setMaterial1Color] = useState('#94a3b8');
     const [material2Color, setMaterial2Color] = useState('#64748b');
-    const [material1Name, setMaterial1Name] = useState('Steel');
-    const [material2Name, setMaterial2Name] = useState('Steel');
+    const [material1Id, setMaterial1Id] = useState('steel');
+    const [material2Id, setMaterial2Id] = useState('steel');
     const [material1Dims, setMaterial1Dims] = useState<any>({ width: 60, height: 80, thickness: 12, wallThickness: 4, diameter: 50, flangeWidth: 40, flangeThickness: 6, webThickness: 4, legWidth: 40, legThickness: 5 });
     const [material2Dims, setMaterial2Dims] = useState<any>({ width: 60, height: 80, thickness: 12, wallThickness: 4, diameter: 50, flangeWidth: 40, flangeThickness: 6, webThickness: 4, legWidth: 40, legThickness: 5 });
 
@@ -82,11 +84,11 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
 
     // Material options
     const MATERIAL_OPTIONS = [
-        { id: 'steel', name: 'Steel', nameTr: 'Çelik', color: '#94a3b8' },
-        { id: 'stainless', name: 'Stainless Steel', nameTr: 'Paslanmaz Çelik', color: '#e2e8f0' },
-        { id: 'aluminum', name: 'Aluminum', nameTr: 'Alüminyum', color: '#f1f5f9' },
-        { id: 'copper', name: 'Copper', nameTr: 'Bakır', color: '#f59e0b' },
-        { id: 'brass', name: 'Brass', nameTr: 'Pirinç', color: '#fbbf24' },
+        { id: 'steel', name: t.welding.materialSteel, color: '#94a3b8' },
+        { id: 'stainless', name: t.welding.materialStainless, color: '#e2e8f0' },
+        { id: 'aluminum', name: t.welding.materialAluminum, color: '#f1f5f9' },
+        { id: 'copper', name: t.welding.materialCopper, color: '#f59e0b' },
+        { id: 'brass', name: t.welding.materialBrass, color: '#fbbf24' },
     ];
 
     // Calculations
@@ -145,8 +147,8 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-orange-600 rounded flex items-center justify-center text-white font-black text-xl">W</div>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase">{dict.welding?.title || 'Welding Calculator'}</h1>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{dict.welding?.subtitle || 'Heat Input • Joint Strength • AWS D1.1'}</p>
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase">{t.welding?.title}</h1>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{t.welding?.subtitle}</p>
                     </div>
                 </div>
                 <div className="flex bg-slate-200 dark:bg-slate-700 rounded p-1">
@@ -163,7 +165,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                     {/* Welding Process Selection */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                            {lang === 'tr' ? 'Kaynak Yöntemi' : 'Welding Process'}
+                            {t.welding.process}
                         </h3>
                         <div className="grid grid-cols-3 gap-2">
                             {Object.values(WELDING_METHODS).map((method) => (
@@ -175,7 +177,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                 >
-                                    {lang === 'tr' ? method.nameTr : method.name}
+                                    {language === 'tr' ? method.nameTr : method.name}
                                 </button>
                             ))}
                         </div>
@@ -185,7 +187,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                     {/* Joint Type Selection */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                            {lang === 'tr' ? 'Kaynak Türü' : 'Joint Type'}
+                            {t.welding.jointType}
                         </h3>
                         <div className="grid grid-cols-3 gap-2">
                             {(['fillet', 'doubleFillet', 'butt', 'vGroove', 'tee', 'lap'] as WeldJointType[]).map((type) => {
@@ -201,7 +203,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                                     >
                                         <span className="text-2xl">{joint.icon}</span>
                                         <div className="text-[10px] font-medium text-slate-600 dark:text-slate-300 mt-1">
-                                            {lang === 'tr' ? joint.nameTr : joint.name}
+                                            {(t.welding.joints as any)[type] || joint.name}
                                         </div>
                                     </button>
                                 );
@@ -212,32 +214,32 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                     {/* Weld Parameters */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-                            {lang === 'tr' ? 'Kaynak Parametreleri' : 'Weld Parameters'}
+                            {t.welding.parameters}
                         </h3>
                         <div className="grid grid-cols-3 gap-3 mb-4">
-                            <CalculatorInput label={dict.welding?.inputs?.current || 'Current'} unit="A" value={current} onChange={(e) => setCurrent(Number(e.target.value))} />
-                            <CalculatorInput label={dict.welding?.inputs?.voltage || 'Voltage'} unit="V" value={voltage} onChange={(e) => setVoltage(Number(e.target.value))} />
-                            <CalculatorInput label={dict.welding?.inputs?.speed || 'Speed'} unit="mm/min" value={speed} onChange={(e) => setSpeed(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.current} unit="A" value={current} onChange={(e) => setCurrent(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.voltage} unit="V" value={voltage} onChange={(e) => setVoltage(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.speed} unit="mm/min" value={speed} onChange={(e) => setSpeed(Number(e.target.value))} />
                         </div>
                         <div className="grid grid-cols-2 gap-3 mb-4">
-                            <CalculatorInput label={dict.welding?.inputs?.thickness || 'Thickness (t)'} unit="mm" value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.thickness} unit="mm" value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
                             {!['butt', 'vGroove', 'uGroove', 'jGroove'].includes(jointType) && (
-                                <CalculatorInput label={dict.welding?.inputs?.legSize || 'Leg Size (a)'} unit="mm" value={legSize} onChange={(e) => setLegSize(Number(e.target.value))} />
+                                <CalculatorInput label={t.welding?.inputs?.legSize} unit="mm" value={legSize} onChange={(e) => setLegSize(Number(e.target.value))} />
                             )}
                             {['vGroove', 'uGroove', 'jGroove'].includes(jointType) && (
-                                <CalculatorInput label="Groove Angle" unit="°" value={grooveAngle} onChange={(e) => setGrooveAngle(Number(e.target.value))} />
+                                <CalculatorInput label={t.welding?.inputs?.grooveAngle} unit="°" value={grooveAngle} onChange={(e) => setGrooveAngle(Number(e.target.value))} />
                             )}
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                            <CalculatorInput label={dict.welding?.inputs?.length || 'Length (L)'} unit="mm" value={length} onChange={(e) => setLength(Number(e.target.value))} />
-                            <CalculatorInput label={dict.welding?.inputs?.load || 'Load (F)'} unit="N" value={load} onChange={(e) => setLoad(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.length} unit="mm" value={length} onChange={(e) => setLength(Number(e.target.value))} />
+                            <CalculatorInput label={t.welding?.inputs?.load} unit="N" value={load} onChange={(e) => setLoad(Number(e.target.value))} />
                         </div>
                     </div>
 
                     {/* Electrode Selection */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                            {lang === 'tr' ? 'Elektrot / Tel Seçimi' : 'Electrode / Wire Selection'}
+                            {t.welding.electrodes}
                         </h3>
                         <select
                             className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded font-mono text-sm text-slate-900 dark:text-white"
@@ -249,7 +251,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         >
                             {compatibleElectrodes.map((el) => (
                                 <option key={el.code} value={el.code}>
-                                    {el.code} - {el.name} ({el.tensileStrength} MPa)
+                                    {el.code} - {language === 'tr' ? el.nameTr : el.name} ({el.tensileStrength} MPa)
                                 </option>
                             ))}
                         </select>
@@ -265,7 +267,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <Layers size={14} />
-                                {lang === 'tr' ? 'Malzeme Profilleri' : 'Material Profiles'}
+                                {t.welding.profiles}
                             </h3>
                             {/* 2D/3D Toggle */}
                             <div className="flex bg-slate-200 dark:bg-slate-700 rounded p-1">
@@ -277,20 +279,20 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         <div className="grid grid-cols-2 gap-4">
                             {/* Material 1 */}
                             <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                                <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">{lang === 'tr' ? 'Malzeme 1' : 'Material 1'}</div>
+                                <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">{t.welding.material1}</div>
                                 <select
                                     className="w-full p-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded mb-2"
-                                    value={material1Name}
+                                    value={material1Id}
                                     onChange={(e) => {
-                                        const mat = MATERIAL_OPTIONS.find(m => m.name === e.target.value);
+                                        const mat = MATERIAL_OPTIONS.find(m => m.id === e.target.value);
                                         if (mat) {
-                                            setMaterial1Name(mat.name);
+                                            setMaterial1Id(mat.id);
                                             setMaterial1Color(mat.color);
                                         }
                                     }}
                                 >
                                     {MATERIAL_OPTIONS.map(m => (
-                                        <option key={m.id} value={m.name}>{lang === 'tr' ? m.nameTr : m.name}</option>
+                                        <option key={m.id} value={m.id}>{m.name}</option>
                                     ))}
                                 </select>
                                 <div className="grid grid-cols-3 gap-1 mb-2">
@@ -309,33 +311,33 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                                 <div className="grid grid-cols-2 gap-2">
                                     {material1Profile === 'sheet' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Width</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.width} onChange={e => setMaterial1Dims({ ...material1Dims, width: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.thickness} onChange={e => setMaterial1Dims({ ...material1Dims, thickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.width}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.width} onChange={e => setMaterial1Dims({ ...material1Dims, width: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.thick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.thickness} onChange={e => setMaterial1Dims({ ...material1Dims, thickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {(material1Profile === 'pipe' || material1Profile === 'bar') && (
-                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">Diameter</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.diameter} onChange={e => setMaterial1Dims({ ...material1Dims, diameter: Number(e.target.value) })} /></div>
+                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.diameter}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.diameter} onChange={e => setMaterial1Dims({ ...material1Dims, diameter: Number(e.target.value) })} /></div>
                                     )}
                                     {(material1Profile === 'pipe' || material1Profile === 'box') && (
-                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">Wall Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.wallThickness} onChange={e => setMaterial1Dims({ ...material1Dims, wallThickness: Number(e.target.value) })} /></div>
+                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.wallThick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.wallThickness} onChange={e => setMaterial1Dims({ ...material1Dims, wallThickness: Number(e.target.value) })} /></div>
                                     )}
                                     {material1Profile === 'box' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Width</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.width} onChange={e => setMaterial1Dims({ ...material1Dims, width: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Height</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.height} onChange={e => setMaterial1Dims({ ...material1Dims, height: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.width}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.width} onChange={e => setMaterial1Dims({ ...material1Dims, width: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.height}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.height} onChange={e => setMaterial1Dims({ ...material1Dims, height: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {(material1Profile === 'ibeam' || material1Profile === 'channel' || material1Profile === 'tee') && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Height</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.height} onChange={e => setMaterial1Dims({ ...material1Dims, height: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Flange</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.flangeWidth} onChange={e => setMaterial1Dims({ ...material1Dims, flangeWidth: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Web T.</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.webThickness} onChange={e => setMaterial1Dims({ ...material1Dims, webThickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.height}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.height} onChange={e => setMaterial1Dims({ ...material1Dims, height: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.flange}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.flangeWidth} onChange={e => setMaterial1Dims({ ...material1Dims, flangeWidth: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.webT}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.webThickness} onChange={e => setMaterial1Dims({ ...material1Dims, webThickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {material1Profile === 'angle' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Leg</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.legWidth} onChange={e => setMaterial1Dims({ ...material1Dims, legWidth: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.legThickness || material1Dims.thickness} onChange={e => setMaterial1Dims({ ...material1Dims, legThickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.leg}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.legWidth} onChange={e => setMaterial1Dims({ ...material1Dims, legWidth: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.thick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material1Dims.legThickness || material1Dims.thickness} onChange={e => setMaterial1Dims({ ...material1Dims, legThickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                 </div>
@@ -343,20 +345,20 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
 
                             {/* Material 2 */}
                             <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                                <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">{lang === 'tr' ? 'Malzeme 2' : 'Material 2'}</div>
+                                <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">{t.welding.material2}</div>
                                 <select
                                     className="w-full p-2 text-sm bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded mb-2"
-                                    value={material2Name}
+                                    value={material2Id}
                                     onChange={(e) => {
-                                        const mat = MATERIAL_OPTIONS.find(m => m.name === e.target.value);
+                                        const mat = MATERIAL_OPTIONS.find(m => m.id === e.target.value);
                                         if (mat) {
-                                            setMaterial2Name(mat.name);
+                                            setMaterial2Id(mat.id);
                                             setMaterial2Color(mat.color);
                                         }
                                     }}
                                 >
                                     {MATERIAL_OPTIONS.map(m => (
-                                        <option key={m.id} value={m.name}>{lang === 'tr' ? m.nameTr : m.name}</option>
+                                        <option key={m.id} value={m.id}>{m.name}</option>
                                     ))}
                                 </select>
                                 <div className="grid grid-cols-3 gap-1 mb-2">
@@ -375,33 +377,33 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                                 <div className="grid grid-cols-2 gap-2">
                                     {material2Profile === 'sheet' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Width</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.width} onChange={e => setMaterial2Dims({ ...material2Dims, width: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.thickness} onChange={e => setMaterial2Dims({ ...material2Dims, thickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.width}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.width} onChange={e => setMaterial2Dims({ ...material2Dims, width: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.thick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.thickness} onChange={e => setMaterial2Dims({ ...material2Dims, thickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {(material2Profile === 'pipe' || material2Profile === 'bar') && (
-                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">Diameter</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.diameter} onChange={e => setMaterial2Dims({ ...material2Dims, diameter: Number(e.target.value) })} /></div>
+                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.diameter}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.diameter} onChange={e => setMaterial2Dims({ ...material2Dims, diameter: Number(e.target.value) })} /></div>
                                     )}
                                     {(material2Profile === 'pipe' || material2Profile === 'box') && (
-                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">Wall Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.wallThickness} onChange={e => setMaterial2Dims({ ...material2Dims, wallThickness: Number(e.target.value) })} /></div>
+                                        <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.wallThick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.wallThickness} onChange={e => setMaterial2Dims({ ...material2Dims, wallThickness: Number(e.target.value) })} /></div>
                                     )}
                                     {material2Profile === 'box' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Width</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.width} onChange={e => setMaterial2Dims({ ...material2Dims, width: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Height</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.height} onChange={e => setMaterial2Dims({ ...material2Dims, height: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.width}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.width} onChange={e => setMaterial2Dims({ ...material2Dims, width: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.height}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.height} onChange={e => setMaterial2Dims({ ...material2Dims, height: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {(material2Profile === 'ibeam' || material2Profile === 'channel' || material2Profile === 'tee') && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Height</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.height} onChange={e => setMaterial2Dims({ ...material2Dims, height: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Flange</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.flangeWidth} onChange={e => setMaterial2Dims({ ...material2Dims, flangeWidth: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Web T.</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.webThickness} onChange={e => setMaterial2Dims({ ...material2Dims, webThickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.height}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.height} onChange={e => setMaterial2Dims({ ...material2Dims, height: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.flange}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.flangeWidth} onChange={e => setMaterial2Dims({ ...material2Dims, flangeWidth: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.webT}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.webThickness} onChange={e => setMaterial2Dims({ ...material2Dims, webThickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                     {material2Profile === 'angle' && (
                                         <>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Leg</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.legWidth} onChange={e => setMaterial2Dims({ ...material2Dims, legWidth: Number(e.target.value) })} /></div>
-                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">Thick</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.legThickness || material2Dims.thickness} onChange={e => setMaterial2Dims({ ...material2Dims, legThickness: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.leg}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.legWidth} onChange={e => setMaterial2Dims({ ...material2Dims, legWidth: Number(e.target.value) })} /></div>
+                                            <div className="col-span-1"><label className="text-[10px] text-slate-400">{t.welding.dims.thick}</label><input type="number" className="w-full text-xs p-1 border rounded" value={material2Dims.legThickness || material2Dims.thickness} onChange={e => setMaterial2Dims({ ...material2Dims, legThickness: Number(e.target.value) })} /></div>
                                         </>
                                     )}
                                 </div>
@@ -409,14 +411,11 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         </div>
 
                         {/* Weldability Check */}
-                        {material1Name !== material2Name && (
+                        {material1Id !== material2Id && (
                             <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex items-center gap-2 text-xs">
                                 <AlertTriangle size={14} className="text-amber-500" />
                                 <span className="text-amber-700 dark:text-amber-400">
-                                    {lang === 'tr'
-                                        ? `Farklı malzemeler: ${material1Name} + ${material2Name} - Özel dolgu malzemesi gerekebilir`
-                                        : `Dissimilar materials: ${material1Name} + ${material2Name} - Special filler may be required`
-                                    }
+                                    {t.welding.dissimilarWarning.replace('{m1}', (MATERIAL_OPTIONS.find(m => m.id === material1Id)?.name || material1Id)).replace('{m2}', (MATERIAL_OPTIONS.find(m => m.id === material2Id)?.name || material2Id))}
                                 </span>
                             </div>
                         )}
@@ -432,13 +431,13 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                             length={length}
                             material1={{
                                 color: material1Color,
-                                name: material1Name,
+                                name: material1Id,
                                 shape: material1Profile,
                                 dimensions: material1Dims
                             }}
                             material2={{
                                 color: material2Color,
-                                name: material2Name,
+                                name: material2Id,
                                 shape: material2Profile,
                                 dimensions: material2Dims
                             }}
@@ -446,18 +445,35 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         />
                     </div>
 
+                    {/* Material Comparison */}
+                    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700/50 pb-1 mb-2">
+                            <span>{material1Id}</span>
+                            <span className="text-slate-700 mx-2">VS</span>
+                            <span>{material2Id}</span>
+                        </div>
+                        <div className="flex h-4 rounded overflow-hidden shadow-inner">
+                            <div className="h-full transition-all duration-500" style={{ width: `${(thickness / (thickness + 10)) * 100}%`, backgroundColor: material1Color }} />
+                            <div className="h-full transition-all duration-500 border-l border-cyan-500/30" style={{ width: '2px', backgroundColor: '#06b6d4' }} />
+                            <div className="h-full transition-all duration-500" style={{ width: `${(10 / (thickness + 10)) * 100}%`, backgroundColor: material2Color }} />
+                        </div>
+                    </div>
 
                     {/* Result Dashboard */}
                     <div className="bg-slate-900 text-white rounded-xl p-6 shadow-xl">
                         <div className="grid grid-cols-2 gap-6">
                             {/* Heat Input */}
-                            <div>
-                                <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">
-                                    <Flame size={12} />
-                                    {dict.welding?.results?.heatInput || 'Heat Input'}
-                                </div>
-                                <div className="text-3xl font-mono font-bold" style={{ color: results.heatStatus.color }}>
-                                    {results.heatInput.toFixed(2)} <span className="text-lg">kJ/mm</span>
+                            <div className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600">
+                                        <Flame size={18} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.welding.heatInput}</h4>
+                                        <div className="text-2xl font-mono font-bold text-slate-900 dark:text-white mt-1">
+                                            {results.heatInput.toFixed(2)} <span className="text-sm font-medium text-slate-400">kJ/mm</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-1 mt-1 text-xs" style={{ color: results.heatStatus.color }}>
                                     {results.heatStatus.status === 'optimal' ? <CheckCircle size={12} /> : <AlertTriangle size={12} />}
@@ -469,7 +485,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                             <div>
                                 <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">
                                     <Zap size={12} />
-                                    {dict.welding?.results?.stress || 'Weld Stress'}
+                                    {t.welding.weldStress}
                                 </div>
                                 <div className={`text-3xl font-mono font-bold ${results.safetyFactor < 1.5 ? 'text-red-400' : results.safetyFactor < 2.5 ? 'text-yellow-400' : 'text-green-400'}`}>
                                     {results.stress.toFixed(1)} <span className="text-lg">MPa</span>
@@ -483,13 +499,13 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                         <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-700">
                             {/* Throat Area */}
                             <div>
-                                <div className="text-[10px] text-slate-400 uppercase">Throat Area</div>
+                                <div className="text-[10px] text-slate-400 uppercase">{t.welding.throatArea}</div>
                                 <div className="font-mono text-lg">{results.throatArea.toFixed(0)} mm²</div>
                             </div>
 
                             {/* Min Weld Size */}
                             <div>
-                                <div className="text-[10px] text-slate-400 uppercase">Min Weld Size</div>
+                                <div className="text-[10px] text-slate-400 uppercase">{t.welding.minWeldSize}</div>
                                 <div className={`font-mono text-lg flex items-center gap-1 ${results.weldSizeOk ? 'text-green-400' : 'text-red-400'}`}>
                                     {results.minWeldSize} mm
                                     {results.weldSizeOk ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
@@ -498,7 +514,7 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
 
                             {/* Joint Efficiency */}
                             <div>
-                                <div className="text-[10px] text-slate-400 uppercase">Joint Efficiency</div>
+                                <div className="text-[10px] text-slate-400 uppercase">{t.welding.jointEfficiency}</div>
                                 <div className="font-mono text-lg text-orange-400">{(currentJoint.jointEfficiency * 100).toFixed(0)}%</div>
                             </div>
                         </div>
@@ -508,16 +524,16 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                             <div className="flex items-center gap-3">
                                 <Thermometer size={20} className={results.preheat.required ? 'text-orange-400' : 'text-slate-500'} />
                                 <div>
-                                    <div className="text-[10px] text-slate-400 uppercase">Preheat</div>
+                                    <div className="text-[10px] text-slate-400 uppercase">{t.welding.preheat}</div>
                                     <div className={`font-mono text-lg ${results.preheat.required ? 'text-orange-400' : 'text-slate-400'}`}>
-                                        {results.preheat.required ? `${results.preheat.temperature}°C` : 'Not Required'}
+                                        {results.preheat.required ? `${results.preheat.temperature}°C` : t.welding.notRequired}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Filler Consumption */}
                             <div>
-                                <div className="text-[10px] text-slate-400 uppercase">Filler Metal Est.</div>
+                                <div className="text-[10px] text-slate-400 uppercase">{t.welding.fillerMetal}</div>
                                 <div className="font-mono text-lg">{results.filler.weight.toFixed(1)} g</div>
                             </div>
                         </div>
@@ -526,15 +542,15 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
                     {/* Process Info */}
                     <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 grid grid-cols-3 gap-4 text-center">
                         <div>
-                            <div className="text-[10px] text-slate-500 uppercase">Efficiency (η)</div>
+                            <div className="text-[10px] text-slate-500 uppercase">{t.welding.efficiency}</div>
                             <div className="font-mono font-bold text-slate-900 dark:text-white">{(currentMethod.efficiency * 100).toFixed(0)}%</div>
                         </div>
                         <div>
-                            <div className="text-[10px] text-slate-500 uppercase">Deposition Rate</div>
+                            <div className="text-[10px] text-slate-500 uppercase">{t.welding.depositionRate}</div>
                             <div className="font-mono font-bold text-slate-900 dark:text-white">{currentMethod.depositionRate.min}-{currentMethod.depositionRate.max} kg/h</div>
                         </div>
                         <div>
-                            <div className="text-[10px] text-slate-500 uppercase">Positions</div>
+                            <div className="text-[10px] text-slate-500 uppercase">{t.welding.positions}</div>
                             <div className="font-mono font-bold text-slate-900 dark:text-white text-xs">{currentMethod.positionCapability.join(', ')}</div>
                         </div>
                     </div>
@@ -542,28 +558,24 @@ export default function WeldingPageClient({ dict, lang }: { dict: any, lang: str
 
             </div>
 
-            <TheorySection title={lang === 'tr' ? 'Kaynak Termodinamiği' : 'Welding Thermodynamics'}>
+            <TheorySection title={t.welding.thermodynamics}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{lang === 'tr' ? 'Isı Girdisi Formülü' : 'Heat Input Formula'}</h4>
+                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t.welding.heatFormula}</h4>
                         <code className="block bg-slate-100 dark:bg-slate-800 p-2 rounded text-sm mb-2">Q = (V × I × 60 × η) / (v × 1000)</code>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                            {lang === 'tr'
-                                ? 'Kaynak boyunca birim uzunluk başına aktarılan enerji. Soğuma hızını ve metalurjik özellikleri kontrol eder.'
-                                : 'Energy delivered per unit length of weld. Controls cooling rate and metallurgical properties.'}
+                            {t.welding.heatFormulaDesc}
                         </p>
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{lang === 'tr' ? 'Karbon Eşdeğeri (CE)' : 'Carbon Equivalent (CE)'}</h4>
+                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t.welding.carbonEquivalent}</h4>
                         <code className="block bg-slate-100 dark:bg-slate-800 p-2 rounded text-xs mb-2">CE = C + Mn/6 + (Cr+Mo+V)/5 + (Ni+Cu)/15</code>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                            {lang === 'tr'
-                                ? 'Sertleşebilirlik ve soğuk çatlama duyarlılığını tahmin eder. CE > %0.40 genellikle ön ısıtma gerektirir.'
-                                : 'Predicts hardenability and cold cracking susceptibility. CE > 0.40% typically requires preheating.'}
+                            {t.welding.carbonEquivalentDesc}
                         </p>
                     </div>
                 </div>
             </TheorySection>
-        </main>
+        </main >
     );
 }

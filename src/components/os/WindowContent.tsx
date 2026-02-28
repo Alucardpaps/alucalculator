@@ -9,6 +9,8 @@ const GearsModule = dynamic(() => import('@/components/modules/mechanical/GearsM
 const Nesting2DModule = dynamic(() => import('@/components/modules/mechanical/Nesting2DModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const MaterialsDatabaseModule = dynamic(() => import('@/components/modules/mechanical/MaterialsDatabaseModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const WeldingModule = dynamic(() => import('@/components/modules/mechanical/WeldingModule').then(mod => mod.WeldingModule as any), { loading: () => <ModuleLoading /> });
+const ManufacturingModule = dynamic(() => import('@/components/modules/mechanical/ManufacturingModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ManufacturingSandbox = dynamic(() => import('@/components/modules/mechanical/ManufacturingModule').then(mod => mod.ManufacturingSandbox as any), { loading: () => <ModuleLoading /> });
 const FastenersModule = dynamic(() => import('@/components/modules/mechanical/FastenersModule').then(mod => mod.FastenersModule as any), { loading: () => <ModuleLoading /> });
 const BearingsModule = dynamic(() => import('@/components/modules/mechanical/BearingsModule').then(mod => mod.BearingsModule as any), { loading: () => <ModuleLoading /> });
 const FitsTolerancesModule = dynamic(() => import('@/components/modules/mechanical/FitsTolerancesModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -16,11 +18,7 @@ const MohrStressModule = dynamic(() => import('@/components/modules/mechanical/M
 const CuttingOptimizerModule = dynamic(() => import('@/components/modules/mechanical/CuttingOptimizerModule').then(mod => mod.CuttingOptimizerModule as any), { loading: () => <ModuleLoading /> });
 const PumpsModule = dynamic(() => import('@/components/modules/mechanical/PumpsModule').then(mod => mod.PumpsModule as any), { loading: () => <ModuleLoading /> });
 const SheetMetalModule = dynamic(() => import('@/components/modules/mechanical/SheetMetalModule').then(mod => mod.SheetMetalModule as any), { loading: () => <ModuleLoading /> });
-const HandbookModule = dynamic(() => import('@/components/modules/mechanical/HandbookModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-
-// Civil
-const BeamDeflectionModule = dynamic(() => import('@/components/modules/civil/BeamDeflectionModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const ConcreteReinforcementModule = dynamic(() => import('@/components/modules/civil/ConcreteReinforcementModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const HandbookModule = dynamic(() => import('@/components/modules/reference/EngineeringHandbookModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 // Electrical
 const OhmsLawModule = dynamic(() => import('@/components/modules/electrical/OhmsLawModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -31,10 +29,6 @@ const UnitConverterModule = dynamic(() => import('@/components/modules/science/U
 const PeriodicTableModule = dynamic(() => import('@/components/modules/science/PeriodicTableModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const CalculatorModule = dynamic(() => import('@/components/modules/science/CalculatorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
-// Finance
-const VatCalculatorModule = dynamic(() => import('@/components/modules/finance/VatCalculatorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const ExcelHelperModule = dynamic(() => import('@/components/modules/finance/ExcelHelperModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-
 // Software
 const JsonFormatterModule = dynamic(() => import('@/components/modules/software/JsonFormatterModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const RegexTesterModule = dynamic(() => import('@/components/modules/software/RegexTesterModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -44,21 +38,36 @@ const FeedbackModule = dynamic(() => import('@/components/modules/other/Feedback
 const NewsModule = dynamic(() => import('@/components/modules/other/NewsModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 // OS 2.0
-const FileExplorerModule = dynamic(() => import('@/components/modules/os/FileExplorerModule').then(mod => mod.FileExplorerModule), { loading: () => <ModuleLoading /> });
+const FileExplorerModule = dynamic(() => import('@/components/modules/os/FileExplorerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const TerminalModule = dynamic(() => import('@/components/modules/os/TerminalModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
 const MediaPlayerModule = dynamic(() => import('@/components/modules/media/MediaPlayerModule').then(mod => mod.MediaPlayerModule), { loading: () => <ModuleLoading /> });
 const ImageViewerModule = dynamic(() => import('@/components/modules/viewers/ImageViewerModule').then(mod => mod.ImageViewerModule), { loading: () => <ModuleLoading /> });
 const PDFViewerModule = dynamic(() => import('@/components/modules/viewers/PDFViewerModule').then(mod => mod.PDFViewerModule), { loading: () => <ModuleLoading /> });
 const SpreadsheetViewerModule = dynamic(() => import('@/components/modules/viewers/SpreadsheetViewerModule').then(mod => mod.SpreadsheetViewerModule), { loading: () => <ModuleLoading /> });
 const BrowserModule = dynamic(() => import('@/components/modules/software/BrowserModule').then(mod => mod.BrowserModule), { loading: () => <ModuleLoading /> });
-const PaintModule = dynamic(() => import('@/components/modules/creative/PaintModule').then(mod => mod.PaintModule), { loading: () => <ModuleLoading /> });
 const AICopilotModule = dynamic(() => import('@/components/modules/ai/AICopilotModule').then(mod => mod.AICopilotModule), { loading: () => <ModuleLoading /> });
+const VariableManagerModule = dynamic(() => import('@/components/os/VariableManager').then(mod => mod.VariableManager as any), { loading: () => <ModuleLoading /> });
+const SettingsModule = dynamic(() => import('@/components/modules/os/SettingsModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+
 
 const ReducerModule = dynamic(() => import('@/components/modules/mechanical/ReducerModule').then(mod => mod.ReducerModule as any), { loading: () => <ModuleLoading /> });
 const BoxProfileDetectorModule = dynamic(() => import('@/components/modules/mechanical/BoxProfileDetectorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const CostEstimatorModule = dynamic(() => import('@/components/modules/finance/CostEstimatorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+
+const ParametricCadModule = dynamic(() => import('@/components/modules/parametric/ParametricCadModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+
+// CAD Editor (AluCalc OS 2.0)
+const CadEditorModule = dynamic(() => import('@/cad/components/AluCAD').then(mod => mod.AluCAD), { loading: () => <ModuleLoading /> });
 
 // Flow Editor (AluCalc OS 2.0)
 const FlowEditorModule = dynamic(() => import('@/components/flow/FlowCanvas').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+
+// Analytics & Simulation
+const AnalyticsDashboardModule = dynamic(() => import('@/components/modules/other/AnalyticsDashboardModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+const SimulationFEAModule = dynamic(() => import('@/components/modules/other/SimulationFEAModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+
+// Creative
+const DeskCanvasModule = dynamic(() => import('@/components/modules/desk/DeskCanvas').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+const ExcalidrawModule = dynamic(() => import('@/components/modules/sketch/ExcalidrawModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
 
 function ModuleLoading() {
     return (
@@ -84,10 +93,8 @@ interface WindowContentProps {
     type: ModuleType;
 }
 
-// ... imports
 import { useOSStore } from '@/store/osStore';
 
-// ... dynamic imports
 
 export function WindowContent({ type }: WindowContentProps) {
     const { currentLanguage, dictionary } = useOSStore();
@@ -104,6 +111,10 @@ export function WindowContent({ type }: WindowContentProps) {
             return <MaterialsDatabaseModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'welding':
             return <WeldingModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'manufacturing':
+            return <ManufacturingModule />;
+        case 'manufacturing-sandbox':
+            return <ManufacturingSandbox />;
         case 'fasteners':
             return <FastenersModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'bearings':
@@ -122,12 +133,6 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'handbook':
             return <HandbookModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
 
-        // Civil
-        case 'beam-deflection':
-            return <BeamDeflectionModule />;
-        case 'concrete-reinforcement':
-            return <ConcreteReinforcementModule />;
-
         // Electrical
         case 'ohms-law':
             return <OhmsLawModule />;
@@ -142,12 +147,6 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'calculator':
             return <CalculatorModule />;
 
-        // Finance
-        case 'vat-calculator':
-            return <VatCalculatorModule />;
-        case 'excel-helper':
-            return <ExcelHelperModule />;
-
         // Software
         case 'json-formatter':
             return <JsonFormatterModule />;
@@ -159,10 +158,6 @@ export function WindowContent({ type }: WindowContentProps) {
             return <FeedbackModule />;
         case 'news':
             return <NewsModule />;
-
-
-
-        // ... existing code ...
 
         // OS 2.0
         case 'ai-copilot':
@@ -179,16 +174,10 @@ export function WindowContent({ type }: WindowContentProps) {
             return <SpreadsheetViewerModule />;
         case 'browser':
             return <BrowserModule />;
-        case 'paint':
-            return <PaintModule />;
 
         // ... Mechanical
         case 'reducer-lubrication':
             return <ReducerModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
-
-        // Finance
-        case 'cost-estimator':
-            return <CostEstimatorModule />;
 
         // Box Profile (AI/Mech)
         case 'box-profile-detector':
@@ -197,6 +186,34 @@ export function WindowContent({ type }: WindowContentProps) {
         // Flow Editor (AluCalc OS 2.0)
         case 'flow-editor':
             return <FlowEditorModule className="w-full h-full" />;
+
+        // Parametric CAD
+        case 'parametric-cad':
+            return <ParametricCadModule />;
+
+        // CAD Editor (AluCalc OS 2.0)
+        case 'cad-editor':
+            return <CadEditorModule className="w-full h-full" />;
+
+        // Analytics & Simulation
+        case 'analytics-dashboard':
+            return <AnalyticsDashboardModule />;
+        case 'simulation-fea':
+            return <SimulationFEAModule />;
+
+        // Creative
+        case 'sketch-pad':
+            return <ExcalidrawModule />;
+
+        case 'project-variables':
+            return <VariableManagerModule />;
+
+        case 'settings':
+            return <SettingsModule />;
+
+        // Terminal CLI
+        case 'terminal':
+            return <TerminalModule />;
 
         default:
             return <PlaceholderModule type={type} />;

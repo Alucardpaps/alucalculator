@@ -24,7 +24,11 @@ import {
     MoreVertical
 } from 'lucide-react';
 import { useWorkspaceStore, Project, WorkspaceLayout } from '@/store/workspaceStore';
+import { useI18nStore } from '@/store/i18nStore';
 
+// ============================================
+// Styles
+// ============================================
 // ============================================
 // Styles
 // ============================================
@@ -130,6 +134,7 @@ const NewProjectModal: React.FC<{
     onClose: () => void;
     onCreate: (name: string, description?: string) => void;
 }> = ({ isOpen, onClose, onCreate }) => {
+    const { t } = useI18nStore();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
 
@@ -149,40 +154,40 @@ const NewProjectModal: React.FC<{
         <div className={styles.modal} onClick={onClose}>
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
-                    <span className="text-sm font-bold text-white">New Project</span>
+                    <span className="text-sm font-bold text-white">{t.projects.newProject}</span>
                 </div>
                 <form onSubmit={handleSubmit} className={styles.modalBody}>
                     <div>
                         <label className="block text-xs text-gray-400 mb-1">
-                            Project Name
+                            {t.projects.projectName}
                         </label>
                         <input
                             type="text"
                             value={name}
                             onChange={e => setName(e.target.value)}
                             className={styles.input}
-                            placeholder="My Engineering Project"
+                            placeholder={t.projects.placeholderName}
                             autoFocus
                         />
                     </div>
                     <div>
                         <label className="block text-xs text-gray-400 mb-1">
-                            Description (optional)
+                            {t.projects.description}
                         </label>
                         <input
                             type="text"
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             className={styles.input}
-                            placeholder="Brief description..."
+                            placeholder={t.projects.placeholderDesc}
                         />
                     </div>
                     <div className="flex gap-2 justify-end pt-2">
                         <button type="button" onClick={onClose} className={styles.btnSecondary}>
-                            Cancel
+                            {t.cancel}
                         </button>
                         <button type="submit" className={styles.btnPrimary}>
-                            Create
+                            {t.ok}
                         </button>
                     </div>
                 </form>
@@ -202,6 +207,7 @@ const ProjectItem: React.FC<{
     onDelete: () => void;
     onDuplicate: () => void;
 }> = ({ project, isActive, onSelect, onDelete, onDuplicate }) => {
+    const { t, language } = useI18nStore();
     const [isExpanded, setIsExpanded] = useState(isActive);
     const [showMenu, setShowMenu] = useState(false);
 
@@ -209,7 +215,7 @@ const ProjectItem: React.FC<{
 
     const formatDate = (timestamp: number) => {
         const date = new Date(timestamp);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { month: 'short', day: 'numeric' });
     };
 
     return (
@@ -232,7 +238,7 @@ const ProjectItem: React.FC<{
                 <div className={styles.projectInfo}>
                     <div className={styles.projectName}>{project.name}</div>
                     <div className={styles.projectMeta}>
-                        {formatDate(project.updatedAt)} · {project.workspaces.length} workspace(s)
+                        {formatDate(project.updatedAt)} · {project.workspaces.length} {t.projects.workspacesCount}
                     </div>
                 </div>
                 <div
@@ -246,13 +252,13 @@ const ProjectItem: React.FC<{
                                 className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-gray-400 hover:bg-white/10"
                                 onClick={onDuplicate}
                             >
-                                <Copy size={12} /> Duplicate
+                                <Copy size={12} /> {t.projects.duplicate}
                             </button>
                             <button
                                 className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10"
                                 onClick={onDelete}
                             >
-                                <Trash2 size={12} /> Delete
+                                <Trash2 size={12} /> {t.projects.delete}
                             </button>
                         </div>
                     )}
@@ -266,8 +272,8 @@ const ProjectItem: React.FC<{
                         <div
                             key={workspace.id}
                             className={`${styles.workspaceTab} ${workspace.id === project.activeWorkspaceId
-                                    ? styles.workspaceTabActive
-                                    : ''
+                                ? styles.workspaceTabActive
+                                : ''
                                 }`}
                             onClick={() => switchWorkspace(workspace.id)}
                         >
@@ -286,6 +292,7 @@ const ProjectItem: React.FC<{
 // ============================================
 
 export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '' }) => {
+    const { t } = useI18nStore();
     const [showNewModal, setShowNewModal] = useState(false);
     const [showImport, setShowImport] = useState(false);
 
@@ -347,13 +354,13 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                 <div className={styles.header}>
                     <span className={styles.title}>
                         <FolderOpen size={16} className="text-[#00e5ff]" />
-                        Projects
+                        {t.projects.title}
                     </span>
                     <div className={styles.headerActions}>
                         <button
                             className={styles.iconBtn}
                             onClick={() => setShowNewModal(true)}
-                            title="New Project"
+                            title={t.projects.newProject}
                         >
                             <Plus size={16} />
                         </button>
@@ -365,18 +372,18 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                     {projects.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
                             <FolderOpen size={32} className="mb-2 opacity-50" />
-                            <span className="text-sm">No projects yet</span>
+                            <span className="text-sm">{t.projects.noProjects}</span>
                             <button
                                 className="mt-3 px-3 py-1.5 bg-[#00e5ff]/20 text-[#00e5ff] text-xs rounded-lg"
                                 onClick={() => setShowNewModal(true)}
                             >
-                                Create First Project
+                                {t.projects.createFirst}
                             </button>
                         </div>
                     ) : (
                         <>
                             <div className={styles.sectionHeader}>
-                                <span>All Projects</span>
+                                <span>{t.projects.allProjects}</span>
                                 <span className="text-[#00e5ff]">{projects.length}</span>
                             </div>
                             {sortedProjects.map(project => (
@@ -397,11 +404,11 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                 <div className={styles.footer}>
                     <button className={styles.footerBtn} onClick={handleExport}>
                         <Download size={14} />
-                        Export Project
+                        {t.projects.exportProject}
                     </button>
                     <label className={styles.footerBtn}>
                         <Upload size={14} />
-                        Import Project
+                        {t.projects.importProject}
                         <input
                             type="file"
                             accept=".json"

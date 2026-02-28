@@ -1,0 +1,95 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+node.exe : ÔÜá Specified "headers" will not automatically
+ work with "output: export". See more info here: https://
+nextjs.org/docs/messages/export-no-custom-routes
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá Specifi 
+   ed "...o-custom-routes:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ÔÜá Warning: Next.js inferred your workspace root, but it
+ may not be correct.
+ We detected multiple lockfiles and selected the director
+y of C:\Users\apo_q\package-lock.json as the root directo
+ry.
+ To silence this warning, set `turbopack.root` in your Ne
+xt.js config, or consider removing one of the lockfiles i
+f it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/n
+ext-config-js/turbopack#root-directory for more informati
+on.
+ Detected additional lockfiles: 
+   * C:\Users\apo_q\.gemini\antigravity\scratch\alucalcul
+ator\package-lock.json
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+ÔÜá Specified "headers" will not automatically work with 
+"output: export". See more info here: https://nextjs.org/
+docs/messages/export-no-custom-routes
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./.gemini/antigravity/scratch/alucalculator/node_modules/
+ytsr/lib
+Module not found: Can't resolve './ROOT/.gemini/antigravi
+ty/scratch/alucalculator/node_modules/ytsr/package.json'
+server relative imports are not implemented yet. Please t
+ry an import relative to the file you are importing from.
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./.gemini/antigravity/scratch/alucalculator/node_modules/
+ytsr/lib/parseItem.js:95:21
+Module not found: Can't resolve '/ROOT/.gemini/antigravit
+y/scratch/alucalculator/node_modules/ytsr/package.json'
+[0m [90m 93 |[39m     [36mconst[39m file [33m=[39m
+ [33mPATH[39m[33m.[39mresolve(dir[33m,[39m [32m`${
+Math.random().toString(36).substr(3)}-${Date.now()}.txt`
+[39m)[33m;[39m
+ [90m 94 |[39m     [36mconst[39m cfg [33m=[39m [33
+mPATH[39m[33m.[39mresolve(__dirname[33m,[39m [32m'.
+./package.json'[39m)[33m;[39m
+[31m[1m>[22m[39m[90m 95 |[39m     [36mconst[39m b
+ugsRef [33m=[39m require(cfg)[33m.[39mbugs[33m.[39m
+url[33m;[39m
+ [90m    |[39m                     [31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 96 |[39m
+ [90m 97 |[39m     [90m/* eslint-disable no-console */
+[39m
+ [90m 98 |[39m     console[33m.[39merror(e[33m.[39m
+stack)[33m;[39m[0m
+
+
+
+Import trace:
+  App Route:
+    ./.gemini/antigravity/scratch/alucalculator/node_modu
+les/ytsr/lib/parseItem.js
+    ./.gemini/antigravity/scratch/alucalculator/node_modu
+les/ytsr/lib/main.js
+    ./.gemini/antigravity/scratch/alucalculator/src/app/a
+pi/music/search/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (https://nextjs.org/docs/messages/module
+-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module
+-not-found)
+

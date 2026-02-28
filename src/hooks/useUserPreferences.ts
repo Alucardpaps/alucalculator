@@ -12,6 +12,7 @@ export interface UserPreferences {
     lastDimensions: Record<string, number>;
     cuttingMethod: string;
     theme: 'light' | 'dark' | 'system';
+    terminalHistory: string[];
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -21,7 +22,8 @@ const DEFAULT_PREFERENCES: UserPreferences = {
     lastShape: 'plate',
     lastDimensions: {},
     cuttingMethod: 'laser_fiber',
-    theme: 'system'
+    theme: 'system',
+    terminalHistory: []
 };
 
 /**
@@ -64,7 +66,8 @@ export function loadAllPreferences(): UserPreferences {
         lastShape: loadPreference('lastShape', DEFAULT_PREFERENCES.lastShape),
         lastDimensions: loadPreference('lastDimensions', DEFAULT_PREFERENCES.lastDimensions),
         cuttingMethod: loadPreference('cuttingMethod', DEFAULT_PREFERENCES.cuttingMethod),
-        theme: loadPreference('theme', DEFAULT_PREFERENCES.theme)
+        theme: loadPreference('theme', DEFAULT_PREFERENCES.theme),
+        terminalHistory: loadPreference('terminalHistory', DEFAULT_PREFERENCES.terminalHistory)
     };
 }
 
@@ -91,7 +94,7 @@ export function usePersistedState<K extends keyof UserPreferences>(
         const stored = loadPreference(key, defaultValue);
         setValue(stored);
         setIsHydrated(true);
-    }, [key, defaultValue]);
+    }, [key]); // Only re-hydrate if the key changes. DefaultValue is only for fallback.
 
     // Save to localStorage on change
     useEffect(() => {

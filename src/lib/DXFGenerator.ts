@@ -23,9 +23,11 @@ export class DXFGenerator {
         this.add('0'); this.add('SECTION');
         this.add('2'); this.add('HEADER');
         this.add('9'); this.add('$ACADVER');
-        this.add('1'); this.add('AC1009');
+        this.add('1'); this.add('AC1015'); // AutoCAD 2000
         this.add('9'); this.add('$INSUNITS');
         this.add('70'); this.add('4'); // 4 = mm
+        this.add('9'); this.add('$DIMTXT'); // Text height default
+        this.add('40'); this.add('2.5');
         this.add('0'); this.add('ENDSEC');
     }
 
@@ -74,12 +76,14 @@ export class DXFGenerator {
     public addPolyline(points: { x: number, y: number }[], closed: boolean = false, layer: string = '0', color: number = 7) {
         // Use LWPOLYLINE for 2D polyline which is more modern/compact than POLYLINE
         this.add('0'); this.add('LWPOLYLINE');
+        this.add('5'); this.add('200'); // Handle (arbitrary)
+        this.add('100'); this.add('AcDbEntity');
         this.pair(8, layer);
         this.pair(62, color);
-        this.pair(100, 'AcDbEntity');
-        this.pair(100, 'AcDbPolyline');
+        this.add('100'); this.add('AcDbPolyline');
         this.pair(90, points.length); // Number of vertices
         this.pair(70, closed ? 1 : 0); // 1 = Closed
+        this.pair(43, 0.0); // Constant width (optional but good for compatibility)
 
         points.forEach(p => {
             this.pair(10, p.x);

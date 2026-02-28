@@ -16,6 +16,8 @@ export interface WindowPosition {
     y: number;
 }
 
+export type Theme = 'dark' | 'light' | 'paper' | 'sea' | 'sky';
+
 export interface OSWindow {
     id: string;
     type: ModuleType;
@@ -24,6 +26,7 @@ export interface OSWindow {
     size: WindowSize;
     zIndex: number;
     minimized: boolean;
+    maximized: boolean;
 }
 
 // ============================================
@@ -36,14 +39,25 @@ interface OSState {
     nextZIndex: number;
     currentLanguage: string;
     dictionary: any;
+
+    // Theme & UX
+    theme: Theme;
+    fontSize: 'small' | 'medium' | 'large';
+    fontFamily: 'sans' | 'mono' | 'serif';
+    hasSeenWelcome: boolean;
+    showWelcomeModal: boolean;
+    startMenuOpen: boolean;
+    activeSettingsTab: string;
 }
 
+
 interface OSActions {
-    openWindow: (type: ModuleType) => void;
+    openWindow: (type: ModuleType, maximized?: boolean) => void;
     closeWindow: (id: string) => void;
     focusWindow: (id: string) => void;
     minimizeWindow: (id: string) => void;
     restoreWindow: (id: string) => void;
+    toggleMaximize: (id: string) => void;
     updateWindowPosition: (id: string, position: WindowPosition) => void;
     updateWindowSize: (id: string, size: WindowSize) => void;
     closeAllWindows: () => void;
@@ -51,7 +65,24 @@ interface OSActions {
     setDictionary: (dict: any) => void;
     toggleWindow: (id: string) => void;
     bringToFront: (id: string) => void;
+
+    setTheme: (theme: Theme) => void;
+    setFontSize: (size: 'small' | 'medium' | 'large') => void;
+    setFontFamily: (family: 'sans' | 'mono' | 'serif') => void;
+    openWelcome: () => void;
+    completeWelcome: () => void;
+    resetWelcome: () => void; // Debug
+
+    // Workspace Mode
+    workspaceMode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea';
+    setWorkspaceMode: (mode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea') => void;
+
+    // Start Menu
+    toggleStartMenu: () => void;
+    setStartMenuOpen: (open: boolean) => void;
+    setActiveSettingsTab: (tab: string) => void;
 }
+
 
 // ============================================
 // Store Implementation
@@ -65,7 +96,25 @@ export const useOSStore = create<OSState & OSActions>()(
             nextZIndex: 100,
             currentLanguage: 'en',
             dictionary: {},
+
+            // Default State
+            theme: 'dark',
+            fontSize: 'medium',
+            fontFamily: 'sans',
+            hasSeenWelcome: true, // Skip Welcome Screen by default
+            showWelcomeModal: false,
+            workspaceMode: 'flow',
+            startMenuOpen: false, // Global Start Menu State
+            activeSettingsTab: 'appearance',
+
+
             setDictionary: (dict: any) => set({ dictionary: dict }),
+            setWorkspaceMode: (mode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea') => set({ workspaceMode: mode }),
+
+            toggleStartMenu: () => set(state => ({ startMenuOpen: !state.startMenuOpen })),
+            setStartMenuOpen: (open: boolean) => set({ startMenuOpen: open }),
+            setActiveSettingsTab: (tab: string) => set({ activeSettingsTab: tab }),
+
 
             bringToFront: (id: string) => get().focusWindow(id),
 
@@ -82,9 +131,9 @@ export const useOSStore = create<OSState & OSActions>()(
                 }
             },
 
-            openWindow: (type: ModuleType) => {
+            openWindow: (type: ModuleType, maximized: boolean = false) => {
                 const { windows, nextZIndex } = get();
-                const module = MODULE_REGISTRY[type];
+                const moduleDef = MODULE_REGISTRY[type];
 
                 // Check if window of this type already exists
                 const existing = windows.find(w => w.type === type);
@@ -93,6 +142,9 @@ export const useOSStore = create<OSState & OSActions>()(
                     get().focusWindow(existing.id);
                     if (existing.minimized) {
                         get().restoreWindow(existing.id);
+                    }
+                    if (maximized && !existing.maximized) {
+                        get().toggleMaximize(existing.id);
                     }
                     return;
                 }
@@ -107,11 +159,12 @@ export const useOSStore = create<OSState & OSActions>()(
                 const newWindow: OSWindow = {
                     id: `${type}-${Date.now()}`,
                     type,
-                    title: module.title,
+                    title: moduleDef.title,
                     position,
-                    size: module.defaultSize,
+                    size: moduleDef.defaultSize,
                     zIndex: nextZIndex,
-                    minimized: false
+                    minimized: false,
+                    maximized: maximized
                 };
 
                 set({
@@ -125,23 +178,42 @@ export const useOSStore = create<OSState & OSActions>()(
                 const { windows, activeWindowId } = get();
                 const filtered = windows.filter(w => w.id !== id);
 
+                let nextActiveId = activeWindowId === id
+                    ? (filtered.length > 0 ? filtered[filtered.length - 1].id : null)
+                    : activeWindowId;
+
                 set({
                     windows: filtered,
-                    activeWindowId: activeWindowId === id
-                        ? (filtered.length > 0 ? filtered[filtered.length - 1].id : null)
-                        : activeWindowId
+                    activeWindowId: nextActiveId
                 });
+
+                if (nextActiveId) {
+                    get().focusWindow(nextActiveId);
+                } else {
+                    set({ workspaceMode: 'desk' });
+                }
             },
 
             focusWindow: (id: string) => {
                 const { windows, nextZIndex } = get();
+                const win = windows.find(w => w.id === id);
+                if (!win) return;
+
+                // Sync workspace mode based on window type for contextual tools and sidebar highlight
+                let mode: any = 'desk';
+                if (win.type === 'cad-editor') mode = 'cad';
+                else if (win.type === 'flow-editor') mode = 'flow';
+                else if (win.type === 'cutting-optimizer') mode = 'cam';
+                else if (win.type === 'simulation-fea') mode = 'fea';
+                else if (win.type === 'manufacturing-sandbox') mode = 'cam'; // Sandbox belongs to CAM/Mfg workspace
 
                 set({
                     windows: windows.map(w =>
                         w.id === id ? { ...w, zIndex: nextZIndex } : w
                     ),
                     activeWindowId: id,
-                    nextZIndex: nextZIndex + 1
+                    nextZIndex: nextZIndex + 1,
+                    workspaceMode: mode
                 });
             },
 
@@ -176,10 +248,18 @@ export const useOSStore = create<OSState & OSActions>()(
                 });
             },
 
+            toggleMaximize: (id: string) => {
+                set(state => ({
+                    windows: state.windows.map(w =>
+                        w.id === id ? { ...w, maximized: !w.maximized } : w
+                    )
+                }));
+            },
+
             updateWindowPosition: (id: string, position: WindowPosition) => {
                 set(state => ({
                     windows: state.windows.map(w =>
-                        w.id === id ? { ...w, position } : w
+                        (w.id === id && !w.maximized) ? { ...w, position } : w
                     )
                 }));
             },
@@ -198,15 +278,52 @@ export const useOSStore = create<OSState & OSActions>()(
 
             setLanguage: (lang: string) => {
                 set({ currentLanguage: lang });
-            }
+            },
+
+            // Theme & UX Actions
+            setTheme: (theme: Theme) => set({ theme }),
+            setFontSize: (fontSize) => set({ fontSize }),
+            setFontFamily: (fontFamily) => set({ fontFamily }),
+
+            openWelcome: () => set({ showWelcomeModal: true }),
+
+            completeWelcome: () => set({
+                showWelcomeModal: false,
+                hasSeenWelcome: true
+            }),
+
+            resetWelcome: () => set({
+                hasSeenWelcome: false,
+                showWelcomeModal: true
+            })
         }),
         {
             name: 'alucalc-os-state',
+            version: 2,
+            migrate: (persistedState: any, version: number) => {
+                if (version < 2) {
+                    // v2 migration: filter out windows with invalid module types
+                    // This prevents crashes when MODULE_REGISTRY changes between deploys
+                    const validTypes = Object.keys(MODULE_REGISTRY);
+                    return {
+                        ...persistedState,
+                        windows: (persistedState.windows || []).filter(
+                            (w: any) => validTypes.includes(w.type)
+                        ),
+                        activeWindowId: null,
+                        nextZIndex: 100,
+                    };
+                }
+                return persistedState as OSState & OSActions;
+            },
             partialize: (state) => ({
                 windows: state.windows,
                 activeWindowId: state.activeWindowId,
                 nextZIndex: state.nextZIndex,
-                currentLanguage: state.currentLanguage
+                currentLanguage: state.currentLanguage,
+                theme: state.theme,
+                hasSeenWelcome: state.hasSeenWelcome,
+                workspaceMode: state.workspaceMode,
             })
         }
     )

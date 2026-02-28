@@ -52,7 +52,26 @@ export const boltStressSchema: CalculatorSchema = {
             max: 100,
             step: 0.5,
             description: 'Nominal thread diameter (M-size). Example: 10 for M10 bolt.',
-            required: true
+            required: true,
+            options: [
+                { label: 'M3', value: 3 },
+                { label: 'M4', value: 4 },
+                { label: 'M5', value: 5 },
+                { label: 'M6', value: 6 },
+                { label: 'M8', value: 8 },
+                { label: 'M10', value: 10 },
+                { label: 'M12', value: 12 },
+                { label: 'M14', value: 14 },
+                { label: 'M16', value: 16 },
+                { label: 'M20', value: 20 },
+                { label: 'M24', value: 24 },
+                { label: 'M30', value: 30 },
+                { label: 'M36', value: 36 },
+                { label: 'M42', value: 42 },
+                { label: 'M48', value: 48 },
+                { label: 'M56', value: 56 },
+                { label: 'M64', value: 64 }
+            ]
         },
         {
             key: 'P',
@@ -85,7 +104,17 @@ export const boltStressSchema: CalculatorSchema = {
             max: 2000,
             step: 10,
             description: 'Minimum yield strength of bolt material. Class 8.8 = 640 MPa, Class 10.9 = 900 MPa, Class 12.9 = 1080 MPa.',
-            required: true
+            required: true,
+            options: [
+                { label: 'Class 4.6 (240 MPa)', value: 240 },
+                { label: 'Class 4.8 (320 MPa)', value: 320 },
+                { label: 'Class 5.6 (300 MPa)', value: 300 },
+                { label: 'Class 5.8 (400 MPa)', value: 400 },
+                { label: 'Class 6.8 (480 MPa)', value: 480 },
+                { label: 'Class 8.8 (640 MPa)', value: 640 },
+                { label: 'Class 10.9 (900 MPa)', value: 900 },
+                { label: 'Class 12.9 (1080 MPa)', value: 1080 }
+            ]
         }
     ],
 

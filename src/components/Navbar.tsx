@@ -175,7 +175,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                             {langDropdownOpen && (
                                 <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 p-2 animate-in fade-in slide-in-from-top-1 z-50">
                                     <div className="grid grid-cols-2 gap-1">
-                                        {['en', 'tr', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'ja', 'zh'].map((locale) => {
+                                        {['en', 'tr', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'ja', 'zh', 'ko', 'ar'].map((locale) => {
                                             const path = `/${locale}${typeof window !== 'undefined' ? window.location.pathname.replace(/^\/[a-z]{2}/, '') : ''}`;
                                             return (
                                                 <Link prefetch={false}

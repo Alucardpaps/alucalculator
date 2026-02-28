@@ -140,8 +140,21 @@ function FitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal }: { holeMax: n
     const sMinDev = (shaftMin - nominal) * 1000;
 
     // Auto-scale to fit roughly +/- 50 microns in view, or whatever the max deviation is
-    const maxAbsDev = Math.max(Math.abs(hMaxDev), Math.abs(sMaxDev), Math.abs(hMinDev), Math.abs(sMinDev), 10);
-    const scaleY = 30 / maxAbsDev; // Height to fill (approx 30px up/down)
+    const validMaxDev = Math.max(
+        Number.isFinite(hMaxDev) ? Math.abs(hMaxDev) : 0,
+        Number.isFinite(sMaxDev) ? Math.abs(sMaxDev) : 0,
+        Number.isFinite(hMinDev) ? Math.abs(hMinDev) : 0,
+        Number.isFinite(sMinDev) ? Math.abs(sMinDev) : 0,
+        10
+    );
+
+    const scaleY = 30 / validMaxDev;
+
+    // Safety fallback for rendering rects
+    const safeHMax = Number.isFinite(hMaxDev) ? hMaxDev : 0;
+    const safeHMin = Number.isFinite(hMinDev) ? hMinDev : 0;
+    const safeSMax = Number.isFinite(sMaxDev) ? sMaxDev : 0;
+    const safeSMin = Number.isFinite(sMinDev) ? sMinDev : 0;
 
     return (
         <svg viewBox="0 0 200 80" className="w-full h-20">

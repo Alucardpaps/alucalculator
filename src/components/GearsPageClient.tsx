@@ -7,15 +7,16 @@ import { TheorySection } from "@/components/TheorySection";
 import { IEC_MOTORS } from "@/data/motorData";
 import { GEAR_MODULES_ISO, GEAR_MATERIALS, APPLICATION_FACTORS } from "@/data/gearsData";
 import { CalculatorInput } from "@/components/CalculatorInput";
+import { UndercutDiagram, ServiceFactorDiagram } from "@/components/mechanical/EducationalAssets";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function GearsPageClient({ dict, lang }: { dict: any, lang: string }) {
     const {
         selectedPower, setSelectedPower,
         selectedPoles, setSelectedPoles,
         motor,
-        applicationName, setApplicationName,
         gearType, setGearType,
-        module, setModule,
+        gearModule, setGearModule,
         z1, setZ1,
         z2, setZ2,
         helixAngle, setHelixAngle,
@@ -24,319 +25,355 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
         materialName, setMaterialName,
         results,
         x1, setX1, x2, setX2,
-        pinDia1, setPinDia1, pinDia2, setPinDia2
+        pinDia1, setPinDia1, pinDia2, setPinDia2,
+        // YR Inputs
+        loadClass, setLoadClass,
+        dailyHours, setDailyHours,
+        startsPerHour, setStartsPerHour,
+        connectionType, setConnectionType,
     } = useDriveTrainCalculator();
 
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
-    // Helper for display
+    // ... (helpers remain same)
     const dist = (val: number) => unit === 'metric' ? `${val.toFixed(3)} mm` : `${(val / 25.4).toFixed(4)} in`;
     const force = (val: number) => unit === 'metric' ? `${val.toFixed(0)} N` : `${(val * 0.2248).toFixed(1)} lbf`;
     const stress = (val: number) => unit === 'metric' ? `${val.toFixed(0)} MPa` : `${(val * 145.038).toFixed(0)} psi`;
     const torque = (val: number) => unit === 'metric' ? `${val.toFixed(1)} Nm` : `${(val * 0.7376).toFixed(1)} lb-ft`;
+    const [activeTab, setActiveTab] = useState<'design' | 'analysis'>('design');
 
     return (
-        <main className="min-h-screen bg-blueprint-grid flex flex-col items-center p-4 lg:p-8 font-sans">
+        <main className="min-h-screen bg-[#0f1115] text-slate-300 font-sans selection:bg-brand-orange selection:text-white pb-20">
+            {/* 1. HERO HEADER */}
+            <header className="border-b border-slate-800 bg-[#0f1115] sticky top-0 z-50 backdrop-blur-md bg-opacity-80">
+                <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded bg-gradient-to-br from-brand-orange to-red-600 flex items-center justify-center text-white font-black text-xs shadow-[0_0_15px_rgba(249,115,22,0.5)]">DT</div>
+                        <div>
+                            <h1 className="text-sm font-bold text-white tracking-wider uppercase">DriveTrain <span className="text-brand-orange">Pro</span></h1>
+                        </div>
+                    </div>
 
-            {/* Header */}
-            <header className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center mb-8 bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-slate-200 shadow-sm">
-                <div className="flex items-center gap-4 mb-4 lg:mb-0">
-                    <div className="w-12 h-12 bg-brand-orange rounded-lg flex items-center justify-center text-white font-black text-2xl shadow-lg">DT</div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-50 tracking-tight uppercase">{dict.driveTrain.title}</h1>
-                        <p className="text-sm text-surface-500 dark:text-surface-400 font-medium">{dict.driveTrain.subtitle}</p>
+                    {/* KPI BAR */}
+                    <div className="hidden lg:flex items-center gap-8 text-xs font-mono">
+                        <div className="flex flex-col items-end">
+                            <span className="text-slate-500 uppercase text-[10px]">Ratio</span>
+                            <span className="text-white font-bold">{results.ratio.toFixed(2)}:1</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-slate-500 uppercase text-[10px]">{dict.motor.torqueOut}</span>
+                            <span className="text-ind-orange font-bold text-sm">{torque(results.outputTorque)}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-slate-500 uppercase text-[10px]">Service Factor</span>
+                            <span className={`font-bold text-sm ${results.requiredFs > 2 ? 'text-red-400' : 'text-emerald-400'}`}>{results.requiredFs.toFixed(2)}</span>
+                        </div>
                     </div>
-                </div>
-                <div className="flex gap-4">
-                    <div className="flex bg-slate-200 rounded p-1 h-fit self-center mr-4">
-                        <button onClick={() => setUnit('metric')} className={`px-3 py-1 text-xs font-bold rounded ${unit === 'metric' ? 'bg-white shadow text-slate-900' : 'text-slate-500'}`}>
-                            {dict.common?.metric?.toUpperCase() ?? (lang === 'tr' ? 'METRİK' : 'METRIC')}
-                        </button>
-                        <button onClick={() => setUnit('imperial')} className={`px-3 py-1 text-xs font-bold rounded ${unit === 'imperial' ? 'bg-white shadow text-slate-900' : 'text-slate-500'}`}>
-                            {dict.common?.imperial?.toUpperCase() ?? (lang === 'tr' ? 'İNÇ' : 'IMPERIAL')}
-                        </button>
-                    </div>
-                    <div className="bg-slate-100 rounded-lg p-2 text-center min-w-[100px]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">{dict.motor.inputPower}</div>
-                        <div className="text-lg font-bold text-slate-700">{selectedPower} kW</div>
-                    </div>
-                    <div className="bg-slate-100 rounded-lg p-2 text-center min-w-[100px]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">{dict.motor.ratio}</div>
-                        <div className="text-lg font-bold text-tech-blue">{results.ratio.toFixed(2)}:1</div>
-                    </div>
-                    <div className="bg-slate-100 rounded-lg p-2 text-center min-w-[100px]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase">{dict.motor.torqueOut}</div>
-                        <div className="text-lg font-bold text-ind-orange">{torque(results.outputTorque)}</div>
+
+                    <div className="flex bg-slate-800/50 rounded p-1">
+                        <button onClick={() => setUnit('metric')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'metric' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>MM</button>
+                        <button onClick={() => setUnit('imperial')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'imperial' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>IN</button>
                     </div>
                 </div>
             </header>
 
-            <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="max-w-[1600px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                {/* COL 1: MOTOR & APPLICATION */}
-                <div className="lg:col-span-3 space-y-6">
-                    {/* MOTOR SECTION */}
-                    <div className="card-tech shadow-md border-l-4 border-l-slate-800">
-                        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                {/* LEFT COL: INPUTS & CONTEXT (3 Cols) */}
+                <div className="lg:col-span-3 space-y-8">
+                    {/* Section: Prime Mover */}
+                    <section className="relative group">
+                        <div className="absolute -left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-slate-700 to-transparent opacity-50 rounded-full" />
+                        <h2 className="text-xs font-bold text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-slate-500" />
                             {dict.driveTrain.primeMover}
                         </h2>
 
                         <div className="space-y-4">
-                            <div>
-                                <label className="label-tech">{dict.motor.nominalPower}</label>
-                                <select
-                                    className="input-tech text-lg"
-                                    value={selectedPower}
-                                    onChange={(e) => setSelectedPower(Number(e.target.value))}
-                                >
-                                    {IEC_MOTORS.map(m => (
-                                        <option key={m.power} value={m.power}>{m.power} kW ({m.frame})</option>
-                                    ))}
-                                </select>
+                            <div className="p-4 bg-[#151921] rounded-xl border border-slate-800 hover:border-slate-700 transition-colors">
+                                <label className="label-tech text-slate-400 mb-2 block">{dict.motor.nominalPower}</label>
+                                <div className="flex gap-2">
+                                    <select
+                                        className="bg-black/20 border border-slate-700 text-white text-sm rounded px-3 py-2 w-full focus:outline-none focus:border-brand-orange transition-colors"
+                                        value={selectedPower}
+                                        onChange={(e) => setSelectedPower(Number(e.target.value))}
+                                    >
+                                        {IEC_MOTORS.map(m => <option key={m.power} value={m.power}>{m.power} kW - {m.frame}</option>)}
+                                    </select>
+                                </div>
                             </div>
 
-                            <div>
-                                <label className="label-tech">{dict.motor.speedPoles}</label>
-                                <div className="flex gap-1 bg-slate-100 p-1 rounded-md">
+                            <div className="p-4 bg-[#151921] rounded-xl border border-slate-800">
+                                <label className="label-tech text-slate-400 mb-2 block">{dict.motor.speedPoles}</label>
+                                <div className="grid grid-cols-3 gap-2">
                                     {[2, 4, 6].map(p => (
                                         <button
                                             key={p}
                                             onClick={() => setSelectedPoles(p as any)}
-                                            className={`flex-1 py-1 text-xs font-bold rounded ${selectedPoles === p ? 'bg-white shadow text-slate-900' : 'text-slate-400'}`}
+                                            className={`py-2 text-xs font-bold rounded border transition-all ${selectedPoles === p
+                                                ? 'bg-brand-orange/10 border-brand-orange text-brand-orange'
+                                                : 'bg-black/20 border-slate-800 text-slate-500 hover:border-slate-600'}`}
                                         >
                                             {p}P
                                         </button>
                                     ))}
                                 </div>
-                                <div className="text-right text-xs font-mono text-slate-400 mt-1">
-                                    {motor.speed_4p} rpm @ 50Hz
-                                </div>
-                            </div>
-
-                            <div className="bg-slate-50 p-3 rounded border border-slate-100">
-                                <div className="flex justify-between text-sm mb-1">
-                                    <span className="text-slate-500">{dict.motor.nominalTorque}</span>
-                                    <span className="font-bold">{results.motorTorque.toFixed(1)} Nm</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">{dict.motor.efficiency}</span>
-                                    <span className="font-bold text-green-600">{motor.efficiency}</span>
+                                <div className="text-right text-[10px] font-mono text-slate-500 mt-2">
+                                    Sync: {motor.speed_4p} rpm
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    {/* APPLICATION SECTION */}
-                    <div className="card-tech shadow-md border-l-4 border-l-slate-400">
-                        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">
-                            {dict.driveTrain.application}
-                        </h2>
-                        <div>
-                            <label className="label-tech">{dict.safety.serviceFactor}</label>
-                            <select
-                                className="input-tech text-sm"
-                                value={applicationName}
-                                onChange={(e) => setApplicationName(e.target.value)}
-                            >
-                                {APPLICATION_FACTORS.map(a => (
-                                    <option key={a.name} value={a.name}>{a.name} (KA {a.Ka})</option>
-                                ))}
-                            </select>
-                            <p className="text-[10px] text-slate-400 mt-2 leading-tight">
-                                {APPLICATION_FACTORS.find(a => a.name === applicationName)?.desc}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* COL 2: GEARBOX DESIGN */}
-                <div className="lg:col-span-5 space-y-6">
-                    <div className="card-tech h-full shadow-lg border-t-4 border-t-tech-blue">
-                        <h2 className="text-sm font-bold text-tech-blue uppercase tracking-widest mb-4 flex items-center justify-between">
-                            <span>{dict.driveTrain.transmission}</span>
-                            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">{dict.gear.inputs.module} {module}</span>
+                    {/* Section: Environment (YR) */}
+                    <section className="relative">
+                        <div className="absolute -left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-900 to-transparent opacity-50 rounded-full" />
+                        <h2 className="text-xs font-bold text-white uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-600" />
+                            Conditions
                         </h2>
 
-                        <div className="mb-6 flex justify-center bg-slate-50 rounded-xl border border-slate-100 py-8">
-                            {/* Reusing Gear Viz but we should update it to accept new props if needed or just generic */}
-                            <TechnicalDrawing mode="gear" activeField={null} data={{ z1, z2, module, width: faceWidth }} />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <CalculatorInput label={dict.manufacturing.pinion} unit="" value={z1} onChange={(e) => setZ1(Number(e.target.value))} />
-                            <CalculatorInput label={dict.manufacturing.gear} unit="" value={z2} onChange={(e) => setZ2(Number(e.target.value))} />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="p-5 bg-gradient-to-br from-[#151921] to-[#0f1115] rounded-xl border border-slate-800 space-y-5">
                             <div>
-                                <label className="label-tech">{dict.gear.inputs.module}</label>
-                                <select
-                                    className="input-tech font-mono font-bold"
-                                    value={module}
-                                    onChange={(e) => setModule(Number(e.target.value))}
-                                >
-                                    {GEAR_MODULES_ISO[0].modules.map(m => <option key={m} value={m}>{m}</option>)}
-                                </select>
-                            </div>
-                            <CalculatorInput
-                                label={dict.gear.inputs.faceWidth}
-                                unit={unit === 'metric' ? "mm" : "in"}
-                                value={unit === 'metric' ? faceWidth : parseFloat((faceWidth / 25.4).toFixed(3))}
-                                onChange={(e) => unit === 'metric' ? setFaceWidth(Number(e.target.value)) : setFaceWidth(Number(e.target.value) * 25.4)}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            <CalculatorInput label={dict.gear.inputs.helixAngle} unit="deg" value={helixAngle} onChange={(e) => setHelixAngle(Number(e.target.value))} />
-                            <div>
-                                <label className="label-tech">{dict.sheetMetal.inputs.material}</label>
-                                <select
-                                    className="input-tech text-xs"
-                                    value={materialName}
-                                    onChange={(e) => setMaterialName(e.target.value)}
-                                >
-                                    {GEAR_MATERIALS.map(m => (
-                                        <option key={m.name} value={m.name}>{m.name}</option>
+                                <div className="flex justify-between items-center mb-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Load Class</label>
+                                    <span className="text-[9px] text-blue-400 bg-blue-950/30 px-1 rounded border border-blue-900/50">YR Std.</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-1">
+                                    {['U', 'M', 'H'].map((lc) => (
+                                        <button
+                                            key={lc}
+                                            onClick={() => setLoadClass(lc as any)}
+                                            className={`text-[10px] font-bold py-1.5 rounded transition-colors ${loadClass === lc ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
+                                        >
+                                            {lc === 'U' ? 'Uniform' : lc === 'M' ? 'Moderate' : 'Heavy'}
+                                        </button>
                                     ))}
-                                </select>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* NEW: Manufacturing Section (Profile Shift) */}
-                        <div className="border-t border-slate-100 pt-4 mb-6">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{dict.manufacturing.profileMod}</h3>
                             <div className="grid grid-cols-2 gap-4">
-                                <CalculatorInput label={`${dict.manufacturing.shiftCoeff} (x1)`} unit="" value={x1} onChange={(e) => setX1(Number(e.target.value))} />
-                                <CalculatorInput label={`${dict.manufacturing.shiftCoeff} (x2)`} unit="" value={x2} onChange={(e) => setX2(Number(e.target.value))} />
-                            </div>
-                        </div>
-
-                        <div className="bg-slate-100 rounded-lg p-4 grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <div className="text-slate-500 text-xs">{dict.common.centerDist || 'Center Dist'}</div>
-                                <div className="font-bold text-slate-800">{dist(results.a)}</div>
-                            </div>
-                            <div>
-                                <div className="text-slate-500 text-xs">{dict.common.outputSpeed || 'Output Speed'}</div>
-                                <div className="font-bold text-slate-800">{results.outputSpeed.toFixed(0)} rpm</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* COL 3: ANALYSIS */}
-                <div className="lg:col-span-4 space-y-6">
-                    <div className="card-tech shadow-md border-r-4 border-r-ind-orange h-full flex flex-col gap-6">
-                        {/* 4A. MANUFACTURING DATA */}
-                        <div className="">
-                            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4 border-b border-orange-100 pb-2 flex items-center gap-2">
-                                {dict.driveTrain.manufacturing}
-                            </h2>
-                            <div className="bg-surface-50 dark:bg-surface-800 p-4 rounded-xl border border-surface-100 dark:border-surface-700 space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="field-label mb-1 text-[9px]">{dict.manufacturing.checkPin} (Z1)</label>
-                                        <input
-                                            type="number"
-                                            inputMode="decimal"
-                                            className="w-full bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded px-2 py-1 text-sm font-bold font-mono text-surface-900 dark:text-surface-100"
-                                            value={pinDia1}
-                                            onChange={(e) => setPinDia1(Number(e.target.value))}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="field-label mb-1 text-[9px]">{dict.manufacturing.checkPin} (Z2)</label>
-                                        <input
-                                            type="number"
-                                            inputMode="decimal"
-                                            className="w-full bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded px-2 py-1 text-sm font-bold font-mono text-surface-900 dark:text-surface-100"
-                                            value={pinDia2}
-                                            onChange={(e) => setPinDia2(Number(e.target.value))}
-                                        />
-                                    </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Hrs / Day</label>
+                                    <select
+                                        className="bg-black/20 border border-slate-700 text-slate-300 text-xs rounded px-2 py-1.5 w-full"
+                                        value={dailyHours}
+                                        onChange={(e) => setDailyHours(Number(e.target.value))}
+                                    >
+                                        <option value={2}>&lt; 3h</option>
+                                        <option value={8}>3 - 10h</option>
+                                        <option value={12}>&gt; 10h</option>
+                                    </select>
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                                    <div className="col-span-2 field-label border-b border-surface-200 dark:border-surface-700 pb-1 mt-2">{dict.manufacturing.overPins}</div>
-                                    <div className="flex justify-between"><span className="text-surface-600 dark:text-surface-400 font-bold">{dict.manufacturing.pinion}:</span> <span className="font-mono text-surface-900 dark:text-surface-200">{dist(results.M1)}</span></div>
-                                    <div className="flex justify-between"><span className="text-surface-600 dark:text-surface-400 font-bold">{dict.manufacturing.gear}:</span> <span className="font-mono text-surface-900 dark:text-surface-200">{dist(results.M2)}</span></div>
-
-                                    <div className="col-span-2 field-label border-b border-surface-200 dark:border-surface-700 pb-1 mt-2">{dict.manufacturing.baseTangent}</div>
-                                    <div className="flex justify-between"><span className="text-surface-600 dark:text-surface-400 font-bold">{dict.manufacturing.pinion} ({results.Wk1.k} {dict.manufacturing.teeth}):</span> <span className="font-mono text-surface-900 dark:text-surface-200">{dist(results.Wk1.W)}</span></div>
-                                    <div className="flex justify-between"><span className="text-surface-600 dark:text-surface-400 font-bold">{dict.manufacturing.gear} ({results.Wk2.k} {dict.manufacturing.teeth}):</span> <span className="font-mono text-surface-900 dark:text-surface-200">{dist(results.Wk2.W)}</span></div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Starts/Hr</label>
+                                    <input
+                                        type="number"
+                                        className="bg-black/20 border border-slate-700 text-slate-300 text-xs rounded px-2 py-1.5 w-full"
+                                        value={startsPerHour}
+                                        onChange={(e) => setStartsPerHour(Number(e.target.value))}
+                                    />
                                 </div>
                             </div>
-                        </div>
 
-
-                        {/* 4B. ENGINEERING ANALYSIS */}
-                        <div className="flex-1">
-                            <h2 className="text-sm font-bold text-ind-orange uppercase tracking-widest mb-6 border-b border-orange-100 pb-2">
-                                {dict.driveTrain.engineering}
-                            </h2>
-
-                            {/* Forces */}
-                            <div className="mb-8">
-                                <h3 className="text-xs font-bold text-slate-400 uppercase mb-3">{dict.safety.loadFactors}</h3>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center group">
-                                        <span className="text-sm text-slate-600 group-hover:text-ind-orange transition-colors">{dict.safety.tangentialForce}</span>
-                                        <span className="font-mono font-bold text-slate-800">{force(results.Ft)}</span>
+                            {/* Educational Feature: Service Factor */}
+                            <div className="pt-2 border-t border-slate-800/50">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-16 opacity-70">
+                                        <ServiceFactorDiagram />
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-slate-400">{dict.safety.radialForce}</span>
-                                        <span className="font-mono font-bold text-slate-400">{force(results.Fr)}</span>
-                                    </div>
-                                    {helixAngle > 0 && (
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm text-slate-400">{dict.safety.axialForce}</span>
-                                            <span className="font-mono font-bold text-slate-400">{force(results.Fa)}</span>
+                                    <div>
+                                        <div className="text-[10px] text-slate-500 leading-tight">
+                                            High shock loads or frequent starts require a higher safety margin ($f_s$).
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Safety Factors */}
-                            <div className="space-y-4">
-                                <h3 className="text-xs font-bold text-slate-400 uppercase mb-3">{dict.safety.safetyEst}</h3>
-
-                                {/* Bending */}
-                                <div className={`p-4 rounded-xl border-l-4 ${results.SF_bending > 1.4 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
-                                    <div className="flex justify-between items-end mb-1">
-                                        <span className="text-xs font-bold uppercase text-slate-500">{dict.safety.bendingSafety}</span>
-                                        <span className={`text-2xl font-black ${results.SF_bending > 1.4 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {results.SF_bending.toFixed(2)}
-                                        </span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-400">
-                                        {dict.safety.stress}: {stress(results.estBendingStress)} / {dict.safety.limit}: {stress(GEAR_MATERIALS.find(m => m.name === materialName)?.sigma_Flim || 0)}
-                                    </div>
-                                </div>
-
-                                {/* Contact */}
-                                <div className={`p-4 rounded-xl border-l-4 ${results.SF_contact > 1.0 ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`}>
-                                    <div className="flex justify-between items-end mb-1">
-                                        <span className="text-xs font-bold uppercase text-slate-500">{dict.safety.pittingSafety}</span>
-                                        <span className={`text-2xl font-black ${results.SF_contact > 1.0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {results.SF_contact.toFixed(2)}
-                                        </span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-400">
-                                        {dict.safety.contactStress}: {stress(results.estContactStress)} / {dict.safety.limit}: {stress(GEAR_MATERIALS.find(m => m.name === materialName)?.sigma_Hlim || 0)}
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+                </div>
 
-                            <div className="mt-8 text-[10px] text-slate-300 italic">
-                                * {dict.safety.safetyWarning}
+
+                {/* CENTER COL: STAGE (5 Cols) */}
+                <div className="lg:col-span-6 flex flex-col gap-6">
+
+                    {/* VISUALIZATION CARD */}
+                    <div className="relative aspect-[4/3] bg-[#0A0C10] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden group">
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                        <div className="absolute top-4 left-4 z-10 flex gap-2">
+                            <div className="px-3 py-1 bg-slate-900/80 backdrop-blur rounded border border-slate-700 text-[10px] text-slate-400 font-mono">
+                                A = <span className="text-white font-bold">{results.a.toFixed(2)}</span> mm
                             </div>
                         </div>
 
+                        {/* RENDER */}
+                        <div className="absolute inset-0 flex items-center justify-center p-8">
+                            <TechnicalDrawing mode="gear" activeField={null} data={{ z1, z2, module: gearModule, width: faceWidth, x1, x2, pressureAngle }} />
+                        </div>
 
+                        {/* FLOATING CONTROLS (Glassmorphism) */}
+                        <div className="absolute bottom-6 left-6 right-6 bg-slate-900/60 backdrop-blur-md border border-white/10 p-4 rounded-xl flex items-center justify-between gap-6">
+                            <div className="flex-1">
+                                <div className="flex justify-between text-xs mb-1 text-slate-300">
+                                    <span>Pinion (Z1)</span>
+                                    <span className="font-bold">{z1}</span>
+                                </div>
+                                <input type="range" min="10" max="100" value={z1} onChange={e => setZ1(Number(e.target.value))} className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-orange" />
+                            </div>
+                            <div className="w-px h-8 bg-white/10" />
+                            <div className="flex-1">
+                                <div className="flex justify-between text-xs mb-1 text-slate-300">
+                                    <span>Gear (Z2)</span>
+                                    <span className="font-bold">{z2}</span>
+                                </div>
+                                <input type="range" min="10" max="200" value={z2} onChange={e => setZ2(Number(e.target.value))} className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-tech-blue" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* MAIN GEOMETRY CONFIG */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="p-5 bg-[#151921] rounded-xl border border-slate-800">
+                            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-4">Base Geometry</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between mb-1">
+                                        <label className="label-tech text-slate-400">Module (m)</label>
+                                        <span className="text-xs font-mono text-slate-500">ISO</span>
+                                    </div>
+                                    <select
+                                        className="input-tech-dark w-full font-mono font-bold text-lg"
+                                        value={gearModule}
+                                        onChange={(e) => setGearModule(Number(e.target.value))}
+                                    >
+                                        {GEAR_MODULES_ISO[0].modules.map(m => <option key={m} value={m}>{m}</option>)}
+                                    </select>
+                                </div>
+                                <CalculatorInput
+                                    label="Face Width (b)"
+                                    unit="mm"
+                                    value={faceWidth}
+                                    onChange={(e) => setFaceWidth(Number(e.target.value))}
+                                    className="bg-black/20 border-slate-700 text-white"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="p-5 bg-[#151921] rounded-xl border border-slate-800 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-brand-orange/10 to-transparent rounded-bl-3xl" />
+                            <div className="flex items-center gap-2 mb-4">
+                                <h3 className="text-[10px] font-bold text-brand-orange uppercase">Refinement</h3>
+                                <div className="text-[9px] px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange border border-brand-orange/30">ADVANCED</div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <CalculatorInput label="Shift (x1)" unit="" value={x1} onChange={(e) => setX1(Number(e.target.value))} className="bg-black/20 border-slate-700 text-white" />
+                                    <CalculatorInput label="Shift (x2)" unit="" value={x2} onChange={(e) => setX2(Number(e.target.value))} className="bg-black/20 border-slate-700 text-white" />
+                                </div>
+
+                                {/* Educational Trigger */}
+                                <div className="group relative cursor-help">
+                                    <div className="flex items-center gap-2 text-[10px] text-slate-500 hover:text-slate-300 transition-colors">
+                                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Why use Profile Shift?
+                                    </div>
+                                    {/* Tooltip */}
+                                    <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-slate-800 rounded-lg shadow-xl border border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                        <UndercutDiagram />
+                                        <p className="mt-2 text-[9px] text-slate-400">
+                                            Shift (x) prevents undercut in small pinions (z{'<'}17) and strengthens the tooth root.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+
+                {/* RIGHT COL: ANALYSIS (4 Cols) */}
+                <div className="lg:col-span-3 space-y-6">
+                    {/* TRAFFIC LIGHTS */}
+                    <div className="bg-[#151921] rounded-2xl border border-slate-800 p-1">
+                        <div className="grid grid-cols-2 divide-x divide-slate-800">
+                            <div className="p-4 flex flex-col items-center text-center">
+                                <div className={`w-3 h-3 rounded-full mb-2 shadow-[0_0_10px_currentColor] ${results.SF_bending > 1.4 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Bending</span>
+                                <span className="text-xl font-black text-white mt-1">{results.SF_bending.toFixed(2)}</span>
+                                <span className="text-[9px] text-slate-600 mt-1">Safety Factor</span>
+                            </div>
+                            <div className="p-4 flex flex-col items-center text-center">
+                                <div className={`w-3 h-3 rounded-full mb-2 shadow-[0_0_10px_currentColor] ${results.SF_contact > 1.0 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">Contact</span>
+                                <span className="text-xl font-black text-white mt-1">{results.SF_contact.toFixed(2)}</span>
+                                <span className="text-[9px] text-slate-600 mt-1">Safety Factor</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* DETAILED SPECS LIST */}
+                    <div className="bg-[#151921] rounded-xl border border-slate-800 p-5">
+                        <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Geometry Output</h3>
+                        <div className="space-y-3 font-mono text-xs">
+                            <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                                <span className="text-slate-500">Center Dist (a)</span>
+                                <span className="text-white bg-slate-800 px-2 py-0.5 rounded">{dist(results.a)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-brand-orange">
+                                <span>Tip Dia (da1)</span>
+                                <span>{dist(results.da1)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-tech-blue">
+                                <span>Tip Dia (da2)</span>
+                                <span>{dist(results.da2)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-slate-600 pt-2">
+                                <span>Root Dia (df1)</span>
+                                <span>{dist(results.df1)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* FORCES */}
+                    <div className="bg-[#151921] rounded-xl border border-slate-800 p-5">
+                        <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Load Analysis</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                                    <span>Tangential Force</span>
+                                    <span>{force(results.Ft)}</span>
+                                </div>
+                                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-slate-500 h-full rounded-full" style={{ width: '40%' }} />
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                                    <span>Radial (Bearing)</span>
+                                    <span className="text-red-400">{force(results.Fr)}</span>
+                                </div>
+                                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-red-500 h-full rounded-full" style={{ width: '25%' }} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
+            {/* FOOTER */}
+            <div className="fixed bottom-0 left-0 right-0 h-6 bg-[#0A0C10] border-t border-slate-800 flex items-center px-4 text-[10px] text-slate-600 justify-between z-50">
+                <div className="flex items-center gap-4">
+                    <span>READY</span>
+                    <span className="text-emerald-500">CALCULATION SYNCED</span>
+                </div>
+                <div className="font-mono">
+                    ALUCALC OS v2.1
+                </div>
+            </div>
+
         </main>
     );
 }

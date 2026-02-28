@@ -3,6 +3,7 @@
  * AST-based expression evaluator - NO eval()
  * 
  * Supports: +, -, *, /, ^, sqrt, sin, cos, tan, log, ln, abs, PI, E
+ * Also supports: ==, !=, <, >, <=, >=, ?: (ternary)
  */
 
 // ============================================
@@ -13,6 +14,9 @@ type TokenType =
     | 'NUMBER'
     | 'IDENTIFIER'
     | 'OPERATOR'
+    | 'COMPARISON'
+    | 'QUESTION'
+    | 'COLON'
     | 'LPAREN'
     | 'RPAREN'
     | 'COMMA'
@@ -32,7 +36,8 @@ type ASTNode =
     | IdentifierNode
     | BinaryOpNode
     | UnaryOpNode
-    | FunctionCallNode;
+    | FunctionCallNode
+    | TernaryNode;
 
 interface NumberNode {
     type: 'Number';
@@ -61,6 +66,13 @@ interface FunctionCallNode {
     type: 'FunctionCall';
     name: string;
     args: ASTNode[];
+}
+
+interface TernaryNode {
+    type: 'Ternary';
+    condition: ASTNode;
+    ifTrue: ASTNode;
+    ifFalse: ASTNode;
 }
 
 // ============================================
@@ -100,6 +112,8 @@ const FUNCTIONS: Record<string, (...args: number[]) => number> = {
     // Engineering functions
     rad: (deg: number) => deg * Math.PI / 180,
     deg: (rad: number) => rad * 180 / Math.PI,
+    // Conditional helpers
+    iif: (cond: number, ifTrue: number, ifFalse: number) => cond ? ifTrue : ifFalse,
 };
 
 // ============================================
@@ -114,8 +128,8 @@ class Lexer {
         this.input = input.replace(/\s+/g, ''); // Remove whitespace
     }
 
-    private peek(): string {
-        return this.input[this.pos] || '';
+    private peek(offset = 0): string {
+        return this.input[this.pos + offset] || '';
     }
 
     private advance(): string {
@@ -184,6 +198,42 @@ class Lexer {
             return this.readIdentifier();
         }
 
+        // Comparison operators (two-char first)
+        if (char === '=' && this.peek(1) === '=') {
+            this.advance(); this.advance();
+            return { type: 'COMPARISON', value: '==' };
+        }
+        if (char === '!' && this.peek(1) === '=') {
+            this.advance(); this.advance();
+            return { type: 'COMPARISON', value: '!=' };
+        }
+        if (char === '<' && this.peek(1) === '=') {
+            this.advance(); this.advance();
+            return { type: 'COMPARISON', value: '<=' };
+        }
+        if (char === '>' && this.peek(1) === '=') {
+            this.advance(); this.advance();
+            return { type: 'COMPARISON', value: '>=' };
+        }
+        if (char === '<') {
+            this.advance();
+            return { type: 'COMPARISON', value: '<' };
+        }
+        if (char === '>') {
+            this.advance();
+            return { type: 'COMPARISON', value: '>' };
+        }
+
+        // Ternary operator
+        if (char === '?') {
+            this.advance();
+            return { type: 'QUESTION', value: '?' };
+        }
+        if (char === ':') {
+            this.advance();
+            return { type: 'COLON', value: ':' };
+        }
+
         if (['+', '-', '*', '/', '^'].includes(char)) {
             this.advance();
             return { type: 'OPERATOR', value: char };
@@ -246,11 +296,39 @@ class Parser {
     }
 
     parse(): ASTNode {
-        const result = this.parseExpression();
+        const result = this.parseTernary();
         if (this.current().type !== 'EOF') {
             throw new FormulaError(`Unexpected token: ${this.current().value}`);
         }
         return result;
+    }
+
+    // Ternary: Comparison ('?' Ternary ':' Ternary)?
+    private parseTernary(): ASTNode {
+        const condition = this.parseComparison();
+
+        if (this.current().type === 'QUESTION') {
+            this.consume(); // ?
+            const ifTrue = this.parseTernary();
+            this.consume('COLON'); // :
+            const ifFalse = this.parseTernary();
+            return { type: 'Ternary', condition, ifTrue, ifFalse };
+        }
+
+        return condition;
+    }
+
+    // Comparison: Expression (('==' | '!=' | '<' | '>' | '<=' | '>=') Expression)?
+    private parseComparison(): ASTNode {
+        let left = this.parseExpression();
+
+        while (this.current().type === 'COMPARISON') {
+            const op = this.consume().value as string;
+            const right = this.parseExpression();
+            left = { type: 'BinaryOp', operator: op, left, right };
+        }
+
+        return left;
     }
 
     // Expression: Term (('+' | '-') Term)*
@@ -305,7 +383,7 @@ class Parser {
         return this.parsePrimary();
     }
 
-    // Primary: NUMBER | IDENTIFIER | FunctionCall | '(' Expression ')'
+    // Primary: NUMBER | IDENTIFIER | FunctionCall | '(' Ternary ')'
     private parsePrimary(): ASTNode {
         const token = this.current();
 
@@ -328,7 +406,7 @@ class Parser {
 
         if (token.type === 'LPAREN') {
             this.consume();
-            const expr = this.parseExpression();
+            const expr = this.parseTernary();
             this.consume('RPAREN');
             return expr;
         }
@@ -341,11 +419,11 @@ class Parser {
         const args: ASTNode[] = [];
 
         if (this.current().type !== 'RPAREN') {
-            args.push(this.parseExpression());
+            args.push(this.parseTernary());
 
             while (this.current().type === 'COMMA') {
                 this.consume();
-                args.push(this.parseExpression());
+                args.push(this.parseTernary());
             }
         }
 
@@ -390,6 +468,13 @@ class Evaluator {
                         if (right === 0) throw new FormulaError('Division by zero');
                         return left / right;
                     case '^': return Math.pow(left, right);
+                    // Comparison operators return 1 (true) or 0 (false)
+                    case '==': return left === right ? 1 : 0;
+                    case '!=': return left !== right ? 1 : 0;
+                    case '<': return left < right ? 1 : 0;
+                    case '>': return left > right ? 1 : 0;
+                    case '<=': return left <= right ? 1 : 0;
+                    case '>=': return left >= right ? 1 : 0;
                     default:
                         throw new FormulaError(`Unknown operator: ${node.operator}`);
                 }
@@ -412,6 +497,12 @@ class Evaluator {
                 }
                 const args = node.args.map(arg => this.evaluate(arg));
                 return func(...args);
+            }
+
+            case 'Ternary': {
+                const cond = this.evaluate(node.condition);
+                // Treat any non-zero value as true
+                return cond !== 0 ? this.evaluate(node.ifTrue) : this.evaluate(node.ifFalse);
             }
         }
     }
@@ -438,6 +529,7 @@ export class FormulaError extends Error {
  * @example
  * evaluateFormula("PI * diameter^2 / 4", { diameter: 10 }) // 78.54
  * evaluateFormula("sqrt(a^2 + b^2)", { a: 3, b: 4 }) // 5
+ * evaluateFormula("x > 10 ? 1 : 0", { x: 15 }) // 1
  */
 export function evaluateFormula(
     formula: string,
@@ -474,21 +566,25 @@ export function validateFormula(formula: string): { valid: boolean; error?: stri
  */
 export function extractVariables(formula: string): string[] {
     const variables: Set<string> = new Set();
-    const lexer = new Lexer(formula);
-    const tokens = lexer.tokenize();
+    try {
+        const lexer = new Lexer(formula);
+        const tokens = lexer.tokenize();
 
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        if (token.type === 'IDENTIFIER') {
-            const name = token.value as string;
-            // Skip if it's a constant or function
-            if (!CONSTANTS[name] && !FUNCTIONS[name]) {
-                // Skip if followed by ( - it's a function call
-                if (tokens[i + 1]?.type !== 'LPAREN') {
-                    variables.add(name);
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i];
+            if (token.type === 'IDENTIFIER') {
+                const name = token.value as string;
+                // Skip if it's a constant or function
+                if (!CONSTANTS[name] && !FUNCTIONS[name]) {
+                    // Skip if followed by ( - it's a function call
+                    if (tokens[i + 1]?.type !== 'LPAREN') {
+                        variables.add(name);
+                    }
                 }
             }
         }
+    } catch {
+        // Return empty if parsing fails
     }
 
     return Array.from(variables);
@@ -507,3 +603,4 @@ export function getAvailableFunctions(): string[] {
 export function getAvailableConstants(): Record<string, number> {
     return { ...CONSTANTS };
 }
+

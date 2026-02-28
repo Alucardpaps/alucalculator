@@ -1,0 +1,3 @@
+module.exports=[55551,a=>{"use strict";var b=a.i(683650);a.s(["BrowserModule",0,()=>(0,b.jsxs)("div",{className:"h-full flex flex-col bg-white",children:[(0,b.jsxs)("div",{className:"p-2 border-b flex gap-2",children:[(0,b.jsx)("button",{className:"px-2",children:"⬅️"}),(0,b.jsx)("button",{className:"px-2",children:"➡️"}),(0,b.jsx)("input",{className:"flex-1 border rounded px-2",value:"https://google.com",readOnly:!0})]}),(0,b.jsx)("iframe",{src:"https://www.bing.com",className:"flex-1 w-full border-0",title:"Browser"})]})])},294930,a=>{a.n(a.i(55551))}];
+
+//# sourceMappingURL=12d90_alucalculator_src_components_modules_software_BrowserModule_tsx_578f4214._.js.map

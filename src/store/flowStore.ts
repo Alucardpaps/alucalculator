@@ -3,24 +3,6 @@
  * 
  * Zustand store for node-based calculator workflows.
  * Manages nodes, edges, data propagation, and circular dependency detection.
- * 
- * DEEP ANALYSIS (ULTRATHINK):
- * ─────────────────────────────────────────────────────────────────────
- * 1. DATA FLOW ARCHITECTURE
- *    - Nodes are calculator instances with schema reference
- *    - Edges connect output ports to input ports
- *    - Data propagation uses topological sort for deterministic order
- *    - Circular dependencies MUST be detected and BLOCKED
- * 
- * 2. STATE CONSISTENCY
- *    - Node data is immutable-style updates
- *    - Edge validation before connection
- *    - Undo/redo support via history stack (future)
- * 
- * 3. PERFORMANCE
- *    - Selective re-computation (only affected nodes)
- *    - Debounced propagation for rapid input changes
- * ─────────────────────────────────────────────────────────────────────
  */
 
 import { create } from 'zustand';
@@ -42,22 +24,48 @@ import { getCalculatorById } from '@/calculators/registry';
 // Types
 // ============================================
 
-export type FlowNodeType = 'calculator' | 'media' | 'note';
+export type FlowNodeType = 'calculator' | 'media' | 'note' | 'notebook' | 'visualizer' | 'standard-calculator' | 'nesting' | 'engineering';
+
+export interface NestingNodeData {
+    type: 'nesting';
+    title?: string;
+}
+
+export interface EngineeringNodeData {
+    type: 'engineering';
+    schemaId: string;
+}
+
+export type FlowNodeData = CalculatorNodeData | MediaNodeData | NoteNodeData | NotebookNodeData | VisualizerNodeData | StandardCalculatorNodeData | NestingNodeData | EngineeringNodeData;
+
+// ... (in FlowActions interface)
+
+// ... (rest of file)
+
 
 export interface CalculatorNodeData {
     type: 'calculator';
     schemaId: string;
     schema: CalculatorSchema;
     inputs: Record<string, number>;
+    inputFormulas?: Record<string, string>; // Store raw formulas (e.g. "=SafetyFactor")
     outputs: Record<string, number>;
     isComputing?: boolean;
     hasError?: boolean;
 }
 
+export interface VisualizerNodeData {
+    type: 'visualizer';
+    vizType: 'gear' | 'beam' | 'welding' | 'details' | 'chart' | 'profile' | 'box-profile' | '3d-box';
+    inputs: Record<string, any>; // Dynamic inputs based on vizType
+    title?: string;
+}
+
 export interface MediaNodeData {
     type: 'media';
-    mediaType: 'youtube' | 'pdf' | 'image';
+    mediaType: 'youtube' | 'pdf' | 'image' | 'music' | 'excel' | 'word' | 'powerpoint';
     url: string;
+    filePath?: string;
     title?: string;
 }
 
@@ -67,7 +75,21 @@ export interface NoteNodeData {
     color?: string;
 }
 
-export type FlowNodeData = CalculatorNodeData | MediaNodeData | NoteNodeData;
+export interface NotebookNodeData {
+    type: 'notebook';
+    content: string;
+    title?: string;
+    color?: string; // Paper color (white, yellow, grid)
+}
+
+export interface StandardCalculatorNodeData {
+    type: 'standard-calculator';
+    expression?: string;
+    result?: string;
+    outputs?: Record<string, number>;
+}
+
+
 
 export interface FlowNode extends Node<FlowNodeData> {
     type: FlowNodeType;
@@ -102,12 +124,17 @@ interface FlowState {
 interface FlowActions {
     // Node operations
     addCalculatorNode: (schemaId: string, position?: { x: number; y: number }) => string;
-    addMediaNode: (mediaType: 'youtube' | 'pdf', url: string, position?: { x: number; y: number }) => string;
+    addVisualizerNode: (vizType: VisualizerNodeData['vizType'], position?: { x: number; y: number }) => string;
+    addMediaNode: (mediaType: MediaNodeData['mediaType'], url: string, position?: { x: number; y: number }, filePath?: string) => string;
     addNoteNode: (content: string, position?: { x: number; y: number }) => string;
+    addNotebookNode: (content?: string, position?: { x: number; y: number }) => string;
+    addNestingNode: (position?: { x: number; y: number }) => string;
+    addStandardCalculatorNode: (position?: { x: number; y: number }) => string;
     removeNode: (id: string) => void;
     updateNodeData: (id: string, data: Partial<FlowNodeData>) => void;
     updateNodePosition: (id: string, position: { x: number; y: number }) => void;
     setSelectedNode: (id: string | null) => void;
+    addEngineeringNode: (schemaId: string, position?: { x: number; y: number }) => string;
 
     // Edge operations
     addEdge: (connection: Connection) => boolean;
@@ -120,9 +147,11 @@ interface FlowActions {
     onConnect: (connection: Connection) => void;
 
     // Data propagation
-    propagateData: (sourceNodeId: string) => void;
+    propagateData: (sourceNodeId: string, freshOutputs?: Record<string, number>) => void;
     updateCalculatorInputs: (nodeId: string, inputs: Record<string, number>) => void;
+    updateCalculatorFormula: (nodeId: string, key: string, formula: string | null) => void;
     updateCalculatorOutputs: (nodeId: string, outputs: Record<string, number>) => void;
+    updateVisualizerInputs: (nodeId: string, inputs: Record<string, any>) => void;
 
     // Project operations
     clearFlow: () => void;
@@ -152,7 +181,17 @@ function generateEdgeId(source: string, target: string, sourceHandle: string, ta
 export const useFlowStore = create<FlowState & FlowActions>()(
     persist(
         (set, get) => ({
-            nodes: [],
+            nodes: [
+                // 1. INPUTS (Left Side)
+                { id: 'n-sheet', type: 'calculator', position: { x: 100, y: 100 }, data: { type: 'calculator', schemaId: 'sheet-metal', inputs: {}, outputs: {} } as any },
+                { id: 'n-profile', type: 'calculator', position: { x: 100, y: 500 }, data: { type: 'calculator', schemaId: 'profile-weight', inputs: {}, outputs: {} } as any },
+
+                // 2. PROCESSING (Middle)
+                // { id: 'n-note-1', type: 'note', position: { x: 600, y: 100 }, data: { type: 'note', content: 'Main Calculation Logic' } as any },
+
+                // 3. OUTPUTS / VISUALIZERS (Right Side)
+                // { id: 'n-viz', type: 'visualizer', position: { x: 1000, y: 200 }, data: { type: 'visualizer', vizType: 'chart', inputs: {} } as any }
+            ],
             edges: [],
             selectedNodeId: null,
             isConnecting: false,
@@ -164,7 +203,6 @@ export const useFlowStore = create<FlowState & FlowActions>()(
             addCalculatorNode: (schemaId: string, position = { x: 100, y: 100 }) => {
                 const schema = getCalculatorById(schemaId);
                 if (!schema) {
-                    console.error(`Schema not found: ${schemaId}`);
                     return '';
                 }
 
@@ -196,7 +234,29 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 return id;
             },
 
-            addMediaNode: (mediaType: 'youtube' | 'pdf', url: string, position = { x: 100, y: 100 }) => {
+            addVisualizerNode: (vizType: VisualizerNodeData['vizType'], position = { x: 100, y: 100 }) => {
+                const id = generateId();
+
+                const newNode: FlowNode = {
+                    id,
+                    type: 'visualizer',
+                    position,
+                    data: {
+                        type: 'visualizer',
+                        vizType,
+                        inputs: {},
+                        title: vizType.charAt(0).toUpperCase() + vizType.slice(1) + ' Visualizer',
+                    },
+                };
+
+                set(state => ({
+                    nodes: [...state.nodes, newNode],
+                }));
+
+                return id;
+            },
+
+            addMediaNode: (mediaType: MediaNodeData['mediaType'], url: string, position = { x: 100, y: 100 }, filePath?: string) => {
                 const id = generateId();
 
                 const newNode: FlowNode = {
@@ -207,6 +267,8 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                         type: 'media',
                         mediaType,
                         url,
+                        filePath,
+                        title: filePath ? filePath.split(/[\\/]/).pop() : undefined, // Auto-title from filename
                     },
                 };
 
@@ -228,6 +290,70 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                         type: 'note',
                         content,
                         color: '#1a2332',
+                    },
+                };
+
+                set(state => ({
+                    nodes: [...state.nodes, newNode],
+                }));
+
+                return id;
+            },
+
+            addNotebookNode: (content = '', position = { x: 100, y: 100 }) => {
+                const id = generateId();
+
+                const newNode: FlowNode = {
+                    id,
+                    type: 'notebook',
+                    position,
+                    data: {
+                        type: 'notebook',
+                        content,
+                        title: 'Untitled Note',
+                        color: '#fdfbf7', // Default paper color
+                    },
+                };
+
+                set(state => ({
+                    nodes: [...state.nodes, newNode],
+                }));
+
+                return id;
+            },
+
+            addNestingNode: (position = { x: 100, y: 100 }) => {
+                const id = generateId();
+
+                const newNode: FlowNode = {
+                    id,
+                    type: 'nesting',
+                    position,
+                    data: {
+                        type: 'nesting',
+                        title: 'Cutting Optimizer',
+                    },
+                };
+
+                set(state => ({
+                    nodes: [...state.nodes, newNode],
+                }));
+
+                return id;
+            },
+
+            addStandardCalculatorNode: (position = { x: 100, y: 100 }) => {
+                const id = generateId();
+
+                const newNode: FlowNode = {
+                    id,
+                    type: 'standard-calculator',
+                    position,
+                    data: {
+                        type: 'standard-calculator',
+                        expression: '',
+                        result: '0',
+                        outputs: {},
                     },
                 };
 
@@ -268,6 +394,23 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 set({ selectedNodeId: id });
             },
 
+            addEngineeringNode: (schemaId: string, position = { x: 400, y: 100 }) => {
+                const id = generateId();
+                const newNode: FlowNode = {
+                    id,
+                    type: 'engineering',
+                    position,
+                    data: {
+                        type: 'engineering',
+                        schemaId
+                    }
+                };
+                set(state => ({
+                    nodes: [...state.nodes, newNode]
+                }));
+                return id;
+            },
+
             // ─────────────────────────────────────
             // Edge Operations
             // ─────────────────────────────────────
@@ -288,9 +431,14 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                     return { valid: false, error: 'Node not found' };
                 }
 
-                // Only calculator nodes can be wired
-                if (sourceNode.data.type !== 'calculator' || targetNode.data.type !== 'calculator') {
-                    return { valid: false, error: 'Only calculator nodes can be connected' };
+                // Source must be calculator or standard-calculator
+                if (sourceNode.data.type !== 'calculator' && sourceNode.data.type !== 'standard-calculator') {
+                    return { valid: false, error: 'Only calculator outputs can be connected' };
+                }
+
+                // Target can be calculator OR visualizer
+                if (targetNode.data.type !== 'calculator' && targetNode.data.type !== 'visualizer') {
+                    return { valid: false, error: 'Target must be a calculator or visualizer' };
                 }
 
                 // Check if connection already exists
@@ -373,32 +521,71 @@ export const useFlowStore = create<FlowState & FlowActions>()(
             // Data Propagation
             // ─────────────────────────────────────
 
-            propagateData: (sourceNodeId: string) => {
+            propagateData: (sourceNodeId: string, freshOutputs?: Record<string, number>) => {
                 const { nodes, edges } = get();
                 const sourceNode = nodes.find(n => n.id === sourceNodeId);
 
-                if (!sourceNode || sourceNode.data.type !== 'calculator') return;
+                if (!sourceNode) return;
 
-                const sourceData = sourceNode.data as CalculatorNodeData;
+                // Allow both schema-based calculators and standard calculator
+                if (sourceNode.data.type !== 'calculator' && sourceNode.data.type !== 'standard-calculator') return;
+
+                const sourceData = sourceNode.data as (CalculatorNodeData | StandardCalculatorNodeData);
+                // Use fresh outputs if provided, otherwise fall back to state
+                const outputs = freshOutputs || sourceData.outputs || {};
 
                 // Find all edges from this source
                 const outgoingEdges = edges.filter(e => e.source === sourceNodeId);
 
                 outgoingEdges.forEach(edge => {
                     const targetNode = nodes.find(n => n.id === edge.target);
-                    if (!targetNode || targetNode.data.type !== 'calculator') return;
+                    if (!targetNode) return;
 
-                    const targetData = targetNode.data as CalculatorNodeData;
-                    const outputKey = edge.sourceHandle as string;
-                    const inputKey = edge.targetHandle as string;
+                    const sourceHandle = edge.sourceHandle as string;
+                    const targetHandle = edge.targetHandle as string;
 
-                    const outputValue = sourceData.outputs[outputKey];
+                    // Get output value from source
+                    let outputValue: number | undefined;
 
-                    if (outputValue !== undefined) {
-                        // Update target node's input
-                        get().updateCalculatorInputs(edge.target, {
+                    if (sourceHandle === 'output') {
+                        // For generic 'output', take the first available output
+                        // But for Variables, we expect specific handles (e.g. 'var-x')
+                        const outputKeys = Object.keys(outputs);
+                        if (outputKeys.length > 0) {
+                            outputValue = outputs[outputKeys[0]];
+                        }
+                    } else {
+                        // Handle usually matches the output key
+                        outputValue = outputs[sourceHandle];
+                    }
+
+                    if (outputValue === undefined) return;
+
+                    // Handle Target: Calculator
+                    if (targetNode.data.type === 'calculator') {
+                        const targetData = targetNode.data as CalculatorNodeData;
+                        let inputKey: string;
+
+                        if (targetHandle === 'input') {
+                            inputKey = targetData.schema.inputs[0]?.key || '';
+                        } else {
+                            inputKey = targetHandle;
+                        }
+
+                        if (inputKey) {
+                            get().updateCalculatorInputs(edge.target, {
+                                ...targetData.inputs,
+                                [inputKey]: outputValue,
+                            });
+                        }
+                    }
+
+                    // Handle Target: Visualizer
+                    else if (targetNode.data.type === 'visualizer') {
+                        const targetData = targetNode.data as VisualizerNodeData;
+                        get().updateVisualizerInputs(edge.target, {
                             ...targetData.inputs,
-                            [inputKey]: outputValue,
+                            [targetHandle]: outputValue,
                         });
                     }
                 });
@@ -419,22 +606,62 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 }));
             },
 
-            updateCalculatorOutputs: (nodeId: string, outputs: Record<string, number>) => {
+            updateCalculatorFormula: (nodeId: string, key: string, formula: string | null) => {
                 set(state => ({
                     nodes: state.nodes.map(node => {
                         if (node.id !== nodeId || node.data.type !== 'calculator') return node;
+
+                        const currentFormulas = (node.data as CalculatorNodeData).inputFormulas || {};
+                        const nextFormulas = { ...currentFormulas };
+
+                        if (formula === null) {
+                            delete nextFormulas[key];
+                        } else {
+                            nextFormulas[key] = formula;
+                        }
+
+                        return {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                inputFormulas: nextFormulas,
+                            } as CalculatorNodeData,
+                        };
+                    }),
+                }));
+            },
+
+            updateCalculatorOutputs: (nodeId: string, outputs: Record<string, number>) => {
+                set(state => ({
+                    nodes: state.nodes.map(node => {
+                        if (node.id !== nodeId || (node.data.type !== 'calculator' && node.data.type !== 'standard-calculator')) return node;
                         return {
                             ...node,
                             data: {
                                 ...node.data,
                                 outputs,
-                            } as CalculatorNodeData,
+                            } as (CalculatorNodeData | StandardCalculatorNodeData),
                         };
                     }),
                 }));
 
-                // Propagate to downstream nodes
-                get().propagateData(nodeId);
+                // Propagate to downstream nodes WITH the fresh outputs
+                get().propagateData(nodeId, outputs);
+            },
+
+            updateVisualizerInputs: (nodeId: string, inputs: Record<string, any>) => {
+                set(state => ({
+                    nodes: state.nodes.map(node => {
+                        if (node.id !== nodeId || node.data.type !== 'visualizer') return node;
+                        return {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                inputs,
+                            } as VisualizerNodeData,
+                        };
+                    }),
+                }));
             },
 
             // ─────────────────────────────────────
@@ -508,6 +735,21 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 nodes: state.nodes,
                 edges: state.edges,
             }),
+            // OPTIMIZATION: Debounce persistence to prevent high-frequency localStorage writes during drags
+            storage: {
+                getItem: (name) => {
+                    const str = localStorage.getItem(name);
+                    return str ? JSON.parse(str) : null;
+                },
+                setItem: (name, value) => {
+                    // Simple debounce mechanism
+                    if ((window as any)._flowPersistTimeout) clearTimeout((window as any)._flowPersistTimeout);
+                    (window as any)._flowPersistTimeout = setTimeout(() => {
+                        localStorage.setItem(name, JSON.stringify(value));
+                    }, 1000); // 1-second debounce for heavy state
+                },
+                removeItem: (name) => localStorage.removeItem(name),
+            },
         }
     )
 );
@@ -522,3 +764,6 @@ export const selectSelectedNode = (state: FlowState) =>
     state.nodes.find(n => n.id === state.selectedNodeId) || null;
 export const selectCalculatorNodes = (state: FlowState) =>
     state.nodes.filter(n => n.data.type === 'calculator');
+
+export const selectNestingNodes = (state: FlowState) =>
+    state.nodes.filter(n => n.data.type === 'nesting');

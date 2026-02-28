@@ -1,26 +1,27 @@
 'use client';
 
-import { useOSStore } from '@/store/osStore'; // Adjust path if needed
+/**
+ * AluCalc OS — Taskbar
+ * Shows active flow nodes instead of windows.
+ * Click to focus/select, X to delete node.
+ */
+
+import { useFlowStore, FlowNode, CalculatorNodeData } from '@/store/flowStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AppWindow, Minus, X, Maximize2, Grid3X3, Search, Battery, Wifi, Volume2 } from 'lucide-react';
+import { X, Grid3X3, Wifi, Volume2, Battery, Calculator, FileText, StickyNote, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getModuleIcon, MODULE_REGISTRY } from '@/config/modules';
-import { StartMenu } from './StartMenu';
+import { useOSStore } from '@/store/osStore';
+import { useI18nStore } from '@/store/i18nStore';
+
 
 export function Taskbar() {
-    const {
-        windows,
-        activeWindowId,
-        toggleWindow,
-        closeWindow,
-        minimizeWindow,
-        restoreWindow,
-        bringToFront,
-        dictionary
-    } = useOSStore();
-
+    const { nodes, selectedNodeId, setSelectedNode, removeNode } = useFlowStore();
+    const { dictionary, workspaceMode } = useOSStore();
+    const { t, language } = useI18nStore();
     const [time, setTime] = useState(new Date());
-    const [isStartOpen, setStartOpen] = useState(false);
+
+
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
@@ -28,110 +29,126 @@ export function Taskbar() {
     }, []);
 
     const formatTime = (date: Date) => {
-        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false });
+        return date.toLocaleTimeString(language, { hour: 'numeric', minute: '2-digit', hour12: false });
     };
 
     const formatDate = (date: Date) => {
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString(language, { month: 'short', day: 'numeric' });
     };
 
+
+    // Get node display info
+    const getNodeInfo = (node: FlowNode) => {
+        if (node.data.type === 'calculator') {
+            const data = node.data as CalculatorNodeData;
+            const moduleInfo = MODULE_REGISTRY[data.schemaId as keyof typeof MODULE_REGISTRY];
+            return {
+                title: t.modules[data.schemaId as keyof typeof t.modules]?.title || data.schemaId,
+                Icon: moduleInfo ? getModuleIcon(moduleInfo.iconName) : Calculator
+            };
+        } else if (node.data.type === 'note') {
+            return { title: t.nodeTypeNote, Icon: StickyNote };
+        } else if (node.data.type === 'media') {
+            return { title: t.nodeTypeMedia, Icon: FileText };
+        }
+        return { title: t.nodeTypeNode, Icon: Calculator };
+
+    };
+
+    // Focus on node — selection triggers FlowCanvas to center on it
+    const handleNodeClick = (nodeId: string) => {
+        setSelectedNode(nodeId);
+    };
+
+    if (workspaceMode !== 'flow') return null;
+
     return (
-        <div className="h-12 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 flex items-center px-4 justify-between z-50 select-none relative">
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center w-auto pointer-events-none">
+            <div className="bg-[#05090e]/60 backdrop-blur-3xl border border-white/5 rounded-2xl px-2 py-1.5 flex items-center gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto ring-1 ring-white/10">
+                {/* Start Button Replacement (System Indicator) */}
+                <div className="px-3 border-r border-white/10 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+                    <span className="text-[9px] font-bold text-slate-400 tracking-widest uppercase font-sans">{t.systemReadyStatus}</span>
+                </div>
 
-            {/* Start / Menu Area */}
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => setStartOpen(!isStartOpen)}
-                    className={`p-2 rounded-lg transition-colors group ${isStartOpen ? 'bg-blue-600' : 'hover:bg-white/10'}`}
-                >
-                    <Grid3X3 size={20} className={`${isStartOpen ? 'text-white' : 'text-blue-400 group-hover:text-blue-300'} transition-colors`} />
-                </button>
-                <div className="h-6 w-px bg-white/10 mx-1" />
-            </div>
 
-            {/* Window List */}
-            <div className="flex-1 flex items-center gap-2 px-4 overflow-x-auto no-scrollbar">
-                <AnimatePresence mode="popLayout">
-                    {windows.map((win) => {
-                        const moduleInfo = MODULE_REGISTRY[win.type];
-                        const Icon = getModuleIcon(moduleInfo?.iconName || 'Circle');
-                        const isActive = activeWindowId === win.id && !win.minimized;
+                {/* Node List */}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[70vw] px-1">
+                    <AnimatePresence mode="popLayout">
+                        {nodes.map((node, i) => {
+                            const { title, Icon } = getNodeInfo(node);
+                            const isActive = selectedNodeId === node.id;
+                            const safeKey = `taskbar-node-${node.id}-${i}`;
 
-                        return (
-                            <motion.button
-                                key={win.id}
-                                layout
-                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9, width: 0 }}
-                                onClick={() => {
-                                    if (isActive) {
-                                        minimizeWindow(win.id);
-                                    } else {
-                                        if (win.minimized) restoreWindow(win.id);
-                                        bringToFront(win.id);
-                                    }
-                                }}
-                                className={`
-                                    group relative flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all min-w-[140px] max-w-[200px]
-                                    ${isActive
-                                        ? 'bg-blue-600/20 border-blue-500/30 text-blue-100 shadow-[0_0_15px_rgba(37,99,235,0.2)]'
-                                        : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:border-white/10'
-                                    }
-                                `}
-                            >
-                                <Icon size={16} className={isActive ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'} />
-                                <span className="text-xs truncate font-medium flex-1 text-left">
-                                    {win.title}
-                                </span>
-
-                                {/* Hover Close Button */}
-                                <div
-                                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 hover:text-red-400 rounded transition-all"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        closeWindow(win.id);
-                                    }}
+                            return (
+                                <motion.button
+                                    key={safeKey}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    onClick={() => handleNodeClick(node.id)}
+                                    className={`
+                                        group relative flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all whitespace-nowrap overflow-hidden
+                                        ${isActive
+                                            ? 'bg-white/10 border-white/20 text-white shadow-xl'
+                                            : 'bg-transparent border-transparent text-slate-500 hover:bg-white/5 hover:text-slate-300'
+                                        }
+                                    `}
                                 >
-                                    <X size={12} />
-                                </div>
+                                    <Icon size={14} className={isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300 transition-colors'} />
+                                    <span className={`text-[10px] font-bold tracking-wide font-sans ${isActive ? 'text-white' : 'text-inherit'}`}>
+                                        {String(title)}
+                                    </span>
 
-                                {/* Active Indicator Line */}
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="active-indicator"
-                                        className="absolute bottom-[-10px] left-2 right-2 h-[2px] bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"
-                                    />
-                                )}
-                            </motion.button>
-                        );
-                    })}
-                </AnimatePresence>
-            </div>
+                                    {/* Active Glow */}
+                                    {isActive && (
+                                        <motion.div
+                                            layoutId="taskbar-active-glow"
+                                            className="absolute inset-0 bg-cyan-500/5 pointer-events-none"
+                                        />
+                                    )}
 
-            {/* System Tray */}
-            <div className="flex items-center gap-4 pl-4 border-l border-white/10">
-                <div className="flex items-center gap-3 text-slate-400">
-                    <Wifi size={16} />
-                    <Volume2 size={16} />
-                    <Battery size={16} />
+                                    {/* Hover Delete */}
+                                    <div
+                                        className="ml-1 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-all"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeNode(node.id);
+                                        }}
+                                    >
+                                        <X size={12} />
+                                    </div>
+                                </motion.button>
+                            );
+                        })}
+                    </AnimatePresence>
+
+                    {nodes.length === 0 && (
+                        <div className="text-[10px] text-slate-600 font-medium px-4 tracking-wide italic">
+                            {t.noActiveNodes}
+                        </div>
+                    )}
+
                 </div>
-                <div className="flex flex-col items-end leading-none cursor-default group">
-                    <span className="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">
-                        {formatTime(time)}
-                    </span>
-                    <span className="text-[10px] text-slate-500 group-hover:text-slate-400 transition-colors">
-                        {formatDate(time)}
-                    </span>
+
+                {/* Status Bar */}
+                <div className="border-l border-white/10 pl-3 pr-2 flex items-center gap-4 text-slate-500">
+                    <div className="flex items-center gap-1.5">
+                        <Grid3X3 size={12} className="text-cyan-500/50" />
+                        <span className="text-[10px] font-mono font-bold text-cyan-500/70">{nodes.length}</span>
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (confirm(t.confirmClearWorkspace)) useFlowStore.getState().clearFlow();
+                        }}
+
+                        className="p-1.5 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-all"
+                    >
+                        <Trash2 size={13} />
+                    </button>
                 </div>
             </div>
-
-            {/* Start Menu Overlay */}
-            <StartMenu
-                isOpen={isStartOpen}
-                onClose={() => setStartOpen(false)}
-                dict={dictionary}
-            />
         </div>
     );
 }

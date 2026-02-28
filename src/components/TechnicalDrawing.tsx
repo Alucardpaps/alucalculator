@@ -11,11 +11,11 @@ interface TechnicalDrawingProps {
 }
 
 export const TechnicalDrawing = ({ mode = 'shape', shape = 'box', fitType, activeField, data }: TechnicalDrawingProps) => {
-    // === 3D MODE for SHAPES & COMPONENTS ===
+    const [viewMode, setViewMode] = React.useState<'3d' | '2d'>('3d');
+
     // === 3D MODE for SHAPES & COMPONENTS ===
     if (['gear', 'bearing', 'fastener'].includes(mode) || ['gear', 'bearing', 'fastener'].includes(shape)) {
         const shapeType = mode === 'shape' ? shape : mode;
-        const [viewMode, setViewMode] = React.useState<'3d' | '2d'>('3d');
 
         return (
             <div className="w-full h-full relative flex flex-col bg-slate-50/50">

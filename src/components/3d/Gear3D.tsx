@@ -12,7 +12,7 @@ function involute(baseRadius: number, t: number) {
 }
 
 interface Gear3DProps {
-    module: number;
+    gearModule: number;
     teeth: number;
     faceWidth: number;
     helixAngle?: number;
@@ -25,7 +25,7 @@ interface Gear3DProps {
 }
 
 export function Gear3D({
-    module,
+    gearModule,
     teeth,
     faceWidth,
     helixAngle = 0,
@@ -41,10 +41,10 @@ export function Gear3D({
 
         // Geometry Params
         const pressureAngleRad = (pressureAngle * Math.PI) / 180;
-        const pitchRadius = (module * teeth) / 2;
+        const pitchRadius = (gearModule * teeth) / 2;
         const baseRadius = pitchRadius * Math.cos(pressureAngleRad);
-        const addendum = module * (1 + profileShift);
-        const dedendum = module * (1.25 - profileShift);
+        const addendum = gearModule * (1 + profileShift);
+        const dedendum = gearModule * (1.25 - profileShift);
         const addendumRadius = pitchRadius + addendum;
         const dedendumRadius = pitchRadius - dedendum;
 
@@ -109,8 +109,8 @@ export function Gear3D({
         const extrudeSettings = {
             depth: faceWidth,
             bevelEnabled: true,
-            bevelThickness: module * 0.1,
-            bevelSize: module * 0.1,
+            bevelThickness: gearModule * 0.1,
+            bevelSize: gearModule * 0.1,
             bevelSegments: 2,
             steps: 1,
             // Helix twist
@@ -118,7 +118,7 @@ export function Gear3D({
         };
 
         return new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    }, [module, teeth, pressureAngle, profileShift, faceWidth, helixAngle]);
+    }, [gearModule, teeth, pressureAngle, profileShift, faceWidth, helixAngle]);
 
     return (
         <group position={position} rotation={rotation}>
@@ -131,7 +131,7 @@ export function Gear3D({
             </mesh>
             {/* Bore for visual realism */}
             <mesh rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[module * 2, module * 2, faceWidth * 1.1, 32]} />
+                <cylinderGeometry args={[gearModule * 2, gearModule * 2, faceWidth * 1.1, 32]} />
                 <meshStandardMaterial color="#222" metalness={0.5} roughness={0.8} />
             </mesh>
         </group>

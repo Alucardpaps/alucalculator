@@ -1,0 +1,3 @@
+module.exports=[179108,a=>{"use strict";var b=a.i(683650);a.s(["PDFViewerModule",0,()=>(0,b.jsx)("div",{className:"h-full bg-gray-100 flex items-center justify-center",children:(0,b.jsxs)("div",{className:"text-center text-gray-500",children:[(0,b.jsx)("div",{className:"text-4xl mb-4",children:"📄"}),(0,b.jsx)("h2",{className:"text-xl font-bold text-gray-700",children:"PDF Viewer"}),(0,b.jsx)("p",{children:"Select a PDF from File Explorer to view."})]})})])},155407,a=>{a.n(a.i(179108))}];
+
+//# sourceMappingURL=12d90_alucalculator_src_components_modules_viewers_PDFViewerModule_tsx_14f0ace4._.js.map

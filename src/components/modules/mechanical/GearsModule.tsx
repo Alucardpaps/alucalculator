@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { useDriveTrainCalculator } from "@/hooks/useDriveTrainCalculator";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
@@ -19,8 +20,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
         selectedPower, setSelectedPower,
         selectedPoles, setSelectedPoles,
         motor,
-        applicationName, setApplicationName,
-        module, setModule,
+        gearModule, setGearModule,
         z1, setZ1,
         z2, setZ2,
         helixAngle, setHelixAngle,
@@ -28,7 +28,12 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
         materialName, setMaterialName,
         results,
         x1, setX1, x2, setX2,
-        pinDia1, setPinDia1, pinDia2, setPinDia2
+        pinDia1, setPinDia1, pinDia2, setPinDia2,
+        // YR Inputs
+        loadClass, setLoadClass,
+        dailyHours, setDailyHours,
+        startsPerHour, setStartsPerHour,
+        connectionType, setConnectionType,
     } = useDriveTrainCalculator();
 
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('3D');
@@ -51,8 +56,8 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
     const status = isSafe ? 'valid' : isWarn ? 'warning' : 'invalid';
 
     // Derived Logic for Stock
-    const da1 = module * z1 + 2 * module * (1 + x1);
-    const da2 = module * z2 + 2 * module * (1 + x2);
+    const da1 = gearModule * z1 + 2 * gearModule * (1 + x1);
+    const da2 = gearModule * z2 + 2 * gearModule * (1 + x2);
     const requiredDia = Math.max(da1, da2) + 5;
     const requiredLen = faceWidth + 10;
 
@@ -74,7 +79,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                     <EngineeringVisualization status={status} label="ISO 6336 GEARSET">
                         {viewMode === '2D' ? (
                             <div className="flex flex-col items-center justify-center p-4">
-                                <TechnicalDrawing mode="gear" activeField={null} data={{ z1, z2, module, width: faceWidth }} />
+                                <TechnicalDrawing mode="gear" activeField={null} data={{ z1, z2, gearModule, width: faceWidth }} />
                                 <div className="text-xs font-mono text-slate-500 mt-2">
                                     System: {results.ratio.toFixed(2)}:1 Ratio | {(results.a).toFixed(1)}mm Center Dist
                                 </div>
@@ -87,7 +92,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                                 <PresentationControls speed={1.5} global zoom={0.7} polar={[-0.1, Math.PI / 4]}>
                                     <Stage environment="city" intensity={0.5}>
                                         <Gear3D
-                                            module={module}
+                                            gearModule={gearModule}
                                             teeth={z1}
                                             faceWidth={faceWidth}
                                             profileShift={x1}
@@ -95,7 +100,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                                             position={[-(results.a) / 2, 0, 0]}
                                         />
                                         <Gear3D
-                                            module={module}
+                                            gearModule={gearModule}
                                             teeth={z2}
                                             faceWidth={faceWidth}
                                             profileShift={x2}
@@ -116,7 +121,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                     <div className="col-span-2 space-y-2">
                         <div className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-1">{dict.common?.dimensions || "Geometry"}</div>
                         <div className="grid grid-cols-2 gap-2">
-                            <CalculatorInput label={dict.gears?.module || "Module (m)"} unit="mm" value={module} onChange={(e) => setModule(Number(e.target.value))} />
+                            <CalculatorInput label={dict.gears?.module || "Module (m)"} unit="mm" value={gearModule} onChange={(e) => setGearModule(Number(e.target.value))} />
                             <CalculatorInput label={dict.gears?.faceWidth || "Face Width"} unit="mm" value={faceWidth} onChange={(e) => setFaceWidth(Number(e.target.value))} />
                             <CalculatorInput label={`${dict.manufacturing?.pinion || "Pinion"} (${dict.gears?.teeth || "z"})`} unit="" value={z1} onChange={(e) => setZ1(Number(e.target.value))} />
                             <CalculatorInput label={`${dict.manufacturing?.gear || "Gear"} (${dict.gears?.teeth || "z"})`} unit="" value={z2} onChange={(e) => setZ2(Number(e.target.value))} />
@@ -124,9 +129,72 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                         </div>
                     </div>
 
+                    {/* Application & Service Conditions (YR Standard) */}
+                    <div className="col-span-2 space-y-2">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-1">Conditions (Yılmaz Redüktör)</div>
+                        <div className="grid grid-cols-2 gap-2">
+                            {/* Load Class */}
+                            <div>
+                                <label className="field-label">Load Class</label>
+                                <select
+                                    className="w-full bg-[#2a2a2a] border border-[#333] rounded px-2 py-1 text-xs text-white"
+                                    value={loadClass}
+                                    onChange={(e) => setLoadClass(e.target.value as any)}
+                                >
+                                    <option value="U">Uniform (U)</option>
+                                    <option value="M">Moderate (M)</option>
+                                    <option value="H">Heavy Shock (H)</option>
+                                </select>
+                            </div>
+                            {/* Daily Hours */}
+                            <div>
+                                <label className="field-label">Daily Hours</label>
+                                <select
+                                    className="w-full bg-[#2a2a2a] border border-[#333] rounded px-2 py-1 text-xs text-white"
+                                    value={dailyHours}
+                                    onChange={(e) => setDailyHours(Number(e.target.value))}
+                                >
+                                    <option value={2}>&lt; 3 Hours</option>
+                                    <option value={8}>3 - 10 Hours</option>
+                                    <option value={12}>&gt; 10 Hours</option>
+                                </select>
+                            </div>
+                            {/* Starts/Hour */}
+                            <div>
+                                <label className="field-label">Starts / Hour</label>
+                                <input
+                                    type="number"
+                                    className="input-tech text-xs py-1"
+                                    value={startsPerHour}
+                                    onChange={(e) => setStartsPerHour(Number(e.target.value))}
+                                />
+                            </div>
+                            {/* Output Connection */}
+                            <div>
+                                <label className="field-label">Output Connect.</label>
+                                <select
+                                    className="w-full bg-[#2a2a2a] border border-[#333] rounded px-2 py-1 text-xs text-white"
+                                    value={connectionType}
+                                    onChange={(e) => setConnectionType(e.target.value as any)}
+                                >
+                                    <option value="coupling">Direct Coupling (1.0)</option>
+                                    <option value="sprocket">Chain Sprocket (1.25)</option>
+                                    <option value="v_belt">V-Belt (1.5)</option>
+                                    <option value="flat_belt">Flat Belt (2.5)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Calculated Service Factor Display */}
+                        <div className="flex items-center justify-between bg-blue-900/20 border border-blue-500/30 p-2 rounded">
+                            <span className="text-xs text-blue-300">Required Service Factor ($f_s$)</span>
+                            <span className="text-lg font-bold text-blue-400 font-mono">{results.requiredFs.toFixed(2)}</span>
+                        </div>
+                    </div>
+
                     {/* Power & Material */}
                     <div className="col-span-2 space-y-2">
-                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-1">Power & Materials</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-1">{dict.driveTrain?.primeMover || "Motor & Material"}</div>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="text-[10px] text-slate-400 block mb-1">{dict.driveTrain?.primeMover || "Motor Power"}</label>
@@ -184,8 +252,28 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                     <div className="space-y-2">
                         <div className="text-xs font-bold text-ind-orange uppercase tracking-widest border-b border-ind-orange/30 pb-1">{dict.manufacturing?.shiftCoeff || "Profile Shift (x)"}</div>
                         <div className="grid grid-cols-2 gap-2">
-                            <CalculatorInput label="Shift x1" unit="" value={x1} onChange={(e) => setX1(Number(e.target.value))} />
-                            <CalculatorInput label="Shift x2" unit="" value={x2} onChange={(e) => setX2(Number(e.target.value))} />
+                            <CalculatorInput
+                                label="Shift x1"
+                                unit=""
+                                type="text"
+                                value={x1}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(',', '.');
+                                    if (val === '' || val === '-') setX1(val as any);
+                                    else if (!isNaN(Number(val))) setX1(Number(val));
+                                }}
+                            />
+                            <CalculatorInput
+                                label="Shift x2"
+                                unit=""
+                                type="text"
+                                value={x2}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(',', '.');
+                                    if (val === '' || val === '-') setX2(val as any);
+                                    else if (!isNaN(Number(val))) setX2(Number(val));
+                                }}
+                            />
                         </div>
                     </div>
 
@@ -208,36 +296,36 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                                 <tbody className="divide-y divide-[#333] font-mono text-slate-300">
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">Ref Diameter (d)</td>
-                                        <td className="p-1 text-center">{(module * z1).toFixed(2)}</td>
-                                        <td className="p-1 text-center">{(module * z2).toFixed(2)}</td>
+                                        <td className="p-1 text-center">{(gearModule * z1).toFixed(2)}</td>
+                                        <td className="p-1 text-center">{(gearModule * z2).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-200 font-bold">Tip Diameter (da)</td>
                                         <td className="p-1 text-center text-ind-orange font-bold">
-                                            {(module * z1 + 2 * module * (1 + x1)).toFixed(2)}
+                                            {results.da1.toFixed(2)}
                                         </td>
                                         <td className="p-1 text-center text-ind-orange font-bold">
-                                            {(module * z2 + 2 * module * (1 + x2)).toFixed(2)}
+                                            {results.da2.toFixed(2)}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">Root Diameter (df)</td>
-                                        <td className="p-1 text-center">{(module * z1 - 2.5 * module + 2 * module * x1).toFixed(2)}</td>
-                                        <td className="p-1 text-center">{(module * z2 - 2.5 * module + 2 * module * x2).toFixed(2)}</td>
+                                        <td className="p-1 text-center">{results.df1.toFixed(2)}</td>
+                                        <td className="p-1 text-center">{results.df2.toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">{dict.gears?.addendum || "Addendum (ha)"}</td>
-                                        <td className="p-1 text-center text-emerald-400">{(module).toFixed(2)}</td>
-                                        <td className="p-1 text-center text-emerald-400">{(module).toFixed(2)}</td>
+                                        <td className="p-1 text-center text-emerald-400">{(gearModule).toFixed(2)}</td>
+                                        <td className="p-1 text-center text-emerald-400">{(gearModule).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">{dict.gears?.dedendum || "Dedendum (hf)"}</td>
-                                        <td className="p-1 text-center">{(1.25 * module).toFixed(2)}</td>
-                                        <td className="p-1 text-center">{(1.25 * module).toFixed(2)}</td>
+                                        <td className="p-1 text-center">{(1.25 * gearModule).toFixed(2)}</td>
+                                        <td className="p-1 text-center">{(1.25 * gearModule).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">{dict.gears?.circularPitch || "Circular Pitch (p)"}</td>
-                                        <td className="p-1 text-center" colSpan={2}>{(Math.PI * module).toFixed(2)}</td>
+                                        <td className="p-1 text-center" colSpan={2}>{(Math.PI * gearModule).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="p-1 py-1.5 text-slate-500">{dict.manufacturing?.overPins || "Over Pins (M)"}</td>
@@ -250,9 +338,9 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
 
                         {/* Validation Alerts */}
                         <div className="space-y-1 mt-2">
-                            {(faceWidth < 6 * module || faceWidth > 10 * module) && (
+                            {(faceWidth < 6 * gearModule || faceWidth > 10 * gearModule) && (
                                 <div className="text-[10px] text-amber-500 flex items-center gap-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/50">
-                                    <span>⚠️</span> {dict.gears?.recFaceWidth || "Rec. Width (6m-10m)"}: {(6 * module).toFixed(1)} - {(10 * module).toFixed(1)} mm
+                                    <span>⚠️</span> {dict.gears?.gearModule || "Rec. Width (6m-10m)"}: {(6 * gearModule).toFixed(1)} - {(10 * gearModule).toFixed(1)} mm
                                 </div>
                             )}
                             {(z1 < 13 || z2 < 13) && (
@@ -270,9 +358,9 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
 
                     {/* Documentation (Shared) */}
                     <PDFGenerator
-                        filename={`GEAR_SET_M${module}`}
+                        filename={`GEAR_SET_M${gearModule}`}
                         title="Gear Manufacturing Job Card"
-                        inputs={{ z1, z2, module, x1, x2, helixAngle, materialName }}
+                        inputs={{ z1, z2, module: gearModule, x1, x2, helixAngle, materialName }}
                         results={results}
                         visualElementId="gears-viz-container"
                         notes={[

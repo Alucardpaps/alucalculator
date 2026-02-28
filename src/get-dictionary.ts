@@ -1,10 +1,10 @@
-// import 'server-only'
-import type { Locale } from './i18n-config';
 import { dictionary } from './locales/dictionary';
 import { extractLocale, type SupportedLocale } from './locales/types';
 
+export type Locale = 'en' | 'tr' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ru' | 'ja' | 'zh' | 'ko' | 'ar';
+
 // Legacy dictionaries for sections not yet migrated to colocated system
-const legacyDictionaries = {
+const legacyDictionaries: Record<string, () => Promise<any>> = {
     en: () => import('./dictionaries/en.json').then((module) => module.default),
     tr: () => import('./dictionaries/tr.json').then((module) => module.default),
     de: () => import('./dictionaries/de.json').then((module) => module.default),
@@ -15,6 +15,8 @@ const legacyDictionaries = {
     ru: () => import('./dictionaries/ru.json').then((module) => module.default),
     ja: () => import('./dictionaries/ja.json').then((module) => module.default),
     zh: () => import('./dictionaries/zh.json').then((module) => module.default),
+    ko: () => import('./dictionaries/ko.json').then((module) => module.default),
+    ar: () => import('./dictionaries/ar.json').then((module) => module.default),
 };
 
 const deepMerge = (target: any, source: any): any => {
@@ -50,25 +52,30 @@ const deepMerge = (target: any, source: any): any => {
  * Falls back to legacy JSON for any unmigrated sections.
  */
 export const getDictionary = async (locale: string) => {
-    const safeLocale = (
-        ['en', 'tr', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'ja', 'zh'].includes(locale)
-            ? locale
-            : 'en'
-    ) as SupportedLocale;
+    const supportedLocales = ['en', 'tr', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'ja', 'zh', 'ko', 'ar'] as const;
+    const safeLocale = (supportedLocales.includes(locale as (typeof supportedLocales)[number]) ? locale : 'en') as SupportedLocale;
 
     // Extract the locale-specific values from the colocated dictionary
     const colocatedDict = extractLocale(dictionary, safeLocale);
 
     // Load legacy dictionaries for full coverage during migration
     const loadEn = legacyDictionaries.en;
-    const loadLocale = legacyDictionaries[safeLocale] ?? legacyDictionaries.en;
+    const loadLocale = legacyDictionaries[safeLocale as keyof typeof legacyDictionaries];
 
     try {
+        if (!loadLocale) {
+            return colocatedDict;
+        }
+
         const enDict = await loadEn();
         const localeDict = locale === 'en' ? enDict : await loadLocale();
 
         // Merge: Legacy English → Legacy Locale → Colocated (highest priority)
         const mergedLegacy = locale === 'en' ? enDict : deepMerge(enDict, localeDict);
+
+        if (safeLocale === 'ko' || safeLocale === 'ar') {
+            return mergedLegacy;
+        }
 
         // Colocated dictionary takes precedence over legacy
         return deepMerge(mergedLegacy, colocatedDict);

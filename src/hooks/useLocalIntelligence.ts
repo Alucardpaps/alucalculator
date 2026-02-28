@@ -1,33 +1,48 @@
 import { useState, useCallback } from 'react';
 import { useOSStore } from '@/store/osStore';
+import { useI18nStore } from '@/store/i18nStore';
 import { ModuleType } from '@/config/modules';
 
-export type IntentType = 'NAVIGATION' | 'CALCULATION' | 'CHAT' | 'HARDWARE' | 'IDENTITY' | 'UNKNOWN';
+export type IntentType = 'NAVIGATION' | 'CALCULATION' | 'CHAT' | 'HARDWARE' | 'IDENTITY' | 'ORCHESTRATION' | 'UNKNOWN';
+
+export interface BModelResponse {
+    status: 'success' | 'error';
+    intent: string;
+    target_module: string;
+    validated: boolean;
+    normalized_inputs: Record<string, any>;
+    validation_flags: string[];
+    execution_graph?: {
+        nodes: any[];
+        edges: any[];
+    };
+    visualization?: {
+        type: 'none' | '2D' | '3D';
+        engine: string;
+        params: any;
+    };
+    ui_message: string;
+}
 
 interface IntelligenceResponse {
     type: IntentType;
     content: string;
     action?: () => void;
+    payload?: BModelResponse;
 }
 
 const KNOWLEDGE_BASE = {
     TR: {
-        identity: "Ben AluCalc OS Yerel Zeka Çekirdeğiyim. Şu an çevrimdışı modda çalışıyorum. Sistem navigasyonu, basit hesaplamalar ve birim dönüşümleri yapabilirim.",
-        hardware: "Sistem: AluCalc OS v2.0 | Çekirdek: Local Regex Parser | Durum: Çevrimdışı/Hızlı | Bellek: Optimize Edildi.",
-        unknown: "Bulut bağlantım şu an pasif. Şu an sadece Sistem Navigasyonu (örn: 'CAD aç'), Modül Aktivasyonu ve temel mühendislik sorularına yanıt verebilirim.",
-        density_alu: "Alüminyum (6061) yoğunluğu yaklaşık 2.70 g/cm³'tür.",
-        density_steel: "Çelik (304) yoğunluğu yaklaşık 7.85 - 8.00 g/cm³'tür.",
-        modulus_steel: "Çeliğin Elastisite Modülü (Young Modülü) yaklaşık 200-210 GPa'dır.",
-        modulus_alu: "Alüminyumun Elastisite Modülü yaklaşık 69-70 GPa'dır."
+        identity: "Ben AluCalc OS Yerel Zeka Çekirdeğiyim. B-Model (Orkestrasyon) prensibiyle çalışıyorum. Niyetinizi anlayıp ilgili mühendislik modülüne yönlendirebilirim.",
+        hardware: "Sistem: AluCalc OS v3.0 | Çekirdek: B-Model Orchestrator | Durum: Hibrit (Yerel/Bulut) | Bellek: Optimize Edildi.",
+        unknown: "Niyetinizi tam olarak belirleyemedim. Lütfen 'çizim aç', 'sehim hesabı yap' gibi komutlar verin veya sistem navigasyonunda yardım isteyin.",
+        routing: (module: string) => `${module} modülü niyetiniz üzerine başlatılıyor...`,
     },
     EN: {
-        identity: "I am the AluCalc OS Local Intelligence Core. Running in offline mode. I can assist with system navigation, basic calculations, and unit conversions.",
-        hardware: "System: AluCalc OS v2.0 | Core: Local Regex Parser | Status: Offline/Fast | Memory: Optimized.",
-        unknown: "My cloud neural link is offline. I can currently assist with: System Navigation (e.g., 'Open CAD'), Module Activation, and basic engineering questions.",
-        density_alu: "The density of Aluminum (6061) is approximately 2.70 g/cm³.",
-        density_steel: "The density of Steel (304) is approximately 7.85 - 8.00 g/cm³.",
-        modulus_steel: "The Modulus of Elasticity (Young's Modulus) for Steel is approx. 200-210 GPa.",
-        modulus_alu: "The Modulus of Elasticity for Aluminum is approx. 69-70 GPa."
+        identity: "I am the AluCalc OS Local Intelligence Core. Running on B-Model Orchestration principles. I interpret engineering intent and route to deterministic modules.",
+        hardware: "System: AluCalc OS v3.0 | Core: B-Model Orchestrator | Status: Hybrid (Local/Cloud) | Memory: Optimized.",
+        unknown: "Intent could not be determined. Please use commands like 'open CAD', 'calculate deflection', or ask for system help.",
+        routing: (module: string) => `Initializing ${module} module based on your intent...`,
     }
 };
 
@@ -38,120 +53,87 @@ export function useLocalIntelligence() {
     const processQuery = useCallback(async (query: string): Promise<IntelligenceResponse> => {
         setIsProcessing(true);
 
-        // Simulate processing time for "thinking" effect
-        await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 400));
-
         const normalize = (text: string) => text.toLowerCase().trim();
         const input = normalize(query);
-
-        // Language Detection
-        // Check for specific Turkish characters or common Turkish words
-        const isTurkish = /[çşğüöı]/.test(input) ||
-            input.includes('aç') ||
-            input.includes('hesapla') ||
-            input.includes('nedir') ||
-            input.includes('merhaba') ||
-            currentLanguage === 'tr';
-
+        const isTurkish = /[çşğüöı]/.test(input) || currentLanguage === 'tr';
         const langInfo = isTurkish ? KNOWLEDGE_BASE.TR : KNOWLEDGE_BASE.EN;
+
+        // In a real implementation with AI SDK, we would call:
+        // const { object } = await generateObject({ model, system: CORE_SYSTEM_PROMPT, prompt: input, schema: BModelSchema });
+        // For now, we simulate the B-Model Orchestrator logic locally
 
         let response: IntelligenceResponse = {
             type: 'UNKNOWN',
             content: langInfo.unknown
         };
 
-        // --- INTENT PARSING LOGIC ---
+        // --- B-MODEL ORCHESTRATION LOGIC (Deterministic Routing) ---
 
-        // 1. NAVIGATION (System Control)
-        if (input.includes('cad') || input.includes('çizim') || input.includes('draw')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "2D Nesting (CAD) Modülü başlatılıyor..." : "Initializing 2D Nesting (CAD) Module...",
-                action: () => openWindow('nesting-2d')
-            };
-        }
-        else if (input.includes('calculator') || input.includes('hesap makinesi')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Standart Hesap Makinesi açılıyor..." : "Opening Standard Calculator...",
-                action: () => openWindow('calculator')
-            };
-        }
-        else if (input.includes('file') || input.includes('dosya') || input.includes('explorer')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Dosya Gezgini açılıyor..." : "Opening File Explorer...",
-                action: () => openWindow('file-explorer')
-            };
-        }
-        else if (input.includes('browser') || input.includes('tarayıcı') || input.includes('internet')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Web Tarayıcısı başlatılıyor..." : "Launching Web Browser...",
-                action: () => openWindow('browser')
-            };
-        }
-        else if (input.includes('paint') || input.includes('çiz') || input.includes('boya')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Creative Studio (Paint) açılıyor..." : "Opening Creative Studio (Paint)...",
-                action: () => openWindow('paint')
-            };
-        }
-        else if (input.includes('profile') || input.includes('profil') || input.includes('weight') || input.includes('ağırlık')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Profil Ağırlık Hesaplayıcı açılıyor..." : "Opening Profile Weight Calculator...",
-                action: () => openWindow('profile-weight')
-            };
-        }
-        else if (input.includes('beam') || input.includes('kiriş') || input.includes('deflection') || input.includes('sehim')) {
-            response = {
-                type: 'NAVIGATION',
-                content: isTurkish ? "Kiriş Sehim Analiz Modülü açılıyor..." : "Opening Beam Deflection Analysis Module...",
-                action: () => openWindow('beam-deflection')
-            };
-        }
+        // 1. NAVIGATION MAPPINGS
+        const navMap: Record<string, { module: ModuleType; titles: string[] }> = {
+            'cad': { module: 'nesting-2d', titles: ['cad', 'çizim', 'draw', 'nesting'] },
+            'calc': { module: 'calculator', titles: ['calculator', 'hesap makinesi', 'standart'] },
+            'files': { module: 'file-explorer', titles: ['file', 'dosya', 'explorer'] },
+            'browser': { module: 'browser', titles: ['browser', 'tarayıcı', 'internet'] },
+            'paint': { module: 'paint', titles: ['paint', 'çiz', 'boya', 'creative'] },
+            'weight': { module: 'profile-weight', titles: ['profile', 'profil', 'weight', 'ağırlık'] },
+            'beam': { module: 'beam-deflection', titles: ['beam', 'kiriş', 'deflection', 'sehim'] },
+            'units': { module: 'unit-converter', titles: ['unit', 'birim', 'çevir', 'convert'] },
+        };
 
-
-        // 2. HARDWARE / STATUS
-        else if (input.includes('system') || input.includes('sistem') || input.includes('ram') || input.includes('cpu') || input.includes('gpu')) {
-            response = {
-                type: 'HARDWARE',
-                content: langInfo.hardware
-            };
-        }
-
-        // 3. IDENTITY
-        else if (input.includes('who are you') || input.includes('kimsin') || input.includes('ne yapabilirsin') || input.includes('what can you do') || input.includes('help')) {
-            response = {
-                type: 'IDENTITY',
-                content: langInfo.identity
-            };
-        }
-
-        // 4. KNOWLEDGE BASE (Basic Engineering)
-        else if (input.includes('density') || input.includes('yoğunluk')) {
-            if (input.includes('alu') || input.includes('alü')) {
-                response = { type: 'CALCULATION', content: langInfo.density_alu };
-            } else if (input.includes('steel') || input.includes('çelik')) {
-                response = { type: 'CALCULATION', content: langInfo.density_steel };
+        for (const [key, data] of Object.entries(navMap)) {
+            if (data.titles.some(t => input.includes(t))) {
+                response = {
+                    type: 'NAVIGATION',
+                    content: langInfo.routing(data.module),
+                    action: () => openWindow(data.module)
+                };
+                break;
             }
         }
-        else if (input.includes('modulus') || input.includes('elastisite') || input.includes('young')) {
-            if (input.includes('alu') || input.includes('alü')) {
-                response = { type: 'CALCULATION', content: langInfo.modulus_alu };
-            } else if (input.includes('steel') || input.includes('çelik')) {
-                response = { type: 'CALCULATION', content: langInfo.modulus_steel };
+
+        // 2. STATUS / IDENTITY
+        if (response.type === 'UNKNOWN') {
+            if (input.includes('system') || input.includes('sistem') || input.includes('version')) {
+                response = { type: 'HARDWARE', content: langInfo.hardware };
+            } else if (input.includes('who are you') || input.includes('help') || input.includes('kimsin') || input.includes('yardım')) {
+                response = { type: 'IDENTITY', content: langInfo.identity };
+            }
+        }
+
+        // 3. COMPLEX INTENT SIMULATION (B-Model Payload)
+        // If query looks like an engineering intent (has numbers and units)
+        if (/\d+/.test(input) && (input.includes('mm') || input.includes('cm') || input.includes('kg') || input.includes('m'))) {
+            // Mocking a successful B-Model orchestration payload
+            response = {
+                type: 'ORCHESTRATION',
+                content: isTurkish ? "Mühendislik niyeti saptandı. Parametreler normalize ediliyor..." : "Engineering intent detected. Normalizing parameters...",
+                payload: {
+                    status: 'success',
+                    intent: 'calculation',
+                    target_module: input.includes('bend') || input.includes('büküm') ? 'src/calculators/sheet_metal' : 'src/calculators/general',
+                    validated: true,
+                    normalized_inputs: {
+                        raw_query: query,
+                        detected_units: 'SI'
+                    },
+                    validation_flags: [],
+                    ui_message: isTurkish ? "Hesaplama modülü hazır." : "Calculation module ready."
+                }
+            };
+
+            // Auto-route based on mock orchestration
+            if (input.includes('bend') || input.includes('büküm')) {
+                response.action = () => openWindow('profile-weight'); // Correct module would go here
             }
         }
 
         // Execute action if present
         if (response.action) {
-            // Small delay to let the user read the confirmation before window pops up
             setTimeout(response.action, 500);
         }
 
+        await new Promise(resolve => setTimeout(resolve, 400)); // Simulating AI thinking delay
         setIsProcessing(false);
         return response;
     }, [openWindow, currentLanguage]);

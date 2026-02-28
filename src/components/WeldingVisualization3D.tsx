@@ -5,6 +5,7 @@ import { OrbitControls, Stage, PerspectiveCamera, OrthographicCamera, Center, En
 import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { ShapeType } from "@/utils/sectionProperties";
+import ClientOnly from "@/components/ClientOnly";
 
 export type WeldJointType3D = 'fillet' | 'butt' | 'vgroove' | 'tee' | 'lap' | 'corner';
 
@@ -435,29 +436,20 @@ export const WeldingVisualization3D = ({
     const commonProps = { legSize, thickness, length, grooveAngle, mat1, mat2 };
 
     return (
-        <div className={`w-full h-full min-h-[300px] cursor-move bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-slate-800`}>
-            <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
-                {is2D ? (
-                    <OrthographicCamera makeDefault position={[0, 0, 100]} zoom={3} />
-                ) : (
-                    <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={50} />
-                )}
+        <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-slate-100 rounded-2xl animate-pulse" />}>
+            <div className={`w-full h-full min-h-[300px] cursor-move bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-slate-800`}>
+                <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
+                    {is2D ? (
+                        <OrthographicCamera makeDefault position={[0, 0, 100]} zoom={3} />
+                    ) : (
+                        <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={50} />
+                    )}
 
-                {is2D ? (
-                    <Center>
-                        {/* In 2D mode, we just show simple ambient light and the mesh from front */}
-                        <ambientLight intensity={1} />
-                        <directionalLight position={[10, 10, 10]} intensity={1} />
-                        {jointType === 'fillet' && <FilletTJoint {...commonProps} />}
-                        {jointType === 'tee' && <FilletTJoint {...commonProps} />}
-                        {jointType === 'butt' && <ButtJoint {...commonProps} />}
-                        {jointType === 'vgroove' && <VGrooveJoint {...commonProps} />}
-                        {jointType === 'lap' && <LapJoint {...commonProps} />}
-                        {jointType === 'corner' && <CornerJoint {...commonProps} />}
-                    </Center>
-                ) : (
-                    <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
+                    {is2D ? (
                         <Center>
+                            {/* In 2D mode, we just show simple ambient light and the mesh from front */}
+                            <ambientLight intensity={1} />
+                            <directionalLight position={[10, 10, 10]} intensity={1} />
                             {jointType === 'fillet' && <FilletTJoint {...commonProps} />}
                             {jointType === 'tee' && <FilletTJoint {...commonProps} />}
                             {jointType === 'butt' && <ButtJoint {...commonProps} />}
@@ -465,34 +457,45 @@ export const WeldingVisualization3D = ({
                             {jointType === 'lap' && <LapJoint {...commonProps} />}
                             {jointType === 'corner' && <CornerJoint {...commonProps} />}
                         </Center>
-                    </Stage>
-                )}
+                    ) : (
+                        <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
+                            <Center>
+                                {jointType === 'fillet' && <FilletTJoint {...commonProps} />}
+                                {jointType === 'tee' && <FilletTJoint {...commonProps} />}
+                                {jointType === 'butt' && <ButtJoint {...commonProps} />}
+                                {jointType === 'vgroove' && <VGrooveJoint {...commonProps} />}
+                                {jointType === 'lap' && <LapJoint {...commonProps} />}
+                                {jointType === 'corner' && <CornerJoint {...commonProps} />}
+                            </Center>
+                        </Stage>
+                    )}
 
-                {!is2D && <OrbitControls autoRotate autoRotateSpeed={0.5} makeDefault />}
-                {!is2D && <Environment preset="apartment" />}
-                {!is2D && <ambientLight intensity={0.5} />}
-            </Canvas>
+                    {!is2D && <OrbitControls autoRotate autoRotateSpeed={0.5} makeDefault />}
+                    {!is2D && <Environment preset="apartment" />}
+                    {!is2D && <ambientLight intensity={0.5} />}
+                </Canvas>
 
-            {/* Legend */}
-            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur p-3 rounded-lg text-[10px] font-mono space-y-1 z-10 pointer-events-none select-none shadow-sm dark:bg-slate-800/90 dark:text-white">
-                <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded" style={{ backgroundColor: mat1.color }}></span>
-                    <span>{mat1.name} ({mat1.shape})</span>
+                {/* Legend */}
+                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur p-3 rounded-lg text-[10px] font-mono space-y-1 z-10 pointer-events-none select-none shadow-sm dark:bg-slate-800/90 dark:text-white">
+                    <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded" style={{ backgroundColor: mat1.color }}></span>
+                        <span>{mat1.name} ({mat1.shape})</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded" style={{ backgroundColor: mat2.color }}></span>
+                        <span>{mat2.name} ({mat2.shape})</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded bg-amber-500"></span>
+                        <span>Weld Bead</span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded" style={{ backgroundColor: mat2.color }}></span>
-                    <span>{mat2.name} ({mat2.shape})</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded bg-amber-500"></span>
-                    <span>Weld Bead</span>
+
+                {/* Joint Type Badge */}
+                <div className="absolute top-4 left-4 bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider z-10 shadow-sm">
+                    {jointType} Joint • {is2D ? '2D View' : '3D View'}
                 </div>
             </div>
-
-            {/* Joint Type Badge */}
-            <div className="absolute top-4 left-4 bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider z-10 shadow-sm">
-                {jointType} Joint • {is2D ? '2D View' : '3D View'}
-            </div>
-        </div>
+        </ClientOnly>
     );
 };

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCADCanvasStore, CADShape } from '@/store/CADCanvasStore';
-import { MousePointer2, Plus } from 'lucide-react';
+import { MousePointer2, Plus, BookOpen } from 'lucide-react';
+import { useOSStore } from '@/store/osStore';
 
 type Shape = 'plate' | 'round' | 'tube' | 'hollow-rect' | 'angle' | 'channel' | 'i-beam' | 'hex';
 
@@ -246,20 +247,28 @@ export default function ProfileWeightModule() {
 
             {/* 2D/3D Toggle + Visualization */}
             <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-os-canvas)' }}>
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between items-center mb-2">
                     <span className="text-[9px] font-bold uppercase" style={{ color: 'var(--color-os-text-secondary)' }}>Preview</span>
-                    <div className="flex gap-1">
-                        {(['2d', '3d'] as const).map(m => (
-                            <button key={m} onClick={() => setViewMode(m)}
-                                className="px-2 py-0.5 rounded text-[9px] font-bold uppercase"
-                                style={{
-                                    backgroundColor: viewMode === m ? 'var(--color-os-accent)' : 'var(--color-os-header)',
-                                    color: viewMode === m ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
-                                }}
-                            >
-                                {m}
-                            </button>
-                        ))}
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => useOSStore.getState().openWindow('handbook')}
+                            className="flex items-center gap-1 text-[9px] font-bold uppercase text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                            <BookOpen size={10} /> Handbook
+                        </button>
+                        <div className="flex gap-1">
+                            {(['2d', '3d'] as const).map(m => (
+                                <button key={m} onClick={() => setViewMode(m)}
+                                    className="px-2 py-0.5 rounded text-[9px] font-bold uppercase"
+                                    style={{
+                                        backgroundColor: viewMode === m ? 'var(--color-os-accent)' : 'var(--color-os-header)',
+                                        color: viewMode === m ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
+                                    }}
+                                >
+                                    {m}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <ShapePreview shape={shape} viewMode={viewMode} w={width} h={height} t={thickness} d={diameter} wt={wallThickness} fW={flangeW} wH={webH} fT={flangeT} wT={webT} L={length} />

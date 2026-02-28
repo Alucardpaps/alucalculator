@@ -1,248 +1,58 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { ModuleType } from '@/config/modules';
 
-// ============================================
-// Types
-// ============================================
-
-export type ModuleInstanceId = string;
-export type VariableId = string;
-
-export interface ModuleVariable {
-    id: VariableId;
-    name: string;
-    value: number | null;
-    unit?: string;
-    linkedFrom?: {
-        sourceModuleId: ModuleInstanceId;
-        sourceVariableId: VariableId;
-    };
-}
-
-export interface ModuleData {
-    id: ModuleInstanceId;
-    type: ModuleType;
-    name: string;
-    inputs: Record<string, ModuleVariable>;
-    outputs: Record<string, ModuleVariable>;
-    position?: { x: number; y: number };
-}
-
-export interface ProjectData {
+export interface ProjectVariable {
     id: string;
     name: string;
-    createdAt: number;
-    updatedAt: number;
-    modules: Record<string, ModuleData>; // Map id -> data
-    moduleOrder: string[]; // Order of module ids
+    value: number;
+    unit?: string;
+    description?: string;
 }
-
-// ============================================
-// Store Interface
-// ============================================
 
 interface ProjectState {
-    currentProject: ProjectData | null;
-    savedProjects: Record<string, ProjectData>; // Map id -> project
+    name: string;
+    variables: ProjectVariable[];
+
+    setName: (name: string) => void;
+    addVariable: (variable: Omit<ProjectVariable, 'id'>) => void;
+    updateVariable: (id: string, updates: Partial<ProjectVariable>) => void;
+    removeVariable: (id: string) => void;
+    getVariableValue: (name: string) => number | undefined;
 }
 
-interface ProjectActions {
-    createProject: (name: string) => void;
-    loadProject: (id: string) => void;
-    saveCurrentProject: () => void;
-    deleteProject: (id: string) => void;
-    addModule: (type: ModuleType) => void;
-    removeModule: (id: string) => void;
-    updateModuleData: (id: string, data: Partial<ModuleData>) => void;
-    linkVariable: (targetModId: string, targetVarId: string, sourceModId: string, sourceVarId: string) => void;
-    unlinkVariable: (targetModId: string, targetVarId: string) => void;
-}
-
-// ============================================
-// Store Implementation
-// ============================================
-
-export const useProjectStore = create<ProjectState & ProjectActions>()(
+export const useProjectStore = create<ProjectState>()(
     persist(
         (set, get) => ({
-            currentProject: null,
-            savedProjects: {},
+            name: 'Untitled Project',
+            variables: [
+                { id: 'default-1', name: 'SafetyFactor', value: 1.5, unit: '', description: 'Global safety factor' },
+                { id: 'default-2', name: 'Density_Steel', value: 7.85, unit: 'g/cm3', description: 'Standard steel density' }
+            ],
 
-            createProject: (name: string) => {
-                const newProject: ProjectData = {
-                    id: crypto.randomUUID(),
-                    name,
-                    createdAt: Date.now(),
-                    updatedAt: Date.now(),
-                    modules: {},
-                    moduleOrder: []
-                };
-                set({ currentProject: newProject });
-                // Auto-save immediately
-                get().saveCurrentProject();
-            },
+            setName: (name) => set({ name }),
 
-            loadProject: (id: string) => {
-                const project = get().savedProjects[id];
-                if (project) {
-                    set({ currentProject: { ...project } });
-                }
-            },
+            addVariable: (variable) => set((state) => ({
+                variables: [...state.variables, { ...variable, id: crypto.randomUUID() }]
+            })),
 
-            saveCurrentProject: () => {
-                const { currentProject, savedProjects } = get();
-                if (currentProject) {
-                    const updated = { ...currentProject, updatedAt: Date.now() };
-                    set({
-                        currentProject: updated,
-                        savedProjects: {
-                            ...savedProjects,
-                            [updated.id]: updated
-                        }
-                    });
-                }
-            },
+            updateVariable: (id, updates) => set((state) => ({
+                variables: state.variables.map((v) =>
+                    v.id === id ? { ...v, ...updates } : v
+                )
+            })),
 
-            deleteProject: (id: string) => {
-                const { savedProjects, currentProject } = get();
-                const newSaved = { ...savedProjects };
-                delete newSaved[id];
+            removeVariable: (id) => set((state) => ({
+                variables: state.variables.filter((v) => v.id !== id)
+            })),
 
-                set({
-                    savedProjects: newSaved,
-                    currentProject: currentProject?.id === id ? null : currentProject
-                });
-            },
-
-            addModule: (type: ModuleType) => {
-                const { currentProject } = get();
-                if (!currentProject) return;
-
-                const moduleId = crypto.randomUUID();
-                const newModule: ModuleData = {
-                    id: moduleId,
-                    type,
-                    name: type.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-                    inputs: {},
-                    outputs: {}
-                };
-
-                const updatedProject = {
-                    ...currentProject,
-                    modules: {
-                        ...currentProject.modules,
-                        [moduleId]: newModule
-                    },
-                    moduleOrder: [...currentProject.moduleOrder, moduleId],
-                    updatedAt: Date.now()
-                };
-
-                set({ currentProject: updatedProject });
-                get().saveCurrentProject();
-            },
-
-            removeModule: (id: string) => {
-                const { currentProject } = get();
-                if (!currentProject) return;
-
-                const newModules = { ...currentProject.modules };
-                delete newModules[id];
-
-                const updatedProject = {
-                    ...currentProject,
-                    modules: newModules,
-                    moduleOrder: currentProject.moduleOrder.filter(mId => mId !== id),
-                    updatedAt: Date.now()
-                };
-
-                set({ currentProject: updatedProject });
-                get().saveCurrentProject();
-            },
-
-            updateModuleData: (id: string, data: Partial<ModuleData>) => {
-                const { currentProject } = get();
-                if (!currentProject || !currentProject.modules[id]) return;
-
-                const updatedModule = { ...currentProject.modules[id], ...data };
-                const updatedProject = {
-                    ...currentProject,
-                    modules: {
-                        ...currentProject.modules,
-                        [id]: updatedModule
-                    },
-                    updatedAt: Date.now()
-                };
-
-                set({ currentProject: updatedProject });
-            },
-
-            linkVariable: (targetModId, targetVarId, sourceModId, sourceVarId) => {
-                const { currentProject } = get();
-                if (!currentProject) return;
-                const targetMod = currentProject.modules[targetModId];
-                if (!targetMod || !targetMod.inputs[targetVarId]) return;
-
-                const updatedMod = {
-                    ...targetMod,
-                    inputs: {
-                        ...targetMod.inputs,
-                        [targetVarId]: {
-                            ...targetMod.inputs[targetVarId],
-                            linkedFrom: { sourceModuleId: sourceModId, sourceVariableId: sourceVarId }
-                        }
-                    }
-                };
-
-                set({
-                    currentProject: {
-                        ...currentProject,
-                        modules: { ...currentProject.modules, [targetModId]: updatedMod }
-                    }
-                });
-                get().saveCurrentProject();
-            },
-
-            unlinkVariable: (targetModId, targetVarId) => {
-                const { currentProject } = get();
-                if (!currentProject) return;
-                const targetMod = currentProject.modules[targetModId];
-                if (!targetMod || !targetMod.inputs[targetVarId]) return;
-
-                const updatedMod = {
-                    ...targetMod,
-                    inputs: {
-                        ...targetMod.inputs,
-                        [targetVarId]: {
-                            ...targetMod.inputs[targetVarId],
-                            linkedFrom: undefined
-                        }
-                    }
-                };
-
-                set({
-                    currentProject: {
-                        ...currentProject,
-                        modules: { ...currentProject.modules, [targetModId]: updatedMod }
-                    }
-                });
-                get().saveCurrentProject();
+            getVariableValue: (name) => {
+                const v = get().variables.find(v => v.name === name);
+                return v ? v.value : undefined;
             }
         }),
         {
-            name: 'alucalc-projects',
-            partialize: (state) => ({
-                savedProjects: state.savedProjects,
-            })
+            name: 'alucalc-project-storage',
+            version: 1
         }
     )
 );
-
-// ============================================
-// Selectors
-// ============================================
-
-export const selectCurrentProject = (state: ProjectState) => state.currentProject;
-export const selectSavedProjects = (state: ProjectState) => state.savedProjects;
-export const selectModuleOrder = (state: ProjectState) => state.currentProject?.moduleOrder || [];
-export const selectModules = (state: ProjectState) => state.currentProject?.modules || {};

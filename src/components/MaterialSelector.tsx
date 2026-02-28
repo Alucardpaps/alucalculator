@@ -11,7 +11,8 @@
  */
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Layers, Zap, Thermometer, Scale } from 'lucide-react';
+import { Search, ChevronDown, X, Layers, Zap, Thermometer, Scale, BookOpen } from 'lucide-react';
+import { useOSStore } from '@/store/osStore';
 import { MATERIALS_DB, getMaterialCategories, type MaterialProp } from '@/data/materialsData';
 
 interface MaterialSelectorProps {
@@ -239,6 +240,14 @@ export function MaterialSelector({
                                         </div>
                                     </div>
                                 </div>
+
+                                <button
+                                    onClick={() => useOSStore.getState().openWindow('handbook')}
+                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg text-[10px] text-indigo-300 font-bold uppercase transition-all active:scale-95"
+                                >
+                                    <BookOpen size={12} />
+                                    View Handbook Details
+                                </button>
                             </div>
                         )}
                     </div>

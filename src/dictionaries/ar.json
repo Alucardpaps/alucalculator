@@ -1,0 +1,661 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "modules": "الوحدات",
+    "settings": "الإعدادات",
+    "homeDesc": "لوحة التحكم الرئيسية",
+    "fits": "حاسبة التوافقات",
+    "handbook": "دليل المهندس",
+    "library": "مكتبة الوحدات",
+    "available": "الوحدات المتاحة",
+    "news": "أخبار الصناعة",
+    "mechanical": "ميكانيكا",
+    "civil": "مدني",
+    "electrical": "كهرباء",
+    "science": "علوم",
+    "finance": "ماليات",
+    "software": "برمجيات",
+    "other": "أخرى"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "حاسبة وزن البروفيل",
+      "desc": "تقدير الكتلة والتكلفة"
+    },
+    "fits": {
+      "title": "التوافقات والتسامحات",
+      "desc": "ISO 286 عمود/ثقب"
+    },
+    "gears": {
+      "title": "حاسبة التروس",
+      "desc": "هندسة التروس المستقيمة واللولبية"
+    },
+    "strength": {
+      "title": "التحمل (موهر)",
+      "desc": "تحليل الإجهاد"
+    },
+    "bearings": {
+      "title": "المحامل (L10)",
+      "desc": "توقع العمر"
+    },
+    "welding": {
+      "title": "حرارة اللحام",
+      "desc": "مدخلات العملية"
+    },
+    "sheetMetal": {
+      "title": "الصفائح المعدنية",
+      "desc": "قوة الثني"
+    },
+    "pumps": {
+      "title": "المضخات",
+      "desc": "القدرة و NPSH"
+    },
+    "fasteners": {
+      "title": "المثبتات",
+      "desc": "لولب متري ISO"
+    },
+    "converter": {
+      "title": "المحوّل",
+      "desc": "الوحدات والقدرة"
+    },
+    "handbook": {
+      "title": "الدليل",
+      "desc": "جداول المحامل، تسامحات ISO، مرجع G‑Code."
+    }
+  },
+  "common": {
+    "calculate": "احسب",
+    "reset": "إعادة ضبط",
+    "inputs": "المدخلات",
+    "results": "النتائج",
+    "dimensions": "الأبعاد",
+    "material": "المادة",
+    "weight": "الوزن",
+    "cost": "التكلفة",
+    "unitPrice": "سعر الوحدة",
+    "quantity": "الكمية",
+    "total": "الإجمالي",
+    "save": "حفظ",
+    "export": "تصدير",
+    "generatedBy": "تم الإنشاء بواسطة AluCalc OS",
+    "design": "تصميم",
+    "view2d": "عرض 2D",
+    "view3d": "عرض 3D",
+    "designParams": "معلمات التصميم",
+    "analysisResults": "نتائج التحليل",
+    "prodNotes": "ملاحظات الإنتاج",
+    "unitWeight": "وزن الوحدة",
+    "totalWeight": "الوزن الإجمالي",
+    "result": "النتيجة",
+    "hole": "ثقب",
+    "shaft": "عمود",
+    "min": "أدنى",
+    "max": "أقصى",
+    "nominalDia": "القطر الاسمي",
+    "explanation": "شرح مفصل",
+    "toleranceValues": "قيم التسامح",
+    "mountingCalc": "حسابات التركيب",
+    "pressure": "ضغط الواجهة",
+    "force": "قوة الدفع",
+    "torque": "عزم منقول",
+    "metric": "متري",
+    "imperial": "إنجليزي",
+    "from": "من",
+    "to": "إلى",
+    "language": "اللغة",
+    "calcTool": "أداة الحساب",
+    "formula": "معادلة الحساب",
+    "ratio": "النسبة",
+    "stress": "الإجهاد",
+    "beam": "عارضة",
+    "cantilever": "كابولي",
+    "simple": "ارتكاز بسيط",
+    "share": "مشاركة الحساب",
+    "copied": "تم النسخ!",
+    "loadGeometry": "التحميل والهندسة",
+    "beamParams": "معلمات العارضة",
+    "calculatedStress": "الإجهاد المحسوب",
+    "maxDeflection": "أقصى ترخيم",
+    "safetyFactor": "معامل الأمان",
+    "centerDist": "المسافة المركزية (awt)",
+    "outputSpeed": "سرعة الخرج"
+  },
+  "dimensions": {
+    "width": "العرض",
+    "height": "الارتفاع",
+    "thickness": "السماكة",
+    "wallThickness": "سماكة الجدار",
+    "outerDiameter": "القطر الخارجي",
+    "diameter": "القطر",
+    "length": "الطول"
+  },
+  "aluminum": {
+    "title": "حاسبة وزن البروفيل",
+    "shapes": {
+      "box": "مقطع صندوقي",
+      "sheet": "صفيحة/لوح",
+      "pipe": "أنبوب دائري",
+      "bar": "قضيب مصمت",
+      "angle": "زاوية (L)",
+      "beam": "جائز (I/H)",
+      "channel": "قناة (U)",
+      "tee": "مقطع T",
+      "hex": "قضيب سداسي"
+    },
+    "params": {
+      "width": "العرض (A)",
+      "height": "الارتفاع (B)",
+      "thickness": "السماكة (t)",
+      "wall": "الجدار (t)",
+      "diameter": "القطر (D)",
+      "length": "الطول",
+      "web": "الجسر (tw)",
+      "flange": "الجناح (tf)"
+    },
+    "theory": {
+      "densityTitle": "الكثافة (ρ)",
+      "densityDesc": "الكثافة هي الكتلة لكل وحدة حجم. تختلف كثافات سبائك الألمنيوم قليلًا بسبب عناصر السبيكة.",
+      "series1000": "سلسلة 1000 (نقي): ~2.70 g/cm³",
+      "series6000": "سلسلة 6000 (Mg+Si): ~2.70 g/cm³",
+      "series7000": "سلسلة 7000 (Zn): ~2.81 g/cm³ (أثقل)",
+      "formula": "الكتلة = الحجم × الكثافة",
+      "plateFormula": "للصفيحة: الطول × العرض × السماكة × ρ"
+    },
+    "disclaimer": "الحسابات مبنية على كثافة نظرية (~2.70 g/cm³). قد يختلف الوزن الفعلي ±5% حسب تفاوتات الإنتاج (ASTM B221). أدخل قيماً صحيحة للحصول على أفضل النتائج.",
+    "projectList": {
+      "title": "قائمة المشروع (BOM)",
+      "add": "إضافة إلى القائمة",
+      "clear": "مسح القائمة",
+      "empty": "القائمة فارغة.",
+      "totalWeight": "إجمالي الوزن الكلي",
+      "totalCost": "إجمالي تكلفة المشروع",
+      "columns": {
+        "id": "#",
+        "desc": "المادة/الأبعاد",
+        "qty": "الكمية",
+        "unitWeight": "وزن الوحدة",
+        "totalWeight": "الوزن الكلي",
+        "actions": "إجراء"
+      }
+    },
+    "costData": {
+      "pricePerKg": "السعر لكل كغ (/kg)",
+      "estimatedCost": "التكلفة التقديرية"
+    },
+    "engineering": {
+      "title": "تحليل هندسي",
+      "surfaceArea": "المساحة السطحية (دهان)",
+      "mechProps": "الخواص الميكانيكية",
+      "yield": "إجهاد الخضوع",
+      "tensile": "إجهاد الشد",
+      "hardness": "الصلادة",
+      "weldability": "قابلية اللحام",
+      "sectionProps": "خواص المقطع",
+      "inertia": "عزم العطالة",
+      "modulus": "معامل المقطع",
+      "radius": "نصف قطر العطالة"
+    },
+    "simulation": {
+      "title": "محاكاة ترخيم العارضة",
+      "open": "فتح المحاكي",
+      "close": "إغلاق",
+      "length": "طول العارضة (L)",
+      "load": "الحمل (F)",
+      "support": "نوع الإسناد",
+      "simple": "إسناد بسيط",
+      "cantilever": "كابولي",
+      "result": "أقصى ترخيم",
+      "safe": "آمن",
+      "unsafe": "غير آمن (>L/300)",
+      "warning": "تنبيه: تقدير بسيط فقط. استخدم FEA للأحمال الحرجة."
+    },
+    "export": {
+      "pdf": "تنزيل العرض (PDF)",
+      "dxf": "تنزيل DXF (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "دليل علوم المواد"
+  },
+  "fit": {
+    "title": "حاسبة التوافقات",
+    "subtitle": "نظام تسامح ISO والتداخل",
+    "tabs": {
+      "standard": "توافقات قياسية",
+      "manual": "تسامح يدوي"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "توافق انزلاقي",
+        "desc": "انزلاق يدوي مع تزييت"
+      },
+      "h7g6": {
+        "name": "توافق تشغيل",
+        "desc": "للأجزاء الدوارة"
+      },
+      "h7f7": {
+        "name": "توافق تشغيل حر",
+        "desc": "خلوص كبير"
+      },
+      "h7k6": {
+        "name": "توافق انتقالي",
+        "desc": "تداخل/خلوص بسيط"
+      },
+      "h7m6": {
+        "name": "توافق انتقالي",
+        "desc": "غالباً تداخل بسيط"
+      },
+      "h7n6": {
+        "name": "توافق انتقالي",
+        "desc": "ميل للتداخل"
+      },
+      "h7p6": {
+        "name": "توافق ضغط خفيف",
+        "desc": "تركيب بمطرقة خفيفة"
+      },
+      "h7r6": {
+        "name": "توافق ضغط",
+        "desc": "يتطلب مكبساً هيدروليكياً"
+      },
+      "h7s6": {
+        "name": "توافق ضغط شديد",
+        "desc": "تجميع بالحرارة/البرودة"
+      }
+    },
+    "inputs": {
+      "nominalSize": "المقاس الاسمي",
+      "fitLength": "طول التوافق",
+      "elasticModulus": "معامل المرونة E",
+      "frictionCoeff": "الاحتكاك (μ)"
+    },
+    "results": {
+      "fitType": "نوع التوافق",
+      "clearanceAmount": "مقدار الخلوص",
+      "interferenceAmount": "مقدار التداخل",
+      "clearance": "خلوص",
+      "transition": "انتقالي",
+      "interference": "تداخل"
+    }
+  },
+  "gear": {
+    "title": "حاسبة التروس",
+    "subtitle": "هندسة التروس المستقيمة واللولبية والمخروطية",
+    "types": {
+      "spur": "ترس مستقيم",
+      "helical": "ترس حلزوني",
+      "bevel": "ترس مخروطي",
+      "worm": "ترس دودي"
+    },
+    "inputs": {
+      "module": "الموديل (m)",
+      "pressureAngle": "زاوية الضغط",
+      "pinionTeeth": "Z1 (بنيون)",
+      "gearTeeth": "Z2 (ترس)",
+      "helixAngle": "زاوية الحلزون",
+      "faceWidth": "عرض الوجه",
+      "power": "القدرة (kW)",
+      "rpm": "السرعة (RPM)"
+    },
+    "results": {
+      "calculatedTorque": "العزم",
+      "transmissionRatio": "النسبة",
+      "pitchDiameter": "قطر الخطوة",
+      "forcesAndStress": "قوى وإجهاد"
+    },
+    "outputs": {
+      "tipDia": "قطر السن",
+      "rootDia": "قطر الجذر"
+    }
+  },
+  "strength": {
+    "title": "حاسبة التحمل",
+    "subtitle": "تحليل الإجهاد ودائرة موهر",
+    "inputs": {
+      "sigmaX": "سيغما X (σx)",
+      "sigmaY": "سيغما Y (σy)",
+      "tauXY": "تاو XY (τxy)",
+      "theta": "الزاوية (θ)"
+    },
+    "results": {
+      "principalStresses": "الإجهادات الرئيسية",
+      "maxShear": "أقصى قص (τmax)",
+      "vonMises": "فون ميزس",
+      "transformed": "الحالة المحولة"
+    }
+  },
+  "bearing": {
+    "title": "حاسبة عمر المحمل",
+    "subtitle": "عمر L10 وتحليل الحمل",
+    "inputs": {
+      "series": "السلسلة",
+      "code": "كود المحمل",
+      "radialLoad": "الحمل الشعاعي (Fr)",
+      "axialLoad": "الحمل المحوري (Fa)",
+      "rpm": "السرعة (RPM)",
+      "reliability": "الموثوقية"
+    },
+    "results": {
+      "lifeHours": "عمر L10 (ساعات)",
+      "lifeRevs": "عمر L10 (ملايين دورات)",
+      "equivalentLoad": "الحمل المكافئ (P)",
+      "staticSafety": "أمان ساكن (s0)"
+    }
+  },
+  "welding": {
+    "title": "حاسبة اللحام",
+    "subtitle": "المدخل الحراري وتحليل الإجهاد",
+    "inputs": {
+      "method": "الطريقة",
+      "type": "نوع الوصلة",
+      "current": "التيار (I)",
+      "voltage": "الجهد (V)",
+      "speed": "السرعة (v)",
+      "legSize": "طول رجل اللحام (a)",
+      "thickness": "السماكة (t)",
+      "length": "الطول (L)",
+      "load": "الحمل (F)"
+    },
+    "results": {
+      "heatInput": "المدخل الحراري",
+      "stress": "الإجهاد",
+      "safetyFactor": "معامل الأمان",
+      "efficiency": "الكفاءة (η)"
+    },
+    "types": {
+      "fillet": "لحام زاوي",
+      "butt": "لحام تناكبي",
+      "doubleFillet": "لحام زاوي مزدوج"
+    }
+  },
+  "sheetMetal": {
+    "bendAngle": "زاوية الثني",
+    "innerRadius": "نصف القطر الداخلي",
+    "bendLength": "طول الثني",
+    "kFactor": "عامل K",
+    "title": "حاسبة الصفائح",
+    "subtitle": "قوة الثني والنمط المسطح",
+    "inputs": {
+      "material": "المادة",
+      "thickness": "السماكة (t)",
+      "angle": "زاوية الثني (α)",
+      "radius": "نصف القطر الداخلي (ri)",
+      "length": "طول الثني (L)",
+      "vOpening": "فتحة قالب V (V)",
+      "flange1": "الشفّة A",
+      "flange2": "الشفّة B",
+      "kFactor": "عامل K"
+    },
+    "results": {
+      "force": "القوة المطلوبة",
+      "flatLength": "الطول المسطح",
+      "bendAllowance": "سماحية الثني (BA)",
+      "bendDeduction": "خصم الثني (BD)",
+      "recV": "قالب V موصى به"
+    }
+  },
+  "pump": {
+    "title": "حاسبة المضخات",
+    "subtitle": "القدرة الهيدروليكية و NPSH",
+    "inputs": {
+      "flow": "معدل التدفق (Q)",
+      "head": "الرفع (H)",
+      "rpm": "السرعة (RPM)",
+      "eff": "الكفاءة (η)",
+      "density": "الكثافة (ρ)",
+      "npsh": "NPSH المتاح"
+    },
+    "results": {
+      "hydPower": "القدرة الهيدروليكية",
+      "shaftPower": "قدرة العمود",
+      "specSpeed": "السرعة النوعية (ns)",
+      "type": "نوع المضخة",
+      "flowVelocity": "سرعة التدفق",
+      "reynolds": "رقم رينولدز"
+    },
+    "types": {
+      "radial": "تدفق شعاعي",
+      "mixed": "تدفق مختلط",
+      "axial": "تدفق محوري"
+    }
+  },
+  "fastener": {
+    "title": "المثبتات واللولب",
+    "subtitle": "بيانات اللولب المتري ISO",
+    "inputs": {
+      "size": "مقاس اللولب (M)",
+      "pitch": "الخطوة (P)",
+      "class": "فئة التسامح"
+    },
+    "results": {
+      "tapDrill": "مقاس مثقاب القلاوظ",
+      "majorDia": "القطر الخارجي (d)",
+      "minorDia": "القطر الداخلي (d1)",
+      "pitchDia": "قطر الخطوة (d2)",
+      "clearingDrill": "ثقب خلوص",
+      "tensileArea": "مساحة الشد (As)"
+    }
+  },
+  "converter": {
+    "title": "محول الوحدات",
+    "categories": {
+      "length": "الطول",
+      "weight": "الوزن",
+      "pressure": "الضغط",
+      "power": "القدرة"
+    }
+  },
+  "beam-deflection": {
+    "title": "ترخيم العارضة",
+    "desc": "حساب الترخيم والإجهاد"
+  },
+  "concrete-reinforcement": {
+    "title": "تسليح الخرسانة",
+    "desc": "مساحة التسليح"
+  },
+  "ohms-law": {
+    "title": "قانون أوم",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "هبوط الجهد",
+    "desc": "تحديد مقطع الكابل"
+  },
+  "periodic-table": {
+    "title": "الجدول الدوري",
+    "desc": "العناصر الكيميائية"
+  },
+  "calculator": {
+    "title": "آلة حاسبة علمية",
+    "desc": "رياضيات متقدمة"
+  },
+  "vat-calculator": {
+    "title": "حاسبة ضريبة القيمة المضافة",
+    "desc": "حساب الضريبة"
+  },
+  "excel-helper": {
+    "title": "مساعد إكسل",
+    "desc": "مولد معادلات"
+  },
+  "json-formatter": {
+    "title": "منسق JSON",
+    "desc": "تنسيق JSON"
+  },
+  "regex-tester": {
+    "title": "مختبر Regex",
+    "desc": "اختبار الأنماط"
+  },
+  "feedback": {
+    "title": "ملاحظات",
+    "desc": "أرسل لنا رأيك"
+  },
+  "driveTrain": {
+    "title": "تصميم منظومة نقل الحركة",
+    "subtitle": "محرك • نقل • تحليل الحمل",
+    "primeMover": "1. المحرك (IEC)",
+    "application": "2. حمل التطبيق",
+    "transmission": "3. تصميم النقل",
+    "analysis": "4. التحليل الهندسي",
+    "manufacturing": "4a. بيانات الفحص (M / Wk)",
+    "engineering": "4b. التحليل الهندسي"
+  },
+  "motor": {
+    "nominalPower": "القدرة الاسمية",
+    "speedPoles": "السرعة (الأقطاب)",
+    "nominalTorque": "العزم الاسمي",
+    "efficiency": "الكفاءة",
+    "inputPower": "قدرة الدخل",
+    "ratio": "النسبة",
+    "torqueOut": "عزم الخرج"
+  },
+  "manufacturing": {
+    "profileMod": "تعديل البروفيل (x)",
+    "shiftCoeff": "معامل الإزاحة",
+    "checkPin": "تحقق من قطر الدبوس",
+    "overPins": "القياس على الدبابيس (M)",
+    "baseTangent": "طول المماس القاعدي (Wk)",
+    "pinion": "بنيون",
+    "gear": "ترس",
+    "teeth": "أسنان"
+  },
+  "safety": {
+    "loadFactors": "عوامل الحمل",
+    "tangentialForce": "القوة المماسية (Ft)",
+    "radialForce": "القوة الشعاعية (Fr)",
+    "axialForce": "القوة المحورية (Fa)",
+    "safetyEst": "تقدير الأمان (أساس ISO 6336)",
+    "bendingSafety": "أمان الانحناء (SF)",
+    "pittingSafety": "أمان التنقر (SH)",
+    "stress": "الإجهاد",
+    "contactStress": "إجهاد التلامس",
+    "limit": "الحد",
+    "serviceFactor": "معامل الخدمة (KA)",
+    "safetyWarning": "معاملات الأمان تقديرية اعتماداً على صيغ لويس المبسطة وإجهاد التلامس لهيرتز. يوصى بتحليل ISO 6336 أو AGMA 2001 للتطبيقات الحرجة."
+  },
+  "market": {
+    "title": "بيانات السوق",
+    "aluminum": "ألمنيوم LME",
+    "copper": "نحاس LME",
+    "live": "مباشر",
+    "useLivePrice": "استخدم السعر المباشر"
+  },
+  "news": {
+    "title": "أخبار الصناعة",
+    "subtitle": "الهندسة والمعادن وتحديثات السوق",
+    "breaking": "عاجل",
+    "readMore": "اقرأ القصة كاملة",
+    "loading": "جارٍ تحميل الخلاصة..."
+  },
+  "project": {
+    "title": "عرض المشروع",
+    "manager": "مدير المشروع",
+    "grid": "شبكة البيانات",
+    "nesting": "تحسين القص",
+    "exportPdf": "تصدير PDF",
+    "clear": "مسح",
+    "empty": "قائمة المشروع فارغة. أضف عناصر من الحاسبة.",
+    "settings": "إعدادات التحسين",
+    "rawLength": "طول الخام",
+    "bladeWidth": "عرض الشفرة",
+    "calculate": "احسب القص",
+    "totalBars": "إجمالي القضبان",
+    "efficiency": "الكفاءة",
+    "waste": "الهدر الكلي",
+    "rem": "المتبقي"
+  },
+  "nesting": {
+    "title": "محسن القص",
+    "subtitle": "تعشيق خطي 1D",
+    "stockLength": "طول الخام",
+    "kerf": "عرض الشفرة (Kerf)",
+    "trimStart": "قص البداية",
+    "trimEnd": "قص النهاية",
+    "addPart": "إضافة جزء",
+    "removePart": "إزالة",
+    "calculate": "تحسين القص",
+    "partLabel": "الملصق",
+    "partLength": "الطول",
+    "partQty": "الكمية",
+    "barsUsed": "عدد القضبان المستخدمة",
+    "efficiency": "كفاءة المادة",
+    "totalWaste": "الهدر الكلي",
+    "algorithm": "الخوارزمية",
+    "noResults": "أضف الأجزاء ثم اضغط تحسين لرؤية النتائج"
+  },
+  "nesting2d": {
+    "title": "تعشيق ثنائي الأبعاد",
+    "subtitle": "تعشيق الأشكال الحقيقية",
+    "dropSvg": "أسقط ملفات SVG هنا أو انقر للرفع",
+    "sheetWidth": "عرض اللوح",
+    "sheetHeight": "ارتفاع اللوح",
+    "spacing": "تباعد الأجزاء",
+    "rotation": "خطوة الدوران",
+    "optimize": "تحسين",
+    "exportDxf": "تصدير DXF",
+    "sheets": "الصفائح",
+    "efficiency": "الكفاءة",
+    "waste": "الهدر",
+    "parts": "الأجزاء",
+    "unplaced": "الأجزاء غير الموزعة"
+  },
+  "gears": {
+    "title": "حاسبة التروس",
+    "module": "الموديل (m)",
+    "teeth": "الأسنان (z)",
+    "pressureAngle": "زاوية الضغط",
+    "helixAngle": "زاوية الحلزون",
+    "faceWidth": "عرض الوجه",
+    "addendum": "ارتفاع السن (ha)",
+    "dedendum": "عمق السن (hf)",
+    "circularPitch": "الخطوة المحيطية (p)",
+    "recFaceWidth": "عرض وجه موصى به (6m-10m)"
+  },
+  "science": {
+    "title": "الجدول الدوري",
+    "meltingPoint": "نقطة الانصهار",
+    "boilingPoint": "نقطة الغليان",
+    "discoveredBy": "المكتشف",
+    "categories": {
+      "alkali metal": "فلز قلوي",
+      "alkaline earth metal": "فلز قلوي ترابي",
+      "transition metal": "فلز انتقالي",
+      "noble gas": "غاز نبيل",
+      "halogen": "هالوجين",
+      "metalloid": "شبه فلز",
+      "nonmetal": "لافلز",
+      "lanthanide": "لانثانيدات",
+      "actinide": "أكتينيدات"
+    }
+  },
+  "materials": {
+    "aluminum": "ألمنيوم",
+    "steel": "فولاذ",
+    "stainless": "فولاذ مقاوم للصدأ",
+    "plastic": "بلاستيك",
+    "nonferrous": "غير حديدي",
+    "superalloy": "سبيكة فائقة"
+  },
+  "civil": {
+    "title": "تسليح الخرسانة",
+    "requiredAs": "As المطلوبة",
+    "actualAs": "As الفعلية",
+    "effectiveD": "d الفعالة"
+  },
+  "electrical": {
+    "title": "هبوط الجهد",
+    "powerFactor": "معامل القدرة",
+    "cableRes": "مقاومة الكابل",
+    "powerLoss": "فقد القدرة",
+    "recSize": "المقاس الموصى به"
+  },
+  "reducer": {
+    "inputPower": "قدرة الدخل",
+    "ambientTemp": "درجة حرارة البيئة"
+  },
+  "cutting": {
+    "stockLength": "طول الخام",
+    "bladeKerf": "عرض الشفرة",
+    "trimStart": "قص البداية",
+    "trimEnd": "قص النهاية"
+  }
+}

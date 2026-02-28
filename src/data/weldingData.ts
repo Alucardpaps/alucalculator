@@ -178,6 +178,7 @@ export const JOINT_TYPES: Record<WeldJointType, JointTypeData> = {
 export interface ElectrodeSpec {
     code: string;
     name: string;
+    nameTr: string;
     process: WeldingProcess[];
     tensileStrength: number; // MPa
     yieldStrength: number;   // MPa
@@ -189,23 +190,23 @@ export interface ElectrodeSpec {
 
 export const ELECTRODE_CATALOG: ElectrodeSpec[] = [
     // SMAW Electrodes
-    { code: 'E6010', name: 'Cellulose Sodium', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'DC+', applications: 'Pipe, root passes' },
-    { code: 'E6011', name: 'Cellulose Potassium', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'AC/DC+', applications: 'General purpose, AC welders' },
-    { code: 'E6013', name: 'Rutile Potassium', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'AC/DC', applications: 'Sheet metal, light fabrication' },
-    { code: 'E7018', name: 'Iron Powder Low H', process: ['smaw'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'AC/DC+', applications: 'Structural steel, pressure vessels' },
-    { code: 'E7024', name: 'Iron Powder Titania', process: ['smaw'], tensileStrength: 490, yieldStrength: 400, elongation: 17, position: 'Flat/Horiz', current: 'AC/DC', applications: 'High deposition flat work' },
-    { code: 'E308L-16', name: 'Stainless 308L', process: ['smaw'], tensileStrength: 550, yieldStrength: 350, elongation: 35, position: 'All', current: 'AC/DC+', applications: '304 stainless steel' },
-    { code: 'E309L-16', name: 'Stainless 309L', process: ['smaw'], tensileStrength: 550, yieldStrength: 350, elongation: 30, position: 'All', current: 'AC/DC+', applications: 'Dissimilar steel joining' },
+    { code: 'E6010', name: 'Cellulose Sodium', nameTr: 'Selülozik Sodyum', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'DC+', applications: 'Pipe, root passes' },
+    { code: 'E6011', name: 'Cellulose Potassium', nameTr: 'Selülozik Potasyum', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'AC/DC+', applications: 'General purpose, AC welders' },
+    { code: 'E6013', name: 'Rutile Potassium', nameTr: 'Rutil Potasyum', process: ['smaw'], tensileStrength: 430, yieldStrength: 340, elongation: 22, position: 'All', current: 'AC/DC', applications: 'Sheet metal, light fabrication' },
+    { code: 'E7018', name: 'Iron Powder Low H', nameTr: 'Demir Tozu Düşük H', process: ['smaw'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'AC/DC+', applications: 'Structural steel, pressure vessels' },
+    { code: 'E7024', name: 'Iron Powder Titania', nameTr: 'Demir Tozu Titanya', process: ['smaw'], tensileStrength: 490, yieldStrength: 400, elongation: 17, position: 'Flat/Horiz', current: 'AC/DC', applications: 'High deposition flat work' },
+    { code: 'E308L-16', name: 'Stainless 308L', nameTr: 'Paslanmaz 308L', process: ['smaw'], tensileStrength: 550, yieldStrength: 350, elongation: 35, position: 'All', current: 'AC/DC+', applications: '304 stainless steel' },
+    { code: 'E309L-16', name: 'Stainless 309L', nameTr: 'Paslanmaz 309L', process: ['smaw'], tensileStrength: 550, yieldStrength: 350, elongation: 30, position: 'All', current: 'AC/DC+', applications: 'Dissimilar steel joining' },
 
     // MIG/GMAW Wires
-    { code: 'ER70S-6', name: 'Solid Wire Carbon', process: ['mig'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'DC+', applications: 'General carbon steel' },
-    { code: 'ER308L', name: 'Stainless 308L Wire', process: ['mig', 'tig'], tensileStrength: 550, yieldStrength: 350, elongation: 35, position: 'All', current: 'DC+', applications: '304 stainless steel' },
-    { code: 'ER4043', name: 'Aluminum Silicon', process: ['mig', 'tig'], tensileStrength: 165, yieldStrength: 70, elongation: 18, position: 'All', current: 'DC+', applications: '6xxx series aluminum' },
-    { code: 'ER5356', name: 'Aluminum Magnesium', process: ['mig', 'tig'], tensileStrength: 265, yieldStrength: 150, elongation: 25, position: 'All', current: 'DC+', applications: '5xxx series aluminum' },
+    { code: 'ER70S-6', name: 'Solid Wire Carbon', nameTr: 'SG2 Gazaltı Teli', process: ['mig'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'DC+', applications: 'General carbon steel' },
+    { code: 'ER308L', name: 'Stainless 308L Wire', nameTr: 'Paslanmaz Tel 308L', process: ['mig', 'tig'], tensileStrength: 550, yieldStrength: 350, elongation: 35, position: 'All', current: 'DC+', applications: '304 stainless steel' },
+    { code: 'ER4043', name: 'Aluminum Silicon', nameTr: 'Alüminyum Silisyum', process: ['mig', 'tig'], tensileStrength: 165, yieldStrength: 70, elongation: 18, position: 'All', current: 'DC+', applications: '6xxx series aluminum' },
+    { code: 'ER5356', name: 'Aluminum Magnesium', nameTr: 'Alüminyum Magnezyum', process: ['mig', 'tig'], tensileStrength: 265, yieldStrength: 150, elongation: 25, position: 'All', current: 'DC+', applications: '5xxx series aluminum' },
 
     // Flux-cored Wires
-    { code: 'E71T-1', name: 'Flux Core Gas Shield', process: ['fcaw'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'DC+', applications: 'Structural steel, shipbuilding' },
-    { code: 'E71T-11', name: 'Flux Core Self-Shield', process: ['fcaw'], tensileStrength: 490, yieldStrength: 400, elongation: 20, position: 'All', current: 'DC-', applications: 'Outdoor, windy conditions' },
+    { code: 'E71T-1', name: 'Flux Core Gas Shield', nameTr: 'Gaz Korumalı Özlü Tel', process: ['fcaw'], tensileStrength: 490, yieldStrength: 400, elongation: 22, position: 'All', current: 'DC+', applications: 'Structural steel, shipbuilding' },
+    { code: 'E71T-11', name: 'Flux Core Self-Shield', nameTr: 'Açık Saha Özlü Tel', process: ['fcaw'], tensileStrength: 490, yieldStrength: 400, elongation: 20, position: 'All', current: 'DC-', applications: 'Outdoor, windy conditions' },
 ];
 
 /**

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 
 /**
- * ScientificCalculatorModule - Full scientific calculator
+ * ScientificCalculatorModule - Refined for Persistent Utility Mode
  */
 export default function ScientificCalculatorModule() {
     const [display, setDisplay] = useState('0');
@@ -70,7 +71,6 @@ export default function ScientificCalculatorModule() {
         }
     }, [lastOp, previousValue, performOperation]);
 
-    // Scientific functions
     const scientific = (fn: string) => {
         const val = parseFloat(display);
         let result = 0;
@@ -87,88 +87,69 @@ export default function ScientificCalculatorModule() {
             case 'π': result = Math.PI; break;
             case 'e': result = Math.E; break;
             case '|x|': result = Math.abs(val); break;
-            case 'n!': result = factorial(val); break;
+            case 'n!': result = (function f(n: number): number { return n <= 1 ? 1 : n * f(n - 1); })(val); break;
         }
         setDisplay(String(result));
         setWaitingForOperand(true);
     };
 
-    const factorial = (n: number): number => {
-        if (n <= 1) return 1;
-        return n * factorial(n - 1);
-    };
-
-    // Memory functions
-    const memoryStore = () => setMemory(parseFloat(display));
-    const memoryRecall = () => { setDisplay(String(memory)); setWaitingForOperand(true); };
-    const memoryAdd = () => setMemory(memory + parseFloat(display));
-    const memoryClear = () => setMemory(0);
-
     const Button = ({ label, onClick, span = 1, accent, secondary }: { label: string; onClick: () => void; span?: number; accent?: boolean; secondary?: boolean }) => (
-        <button
+        <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className="py-2 px-1 rounded text-xs font-mono font-medium transition-all hover:opacity-80 active:scale-95"
+            className={`
+                py-2.5 px-1 rounded-lg text-[10px] font-mono font-bold transition-all
+                ${accent ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.3)]' :
+                    secondary ? 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10' :
+                        'bg-white/10 text-white hover:bg-white/20'}
+            `}
             style={{
                 gridColumn: span > 1 ? `span ${span}` : undefined,
-                backgroundColor: accent ? 'var(--color-os-accent)' : secondary ? 'var(--color-os-panel)' : 'var(--color-os-header)',
-                color: accent ? 'var(--color-os-canvas)' : 'var(--color-os-text-primary)',
             }}
         >
             {label}
-        </button>
+        </motion.button>
     );
 
     return (
-        <div className="flex flex-col gap-2 h-full">
+        <div className="flex flex-col gap-3 h-full select-none">
             {/* Display */}
-            <div
-                className="p-4 rounded-lg text-right"
-                style={{ backgroundColor: 'var(--color-os-canvas)', border: '1px solid var(--color-os-border)' }}
-            >
-                <div className="text-[10px] h-4" style={{ color: 'var(--color-os-text-secondary)' }}>
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                <div className="text-[9px] h-3 font-mono opacity-40 text-right">
                     {previousValue !== null && lastOp ? `${previousValue} ${lastOp}` : ''}
                 </div>
-                <div
-                    className="font-mono text-2xl font-bold truncate"
-                    style={{ color: 'var(--color-os-accent)' }}
-                >
+                <div className="font-mono text-2xl font-black text-right tracking-tighter text-cyan-400 truncate drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">
                     {display}
                 </div>
-                {memory !== 0 && <div className="text-[9px] mt-1" style={{ color: 'var(--color-os-warning)' }}>M={memory}</div>}
+                {memory !== 0 && (
+                    <div className="text-[8px] mt-1 text-orange-400 font-bold tracking-widest uppercase flex items-center gap-1">
+                        <div className="w-1 h-1 rounded-full bg-orange-500 animate-pulse" />
+                        Memory: {memory}
+                    </div>
+                )}
             </div>
 
             {/* Scientific buttons */}
-            <div className="grid grid-cols-5 gap-1">
+            <div className="grid grid-cols-5 gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                 <Button label="sin" onClick={() => scientific('sin')} secondary />
                 <Button label="cos" onClick={() => scientific('cos')} secondary />
                 <Button label="tan" onClick={() => scientific('tan')} secondary />
+                <Button label="√" onClick={() => scientific('√')} secondary />
+                <Button label="π" onClick={() => scientific('π')} secondary />
+
                 <Button label="ln" onClick={() => scientific('ln')} secondary />
                 <Button label="log" onClick={() => scientific('log')} secondary />
-                <Button label="√" onClick={() => scientific('√')} secondary />
                 <Button label="x²" onClick={() => scientific('x²')} secondary />
-                <Button label="x³" onClick={() => scientific('x³')} secondary />
                 <Button label="yˣ" onClick={() => performOperation('yˣ')} secondary />
-                <Button label="1/x" onClick={() => scientific('1/x')} secondary />
-                <Button label="π" onClick={() => scientific('π')} secondary />
-                <Button label="e" onClick={() => scientific('e')} secondary />
-                <Button label="|x|" onClick={() => scientific('|x|')} secondary />
-                <Button label="n!" onClick={() => scientific('n!')} secondary />
                 <Button label="%" onClick={percent} secondary />
             </div>
 
-            {/* Memory row */}
-            <div className="grid grid-cols-4 gap-1">
-                <Button label="MC" onClick={memoryClear} secondary />
-                <Button label="MR" onClick={memoryRecall} secondary />
-                <Button label="M+" onClick={memoryAdd} secondary />
-                <Button label="MS" onClick={memoryStore} secondary />
-            </div>
-
-            {/* Main keypad */}
-            <div className="grid grid-cols-4 gap-1 flex-1">
-                <Button label="C" onClick={clear} />
-                <Button label="CE" onClick={clearEntry} />
-                <Button label="±" onClick={toggleSign} />
+            {/* Keypad */}
+            <div className="grid grid-cols-4 gap-1.5">
+                <Button label="C" onClick={clear} secondary />
+                <Button label="CE" onClick={clearEntry} secondary />
+                <Button label="±" onClick={toggleSign} secondary />
                 <Button label="÷" onClick={() => performOperation('÷')} accent />
 
                 <Button label="7" onClick={() => inputDigit('7')} />

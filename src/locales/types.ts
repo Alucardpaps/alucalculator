@@ -5,10 +5,10 @@
  * for every translation key. Missing a locale = TypeScript error.
  */
 
-import { i18n } from '@/i18n-config';
-
-// Supported locales derived from config
-export type SupportedLocale = (typeof i18n.locales)[number];
+/**
+ * Supported locales derived from config
+ */
+export type SupportedLocale = 'en' | 'tr' | 'de' | 'fr' | 'es' | 'it' | 'pt' | 'ru' | 'ja' | 'zh' | 'ko' | 'ar';
 
 /**
  * Every translation entry MUST have all supported locales.
@@ -18,12 +18,23 @@ export type TranslationEntry = {
     [K in SupportedLocale]: string;
 };
 
+export type TranslationInput = Partial<TranslationEntry> & { en: string };
+
 /**
  * Helper to create a translation entry with type safety.
  * Usage: t({ en: "Hello", tr: "Merhaba", ... })
  */
-export function t(entry: TranslationEntry): TranslationEntry {
-    return entry;
+const SUPPORTED_LOCALES: SupportedLocale[] = [
+    'en', 'tr', 'de', 'fr', 'es', 'it', 'pt', 'ru', 'ja', 'zh', 'ko', 'ar'
+];
+
+export function t(entry: TranslationInput): TranslationEntry {
+    const fallback = entry.tr ?? entry.en;
+    const result: Partial<TranslationEntry> = {};
+    for (const locale of SUPPORTED_LOCALES) {
+        result[locale] = entry[locale] ?? fallback;
+    }
+    return result as TranslationEntry;
 }
 
 /**
@@ -58,6 +69,7 @@ export function extractLocale<T, L extends SupportedLocale>(
         'en' in dict && 'tr' in dict && 'de' in dict &&
         'fr' in dict && 'es' in dict && 'it' in dict &&
         'pt' in dict && 'ru' in dict && 'ja' in dict && 'zh' in dict &&
+        'ko' in dict && 'ar' in dict &&
         typeof (dict as any).en === 'string'
     ) {
         return (dict as any)[locale] as ExtractLocale<T, L>;

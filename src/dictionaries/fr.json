@@ -1,43 +1,43 @@
-{
+﻿{
   "nav": {
     "home": "Accueil",
     "dashboard": "Tableau de bord",
     "modules": "Modules",
-    "settings": "Paramètres",
+    "settings": "Paramtres",
     "homeDesc": "Tableau de Bord",
     "fits": "Calculateur d'Ajustement",
-    "handbook": "Manuel de l'Ingénieur",
-    "library": "Bibliothèque Modules",
+    "handbook": "Manuel de l'Ingnieur",
+    "library": "Bibliothque Modules",
     "available": "Modules Disponibles",
     "news": "Industry News"
   },
   "modules": {
     "aluminum": {
-      "title": "Calculateur de Profilé",
-      "desc": "Masse & Estimation Coût"
+      "title": "Calculateur de Profil",
+      "desc": "Masse & Estimation Cot"
     },
     "fits": {
-      "title": "Ajustements & Tolérances",
-      "desc": "ISO 286 Arbre/Alésage"
+      "title": "Ajustements & Tolrances",
+      "desc": "ISO 286 Arbre/Alsage"
     },
     "gears": {
       "title": "Calculateur Engrenages",
-      "desc": "Géométrie Droit/Hélicoïdal"
+      "desc": "Gomtrie Droit/Hlicodal"
     },
     "strength": {
-      "title": "Résistance (Mohr)",
+      "title": "Rsistance (Mohr)",
       "desc": "Analyse de Contrainte"
     },
     "bearings": {
       "title": "Roulements (L10)",
-      "desc": "Durée de Vie"
+      "desc": "Dure de Vie"
     },
     "welding": {
       "title": "Chaleur Soudage",
-      "desc": "Entrées Procédé"
+      "desc": "Entres Procd"
     },
     "sheetMetal": {
-      "title": "Tôlerie",
+      "title": "Tlerie",
       "desc": "Force de Pliage"
     },
     "pumps": {
@@ -46,116 +46,116 @@
     },
     "fasteners": {
       "title": "Fixations",
-      "desc": "Filetage Métrique ISO"
+      "desc": "Filetage Mtrique ISO"
     },
     "converter": {
       "title": "Convertisseur",
-      "desc": "Unités & Puissance"
+      "desc": "Units & Puissance"
     },
     "handbook": {
       "title": "Manuel",
-      "desc": "Roulements, Tolérances, G-Code."
+      "desc": "Roulements, Tolrances, G-Code."
     }
   },
   "common": {
     "calculate": "Calculer",
-    "reset": "Réinitialiser",
-    "inputs": "Entrées",
-    "results": "Résultats",
+    "reset": "Rinitialiser",
+    "inputs": "Entres",
+    "results": "Rsultats",
     "dimensions": "Dimensions",
-    "material": "Matériau",
+    "material": "Matriau",
     "weight": "Poids",
-    "cost": "Coût",
+    "cost": "Cot",
     "unitPrice": "Prix unitaire",
-    "quantity": "Quantité",
+    "quantity": "Quantit",
     "total": "Total",
     "save": "Enregistrer",
     "export": "Exporter",
-    "generatedBy": "Généré par AluCalc OS",
+    "generatedBy": "Gnr par AluCalc OS",
     "design": "Conception",
     "view2d": "Vue 2D",
     "view3d": "Vue 3D",
-    "designParams": "Paramètres de conception",
-    "analysisResults": "Résultats d'analyse",
+    "designParams": "Paramtres de conception",
+    "analysisResults": "Rsultats d'analyse",
     "prodNotes": "Notes de production",
     "unitWeight": "Poids unitaire",
     "totalWeight": "Poids total",
-    "result": "Résultat",
-    "hole": "Alésage",
+    "result": "Rsultat",
+    "hole": "Alsage",
     "shaft": "Arbre",
     "min": "Min",
     "max": "Max",
-    "nominalDia": "Diamètre Nominal",
+    "nominalDia": "Diamtre Nominal",
     "explanation": "Explication",
-    "toleranceValues": "Valeurs de Tolérance",
+    "toleranceValues": "Valeurs de Tolrance",
     "mountingCalc": "Calculs de Montage",
     "pressure": "Pression de Contact",
     "force": "Force de Montage",
     "torque": "Couple Transmissible",
-    "metric": "Métrique",
-    "imperial": "Impérial",
+    "metric": "Mtrique",
+    "imperial": "Imprial",
     "from": "De",
-    "to": "À",
+    "to": "",
     "language": "Langue",
     "calcTool": "Outil de Calcul",
     "formula": "Formule",
     "ratio": "Rapport",
     "stress": "Contrainte",
     "beam": "Poutre",
-    "cantilever": "Porte-à-faux",
+    "cantilever": "Porte--faux",
     "simple": "Simple",
     "share": "Partager",
-    "copied": "Copié !",
-    "loadGeometry": "Charge & Géométrie",
-    "beamParams": "Paramètres de Poutre",
-    "calculatedStress": "Contrainte Calculée",
-    "maxDeflection": "Flèche Max",
-    "safetyFactor": "Facteur de Sécurité",
+    "copied": "Copi !",
+    "loadGeometry": "Charge & Gomtrie",
+    "beamParams": "Paramtres de Poutre",
+    "calculatedStress": "Contrainte Calcule",
+    "maxDeflection": "Flche Max",
+    "safetyFactor": "Facteur de Scurit",
     "centerDist": "Entraxe (awt)",
     "outputSpeed": "Vitesse de Sortie"
   },
   "dimensions": {
     "width": "Largeur",
     "height": "Hauteur",
-    "thickness": "Épaisseur",
-    "wallThickness": "Ép. Paroi",
-    "outerDiameter": "Ø Extérieur",
-    "diameter": "Diamètre",
+    "thickness": "paisseur",
+    "wallThickness": "p. Paroi",
+    "outerDiameter": " Extrieur",
+    "diameter": "Diamtre",
     "length": "Longueur"
   },
   "aluminum": {
     "title": "Calculateur de poids de profil",
     "shapes": {
-      "box": "Profilé caisson",
+      "box": "Profil caisson",
       "sheet": "Feuille / Plaque",
       "pipe": "Tube rond",
       "bar": "Barre pleine",
-      "angle": "Cornière (L)",
+      "angle": "Cornire (L)",
       "beam": "Poutre (I/H)",
-      "channel": "Profilé U",
-      "tee": "Profilé T",
+      "channel": "Profil U",
+      "tee": "Profil T",
       "hex": "Barre hexagonale"
     },
     "params": {
       "width": "Largeur (A)",
       "height": "Hauteur (B)",
-      "thickness": "Épaisseur (t)",
+      "thickness": "paisseur (t)",
       "wall": "Paroi (t)",
-      "diameter": "Diamètre (D)",
+      "diameter": "Diamtre (D)",
       "length": "Longueur",
-      "web": "Âme (tw)",
+      "web": "me (tw)",
       "flange": "Semelle (tf)"
     },
     "theory": {
-      "densityTitle": "Masse Volumique (ρ)",
-      "densityDesc": "La masse volumique est la masse par unité de volume. Variable selon l'alliage.",
-      "series1000": "Série 1000 (Pur): ~2.70 g/cm³",
-      "series6000": "Série 6000 (Mg+Si): ~2.70 g/cm³",
-      "series7000": "Série 7000 (Zn): ~2.81 g/cm³ (Lourd)",
-      "formula": "Masse = Volume × ρ",
-      "plateFormula": "Plaque: Longueur × Largeur × Ép. × ρ"
+      "densityTitle": "Masse Volumique (?)",
+      "densityDesc": "La masse volumique est la masse par unit de volume. Variable selon l'alliage.",
+      "series1000": "Srie 1000 (Pur): ~2.70 g/cm",
+      "series6000": "Srie 6000 (Mg+Si): ~2.70 g/cm",
+      "series7000": "Srie 7000 (Zn): ~2.81 g/cm (Lourd)",
+      "formula": "Masse = Volume  ?",
+      "plateFormula": "Plaque: Longueur  Largeur  p.  ?"
     },
-    "disclaimer": "Basé sur densité théorique (~2.70 g/cm³). Poids réel ±5% selon tolérances (ASTM B221).",
+    "disclaimer": "Bas sur densit thorique (~2.70 g/cm). Poids rel 5% selon tolrances (ASTM B221).",
     "projectList": {
       "title": "Project List (BOM)",
       "add": "Add to List",
@@ -209,11 +209,11 @@
     }
   },
   "handbook": {
-    "title": "Guide Science des Matériaux"
+    "title": "Guide Science des Matriaux"
   },
   "fit": {
     "title": "Ajustements ISO",
-    "subtitle": "Système de tolérances",
+    "subtitle": "Systme de tolrances",
     "tabs": {
       "standard": "Standards",
       "manual": "Manuel"
@@ -221,11 +221,11 @@
     "fitTypes": {
       "h7h6": {
         "name": "Ajustement Glissant",
-        "desc": "Montage manuel, lubrifié"
+        "desc": "Montage manuel, lubrifi"
       },
       "h7g6": {
         "name": "Ajustement Tournant",
-        "desc": "Pour pièces rotatives"
+        "desc": "Pour pices rotatives"
       },
       "h7f7": {
         "name": "Ajustement Libre",
@@ -233,23 +233,23 @@
       },
       "h7k6": {
         "name": "Ajustement Incertain",
-        "desc": "Jeu/Serrage léger"
+        "desc": "Jeu/Serrage lger"
       },
       "h7m6": {
         "name": "Ajustement Incertain",
-        "desc": "Généralement serré"
+        "desc": "Gnralement serr"
       },
       "h7n6": {
         "name": "Ajustement Incertain",
-        "desc": "Tendance serrée"
+        "desc": "Tendance serre"
       },
       "h7p6": {
-        "name": "Serrage Léger",
+        "name": "Serrage Lger",
         "desc": "Montage au maillet"
       },
       "h7r6": {
         "name": "Serrage Moyen",
-        "desc": "Presse nécessaire"
+        "desc": "Presse ncessaire"
       },
       "h7s6": {
         "name": "Serrage Fort",
@@ -260,7 +260,7 @@
       "nominalSize": "Dimension Nominale",
       "fitLength": "Longueur de Contact",
       "elasticModulus": "Module de Young",
-      "frictionCoeff": "Frottement (μ)"
+      "frictionCoeff": "Frottement (?)"
     },
     "results": {
       "fitType": "Type d'Ajustement",
@@ -268,15 +268,15 @@
       "interferenceAmount": "Serrage",
       "clearance": "Jeu",
       "transition": "Incertain",
-      "interference": "Serré"
+      "interference": "Serr"
     }
   },
   "gear": {
     "title": "Calculateur d'Engrenages",
-    "subtitle": "Droit, Hélicoïdal, Conique",
+    "subtitle": "Droit, Hlicodal, Conique",
     "types": {
       "spur": "Droit",
-      "helical": "Hélicoïdal",
+      "helical": "Hlicodal",
       "bevel": "Conique",
       "worm": "Vis sans fin"
     },
@@ -285,7 +285,7 @@
       "pressureAngle": "Angle de Pression",
       "pinionTeeth": "Z1 (Pignon)",
       "gearTeeth": "Z2 (Roue)",
-      "helixAngle": "Angle d'Hélice",
+      "helixAngle": "Angle d'Hlice",
       "faceWidth": "Largeur",
       "power": "Puissance (kW)",
       "rpm": "Vitesse (tr/min)"
@@ -293,7 +293,7 @@
     "results": {
       "calculatedTorque": "Couple",
       "transmissionRatio": "Rapport",
-      "pitchDiameter": "Diamètre Primitif",
+      "pitchDiameter": "Diamtre Primitif",
       "forcesAndStress": "Forces & Contraintes"
     }
   },
@@ -301,128 +301,128 @@
     "title": "Calculateur RDM",
     "subtitle": "Cercle de Mohr & Contraintes",
     "inputs": {
-      "sigmaX": "Sigma X (σx)",
-      "sigmaY": "Sigma Y (σy)",
-      "tauXY": "Tau XY (τxy)",
-      "theta": "Angle (θ)"
+      "sigmaX": "Sigma X (?x)",
+      "sigmaY": "Sigma Y (?y)",
+      "tauXY": "Tau XY (?xy)",
+      "theta": "Angle (?)"
     },
     "results": {
       "principalStresses": "Contraintes Principales",
-      "maxShear": "Cisaillement Max (τmax)",
+      "maxShear": "Cisaillement Max (?max)",
       "vonMises": "Von Mises",
-      "transformed": "État Transformé"
+      "transformed": "tat Transform"
     }
   },
   "bearing": {
-    "title": "Durée de Vie Roulement",
-    "subtitle": "Durée L10 & Charges",
+    "title": "Dure de Vie Roulement",
+    "subtitle": "Dure L10 & Charges",
     "inputs": {
-      "series": "Série",
+      "series": "Srie",
       "code": "Code Roulement",
       "radialLoad": "Charge Radiale (Fr)",
       "axialLoad": "Charge Axiale (Fa)",
       "rpm": "Vitesse (tr/min)",
-      "reliability": "Fiabilité"
+      "reliability": "Fiabilit"
     },
     "results": {
-      "lifeHours": "Durée L10 (Heures)",
-      "lifeRevs": "Durée L10 (M Tours)",
-      "equivalentLoad": "Charge Équivalente (P)",
-      "staticSafety": "Sécurité Statique (s0)"
+      "lifeHours": "Dure L10 (Heures)",
+      "lifeRevs": "Dure L10 (M Tours)",
+      "equivalentLoad": "Charge quivalente (P)",
+      "staticSafety": "Scurit Statique (s0)"
     }
   },
   "welding": {
     "title": "Calculateur Soudure",
     "subtitle": "Apport Chaleur & Contraintes",
     "inputs": {
-      "method": "Procédé",
+      "method": "Procd",
       "type": "Type Joint",
       "current": "Courant (I)",
       "voltage": "Tension (V)",
       "speed": "Vitesse (v)",
       "legSize": "Gorge (a)",
-      "thickness": "Épaisseur (t)",
+      "thickness": "paisseur (t)",
       "length": "Longueur (L)",
       "load": "Charge (F)"
     },
     "results": {
-      "heatInput": "Énergie",
+      "heatInput": "nergie",
       "stress": "Contrainte",
-      "safetyFactor": "Sécurité",
-      "efficiency": "Efficacité (η)"
+      "safetyFactor": "Scurit",
+      "efficiency": "Efficacit (?)"
     },
     "types": {
       "fillet": "Angle",
-      "butt": "Bout à Bout",
+      "butt": "Bout  Bout",
       "doubleFillet": "Double Angle"
     }
   },
   "sheetMetal": {
     "bendAngle": "Angle de pliage",
-    "innerRadius": "Rayon intérieur",
+    "innerRadius": "Rayon intrieur",
     "bendLength": "Longueur de pli",
     "kFactor": "Facteur K",
-    "title": "Tôlerie",
-    "subtitle": "Pliage & Déplié",
+    "title": "Tlerie",
+    "subtitle": "Pliage & Dpli",
     "inputs": {
-      "material": "Matière",
-      "thickness": "Épaisseur (t)",
-      "angle": "Angle (α)",
-      "radius": "Rayon Intérieur (ri)",
+      "material": "Matire",
+      "thickness": "paisseur (t)",
+      "angle": "Angle (?)",
+      "radius": "Rayon Intrieur (ri)",
       "length": "Longueur (L)",
-      "vOpening": "Vé (V)",
+      "vOpening": "V (V)",
       "flange1": "Aile A",
       "flange2": "Aile B",
       "kFactor": "Facteur K"
     },
     "results": {
       "force": "Force Requise",
-      "flatLength": "Longueur Dépliée",
-      "bendAllowance": "Matière Pli (BA)",
+      "flatLength": "Longueur Dplie",
+      "bendAllowance": "Matire Pli (BA)",
       "bendDeduction": "Retrait Pli (BD)",
-      "recV": "Vé Recommandé"
+      "recV": "V Recommand"
     }
   },
   "pump": {
     "title": "Calculateur Pompe",
     "subtitle": "PuissanceHydraulique & NPSH",
     "inputs": {
-      "flow": "Débit (Q)",
+      "flow": "Dbit (Q)",
       "head": "HMT (H)",
       "rpm": "Vitesse",
-      "eff": "Rendement (η)",
-      "density": "Densité (ρ)",
+      "eff": "Rendement (?)",
+      "density": "Densit (?)",
       "npsh": "NPSH Disponible"
     },
     "results": {
       "hydPower": "Puissance Hydro",
       "shaftPower": "Puissance Arbre",
-      "specSpeed": "Vitesse Spécifique (ns)",
+      "specSpeed": "Vitesse Spcifique (ns)",
       "type": "Type Pompe",
       "flowVelocity": "Vitesse Fluide",
       "reynolds": "Reynolds"
     },
     "types": {
       "radial": "Centrifuge",
-      "mixed": "Hélico-centrifuge",
+      "mixed": "Hlico-centrifuge",
       "axial": "Axiale"
     }
   },
   "fastener": {
     "title": "Visserie",
-    "subtitle": "Filetage Métrique ISO",
+    "subtitle": "Filetage Mtrique ISO",
     "inputs": {
       "size": "Taille (M)",
       "pitch": "Pas (P)",
       "class": "Classe"
     },
     "results": {
-      "tapDrill": "Perçage",
-      "majorDia": "Ø Extérieur (d)",
-      "minorDia": "Ø Noyau (d1)",
-      "pitchDia": "Ø Flancs (d2)",
+      "tapDrill": "Perage",
+      "majorDia": " Extrieur (d)",
+      "minorDia": " Noyau (d1)",
+      "pitchDia": " Flancs (d2)",
       "clearingDrill": "Trou de Passage",
-      "tensileArea": "Section Résistante (As)"
+      "tensileArea": "Section Rsistante (As)"
     }
   },
   "converter": {
@@ -436,27 +436,27 @@
   },
   "driveTrain": {
     "title": "Concepteur Transmission",
-    "subtitle": "Moteur • Boîte • Charge",
+    "subtitle": "Moteur . Bote . Charge",
     "primeMover": "1. Moteur Principal (IEC)",
     "application": "2. Facteur de Service",
     "transmission": "3. Conception Engrenage",
-    "analysis": "4. Analyse Ingénierie",
+    "analysis": "4. Analyse Ingnierie",
     "manufacturing": "4a. Inspection (M / Wk)",
     "engineering": "4b. Analyse Contraintes"
   },
   "motor": {
     "nominalPower": "Puissance",
-    "speedPoles": "Vitesse (Pôles)",
+    "speedPoles": "Vitesse (Ples)",
     "nominalTorque": "Couple Nominal",
     "efficiency": "Rendement",
-    "inputPower": "P. Entrée",
+    "inputPower": "P. Entre",
     "ratio": "Rapport",
     "torqueOut": "Couple Sortie"
   },
   "manufacturing": {
-    "profileMod": "Déport de Profil (x)",
-    "shiftCoeff": "Coeff. Déport",
-    "checkPin": "Diamètre Pige",
+    "profileMod": "Dport de Profil (x)",
+    "shiftCoeff": "Coeff. Dport",
+    "checkPin": "Diamtre Pige",
     "overPins": "Cote sur Piges (M)",
     "baseTangent": "Cote sur K dents (Wk)",
     "pinion": "Pignon",
@@ -468,14 +468,14 @@
     "tangentialForce": "Force Tangentielle (Ft)",
     "radialForce": "Force Radiale (Fr)",
     "axialForce": "Force Axiale (Fa)",
-    "safetyEst": "Estimation Sécurité (ISO 6336)",
-    "bendingSafety": "Sécurité Flexion (SF)",
-    "pittingSafety": "Sécurité Piqûres (SH)",
+    "safetyEst": "Estimation Scurit (ISO 6336)",
+    "bendingSafety": "Scurit Flexion (SF)",
+    "pittingSafety": "Scurit Piqres (SH)",
     "stress": "Contrainte",
     "contactStress": "Pression Hertz",
     "limit": "Limite",
     "serviceFactor": "Facteur Service (KA)",
-    "safetyWarning": "Les facteurs de sécurité sont des estimations. Pour les applications critiques, utiliser ISO 6336 ou AGMA 2001."
+    "safetyWarning": "Les facteurs de scurit sont des estimations. Pour les applications critiques, utiliser ISO 6336 ou AGMA 2001."
   },
   "market": {
     "title": "Market Data",
@@ -485,70 +485,70 @@
     "useLivePrice": "Use Live Price"
   },
   "news": {
-    "title": "Actualités Industrielles",
-    "subtitle": "Ingénierie, Métallurgie & Mises à jour du Marché",
-    "breaking": "Dernière Heure",
-    "readMore": "Lire l'histoire complète",
+    "title": "Actualits Industrielles",
+    "subtitle": "Ingnierie, Mtallurgie & Mises  jour du March",
+    "breaking": "Dernire Heure",
+    "readMore": "Lire l'histoire complte",
     "loading": "Chargement..."
   },
   "project": {
     "title": "Devis Projet",
     "manager": "Gestionnaire",
     "grid": "Tableau",
-    "nesting": "Optimisation Découpe",
+    "nesting": "Optimisation Dcoupe",
     "exportPdf": "Export PDF",
     "clear": "Effacer",
     "empty": "Liste vide.",
-    "settings": "Paramètres",
+    "settings": "Paramtres",
     "rawLength": "Longueur Brute",
     "bladeWidth": "Largeur Scie",
     "calculate": "Calculer",
     "totalBars": "Barres Totales",
-    "efficiency": "Efficacité",
+    "efficiency": "Efficacit",
     "waste": "Chutes Totales",
     "rem": "Reste"
   },
   "nesting": {
-    "title": "Optimiseur de Découpe",
+    "title": "Optimiseur de Dcoupe",
     "subtitle": "Imbrication 1D",
     "stockLength": "Longueur Stock",
     "kerf": "Largeur Trait (Kerf)",
-    "trimStart": "Coupe Début",
+    "trimStart": "Coupe Dbut",
     "trimEnd": "Coupe Fin",
-    "addPart": "Ajouter Pièce",
+    "addPart": "Ajouter Pice",
     "removePart": "Supprimer",
     "calculate": "Optimiser",
-    "partLabel": "Étiquette",
+    "partLabel": "tiquette",
     "partLength": "Longueur",
-    "partQty": "Quantité",
-    "barsUsed": "Barres Utilisées",
-    "efficiency": "Efficacité Matière",
+    "partQty": "Quantit",
+    "barsUsed": "Barres Utilises",
+    "efficiency": "Efficacit Matire",
     "totalWaste": "Chutes Totales",
     "algorithm": "Algorithme",
-    "noResults": "Ajoutez des pièces et cliquez Optimiser"
+    "noResults": "Ajoutez des pices et cliquez Optimiser"
   },
   "nesting2d": {
     "title": "Imbrication 2D",
-    "subtitle": "Imbrication Forme Réelle",
-    "dropSvg": "Déposez les fichiers SVG ici ou cliquez",
+    "subtitle": "Imbrication Forme Relle",
+    "dropSvg": "Dposez les fichiers SVG ici ou cliquez",
     "sheetWidth": "Largeur Feuille",
     "sheetHeight": "Hauteur Feuille",
-    "spacing": "Espacement Pièces",
+    "spacing": "Espacement Pices",
     "rotation": "Pas de Rotation",
     "optimize": "Optimiser",
     "exportDxf": "Exporter DXF",
     "sheets": "Feuilles",
-    "efficiency": "Efficacité",
+    "efficiency": "Efficacit",
     "waste": "Chute",
-    "parts": "Pièces",
-    "unplaced": "Pièces non placées"
+    "parts": "Pices",
+    "unplaced": "Pices non places"
   },
   "gears": {
     "title": "Calculateur d'engrenages",
     "module": "Module (m)",
     "teeth": "Dents (z)",
     "pressureAngle": "Angle de pression",
-    "helixAngle": "Angle d'hélice",
+    "helixAngle": "Angle d'hlice",
     "faceWidth": "Largeur de face",
     "addendum": "Saillie (ha)",
     "dedendum": "Creux (hf)",
@@ -556,18 +556,18 @@
     "recFaceWidth": "Larg. recomm. (6m-10m)"
   },
   "science": {
-    "title": "Tableau périodique",
+    "title": "Tableau priodique",
     "meltingPoint": "Point de fusion",
-    "boilingPoint": "Point d'ébullition",
-    "discoveredBy": "Découvert par",
+    "boilingPoint": "Point d'bullition",
+    "discoveredBy": "Dcouvert par",
     "categories": {
-      "alkali metal": "Métal alcalin",
+      "alkali metal": "Mtal alcalin",
       "alkaline earth metal": "Alcalino-terreux",
-      "transition metal": "Métal de transition",
+      "transition metal": "Mtal de transition",
       "noble gas": "Gaz noble",
-      "halogen": "Halogène",
-      "metalloid": "Métalloïde",
-      "nonmetal": "Non-métal",
+      "halogen": "Halogne",
+      "metalloid": "Mtallode",
+      "nonmetal": "Non-mtal",
       "lanthanide": "Lanthanide",
       "actinide": "Actinide"
     }
@@ -581,26 +581,26 @@
     "superalloy": "Superalliage"
   },
   "civil": {
-    "title": "Armature béton",
+    "title": "Armature bton",
     "requiredAs": "As requis",
-    "actualAs": "As réel",
+    "actualAs": "As rel",
     "effectiveD": "d effectif"
   },
   "electrical": {
     "title": "Chute de tension",
     "powerFactor": "Facteur de puissance",
-    "cableRes": "Résistance câble",
+    "cableRes": "Rsistance cble",
     "powerLoss": "Perte de puissance",
     "recSize": "Taille recomm."
   },
   "reducer": {
-    "inputPower": "Puissance d'entrée",
+    "inputPower": "Puissance d'entre",
     "ambientTemp": "Temp. ambiante"
   },
   "cutting": {
     "stockLength": "Longueur stock",
     "bladeKerf": "Trait de scie",
-    "trimStart": "Coupe début",
+    "trimStart": "Coupe dbut",
     "trimEnd": "Coupe fin"
   }
 }

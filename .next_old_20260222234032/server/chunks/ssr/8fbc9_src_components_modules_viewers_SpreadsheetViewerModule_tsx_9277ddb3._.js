@@ -1,0 +1,3 @@
+module.exports=[736410,a=>{"use strict";var b=a.i(683650);a.s(["SpreadsheetViewerModule",0,()=>(0,b.jsx)("div",{className:"h-full bg-white flex items-center justify-center",children:(0,b.jsxs)("div",{className:"text-center text-green-700",children:[(0,b.jsx)("div",{className:"text-4xl mb-4",children:"📊"}),(0,b.jsx)("h2",{className:"text-xl font-bold",children:"Spreadsheet Viewer"}),(0,b.jsx)("p",{className:"text-gray-500",children:"Select a spreadsheet from File Explorer."})]})})])},18226,a=>{a.n(a.i(736410))}];
+
+//# sourceMappingURL=8fbc9_src_components_modules_viewers_SpreadsheetViewerModule_tsx_9277ddb3._.js.map

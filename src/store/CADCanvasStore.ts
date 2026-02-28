@@ -29,7 +29,12 @@ export type CADTool =
     | 'extend'
     | 'fillet'
     | 'chamfer'
-    | 'smart-dimension';
+    | 'smart-dimension'
+    // Drawing Tools
+    | 'pen'
+    | 'eraser'
+    | 'highlighter'
+    | 'arrow';
 
 export type SnapMode = 'grid' | 'endpoint' | 'midpoint' | 'intersection' | 'perpendicular';
 
@@ -40,7 +45,7 @@ export interface Point {
 
 export interface CADShape {
     id: string;
-    type: 'line' | 'rectangle' | 'circle' | 'arc' | 'polyline';
+    type: 'line' | 'rectangle' | 'circle' | 'arc' | 'polyline' | 'arrow';
     points: Point[];
     style: ShapeStyle;
     locked: boolean;
@@ -96,6 +101,15 @@ export interface AnnotationStyle {
     padding?: number;
 }
 
+export interface FreehandStroke {
+    id: string;
+    points: Point[];
+    color: string;
+    width: number;
+    opacity: number;
+    tool: 'pen' | 'highlighter';
+}
+
 export interface SnapSettings {
     enabled: boolean;
     modes: SnapMode[];
@@ -148,6 +162,7 @@ interface CADCanvasState {
     shapes: CADShape[];
     dimensions: Dimension[];
     annotations: Annotation[];
+    freehandStrokes: FreehandStroke[];
 
     // Tool State
     currentTool: CADTool;
@@ -195,6 +210,12 @@ interface CADCanvasActions {
     addAnnotation: (annotation: Omit<Annotation, 'id'>) => string;
     updateAnnotation: (id: string, updates: Partial<Annotation>) => void;
     deleteAnnotation: (id: string) => void;
+
+    // Freehand Drawing Actions
+    addFreehandStroke: (stroke: Omit<FreehandStroke, 'id'>) => string;
+    addPointToCurrentStroke: (point: Point) => void;
+    deleteFreehandStroke: (id: string) => void;
+    clearFreehandStrokes: () => void;
 
     // Settings Actions
     setUnit: (unit: Unit) => void;
@@ -253,6 +274,7 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
             // Initial State
             shapes: [],
             dimensions: [],
+            freehandStrokes: [],
             annotations: [],
 
             currentTool: 'select',
@@ -353,6 +375,33 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
                 }));
             },
 
+            // Freehand Drawing Actions
+            addFreehandStroke: (stroke) => {
+                const id = generateId();
+                set(state => ({
+                    freehandStrokes: [...state.freehandStrokes, { ...stroke, id }]
+                }));
+                return id;
+            },
+
+            addPointToCurrentStroke: (point) => {
+                // This is used for real-time drawing
+                // We'll update the tempPoints which connects to the UI
+                set(state => ({
+                    tempPoints: [...state.tempPoints, point]
+                }));
+            },
+
+            deleteFreehandStroke: (id) => {
+                set(state => ({
+                    freehandStrokes: state.freehandStrokes.filter(s => s.id !== id)
+                }));
+            },
+
+            clearFreehandStrokes: () => {
+                set({ freehandStrokes: [] });
+            },
+
             // Settings Actions
             setUnit: (unit) => set({ unit }),
             setPrecision: (precision) => set({ precision }),
@@ -450,13 +499,14 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
                 shapes: [],
                 dimensions: [],
                 annotations: [],
+                freehandStrokes: [],
                 selectedIds: [],
                 tempPoints: [],
                 isDrawing: false
             }),
 
             exportToJSON: () => {
-                const { shapes, dimensions, annotations, unit, precision, gridSize } = get();
+                const { shapes, dimensions, annotations, freehandStrokes, unit, precision, gridSize } = get();
                 return JSON.stringify({
                     version: '1.0',
                     unit,
@@ -464,7 +514,8 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
                     gridSize,
                     shapes,
                     dimensions,
-                    annotations
+                    annotations,
+                    freehandStrokes
                 }, null, 2);
             },
 
@@ -476,6 +527,7 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
                             shapes: data.shapes || [],
                             dimensions: data.dimensions || [],
                             annotations: data.annotations || [],
+                            freehandStrokes: data.freehandStrokes || [],
                             unit: data.unit || 'mm',
                             precision: data.precision || 2,
                             gridSize: data.gridSize || 10
@@ -497,6 +549,7 @@ export const useCADCanvasStore = create<CADCanvasState & CADCanvasActions>()(
                 shapes: state.shapes,
                 dimensions: state.dimensions,
                 annotations: state.annotations,
+                freehandStrokes: state.freehandStrokes,
                 unit: state.unit,
                 precision: state.precision,
                 snapSettings: state.snapSettings,

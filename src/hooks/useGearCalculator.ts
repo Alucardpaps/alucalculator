@@ -8,7 +8,7 @@ export type GearType = 'spur' | 'helical' | 'bevel' | 'worm';
 export const useGearCalculator = () => {
     // Inputs
     const [gearType, setGearType] = useState<GearType>('spur');
-    const [module, setModule] = useState(3);
+    const [gearModule, setGearModule] = useState(3);
     const [z1, setZ1] = useState(20); // Pinion
     const [z2, setZ2] = useState(40); // Gear
     const [pressureAngle, setPressureAngle] = useState(20);
@@ -26,7 +26,7 @@ export const useGearCalculator = () => {
 
         // Module handling
         // Plain module 'm' is Normal Module 'mn'
-        const mn = module;
+        const mn = gearModule;
         const mt = gearType === 'helical' ? mn / Math.cos(radBeta) : mn;
 
         // Diameters
@@ -58,11 +58,11 @@ export const useGearCalculator = () => {
             ratio
         };
 
-    }, [gearType, module, z1, z2, pressureAngle, helixAngle, power, rpm]);
+    }, [gearType, gearModule, z1, z2, pressureAngle, helixAngle, power, rpm]);
 
     return {
         gearType, setGearType,
-        module, setModule,
+        gearModule, setGearModule,
         z1, setZ1,
         z2, setZ2,
         pressureAngle, setPressureAngle,

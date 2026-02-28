@@ -11,9 +11,6 @@ const RUNTIME_CACHE = `alucalc-runtime-${CACHE_VERSION}`;
 // Critical assets to cache immediately
 const STATIC_ASSETS = [
     '/',
-    '/en/',
-    '/tr/',
-    '/de/',
     '/offline.html',
     '/data/aluminum_alloys.json',
     '/data/kerf_tables.json',
@@ -22,9 +19,8 @@ const STATIC_ASSETS = [
 
 // Assets to cache on first access
 const CACHE_ON_DEMAND = [
-    '/en/aluminum/',
-    '/en/nesting2d/',
-    '/en/fastener/'
+    '/data/fasteners.json',
+    '/data/materials.json'
 ];
 
 /**

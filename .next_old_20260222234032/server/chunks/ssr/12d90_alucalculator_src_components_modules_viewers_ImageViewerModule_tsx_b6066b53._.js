@@ -1,0 +1,3 @@
+module.exports=[834469,a=>{"use strict";var b=a.i(683650);a.s(["ImageViewerModule",0,()=>(0,b.jsx)("div",{className:"h-full bg-black text-white flex items-center justify-center",children:(0,b.jsxs)("div",{className:"text-center",children:[(0,b.jsx)("div",{className:"text-4xl mb-4",children:"🖼️"}),(0,b.jsx)("h2",{className:"text-xl font-bold",children:"Image Viewer"}),(0,b.jsx)("p",{className:"text-gray-400",children:"Select an image from File Explorer to view."})]})})])},334230,a=>{a.n(a.i(834469))}];
+
+//# sourceMappingURL=12d90_alucalculator_src_components_modules_viewers_ImageViewerModule_tsx_b6066b53._.js.map

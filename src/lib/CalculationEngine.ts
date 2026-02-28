@@ -420,22 +420,95 @@ export class CalculationEngine {
     }
 
     // ----------------------------------------
+    // ----------------------------------------
     // Thermal Expansion
     // ----------------------------------------
 
-    calculateThermalExpansion(originalLengthMm: number, deltaT: number): ThermalResult {
-        const alpha = (this.material.thermalExp || 23.6) * 1e-6;
-        const deltaL = originalLengthMm * alpha * deltaT;
+    calculateThermalExpansion(length: number, deltaT: number): ThermalResult {
+        try {
+            const L = validateInput(length, { name: 'Length', max: 100000 });
+            const dT = validateInput(deltaT, { name: 'Delta T', min: -500, max: 2000 });
 
-        return {
-            success: true,
-            originalLengthMm,
-            deltaT,
-            thermalCoefficient: this.material.thermalExp || 23.6,
-            deltaLengthMm: parseFloat(deltaL.toFixed(4)),
-            finalLengthMm: parseFloat((originalLengthMm + deltaL).toFixed(4)),
-            material: this.material.name
-        };
+            // Alpha (thermal expansion coefficient) in microstrain/C (1e-6)
+            // materialsDB has thermalExp prop
+            const alpha = this.material.thermalExp || 12; // Default to steel if missing
+            const deltaL = (alpha * 1e-6) * L * dT;
+            const finalL = L + deltaL;
+
+            return {
+                success: true,
+                originalLengthMm: L,
+                deltaT: dT,
+                thermalCoefficient: alpha,
+                deltaLengthMm: parseFloat(deltaL.toFixed(4)),
+                finalLengthMm: parseFloat(finalL.toFixed(4)),
+                material: this.material.name
+            };
+        } catch (error) {
+            return { success: false, error: (error as Error).message };
+        }
+    }
+    // Sheet Metal Bending (Deterministic)
+    // ----------------------------------------
+
+    calculateSheetMetalBend(
+        thickness: number,
+        radius: number,
+        angleDeg: number,
+        customKFactor?: number
+    ): {
+        success: boolean;
+        bendAllowance: number;
+        bendDeduction: number;
+        outsideSetback: number;
+        kFactor: number;
+        warnings: string[];
+        error?: string;
+    } {
+        try {
+            const t = validateInput(thickness, { name: 'Thickness', max: 50 });
+            const R = validateInput(radius, { name: 'Radius', max: 500 });
+            const A = validateInput(angleDeg, { name: 'Angle', min: 0, max: 180 });
+
+            // Dynamic K-Factor calculation if not provided
+            // Based on R/t ratio as per B-Model directives
+            let K = customKFactor;
+            if (K === undefined) {
+                const ratio = R / t;
+                if (ratio < 1) K = 0.33;
+                else if (ratio < 1.5) K = 0.40;
+                else K = 0.50;
+            }
+
+            const rads = (A * Math.PI) / 180;
+            const BA = rads * (R + (K * t));
+            const OSSB = (R + t) * Math.tan(rads / 2);
+            const BD = (2 * OSSB) - BA;
+
+            const warnings: string[] = [];
+            if (R < t) {
+                warnings.push("CRR_RISK: Inner radius is less than thickness. Cracking risk detected.");
+            }
+
+            return {
+                success: true,
+                bendAllowance: parseFloat(BA.toFixed(4)),
+                bendDeduction: parseFloat(BD.toFixed(4)),
+                outsideSetback: parseFloat(OSSB.toFixed(4)),
+                kFactor: K,
+                warnings
+            };
+        } catch (error) {
+            return {
+                success: false,
+                bendAllowance: 0,
+                bendDeduction: 0,
+                outsideSetback: 0,
+                kFactor: 0,
+                warnings: [],
+                error: (error as Error).message
+            };
+        }
     }
 }
 

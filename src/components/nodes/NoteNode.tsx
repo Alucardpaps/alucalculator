@@ -7,174 +7,134 @@
  * Supports markdown-style formatting.
  */
 
-import React, { memo, useState, useCallback } from 'react';
-import { NodeProps } from 'reactflow';
-import { X, Edit2, Check, AlertTriangle, Info, BookOpen } from 'lucide-react';
-import type { NoteNodeData } from '@/store/flowStore';
+import React, { memo, useState, useCallback, useEffect } from 'react';
+import { NodeProps, NodeToolbar, Position } from 'reactflow';
+import { X, Edit2, Check, Type, Bold, Italic, Minus, Plus, Palette, EyeOff, Eye, Trash2 } from 'lucide-react';
 import { useFlowStore } from '@/store/flowStore';
 
-// ============================================
-// Styles
-// ============================================
+const COLORS = ['#ffffff', '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
 
-const styles = {
-    node: `
-        min-w-[250px] max-w-[400px] bg-[#0f1419] 
-        rounded-lg shadow-2xl border border-[#2a3a4a]
-        overflow-hidden
-    `,
-    nodeSelected: `
-        border-[#00e5ff] ring-2 ring-[#00e5ff]/30
-    `,
-    header: `
-        flex items-center justify-between gap-2 px-3 py-2
-        bg-gradient-to-r from-[#1a2332] to-[#0f1419]
-        border-b border-[#2a3a4a] cursor-move
-    `,
-    headerTitle: `
-        text-xs font-bold text-gray-400 uppercase tracking-wider
-        flex items-center gap-2
-    `,
-    headerBtn: `
-        p-1 rounded hover:bg-white/10 text-gray-500 hover:text-white
-        transition-colors cursor-pointer
-    `,
-    body: `
-        p-3
-    `,
-    content: `
-        text-sm text-gray-300 whitespace-pre-wrap
-        leading-relaxed
-    `,
-    editor: `
-        w-full bg-[#1a2332] border border-[#2a3a4a] rounded
-        text-sm text-gray-300 p-2 resize-none
-        focus:outline-none focus:border-[#00e5ff]
-        min-h-[100px]
-    `,
-    noteType: {
-        info: 'border-l-4 border-l-blue-500 pl-3',
-        warning: 'border-l-4 border-l-yellow-500 pl-3',
-        assumption: 'border-l-4 border-l-purple-500 pl-3',
-        default: '',
-    },
-};
-
-// ============================================
-// Note Type Detection
-// ============================================
-
-function detectNoteType(content: string): 'info' | 'warning' | 'assumption' | 'default' {
-    const lower = content.toLowerCase();
-    if (lower.startsWith('[warning]') || lower.startsWith('⚠')) return 'warning';
-    if (lower.startsWith('[info]') || lower.startsWith('ℹ')) return 'info';
-    if (lower.startsWith('[assumption]') || lower.startsWith('📌')) return 'assumption';
-    return 'default';
-}
-
-const noteIcons = {
-    info: Info,
-    warning: AlertTriangle,
-    assumption: BookOpen,
-    default: null,
-};
-
-// ============================================
-// Main Component
-// ============================================
-
-const NoteNode: React.FC<NodeProps<NoteNodeData>> = ({
-    id,
-    data,
-    selected
-}) => {
+const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
     const { removeNode, updateNodeData } = useFlowStore();
     const [isEditing, setIsEditing] = useState(false);
-    const [editContent, setEditContent] = useState(data.content);
+    const [content, setContent] = useState(data.content || '');
 
-    const handleClose = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        removeNode(id);
-    };
+    // Style states (synced with data)
+    const padding = 16;
+    const fontSize = data.fontSize || 14;
+    const fontWeight = data.fontWeight || 'normal';
+    const fontStyle = data.fontStyle || 'normal';
+    const color = data.color || '#ffffff';
+    const isTransparent = data.isTransparent || false;
 
-    const handleEdit = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsEditing(true);
-        setEditContent(data.content);
-    };
+    useEffect(() => {
+        setContent(data.content || '');
+    }, [data.content]);
 
-    const handleSave = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
-        updateNodeData(id, { content: editContent });
+    const handleSave = () => {
+        updateNodeData(id, { content });
         setIsEditing(false);
-    }, [id, editContent, updateNodeData]);
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Escape') {
-            setIsEditing(false);
-        }
-        if (e.key === 'Enter' && e.ctrlKey) {
-            updateNodeData(id, { content: editContent });
-            setIsEditing(false);
-        }
     };
 
-    const noteType = detectNoteType(data.content);
-    const Icon = noteIcons[noteType];
+    const updateStyle = (key: string, value: any) => {
+        updateNodeData(id, { [key]: value });
+    };
 
     return (
-        <div className={`${styles.node} ${selected ? styles.nodeSelected : ''}`}>
-            {/* Header */}
-            <div className={`${styles.header} draggable-handle`}>
-                <div className={styles.headerTitle}>
-                    {Icon && <Icon size={14} />}
-                    NOTE
+        <>
+            <NodeToolbar isVisible={selected} position={Position.Top} className="flex gap-1 bg-[#1a2332] p-1.5 rounded-lg border border-[#2a3a4a] shadow-xl">
+                {/* Font Size */}
+                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
+                    <button onClick={() => updateStyle('fontSize', Math.max(10, fontSize - 2))} className="p-1 hover:bg-white/10 rounded"><Minus size={12} /></button>
+                    <span className="text-[10px] w-4 text-center text-gray-400">{fontSize}</span>
+                    <button onClick={() => updateStyle('fontSize', Math.min(72, fontSize + 2))} className="p-1 hover:bg-white/10 rounded"><Plus size={12} /></button>
                 </div>
-                <div className="flex items-center gap-1">
-                    {isEditing ? (
-                        <button
-                            className={`${styles.headerBtn} !text-green-400`}
-                            onClick={handleSave}
-                            title="Save (Ctrl+Enter)"
-                        >
-                            <Check size={12} />
-                        </button>
-                    ) : (
-                        <button
-                            className={styles.headerBtn}
-                            onClick={handleEdit}
-                            title="Edit"
-                        >
-                            <Edit2 size={12} />
-                        </button>
-                    )}
+
+                {/* Styling */}
+                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
                     <button
-                        className={styles.headerBtn}
-                        onClick={handleClose}
+                        onClick={() => updateStyle('fontWeight', fontWeight === 'bold' ? 'normal' : 'bold')}
+                        className={`p-1 rounded ${fontWeight === 'bold' ? 'bg-cyan-500/20 text-cyan-400' : 'hover:bg-white/10 text-gray-400'}`}
                     >
-                        <X size={12} />
+                        <Bold size={14} />
+                    </button>
+                    <button
+                        onClick={() => updateStyle('fontStyle', fontStyle === 'italic' ? 'normal' : 'italic')}
+                        className={`p-1 rounded ${fontStyle === 'italic' ? 'bg-cyan-500/20 text-cyan-400' : 'hover:bg-white/10 text-gray-400'}`}
+                    >
+                        <Italic size={14} />
                     </button>
                 </div>
-            </div>
 
-            {/* Body */}
-            <div className={styles.body}>
+                {/* Color */}
+                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
+                    {COLORS.map(c => (
+                        <button
+                            key={c}
+                            onClick={() => updateStyle('color', c)}
+                            className={`w-3 h-3 rounded-full ${color === c ? 'ring-2 ring-white scale-110' : 'opacity-70 hover:opacity-100'}`}
+                            style={{ backgroundColor: c }}
+                        />
+                    ))}
+                </div>
+
+                {/* Transparency Toggle */}
+                <button
+                    onClick={() => updateStyle('isTransparent', !isTransparent)}
+                    className={`p-1 rounded ${isTransparent ? 'bg-cyan-500/20 text-cyan-400' : 'hover:bg-white/10 text-gray-400'}`}
+                    title="Toggle Transparency"
+                >
+                    {isTransparent ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 ml-1 pl-2 border-l border-[#2a3a4a]">
+                    <button onClick={() => setIsEditing(!isEditing)} className={`p-1 rounded ${isEditing ? 'text-green-400' : 'hover:bg-white/10 text-gray-400'}`}>
+                        {isEditing ? <Check size={14} /> : <Edit2 size={14} />}
+                    </button>
+                    <button onClick={() => removeNode(id)} className="p-1 hover:bg-red-500/20 hover:text-red-400 rounded text-gray-400">
+                        <Trash2 size={14} />
+                    </button>
+                </div>
+            </NodeToolbar>
+
+            <div
+                className={`transition-all duration-200 min-w-[100px] min-h-[40px]
+                    ${isTransparent
+                        ? 'bg-transparent border-2 border-transparent hover:border-dashed hover:border-gray-700/50'
+                        : 'bg-[#0f1419] border border-[#2a3a4a] rounded-lg shadow-2xl'
+                    }
+                    ${selected && !isTransparent ? '!border-[#00e5ff] ring-1 ring-[#00e5ff]/30' : ''}
+                    ${selected && isTransparent ? '!border-dashed !border-gray-600' : ''}
+                `}
+            >
                 {isEditing ? (
                     <textarea
-                        className={styles.editor}
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        onKeyDown={handleKeyDown}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        onBlur={handleSave}
                         autoFocus
-                        placeholder="Enter note content...&#10;&#10;Tip: Start with [WARNING], [INFO], or [ASSUMPTION] for special formatting."
+                        className="bg-[#1a2332] text-white p-2 rounded w-full h-full min-w-[200px] min-h-[100px] outline-none resize border border-[#00e5ff]"
+                        style={{ fontSize, fontWeight: fontWeight as any, fontStyle: fontStyle as any, color }}
+                        placeholder="Type your note here..."
                     />
                 ) : (
-                    <div className={`${styles.content} ${styles.noteType[noteType]}`}>
-                        {data.content || 'Click edit to add content...'}
+                    <div
+                        onDoubleClick={() => setIsEditing(true)}
+                        className="p-4 whitespace-pre-wrap leading-relaxed cursor-text"
+                        style={{
+                            fontSize,
+                            fontWeight: fontWeight as any,
+                            fontStyle: fontStyle as any,
+                            color,
+                            fontFamily: 'inherit'
+                        }}
+                    >
+                        {content || <span className="opacity-50 italic">Empty note...</span>}
                     </div>
                 )}
             </div>
-        </div>
+        </>
     );
 };
 

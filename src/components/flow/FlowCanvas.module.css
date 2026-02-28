@@ -1,0 +1,19 @@
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #05090e;
+    /* Deep space background */
+}
+
+.flowCanvas {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    /* Let ReactFlow background handle it */
+}
+
+/* Optional: Override ReactFlow controls or minimap if needed here, 
+   though Tailwind classes in the component are preferred for that. */

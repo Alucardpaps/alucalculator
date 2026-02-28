@@ -302,6 +302,10 @@
       "transmissionRatio": "Çevrim Oranı",
       "pitchDiameter": "Bölüm Dairesi",
       "forcesAndStress": "Kuvvetler & Gerilme"
+    },
+    "outputs": {
+      "tipDia": "Diş Üstü Çapı (da)",
+      "rootDia": "Diş Dibi Çapı (df)"
     }
   },
   "driveTrain": {

@@ -1,0 +1,69 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+node.exe : ÔÜá Specified "headers" will not automatically
+ work with "output: export". See more info here: https://
+nextjs.org/docs/messages/export-no-custom-routes
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá Specifie
+d     "...o-custom-routes:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ÔÜá Warning: Next.js inferred your workspace root, but it
+ may not be correct.
+ We detected multiple lockfiles and selected the director
+y of C:\Users\apo_q\package-lock.json as the root directo
+ry.
+ To silence this warning, set `turbopack.root` in your Ne
+xt.js config, or consider removing one of the lockfiles i
+f it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/n
+ext-config-js/turbopack#root-directory for more informati
+on.
+ Detected additional lockfiles: 
+   * C:\Users\apo_q\.gemini\antigravity\scratch\alucalcul
+ator\package-lock.json
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+ÔÜá Specified "headers" will not automatically work with 
+"output: export". See more info here: https://nextjs.org/
+docs/messages/export-no-custom-routes
+Ô£ô Compiled successfully in 8.4s
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+Error: export const dynamic = "force-static"/export const
+ revalidate not configured on route "/api/music/search" w
+ith "output: export". See more info here: https://nextjs.
+org/docs/advanced-features/static-html-export
+    at module evaluation (C:\Users\apo_q\.gemini\antigrav
+ity\scratch\alucalculator\.next\server\chunks\[root-of-th
+e-server]__e22533de._.js:2:13138)
+    at instantiateModule (C:\Users\apo_q\.gemini\antigrav
+ity\scratch\alucalculator\.next\server\chunks\[turbopack]
+_runtime.js:740:9)
+    at instantiateRuntimeModule (C:\Users\apo_q\.gemini\a
+ntigravity\scratch\alucalculator\.next\server\chunks\[tur
+bopack]_runtime.js:768:12)
+    at getOrInstantiateRuntimeModule (C:\Users\apo_q\.gem
+ini\antigravity\scratch\alucalculator\.next\server\chunks
+\[turbopack]_runtime.js:781:12)
+    at Object.m (C:\Users\apo_q\.gemini\antigravity\scrat
+ch\alucalculator\.next\server\chunks\[turbopack]_runtime.
+js:790:18)
+    at Object.<anonymous> (C:\Users\apo_q\.gemini\antigra
+vity\scratch\alucalculator\.next\server\app\api\music\sea
+rch\route.js:6:3)
+
+> Build error occurred
+Error: Failed to collect page data for /api/music/search
+    at ignore-listed frames {
+  type: 'Error'
+}
+

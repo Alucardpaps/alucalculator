@@ -90,53 +90,57 @@ const Scene = () => {
     );
 };
 
+import ClientOnly from './ClientOnly';
+
 export const InteractiveHero3D = ({ lang, dict }: { lang: string, dict: any }) => {
     return (
-        <section className="relative w-full h-[600px] bg-slate-950 overflow-hidden flex items-center justify-center">
+        <ClientOnly fallback={<div className="w-full h-[600px] bg-slate-950" />}>
+            <section className="relative w-full h-[600px] bg-slate-950 overflow-hidden flex items-center justify-center">
 
-            {/* 3D Background */}
-            <div className="absolute inset-0 z-0">
-                <Canvas dpr={[1, 2]}>
-                    <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-                    <Scene />
-                </Canvas>
-            </div>
-
-            {/* Overlay Gradient for Text Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent z-10 pointer-events-none"></div>
-
-            {/* Text Content */}
-            <div className="relative z-20 text-center space-y-6 max-w-4xl px-4 mt-16 pointer-events-none">
-                <div className="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-md">
-                    <span className="text-xs font-bold text-blue-400 tracking-widest uppercase">v4.0.0 STABLE</span>
+                {/* 3D Background */}
+                <div className="absolute inset-0 z-0">
+                    <Canvas dpr={[1, 2]}>
+                        <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
+                        <Scene />
+                    </Canvas>
                 </div>
 
-                <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-500 tracking-tighter drop-shadow-2xl">
-                    ENGINEERING<br />
-                    <span className="text-blue-500">INTELLIGENCE</span>
-                </h1>
+                {/* Overlay Gradient for Text Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent z-10 pointer-events-none"></div>
 
-                <p className="text-lg md:text-xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                    The advanced toolkit for mechanical engineers. Compute weight, fits, gears, and thermodynamics with precision.
-                </p>
+                {/* Text Content */}
+                <div className="relative z-20 text-center space-y-6 max-w-4xl px-4 mt-16 pointer-events-none">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 backdrop-blur-md">
+                        <span className="text-xs font-bold text-blue-400 tracking-widest uppercase">v4.0.0 STABLE</span>
+                    </div>
 
-                <div className="pt-8 pointer-events-auto">
-                    {/* Search Bar Placeholder for future interactivity */}
-                    <div className="bg-white/5 border border-white/10 p-2 rounded-full max-w-md mx-auto flex backdrop-blur-sm">
-                        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                    <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-500 tracking-tighter drop-shadow-2xl">
+                        ENGINEERING<br />
+                        <span className="text-blue-500">INTELLIGENCE</span>
+                    </h1>
+
+                    <p className="text-lg md:text-xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
+                        The advanced toolkit for mechanical engineers. Compute weight, fits, gears, and thermodynamics with precision.
+                    </p>
+
+                    <div className="pt-8 pointer-events-auto">
+                        {/* Search Bar Placeholder for future interactivity */}
+                        <div className="bg-white/5 border border-white/10 p-2 rounded-full max-w-md mx-auto flex backdrop-blur-sm">
+                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search calculator (e.g. 'Bolt', 'Gear')..."
+                                className="bg-transparent border-none outline-none text-white placeholder-slate-500 flex-1 px-4 font-medium"
+                            />
+                            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 rounded-full font-bold transition-colors text-sm">
+                                GO
+                            </button>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search calculator (e.g. 'Bolt', 'Gear')..."
-                            className="bg-transparent border-none outline-none text-white placeholder-slate-500 flex-1 px-4 font-medium"
-                        />
-                        <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 rounded-full font-bold transition-colors text-sm">
-                            GO
-                        </button>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </ClientOnly>
     );
 };

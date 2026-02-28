@@ -1,0 +1,3 @@
+module.exports=[767598,a=>{"use strict";var b=a.i(683650);a.s(["MediaPlayerModule",0,()=>(0,b.jsx)("div",{className:"h-full bg-black text-white flex items-center justify-center",children:(0,b.jsxs)("div",{className:"text-center",children:[(0,b.jsx)("div",{className:"text-4xl mb-4",children:"🎥"}),(0,b.jsx)("h2",{className:"text-xl font-bold",children:"Media Player"}),(0,b.jsx)("p",{className:"text-gray-400",children:"Select a file from File Explorer to play."})]})})])},648980,a=>{a.n(a.i(767598))}];
+
+//# sourceMappingURL=12d90_alucalculator_src_components_modules_media_MediaPlayerModule_tsx_70cba847._.js.map

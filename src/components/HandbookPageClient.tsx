@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import { BookOpen, Table, Search, Filter } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 import { BEARINGS_DB } from '@/data/bearingsData';
 import { MATERIALS_DB, FITS_DB } from '@/data/materialsData';
+import { useI18nStore } from '@/store/i18nStore';
 
 type Section = 'bearings' | 'tolerances' | 'gcodes' | 'materials';
 
@@ -18,7 +19,8 @@ const G_CODES = [
     { code: 'M08', desc: 'Coolant ON' },
 ];
 
-export default function HandbookPageClient({ lang, dict }: { lang: string, dict: any }) {
+export default function HandbookPageClient() {
+    const { t, language: lang } = useI18nStore();
     const [section, setSection] = useState<Section>('bearings');
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('All');
@@ -35,9 +37,9 @@ export default function HandbookPageClient({ lang, dict }: { lang: string, dict:
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                         <BookOpen className="text-blue-600 dark:text-blue-400" />
-                        {dict.nav?.handbook || "ENGINEER'S HANDBOOK"}
+                        {t.modules.handbook.title}
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400">{dict.bearing?.subtitle || 'Reference Tables & Standards'}</p>
+                    <p className="text-slate-500 dark:text-slate-400">{t.handbook.description}</p>
                 </div>
             </header>
 
@@ -49,19 +51,19 @@ export default function HandbookPageClient({ lang, dict }: { lang: string, dict:
                         onClick={() => setSection('bearings')}
                         className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'bearings' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
-                        {dict.bearing?.title || 'Bearing Tables'}
+                        {t.handbook.categories}
                     </button>
                     <button
                         onClick={() => setSection('tolerances')}
                         className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'tolerances' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
-                        {dict.fit?.title || 'Fits & Tolerances'}
+                        {t.modules['fits-tolerances'].title}
                     </button>
                     <button
                         onClick={() => setSection('materials')}
                         className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'materials' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
-                        {dict.sheetMetal?.inputs?.material || 'Material Properties'} {/* Mapping Material input label as title substitute */}
+                        {t.modules['materials-db'].title}
                     </button>
                     <button
                         onClick={() => setSection('gcodes')}
@@ -93,7 +95,7 @@ export default function HandbookPageClient({ lang, dict }: { lang: string, dict:
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                                         <tr>
-                                            <th className="p-4">{dict.bearing?.inputs?.code || 'Code'}</th>
+                                            <th className="p-4">{t.variables.name}</th>
                                             <th className="p-4">{lang === 'tr' ? 'Tip' : 'Type'}</th>
                                             <th className="p-4">ID (d)</th>
                                             <th className="p-4">OD (D)</th>

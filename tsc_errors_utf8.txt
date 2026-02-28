@@ -1,0 +1,115 @@
+﻿src/app/page.tsx(105,21): error TS2322: Type '{ isOpen: boolean; onClose: () => void; dict: any; }' is not assignable to type 'IntrinsicAttributes & StartMenuProps'.
+  Property 'dict' does not exist on type 'IntrinsicAttributes & StartMenuProps'.
+src/cad/components/CadCanvas.tsx(632,41): error TS2551: Property 'entities' does not exist on type 'Constraint'. Did you mean 'entityIds'?
+src/cad/components/CadCanvas.tsx(637,9): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"horizontal"' have no overlap.
+src/cad/components/CadCanvas.tsx(637,45): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"vertical"' have no overlap.
+src/cad/components/CadCanvas.tsx(643,16): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"parallel"' have no overlap.
+src/cad/components/CadCanvas.tsx(643,50): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"perpendicular"' have no overlap.
+src/cad/components/CadCanvas.tsx(649,16): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"coincident"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(42,17): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"coincident"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(42,44): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"concentric"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(52,45): error TS2551: Property 'entities' does not exist on type 'Constraint'. Did you mean 'entityIds'?
+src/cad/kernel/solver/NewtonSolver.ts(52,58): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/cad/kernel/solver/NewtonSolver.ts(54,21): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"coincident"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(80,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"parallel"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(108,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"perpendicular"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(136,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"distance"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(157,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"equal_length"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(178,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"concentric"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(193,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"tangent"' have no overlap.
+src/cad/kernel/solver/NewtonSolver.ts(212,26): error TS2367: This comparison appears to be unintentional because the types 'ConstraintType' and '"angle"' have no overlap.
+src/cad/presentation/components/ValidationPanel.tsx(96,48): error TS2551: Property 'entities' does not exist on type 'Constraint'. Did you mean 'entityIds'?
+src/cad/presentation/components/ValidationPanel.tsx(96,61): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/cad/tests/verify_solver.ts(24,43): error TS2339: Property 'start' does not exist on type 'GeometryType'.
+  Property 'start' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(24,70): error TS2339: Property 'start' does not exist on type 'GeometryType'.
+  Property 'start' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(24,101): error TS2339: Property 'end' does not exist on type 'GeometryType'.
+  Property 'end' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(24,126): error TS2339: Property 'end' does not exist on type 'GeometryType'.
+  Property 'end' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(25,43): error TS2339: Property 'start' does not exist on type 'GeometryType'.
+  Property 'start' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(25,70): error TS2339: Property 'start' does not exist on type 'GeometryType'.
+  Property 'start' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(25,101): error TS2339: Property 'end' does not exist on type 'GeometryType'.
+  Property 'end' does not exist on type 'CircleGeometry'.
+src/cad/tests/verify_solver.ts(25,126): error TS2339: Property 'end' does not exist on type 'GeometryType'.
+  Property 'end' does not exist on type 'CircleGeometry'.
+src/components/modules/sketch/engineering-library.ts(2,30): error TS2307: Cannot find module '@excalidraw/excalidraw/types/types' or its corresponding type declarations.
+src/components/ModuleWorkspace.tsx(27,5): error TS2305: Module '"@/store/projectStore"' has no exported member 'selectCurrentProject'.
+src/components/ModuleWorkspace.tsx(28,5): error TS2305: Module '"@/store/projectStore"' has no exported member 'selectModuleOrder'.
+src/components/ModuleWorkspace.tsx(29,5): error TS2305: Module '"@/store/projectStore"' has no exported member 'selectSavedProjects'.
+src/components/ModuleWorkspace.tsx(62,50): error TS2339: Property 'createProject' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(63,48): error TS2339: Property 'loadProject' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(64,50): error TS2339: Property 'deleteProject' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(65,55): error TS2339: Property 'saveCurrentProject' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(66,46): error TS2339: Property 'addModule' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(67,49): error TS2339: Property 'removeModule' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(68,44): error TS2339: Property 'currentProject' does not exist on type 'ProjectState'.
+src/components/ModuleWorkspace.tsx(92,17): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/components/ModuleWorkspace.tsx(93,68): error TS2339: Property 'name' does not exist on type '{}'.
+src/components/ModuleWorkspace.tsx(124,50): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(o: {}): string[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type '{}'.
+  Overload 2 of 2, '(o: object): string[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'object'.
+src/components/ModuleWorkspace.tsx(127,60): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(o: ArrayLike<unknown> | { [s: string]: unknown; }): unknown[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'ArrayLike<unknown> | { [s: string]: unknown; }'.
+  Overload 2 of 2, '(o: {}): any[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type '{}'.
+src/components/ModuleWorkspace.tsx(128,59): error TS18046: 'project' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(131,84): error TS18046: 'project' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(134,58): error TS18046: 'project' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(138,86): error TS18046: 'project' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(184,34): error TS18046: 'moduleOrder' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(189,37): error TS18046: 'moduleOrder' is of type 'unknown'.
+src/components/ModuleWorkspace.tsx(189,53): error TS7006: Parameter 'moduleId' implicitly has an 'any' type.
+src/components/ModuleWorkspace.tsx(193,58): error TS18046: 'i' is of type 'unknown'.
+src/components/os/AluDock.tsx(72,40): error TS2339: Property 'calculator' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(77,44): error TS2339: Property 'profileWeight' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(82,35): error TS2339: Property 'gearsBearings' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(87,37): error TS2339: Property 'welding' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(92,39): error TS2339: Property 'fasteners' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(98,39): error TS2339: Property 'materialsDB' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/AluDock.tsx(103,37): error TS2339: Property 'cuttingOptimizer' does not exist on type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+src/components/os/RibbonBar.tsx(77,28): error TS2304: Cannot find name 't'.
+src/components/os/RibbonBar.tsx(87,34): error TS2304: Cannot find name 't'.
+src/components/os/RibbonBar.tsx(107,24): error TS2304: Cannot find name 't'.
+src/components/os/RibbonBar.tsx(114,24): error TS2304: Cannot find name 't'.
+src/components/os/RibbonBar.tsx(840,32): error TS2304: Cannot find name 't'.
+src/components/VariableLinkSelector.tsx(14,5): error TS2305: Module '"@/store/projectStore"' has no exported member 'selectModules'.
+src/components/VariableLinkSelector.tsx(15,10): error TS2305: Module '"@/store/projectStore"' has no exported member 'ModuleInstanceId'.
+src/components/VariableLinkSelector.tsx(16,10): error TS2305: Module '"@/store/projectStore"' has no exported member 'VariableId'.
+src/components/VariableLinkSelector.tsx(17,10): error TS2305: Module '"@/store/projectStore"' has no exported member 'ModuleVariable'.
+src/components/VariableLinkSelector.tsx(44,49): error TS2339: Property 'linkVariable' does not exist on type 'ProjectState'.
+src/components/VariableLinkSelector.tsx(45,51): error TS2339: Property 'unlinkVariable' does not exist on type 'ProjectState'.
+src/components/VariableLinkSelector.tsx(50,37): error TS18046: 'modules' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(54,42): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(o: ArrayLike<unknown> | { [s: string]: unknown; }): unknown[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'ArrayLike<unknown> | { [s: string]: unknown; }'.
+  Overload 2 of 2, '(o: {}): any[]', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type '{}'.
+src/components/VariableLinkSelector.tsx(55,24): error TS18046: 'mod' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(57,27): error TS18046: 'mod' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(58,27): error TS18046: 'mod' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(59,29): error TS18046: 'mod' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(60,29): error TS18046: 'output' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(61,31): error TS18046: 'output' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(62,24): error TS18046: 'output' is of type 'unknown'.
+src/components/VariableLinkSelector.tsx(63,23): error TS18046: 'output' is of type 'unknown'.
+src/flow/tests/verify_cad_integration.ts(46,9): error TS2741: Property 'position' is missing in type '{ id: string; data: { schemaId: string; paramName: string; }; type: string; }' but required in type 'Node'.
+src/flow/tests/verify_cad_integration.ts(47,9): error TS2741: Property 'position' is missing in type '{ id: string; data: { schemaId: string; entityId: string; property: string; }; type: string; }' but required in type 'Node'.
+src/flow/tests/verify_flow.ts(103,9): error TS2741: Property 'position' is missing in type '{ id: string; data: { schemaId: string; x: number; y: number; }; }' but required in type 'Node'.
+src/flow/tests/verify_flow.ts(104,9): error TS2741: Property 'position' is missing in type '{ id: string; data: { schemaId: string; x: number; y: number; }; }' but required in type 'Node'.
+src/flow/tests/verify_flow.ts(105,9): error TS2741: Property 'position' is missing in type '{ id: string; data: { schemaId: string; }; }' but required in type 'Node'.
+src/store/i18nStore.ts(14,5): error TS2322: Type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "├çal─▒┼şma Alan─▒n─▒z─▒"; readonly welcomeHighlight: "Se├ğin"; readonly welcomeDesc: "Birincil aray├╝z├╝n├╝z├╝ se├ğin. ─░stedi─şiniz zaman de─şi┼ştirebilirsiniz."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }' is not assignable to type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+  Types of property 'welcomeTitle' are incompatible.
+    Type '"├çal─▒┼şma Alan─▒n─▒z─▒"' is not assignable to type '"Choose Your"'.
+src/store/i18nStore.ts(15,5): error TS2322: Type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "W├ñhlen Sie Ihren"; readonly welcomeHighlight: "Arbeitsbereich"; readonly welcomeDesc: "W├ñhlen Sie Ihre prim├ñre Benutzeroberfl├ñche. Sie k├Ânnen jederzeit wechseln."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }' is not assignable to type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+  Types of property 'welcomeTitle' are incompatible.
+    Type '"W├ñhlen Sie Ihren"' is not assignable to type '"Choose Your"'.
+src/store/i18nStore.ts(16,5): error TS2322: Type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Elige tu"; readonly welcomeHighlight: "Espacio de trabajo"; readonly welcomeDesc: "Selecciona tu interfaz principal. Puedes cambiar en cualquier momento."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }' is not assignable to type '{ readonly osName: "AluCalc OS"; readonly version: "v5.0"; readonly welcomeTitle: "Choose Your"; readonly welcomeHighlight: "Workspace"; readonly welcomeDesc: "Select your primary interface. You can switch anytime."; ... 51 more ...; readonly termPrefix: "AluCalc ÔØ»"; }'.
+  Types of property 'welcomeTitle' are incompatible.
+    Type '"Elige tu"' is not assignable to type '"Choose Your"'.

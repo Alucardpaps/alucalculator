@@ -3,9 +3,10 @@ import {
     Ruler, Square, Circle, Settings, Grid3X3, Database, Flame, Wrench, CircleDot,
     CircleSlash, Scissors, Droplets, Layers, BookOpen, ArrowDownToLine, Zap, Cable,
     Atom, ArrowLeftRight, Calculator, Receipt, Table, Braces, Regex, MessageSquare, Newspaper,
-    Folder, File, Image, Video, Music, FileText, Palette, Globe, GitGraph
+    Folder, File, Image, Video, Music, FileText, Palette, Globe, GitGraph,
+    Bot, Scan, DollarSign, Droplet, BarChart3, Box, Factory, PenTool, Variable,
+    Terminal, Sparkles
 } from 'lucide-react';
-
 // ============================================
 // Types
 // ============================================
@@ -27,6 +28,7 @@ export type ModuleType =
     | 'cutting-optimizer'
     | 'pumps'
     | 'sheet-metal'
+    | 'manufacturing'
     | 'handbook'
     // Civil
     | 'beam-deflection'
@@ -46,7 +48,6 @@ export type ModuleType =
     | 'news'
     // Software
     | 'json-formatter'
-    | 'json-formatter'
     | 'regex-tester'
     // AI Tools
     | 'ai-copilot'
@@ -61,17 +62,33 @@ export type ModuleType =
     | 'browser'
     | 'paint'
     // Flow Editor (AluCalc OS 2.0)
-    | 'flow-editor';
+    | 'flow-editor'
+    | 'parametric-cad'
+    | 'cad-editor'
+    // Analytics & Simulation
+    | 'analytics-dashboard'
+    | 'simulation-fea'
+    // Creative
+    | 'sketch-pad'
+    // Project
+    | 'project-variables'
+    // Terminal
+    | 'terminal'
+    // System
+    | 'manufacturing-sandbox'
+    | 'settings';
 
 export interface WindowSize {
     width: number;
     height: number;
 }
 
+export type ModuleCategory = 'mechanical' | 'civil' | 'electrical' | 'science' | 'finance' | 'software' | 'other';
+
 export interface ModuleDefinition {
     type: ModuleType;
     title: string;
-    category: 'mechanical' | 'civil' | 'electrical' | 'science' | 'finance' | 'software' | 'other';
+    category: ModuleCategory;
     iconName: string; // Storing string name for serialization if needed
     defaultSize: WindowSize;
 }
@@ -178,12 +195,26 @@ export const MODULE_REGISTRY: Record<ModuleType, ModuleDefinition> = {
         iconName: 'Layers',
         defaultSize: { width: 800, height: 700 }
     },
+    'manufacturing': {
+        type: 'manufacturing',
+        title: 'Manufacturing (CAM)',
+        category: 'mechanical',
+        iconName: 'Factory',
+        defaultSize: { width: 1000, height: 800 }
+    },
     'handbook': {
         type: 'handbook',
         title: 'Eng. Handbook',
         category: 'mechanical',
         iconName: 'BookOpen',
         defaultSize: { width: 1100, height: 850 }
+    },
+    'manufacturing-sandbox': {
+        type: 'manufacturing-sandbox',
+        title: 'Manufacturing Sandbox',
+        category: 'mechanical',
+        iconName: 'Sparkles',
+        defaultSize: { width: 1200, height: 850 }
     },
     // Civil
     'beam-deflection': {
@@ -363,6 +394,65 @@ export const MODULE_REGISTRY: Record<ModuleType, ModuleDefinition> = {
         category: 'mechanical',
         iconName: 'GitGraph',
         defaultSize: { width: 1400, height: 900 }
+    },
+    'parametric-cad': {
+        type: 'parametric-cad',
+        title: 'Parametric CAD',
+        category: 'mechanical',
+        iconName: 'Box',
+        defaultSize: { width: 1400, height: 900 }
+    },
+    'cad-editor': {
+        type: 'cad-editor',
+        title: 'CAD Editor',
+        category: 'mechanical',
+        iconName: 'Ruler', // Using generic Ruler if Move3d not in Lucide imports
+        defaultSize: { width: 1400, height: 900 }
+    },
+    // Analytics & Simulation
+    'analytics-dashboard': {
+        type: 'analytics-dashboard',
+        title: 'Analytics Dashboard',
+        category: 'other',
+        iconName: 'BarChart3',
+        defaultSize: { width: 900, height: 700 }
+    },
+    'simulation-fea': {
+        type: 'simulation-fea',
+        title: 'Simulation / FEA Lite',
+        category: 'mechanical',
+        iconName: 'Box',
+        defaultSize: { width: 950, height: 750 }
+    },
+    // Creative
+    'sketch-pad': {
+        type: 'sketch-pad',
+        title: 'Sketch Pad',
+        category: 'other',
+        iconName: 'PenTool', // Will need to define this or map it
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'project-variables': {
+        type: 'project-variables',
+        title: 'Project Variables',
+        category: 'other',
+        iconName: 'Variable',
+        defaultSize: { width: 600, height: 500 }
+    },
+    // Terminal CLI
+    'terminal': {
+        type: 'terminal',
+        title: 'Terminal',
+        category: 'software',
+        iconName: 'Terminal',
+        defaultSize: { width: 800, height: 500 }
+    },
+    'settings': {
+        type: 'settings',
+        title: 'Settings',
+        category: 'other',
+        iconName: 'Settings',
+        defaultSize: { width: 1000, height: 750 }
     }
 };
 
@@ -404,6 +494,17 @@ export const getModuleIcon = (name: string) => {
         case 'Palette': return Palette;
         case 'Globe': return Globe;
         case 'GitGraph': return GitGraph;
+        case 'Bot': return Bot;
+        case 'Scan': return Scan;
+        case 'DollarSign': return DollarSign;
+        case 'Droplet': return Droplet;
+        case 'BarChart3': return BarChart3;
+        case 'Box': return Box;
+        case 'Factory': return Factory;
+        case 'PenTool': return PenTool;
+        case 'Variable': return Variable;
+        case 'Terminal': return Terminal;
+        case 'Sparkles': return Sparkles;
         default: return Circle;
     }
 };

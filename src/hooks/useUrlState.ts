@@ -7,14 +7,14 @@ export function useUrlState() {
     const searchParams = useSearchParams();
 
     // Helper to get initial values on mount
-    const getInitialState = () => {
+    const getInitialState = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
         const state: any = {};
         for (const [key, value] of params.entries()) {
             state[key] = value;
         }
         return state;
-    };
+    }, [searchParams]);
 
     // Debounced update function
     const updateUrl = useCallback((newState: Record<string, string | number>) => {

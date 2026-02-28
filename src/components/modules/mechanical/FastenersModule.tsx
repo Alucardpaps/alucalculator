@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { useFastenerCalculator } from "@/hooks/useFastenerCalculator";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";

@@ -302,6 +302,10 @@
       "transmissionRatio": "Ratio",
       "pitchDiameter": "Pitch Dia",
       "forcesAndStress": "Forces & Stress"
+    },
+    "outputs": {
+      "tipDia": "Tip Diameter",
+      "rootDia": "Root Diameter"
     }
   },
   "strength": {

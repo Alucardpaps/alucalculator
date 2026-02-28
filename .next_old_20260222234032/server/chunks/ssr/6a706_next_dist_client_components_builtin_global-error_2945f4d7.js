@@ -1,0 +1,3 @@
+module.exports=[835921,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(968356);a.n(d("[project]/.gemini/antigravity/scratch/alucalculator/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},995682,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(968356);a.n(d("[project]/.gemini/antigravity/scratch/alucalculator/node_modules/next/dist/client/components/builtin/global-error.js"))},220542,a=>{"use strict";a.i(835921);var b=a.i(995682);a.n(b)}];
+
+//# sourceMappingURL=6a706_next_dist_client_components_builtin_global-error_2945f4d7.js.map

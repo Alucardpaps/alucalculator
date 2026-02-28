@@ -1,328 +1,241 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { Plus, Trash2, Box, Ruler, Layers, Search, AlertCircle } from 'lucide-react';
-
-// =============================================================================
-// MATERIALS DATABASE (Properties)
-// =============================================================================
-const MATERIALS_DB = {
-    steel: [
-        { name: 'S235JR', yield: 235, tensile: 360, density: 7.85, E: 210, type: 'Structural' },
-        { name: 'S355J2', yield: 355, tensile: 470, density: 7.85, E: 210, type: 'Structural' },
-        { name: 'S420MC', yield: 420, tensile: 500, density: 7.85, E: 210, type: 'High Strength' },
-        { name: 'C45 (1.0503)', yield: 370, tensile: 700, density: 7.85, E: 205, type: 'Quenched & Tempered' },
-        { name: '42CrMo4 (1.7225)', yield: 750, tensile: 1000, density: 7.85, E: 210, type: 'High Strength Alloy' },
-        { name: '16MnCr5 (1.7131)', yield: 600, tensile: 800, density: 7.85, E: 210, type: 'Case Hardening' },
-        { name: 'AISI 1018', yield: 250, tensile: 400, density: 7.87, E: 205, type: 'Carbon' },
-        { name: 'AISI 1045', yield: 310, tensile: 565, density: 7.85, E: 206, type: 'Medium Carbon' },
-        { name: 'AISI 4140', yield: 655, tensile: 850, density: 7.85, E: 210, type: 'Chromoly' },
-        { name: 'D2 Tool Steel', yield: 1600, tensile: 1900, density: 7.70, E: 210, type: 'Tool Steel' },
-        { name: '304 SS', yield: 215, tensile: 505, density: 8.00, E: 193, type: 'Stainless' },
-        { name: '316L SS', yield: 220, tensile: 520, density: 8.00, E: 193, type: 'Stainless' },
-    ],
-    aluminum: [
-        { name: '6061-T6', yield: 276, tensile: 310, density: 2.70, E: 69, type: 'Structural' },
-        { name: '7075-T6', yield: 503, tensile: 572, density: 2.81, E: 72, type: 'High Strength' },
-        { name: '5083-H111', yield: 125, tensile: 275, density: 2.66, E: 71, type: 'Marine' },
-        { name: '2024-T3', yield: 345, tensile: 483, density: 2.78, E: 73, type: 'Aerospace' },
-    ],
-    plastic: [
-        { name: 'POM (Delrin)', yield: 65, tensile: 70, density: 1.41, E: 3.1, type: 'Engineering' },
-        { name: 'PA6 (Nylon)', yield: 45, tensile: 80, density: 1.15, E: 2.8, type: 'Engineering' },
-        { name: 'PEEK', yield: 95, tensile: 100, density: 1.32, E: 3.6, type: 'High Performance' },
-    ],
-    misc: [
-        { name: 'CuSn12 (Bronze)', yield: 150, tensile: 300, density: 8.6, E: 90, type: 'Bearing' },
-        { name: 'CuZn39Pb3 (Brass)', yield: 250, tensile: 430, density: 8.4, E: 100, type: 'Free Machining' },
-    ]
-};
-
-type MaterialCategory = keyof typeof MATERIALS_DB;
-
-// =============================================================================
-// INVENTORY TYPES
-// =============================================================================
-export interface StockItem {
-    id: string;
-    material: string;
-    form: 'round' | 'rect' | 'sheet';
-    dim1: number; // Diameter or Width (mm)
-    dim2?: number; // Height or Thickness (mm)
-    length: number; // Length (mm)
-    qty: number;
-}
+import React, { useState, useMemo } from 'react';
+import { Layers, Search, Activity, ChevronRight } from 'lucide-react';
+import { MATERIALS_DB, MaterialProp } from '@/data/materialsData';
+import { useI18nStore } from '@/store/i18nStore';
 
 /**
- * MaterialsDatabaseModule - Engineering materials reference + Inventory
+ * MaterialsDatabaseModule - Consolidated Engineering Materials Reference
+ * Displays all materials and their detailed properties in a single-page layout.
  */
-export default function MaterialsDatabaseModule() {
-    const [view, setView] = useState<'database' | 'inventory'>('database');
-
-    // Database State
-    const [category, setCategory] = useState<MaterialCategory>('steel');
+export function MaterialsDatabaseModule() {
+    const { t } = useI18nStore();
     const [search, setSearch] = useState('');
-    const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
+    const [selectedMaterialName, setSelectedMaterialName] = useState<string | null>(MATERIALS_DB[0].name);
 
-    // Inventory State
-    const [stock, setStock] = useState<StockItem[]>([]);
-    const [newStock, setNewStock] = useState<Partial<StockItem>>({ form: 'round', material: 'S235JR', qty: 1 });
-
-    // Load Stock from LocalStorage
-    useEffect(() => {
-        const saved = localStorage.getItem('manufacturing_stock');
-        if (saved) {
-            try { setStock(JSON.parse(saved)); } catch (e) { console.error('Stock load error', e); }
-        } else {
-            // Default Demo Stock
-            setStock([
-                { id: '1', material: 'S355J2', form: 'round', dim1: 50, length: 1500, qty: 2 },
-                { id: '2', material: '42CrMo4', form: 'round', dim1: 160, length: 3000, qty: 1 }, // Perfect for the user's gear!
-                { id: '3', material: 'POM (Delrin)', form: 'sheet', dim1: 1000, dim2: 500, length: 20, qty: 5 },
-            ]);
-        }
-    }, []);
-
-    // Save Stock
-    useEffect(() => {
-        if (stock.length > 0) {
-            localStorage.setItem('manufacturing_stock', JSON.stringify(stock));
-            // Also notify OS Store via custom event if we want real-time updates across modules,
-            // but for now modules will read from localStorage or we rely on OS state lifting later.
-            window.dispatchEvent(new Event('stock-updated'));
-        }
-    }, [stock]);
-
-    // Database Logic
-    const materials = useMemo(() => {
-        const list = MATERIALS_DB[category];
-        if (!search) return list;
-        return list.filter(m =>
-            m.name.toLowerCase().includes(search.toLowerCase()) ||
-            m.type.toLowerCase().includes(search.toLowerCase())
+    // Filtered materials grouped by category
+    const materialsByCategory = useMemo(() => {
+        const q = search.toLowerCase();
+        const filtered = MATERIALS_DB.filter(m =>
+            m.name.toLowerCase().includes(q) ||
+            m.category.toLowerCase().includes(q) ||
+            (m.machinability && m.machinability.toLowerCase().includes(q)) ||
+            (m.weldability && m.weldability.toLowerCase().includes(q))
         );
-    }, [category, search]);
 
-    const selected = useMemo(() => {
-        if (!selectedMaterial) return null;
-        return MATERIALS_DB[category].find(m => m.name === selectedMaterial);
-    }, [category, selectedMaterial]);
+        return filtered.reduce((acc, m) => {
+            if (!acc[m.category]) acc[m.category] = [];
+            acc[m.category].push(m);
+            return acc;
+        }, {} as Record<string, MaterialProp[]>);
+    }, [search]);
 
-    // Inventory Logic
-    const addStock = () => {
-        if (!newStock.material || !newStock.dim1 || !newStock.length) return;
-        const item: StockItem = {
-            id: Math.random().toString(36).substr(2, 9),
-            material: newStock.material!,
-            form: newStock.form as any,
-            dim1: Number(newStock.dim1),
-            dim2: newStock.dim2 ? Number(newStock.dim2) : undefined,
-            length: Number(newStock.length),
-            qty: Number(newStock.qty) || 1
-        };
-        setStock(prev => [...prev, item]);
-        setNewStock(prev => ({ ...prev, dim1: undefined, length: undefined, qty: 1 })); // Reset fields
-    };
-
-    const removeStock = (id: string) => {
-        setStock(prev => prev.filter(s => s.id !== id));
-    };
+    const selected = useMemo(() =>
+        MATERIALS_DB.find(m => m.name === selectedMaterialName) || null
+        , [selectedMaterialName]);
 
     return (
-        <div className="flex flex-col h-full bg-[#1e1e1e] text-slate-200">
-            {/* Header Tabs */}
-            <div className="flex bg-[#252525] p-1 gap-1 border-b border-[#333]">
-                <button
-                    onClick={() => setView('database')}
-                    className={`flex-1 py-2 text-xs font-bold uppercase rounded flex items-center justify-center gap-2 transition-all ${view === 'database' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-[#333]'}`}
-                >
-                    <Layers size={14} /> Global Material DB
-                </button>
-                <button
-                    onClick={() => setView('inventory')}
-                    className={`flex-1 py-2 text-xs font-bold uppercase rounded flex items-center justify-center gap-2 transition-all ${view === 'inventory' ? 'bg-ind-orange text-white' : 'text-slate-400 hover:bg-[#333]'}`}
-                >
-                    <Box size={14} /> Shop Inventory
-                </button>
+        <div className="flex flex-col h-full bg-[#0a0f14] text-slate-200 overflow-hidden font-sans">
+            {/* ─── HEADER: SEARCH & TITLE ─── */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 border-b border-slate-800/50 bg-[#0d121aa0] backdrop-blur-xl sticky top-0 z-20">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+                        <Layers size={22} className="text-blue-400" />
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-black text-white tracking-tight uppercase">Material Science</h1>
+                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-1">Unified Engineering Database</p>
+                    </div>
+                </div>
+
+                <div className="relative group w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search grade, category, or property..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950/50 border border-slate-800 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm transition-all shadow-inner"
+                    />
+                </div>
             </div>
 
-            {/* --- DATABASE VIEW --- */}
-            {view === 'database' && (
-                <div className="flex flex-col gap-3 h-full p-3">
-                    {/* Category Tabs */}
-                    <div className="flex gap-1 flex-wrap">
-                        {(Object.keys(MATERIALS_DB) as MaterialCategory[]).map(cat => (
+            <div className="flex flex-1 overflow-hidden">
+                {/* ─── SIDEBAR: NAVIGATION & SELECTION DETAILS ─── */}
+                <div className="w-80 border-r border-slate-800/50 bg-[#0d121aa0] backdrop-blur-xl flex flex-col p-4 gap-4 overflow-y-auto custom-scrollbar">
+                    <div className="space-y-1">
+                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 py-2 mb-1">Categories</div>
+                        {Object.keys(materialsByCategory).map(cat => (
                             <button
                                 key={cat}
-                                onClick={() => { setCategory(cat); setSelectedMaterial(null); }}
-                                className="px-3 py-1.5 rounded text-[10px] font-bold uppercase transition-all"
-                                style={{
-                                    backgroundColor: category === cat ? 'var(--color-os-accent)' : 'var(--color-os-header)',
-                                    color: category === cat ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
+                                onClick={() => {
+                                    const el = document.getElementById(`cat-${cat}`);
+                                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                 }}
+                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all group"
                             >
-                                {cat}
+                                <span className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500/30 group-hover:bg-blue-500 transition-colors" />
+                                    {cat}
+                                </span>
+                                <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-500 group-hover:bg-blue-500 group-hover:text-white transition-all font-bold">
+                                    {materialsByCategory[cat].length}
+                                </span>
                             </button>
                         ))}
                     </div>
 
-                    {/* Search */}
-                    <div className="relative">
-                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                        <input
-                            type="text"
-                            placeholder="Search standard materials..."
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 rounded text-xs bg-[#252525] border border-[#333] focus:border-blue-500 outline-none"
-                        />
-                    </div>
-
-                    {/* Materials List */}
-                    <div className="flex-1 overflow-auto rounded-lg border border-[#333] bg-[#000]/20">
-                        <table className="w-full text-[10px]">
-                            <thead className="bg-[#2a2a2a] text-slate-400 sticky top-0">
-                                <tr>
-                                    <th className="text-left px-2 py-1.5 font-bold">Material</th>
-                                    <th className="text-right px-2 py-1.5 font-bold">Yield (MPa)</th>
-                                    <th className="text-right px-2 py-1.5 font-bold">Tensile (MPa)</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#333]">
-                                {materials.map(m => (
-                                    <tr
-                                        key={m.name}
-                                        onClick={() => setSelectedMaterial(m.name)}
-                                        className={`cursor-pointer transition-colors ${selectedMaterial === m.name ? 'bg-blue-900/40 text-blue-200' : 'hover:bg-[#333]'}`}
-                                    >
-                                        <td className="px-2 py-1.5 font-medium border-l-2 border-transparent" style={{ borderColor: selectedMaterial === m.name ? '#3b82f6' : 'transparent' }}>{m.name}</td>
-                                        <td className="px-2 py-1.5 text-right font-mono text-slate-400">{m.yield}</td>
-                                        <td className="px-2 py-1.5 text-right font-mono text-slate-400">{m.tensile}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Footer Detail */}
                     {selected && (
-                        <div className="p-3 rounded-lg bg-[#252525] border border-blue-500/30 shadow-lg">
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="font-bold text-blue-400">{selected.name}</span>
-                                <span className="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-0.5 rounded">{selected.type}</span>
+                        <div className="mt-4 p-5 rounded-2xl bg-gradient-to-br from-blue-900/10 to-transparent border border-blue-500/20 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 className="font-black text-white text-lg tracking-tight mb-0.5">{selected.name}</h3>
+                                    <span className="text-[11px] uppercase font-bold text-blue-500 tracking-widest">{selected.category}</span>
+                                </div>
+                                <div className="p-2 bg-blue-500/10 rounded-lg">
+                                    <Activity size={16} className="text-blue-400" />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-4 gap-2 text-[10px]">
-                                <DetailBox label="Yield" value={selected.yield} unit="MPa" />
-                                <DetailBox label="Tensile" value={selected.tensile} unit="MPa" />
-                                <DetailBox label="Density" value={selected.density} unit="g/cm³" />
-                                <DetailBox label="E-Modulus" value={selected.E} unit="GPa" />
+
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <QuickStat label="Density" value={selected.density} unit="g/cm³" />
+                                    <QuickStat label="Hardness" value={selected.hardness} unit="" />
+                                </div>
+
+                                <div className="space-y-2.5 pt-4 border-t border-slate-800/50">
+                                    <DetailedRow label="Young's Moduli (E)" value={selected.youngsModulus} unit="GPa" />
+                                    <DetailedRow label="Yield Strength (Sy)" value={selected.yield} unit="MPa" />
+                                    <DetailedRow label="Tensile Strength (St)" value={selected.tensile} unit="MPa" />
+                                    <DetailedRow label="Poisson's Ratio" value={selected.poissonsRatio} unit="" />
+                                    <DetailedRow label="Weldability" value={selected.weldability} unit="" />
+                                    <DetailedRow label="Machinability" value={selected.machinability} unit="" />
+                                </div>
+
+                                {(selected.thermalCond || selected.meltingPoint) && (
+                                    <div className="space-y-2.5 pt-4 border-t border-slate-800/50">
+                                        <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Thermal & Phys.</div>
+                                        {selected.thermalCond && <DetailedRow label="Thermal Cond." value={selected.thermalCond} unit="W/mK" />}
+                                        {selected.thermalExp && <DetailedRow label="Thermal Exp." value={selected.thermalExp} unit="µm/mK" />}
+                                        {selected.specificHeat && <DetailedRow label="Specific Heat" value={selected.specificHeat} unit="J/kgK" />}
+                                        {selected.elecResist && <DetailedRow label="Elec. Resist." value={selected.elecResist} unit="µΩcm" />}
+                                        {selected.meltingPoint && <DetailedRow label="Melting Point" value={selected.meltingPoint} unit="°C" />}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
-            )}
 
-            {/* --- INVENTORY VIEW --- */}
-            {view === 'inventory' && (
-                <div className="flex flex-col h-full p-3 gap-4">
-                    {/* Add Stock Form */}
-                    <div className="bg-[#252525] p-3 rounded-lg border border-[#333]">
-                        <div className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
-                            <Plus size={14} /> Add New Stock
-                        </div>
-                        <div className="grid grid-cols-[1fr_80px_60px_60px_40px] gap-2 mb-2">
-                            <input
-                                type="text"
-                                placeholder="Material Name (e.g. S355)"
-                                className="bg-[#1a1a1a] border border-[#333] rounded px-2 py-1 text-xs"
-                                value={newStock.material}
-                                onChange={e => setNewStock({ ...newStock, material: e.target.value })}
-                            />
-                            <select
-                                className="bg-[#1a1a1a] border border-[#333] rounded px-2 py-1 text-xs"
-                                value={newStock.form}
-                                onChange={e => setNewStock({ ...newStock, form: e.target.value as any })}
-                            >
-                                <option value="round">Round Ø</option>
-                                <option value="rect">Rect</option>
-                                <option value="sheet">Sheet</option>
-                            </select>
-                            <input
-                                type="number"
-                                placeholder={newStock.form === 'round' ? 'Dia' : 'Width'}
-                                className="bg-[#1a1a1a] border border-[#333] rounded px-2 py-1 text-xs"
-                                value={newStock.dim1 || ''}
-                                onChange={e => setNewStock({ ...newStock, dim1: Number(e.target.value) })}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Len"
-                                className="bg-[#1a1a1a] border border-[#333] rounded px-2 py-1 text-xs"
-                                value={newStock.length || ''}
-                                onChange={e => setNewStock({ ...newStock, length: Number(e.target.value) })}
-                            />
-                            <input
-                                type="number"
-                                placeholder="Qty"
-                                className="bg-[#1a1a1a] border border-[#333] rounded px-2 py-1 text-xs text-center"
-                                value={newStock.qty || 1}
-                                onChange={e => setNewStock({ ...newStock, qty: Number(e.target.value) })}
-                            />
-                        </div>
-                        <button
-                            onClick={addStock}
-                            className="w-full py-1.5 bg-ind-orange text-white text-xs font-bold rounded hover:bg-orange-600 transition-colors"
-                        >
-                            ADD TO STOCK
-                        </button>
-                    </div>
-
-                    {/* Stock List */}
-                    <div className="flex-1 overflow-auto">
-                        <div className="grid gap-2">
-                            {stock.length === 0 && (
-                                <div className="text-center text-slate-500 py-8 text-xs">No stock items available.</div>
-                            )}
-                            {stock.map(item => (
-                                <div key={item.id} className="bg-[#2a2a2a] p-2 rounded border border-[#333] flex justify-between items-center group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-500">
-                                            {item.form === 'round' ? <div className="w-4 h-4 rounded-full border-2 border-slate-500" /> : <div className="w-4 h-4 border-2 border-slate-500" />}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-sm text-white">{item.material}</div>
-                                            <div className="text-[10px] text-slate-400 font-mono">
-                                                {item.form === 'round' ? `Ø${item.dim1}mm` : `${item.dim1}x${item.dim2}mm`} × L{item.length}mm
-                                            </div>
-                                        </div>
+                {/* ─── MAIN CONTENT: PROPERTY GRID ─── */}
+                <div className="flex-1 overflow-y-auto bg-slate-950/20 custom-scrollbar p-8">
+                    <div className="space-y-16 max-w-[1400px] mx-auto pb-20">
+                        {Object.keys(materialsByCategory).map(cat => (
+                            <section key={cat} id={`cat-${cat}`} className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                                <div className="flex items-center gap-6 mb-8 group/header">
+                                    <div className="relative">
+                                        <h2 className="text-2xl font-black text-white tracking-widest uppercase flex items-center gap-2 group-hover/header:text-blue-400 transition-colors">
+                                            {cat}
+                                        </h2>
+                                        <div className="absolute -bottom-2 left-0 w-12 h-1 bg-blue-500 rounded-full group-hover/header:w-full transition-all duration-500" />
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right">
-                                            <div className="text-[10px] text-slate-500 uppercase">Available</div>
-                                            <div className="text-lg font-bold text-ind-orange">{item.qty}</div>
-                                        </div>
-                                        <button
-                                            onClick={() => removeStock(item.id)}
-                                            className="p-2 hover:bg-red-900/20 text-slate-600 hover:text-red-400 rounded transition-colors"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                    <div className="flex-1 h-px bg-slate-800/50" />
                                 </div>
-                            ))}
-                        </div>
+
+                                <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+                                    {materialsByCategory[cat].map(m => (
+                                        <button
+                                            key={m.name}
+                                            onClick={() => setSelectedMaterialName(m.name)}
+                                            className={`group relative text-left p-6 rounded-[2rem] border transition-all duration-500 ${selectedMaterialName === m.name
+                                                ? 'bg-blue-600/10 border-blue-500/50 ring-1 ring-blue-500/50 shadow-2xl shadow-blue-500/10 scale-[1.02]'
+                                                : 'bg-slate-900/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-900/60 shadow-lg'
+                                                }`}
+                                        >
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div>
+                                                    <div className="font-black text-slate-100 group-hover:text-white transition-colors text-base leading-tight">{m.name}</div>
+                                                    <div className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1 opacity-60 group-hover:opacity-100 transition-opacity">Engineering Specifications</div>
+                                                </div>
+                                                {selectedMaterialName === m.name && (
+                                                    <div className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.6)] animate-pulse" />
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-3">
+                                                    <PropertyCompact label="Yield (Sy)" value={m.yield} unit="MPa" />
+                                                    <PropertyCompact label="Tensile (St)" value={m.tensile} unit="MPa" />
+                                                    <PropertyCompact label="Young's (E)" value={m.youngsModulus} unit="GPa" />
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <PropertyCompact label="Poissons" value={m.poissonsRatio} unit="" />
+                                                    <PropertyCompact label="Density" value={m.density} unit="g/cm³" />
+                                                    <PropertyCompact label="Hardness" value={m.hardness} unit="" />
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-8 pt-6 border-t border-slate-800/50 flex flex-col gap-3">
+                                                <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-tight">
+                                                    <span className="text-slate-500">Machinability</span>
+                                                    <span className={`px-2 py-0.5 rounded-full ${m.machinability.includes('Excellent') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>{m.machinability}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-tight">
+                                                    <span className="text-slate-500">Weldability</span>
+                                                    <span className={`px-2 py-0.5 rounded-full ${m.weldability.includes('Excellent') ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-400'}`}>{m.weldability}</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
+                        ))}
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }
 
-function DetailBox({ label, value, unit }: { label: string, value: number, unit: string }) {
+// ═══════════════════════════════════════════════════════════════
+// HELPER COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+
+function QuickStat({ label, value, unit }: { label: string, value: any, unit: string }) {
+    if (value === undefined || value === null) return null;
     return (
-        <div className="bg-[#1a1a1a] p-1.5 rounded">
-            <div className="text-[8px] text-slate-500 uppercase">{label}</div>
-            <div className="font-mono text-white text-xs">{value} <span className="text-[8px] text-slate-600">{unit}</span></div>
+        <div className="bg-slate-950/40 p-3 rounded-2xl border border-slate-800/30">
+            <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1 leading-none">{label}</div>
+            <div className="text-sm font-mono text-white leading-none">
+                {value} <span className="text-[8px] text-slate-500">{unit}</span>
+            </div>
         </div>
     );
 }
+
+function DetailedRow({ label, value, unit }: { label: string, value: any, unit: string }) {
+    if (value === undefined || value === null) return null;
+    return (
+        <div className="flex justify-between items-center group/row">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight group-hover/row:text-slate-400 transition-colors">{label}</span>
+            <span className="text-[11px] font-mono text-slate-200 group-hover/row:text-blue-400 transition-colors">
+                {value} <span className="text-[8px] text-slate-500 uppercase">{unit}</span>
+            </span>
+        </div>
+    );
+}
+
+function PropertyCompact({ label, value, unit }: { label: string, value: any, unit: string }) {
+    if (value === undefined || value === null) return null;
+    return (
+        <div className="flex flex-col gap-0.5">
+            <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none">{label}</div>
+            <div className="text-xs font-mono text-slate-200 leading-none">
+                {value} <span className="text-[7px] text-slate-600 uppercase">{unit}</span>
+            </div>
+        </div>
+    );
+}
+
+export default MaterialsDatabaseModule;

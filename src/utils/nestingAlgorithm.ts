@@ -26,6 +26,12 @@ export interface CutPattern {
     waste: number;
     wastePct: number;
     isRemnant?: boolean;
+    rotationApplied?: boolean; // Track if rotation was needed
+}
+
+export interface ManualSheet {
+    width: number;
+    height: number;
 }
 
 export interface NestingResult {
@@ -218,6 +224,36 @@ function allocateFirstFit(
             patterns.push(newPattern);
         }
     });
+}
+
+/**
+ * 2D Nesting Helper (Simple Rotation Check)
+ * This logic extends the 1D algorithm for basic 2D checks if needed,
+ * though full 2D nesting is handled by the worker.
+ * 
+ * Mimics the requested logic:
+ * if (currentX + part.width > sheet.width) {
+ *    // Try rotation
+ *    if (currentX + part.height <= sheet.width && ...)
+ * }
+ */
+export function canFitWithRotation(
+    partWidth: number,
+    partHeight: number,
+    spaceWidth: number,
+    spaceHeight: number
+): { fits: boolean, rotated: boolean } {
+    // Try normal
+    if (partWidth <= spaceWidth && partHeight <= spaceHeight) {
+        return { fits: true, rotated: false };
+    }
+
+    // Try rotation
+    if (partHeight <= spaceWidth && partWidth <= spaceHeight) {
+        return { fits: true, rotated: true };
+    }
+
+    return { fits: false, rotated: false };
 }
 
 /**

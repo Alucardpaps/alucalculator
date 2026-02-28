@@ -58,6 +58,9 @@ interface WorkspaceState {
     isDirty: boolean;
     lastSaved: number | null;
     autoSaveEnabled: boolean;
+
+    // System
+    debugMode: boolean;
 }
 
 interface WorkspaceActions {
@@ -90,6 +93,9 @@ interface WorkspaceActions {
     getCurrentWorkspace: () => WorkspaceLayout | null;
     exportProject: (id: string) => string; // JSON
     importProject: (json: string) => string; // returns new project ID
+
+    // System
+    toggleDebugMode: () => void;
 }
 
 // ============================================
@@ -124,6 +130,13 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             isDirty: false,
             lastSaved: null,
             autoSaveEnabled: true,
+            debugMode: false,
+
+            // ─────────────────────────────────────
+            // System
+            // ─────────────────────────────────────
+
+            toggleDebugMode: () => set(state => ({ debugMode: !state.debugMode })),
 
             // ─────────────────────────────────────
             // Project CRUD
@@ -434,6 +447,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
                 recentProjects: state.recentProjects,
                 currentProjectId: state.currentProjectId,
                 autoSaveEnabled: state.autoSaveEnabled,
+                debugMode: state.debugMode,
             }),
         }
     )

@@ -1,0 +1,61 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+node.exe : ÔÜá `skipMiddlewareUrlNormalize` is deprecated. 
+Please use `skipProxyUrlNormalize` instead in next.config.t
+s.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\no
+dejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá `skipMi   
+ ddle...next.config.ts.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ÔÜá `eslint` configuration in next.config.ts is no longer s
+upported. See more info here: https://nextjs.org/docs/app/a
+pi-reference/cli/next#next-lint-options
+ÔÜá Invalid next.config.ts options detected: 
+ÔÜá     Unrecognized key(s) in object: 'eslint'
+ÔÜá See more info here: https://nextjs.org/docs/messages/in
+valid-next-config
+ÔÜá Warning: Next.js inferred your workspace root, but it m
+ay not be correct.
+ We detected multiple lockfiles and selected the directory 
+of C:\Users\apo_q\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next
+.js config, or consider removing one of the lockfiles if it
+'s not needed.
+   See https://nextjs.org/docs/app/api-reference/config/nex
+t-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\apo_q\.gemini\antigravity\scratch\alucalculat
+or\package-lock.json
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 7.1s
+  Running TypeScript ...
+Failed to compile.
+
+./src/calculators/schemas-v2/torsion-shaft.tsx:1:35
+Type error: Module '"@/types/calculator-schema-v2"' declare
+s 'CalculationResult' locally, but it is not exported.
+
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m typ
+e { [33mCalculatorSchemaV2[39m[33m,[39m [33mCalculatio
+nResult[39m } [36mfrom[39m [32m'@/types/calculator-sche
+ma-v2'[39m[33m;[39m
+ [90m   |[39m                                   [31m[1m
+^[22m[39m
+ [90m 2 |[39m [36mimport[39m { createValidatedValue } 
+[36mfrom[39m [32m'@/types/engineering'[39m[33m;[39m
+ [90m 3 |[39m
+ [90m 4 |[39m [36mexport[39m [36mconst[39m torsionSha
+ftSchema[33m:[39m [33mCalculatorSchemaV2[39m [33m=[39
+m {[0m
+Next.js build worker exited with code: 1 and signal: null
+

@@ -11,11 +11,13 @@
  */
 
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Scissors, BarChart3, AlertTriangle, CheckCircle } from 'lucide-react';
 import type { NestingResult, CutPattern, CutItem } from '@/utils/nestingAlgorithm';
 
 interface NestingVisualizationProps {
     result: NestingResult;
+    bladeWidth?: number;
     onPatternClick?: (patternIndex: number) => void;
     showLabels?: boolean;
     compact?: boolean;
@@ -45,6 +47,7 @@ function getPartColor(label: string): string {
 
 export function NestingVisualization({
     result,
+    bladeWidth = 4,
     onPatternClick,
     showLabels = true,
     compact = false,
@@ -143,6 +146,7 @@ export function NestingVisualization({
                         pattern={pattern}
                         index={patternIdx}
                         compact={compact}
+                        bladeWidth={bladeWidth}
                         onClick={() => onPatternClick?.(patternIdx)}
                     />
                 ))}
@@ -262,28 +266,39 @@ function StockBar({
     pattern,
     index,
     compact,
+    bladeWidth,
     onClick,
 }: {
     pattern: CutPattern;
     index: number;
     compact: boolean;
+    bladeWidth: number;
     onClick?: () => void;
 }) {
     const barHeight = compact ? 28 : 40;
 
-    // Calculate positions
+    // Calculate positions taking kerf into account
     let currentX = 0;
+    const kerfPct = (bladeWidth / pattern.stockLength) * 100;
+
     const segments = pattern.cuts.map((cut, cutIdx) => {
         const width = (cut.length / pattern.stockLength) * 100;
         const x = currentX;
         currentX += width;
-        return { cut, x, width, cutIdx };
+
+        const kerfX = currentX;
+        currentX += kerfPct; // Advance X by kerf width for the next part
+
+        return { cut, x, width, cutIdx, kerfX };
     });
 
     const wasteWidth = (pattern.waste / pattern.stockLength) * 100;
 
     return (
-        <div
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
             className="stock-bar-wrapper"
             onClick={onClick}
             style={{ cursor: onClick ? 'pointer' : 'default' }}
@@ -306,19 +321,37 @@ function StockBar({
                     />
 
                     {/* Cut segments */}
-                    {segments.map(({ cut, x, width, cutIdx }) => (
+                    {segments.map(({ cut, x, width, cutIdx, kerfX }) => (
                         <g key={cutIdx}>
-                            <rect
+                            <motion.rect
+                                initial={{ width: 0 }}
+                                animate={{ width: `${width}%` }}
+                                transition={{ duration: 0.5, delay: index * 0.1 + cutIdx * 0.05, ease: "easeOut" }}
                                 x={`${x}%`}
                                 y="2"
-                                width={`${width}%`}
                                 height={barHeight - 4}
                                 fill={getPartColor(cut.label)}
                                 rx="3"
                             />
+                            {/* Kerf Allowance Visual (Red Hatched) - Show after each cut except the last one if it goes into waste */}
+                            {cutIdx < segments.length - 1 && (
+                                <motion.rect
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3, delay: index * 0.1 + cutIdx * 0.05 + 0.3 }}
+                                    x={`${kerfX}%`}
+                                    y="2"
+                                    width={`${kerfPct}%`}
+                                    height={barHeight - 4}
+                                    fill="url(#kerfPattern)"
+                                />
+                            )}
                             {/* Label text */}
                             {!compact && width > 8 && (
-                                <text
+                                <motion.text
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.3, delay: index * 0.1 + cutIdx * 0.05 + 0.4 }}
                                     x={`${x + width / 2}%`}
                                     y={barHeight / 2 + 4}
                                     textAnchor="middle"
@@ -328,17 +361,19 @@ function StockBar({
                                     fontFamily="var(--font-mono, monospace)"
                                 >
                                     {cut.length}
-                                </text>
+                                </motion.text>
                             )}
                         </g>
                     ))}
 
                     {/* Waste segment */}
                     {wasteWidth > 0.5 && (
-                        <rect
+                        <motion.rect
+                            initial={{ opacity: 0, width: 0 }}
+                            animate={{ opacity: 1, width: `${wasteWidth}%` }}
+                            transition={{ duration: 0.6, delay: index * 0.1 + segments.length * 0.05 + 0.2 }}
                             x={`${100 - wasteWidth}%`}
                             y="2"
-                            width={`${wasteWidth}%`}
                             height={barHeight - 4}
                             fill="url(#wastePattern)"
                             rx="3"
@@ -355,6 +390,15 @@ function StockBar({
                         >
                             <rect width="6" height="6" fill="#252545" />
                             <path d="M0 6L6 0" stroke="#333" strokeWidth="1" />
+                        </pattern>
+                        <pattern
+                            id="kerfPattern"
+                            patternUnits="userSpaceOnUse"
+                            width="4"
+                            height="4"
+                        >
+                            <rect width="4" height="4" fill="#660000" />
+                            <path d="M0 4L4 0" stroke="#ff0000" strokeWidth="0.5" opacity="0.5" />
                         </pattern>
                     </defs>
                 </svg>
@@ -427,7 +471,7 @@ function StockBar({
                     color: var(--text-dim, #666);
                 }
             `}</style>
-        </div>
+        </motion.div>
     );
 }
 

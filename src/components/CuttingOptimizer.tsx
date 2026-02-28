@@ -140,6 +140,37 @@ export function CuttingOptimizer({ dict, lang = 'en' }: CuttingOptimizerProps) {
         [stockLength, trimStart, trimEnd]
     );
 
+    // Event Listener for Ribbon Actions
+    React.useEffect(() => {
+        const handleCamAction = (e: CustomEvent) => {
+            const { action } = e.detail;
+            console.log("CAM Action received:", action); // Debug
+
+            if (action === 'nest') {
+                calculate();
+            } else if (action === 'reset') {
+                resetAll();
+            } else if (action === 'report') {
+                window.print();
+            } else if (action === 'export') {
+                if (result) {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(result, null, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", "nesting_result.json");
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                } else {
+                    alert("Please calculate nesting first before exporting.");
+                }
+            }
+        };
+
+        window.addEventListener('cam:action', handleCamAction as EventListener);
+        return () => window.removeEventListener('cam:action', handleCamAction as EventListener);
+    }, [calculate, resetAll, result]);
+
     return (
         <div className="cutting-optimizer" id="cutting-optimizer-printable">
             {/* Header */}

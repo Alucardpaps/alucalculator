@@ -18,7 +18,10 @@ interface CanvasWindowProps {
     onSizeChange?: (size: WindowSize) => void;
     zIndex: number;
     minimized?: boolean;
+    maximized?: boolean;
     scale?: number;
+    minWidth?: number;
+    minHeight?: number;
 }
 
 const SNAP_THRESHOLD = 15;
@@ -35,22 +38,41 @@ export function CanvasWindow({
     onSizeChange,
     zIndex,
     minimized,
-    scale = 1
+    maximized: propMaximized,
+    scale = 1,
+    minWidth = 300,
+    minHeight = 200
 }: CanvasWindowProps) {
-    const { closeWindow, focusWindow, activeWindowId, minimizeWindow, windows } = useOSStore();
+    const { closeWindow, focusWindow, activeWindowId, minimizeWindow, toggleMaximize, windows } = useOSStore();
     const nodeRef = useRef<HTMLDivElement>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 640);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const isActive = activeWindowId === id;
     const defaultWidth = initialSize?.width || 500;
     const defaultHeight = initialSize?.height || 400;
 
-    // Use propSize if available (controlled), otherwise local state (though we prefer controlled now)
-    const [localSize, setLocalSize] = useState({ width: defaultWidth, height: defaultHeight });
-    const currentSize = propSize || localSize;
+    // Initialize with clamped values
+    const [localSize, setLocalSize] = useState({
+        width: Math.max(minWidth, defaultWidth),
+        height: Math.max(minHeight, defaultHeight)
+    });
+
+    // Always use clamped values for rendering
+    const currentSize = useMemo(() => ({
+        width: Math.max(minWidth, (propSize || localSize).width),
+        height: Math.max(minHeight, (propSize || localSize).height)
+    }), [propSize, localSize, minWidth, minHeight]);
 
     const [isResizing, setIsResizing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
-    const [isMaximized, setIsMaximized] = useState(false);
+    const isMaximized = propMaximized || false;
 
     // Sync local size with prop size if it changes and we aren't resizing
     useEffect(() => {
@@ -91,8 +113,8 @@ export function CanvasWindow({
             const rect = (nodeRef.current as HTMLElement).getBoundingClientRect();
 
             // Calculate new size handling scale
-            const newWidth = Math.max(300, (e.clientX - rect.left) / scale); // Divide by scale
-            const newHeight = Math.max(200, (e.clientY - rect.top) / scale); // Divide by scale
+            const newWidth = Math.max(minWidth, (e.clientX - rect.left) / scale); // Divide by scale
+            const newHeight = Math.max(minHeight, (e.clientY - rect.top) / scale); // Divide by scale
 
             setLocalSize({ width: newWidth, height: newHeight });
         };
@@ -170,9 +192,11 @@ export function CanvasWindow({
     if (minimized) return null;
 
     // Performance Optimization Class
-    const interactionClass = (isDragging || isResizing)
-        ? 'opacity-90 shadow-none border-cyan-500/50 transition-none'
-        : `${isActive ? 'border-cyan-500 shadow-[0_0_30px_rgba(0,229,255,0.15)]' : 'border-slate-700/50 shadow-black/50'} transition-all duration-200`;
+    const interactionClass = isMaximized
+        ? 'transition-all duration-300'
+        : (isDragging || isResizing)
+            ? 'opacity-90 shadow-none border-cyan-500/50 transition-none'
+            : `${isActive ? 'border-cyan-500/60 shadow-[0_0_40px_rgba(0,229,255,0.12),0_8px_32px_rgba(0,0,0,0.5)]' : 'border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'} transition-all duration-200`;
 
     return (
         <Draggable
@@ -195,56 +219,76 @@ export function CanvasWindow({
         >
             <div
                 ref={nodeRef}
+                id={id}
+                data-window-type={id.includes('settings') ? 'settings' : 'other'}
+                data-min-width={minWidth}
+                data-current-width={currentSize.width}
                 style={{
                     zIndex,
-                    width: isMaximized ? '100%' : currentSize.width,
-                    height: isMaximized ? '100%' : currentSize.height,
-                    left: isMaximized ? 0 : undefined,
-                    top: isMaximized ? 0 : undefined,
-                    position: isMaximized ? 'fixed' : 'absolute',
-                    transform: isMaximized ? 'none' : undefined
+                    width: isMaximized || isMobile ? '100%' : `${currentSize.width}px`,
+                    height: isMaximized || isMobile ? '100%' : `${currentSize.height}px`,
+                    left: isMaximized || isMobile ? 0 : undefined,
+                    top: isMaximized || isMobile ? 0 : undefined,
+                    position: 'absolute',
+                    transform: isMaximized || (isMobile && !isDragging) ? 'none' : undefined,
+                    backgroundColor: isMaximized ? '#050505' : 'rgba(18, 22, 30, 0.92)',
+                    backdropFilter: isMaximized ? 'none' : 'blur(24px) saturate(1.2)',
                 }}
-                className={`bg-[#1e1e1e]/90 backdrop-blur-md border rounded-lg flex flex-col overflow-hidden pointer-events-auto ${interactionClass}`}
+                className={`
+                    ${(isMaximized || isMobile) ? 'canvas-window-max border-none rounded-none' : 'border rounded-xl'}
+                    flex flex-col overflow-hidden pointer-events-auto ${interactionClass}
+                `}
                 onClick={() => focusWindow(id)}
             >
-                {/* Header */}
-                <div
-                    className={`window-header h-9 flex-none flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b select-none
-                        ${isActive ? 'bg-gradient-to-r from-cyan-950/30 to-slate-900/0 border-cyan-500/20' : 'bg-slate-800/10 border-white/5'}
-                    `}
-                    onDoubleClick={() => setIsMaximized(!isMaximized)}
-                >
-                    <div className="flex items-center gap-2.5">
-                        <Move size={12} className={isActive ? "text-cyan-400" : "text-slate-500"} />
-                        <span className={`text-xs font-semibold tracking-wide uppercase truncate max-w-[200px] ${isActive ? "text-cyan-50" : "text-slate-400"}`}>
+                {/* Header - Only show if not maximized */}
+                {!isMaximized && (
+                    <div
+                        className={`window-header h-10 flex-none flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b select-none
+                            ${isActive
+                                ? 'bg-gradient-to-r from-cyan-950/40 via-slate-900/20 to-transparent border-white/[0.06]'
+                                : 'bg-white/[0.02] border-white/[0.04]'
+                            }
+                        `}
+                        style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)' }}
+                        onDoubleClick={() => toggleMaximize(id)}
+                    >
+                        {/* macOS-style traffic light controls */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
+                                className="w-3.5 h-3.5 rounded-full bg-[#ff5f57] hover:brightness-110 transition-all flex items-center justify-center group"
+                                style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                            >
+                                <X size={8} className="opacity-0 group-hover:opacity-100 text-[#4a0002] transition-opacity" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); minimizeWindow(id); }}
+                                className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-all flex items-center justify-center group"
+                                style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                            >
+                                <Minus size={8} className="opacity-0 group-hover:opacity-100 text-[#5c4700] transition-opacity" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
+                                className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-all flex items-center justify-center group"
+                                style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+                            >
+                                <Maximize2 size={7} className="opacity-0 group-hover:opacity-100 text-[#006500] transition-opacity" />
+                            </button>
+                        </div>
+
+                        {/* Title */}
+                        <span className={`text-[11px] font-semibold tracking-wide truncate max-w-[250px] ${isActive ? 'text-white/80' : 'text-white/30'}`}>
                             {title}
                         </span>
-                    </div>
 
-                    <div className="flex items-center gap-1.5 pl-4">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); minimizeWindow(id); }}
-                            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white transition-colors"
-                        >
-                            <Minus size={12} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setIsMaximized(!isMaximized); }}
-                            className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white transition-colors"
-                        >
-                            {isMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
-                            className="p-1 hover:bg-red-500/80 rounded text-slate-400 hover:text-white transition-colors"
-                        >
-                            <X size={12} />
-                        </button>
+                        {/* Spacer to balance layout */}
+                        <div className="w-[56px]" />
                     </div>
-                </div>
+                )}
 
                 {/* Content */}
-                <div className={`flex-1 overflow-auto relative scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent ${(isDragging || isResizing) ? 'pointer-events-none' : ''}`}>
+                <div className={`flex-1 w-full h-full overflow-auto relative scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent ${(isDragging || isResizing) ? 'pointer-events-none' : ''}`}>
                     {children}
                 </div>
 
@@ -252,9 +296,13 @@ export function CanvasWindow({
                 {!isMaximized && (
                     <div
                         onMouseDown={handleResizeStart}
-                        className="absolute bottom-0 right-0 w-5 h-5 cursor-nwse-resize z-50 flex items-end justify-end p-1 group"
+                        className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize z-50 flex items-end justify-end p-1 group"
                     >
-                        <div className="w-1.5 h-1.5 bg-slate-500/50 group-hover:bg-cyan-400 rounded-bl-[1px]" />
+                        <svg width="10" height="10" viewBox="0 0 10 10" className="text-white/15 group-hover:text-cyan-400/60 transition-colors">
+                            <line x1="8" y1="2" x2="2" y2="8" stroke="currentColor" strokeWidth="1" />
+                            <line x1="8" y1="5" x2="5" y2="8" stroke="currentColor" strokeWidth="1" />
+                            <line x1="8" y1="8" x2="8" y2="8" stroke="currentColor" strokeWidth="1.5" />
+                        </svg>
                     </div>
                 )}
             </div>

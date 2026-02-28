@@ -10,6 +10,7 @@ import { useCADCanvasStore, Point, CADShape, CADTool } from '@/store/CADCanvasSt
 import { SnapEngine, SNAP_SYMBOLS } from '@/lib/SnapSystem';
 import DimensionRenderer from './DimensionRenderer';
 import { useCADTools } from '@/hooks/useCADTools';
+import { isEntityInsideBox, isEntityIntersectingBox } from '@/cad/geometry/GeometryUtils';
 
 // ============================================
 // Types
@@ -403,6 +404,9 @@ export function CADCanvas({ className }: CADCanvasProps) {
     const [isPanning, setIsPanning] = useState(false);
     const [lastMousePos, setLastMousePos] = useState<Point>({ x: 0, y: 0 });
 
+    // Selection State
+    const [selectionBox, setSelectionBox] = useState<{ start: Point; current: Point; active: boolean } | null>(null);
+
     const {
         shapes,
         dimensions,
@@ -475,6 +479,14 @@ export function CADCanvas({ className }: CADCanvasProps) {
         // Convert to world coordinates
         let worldPos = screenToWorld(screenPos, viewport);
 
+        // Handle Selection Box Drag
+        if (selectionBox?.active) {
+            setSelectionBox({ ...selectionBox, current: worldPos });
+            // Do not snap while selecting (usually)
+            setWorldCursor(worldPos);
+            return;
+        }
+
         // Apply snap
         const snapResult = snapEngine.snap(worldPos);
         if (snapResult.snapped) {
@@ -510,8 +522,22 @@ export function CADCanvas({ className }: CADCanvasProps) {
         const drawingTools: CADTool[] = ['line', 'rectangle', 'circle', 'arc'];
 
         if (currentTool === 'select') {
-            // Deselect on empty canvas click
-            deselectAll();
+            // Check if clicked ON an entity first (single select)
+            // If not, start box selection
+            // We need to know if we clicked on something. 
+            // Reuse findEntity logic or checking snap...
+            // For now, let's assume if snap triggered, we clicked something? 
+            // Or better: try findEntityAtPoint from GeometryUtils if available here.
+            // Simplified: If Shift is held, or if we want to drag-select, we start box.
+
+            // Start Selection Box
+            setSelectionBox({ start: worldCursor, current: worldCursor, active: true });
+
+            if (!e.shiftKey) {
+                // Maybe clear previous if not adding? 
+                // AutoCAD behavior: Click empty = start box. Click entity = select it.
+                // We will handle "Click Entity" in MouseUp if no drag occurred.
+            }
             return;
         }
 
@@ -570,11 +596,93 @@ export function CADCanvas({ className }: CADCanvasProps) {
     }, [currentTool, isDrawing, worldCursor, tempPoints, currentShapeStyle, unit, precision, deselectAll, setIsDrawing, addTempPoint, addShape, clearTempPoints, addDimension]);
 
     // Mouse up handler
-    const handleMouseUp = useCallback(() => {
+    const handleMouseUp = useCallback((e: React.MouseEvent) => {
         if (isPanning) {
             setIsPanning(false);
         }
-    }, [isPanning]);
+
+        if (selectionBox?.active) {
+            // Finish Selection
+            const start = selectionBox.start;
+            const end = selectionBox.current;
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+
+            // Box dimensions
+            const box = {
+                minX: Math.min(start.x, end.x),
+                maxX: Math.max(start.x, end.x),
+                minY: Math.min(start.y, end.y),
+                maxY: Math.max(start.y, end.y)
+            };
+
+            // Identify Mode
+            // Drag Right (dx > 0) = Window Selection (Blue) -> Inside Only
+            // Drag Left (dx < 0) = Crossing Selection (Green) -> Intersecting
+            const isCrossing = dx < 0;
+
+            const newSelectedIds: string[] = [];
+
+            // Map store 'shapes' to 'CadEntity' structure expected by GeometryUtils
+            // Our store uses 'CADShape', GeometryUtils uses 'CadEntity'.
+            // They need to match or be adapted. 
+            // Looking at existing code, CADCanvas uses CADShape. GeometryUtils uses CadEntity.
+            // We need to adapt CADShape to CadEntity for the util.
+
+            // Assumption: CADShape has 'type', 'points'. CadEntity has 'geometry' { type: ..., ... }.
+            // We perform ad-hoc conversion here or update Utils.
+            // Let's do ad-hoc conversion for logic check.
+
+            shapes.forEach(shape => {
+                let geom;
+                if (shape.type === 'line') geom = { type: 'LINE', start: shape.points[0], end: shape.points[1] };
+                else if (shape.type === 'circle') geom = { type: 'CIRCLE', center: shape.points[0], radius: distance(shape.points[0], shape.points[1]) };
+                else if (shape.type === 'polyline') geom = { type: 'POLYLINE', vertices: shape.points, closed: false }; // assume open for now if not specified
+                else if (shape.type === 'rectangle') {
+                    const [p1, p2] = shape.points;
+                    const p3 = { x: p2.x, y: p1.y };
+                    const p4 = { x: p1.x, y: p2.y };
+                    geom = { type: 'POLYLINE', vertices: [p1, p3, p2, p4], closed: true };
+                }
+
+                if (geom) {
+                    const mockEntity = { geometry: geom } as any; // Cast to satisfy type
+
+                    let isSelected = false;
+                    if (isCrossing) {
+                        isSelected = isEntityIntersectingBox(mockEntity, box);
+                    } else {
+                        isSelected = isEntityInsideBox(mockEntity, box);
+                    }
+
+                    if (isSelected) newSelectedIds.push(shape.id);
+                }
+            });
+
+            // Update Selection
+            // If shift held, toggle. If not, replace (unless drag was tiny = click)
+            if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+                // Click behavior handled in handleShapeClick or here?
+                // If we didn't hit a shape (handled in handleShapeClick), we deselect all here.
+                if (!e.shiftKey) deselectAll();
+            } else {
+                if (e.shiftKey) {
+                    // Add to selection
+                    newSelectedIds.forEach(id => selectShape(id, true));
+                } else {
+                    // Replace selection
+                    deselectAll();
+                    // We need a store method to 'setSelectedIds'.
+                    // Currently 'selectShape' toggles or adds.
+                    // We iterate and add.
+                    newSelectedIds.forEach(id => selectShape(id, true));
+                }
+            }
+
+            setSelectionBox(null);
+        }
+
+    }, [isPanning, selectionBox, shapes, selectShape, deselectAll]);
 
     const handleShapeClick = useCallback((id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -769,6 +877,36 @@ export function CADCanvas({ className }: CADCanvasProps) {
                     viewport={viewport}
                 />
             )}
+
+            {/* Selection Box Render */}
+            {selectionBox && selectionBox.active && (() => {
+                const startScreen = worldToScreen(selectionBox.start, viewport);
+                const currentScreen = worldToScreen(selectionBox.current, viewport);
+
+                const x = Math.min(startScreen.x, currentScreen.x);
+                const y = Math.min(startScreen.y, currentScreen.y);
+                const width = Math.abs(currentScreen.x - startScreen.x);
+                const height = Math.abs(currentScreen.y - startScreen.y);
+
+                const isCrossing = selectionBox.current.x < selectionBox.start.x;
+                const bgColor = isCrossing ? 'rgba(74, 222, 128, 0.2)' : 'rgba(59, 130, 246, 0.2)'; // Green vs Blue
+                const borderColor = isCrossing ? 'rgba(74, 222, 128, 0.8)' : 'rgba(59, 130, 246, 0.8)';
+
+                return (
+                    <div
+                        className="absolute pointer-events-none z-50 border"
+                        style={{
+                            left: x,
+                            top: y,
+                            width,
+                            height,
+                            backgroundColor: bgColor,
+                            borderColor: borderColor,
+                            borderStyle: isCrossing ? 'dashed' : 'solid'
+                        }}
+                    />
+                );
+            })()}
 
             {/* Coordinate Display */}
             <div

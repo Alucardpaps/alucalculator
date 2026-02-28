@@ -12,8 +12,10 @@
 export interface GearVisualizerParams {
     module: number;              // Module in mm (m = D/z)
     teeth: number;               // Number of teeth (z)
+    gearTeeth?: number;          // Number of teeth for gear (z2)
     pressureAngle?: number;      // Pressure angle in degrees (default 20°)
-    profileShift?: number;       // Profile shift coefficient (x)
+    profileShift?: number;       // Profile shift coefficient (x1)
+    gearShift?: number;          // Gear shift coefficient (x2)
     faceWidth?: number;          // Face width for 3D-like rendering
     showAnnotations?: boolean;   // Show dimensions
     highlightTooth?: number;     // Index of tooth to highlight stress
@@ -43,19 +45,19 @@ export interface GearSpecs {
 // Gear Geometry Calculations
 // ============================================
 
-function calculateGearSpecs(module: number, teeth: number, pressureAngle: number): GearSpecs {
-    const d = module * teeth;                          // Pitch diameter
+function calculateGearSpecs(gearModule: number, teeth: number, pressureAngle: number): GearSpecs {
+    const d = gearModule * teeth;                          // Pitch diameter
     const alpha = pressureAngle * Math.PI / 180;       // Pressure angle in radians
 
     return {
         pitchDiameter: d,
         baseDiameter: d * Math.cos(alpha),
-        outsideDiameter: d + 2 * module,
-        rootDiameter: d - 2.5 * module,
-        circularPitch: Math.PI * module,
-        toothThickness: Math.PI * module / 2,
-        addendum: module,
-        dedendum: 1.25 * module,
+        outsideDiameter: d + 2 * gearModule,
+        rootDiameter: d - 2.5 * gearModule,
+        circularPitch: Math.PI * gearModule,
+        toothThickness: Math.PI * gearModule / 2,
+        addendum: gearModule,
+        dedendum: 1.25 * gearModule,
     };
 }
 
@@ -77,7 +79,8 @@ function generateInvolutePoint(baseRadius: number, angle: number): { x: number; 
 function generateToothProfile(
     specs: GearSpecs,
     toothIndex: number,
-    totalTeeth: number
+    totalTeeth: number,
+    toothWidthParam: number // Calculated angular parameter for correct thickness
 ): string {
     const { pitchDiameter, baseDiameter, outsideDiameter, rootDiameter } = specs;
 
@@ -105,11 +108,12 @@ function generateToothProfile(
     }
 
     // Mirror for other side of tooth
-    const toothWidth = toothAngle * 0.4; // Approximate tooth width angle
+    // toothWidthParam = angularThickness + 2*inv(alpha)
+    // Mirror Axis approx: newAngle = 2*baseAngle + toothWidthParam - angle
     const mirrorPoints = involutePoints.map(p => {
         const angle = Math.atan2(p.y, p.x);
         const r = Math.sqrt(p.x ** 2 + p.y ** 2);
-        const newAngle = 2 * baseAngle + toothWidth - angle;
+        const newAngle = 2 * baseAngle + toothWidthParam - angle;
         return {
             x: r * Math.cos(newAngle),
             y: r * Math.sin(newAngle),
@@ -120,12 +124,12 @@ function generateToothProfile(
     const allPoints = [...involutePoints, ...mirrorPoints];
 
     // Start from root
-    const rootStartAngle = baseAngle - toothAngle * 0.3;
-    const rootEndAngle = baseAngle + toothWidth + toothAngle * 0.3;
+    const rootStartAngle = baseAngle - toothAngle * 0.3; // Arbitrary root spacing
+    const rootEndAngle = 2 * baseAngle + toothWidthParam - rootStartAngle; // Symmetric root end
 
     let path = '';
 
-    // Root arc start
+    // Root arc start (approximate fillet)
     path += `M ${rf * Math.cos(rootStartAngle)} ${rf * Math.sin(rootStartAngle)} `;
 
     // Line to first involute point
@@ -149,7 +153,11 @@ function generateToothProfile(
     }
 
     // Line back to root
-    path += `L ${rf * Math.cos(rootEndAngle)} ${rf * Math.sin(rootEndAngle)} `;
+    const endRootX = rf * Math.cos(rootEndAngle);
+    const endRootY = rf * Math.sin(rootEndAngle);
+
+    // Check reasonable closure
+    path += `L ${endRootX} ${endRootY} `;
 
     return path;
 }
@@ -170,171 +178,166 @@ function getStressColor(ratio: number): string {
 // ============================================
 
 export function generateGearSVG(params: GearVisualizerParams): GearVisualizerOutput {
-    const {
-        module,
-        teeth,
-        pressureAngle = 20,
-        profileShift = 0,
-        faceWidth,
-        showAnnotations = true,
-        highlightTooth,
-        stressRatio = 0,
-    } = params;
+    // Map schema keys to visualizer params
+    const mod = params.module || (params as any).m;
+    const z1 = params.teeth || (params as any).z1 || 20; // Pinion teeth
+    const z2 = params.gearTeeth || (params as any).z2 || 40; // Gear teeth (new param)
+    const angle = params.pressureAngle || (params as any).alpha || 20;
+    const x1 = params.profileShift || (params as any).x1 || 0; // Pinion shift
+    const x2 = (params as any).x2 || 0; // Gear shift
 
-    const specs = calculateGearSpecs(module, teeth, pressureAngle);
-    const { outsideDiameter, pitchDiameter, baseDiameter, rootDiameter } = specs;
+    // Optional params
+    const showAnnotations = params.showAnnotations !== false;
+    const highlightTooth = params.highlightTooth;
+    const stressRatio = params.stressRatio || 0;
 
-    // SVG dimensions with padding
-    const padding = outsideDiameter * 0.3;
-    const size = outsideDiameter + padding * 2;
-    const cx = size / 2;
-    const cy = size / 2;
+    // Validation
+    if (!mod || !z1 || !z2 || mod <= 0 || z1 < 3 || z2 < 3) {
+        return {
+            svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><text x="50" y="50" text-anchor="middle" fill="#666" font-size="10">Invalid params</text></svg>',
+            viewBox: '0 0 100 100',
+            width: 100,
+            height: 100,
+            specs: {
+                pitchDiameter: 0,
+                baseDiameter: 0,
+                outsideDiameter: 0,
+                rootDiameter: 0,
+                circularPitch: 0,
+                toothThickness: 0,
+                addendum: 0,
+                dedendum: 0,
+            },
+        };
+    }
+
+    const alphaRad = angle * Math.PI / 180;
+
+    // Helper to calc specs
+    const calcSpecs = (z: number, x: number): GearSpecs => {
+        const d = mod * z;
+        return {
+            pitchDiameter: d,
+            baseDiameter: d * Math.cos(alphaRad),
+            outsideDiameter: d + 2 * mod * (1 + x),
+            rootDiameter: d - 2 * mod * (1.25 - x),
+            circularPitch: Math.PI * mod,
+            toothThickness: (Math.PI * mod / 2) + (2 * x * mod * Math.tan(alphaRad)),
+            addendum: mod * (1 + x),
+            dedendum: mod * (1.25 - x),
+        };
+    };
+
+    const pinionSpecs = calcSpecs(z1, x1);
+    const gearSpecs = calcSpecs(z2, x2);
+
+    // Center Distance
+    // Center Distance with Profile Shift
+    // a = (d1 + d2) / 2 + (x1 + x2) * m
+    const centerDist = (pinionSpecs.pitchDiameter + gearSpecs.pitchDiameter) / 2 + mod * (x1 + x2);
+
+    // Layout
+    const maxRadius = Math.max(pinionSpecs.outsideDiameter, gearSpecs.outsideDiameter) / 2;
+    const padding = maxRadius * 0.4;
+    const width = centerDist + pinionSpecs.outsideDiameter / 2 + gearSpecs.outsideDiameter / 2 + padding * 2;
+    const height = Math.max(pinionSpecs.outsideDiameter, gearSpecs.outsideDiameter) + padding * 2;
+
+    const cy = height / 2;
+    const cx1 = padding + pinionSpecs.outsideDiameter / 2;
+    const cx2 = cx1 + centerDist;
 
     const stressColor = getStressColor(stressRatio);
 
     let svg = `
         <svg xmlns="http://www.w3.org/2000/svg" 
-             viewBox="0 0 ${size} ${size}" 
-             width="${size}" height="${size}">
+             viewBox="0 0 ${width} ${height}" 
+             width="${width}" height="${height}">
         
-        <!-- Definitions -->
         <defs>
             <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:#3a4a5a"/>
-                <stop offset="50%" style="stop-color:#2a3a4a"/>
                 <stop offset="100%" style="stop-color:#1a2a3a"/>
             </linearGradient>
-            
-            <linearGradient id="stressGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:${stressColor}"/>
-                <stop offset="100%" style="stop-color:#1a2a3a"/>
+            <linearGradient id="pinionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#4a5a6a"/>
+                <stop offset="100%" style="stop-color:#2a3a4a"/>
             </linearGradient>
-            
             <filter id="gearShadow" x="-20%" y="-20%" width="140%" height="140%">
                 <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
             </filter>
         </defs>
         
-        <!-- Background grid -->
-        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#1a2a3a" stroke-width="0.5"/>
-        </pattern>
-        <rect width="100%" height="100%" fill="url(#grid)"/>
+        <rect width="100%" height="100%" fill="#0a0e14" opacity="0"/>
     `;
 
-    // Generate gear body
-    svg += `<g transform="translate(${cx}, ${cy})" filter="url(#gearShadow)">`;
+    const invAlpha = Math.tan(alphaRad) - alphaRad;
 
-    // Root circle (base of teeth)
-    svg += `
-        <circle cx="0" cy="0" r="${rootDiameter / 2}" 
-                fill="url(#gearGradient)" stroke="#4a5a6a" stroke-width="1"/>
-    `;
+    // Render Gear Helper
+    const renderGear = (specs: GearSpecs, z: number, cx: number, cy: number, isPinion: boolean, rotationOffset: number) => {
+        let path = '';
 
-    // Generate all teeth
-    for (let i = 0; i < teeth; i++) {
-        const isHighlighted = highlightTooth !== undefined && i === highlightTooth;
-        const toothPath = generateToothProfile(specs, i, teeth);
+        // Calculate correct angular width for tooth thickness (including profile shift)
+        // Angular thickness at pitch circle
+        const angularThickness = specs.toothThickness / (specs.pitchDiameter / 2);
+        // Param for mirror logic: W = psi + 2*inv(alpha)
+        const toothWidthParam = angularThickness + 2 * invAlpha;
 
-        svg += `
-            <path d="${toothPath}" 
-                  fill="${isHighlighted ? 'url(#stressGradient)' : 'url(#gearGradient)'}"
+        // Root circle
+        path += `<circle cx="${0}" cy="${0}" r="${specs.rootDiameter / 2}" />`;
+
+        // Teeth
+        for (let i = 0; i < z; i++) {
+            const toothPath = generateToothProfile(specs, i, z, toothWidthParam); // Use calculated width
+            path += `<path d="${toothPath}" />`;
+        }
+
+        // We need to transform the group
+        const rotation = isPinion ? 0 : 180 / z + rotationOffset; // Phase shift for meshing
+
+        // Re-using the generateToothProfile logic but applying transform in SVG group
+        // Note: generateToothProfile returns 'M... L...' string.
+
+        // Actually, let's just generate the SVG content string
+        let gearSvg = `<g transform="translate(${cx}, ${cy}) rotate(${rotation})">`;
+
+        // Hub
+        gearSvg += `<circle cx="0" cy="0" r="${specs.rootDiameter / 2}" fill="url(#${isPinion ? 'pinionGradient' : 'gearGradient'})" stroke="#4a5a6a" stroke-width="1"/>`;
+
+        for (let i = 0; i < z; i++) {
+            const isHighlighted = isPinion && highlightTooth !== undefined && i === highlightTooth;
+            const tp = generateToothProfile(specs, i, z, toothWidthParam);
+            gearSvg += `<path d="${tp}" 
+                  fill="${isHighlighted ? stressColor : `url(#${isPinion ? 'pinionGradient' : 'gearGradient'})`}"
                   stroke="${isHighlighted ? stressColor : '#4a5a6a'}" 
-                  stroke-width="${isHighlighted ? 2 : 1}"/>
-        `;
-    }
+                  stroke-width="${isHighlighted ? 2 : 1}"/>`;
+        }
 
-    // Center hub
-    const hubRadius = rootDiameter / 2 * 0.4;
-    svg += `
-        <circle cx="0" cy="0" r="${hubRadius}" 
-                fill="#0a1a2a" stroke="#3a4a5a" stroke-width="1"/>
-    `;
+        // Bore
+        gearSvg += `<circle cx="0" cy="0" r="${specs.rootDiameter / 2 * 0.4}" fill="#0a1a2a" stroke="#3a4a5a" stroke-width="1"/>`;
+        // Keyway
+        const kw = specs.rootDiameter / 2 * 0.15;
+        gearSvg += `<rect x="${-kw / 2}" y="${-specs.rootDiameter / 2 * 0.4}" width="${kw}" height="${kw}" fill="#0a1a2a"/>`;
 
-    // Keyway
-    const keyWidth = hubRadius * 0.4;
-    const keyDepth = hubRadius * 0.15;
-    svg += `
-        <rect x="${-keyWidth / 2}" y="${-hubRadius}" 
-              width="${keyWidth}" height="${keyDepth + hubRadius * 0.1}"
-              fill="#0a1a2a" stroke="#3a4a5a" stroke-width="0.5"/>
-    `;
+        gearSvg += `</g>`;
+        return gearSvg;
+    };
 
-    // Center bore
-    svg += `
-        <circle cx="0" cy="0" r="${hubRadius * 0.5}" 
-                fill="#050a0f" stroke="#2a3a4a" stroke-width="0.5"/>
-    `;
+    // Draw Pinion
+    svg += renderGear(pinionSpecs, z1, cx1, cy, true, 0);
 
-    svg += `</g>`;
+    // Draw Gear (Meshed)
+    // Rotate gear by half a tooth pitch to mesh? 
+    // Simplified meshing: rotate gear by 180/z2 to align tooth gap with pinion tooth
+    svg += renderGear(gearSpecs, z2, cx2, cy, false, 180 / z2);
 
-    // Annotations
     if (showAnnotations) {
-        const annotationY = size - padding / 2;
-        const leftX = padding / 2;
-
         svg += `
-            <!-- Diameter annotations -->
             <g font-family="monospace" font-size="10" fill="#a0aab4">
-                <text x="${leftX}" y="${annotationY - 30}">
-                    m = ${module.toFixed(1)} mm
+                <text x="${width / 2}" y="${height - 10}" text-anchor="middle">
+                    a = ${centerDist.toFixed(2)} mm
                 </text>
-                <text x="${leftX}" y="${annotationY - 15}">
-                    z = ${teeth}
-                </text>
-                <text x="${leftX}" y="${annotationY}">
-                    d = ${pitchDiameter.toFixed(1)} mm
-                </text>
-                
-                <text x="${size - leftX}" y="${annotationY - 30}" text-anchor="end">
-                    da = ${outsideDiameter.toFixed(1)} mm
-                </text>
-                <text x="${size - leftX}" y="${annotationY - 15}" text-anchor="end">
-                    db = ${baseDiameter.toFixed(1)} mm
-                </text>
-                <text x="${size - leftX}" y="${annotationY}" text-anchor="end">
-                    α = ${pressureAngle}°
-                </text>
+                <line x1="${cx1}" y1="${cy}" x2="${cx2}" y2="${cy}" stroke="#00e5ff" stroke-width="0.5" stroke-dasharray="4,2"/>
             </g>
-            
-            <!-- ISO Reference -->
-            <text x="${cx}" y="15" text-anchor="middle" 
-                  font-family="monospace" font-size="9" fill="#00e5ff">
-                ISO 53:1998 - Involute Spur Gear
-            </text>
-        `;
-
-        // Diameter dimension lines
-        svg += `
-            <g stroke="#00e5ff" stroke-width="0.5" stroke-dasharray="4,2">
-                <!-- Pitch diameter -->
-                <circle cx="${cx}" cy="${cy}" r="${pitchDiameter / 2}" fill="none"/>
-                
-                <!-- Base diameter -->
-                <circle cx="${cx}" cy="${cy}" r="${baseDiameter / 2}" fill="none" 
-                        stroke="#a0aab4" stroke-dasharray="2,2"/>
-            </g>
-        `;
-    }
-
-    // Stress indicator
-    if (stressRatio > 0) {
-        const indicatorX = size - 25;
-        const indicatorHeight = size - 2 * padding;
-        const indicatorY = padding;
-        const fillHeight = indicatorHeight * stressRatio;
-
-        svg += `
-            <rect x="${indicatorX}" y="${indicatorY}" 
-                  width="15" height="${indicatorHeight}" 
-                  fill="#0a1a2a" stroke="#2a3a4a" stroke-width="1" rx="2"/>
-            <rect x="${indicatorX + 2}" y="${indicatorY + indicatorHeight - fillHeight}" 
-                  width="11" height="${fillHeight}" 
-                  fill="${stressColor}" rx="1"/>
-            <text x="${indicatorX + 7.5}" y="${indicatorY + indicatorHeight + 12}" 
-                  text-anchor="middle" font-size="8" fill="${stressColor}">
-                ${Math.round(stressRatio * 100)}%
-            </text>
         `;
     }
 
@@ -342,10 +345,10 @@ export function generateGearSVG(params: GearVisualizerParams): GearVisualizerOut
 
     return {
         svg,
-        viewBox: `0 0 ${size} ${size}`,
-        width: size,
-        height: size,
-        specs,
+        viewBox: `0 0 ${width} ${height}`,
+        width,
+        height,
+        specs: pinionSpecs, // Return pinion specs as primary
     };
 }
 

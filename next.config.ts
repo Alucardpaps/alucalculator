@@ -1,29 +1,20 @@
 import type { NextConfig } from "next";
 
-const getBuildId = () => {
-  if (process.env.GIT_HASH) {
-    return process.env.GIT_HASH;
-  }
-  try {
-    const { execSync } = require('child_process');
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (e) {
-    return `build-${Date.now()}`;
-  }
-};
+const buildTimestamp = new Date().toISOString();
+const buildId = `build-${Date.now()}`;
 
-const buildId = getBuildId();
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   output: 'export',  // Static export for Hostinger deployment
   trailingSlash: true,
-  skipMiddlewareUrlNormalize: true,
   env: {
     BUILD_ID: buildId,
+    NEXT_PUBLIC_BUILD_TIMESTAMP: buildTimestamp,
   },
   generateBuildId: async () => buildId,
-  /* config options here */
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
 };
 
 export default nextConfig;
-
