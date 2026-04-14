@@ -1,0 +1,24 @@
+{
+  "id": "conveyor-pow",
+  "category": "mechanical",
+  "title": "Conv Power",
+  "slug": "conveyor-pow",
+  "meta": {
+    "title": "Conveyor | AluCalc",
+    "description": "Belt conveyor power."
+  },
+  "seo": {
+    "h1": "Conveyor Drive Sizing",
+    "intro": "Bulk handling power.",
+    "formula": "P = f(Te,v)",
+    "variables": {
+      "Te": "Tens"
+    },
+    "practical": "Mining.",
+    "example": "Lift vs Flat."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

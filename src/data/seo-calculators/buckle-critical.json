@@ -1,0 +1,24 @@
+{
+  "id": "buckle-critical",
+  "category": "structural",
+  "title": "Finite Buckle",
+  "slug": "buckle-critical",
+  "meta": {
+    "title": "FE Buckle | AluCalc",
+    "description": "Buckling Eigenvalue."
+  },
+  "seo": {
+    "h1": "Structural Buckling Modal",
+    "intro": "Higher modes of fail.",
+    "formula": "λK_e + K_g = 0",
+    "variables": {
+      "λ": "Eig"
+    },
+    "practical": "FEA.",
+    "example": "Mode 1 primary."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "grades": {
+    "S235": {
+      "name": "S235",
+      "density": 7850,
+      "youngsModulus": 210000,
+      "yieldStrength": 235,
+      "ultimateTensileStrength": 360,
+      "poissonRatio": 0.3,
+      "thermalExpansion": 12.0,
+      "default": true,
+      "description": "Standard structural steel."
+    },
+    "S355": {
+      "name": "S355",
+      "density": 7850,
+      "youngsModulus": 210000,
+      "yieldStrength": 355,
+      "ultimateTensileStrength": 470,
+      "poissonRatio": 0.3,
+      "thermalExpansion": 12.0,
+      "default": false,
+      "description": "High-strength structural steel."
+    }
+  }
+}

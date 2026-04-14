@@ -1,0 +1,34 @@
+{
+  "id": "cavitation-calculator",
+  "title": "Cavitation Calculator - AluCalc Engineering",
+  "slug": "cavitation-calculator",
+  "keyword": "cavitation calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Cavitation Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional cavitation calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Cavitation Calculator",
+    "intro": "Comprehensive engineering guide for cavitation calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for cavitation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for cavitation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Cavitation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical cavitation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pump-power-calculator",
+    "pump-efficiency-calculator",
+    "pump-head-calculator",
+    "pump-flow-rate-calculator",
+    "cavitation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -2,45 +2,28 @@ import { useState, useCallback } from 'react';
 import { useOSStore } from '@/store/osStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { ModuleType } from '@/config/modules';
+import { generateStructuredJSON } from '@/lib/gemini';
 
 export type IntentType = 'NAVIGATION' | 'CALCULATION' | 'CHAT' | 'HARDWARE' | 'IDENTITY' | 'ORCHESTRATION' | 'UNKNOWN';
 
-export interface BModelResponse {
-    status: 'success' | 'error';
-    intent: string;
+interface AIIntentResponse {
+    type: IntentType;
+    content: string;
     target_module: string;
-    validated: boolean;
-    normalized_inputs: Record<string, any>;
-    validation_flags: string[];
-    execution_graph?: {
-        nodes: any[];
-        edges: any[];
-    };
-    visualization?: {
-        type: 'none' | '2D' | '3D';
-        engine: string;
-        params: any;
-    };
-    ui_message: string;
 }
 
 interface IntelligenceResponse {
     type: IntentType;
     content: string;
     action?: () => void;
-    payload?: BModelResponse;
 }
 
 const KNOWLEDGE_BASE = {
     TR: {
-        identity: "Ben AluCalc OS Yerel Zeka Çekirdeğiyim. B-Model (Orkestrasyon) prensibiyle çalışıyorum. Niyetinizi anlayıp ilgili mühendislik modülüne yönlendirebilirim.",
-        hardware: "Sistem: AluCalc OS v3.0 | Çekirdek: B-Model Orchestrator | Durum: Hibrit (Yerel/Bulut) | Bellek: Optimize Edildi.",
         unknown: "Niyetinizi tam olarak belirleyemedim. Lütfen 'çizim aç', 'sehim hesabı yap' gibi komutlar verin veya sistem navigasyonunda yardım isteyin.",
         routing: (module: string) => `${module} modülü niyetiniz üzerine başlatılıyor...`,
     },
     EN: {
-        identity: "I am the AluCalc OS Local Intelligence Core. Running on B-Model Orchestration principles. I interpret engineering intent and route to deterministic modules.",
-        hardware: "System: AluCalc OS v3.0 | Core: B-Model Orchestrator | Status: Hybrid (Local/Cloud) | Memory: Optimized.",
         unknown: "Intent could not be determined. Please use commands like 'open CAD', 'calculate deflection', or ask for system help.",
         routing: (module: string) => `Initializing ${module} module based on your intent...`,
     }
@@ -53,87 +36,64 @@ export function useLocalIntelligence() {
     const processQuery = useCallback(async (query: string): Promise<IntelligenceResponse> => {
         setIsProcessing(true);
 
-        const normalize = (text: string) => text.toLowerCase().trim();
-        const input = normalize(query);
-        const isTurkish = /[çşğüöı]/.test(input) || currentLanguage === 'tr';
+        const isTurkish = /[çşğüöı]/.test(query.toLowerCase()) || currentLanguage === 'tr';
         const langInfo = isTurkish ? KNOWLEDGE_BASE.TR : KNOWLEDGE_BASE.EN;
 
-        // In a real implementation with AI SDK, we would call:
-        // const { object } = await generateObject({ model, system: CORE_SYSTEM_PROMPT, prompt: input, schema: BModelSchema });
-        // For now, we simulate the B-Model Orchestrator logic locally
+        const prompt = `You are "AluCalc Intelligence Copilot", an expert engineering, manufacturing, and CAD AI assistant.
+User Query: "${query}"
+Response Language: ${isTurkish ? 'Turkish' : 'English'}
+
+Your task is to analyze the intent and provide a direct, factual response.
+
+RULES:
+1. CALCULATION/CHAT: If the user asks an engineering question (e.g., standard part dimensions, material properties, formulas), you MUST provide the ACTUAL numbers, formulas, and exact data directly in the 'content'. DO NOT roleplay that you are "scanning databases" or "checking metadata". DO NOT use generic boilerplate like "Hemen anladım, tarama yapıyorum". Act as a real assistant and give the direct technical answer using your internal knowledge. Use markdown formatting.
+2. NAVIGATION: If the user explicitly asks to open, launch, or navigate to a module or app, set 'target_module' to the corresponding string from the list below, and set 'content' to a brief confirmation message.
+3. If it's a general greeting, respond professionally as an engineering AI.
+
+Valid module list for 'target_module' (use 'none' if no navigation is requested):
+- CAD/Manufacturing: 'manufacturing-sandbox', 'parametric-cad', 'cad-editor', 'nesting-2d', 'sheet-metal', 'cutting-optimizer', 'welding', 'fasteners'
+- Civil/Mechanical: 'beam-deflection', 'strength-analysis', 'profile-weight', 'reducer-lubrication', 'gears-bearings', 'bearings', 'fits-tolerances', 'thermal-expansion', 'pumps'
+- Science/Electrical: 'ohms-law', 'voltage-drop', 'periodic-table', 'unit-converter', 'calculator'
+- Finance/Other: 'cost-estimator', 'vat-calculator', 'materials-db', 'handbook', 'engineering-selection'
+- OS Tools: 'file-explorer', 'browser', 'paint', 'terminal', 'json-formatter', 'regex-tester'`;
+
+        const schema = `{ "type": "NAVIGATION" | "CALCULATION" | "CHAT" | "UNKNOWN", "content": "string", "target_module": "string (from valid list) or 'none'" }`;
 
         let response: IntelligenceResponse = {
             type: 'UNKNOWN',
             content: langInfo.unknown
         };
 
-        // --- B-MODEL ORCHESTRATION LOGIC (Deterministic Routing) ---
+        const aiResult = await generateStructuredJSON<AIIntentResponse>(prompt, schema);
 
-        // 1. NAVIGATION MAPPINGS
-        const navMap: Record<string, { module: ModuleType; titles: string[] }> = {
-            'cad': { module: 'nesting-2d', titles: ['cad', 'çizim', 'draw', 'nesting'] },
-            'calc': { module: 'calculator', titles: ['calculator', 'hesap makinesi', 'standart'] },
-            'files': { module: 'file-explorer', titles: ['file', 'dosya', 'explorer'] },
-            'browser': { module: 'browser', titles: ['browser', 'tarayıcı', 'internet'] },
-            'paint': { module: 'paint', titles: ['paint', 'çiz', 'boya', 'creative'] },
-            'weight': { module: 'profile-weight', titles: ['profile', 'profil', 'weight', 'ağırlık'] },
-            'beam': { module: 'beam-deflection', titles: ['beam', 'kiriş', 'deflection', 'sehim'] },
-            'units': { module: 'unit-converter', titles: ['unit', 'birim', 'çevir', 'convert'] },
-        };
+        if (aiResult) {
+            response.type = aiResult.type;
+            response.content = aiResult.content;
 
-        for (const [key, data] of Object.entries(navMap)) {
-            if (data.titles.some(t => input.includes(t))) {
-                response = {
-                    type: 'NAVIGATION',
-                    content: langInfo.routing(data.module),
-                    action: () => openWindow(data.module)
-                };
-                break;
+            if (aiResult.target_module && aiResult.target_module !== 'none') {
+                response.action = () => openWindow(aiResult.target_module as ModuleType);
             }
-        }
+        } else {
+            // Fallback to basic regex if AI API fails or is missing key
+            const normalize = (text: string) => text.toLowerCase().trim();
+            const input = normalize(query);
 
-        // 2. STATUS / IDENTITY
-        if (response.type === 'UNKNOWN') {
-            if (input.includes('system') || input.includes('sistem') || input.includes('version')) {
-                response = { type: 'HARDWARE', content: langInfo.hardware };
-            } else if (input.includes('who are you') || input.includes('help') || input.includes('kimsin') || input.includes('yardım')) {
-                response = { type: 'IDENTITY', content: langInfo.identity };
-            }
-        }
-
-        // 3. COMPLEX INTENT SIMULATION (B-Model Payload)
-        // If query looks like an engineering intent (has numbers and units)
-        if (/\d+/.test(input) && (input.includes('mm') || input.includes('cm') || input.includes('kg') || input.includes('m'))) {
-            // Mocking a successful B-Model orchestration payload
-            response = {
-                type: 'ORCHESTRATION',
-                content: isTurkish ? "Mühendislik niyeti saptandı. Parametreler normalize ediliyor..." : "Engineering intent detected. Normalizing parameters...",
-                payload: {
-                    status: 'success',
-                    intent: 'calculation',
-                    target_module: input.includes('bend') || input.includes('büküm') ? 'src/calculators/sheet_metal' : 'src/calculators/general',
-                    validated: true,
-                    normalized_inputs: {
-                        raw_query: query,
-                        detected_units: 'SI'
-                    },
-                    validation_flags: [],
-                    ui_message: isTurkish ? "Hesaplama modülü hazır." : "Calculation module ready."
-                }
-            };
-
-            // Auto-route based on mock orchestration
-            if (input.includes('bend') || input.includes('büküm')) {
-                response.action = () => openWindow('profile-weight'); // Correct module would go here
+            if (input.includes('cad') || input.includes('çizim')) {
+                response.content = langInfo.routing('cad-editor');
+                response.action = () => openWindow('cad-editor');
+            } else if (input.includes('kiriş') || input.includes('beam')) {
+                response.content = langInfo.routing('beam-deflection');
+                response.action = () => openWindow('beam-deflection');
+            } else {
+                response.content = langInfo.unknown;
             }
         }
 
         // Execute action if present
         if (response.action) {
-            setTimeout(response.action, 500);
+            setTimeout(response.action, 800);
         }
 
-        await new Promise(resolve => setTimeout(resolve, 400)); // Simulating AI thinking delay
         setIsProcessing(false);
         return response;
     }, [openWindow, currentLanguage]);

@@ -1,0 +1,34 @@
+{
+  "id": "conduction-heat-transfer-explained",
+  "title": "Conduction Heat Transfer Explained - AluCalc Engineering",
+  "slug": "conduction-heat-transfer-explained",
+  "keyword": "conduction heat transfer explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Conduction Heat Transfer Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional conduction heat transfer explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Conduction Heat Transfer Explained",
+    "intro": "Comprehensive engineering guide for conduction heat transfer explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for conduction heat transfer)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for conduction heat transfer.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Conduction Heat Transfer is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical conduction heat transfer scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "heat-transfer-calculator",
+    "convection-heat-transfer-calculator",
+    "radiation-heat-transfer-calculator",
+    "thermal-expansion-calculator",
+    "conduction-heat-transfer-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

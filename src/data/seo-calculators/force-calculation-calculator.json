@@ -1,0 +1,34 @@
+{
+  "id": "force-calculation-calculator",
+  "title": "Force Calculation Calculator - AluCalc Engineering",
+  "slug": "force-calculation-calculator",
+  "keyword": "force calculation calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Force Calculation Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional force calculation calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Force Calculation Calculator",
+    "intro": "Comprehensive engineering guide for force calculation calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for force calculation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for force calculation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Force Calculation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical force calculation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "velocity-calculation-calculator",
+    "acceleration-calculation-calculator",
+    "kinetic-energy-calculator",
+    "potential-energy-calculator",
+    "force-calculation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

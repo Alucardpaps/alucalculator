@@ -1,0 +1,24 @@
+{
+  "id": "rc-filter",
+  "category": "electrical",
+  "title": "RC Filter",
+  "slug": "rc-filter",
+  "meta": {
+    "title": "Filter | AluCalc",
+    "description": "Low-pass cut-off."
+  },
+  "seo": {
+    "h1": "RC Filter Cut-off Freq",
+    "intro": "Signal smoothing.",
+    "formula": "fc = 1/2πRC",
+    "variables": {
+      "fc": "Cut"
+    },
+    "practical": "Digitizing.",
+    "example": "Remove noise."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

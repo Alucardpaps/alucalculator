@@ -5,38 +5,58 @@
  * Manages spatial indexing and shape registry.
  */
 
+import { QuadtreeIndex } from './QuadtreeIndex';
+import { Rect } from './ISpatialIndex';
+
 export interface Shape {
     id: string;
     type: string;
     x: number;
     y: number;
+    width?: number;
+    height?: number;
     rotation?: number;
     selected?: boolean;
     [key: string]: any; // Flexible props
 }
 
 export class Scene {
-    shapes: Map<string, Shape> = new Map();
+    private shapes: Map<string, Shape> = new Map();
+    private spatialIndex: QuadtreeIndex<string>;
 
     // Z-Index order (array of IDs)
-    order: string[] = [];
+    private order: string[] = [];
 
-    constructor() { }
+    constructor() {
+        this.spatialIndex = new QuadtreeIndex();
+    }
+
+    private getBounds(shape: Shape): Rect {
+        return {
+            x: shape.x,
+            y: shape.y,
+            width: shape.width || 100,
+            height: shape.height || 100
+        };
+    }
 
     addShape(shape: Shape) {
         this.shapes.set(shape.id, shape);
         this.order.push(shape.id);
+        this.spatialIndex.insert(shape.id, this.getBounds(shape), shape.id);
     }
 
     removeShape(id: string) {
         this.shapes.delete(id);
         this.order = this.order.filter(oid => oid !== id);
+        this.spatialIndex.remove(id);
     }
 
     updateShape(id: string, updates: Partial<Shape>) {
         const shape = this.shapes.get(id);
         if (shape) {
             Object.assign(shape, updates);
+            this.spatialIndex.update(id, this.getBounds(shape), id);
         }
     }
 
@@ -45,26 +65,28 @@ export class Scene {
     }
 
     /**
-     * Hit Test (Simple bounding box for now)
+     * Hit Test Optimized via Quadtree
      * Returns top-most shape at world coordinates
      */
     hitTest(x: number, y: number): Shape | null {
-        // Iterate in reverse order (top to bottom)
-        for (let i = this.order.length - 1; i >= 0; i--) {
-            const shape = this.shapes.get(this.order[i]);
-            if (!shape) continue;
+        // 1. Query spatial index for candidate shapes in a 1x1 area
+        const candidates = this.spatialIndex.query({ x, y, width: 1, height: 1 });
+        
+        if (candidates.length === 0) return null;
 
-            // Simple Box hit test logic (assumes width/height exist on shape)
-            // Real engine usage would delegate to ShapeType.hitTest
-            const w = shape.width || 100; // Default or prop
-            const h = shape.height || 100;
+        // 2. Resolve z-index priority (highest index in order array is top)
+        let topShape: Shape | null = null;
+        let maxIndex = -1;
 
-            if (x >= shape.x && x <= shape.x + w &&
-                y >= shape.y && y <= shape.y + h) {
-                return shape;
+        for (const id of candidates) {
+            const index = this.order.indexOf(id);
+            if (index > maxIndex) {
+                maxIndex = index;
+                topShape = this.shapes.get(id) || null;
             }
         }
-        return null;
+
+        return topShape;
     }
 
     getAllShapes() {

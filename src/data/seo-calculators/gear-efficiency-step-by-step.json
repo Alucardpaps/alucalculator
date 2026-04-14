@@ -1,0 +1,34 @@
+{
+  "id": "gear-efficiency-step-by-step",
+  "title": "Gear Efficiency Step By Step - AluCalc Engineering",
+  "slug": "gear-efficiency-step-by-step",
+  "keyword": "gear efficiency step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Gear Efficiency Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional gear efficiency step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Efficiency Step By Step",
+    "intro": "Comprehensive engineering guide for gear efficiency step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear efficiency)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear efficiency.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Efficiency is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear efficiency scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-ratio-calculator",
+    "gear-module-calculator",
+    "gear-pitch-calculator",
+    "gear-design-calculator",
+    "gear-efficiency-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

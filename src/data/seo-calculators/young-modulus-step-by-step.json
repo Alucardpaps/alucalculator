@@ -1,0 +1,34 @@
+{
+  "id": "young-modulus-step-by-step",
+  "title": "Young Modulus Step By Step - AluCalc Engineering",
+  "slug": "young-modulus-step-by-step",
+  "keyword": "young modulus step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Young Modulus Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional young modulus step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Young Modulus Step By Step",
+    "intro": "Comprehensive engineering guide for young modulus step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for young modulus)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for young modulus.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Young Modulus is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical young modulus scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "stress-strain-calculator",
+    "shear-modulus-calculator",
+    "poisson-ratio-calculator",
+    "yield-strength-calculator",
+    "young-modulus-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "fatigue-life-formula",
+  "title": "Fatigue Life Formula - AluCalc Engineering",
+  "slug": "fatigue-life-formula",
+  "keyword": "fatigue life formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Fatigue Life Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional fatigue life formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Fatigue Life Formula",
+    "intro": "Comprehensive engineering guide for fatigue life formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for fatigue life)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for fatigue life.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Fatigue Life is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical fatigue life scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "stress-strain-calculator",
+    "young-modulus-calculator",
+    "shear-modulus-calculator",
+    "poisson-ratio-calculator",
+    "fatigue-life-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

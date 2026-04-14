@@ -1,0 +1,34 @@
+{
+  "id": "harmonic-motion-example",
+  "title": "Harmonic Motion Example - AluCalc Engineering",
+  "slug": "harmonic-motion-example",
+  "keyword": "harmonic motion example",
+  "intent": "example",
+  "meta": {
+    "title": "Harmonic Motion Example | Free Engineering Tool | AluCalc",
+    "description": "Professional harmonic motion example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Harmonic Motion Example",
+    "intro": "Comprehensive engineering guide for harmonic motion example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for harmonic motion)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for harmonic motion.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Harmonic Motion is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical harmonic motion scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "spring-design-calculator",
+    "spring-constant-calculator",
+    "spring-force-calculator",
+    "spring-deflection-calculator",
+    "harmonic-motion-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

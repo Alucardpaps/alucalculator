@@ -1,0 +1,34 @@
+{
+  "id": "beam-stiffness-explained",
+  "title": "Beam Stiffness Explained - AluCalc Engineering",
+  "slug": "beam-stiffness-explained",
+  "keyword": "beam stiffness explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Beam Stiffness Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional beam stiffness explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Beam Stiffness Explained",
+    "intro": "Comprehensive engineering guide for beam stiffness explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for beam stiffness)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for beam stiffness.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Beam Stiffness is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical beam stiffness scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "beam-deflection-calculator",
+    "beam-load-calculator",
+    "beam-stress-calculator",
+    "bending-moment-calculator",
+    "beam-stiffness-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

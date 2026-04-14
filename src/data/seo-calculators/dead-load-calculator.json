@@ -1,0 +1,34 @@
+{
+  "id": "dead-load-calculator",
+  "title": "Dead Load Calculator - AluCalc Engineering",
+  "slug": "dead-load-calculator",
+  "keyword": "dead load calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Dead Load Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional dead load calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Dead Load Calculator",
+    "intro": "Comprehensive engineering guide for dead load calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for dead load)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for dead load.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Dead Load is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical dead load scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "truss-analysis-calculator",
+    "frame-analysis-calculator",
+    "structural-load-calculator",
+    "wind-load-calculator",
+    "dead-load-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

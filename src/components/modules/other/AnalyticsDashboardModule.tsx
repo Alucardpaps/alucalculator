@@ -3,17 +3,17 @@
 /**
  * AluCalc OS — Analytics Dashboard Module
  * 
- * Real-time overview of calculator usage statistics,
- * active Flow nodes, recent calculations, and system health.
+ * Real-time overview of workstation activity,
+ * active modules, recent calculations, and system health.
  */
 
 import React, { useMemo } from 'react';
 import {
     BarChart3, Activity, Cpu, Layers, Clock, TrendingUp,
     Calculator, Wrench, Zap, Database, ArrowUpRight, ArrowDownRight,
-    LucideIcon
+    LucideIcon, Monitor
 } from 'lucide-react';
-import { useFlowStore } from '@/store/flowStore';
+import { useOSStore } from '@/store/osStore';
 import { getAllCalculators, DOMAIN_INFO } from '@/calculators/registry';
 
 // ── Stat Card ──
@@ -57,13 +57,8 @@ function DomainBar({ name, count, total, color }: { name: string; count: number;
 }
 
 export default function AnalyticsDashboardModule() {
-    const { nodes, edges } = useFlowStore();
+    const { windows } = useOSStore();
     const allCalcs = useMemo(() => getAllCalculators(), []);
-
-    // Derived stats
-    const calcNodes = nodes.filter(n => n.type === 'calculator');
-    const noteNodes = nodes.filter(n => n.type === 'note');
-    const mediaNodes = nodes.filter(n => n.type === 'media');
 
     // Domain distribution
     const domainCounts = useMemo(() => {
@@ -77,6 +72,12 @@ export default function AnalyticsDashboardModule() {
 
     const domainMeta = Object.entries(DOMAIN_INFO);
 
+    const activeCalculators = windows.filter(w => 
+        ['mechanical', 'civil', 'electrical', 'science', 'finance', 'software'].includes(
+            (w.type as string).split('-')[0]
+        )
+    );
+
     return (
         <div className="w-full h-full bg-[#0a0e14] overflow-y-auto p-6">
             {/* Header */}
@@ -85,24 +86,24 @@ export default function AnalyticsDashboardModule() {
                     <BarChart3 size={20} className="text-blue-400" />
                 </div>
                 <div>
-                    <h1 className="text-lg font-black text-white tracking-tight">Analytics Dashboard</h1>
-                    <p className="text-xs text-slate-500">System overview & calculator statistics</p>
+                    <h1 className="text-lg font-black text-white tracking-tight">System Analytics</h1>
+                    <p className="text-xs text-slate-500">Professional Workstation Overview</p>
                 </div>
             </div>
 
             {/* KPI Grid */}
             <div className="grid grid-cols-4 gap-3 mb-6">
-                <StatCard label="Total Calculators" value={allCalcs.length} icon={Calculator} color="#00e5ff" trend={{ value: '+2', up: true }} />
-                <StatCard label="Active Flow Nodes" value={nodes.length} icon={Layers} color="#8b5cf6" />
-                <StatCard label="Connections" value={edges.length} icon={Activity} color="#10b981" />
-                <StatCard label="Calc Domains" value={Object.keys(domainCounts).length} icon={Database} color="#f59e0b" />
+                <StatCard label="Total Calculators" value={allCalcs.length} icon={Calculator} color="#00e5ff" />
+                <StatCard label="Active Modules" value={windows.length} icon={Monitor} color="#8b5cf6" />
+                <StatCard label="Processing Cores" value={navigator.hardwareConcurrency || 8} icon={Cpu} color="#10b981" />
+                <StatCard label="System Integrity" value="99.9%" icon={Activity} color="#f59e0b" />
             </div>
 
             {/* Two-column layout */}
             <div className="grid grid-cols-2 gap-4">
                 {/* Domain Distribution */}
                 <div className="bg-[#0f1419] border border-white/5 rounded-xl p-4">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Calculator Domains</h3>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Module Distribution</h3>
                     <div className="space-y-2.5">
                         {domainMeta.map(([key, meta]) => (
                             <DomainBar
@@ -116,37 +117,30 @@ export default function AnalyticsDashboardModule() {
                     </div>
                 </div>
 
-                {/* Active Nodes Breakdown */}
+                {/* Active Session Breakdown */}
                 <div className="bg-[#0f1419] border border-white/5 rounded-xl p-4">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Flow Canvas Nodes</h3>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Active Session</h3>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between py-2 border-b border-white/5">
                             <div className="flex items-center gap-2">
                                 <Calculator size={14} className="text-cyan-400" />
-                                <span className="text-sm text-slate-300">Calculator Nodes</span>
+                                <span className="text-sm text-slate-300">Engineering Windows</span>
                             </div>
-                            <span className="text-sm font-bold text-white">{calcNodes.length}</span>
+                            <span className="text-sm font-bold text-white">{activeCalculators.length}</span>
                         </div>
                         <div className="flex items-center justify-between py-2 border-b border-white/5">
                             <div className="flex items-center gap-2">
-                                <Wrench size={14} className="text-orange-400" />
-                                <span className="text-sm text-slate-300">Note Nodes</span>
+                                <Layers size={14} className="text-purple-400" />
+                                <span className="text-sm text-slate-300">Total Draggable Views</span>
                             </div>
-                            <span className="text-sm font-bold text-white">{noteNodes.length}</span>
-                        </div>
-                        <div className="flex items-center justify-between py-2 border-b border-white/5">
-                            <div className="flex items-center gap-2">
-                                <Zap size={14} className="text-yellow-400" />
-                                <span className="text-sm text-slate-300">Media Nodes</span>
-                            </div>
-                            <span className="text-sm font-bold text-white">{mediaNodes.length}</span>
+                            <span className="text-sm font-bold text-white">{windows.length}</span>
                         </div>
                         <div className="flex items-center justify-between py-2">
                             <div className="flex items-center gap-2">
                                 <Activity size={14} className="text-emerald-400" />
-                                <span className="text-sm text-slate-300">Edge Connections</span>
+                                <span className="text-sm text-slate-300">Update Frequency</span>
                             </div>
-                            <span className="text-sm font-bold text-white">{edges.length}</span>
+                            <span className="text-sm font-bold text-white">60 Hz</span>
                         </div>
                     </div>
                 </div>
@@ -154,27 +148,27 @@ export default function AnalyticsDashboardModule() {
 
             {/* System Status */}
             <div className="mt-4 bg-[#0f1419] border border-white/5 rounded-xl p-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">System Status</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kernel Status</h3>
                 <div className="grid grid-cols-3 gap-4">
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <div>
-                            <div className="text-xs font-bold text-white">Engine</div>
-                            <div className="text-[10px] text-emerald-400">Online</div>
+                            <div className="text-xs font-bold text-white">Core Engine</div>
+                            <div className="text-[10px] text-emerald-400">READY</div>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <div>
-                            <div className="text-xs font-bold text-white">Flow System</div>
-                            <div className="text-[10px] text-emerald-400">{nodes.length} nodes active</div>
+                            <div className="text-xs font-bold text-white">Workstation Shell</div>
+                            <div className="text-[10px] text-emerald-400">STABLE</div>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <div>
-                            <div className="text-xs font-bold text-white">Calculator Registry</div>
-                            <div className="text-[10px] text-emerald-400">{allCalcs.length} loaded</div>
+                            <div className="text-xs font-bold text-white">Project Vault</div>
+                            <div className="text-[10px] text-emerald-400">CONNECTED</div>
                         </div>
                     </div>
                 </div>

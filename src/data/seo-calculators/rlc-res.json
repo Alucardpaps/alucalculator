@@ -1,0 +1,24 @@
+{
+  "id": "rlc-res",
+  "category": "electrical",
+  "title": "RLC Res",
+  "slug": "rlc-res",
+  "meta": {
+    "title": "RLC | AluCalc",
+    "description": "Tuned freq and Q."
+  },
+  "seo": {
+    "h1": "RLC Resonance Calc",
+    "intro": "Filter design freq.",
+    "formula": "f = 1/2π√LC",
+    "variables": {
+      "L": "H"
+    },
+    "practical": "Radios.",
+    "example": "Tuner circuits."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

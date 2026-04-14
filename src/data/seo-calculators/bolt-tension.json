@@ -1,0 +1,24 @@
+{
+  "id": "bolt-tension",
+  "category": "structural",
+  "title": "Bolt Tension",
+  "slug": "bolt-tension",
+  "meta": {
+    "title": "Preload | AluCalc",
+    "description": "Bolt tensioning force."
+  },
+  "seo": {
+    "h1": "Fastener Preload Calc",
+    "intro": "Clamp force security.",
+    "formula": "Fp = f(T)",
+    "variables": {
+      "Fp": "Force"
+    },
+    "practical": "Engines.",
+    "example": "Hydraulic tension."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

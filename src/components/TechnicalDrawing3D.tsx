@@ -1,11 +1,11 @@
 "use client";
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera, Stage, Center, Environment } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Stage, Center, Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from 'three';
 import ClientOnly from "./ClientOnly";
-import { MetalShape } from "@/hooks/useWeightCalculator";
 import React, { useMemo } from "react";
+import { usePartStore } from "@/store/usePartStore";
 
 class CustomHelixCurve extends THREE.Curve<THREE.Vector3> {
     constructor(public radius: number, public height: number, public turns: number, public taper: number = 0) {
@@ -21,6 +21,8 @@ class CustomHelixCurve extends THREE.Curve<THREE.Vector3> {
         return optionalTarget.set(x, y, z);
     }
 }
+
+import { MetalShape } from "@/hooks/useWeightCalculator";
 
 interface TechnicalDrawing3DProps {
     shape: MetalShape | 'gear' | 'bearing' | 'fastener';
@@ -230,13 +232,26 @@ export const TechnicalDrawing3D = ({ shape, inputs }: TechnicalDrawing3DProps) =
         return ['box', 'sheet', 'pipe', 'bar', 'hex', 'angle', 'beam', 'channel', 'tee'].includes(shape as string);
     }, [shape]);
 
-    // Material for standard profiles
-    const material = new THREE.MeshStandardMaterial({
-        color: "#e2e8f0",
-        roughness: 0.4,
-        metalness: 0.6,
-        side: THREE.DoubleSide
-    });
+    // Material with Clipping Planes support
+    const { sectionX, sectionY, sectionZ, isSectionActive, visibleComponents } = usePartStore();
+    
+    const clippingPlanes = useMemo(() => {
+        if (!isSectionActive) return [];
+        return [
+            new THREE.Plane(new THREE.Vector3(-1, 0, 0), sectionX * 500 - 250),
+            new THREE.Plane(new THREE.Vector3(0, -1, 0), sectionY * 500 - 250),
+            new THREE.Plane(new THREE.Vector3(0, 0, -1), sectionZ * 500 - 250),
+        ];
+    }, [isSectionActive, sectionX, sectionY, sectionZ]);
+
+    const material = useMemo(() => new THREE.MeshStandardMaterial({
+        color: "#1a202c", // Black Oxide Base
+        roughness: 0.85,  // Matte
+        metalness: 0.3,   // Subtle Metallic Sheen
+        side: THREE.DoubleSide,
+        clippingPlanes: clippingPlanes,
+        clipShadows: true
+    }), [clippingPlanes]);
 
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [isExporting, setIsExporting] = React.useState(false);
@@ -263,21 +278,32 @@ export const TechnicalDrawing3D = ({ shape, inputs }: TechnicalDrawing3DProps) =
     const [exportTrigger, setExportTrigger] = React.useState(0);
 
     return (
-        <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-slate-100 rounded-2xl animate-pulse" />}>
-            <div className="w-full h-full min-h-[300px] cursor-move bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl overflow-hidden relative group">
-                <Canvas shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
+        <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-[#0a1018] rounded-2xl animate-pulse border border-white/5" />}>
+            <div className={`w-full h-full min-h-[300px] relative z-10 transition-colors duration-700 bg-transparent group cursor-move rounded-2xl overflow-hidden`}>
+                <Canvas shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }} gl={{ preserveDrawingBuffer: true, antialias: true, alpha: false }}>
+                    <color attach="background" args={['#03060a']} />
                     <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={40} />
                     <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
                         <Center>
-                            {isStandardProfile && <StandardProfile inputs={inputs} shape={shape as MetalShape} material={material} />}
-                            {shape === 'gear' && <GearAssembly inputs={inputs} />}
-                            {shape === 'bearing' && <BearingAssembly inputs={inputs} />}
-                            {shape === 'fastener' && <FastenerAssembly inputs={inputs} />}
+                            {isStandardProfile && (visibleComponents.includes('all') || visibleComponents.includes('main')) && (
+                                <StandardProfile inputs={inputs} shape={shape as MetalShape} material={material} />
+                            )}
+                            {shape === 'gear' && (visibleComponents.includes('all') || visibleComponents.includes('gears')) && (
+                                <GearAssembly inputs={inputs} material={material} />
+                            )}
+                            {shape === 'bearing' && (visibleComponents.includes('all') || visibleComponents.includes('bearing')) && (
+                                <BearingAssembly inputs={inputs} material={material} />
+                            )}
+                            {shape === 'fastener' && (visibleComponents.includes('all') || visibleComponents.includes('fastener')) && (
+                                <FastenerAssembly inputs={inputs} material={material} />
+                            )}
                         </Center>
                     </Stage>
-                    <OrbitControls autoRotate autoRotateSpeed={1} makeDefault />
-                    <Environment preset="apartment" />
-                    <ambientLight intensity={0.5} />
+                    <OrbitControls autoRotate autoRotateSpeed={0.5} makeDefault />
+                    <Environment preset="city" />
+                    <ambientLight intensity={0.4} />
+                    <spotLight position={[50, 50, 50]} angle={0.15} penumbra={1} intensity={1} castShadow />
+                    <ContactShadows opacity={0.6} scale={20} blur={2.5} far={10} resolution={256} color="#000000" />
 
                     <SceneExporter trigger={exportTrigger} onExportEnd={() => setIsExporting(false)} />
                 </Canvas>
@@ -310,17 +336,43 @@ export const TechnicalDrawing3D = ({ shape, inputs }: TechnicalDrawing3DProps) =
 };
 
 // --- EXPORTER HELPER ---
-const SceneExporter = ({ trigger, onExportEnd }: { trigger: number, onExportEnd: () => void }) => {
-    const { scene } = useThree(); // Wait, need to import useThree
+const SceneExporter = ({ trigger, onExportEnd }: { trigger: number | 'stl', onExportEnd: () => void }) => {
+    const { scene } = useThree();
 
     React.useEffect(() => {
-        if (trigger > 0) {
-            // @ts-ignore
-            import('three/examples/jsm/exporters/GLTFExporter').then(({ GLTFExporter }) => {
+        if (trigger === 0) return;
+
+        if (trigger === 'stl') {
+            // STL Export Logic
+            import('three/examples/jsm/exporters/STLExporter.js').then(({ STLExporter }) => {
+                const exporter = new STLExporter();
+                const result = exporter.parse(scene, { binary: true });
+                const blob = new Blob([result], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'model.stl';
+                link.click();
+                URL.revokeObjectURL(url);
+                onExportEnd();
+            });
+            return;
+        }
+
+        if (typeof trigger === 'number' && trigger > 0) {
+            // GLTF Export Logic (existing)
+            import('three/examples/jsm/exporters/GLTFExporter.js').then(({ GLTFExporter }) => {
                 const exporter = new GLTFExporter();
+                const prevEnv = scene.environment;
+                const prevBg = scene.background;
+                scene.environment = null;
+                scene.background = null;
+
                 exporter.parse(
                     scene,
                     (gltf: any) => {
+                        scene.environment = prevEnv;
+                        scene.background = prevBg;
                         const blob = new Blob([JSON.stringify(gltf)], { type: 'application/json' });
                         const url = URL.createObjectURL(blob);
                         const link = document.createElement('a');
@@ -331,7 +383,9 @@ const SceneExporter = ({ trigger, onExportEnd }: { trigger: number, onExportEnd:
                         onExportEnd();
                     },
                     (err: any) => {
-                        console.error('An error happened', err);
+                        scene.environment = prevEnv;
+                        scene.background = prevBg;
+                        console.error('GLTF Export Error', err);
                         onExportEnd();
                     },
                     { binary: false }
@@ -369,7 +423,7 @@ const StandardProfile = ({ inputs, shape, material }: { inputs: any, shape: Meta
 }
 
 // --- GEAR ASSEMBLY ---
-const GearAssembly = ({ inputs }: { inputs: any }) => {
+const GearAssembly = ({ inputs, material }: { inputs: any, material: THREE.Material }) => {
     // Inputs: z1, z2, module, helixAngle?
     const z1 = Math.max(parseInt(inputs?.z1) || 20, 5);
     const z2 = Math.max(parseInt(inputs?.z2) || 40, 5);
@@ -440,9 +494,11 @@ const GearAssembly = ({ inputs }: { inputs: any }) => {
         </group>
     );
 }
+// Note: GearAssembly above doesn't use the 'material' prop yet for individual teeth. 
+// Let's refactor GearMesh to support the shared material if clipping is needed.
 
 // --- BEARING ASSEMBLY ---
-const BearingAssembly = ({ inputs }: { inputs: any }) => {
+const BearingAssembly = ({ inputs, material }: { inputs: any, material: THREE.Material }) => {
     // Inputs: OD, ID, width (B), type
     const od = Math.max(parseFloat(inputs?.outerDiameter || inputs?.od) || 80, 20);
     const id = Math.max(parseFloat(inputs?.innerDiameter || inputs?.id) || 40, 10);
@@ -559,7 +615,7 @@ const BearingAssembly = ({ inputs }: { inputs: any }) => {
 
 // --- FASTENER ASSEMBLY ---
 // --- FASTENER ASSEMBLY ---
-const FastenerAssembly = ({ inputs }: { inputs: any }) => {
+const FastenerAssembly = ({ inputs, material }: { inputs: any, material: THREE.Material }) => {
     // Determine Unit (Metric default)
     const isInch = inputs?.unit === 'inch' || inputs?.unit === 'in' || inputs?.standard?.includes('UNC') || inputs?.standard?.includes('UNF');
 
@@ -691,9 +747,9 @@ const FastenerAssembly = ({ inputs }: { inputs: any }) => {
         const tubeRadius = useMemo(() => safePitch * 0.45, [safePitch]);
 
         const tubeParams = useMemo(() => ({
-            tubularSegments: Math.floor(Math.abs(turns) * 16),
-            radialSegments: isNPTFlag ? 3 : (isBSPTFlag ? 12 : 5)
-        }), [turns, isNPTFlag, isBSPTFlag]);
+            tubularSegments: Math.min(Math.floor(Math.abs(turns) * 12), 400), // OPTIMIZED FOR 60FPS
+            radialSegments: 3 // Sharp V-cut
+        }), [turns]);
 
         const geometry = useMemo(() =>
             new THREE.TubeGeometry(curve, tubeParams.tubularSegments, tubeRadius, tubeParams.radialSegments, false),
@@ -703,10 +759,12 @@ const FastenerAssembly = ({ inputs }: { inputs: any }) => {
         return (
             <mesh position={position} rotation={rotation as any} geometry={geometry}>
                 <meshStandardMaterial
-                    color={color}
-                    metalness={0.7}
-                    roughness={0.4}
-                    flatShading={isNPTFlag}
+                    color={color || "#6366f1"} // NEON BLUE ACCENT
+                    emissive={color || "#6366f1"}
+                    emissiveIntensity={0.5}
+                    metalness={0.8}
+                    roughness={0.2}
+                    flatShading={true}
                 />
             </mesh>
         );
@@ -740,7 +798,7 @@ const FastenerAssembly = ({ inputs }: { inputs: any }) => {
     // Nut Component
     const Nut = () => {
         const shape = useMemo(() => {
-            // Hexagon
+            // Hexagon with Rounded Chamfer
             const r = nutSize / 2;
             const s = new THREE.Shape();
             for (let i = 0; i < 6; i++) {
@@ -751,81 +809,105 @@ const FastenerAssembly = ({ inputs }: { inputs: any }) => {
                 else s.lineTo(x, y);
             }
             s.closePath();
-            // Hole
+            // Thread Hole (Inner Dia d1)
             const hole = new THREE.Path();
-            hole.absarc(0, 0, dia / 2 * 1.05, 0, Math.PI * 2, true);
+            hole.absarc(0, 0, dia / 2 * 0.9, 0, Math.PI * 2, true);
             s.holes.push(hole);
             return s;
         }, [nutSize, dia]);
 
         return (
-            <group position={type === 'nut' ? [0, 0, 0] : [0, -len / 2 + threadLen * 0.3, 0]}>
+            <group position={type === 'nut' ? [0, 0, 0] : [0, -len * 0.8, 0]}>
                 <mesh>
-                    <extrudeGeometry args={[shape, { depth: nutHeight, bevelEnabled: true, bevelSize: dia * 0.05, bevelThickness: dia * 0.05 }]} />
-                    <meshStandardMaterial color={bodyColor} metalness={0.5} roughness={0.3} side={THREE.DoubleSide} />
+                    <extrudeGeometry args={[shape, { 
+                        depth: nutHeight, 
+                        bevelEnabled: true, 
+                        bevelSize: dia * 0.08, 
+                        bevelThickness: dia * 0.08,
+                        bevelSegments: 4
+                    }]} />
+                    <meshStandardMaterial 
+                        color={"#a855f7"} // NEON PURPLE
+                        emissive={"#a855f7"}
+                        emissiveIntensity={0.4}
+                        metalness={0.7} 
+                        roughness={0.2} 
+                        side={THREE.DoubleSide} 
+                    />
                 </mesh>
 
-                {/* Machined Internal Threads for Nut - Match body color to look like part of same metal */}
+                {/* Machined Internal Threads for Nut */}
                 <GenericThreads
                     length={nutHeight}
-                    radius={dia / 2 * 1.05} // Thread inside the hole
+                    radius={dia / 2 * 0.9}
                     position={[0, 0, nutHeight / 2]}
-                    color={bodyColor} // Machined look
+                    color={"#a855f7"}
                     direction={-1}
                     rotation={[0, 0, 0]}
-                    isNPTFlag={isNPT}
-                    isBSPTFlag={isBSPT}
                 />
             </group>
         );
     };
 
+    const isExploded = inputs?.exploded === true;
+
     return (
         <group rotation={[Math.PI / 2, 0, 0]}> {/* Lay flat for view */}
 
-            {/* BOLT PARTS - Only if type is BOLT */}
-            {type === 'bolt' && (
-                <>
-                    {/* Hex Head */}
-                    <mesh position={[0, len / 2 + headHeight / 2, 0]}>
-                        <cylinderGeometry args={[headSize / 2, headSize / 2, headHeight, 6]} />
-                        <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.5} />
-                    </mesh>
-
-                    {/* Unthreaded Shank */}
-                    <mesh position={[0, (len / 2) - (len - threadLen) / 2, 0]}>
-                        <cylinderGeometry args={[dia / 2, dia / 2, len - threadLen, 32]} />
-                        <meshStandardMaterial color="#94a3b8" metalness={0.6} roughness={0.4} />
-                    </mesh>
-
-                    {/* Threads */}
-                    <Threads />
-
-                    {/* Chamfered Tip */}
-                    <mesh position={[0, -len / 2 - (dia * 0.1), 0]}>
-                        <cylinderGeometry args={[dia / 2 * 0.7, dia / 2 * 0.85, dia * 0.2, 32]} />
-                        <meshStandardMaterial color="#64748b" metalness={0.6} roughness={0.4} />
-                    </mesh>
-                </>
+            {/* GUIDE LINE (If exploded) */}
+            {isExploded && (
+                <line>
+                    <bufferGeometry>
+                        <bufferAttribute
+                            attach="attributes-position"
+                            args={[new Float32Array([0, len / 2, 0, 0, -len * 1.2, 0]), 3]}
+                            count={2}
+                        />
+                    </bufferGeometry>
+                    <lineDashedMaterial color="#3b82f6" opacity={0.3} transparent dashSize={2} gapSize={1} scale={1} />
+                </line>
             )}
 
-            {/* NUT - Show if Nut OR Bolt (show nut on bolt?) 
-                User said "Separate". 
-                If Bolt: Show JUST Bolt? User said "Civata ve Somun ayrı ayrı". 
-                Usually Civata implies "Bolt with Nut" in visuals, but let's strictly separate if requested.
-                However, existing code showed Nut on Bolt. 
-                "Civata" means Bolt. "Somun" means Nut.
-                Let's assume:
-                Bolt Tab -> Only Bolt.
-                Nut Tab -> Only Nut. 
-            */}
-            {type === 'nut' ? <Nut /> : (
-                // If Bolt mode, do we show nut? 
-                // "Civata ve Somunun ayrı ayrı 2d ve 3d resimleri olsun" -> Separate pictures.
-                // So Bolt view should likely NOT have the nut, or maybe purely Bolt.
-                // Let's render ONLY Bolt in Bolt mode.
-                null
-            )}
+            {/* BOLT PARTS */}
+            <group position={[0, isExploded ? len * 0.2 : 0, 0]}>
+                {/* Hex Head */}
+                <mesh position={[0, len / 2 + headHeight / 2, 0]}>
+                    <cylinderGeometry args={[headSize / 2, headSize / 2, headHeight, 6]} />
+                    <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.5} />
+                </mesh>
+
+                {/* Unthreaded Shank (Major Diameter) */}
+                <mesh position={[0, (len / 2) - (len - threadLen) / 2, 0]}>
+                    <cylinderGeometry args={[dia / 2, dia / 2, len - threadLen, 32]} />
+                    <meshStandardMaterial 
+                        color="#6366f1" 
+                        emissive="#6366f1"
+                        emissiveIntensity={0.2}
+                        metalness={0.9} 
+                        roughness={0.1} 
+                    />
+                </mesh>
+
+                {/* Threaded Region Core */}
+                <mesh position={[0, -len / 2 + threadLen / 2, 0]}>
+                    <cylinderGeometry args={[dia / 2 * 0.82, dia / 2 * 0.82, threadLen, 32]} />
+                    <meshStandardMaterial color="#0a0a0a" metalness={0.1} roughness={0.9} />
+                </mesh>
+
+                {/* Threads */}
+                <Threads />
+
+                {/* Chamfered Tip */}
+                <mesh position={[0, -len / 2 - (dia * 0.1), 0]}>
+                    <cylinderGeometry args={[dia / 2 * 0.7, dia / 2 * 0.85, dia * 0.2, 32]} />
+                    <meshStandardMaterial color="#64748b" metalness={0.6} roughness={0.4} />
+                </mesh>
+            </group>
+
+            {/* NUT (Separated if exploded) */}
+            <group position={[0, isExploded ? -len * 0.8 : -len / 2 + threadLen * 0.3, 0]}>
+                <Nut />
+            </group>
         </group>
     )
 }

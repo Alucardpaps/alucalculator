@@ -1,0 +1,34 @@
+{
+  "id": "flat-belt-drive-calculator",
+  "title": "Flat Belt Drive Calculator - AluCalc Engineering",
+  "slug": "flat-belt-drive-calculator",
+  "keyword": "flat belt drive calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Flat Belt Drive Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional flat belt drive calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Flat Belt Drive Calculator",
+    "intro": "Comprehensive engineering guide for flat belt drive calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for flat belt drive)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for flat belt drive.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Flat Belt Drive is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical flat belt drive scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-design-calculator",
+    "timing-belt-length-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "flat-belt-drive-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

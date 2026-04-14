@@ -201,6 +201,9 @@ export default {
         'periodic-table': { title: "Periodic Table" },
         'simulation-fea': { title: "FEA Simulation" },
         'manufacturing-sandbox': { title: "Mfg. Sandbox" },
+        'engineering-selection': { title: "Engineering Selection" },
+        'thermal-expansion': { title: "Thermal Expansion" },
+        'project-manager': { title: "Project BOM" },
 
         'profile-weight': { title: "Profile Weight" },
         'gears-bearings': { title: "Gear Calculator" },
@@ -232,6 +235,20 @@ export default {
         'welding-fillet': { title: "Fillet Weld Strength" },
         'welding-heat': { title: "Welding Heat Input" },
         'nesting': { title: "Nesting Tool" },
+        'cost-estimator': { title: "Real-Time Cost Engine" },
+        'manufacturing-readiness': { title: "Mfg Readiness Analyzer" },
+        'topology-optimization': { title: "Generative Design" },
+        'machine-assembly': { title: "Drag & Build Machine" },
+        'failure-prediction': { title: "Failure Predictor" },
+        'fluid-dynamics': { title: "Fluid Dynamics" },
+        'bolt-torque': { title: "Bolt Torque & Preload" },
+        'engineering-notes': { title: "Engineering Scratchpad" },
+        'physics-kinematics': { title: "Physics & Kinematics" },
+        'chemistry-reactions': { title: "Chemistry Lab" },
+        'biology-genetics': { title: "Biology & Genetics" },
+        'cs-algorithms': { title: "CS & Algorithms" },
+        'aerospace-dynamics': { title: "Aerospace Dynamics" },
+        'naval-hydrostatics': { title: "Naval Architecture" },
     } as Record<string, { title: string }>,
 
     // Node Palette Categories
@@ -261,9 +278,24 @@ export default {
         'welding': 'Weld throat & strength',
         'fasteners': 'Bolt torque & preload',
         'materials-db': 'Material properties',
+        'thermal-expansion': 'Thermal expansion & dimensional shift',
         'cutting-optimizer': 'Stock cutting efficiency',
         'music-player': 'Local & streaming audio',
         'belt-drive': 'Pulley & belt length calculation',
+        'cost-estimator': 'Predict manufacturing costs in real-time',
+        'manufacturing-readiness': 'Analyze part for CNC & 3D print readiness',
+        'topology-optimization': 'AI-driven generative geometry reduction',
+        'machine-assembly': 'Pre-built mechanical system libraries',
+        'failure-prediction': 'Stress and fatigue failure AI simulation',
+        'fluid-dynamics': 'Pipe flow, pressure drop & Reynolds number',
+        'bolt-torque': 'ISO standard fastening torque & preload calculator',
+        'engineering-notes': 'Floating scratchpad for rapid engineering notes',
+        'physics-kinematics': 'Projectile motion, trajectories and rigid body dynamics',
+        'chemistry-reactions': 'Reaction balancing and chemical computing',
+        'biology-genetics': 'DNA sequencing and bioinformatics assistant',
+        'cs-algorithms': 'Big-O calculations and algorithm visualization',
+        'aerospace-dynamics': 'Flight envelope and compressible flow modeling',
+        'naval-hydrostatics': 'Ship stability and hydrostatic curves computation',
     } as Record<string, string>,
 
     // Categories
@@ -271,7 +303,12 @@ export default {
         'mechanical': 'Mechanical',
         'structural': 'Structural',
         'utilities': 'Utilities',
-        'reference': 'Reference'
+        'reference': 'Reference',
+        'science': 'Sciences',
+        'software': 'Software',
+        'civil': 'Civil',
+        'finance': 'Finance',
+        'other': 'Other'
     } as Record<string, string>,
 
     // Ribbon Bar
@@ -490,6 +527,7 @@ export default {
 
     // General
     close: "Close",
+    closeAll: "Close All Apps",
     minimize: "Minimize",
     maximize: "Maximize",
     save: "Save",

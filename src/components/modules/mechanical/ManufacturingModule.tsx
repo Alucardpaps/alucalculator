@@ -6,8 +6,10 @@ import { exportGCode } from '@/lib/cam/gcode';
 import {
     FileCode, Flame, FoldHorizontal, Copy, Check, X,
     Sparkles, Gauge, Thermometer, Activity, Info,
-    Box, BookOpen, ExternalLink, Layers
+    Box, BookOpen, ExternalLink, Layers, Target,
+    Maximize2, Zap, Radio
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MATERIALS_DB } from '@/data/materialsData';
 import {
     MANUFACTURING_PATHS, SURFACE_FINISH_DB, SURFACE_COATING_DB,
@@ -156,62 +158,287 @@ function PhaseDiagram({ carbonContent }: { carbonContent?: number }) {
 }
 
 // ------------------------------------------------------------------
-// STRESS-STRAIN VISUALIZER
+// HELPERS & CONSTANTS
 // ------------------------------------------------------------------
 
-function StressStrainChart({ yieldStrength, tensileStrength, modulus, strainHardening = 0.2, strengthCoeff = 1000 }: {
+const getRecommendedProcessId = (materialName: string): string | null => {
+    const map: Record<string, string> = {
+        'AISI 1045 (Carbon)': 'q-water',
+        'AISI 4140 (Cr-Mo)': '4140-qo',
+        '6061-T6 (US Standard)': '6061-t6-aging',
+        'AISI 1018 (Mild)': '1018-cr',
+        'AISI 4340 (High St)': '4340-ht',
+        'SS 304 (Std)': '304-ann',
+        'Alu 7075-T6': '7075-t6',
+        'Titanium Gr5': 'ti-ann',
+        'AISI D2 (Tool Steel)': 'd2-harden',
+        'Brass (C360)': 'brass-soft',
+        'Inconel 625': 'inc625-ann',
+        'AISI 4130 (Chromoly)': '4130-norm',
+        'SS 316 (Marine)': '316-ann',
+        'St37 (S235JR)': 'st37-sr',
+        'St52 (S355J2)': 'st52-sr',
+        'C50 (Carbon)': 'c50-ind',
+        '8620 (Case Hard.)': '8620-carburize',
+        '1.2344 (H13 Hot)': 'h13-harden'
+    };
+    return map[materialName] || null;
+};
+
+// ------------------------------------------------------------------
+// PREMIUM UI COMPONENTS (THE COCKPIT DESIGN SYSTEM)
+// ------------------------------------------------------------------
+
+function GlassCard({ children, className = "", glowColor = "blue" }: { children: React.ReactNode, className?: string, glowColor?: 'blue' | 'emerald' | 'orange' | 'amber' }) {
+    const glows = {
+        blue: "shadow-blue-500/10 border-blue-500/10",
+        emerald: "shadow-emerald-500/10 border-emerald-500/10",
+        orange: "shadow-orange-500/10 border-orange-500/10",
+        amber: "shadow-amber-500/10 border-amber-500/10"
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`relative overflow-hidden bg-slate-900/60 backdrop-blur-2xl border ${glows[glowColor]} shadow-2xl rounded-[32px] p-6 ${className}`}
+        >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+            <div className={`absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-${glowColor}-500/20 to-transparent`} />
+            <div className="relative z-10 h-full">{children}</div>
+        </motion.div>
+    );
+}
+
+function StatHUD({ label, value, unit, icon: Icon, color = "blue", subValue }: { label: string, value: string | number, unit: string, icon: any, color?: string, subValue?: string }) {
+    return (
+        <div className="relative group">
+            <div className={`absolute -inset-1 bg-${color}-500/5 blur-xl group-hover:bg-${color}-500/10 transition-all duration-700 rounded-full`} />
+            <div className="relative flex flex-col items-start">
+                <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-1.5 rounded-lg bg-${color}-500/10 border border-${color}-500/20`}>
+                        <Icon className={`w-3 h-3 text-${color}-400`} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 group-hover:text-white/80 transition-colors">{label}</span>
+                </div>
+                <div className="flex items-baseline gap-1.5 ml-1">
+                    <span className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">{value}</span>
+                    <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">{unit}</span>
+                </div>
+                {subValue && (
+                    <div className={`text-[9px] font-bold uppercase tracking-widest mt-2 ml-1 text-${color}-400/60 border-t border-${color}-500/10 pt-1.5 w-full`}>{subValue}</div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ------------------------------------------------------------------
+// HIGH-FIDELITY STRESS-STRAIN VISUALIZER
+// ------------------------------------------------------------------
+
+function HUDCallout({ x, y, label, value, color, alignment = 'top' }: { x: number, y: number, label: string, value: string, color: string, alignment?: 'top' | 'right' | 'bottom' }) {
+    const isTop = alignment === 'top';
+    const isBottom = alignment === 'bottom';
+
+    let pathD = `M ${x} ${y} L ${x} ${y - 15} L ${x + 20} ${y - 15}`;
+    if (isBottom) pathD = `M ${x} ${y} L ${x} ${y + 15} L ${x + 20} ${y + 15}`;
+    if (alignment === 'right') pathD = `M ${x} ${y} L ${x + 15} ${y} L ${x + 15} ${y - 10}`;
+
+    return (
+        <g className="transition-all duration-500">
+            {/* Leader Line */}
+            <path
+                d={pathD}
+                className={`stroke-${color}-500/50 fill-none`}
+                strokeWidth="1"
+            />
+            {/* Callout Box */}
+            <g transform={`translate(${alignment === 'right' ? x + 17 : x + 22}, ${isTop ? y - 30 : isBottom ? y + 5 : y - 25})`}>
+                <rect width="80" height="24" rx="6" className="fill-slate-900/90 border border-white/10 backdrop-blur-md" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                <rect width="3" height="24" rx="1.5" className={`fill-${color}-500`} />
+                <text x="8" y="10" className={`text-[9px] font-black uppercase tracking-widest fill-${color}-400`}>{label}</text>
+                <text x="8" y="20" className="text-[11px] font-black fill-white tracking-tight">{value}</text>
+            </g>
+        </g>
+    );
+}
+
+function StressStrainChart({ yieldStrength, tensileStrength, modulus, strainHardening = 0.2, strengthCoeff = 1000, elongation = 20 }: {
     yieldStrength: number,
     tensileStrength: number,
     modulus: number,
     strainHardening?: number,
-    strengthCoeff?: number
+    strengthCoeff?: number,
+    elongation?: number
 }) {
-    const width = 300;
-    const height = 150;
-    const padding = 20;
+    const width = 800;
+    const height = 400;
+    const padding = 45; // Reduced padding for more space
 
-    const maxStress = tensileStrength * 1.3;
-    const maxStrain = 0.4;
+    const fractureStrain = (elongation / 100) || 0.35;
+    const maxStrain = fractureStrain * 1.15; // Adaptive zoom
+    const maxStress = Math.max(tensileStrength * 1.1, 400); // Adaptive vertical zoom
 
     const scaleX = (strain: number) => (strain / maxStrain) * (width - 2 * padding) + padding;
     const scaleY = (stress: number) => height - padding - (stress / maxStress) * (height - 2 * padding);
 
     const yieldStrain = (yieldStrength / (modulus * 1000));
-    const points: [number, number][] = [];
 
+    const points: [number, number][] = [];
     points.push([0, 0]);
     points.push([yieldStrain, yieldStrength]);
 
-    const steps = 20;
-    const breakingStrain = 0.35;
+    const steps = 60;
     for (let i = 1; i <= steps; i++) {
-        const strain = yieldStrain + (breakingStrain - yieldStrain) * (i / steps);
-        const stress = strengthCoeff * Math.pow(strain, strainHardening);
-        points.push([strain, Math.min(stress, tensileStrength * 1.1)]);
+        const strain = yieldStrain + (fractureStrain - yieldStrain) * (i / steps);
+        let stress = strengthCoeff * Math.pow(strain, strainHardening);
+        if (strain > fractureStrain * 0.7) {
+            const neckingFactor = 1 - (strain - fractureStrain * 0.7) * 0.5;
+            stress = Math.min(stress, tensileStrength) * neckingFactor;
+        } else {
+            stress = Math.min(stress, tensileStrength * 1.05);
+        }
+        points.push([strain, stress]);
     }
 
     const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${scaleX(p[0])} ${scaleY(p[1])}`).join(' ');
+    const utsPoint = points[Math.round(points.length * 0.6)];
 
     return (
-        <div className="relative group">
-            <svg width={width} height={height} className="overflow-visible">
-                <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="1" />
-                <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="stroke-slate-200 dark:stroke-slate-800" strokeWidth="1" />
-                <text x={width - padding} y={height - 2} className="text-[8px] fill-slate-400 text-right" textAnchor="end">Strain (ε)</text>
-                <text x={2} y={padding} className="text-[8px] fill-slate-400" transform={`rotate(-90, 2, ${padding})`} textAnchor="end">Stress (σ)</text>
-                <line
-                    x1={padding} y1={scaleY(yieldStrength)} x2={width - padding} y2={scaleY(yieldStrength)}
-                    className="stroke-blue-500/20 stroke-dasharray-[2,2]" strokeDasharray="2,2"
-                />
-                <text x={padding + 5} y={scaleY(yieldStrength) - 2} className="text-[7px] fill-blue-500/50 font-bold uppercase">Yield</text>
-                <path
+        <div className="relative group w-full flex flex-col items-center p-4">
+            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none drop-shadow-2xl">
+                <defs>
+                    <linearGradient id="curveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.15" />
+                        <stop offset="100%" stopColor="#60a5fa" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                        <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                </defs>
+
+                {/* Reticle Axes */}
+                {[0.1, 0.2, 0.3, 0.4].map(s => (
+                    <g key={s}>
+                        <line x1={scaleX(s)} y1={padding} x2={scaleX(s)} y2={height - padding} className="stroke-white/5" strokeWidth="0.5" />
+                        <text x={scaleX(s)} y={height - padding + 20} className="text-[10px] fill-white/20 font-black uppercase tracking-widest" textAnchor="middle">{s}ε</text>
+                    </g>
+                ))}
+
+                <line x1={padding} y1={height - padding} x2={width - padding + 40} y2={height - padding} className="stroke-white/10" strokeWidth="0.5" />
+                <line x1={padding} y1={padding - 20} x2={padding} y2={height - padding} className="stroke-white/10" strokeWidth="0.5" />
+
+                <path d={`${pathData} L ${scaleX(points[points.length - 1][0])} ${scaleY(0)} L ${scaleX(0)} ${scaleY(0)} Z`} fill="url(#curveGrad)" />
+
+                <motion.path
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
                     d={pathData}
-                    className="stroke-blue-500 dark:stroke-blue-400 fill-none transition-all duration-500"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    className="stroke-blue-400 fill-none"
+                    strokeWidth="1.2"
+                    filter="url(#glow)"
                 />
-                <circle cx={scaleX(yieldStrain)} cy={scaleY(yieldStrength)} r="3" className="fill-blue-500 shadow-lg" />
+
+                {/* HUD Elements */}
+                <HUDCallout
+                    x={scaleX(yieldStrain)}
+                    y={scaleY(yieldStrength)}
+                    label="Yield"
+                    value={`${Math.round(yieldStrength)} MPa`}
+                    color="blue"
+                    alignment="top"
+                />
+                <HUDCallout
+                    x={scaleX(utsPoint[0])}
+                    y={scaleY(tensileStrength)}
+                    label="UTS"
+                    value={`${Math.round(tensileStrength)} MPa`}
+                    color="emerald"
+                    alignment="top"
+                />
+                <HUDCallout
+                    x={scaleX(points[points.length - 1][0])}
+                    y={scaleY(points[points.length - 1][1])}
+                    label="Fracture"
+                    value={`${Math.round(points[points.length - 1][1])} MPa`}
+                    color="red"
+                    alignment="bottom"
+                />
+            </svg>
+        </div>
+    );
+}
+
+// ------------------------------------------------------------------
+// PROPERTY TRENDS CHART (CUMULATIVE CHANGES)
+// ------------------------------------------------------------------
+
+function PropertyTrendsChart({ stepStates }: { stepStates: any[] }) {
+    const width = 800;
+    const height = 300;
+    const padding = 45;
+
+    const maxYield = Math.max(...stepStates.map(s => s.yield)) * 1.15; // Tighter zoom
+    const maxHardness = Math.max(...stepStates.map(s => s.hardness)) * 1.15; // Tighter zoom
+    const maxElongation = Math.max(...stepStates.map(s => s.elongation || 20)) * 1.25;
+
+    const scaleX = (idx: number) => (idx / (stepStates.length - 1 || 1)) * (width - 2 * padding) + padding;
+    const scaleY = (val: number, max: number) => height - padding - (val / max) * (height - 2 * padding);
+
+    const yieldPoints = stepStates.map((s, i) => [scaleX(i), scaleY(s.yield, maxYield)]);
+    const hardnessPoints = stepStates.map((s, i) => [scaleX(i), scaleY(s.hardness, maxHardness)]);
+    const elongationPoints = stepStates.map((s, i) => [scaleX(i), scaleY(s.elongation || 20, maxElongation)]);
+
+    const getLinePath = (pts: number[][]) => pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ');
+
+    return (
+        <div className="w-full relative py-2">
+            <div className="flex gap-4 mb-6 justify-center">
+                {[
+                    { label: 'Strength', color: 'bg-emerald-500' },
+                    { label: 'Hardness', color: 'bg-blue-500' },
+                    { label: 'Ductility', color: 'bg-red-500' }
+                ].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full ${item.color}`} />
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{item.label}</span>
+                    </div>
+                ))}
+            </div>
+
+            <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none transition-all">
+                {/* Horizontal Scan Lines */}
+                {[0, 0.25, 0.5, 0.75, 1].map(v => (
+                    <line key={v} x1={padding} y1={padding + v * (height - 2 * padding)} x2={width - padding} y2={padding + v * (height - 2 * padding)} className="stroke-white/[0.03]" strokeWidth="0.5" />
+                ))}
+
+                {/* X-Markers */}
+                {stepStates.map((_, i) => (
+                    <g key={i}>
+                        <line x1={scaleX(i)} y1={padding} x2={scaleX(i)} y2={height - padding} className="stroke-white/[0.05]" strokeDasharray="2,4" strokeWidth="0.5" />
+                        <text x={scaleX(i)} y={height - padding + 25} className="text-[11px] font-black fill-white/10 uppercase tracking-tighter" textAnchor="middle">S{i + 1}</text>
+                    </g>
+                ))}
+
+                {/* Paths with precision lines */}
+                <path d={getLinePath(elongationPoints)} className="stroke-red-500/20 fill-none" strokeWidth="0.8" strokeDasharray="4,2" />
+                <path d={getLinePath(hardnessPoints)} className="stroke-blue-500/30 fill-none" strokeWidth="1.0" />
+                <path d={getLinePath(yieldPoints)} className="stroke-emerald-500/40 fill-none" strokeWidth="1.2" />
+
+                {/* Data Nodes */}
+                {stepStates.map((s, i) => (
+                    <g key={i}>
+                        {/* Yield */}
+                        <circle cx={scaleX(i)} cy={scaleY(s.yield, maxYield)} r="2" className="fill-slate-950 stroke-emerald-500/50 stroke-1" />
+                        <text x={scaleX(i)} y={scaleY(s.yield, maxYield) + 15} className="text-[10px] font-black fill-emerald-400/80" textAnchor="middle">{Math.round(s.yield)}</text>
+                        {/* Hardness */}
+                        <circle cx={scaleX(i)} cy={scaleY(s.hardness, maxHardness)} r="2" className="fill-slate-950 stroke-blue-500/50 stroke-1" />
+                        <text x={scaleX(i)} y={scaleY(s.hardness, maxHardness) - 12} className="text-[10px] font-black fill-blue-400/80" textAnchor="middle">{Math.round(s.hardness)}</text>
+                    </g>
+                ))}
             </svg>
         </div>
     );
@@ -240,9 +467,12 @@ function ProcessChainTimeline({
                         <div className="w-4 h-[1px] bg-slate-300 dark:bg-slate-700 mx-1 flex-shrink-0" />
                     )}
                     <div className="relative">
-                        <button
+                        <div
+                            role="button"
+                            tabIndex={0}
                             onClick={() => onSelect(index)}
-                            className={`flex flex-col items-center min-w-[100px] p-3 rounded-2xl border transition-all relative
+                            onKeyDown={(e) => e.key === 'Enter' && onSelect(index)}
+                            className={`flex flex-col items-center min-w-[100px] p-3 rounded-2xl border transition-all relative cursor-pointer
                                 ${index === activeIndex
                                     ? 'bg-blue-500 text-white border-blue-400 shadow-lg shadow-blue-500/20'
                                     : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400'
@@ -258,7 +488,7 @@ function ProcessChainTimeline({
                                     <X className="w-3 h-3" />
                                 </button>
                             )}
-                        </button>
+                        </div>
                     </div>
                 </div>
             ))}
@@ -330,40 +560,43 @@ export function ManufacturingSandbox() {
 
 
     return (
-        <div className="space-y-6 pb-20 p-2 sm:p-4 animate-in fade-in duration-500">
+        <div className="space-y-6 pb-20 p-2 sm:p-6 animate-in fade-in duration-700 bg-slate-950 text-slate-200 min-h-screen">
             {/* Header with Title and Diagram Toggle */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm gap-4">
-                <div className="flex flex-col gap-1">
-                    <h2 className="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white uppercase tracking-tight">
-                        <div className="p-2 bg-blue-500 rounded-xl shadow-lg shadow-blue-500/20">
-                            <Sparkles className="w-5 h-5 text-white" />
+            <GlassCard className="!p-8" glowColor="blue">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-2xl font-black flex items-center gap-4 text-white uppercase tracking-tighter">
+                            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl shadow-blue-500/20">
+                                <Sparkles className="w-6 h-6 text-white" />
+                            </div>
+                            {sandboxTitle}
+                        </h2>
+                        <div className="text-[10px] text-blue-400 font-bold uppercase tracking-[0.4em] ml-16 opacity-80">Precision Engineering Sandbox</div>
+                    </div>
+                    <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                        <button
+                            onClick={() => setShowDiagram(true)}
+                            className="flex-1 sm:flex-none text-[10px] bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl transition-all flex items-center justify-center gap-3 font-bold border border-white/10 uppercase tracking-widest backdrop-blur"
+                        >
+                            <Activity className="w-4 h-4 text-blue-400" />
+                            Phase Diagram
+                        </button>
+                        <div className="hidden sm:flex px-4 py-3 rounded-2xl text-[9px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-[0.2em] items-center">
+                            Physics Engine v3.0
                         </div>
-                        {sandboxTitle}
-                    </h2>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] ml-12">Experimental Multi-Stage Sandbox</div>
+                    </div>
                 </div>
-                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                    <button
-                        onClick={() => setShowDiagram(true)}
-                        className="flex-1 sm:flex-none text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-bold border border-slate-200 dark:border-slate-700 uppercase tracking-widest"
-                    >
-                        <Activity className="w-4 h-4" />
-                        Phase Diagram
-                    </button>
-                    <span className="hidden sm:flex px-3 py-2 rounded-xl text-[9px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wider items-center">
-                        Physics-Based Simulation
-                    </span>
-                </div>
-            </div>
+            </GlassCard>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Control Panel */}
-                <div className="lg:col-span-4 space-y-6">
-                    <section className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-200 dark:border-slate-800">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-4 flex items-center gap-2">
-                            <Box className="w-4 h-4" /> 1. Select Material
-                        </h3>
-                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="lg:col-span-3 space-y-4">
+                    <GlassCard glowColor="blue" className="!p-4 bg-slate-900/40">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-blue-500/20 rounded-lg"><Box className="w-3 h-3 text-blue-400" /></div>
+                            <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-blue-400">Material Core</h3>
+                        </div>
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                             {MANUFACTURING_PATHS.map(path => (
                                 <button
                                     key={path.materialName}
@@ -373,275 +606,300 @@ export function ManufacturingSandbox() {
                                         setActiveStepIndex(0);
                                         setSelectedCoatingId(null);
                                     }}
-                                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm transition-all border ${selectedMaterialName === path.materialName
-                                        ? 'bg-blue-500 text-white border-blue-400 shadow-lg shadow-blue-500/20'
-                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400'
+                                    className={`w-full text-left px-4 py-3 rounded-xl border transition-all relative overflow-hidden group
+                                        ${selectedMaterialName === path.materialName
+                                            ? 'bg-blue-600/20 border-blue-500 shadow-lg'
+                                            : 'bg-white/[0.02] border-white/[0.05] hover:border-blue-500/30'
                                         }`}
                                 >
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <div className="font-bold">{path.materialName}</div>
-                                            <div className={`text-[9px] uppercase font-medium ${selectedMaterialName === path.materialName ? 'text-blue-100' : 'text-slate-400'}`}>
-                                                {MATERIALS_DB.find(m => m.name === path.materialName)?.category} Grade
-                                            </div>
-                                        </div>
+                                    <div className="relative z-10 flex justify-between items-center">
+                                        <div className="font-black text-[10px] uppercase tracking-widest">{path.materialName}</div>
+                                        {selectedMaterialName === path.materialName && <Target className="w-3 h-3 text-blue-400 animate-pulse" />}
                                     </div>
                                 </button>
                             ))}
                         </div>
-                    </section>
+                    </GlassCard>
 
-                    <section className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-200 dark:border-slate-800">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 flex items-center gap-2">
-                                <Thermometer className="w-4 h-4" /> 2. Add to Chain (HT)
-                            </h3>
-                            <div className="px-2 py-0.5 bg-orange-500/10 text-orange-500 rounded text-[8px] font-black uppercase">Experimental</div>
+                    <GlassCard glowColor="orange" className="!p-4 bg-slate-900/40">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-orange-500/20 rounded-lg"><Zap className="w-3 h-3 text-orange-400" /></div>
+                            <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-orange-400">Process Library</h3>
                         </div>
-                        <div className="grid grid-cols-1 gap-2">
-                            {/* In Sandbox mode, we show ALL treatments from ALL paths for experimentation */}
-                            {Array.from(new Set(MANUFACTURING_PATHS.flatMap(p => p.treatments.map(t => t.method)))).map(method => {
-                                const t = MANUFACTURING_PATHS.flatMap(p => p.treatments).find(treat => treat.method === method)!;
-                                return (
-                                    <button
-                                        key={t.id}
-                                        onClick={() => addToChain(t)}
-                                        className="w-full text-left px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm transition-all hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/20 group"
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-orange-500 transition-colors uppercase text-xs">{t.method}</span>
-                                            <div className="p-1 bg-slate-100 dark:bg-slate-700 rounded-lg group-hover:bg-orange-100 dark:group-hover:bg-orange-900/40">
-                                                <Sparkles className="w-3 h-3 text-slate-400 group-hover:text-orange-500" />
+                        <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-1">
+                            {(() => {
+                                const recommendedId = getRecommendedProcessId(selectedMaterialName);
+                                const allProcesses = Array.from(new Set(MANUFACTURING_PATHS.flatMap(p => p.treatments.map(t => t.method)))).map(method => {
+                                    return MANUFACTURING_PATHS.flatMap(p => p.treatments).find(treat => treat.method === method)!;
+                                });
+
+                                // Sort: Recommended first, then alphabetically
+                                const sorted = [...allProcesses].sort((a, b) => {
+                                    if (a.id === recommendedId) return -1;
+                                    if (b.id === recommendedId) return 1;
+                                    return a.method.localeCompare(b.method);
+                                });
+
+                                return sorted.map(t => {
+                                    const isRecommended = t.id === recommendedId;
+                                    return (
+                                        <motion.button
+                                            key={t.id}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() => addToChain(t)}
+                                            className={`w-full text-left p-3 rounded-xl transition-all flex justify-between items-center group relative overflow-hidden
+                                                ${isRecommended
+                                                    ? 'bg-amber-500/10 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.1)] border-2'
+                                                    : 'bg-white/[0.02] border-white/[0.05] border'
+                                                } hover:bg-orange-500/10 hover:border-orange-500/30`}
+                                        >
+                                            {isRecommended && (
+                                                <motion.div
+                                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/15 to-transparent -translate-x-full"
+                                                    animate={{ x: ['100%', '-100%'] }}
+                                                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                                                />
+                                            )}
+                                            <div className="flex flex-col gap-0.5 relative z-10">
+                                                <span className={`font-bold text-[9px] uppercase tracking-wider ${isRecommended ? 'text-amber-400' : 'text-white/60'} group-hover:text-white transition-colors`}>
+                                                    {t.method}
+                                                </span>
+                                                {isRecommended && (
+                                                    <span className="text-[6px] font-black text-amber-500/80 uppercase tracking-[0.2em] flex items-center gap-1">
+                                                        <Sparkles className="w-2 h-2" /> Recommended State
+                                                    </span>
+                                                )}
                                             </div>
-                                        </div>
-                                    </button>
-                                );
-                            })}
+                                            <Maximize2 className={`w-2.5 h-2.5 ${isRecommended ? 'text-amber-400' : 'text-orange-400'} opacity-0 group-hover:opacity-100 transition-all scale-50 group-hover:scale-100`} />
+                                        </motion.button>
+                                    );
+                                });
+                            })()}
                         </div>
-                    </section>
+                    </GlassCard>
+
+                    <GlassCard glowColor="emerald" className="!p-4 bg-slate-900/40">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-emerald-500/20 rounded-lg"><Layers className="w-3 h-3 text-emerald-400" /></div>
+                            <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400">Final Processing</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[7px] font-black text-white/30 uppercase tracking-widest block mb-2">Surface Finish (Ra)</label>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {SURFACE_FINISH_DB.map(f => (
+                                        <button
+                                            key={f.name}
+                                            onClick={() => setMachiningProcess(f)}
+                                            className={`text-left p-2 rounded-lg text-[8px] font-bold transition-all border ${machiningProcess.name === f.name
+                                                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                                : 'bg-white/[0.02] border-white/[0.05] text-white/40 hover:bg-white/[0.05]'
+                                                }`}
+                                        >
+                                            <div className="flex justify-between">
+                                                <span>{f.name}</span>
+                                                <span className="opacity-60">Ra {f.raRange[0]}-{f.raRange[1]}</span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-[7px] font-black text-white/30 uppercase tracking-widest block mb-2">Surface Coating</label>
+                                <div className="grid grid-cols-1 gap-1">
+                                    <button
+                                        onClick={() => setSelectedCoatingId(null)}
+                                        className={`text-left p-2 rounded-lg text-[8px] font-bold transition-all border ${!selectedCoatingId
+                                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                            : 'bg-white/[0.02] border-white/[0.05] text-white/40 hover:bg-white/[0.05]'
+                                            }`}
+                                    >
+                                        None / Raw
+                                    </button>
+                                    {SURFACE_COATING_DB.map(c => {
+                                        const isCompatible = c.compatibleMaterials.some(m => selectedMaterialName.includes(m));
+                                        return (
+                                            <button
+                                                key={c.id}
+                                                disabled={!isCompatible}
+                                                onClick={() => setSelectedCoatingId(c.id)}
+                                                className={`text-left p-2 rounded-lg text-[8px] font-bold transition-all border relative overflow-hidden ${selectedCoatingId === c.id
+                                                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                                    : isCompatible
+                                                        ? 'bg-white/[0.02] border-white/[0.05] text-white/40 hover:bg-white/[0.05]'
+                                                        : 'opacity-20 cursor-not-allowed bg-black/40 border-transparent text-white/10'
+                                                    }`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span>{c.name}</span>
+                                                    {isCompatible && <span className="text-[6px] opacity-40">{c.thicknessRange}</span>}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </GlassCard>
                 </div>
 
                 {/* Results Display */}
-                <div className="lg:col-span-8 space-y-6">
-                    {/* Process Timeline */}
-                    <section className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm border-b-4 border-b-blue-500/20">
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center justify-between">
-                            <span>Process Path Sequence</span>
-                            <span className="text-blue-500">Step {activeStepIndex + 1} Selected</span>
-                        </div>
-                        <ProcessChainTimeline
-                            chain={processChain}
-                            activeIndex={activeStepIndex}
-                            onSelect={setActiveStepIndex}
-                            onRemove={removeFromChain}
-                        />
-                    </section>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-slate-950 p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center min-h-[220px]">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-6 self-start">Engineering Stress-Strain</span>
-                            <StressStrainChart
-                                yieldStrength={currentState.yield}
-                                tensileStrength={currentState.tensile}
-                                modulus={currentState.modulus}
-                                strainHardening={currentState.strainHardening}
-                                strengthCoeff={currentState.strengthCoeff}
+                <div className="lg:col-span-9 space-y-4">
+                    {/* Top Row: Path & HUD Stats */}
+                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+                        <GlassCard className="xl:col-span-2 !p-5" glowColor="blue">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="text-[7px] font-black uppercase tracking-[0.4em] text-white/30 flex items-center gap-2">
+                                    <Radio className="w-3 h-3 text-blue-500" /> Tracking Active Sequence
+                                </div>
+                                <div className="text-[8px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 uppercase tracking-widest">Cockpit v3.0</div>
+                            </div>
+                            <ProcessChainTimeline
+                                chain={processChain}
+                                activeIndex={activeStepIndex}
+                                onSelect={setActiveStepIndex}
+                                onRemove={removeFromChain}
                             />
-                        </div>
+                        </GlassCard>
 
-                        <div className="grid grid-rows-2 gap-4">
-                            <div className="bg-slate-950 text-white p-6 rounded-3xl border border-white/5 relative overflow-hidden group">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 block mb-2">Hardness at Step {activeStepIndex + 1}</span>
-                                <div className="text-5xl font-black mb-1 tracking-tighter">{convertHBtoHRC(currentState.hardness)}</div>
-                                <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{processChain[activeStepIndex]?.method}</div>
-                                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-125 transition-transform duration-500">
-                                    <Gauge size={120} />
-                                </div>
-                            </div>
+                        <GlassCard className="xl:col-span-1 !p-5" glowColor="blue">
+                            <StatHUD
+                                label="Surface Hardness"
+                                value={convertHBtoHRC(currentState.hardness).split(' ')[0]}
+                                unit={convertHBtoHRC(currentState.hardness).split(' ')[1]}
+                                icon={Gauge}
+                                color="blue"
+                                subValue={`${Math.round(currentState.hardness)} HB`}
+                            />
+                        </GlassCard>
 
-                            <div className="bg-slate-950 text-white p-6 rounded-3xl border border-white/5 relative overflow-hidden group">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 block mb-2">Yield Strength</span>
-                                <div className="text-5xl font-black mb-1 tracking-tighter">
-                                    {Math.round(currentState.yield)} <span className="text-lg font-normal text-white/20">MPa</span>
-                                </div>
-                                <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Base: {baseMaterial.yield} MPa</div>
-                                <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-125 transition-transform duration-500">
-                                    <Activity size={120} />
-                                </div>
-                            </div>
-                        </div>
+                        <GlassCard className="xl:col-span-1 !p-5" glowColor="emerald">
+                            <StatHUD
+                                label="Yield Peak"
+                                value={Math.round(currentState.yield)}
+                                unit="MPa"
+                                icon={Activity}
+                                color="emerald"
+                                subValue={`Factor: ${(currentState.yield / baseMaterial.yield).toFixed(2)}x`}
+                            />
+                        </GlassCard>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <section className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between h-full shadow-sm">
-                            <div>
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                                    <Info className="w-4 h-4" /> Process Details
-                                </h3>
-                                {activeTreatment ? (
-                                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
-                                            <h4 className="text-xs font-black text-blue-500 uppercase tracking-widest mb-3">{activeTreatment.method}</h4>
-                                            <p className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed font-medium">
-                                                {activeTreatment.instructions || activeTreatment.description}
-                                            </p>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
-                                                <div className="text-[8px] font-black text-slate-400 uppercase mb-1">Temperature</div>
-                                                <div className="text-sm font-black text-slate-700 dark:text-slate-200">{activeTreatment.temperature || 'N/A'}</div>
-                                            </div>
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
-                                                <div className="text-[8px] font-black text-slate-400 uppercase mb-1">Quench Medium</div>
-                                                <div className="text-sm font-black text-slate-700 dark:text-slate-200">{activeTreatment.medium || 'N/A'}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-slate-400 gap-3 grayscale opacity-50">
-                                        <Box className="w-8 h-8 opacity-20" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest">Base Material State</p>
-                                    </div>
-                                )}
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+                        <GlassCard className="xl:col-span-12 2xl:col-span-5 !p-4 min-h-[300px] flex flex-col relative" glowColor="blue">
+                            <div className="absolute top-4 left-6 text-[7px] font-black uppercase tracking-[0.4em] text-white/20 z-10">Stress-Strain HUD</div>
+                            <div className="w-full flex-1 flex items-center">
+                                <StressStrainChart
+                                    yieldStrength={currentState.yield}
+                                    tensileStrength={currentState.tensile}
+                                    modulus={currentState.modulus}
+                                    strainHardening={currentState.strainHardening}
+                                    strengthCoeff={currentState.strengthCoeff}
+                                    elongation={currentState.elongation}
+                                />
                             </div>
+                        </GlassCard>
 
-                            <div className="mt-8 p-4 bg-amber-500/5 dark:bg-amber-500/10 rounded-2xl border border-amber-500/20">
-                                <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">Property Insight</h4>
-                                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium italic">
-                                    {activeTreatment?.bestFor || materialPath.machiningNotes}
-                                </p>
+                        <GlassCard className="xl:col-span-12 2xl:col-span-7 !p-4 relative min-h-[300px]" glowColor="amber">
+                            <div className="absolute top-4 left-6 text-[7px] font-black uppercase tracking-[0.4em] text-white/20 z-10">Material Property Monitor</div>
+                            <div className="h-full flex flex-col justify-center pt-8">
+                                <PropertyTrendsChart stepStates={stepStates} />
                             </div>
-                        </section>
+                        </GlassCard>
+                    </div>
 
-                        <section className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm">
-                            <div className="space-y-6">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                                    <Layers className="w-4 h-4" /> Final Finish & Coating
-                                </h3>
-                                <div>
-                                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">Surface Coating System</label>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            onClick={() => setSelectedCoatingId(null)}
-                                            className={`px-4 py-3 rounded-xl text-[10px] font-bold border transition-all uppercase tracking-widest ${!selectedCoatingId ? 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-orange-400'}`}
-                                        >
-                                            UNCOATED (RAW)
-                                        </button>
-                                        {SURFACE_COATING_DB.filter(c => c.compatibleMaterials.includes(baseMaterial.category)).map(coating => (
-                                            <button
-                                                key={coating.id}
-                                                onClick={() => setSelectedCoatingId(coating.id)}
-                                                className={`px-4 py-3 rounded-xl text-[10px] font-bold border transition-all uppercase tracking-widest ${selectedCoatingId === coating.id ? 'bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-orange-400'}`}
-                                            >
-                                                {coating.name}
-                                            </button>
+                    {/* Bottom Row: Details & Surface */}
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                        <GlassCard className="xl:col-span-2 !p-5" glowColor="blue">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-blue-500/20 rounded-lg"><Info className="w-3 h-3 text-blue-400" /></div>
+                                <h3 className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Step Telemetry</h3>
+                            </div>
+                            {activeTreatment ? (
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{activeTreatment.method}</div>
+                                        <p className="text-[9px] text-white/40 leading-relaxed font-bold tracking-tight line-clamp-3">
+                                            {activeTreatment.instructions || activeTreatment.description}
+                                        </p>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {[
+                                            { label: 'Temp', val: activeTreatment.temperature || 'N/A' },
+                                            { label: 'Medium', val: activeTreatment.medium || 'N/A' }
+                                        ].map(item => (
+                                            <div key={item.label} className="bg-white/[0.02] border border-white/[0.05] p-2 rounded-lg flex items-center justify-between">
+                                                <span className="text-[7px] font-black text-white/20 uppercase tracking-widest">{item.label}</span>
+                                                <span className="text-[10px] font-black text-white/80">{item.val}</span>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
+                            ) : (
+                                <div className="h-20 flex items-center justify-center border border-dashed border-white/5 rounded-2xl text-white/10 text-[8px] font-black uppercase tracking-[0.4em]">Base State Active</div>
+                            )}
+                        </GlassCard>
 
+                        <GlassCard className="!p-5 bg-gradient-to-br from-indigo-600/40 to-blue-700/40 border-blue-500/30" glowColor="blue">
+                            <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">Machining Precision (Ra)</label>
-                                    <select
-                                        value={machiningProcess.name}
-                                        onChange={(e) => setMachiningProcess(SURFACE_FINISH_DB.find(p => p.name === e.target.value)!)}
-                                        className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-[10px] font-black uppercase appearance-none outline-none focus:ring-2 ring-orange-500/20 transition-all cursor-pointer tracking-widest"
-                                    >
-                                        {SURFACE_FINISH_DB.map(p => (
-                                            <option key={p.name} value={p.name}>{p.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="p-5 bg-slate-950 rounded-2xl space-y-4 border border-white/5">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Surface Quality</span>
-                                    <div className="px-3 py-1 bg-blue-500 text-white rounded-full text-[9px] font-black tracking-widest shadow-lg shadow-blue-500/20 animate-pulse">
-                                        {machiningProcess.raRange[0]} - {machiningProcess.raRange[1]} µm
+                                    <div className="text-[7px] font-black uppercase tracking-[0.4em] text-white/40 mb-1">Final Spec</div>
+                                    <div className="text-sm font-black text-white uppercase tracking-tighter tabular-nums leading-tight">
+                                        {selectedMaterialName}
                                     </div>
                                 </div>
-                                <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden flex">
-                                    <div style={{ width: (machiningProcess.raRange[0] / 50 * 100) + '%' }} className="h-full bg-slate-400/10" />
-                                    <div style={{ width: ((machiningProcess.raRange[1] - machiningProcess.raRange[0]) / 50 * 100) + '%' }} className="h-full bg-blue-500" />
+                                <div className="p-2 bg-white/10 rounded-lg"><Target className="w-3 h-3 text-white" /></div>
+                            </div>
+                            <div className="space-y-3 border-t border-white/10 pt-3">
+                                <div className="text-[8px] text-white/40 font-bold uppercase tracking-widest line-clamp-1">
+                                    {processChain.slice(1).map(p => p.method).join(' → ') || 'Unprocessed Core'}
+                                </div>
+                                <div className="flex items-center gap-4 text-[7px] font-black text-white/60 uppercase tracking-widest">
+                                    <div className="flex items-center gap-1"><Maximize2 className="w-2 h-2 text-emerald-400" /> Ra {machiningProcess.raRange[0]}-{machiningProcess.raRange[1]}</div>
+                                    <div className="flex items-center gap-1"><Sparkles className="w-2 h-2 text-blue-400" /> {selectedCoatingId ? SURFACE_COATING_DB.find(c => c.id === selectedCoatingId)?.name : 'No Coating'}</div>
                                 </div>
                             </div>
-
-                            <div className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-3xl shadow-xl shadow-orange-500/20 relative overflow-hidden group">
-                                <div className="relative z-10 flex justify-between items-start">
-                                    <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2">Final System Spec</h4>
-                                        <div className="text-lg font-black leading-tight uppercase tracking-tight">
-                                            {selectedMaterialName} <br />
-                                            <span className="text-xs opacity-80">{processChain.slice(1).map(p => p.method).join(' → ') || 'Raw state'}</span>
-                                        </div>
-                                    </div>
-                                    <Layers className="w-6 h-6 opacity-30 group-hover:rotate-12 transition-transform duration-500" />
-                                </div>
-                                {currentCoating && (
-                                    <div className="mt-4 pt-4 border-t border-white/20">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {currentCoating.benefits.map(b => (
-                                                <span key={b} className="bg-white/20 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter shadow-sm">{b}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </section>
+                        </GlassCard>
                     </div>
-                </div>
-                <div className="lg:col-span-12">
-                    <section className="bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
-                                <BookOpen className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Engineering Documentation</h4>
-                                <p className="text-[10px] text-slate-500 font-medium">Verify structural changes against machinery handbook standards.</p>
-                            </div>
-                        </div>
-                        {handbookReference ? (
-                            <button
-                                onClick={() => {/* navigate to handbook */ }}
-                                className="w-full sm:w-auto px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-[10px] font-black text-blue-500 hover:border-blue-500 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2"
-                            >
-                                Open Handbook: Section {activeTreatment?.handbookSectionId || 'HT'}
-                                <ExternalLink className="w-4 h-4" />
-                            </button>
-                        ) : (
-                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Reference Available</div>
-                        )}
-                    </section>
                 </div>
             </div>
 
             {/* Phase Diagram Modal */}
-            {showDiagram && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden">
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter flex items-center gap-3">
-                                <Activity className="text-blue-500" />
-                                Iron-Carbon Phase Diagram
-                            </h3>
-                            <button
-                                onClick={() => setShowDiagram(false)}
-                                className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="flex-1 p-6 flex flex-col items-center justify-center relative overflow-auto bg-slate-50 dark:bg-slate-950/50">
-                            <PhaseDiagram carbonContent={baseMaterial.carbonContent} />
-                        </div>
-                        <div className="p-4 bg-slate-900 text-slate-400 text-[10px] leading-relaxed border-t border-slate-800 px-8 py-4 text-center">
-                            <div className="text-white font-bold mb-1">Current Material: {selectedMaterialName} (Carbon: {baseMaterial.carbonContent || 'N/A'}%)</div>
-                            The diagram shows thermodynamic equilibrium phases. Heat treatments like Quenching bypass these regions to form non-equilibrium Martensite.
-                        </div>
+            <AnimatePresence>
+                {showDiagram && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-[40px] border border-white/10 shadow-2xl flex flex-col overflow-hidden"
+                        >
+                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900">
+                                <h3 className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
+                                    <Activity className="text-blue-500" />
+                                    Iron-Carbon Phase Diagram
+                                </h3>
+                                <button
+                                    onClick={() => setShowDiagram(false)}
+                                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                >
+                                    <X className="w-4 h-4 text-white" />
+                                </button>
+                            </div>
+                            <div className="flex-1 p-6 flex flex-col items-center justify-center relative overflow-auto bg-slate-950">
+                                <PhaseDiagram carbonContent={baseMaterial.carbonContent} />
+                            </div>
+                            <div className="p-4 bg-slate-900 text-slate-400 text-[10px] leading-relaxed border-t border-white/5 px-8 py-5 text-center">
+                                <div className="text-white font-bold mb-1">Material: {selectedMaterialName} (Carbon: {baseMaterial.carbonContent || 'N/A'}%)</div>
+                                <div className="opacity-50 font-medium">Thermodynamic equilibrium states. Processing logic accounts for non-equilibrium phase shifts.</div>
+                            </div>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
         </div>
     );
 }

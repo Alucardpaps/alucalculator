@@ -1,0 +1,22 @@
+{
+    "id": "alucalc.mechanical.failure-prediction",
+    "version": "1.0.0",
+    "type": "strength-analysis",
+    "category": "mechanical",
+    "title": "Failure Predictor",
+    "description": "Smart analyzer for fatigue risk, stress concentrations, and sharp corner detection.",
+    "icon": "AlertTriangle",
+    "defaultSize": {
+        "width": 800,
+        "height": 750
+    },
+    "capabilities": [
+        "geometry-analysis",
+        "safety-factor"
+    ],
+    "permissions": [
+        "project.read"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

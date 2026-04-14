@@ -1,0 +1,64 @@
+{
+  "id": "failure_analysis_tool",
+  "name": "Failure Analysis Tool",
+  "category": "mechanical",
+  "description": "Diagnose failure mode (overload, fatigue, or design deficiency) based on stress state, material properties, and load cycles.",
+  "inputs": [
+    { "key": "sigma_applied", "type": "number", "unit": "MPa", "description": "Applied Stress", "default": 300 },
+    { "key": "sigma_yield", "type": "number", "unit": "MPa", "description": "Material Yield Strength", "default": 350 },
+    { "key": "sigma_ult", "type": "number", "unit": "MPa", "description": "Material Ultimate Strength", "default": 500 },
+    { "key": "sigma_endurance", "type": "number", "unit": "MPa", "description": "Endurance Limit (Se)", "default": 250 },
+    { "key": "N_cycles", "type": "number", "unit": "cycles", "description": "Number of Load Cycles", "default": 1000000 }
+  ],
+  "steps": [
+    {
+      "id": "ratio_yield",
+      "formula": "sigma_applied / sigma_yield",
+      "description": "Stress ratio to yield",
+      "latex": "R_{yield} = \\frac{\\sigma_{applied}}{\\sigma_{yield}}"
+    },
+    {
+      "id": "ratio_ultimate",
+      "formula": "sigma_applied / sigma_ult",
+      "description": "Stress ratio to ultimate",
+      "latex": "R_{ult} = \\frac{\\sigma_{applied}}{\\sigma_{ult}}"
+    },
+    {
+      "id": "ratio_endurance",
+      "formula": "sigma_applied / sigma_endurance",
+      "description": "Stress ratio to endurance limit",
+      "latex": "R_{endurance} = \\frac{\\sigma_{applied}}{S_e}"
+    },
+    {
+      "id": "overload_flag",
+      "formula": "sigma_applied >= sigma_ult ? 1 : 0",
+      "description": "Overload failure detected (1=yes)",
+      "latex": "\\text{Overload} = \\sigma \\geq \\sigma_{ult}"
+    },
+    {
+      "id": "yield_flag",
+      "formula": "sigma_applied >= sigma_yield ? 1 : 0",
+      "description": "Yielding detected (1=yes)",
+      "latex": "\\text{Yielding} = \\sigma \\geq \\sigma_{y}"
+    },
+    {
+      "id": "fatigue_flag",
+      "formula": "(sigma_applied > sigma_endurance && N_cycles > 1000) ? 1 : 0",
+      "description": "Fatigue risk detected (1=yes)",
+      "latex": "\\text{Fatigue Risk} = \\sigma > S_e \\text{ and } N > 1000"
+    },
+    {
+      "id": "safety_factor_static",
+      "formula": "sigma_yield / sigma_applied",
+      "description": "Static safety factor",
+      "latex": "n_s = \\frac{\\sigma_y}{\\sigma}"
+    },
+    {
+      "id": "safety_factor_fatigue",
+      "formula": "sigma_endurance / sigma_applied",
+      "description": "Fatigue safety factor",
+      "latex": "n_f = \\frac{S_e}{\\sigma}"
+    }
+  ],
+  "outputs": ["ratio_yield", "ratio_ultimate", "ratio_endurance", "overload_flag", "yield_flag", "fatigue_flag", "safety_factor_static", "safety_factor_fatigue"]
+}

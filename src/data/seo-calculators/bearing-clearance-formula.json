@@ -1,0 +1,34 @@
+{
+  "id": "bearing-clearance-formula",
+  "title": "Bearing Clearance Formula - AluCalc Engineering",
+  "slug": "bearing-clearance-formula",
+  "keyword": "bearing clearance formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Bearing Clearance Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional bearing clearance formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bearing Clearance Formula",
+    "intro": "Comprehensive engineering guide for bearing clearance formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bearing clearance)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bearing clearance.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bearing Clearance is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bearing clearance scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bearing-life-calculator",
+    "bearing-load-calculator",
+    "bearing-selection-calculator",
+    "bearing-lubrication-calculator",
+    "bearing-clearance-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

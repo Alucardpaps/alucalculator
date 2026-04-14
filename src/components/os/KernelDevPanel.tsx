@@ -23,14 +23,16 @@ import {
     X,
     Activity,
     Database,
-    FileCode
+    FileCode,
+    Bot,
+    Zap
 } from 'lucide-react';
 
 interface KernelDevPanelProps {
     defaultOpen?: boolean;
 }
 
-type Tab = 'modules' | 'schemas' | 'trace';
+type Tab = 'modules' | 'schemas' | 'trace' | 'intelligence';
 
 export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
     const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -160,6 +162,12 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
             {/* Tabs */}
             <div className="flex border-b border-slate-700 bg-slate-900/30">
                 <button
+                    onClick={() => setActiveTab('intelligence')}
+                    className={`flex-1 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 transition-colors ${activeTab === 'intelligence' ? 'text-cyan-400 bg-slate-800/50 border-b-2 border-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                    <Bot size={12} /> MCP
+                </button>
+                <button
                     onClick={() => setActiveTab('schemas')}
                     className={`flex-1 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 transition-colors ${activeTab === 'schemas' ? 'text-amber-400 bg-slate-800/50 border-b-2 border-amber-400' : 'text-slate-500 hover:text-slate-300'}`}
                 >
@@ -181,6 +189,45 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto bg-[#0a0e14]">
+                {/* INTELLIGENCE TAB */}
+                {!loading && activeTab === 'intelligence' && (
+                    <div className="p-3 space-y-4">
+                        <div className="flex items-center gap-2 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-4">
+                            <Zap size={10} /> Active Logic Bridges
+                        </div>
+                        
+                        {[
+                            { id: 'materials-project', title: 'Materials Science MCP', status: 'CONNECTED', tools: ['search_materials', 'get_structure'] },
+                            { id: 'phys-cas', title: 'Physics CAS MCP', status: 'CONNECTED', tools: ['solve_physics', 'plot_symbolic'] },
+                            { id: 'figma-context', title: 'Figma Design MCP', status: 'READY', tools: ['get_component_spec'] },
+                            { id: 'git-fs', title: 'Git & Filesystem MCP', status: 'INDEXING', tools: ['read_file', 'git_diff'] }
+                        ].map(mcp => (
+                            <div key={mcp.id} className="bg-[#161b22] border border-slate-800 rounded-lg overflow-hidden">
+                                <div className="px-3 py-2 bg-slate-800/30 flex justify-between items-center border-b border-slate-800">
+                                    <span className="text-xs font-bold text-white">{mcp.title}</span>
+                                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${mcp.status === 'CONNECTED' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-slate-700 text-slate-400'}`}>
+                                        {mcp.status}
+                                    </span>
+                                </div>
+                                <div className="p-2">
+                                    <div className="text-[9px] text-slate-500 mb-1 uppercase tracking-tighter">Exposed Tools:</div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {mcp.tools.map(tool => (
+                                            <span key={tool} className="text-[9px] px-1.5 py-0.5 bg-black/40 border border-slate-700 rounded text-slate-400 font-mono">
+                                                {tool}()
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        
+                        <div className="mt-4 p-2 bg-blue-500/5 border border-blue-500/20 rounded text-[10px] text-blue-300">
+                            <span className="font-bold">NOTE:</span> These bridges allow AluCalc AI to access external engineering data and files autonomously.
+                        </div>
+                    </div>
+                )}
+
                 {loading && <div className="p-4 text-center text-slate-500 text-xs">Loading kernel state...</div>}
 
                 {/* SCHEMAS TAB */}

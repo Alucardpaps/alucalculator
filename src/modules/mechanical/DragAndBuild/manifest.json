@@ -1,0 +1,24 @@
+{
+    "id": "alucalc.mechanical.drag-build",
+    "version": "1.0.0",
+    "type": "machine-assembly",
+    "category": "mechanical",
+    "title": "Machine Builder",
+    "description": "Drag-and-drop intelligent machine assembly environment with kinetic constraints.",
+    "icon": "Wrench",
+    "defaultSize": {
+        "width": 1000,
+        "height": 800
+    },
+    "capabilities": [
+        "assembly",
+        "kinematics",
+        "library"
+    ],
+    "permissions": [
+        "project.read",
+        "project.write"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

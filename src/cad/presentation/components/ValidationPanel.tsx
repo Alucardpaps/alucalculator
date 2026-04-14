@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export function ValidationPanel() {
-    const { constraints, entities, solverInterface, syncFromModel } = useCadStore();
+    const { constraints, entities } = useCadStore();
 
     // Simplified solver stats from store (in a real app, these would be in the store)
     // For now we'll mock them or add them to the store later.
@@ -33,11 +33,7 @@ export function ValidationPanel() {
     };
 
     const handleDeleteConstraint = (id: string) => {
-        const model = useCadStore.getState().sketchModel;
-        if (model) {
-            model.constraints.delete(id);
-            syncFromModel();
-        }
+        useCadStore.getState().removeConstraint(id);
     };
 
     return (
@@ -102,11 +98,9 @@ export function ValidationPanel() {
                                                     className="w-16 bg-black/40 border border-[#1e2833] rounded px-1 py-0.5 text-center focus:border-cyan-500 focus:outline-none"
                                                     defaultValue={c.value}
                                                     onBlur={(e) => {
-                                                        const model = useCadStore.getState().sketchModel;
-                                                        if (model) {
-                                                            const constraint = model.constraints.get(c.id);
-                                                            if (constraint) constraint.value = parseFloat(e.target.value);
-                                                            solverInterface?.solve();
+                                                        const newVal = parseFloat(e.target.value);
+                                                        if (!isNaN(newVal)) {
+                                                            useCadStore.getState().editDimension(c.id, newVal);
                                                         }
                                                     }}
                                                 />

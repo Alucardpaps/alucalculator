@@ -1,0 +1,34 @@
+{
+  "id": "projectile-motion-explained",
+  "title": "Projectile Motion Explained - AluCalc Engineering",
+  "slug": "projectile-motion-explained",
+  "keyword": "projectile motion explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Projectile Motion Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional projectile motion explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Projectile Motion Explained",
+    "intro": "Comprehensive engineering guide for projectile motion explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for projectile motion)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for projectile motion.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Projectile Motion is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical projectile motion scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "velocity-calculation-calculator",
+    "acceleration-calculation-calculator",
+    "force-calculation-calculator",
+    "kinetic-energy-calculator",
+    "projectile-motion-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

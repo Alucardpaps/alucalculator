@@ -8,6 +8,7 @@
  */
 
 import type { CalculatorCategory } from '@/types/calculator-schema-v2';
+import type { EngineManifest } from '@/types/engine-contracts';
 
 // ============================================
 // TYPES
@@ -23,6 +24,8 @@ export interface KernelModule {
         icon?: string;
         version?: string;
         standards?: string[];
+        /** Enterprise engine manifest (optional, for engines with full metadata) */
+        manifest?: EngineManifest;
     };
     loader?: () => Promise<{ default: unknown }>;
     instance?: unknown;

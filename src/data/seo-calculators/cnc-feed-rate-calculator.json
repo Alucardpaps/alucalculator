@@ -1,0 +1,34 @@
+{
+  "id": "cnc-feed-rate-calculator",
+  "title": "Cnc Feed Rate Calculator - AluCalc Engineering",
+  "slug": "cnc-feed-rate-calculator",
+  "keyword": "cnc feed rate calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Cnc Feed Rate Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional cnc feed rate calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Cnc Feed Rate Calculator",
+    "intro": "Comprehensive engineering guide for cnc feed rate calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for cnc feed rate)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for cnc feed rate.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Cnc Feed Rate is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical cnc feed rate scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "tool-life-calculator",
+    "cnc-feed-rate-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

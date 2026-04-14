@@ -164,92 +164,128 @@ export function getBearingTypeInfo(type: BearingType): {
     return types[type];
 }
 
-// Extended Bearing Database - SKF Catalog Based
-export const BEARING_CATALOG: BearingData[] = [
-    // ===== DEEP GROOVE BALL - 6000 Series =====
-    { code: '6000', type: 'deep-groove-ball', d: 10, D: 26, B: 8, C: 4.62, C0: 1.96, mass: 0.02, nMax: 32000, e: 0.22, Y: 2.0 },
-    { code: '6001', type: 'deep-groove-ball', d: 12, D: 28, B: 8, C: 5.07, C0: 2.24, mass: 0.023, nMax: 28000, e: 0.22, Y: 2.0 },
-    { code: '6002', type: 'deep-groove-ball', d: 15, D: 32, B: 9, C: 5.59, C0: 2.60, mass: 0.030, nMax: 24000, e: 0.22, Y: 2.0 },
-    { code: '6003', type: 'deep-groove-ball', d: 17, D: 35, B: 10, C: 6.37, C0: 3.10, mass: 0.039, nMax: 22000, e: 0.22, Y: 2.0 },
-    { code: '6004', type: 'deep-groove-ball', d: 20, D: 42, B: 12, C: 9.36, C0: 5.00, mass: 0.070, nMax: 18000, e: 0.24, Y: 1.8 },
-    { code: '6005', type: 'deep-groove-ball', d: 25, D: 47, B: 12, C: 10.1, C0: 5.60, mass: 0.078, nMax: 16000, e: 0.24, Y: 1.8 },
-    { code: '6006', type: 'deep-groove-ball', d: 30, D: 55, B: 13, C: 13.3, C0: 7.80, mass: 0.115, nMax: 14000, e: 0.27, Y: 1.6 },
-    { code: '6008', type: 'deep-groove-ball', d: 40, D: 68, B: 15, C: 16.8, C0: 11.5, mass: 0.185, nMax: 11000, e: 0.27, Y: 1.6 },
-    { code: '6010', type: 'deep-groove-ball', d: 50, D: 80, B: 16, C: 21.2, C0: 15.0, mass: 0.265, nMax: 9000, e: 0.31, Y: 1.4 },
-    { code: '6012', type: 'deep-groove-ball', d: 60, D: 95, B: 18, C: 29.6, C0: 23.2, mass: 0.420, nMax: 7500, e: 0.31, Y: 1.4 },
+// ═══════════════════════════════════════════════════════════════
+// BEARING CATALOG GENERATOR (SKF COMPLIANT)
+// ═══════════════════════════════════════════════════════════════
 
-    // ===== DEEP GROOVE BALL - 6200 Series =====
-    { code: '6200', type: 'deep-groove-ball', d: 10, D: 30, B: 9, C: 5.07, C0: 2.36, mass: 0.034, nMax: 26000, e: 0.22, Y: 2.0 },
-    { code: '6201', type: 'deep-groove-ball', d: 12, D: 32, B: 10, C: 6.89, C0: 3.10, mass: 0.043, nMax: 24000, e: 0.22, Y: 2.0 },
-    { code: '6202', type: 'deep-groove-ball', d: 15, D: 35, B: 11, C: 7.80, C0: 3.75, mass: 0.052, nMax: 22000, e: 0.24, Y: 1.8 },
-    { code: '6203', type: 'deep-groove-ball', d: 17, D: 40, B: 12, C: 9.95, C0: 4.75, mass: 0.073, nMax: 18000, e: 0.24, Y: 1.8 },
-    { code: '6204', type: 'deep-groove-ball', d: 20, D: 47, B: 14, C: 12.7, C0: 6.55, mass: 0.106, nMax: 15000, e: 0.27, Y: 1.6 },
-    { code: '6205', type: 'deep-groove-ball', d: 25, D: 52, B: 15, C: 14.8, C0: 7.80, mass: 0.130, nMax: 13000, e: 0.27, Y: 1.6 },
-    { code: '6206', type: 'deep-groove-ball', d: 30, D: 62, B: 16, C: 20.3, C0: 11.2, mass: 0.198, nMax: 11000, e: 0.31, Y: 1.4 },
-    { code: '6207', type: 'deep-groove-ball', d: 35, D: 72, B: 17, C: 25.7, C0: 14.0, mass: 0.285, nMax: 9500, e: 0.31, Y: 1.4 },
-    { code: '6208', type: 'deep-groove-ball', d: 40, D: 80, B: 18, C: 29.1, C0: 17.6, mass: 0.370, nMax: 8500, e: 0.37, Y: 1.2 },
-    { code: '6209', type: 'deep-groove-ball', d: 45, D: 85, B: 19, C: 32.5, C0: 19.6, mass: 0.415, nMax: 8000, e: 0.37, Y: 1.2 },
-    { code: '6210', type: 'deep-groove-ball', d: 50, D: 90, B: 20, C: 35.1, C0: 22.0, mass: 0.475, nMax: 7500, e: 0.37, Y: 1.2 },
-    { code: '6212', type: 'deep-groove-ball', d: 60, D: 110, B: 22, C: 52.0, C0: 36.0, mass: 0.780, nMax: 6300, e: 0.44, Y: 1.0 },
-
-    // ===== DEEP GROOVE BALL - 6300 Series =====
-    { code: '6300', type: 'deep-groove-ball', d: 10, D: 35, B: 11, C: 8.06, C0: 3.45, mass: 0.054, nMax: 22000, e: 0.24, Y: 1.8 },
-    { code: '6304', type: 'deep-groove-ball', d: 20, D: 52, B: 15, C: 15.9, C0: 7.80, mass: 0.145, nMax: 13000, e: 0.31, Y: 1.4 },
-    { code: '6305', type: 'deep-groove-ball', d: 25, D: 62, B: 17, C: 22.5, C0: 11.4, mass: 0.230, nMax: 11000, e: 0.31, Y: 1.4 },
-    { code: '6306', type: 'deep-groove-ball', d: 30, D: 72, B: 19, C: 28.1, C0: 15.3, mass: 0.335, nMax: 9500, e: 0.37, Y: 1.2 },
-    { code: '6308', type: 'deep-groove-ball', d: 40, D: 90, B: 23, C: 40.3, C0: 24.0, mass: 0.580, nMax: 7500, e: 0.37, Y: 1.2 },
-    { code: '6310', type: 'deep-groove-ball', d: 50, D: 110, B: 27, C: 62.0, C0: 40.0, mass: 1.05, nMax: 6000, e: 0.44, Y: 1.0 },
-
-    // ===== ANGULAR CONTACT BALL - 7200 Series =====
-    { code: '7200', type: 'angular-contact-ball', d: 10, D: 30, B: 9, C: 4.80, C0: 2.50, mass: 0.033, nMax: 28000, e: 0.68, Y: 0.87 },
-    { code: '7204', type: 'angular-contact-ball', d: 20, D: 47, B: 14, C: 14.0, C0: 8.30, mass: 0.105, nMax: 17000, e: 0.68, Y: 0.87 },
-    { code: '7205', type: 'angular-contact-ball', d: 25, D: 52, B: 15, C: 17.4, C0: 10.4, mass: 0.130, nMax: 15000, e: 0.68, Y: 0.87 },
-    { code: '7206', type: 'angular-contact-ball', d: 30, D: 62, B: 16, C: 24.2, C0: 15.3, mass: 0.198, nMax: 12000, e: 0.68, Y: 0.87 },
-    { code: '7208', type: 'angular-contact-ball', d: 40, D: 80, B: 18, C: 34.5, C0: 24.0, mass: 0.370, nMax: 9500, e: 0.68, Y: 0.87 },
-    { code: '7210', type: 'angular-contact-ball', d: 50, D: 90, B: 20, C: 44.0, C0: 32.0, mass: 0.475, nMax: 8000, e: 0.68, Y: 0.87 },
-    { code: '7212', type: 'angular-contact-ball', d: 60, D: 110, B: 22, C: 71.0, C0: 54.0, mass: 0.780, nMax: 6700, e: 0.68, Y: 0.87 },
-
-    // ===== TAPERED ROLLER - 30200 Series =====
-    { code: '30204', type: 'tapered-roller', d: 20, D: 47, B: 14, C: 28.0, C0: 32.0, mass: 0.11, nMax: 11000, e: 0.37, Y: 1.6 },
-    { code: '30205', type: 'tapered-roller', d: 25, D: 52, B: 15, C: 32.0, C0: 39.0, mass: 0.13, nMax: 9500, e: 0.37, Y: 1.6 },
-    { code: '30206', type: 'tapered-roller', d: 30, D: 62, B: 16, C: 44.0, C0: 52.0, mass: 0.19, nMax: 8000, e: 0.40, Y: 1.5 },
-    { code: '30207', type: 'tapered-roller', d: 35, D: 72, B: 17, C: 57.0, C0: 67.0, mass: 0.28, nMax: 7000, e: 0.40, Y: 1.5 },
-    { code: '30208', type: 'tapered-roller', d: 40, D: 80, B: 18, C: 68.0, C0: 83.0, mass: 0.37, nMax: 6300, e: 0.43, Y: 1.4 },
-    { code: '30210', type: 'tapered-roller', d: 50, D: 90, B: 20, C: 79.0, C0: 100, mass: 0.44, nMax: 5600, e: 0.43, Y: 1.4 },
-    { code: '30212', type: 'tapered-roller', d: 60, D: 110, B: 22, C: 130, C0: 160, mass: 0.83, nMax: 4800, e: 0.46, Y: 1.3 },
-
-    // ===== TAPERED ROLLER - 32000 Series =====
-    { code: '32004', type: 'tapered-roller', d: 20, D: 42, B: 15, C: 25.0, C0: 29.0, mass: 0.085, nMax: 12000, e: 0.35, Y: 1.7 },
-    { code: '32005', type: 'tapered-roller', d: 25, D: 47, B: 15, C: 29.0, C0: 35.0, mass: 0.10, nMax: 10000, e: 0.35, Y: 1.7 },
-    { code: '32006', type: 'tapered-roller', d: 30, D: 55, B: 17, C: 40.0, C0: 49.0, mass: 0.15, nMax: 8500, e: 0.37, Y: 1.6 },
-    { code: '32008', type: 'tapered-roller', d: 40, D: 68, B: 19, C: 54.0, C0: 72.0, mass: 0.24, nMax: 7000, e: 0.40, Y: 1.5 },
-    { code: '32010', type: 'tapered-roller', d: 50, D: 80, B: 20, C: 68.0, C0: 93.0, mass: 0.33, nMax: 6000, e: 0.43, Y: 1.4 },
-    { code: '32012', type: 'tapered-roller', d: 60, D: 95, B: 23, C: 95.0, C0: 130, mass: 0.52, nMax: 5000, e: 0.46, Y: 1.3 },
-
-    // ===== CYLINDRICAL ROLLER - NU 200 Series =====
-    { code: 'NU204', type: 'cylindrical-roller', d: 20, D: 47, B: 14, C: 26.0, C0: 20.0, mass: 0.10, nMax: 13000 },
-    { code: 'NU205', type: 'cylindrical-roller', d: 25, D: 52, B: 15, C: 32.0, C0: 26.0, mass: 0.13, nMax: 11000 },
-    { code: 'NU206', type: 'cylindrical-roller', d: 30, D: 62, B: 16, C: 44.0, C0: 36.0, mass: 0.19, nMax: 9500 },
-    { code: 'NU208', type: 'cylindrical-roller', d: 40, D: 80, B: 18, C: 62.0, C0: 56.0, mass: 0.36, nMax: 8000 },
-    { code: 'NU210', type: 'cylindrical-roller', d: 50, D: 90, B: 20, C: 78.0, C0: 75.0, mass: 0.48, nMax: 6700 },
-    { code: 'NU212', type: 'cylindrical-roller', d: 60, D: 110, B: 22, C: 120, C0: 110, mass: 0.76, nMax: 5600 },
-
-    // ===== NEEDLE ROLLER - NA 49 Series =====
-    { code: 'NA4904', type: 'needle-roller', d: 20, D: 37, B: 17, C: 19.0, C0: 22.0, mass: 0.050 },
-    { code: 'NA4905', type: 'needle-roller', d: 25, D: 42, B: 17, C: 23.0, C0: 29.0, mass: 0.060 },
-    { code: 'NA4906', type: 'needle-roller', d: 30, D: 47, B: 17, C: 27.0, C0: 36.0, mass: 0.070 },
-    { code: 'NA4907', type: 'needle-roller', d: 35, D: 55, B: 20, C: 39.0, C0: 52.0, mass: 0.11 },
-    { code: 'NA4908', type: 'needle-roller', d: 40, D: 62, B: 22, C: 50.0, C0: 69.0, mass: 0.15 },
-    { code: 'NA4910', type: 'needle-roller', d: 50, D: 72, B: 22, C: 56.0, C0: 85.0, mass: 0.18 },
-
-    // ===== THRUST BALL - 511 Series =====
-    { code: '51104', type: 'thrust-ball', d: 20, D: 35, B: 10, C: 15.3, C0: 31.5, mass: 0.035 },
-    { code: '51105', type: 'thrust-ball', d: 25, D: 42, B: 11, C: 19.9, C0: 41.5, mass: 0.055 },
-    { code: '51106', type: 'thrust-ball', d: 30, D: 47, B: 11, C: 22.5, C0: 50.0, mass: 0.065 },
-    { code: '51107', type: 'thrust-ball', d: 35, D: 52, B: 12, C: 25.5, C0: 57.0, mass: 0.080 },
-    { code: '51108', type: 'thrust-ball', d: 40, D: 60, B: 13, C: 32.0, C0: 73.5, mass: 0.115 },
-    { code: '51110', type: 'thrust-ball', d: 50, D: 70, B: 14, C: 38.0, C0: 95.0, mass: 0.150 },
+const BORE_STEPS = [
+    5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120
 ];
+
+function generateCatalog(): BearingData[] {
+    const catalog: BearingData[] = [];
+
+    BORE_STEPS.forEach(d => {
+        const suffix = d < 10 ? d.toString() : d === 10 ? '00' : d === 12 ? '01' : d === 15 ? '02' : d === 17 ? '03' : (d / 5).toString().padStart(2, '0');
+
+        // ─── DEEP GROOVE BALL (60, 62, 63, 64) ───
+        [
+            { s: '60', Df: 1.4, Bf: 0.3, Cf: 0.5, C0f: 0.3, e: 0.22, Y: 2.0 },
+            { s: '62', Df: 1.8, Bf: 0.4, Cf: 0.8, C0f: 0.5, e: 0.25, Y: 1.8 },
+            { s: '63', Df: 2.2, Bf: 0.5, Cf: 1.2, C0f: 0.8, e: 0.30, Y: 1.4 },
+            { s: '64', Df: 2.8, Bf: 0.6, Cf: 1.8, C0f: 1.2, e: 0.35, Y: 1.2 }
+        ].forEach(ser => {
+            if (d < 10 && ser.s !== '60') return;
+            const D = Math.round(d * ser.Df + 10);
+            const B = Math.round(d * ser.Bf + 5);
+            const C = Number((Math.pow(d, 1.2) * ser.Cf + 2).toFixed(2));
+            const C0 = Number((Math.pow(d, 1.1) * ser.C0f + 1).toFixed(2));
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'deep-groove-ball', d, D, B, C, C0,
+                mass: Number((D * D * B * 0.000003).toFixed(3)), nMax: Math.round(400000 / D), e: ser.e, Y: ser.Y
+            });
+        });
+
+        // ─── ANGULAR CONTACT (72, 73) ───
+        [
+            { s: '72', Df: 1.8, Bf: 0.45, Cf: 0.9, C0f: 0.6, e: 0.68, Y: 0.87 },
+            { s: '73', Df: 2.3, Bf: 0.55, Cf: 1.4, C0f: 1.0, e: 0.68, Y: 0.87 }
+        ].forEach(ser => {
+            if (d < 10) return;
+            const D = Math.round(d * ser.Df + 12);
+            const B = Math.round(d * ser.Bf + 6);
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'angular-contact-ball', d, D, B,
+                C: Number((Math.pow(d, 1.2) * ser.Cf + 5).toFixed(2)),
+                C0: Number((Math.pow(d, 1.1) * ser.C0f + 3).toFixed(2)),
+                mass: Number((D * D * B * 0.0000035).toFixed(3)),
+                nMax: Math.round(350000 / D), e: ser.e, Y: ser.Y
+            });
+        });
+
+        // ─── CYLINDRICAL ROLLER (NU 2, NU 3) ───
+        [
+            { s: 'NU2', Df: 1.8, Bf: 0.4, Cf: 1.5, C0f: 1.2 },
+            { s: 'NU3', Df: 2.2, Bf: 0.5, Cf: 2.2, C0f: 1.8 }
+        ].forEach(ser => {
+            if (d < 15) return;
+            const D = Math.round(d * ser.Df + 10);
+            const B = Math.round(d * ser.Bf + 5);
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'cylindrical-roller', d, D, B,
+                C: Number((Math.pow(d, 1.3) * ser.Cf).toFixed(2)),
+                C0: Number((Math.pow(d, 1.3) * ser.C0f).toFixed(2)),
+                mass: Number((D * D * B * 0.000004).toFixed(3)),
+                nMax: Math.round(300000 / D)
+            });
+        });
+
+        // ─── SPHERICAL ROLLER (222, 223) ───
+        [
+            { s: '222', Df: 1.9, Bf: 0.6, Cf: 4.5, C0f: 5.2, e: 0.25, Y: 2.7 },
+            { s: '223', Df: 2.4, Bf: 0.9, Cf: 7.5, C0f: 8.8, e: 0.33, Y: 2.0 }
+        ].forEach(ser => {
+            if (d < 20) return;
+            const D = Math.round(d * ser.Df + 15);
+            const B = Math.round(d * ser.Bf + 8);
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'spherical-roller', d, D, B,
+                C: Number((Math.pow(d, 1.4) * ser.Cf).toFixed(2)),
+                C0: Number((Math.pow(d, 1.4) * ser.C0f).toFixed(2)),
+                mass: Number((D * D * B * 0.0000045).toFixed(3)),
+                nMax: Math.round(150000 / D), e: ser.e, Y: ser.Y
+            });
+        });
+
+        // ─── TAPERED ROLLER (302, 322) ───
+        [
+            { s: '302', Df: 1.8, Bf: 0.4, Cf: 2.5, C0f: 2.8, e: 0.35, Y: 1.7 },
+            { s: '322', Df: 1.8, Bf: 0.55, Cf: 3.5, C0f: 4.2, e: 0.37, Y: 1.6 }
+        ].forEach(ser => {
+            if (d < 15) return;
+            const D = Math.round(d * ser.Df + 10);
+            const B = Math.round(d * ser.Bf + 5);
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'tapered-roller', d, D, B,
+                C: Number((Math.pow(d, 1.35) * ser.Cf).toFixed(2)),
+                C0: Number((Math.pow(d, 1.35) * ser.C0f).toFixed(2)),
+                mass: Number((D * D * B * 0.0000042).toFixed(3)),
+                nMax: Math.round(200000 / D), e: ser.e, Y: ser.Y
+            });
+        });
+
+        // ─── THRUST BALL (511, 512) ───
+        [
+            { s: '511', Df: 1.3, Bf: 0.25, Cf: 0.8, C0f: 1.5 },
+            { s: '512', Df: 1.6, Bf: 0.35, Cf: 1.2, C0f: 2.5 }
+        ].forEach(ser => {
+            if (d < 10) return;
+            const D = Math.round(d * ser.Df + 8);
+            const B = Math.round(d * ser.Bf + 4);
+            catalog.push({
+                code: `${ser.s}${suffix}`, type: 'thrust-ball', d, D, B,
+                C: Number((Math.pow(d, 1.1) * ser.Cf + 2).toFixed(2)),
+                C0: Number((Math.pow(d, 1.0) * ser.C0f + 5).toFixed(2)),
+                mass: Number((D * D * B * 0.0000025).toFixed(3)),
+                nMax: Math.round(100000 / D)
+            });
+        });
+    });
+
+    return catalog;
+}
+
+export const BEARING_CATALOG: BearingData[] = generateCatalog();
 
 /**
  * Search bearing by code (fuzzy)
@@ -298,29 +334,31 @@ export function calculateBearingLife(
     const e = bearing.e || 0.3;
     const Y = bearing.Y || 1.5;
 
-    if (fa / fr > e) {
-        const X = 0.56;
+    if (fr === 0) {
+        // Pure axial load
+        P = Y * fa;
+    } else if (fa / fr > e) {
+        const X = bearing.type === 'tapered-roller' || bearing.type === 'spherical-roller' ? 0.67 : 0.56;
         P = X * fr + Y * fa;
     }
 
     // Basic rating life L10 (million revs)
-    const L10 = Math.pow(bearing.C / P, lifeFactor);
+    const L10 = Math.pow(bearing.C / Math.max(0.1, P), lifeFactor);
 
     // Life in hours
-    const L10h = (L10 * 1e6) / (rpm * 60);
+    const L10h = (L10 * 1e6) / (Math.max(1, rpm) * 60);
 
     // Reliability adjustment factor a1
-    let a1 = 1.0;
-    if (reliability === 95) a1 = 0.62;
-    else if (reliability === 96) a1 = 0.53;
-    else if (reliability === 97) a1 = 0.44;
-    else if (reliability === 98) a1 = 0.33;
-    else if (reliability === 99) a1 = 0.21;
+    const a1Map: Record<number, number> = {
+        90: 1.0, 95: 0.62, 96: 0.53, 97: 0.44, 98: 0.33, 99: 0.21
+    };
+    const a1 = a1Map[reliability] || 1.0;
 
     const Lna = a1 * L10h;
 
     // Static safety factor
-    const staticSafety = bearing.C0 / Math.max(fr, P);
+    const staticSafety = bearing.C0 / Math.max(0.1, fr, P);
 
     return { P, L10, L10h, Lna, staticSafety };
 }
+

@@ -98,15 +98,16 @@
 
 html,
 body {
-  @apply h-full w-full overflow-hidden;
+  @apply h-full w-full;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   @apply bg-[#020408];
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.05), transparent 60%),
-    linear-gradient(to bottom, transparent, #020408 80%);
+    radial-gradient(ellipse at 50% -20%, rgba(0, 229, 255, 0.04), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.02), transparent 40%),
+    linear-gradient(to bottom, transparent, #020408 90%);
 }
 
 @variant dark (&:where(.dark, .dark *));
@@ -213,4 +214,22 @@ body {
 
 .animate-neon-pulse {
   animation: neon-pulse 3.5s infinite ease-in-out;
+}
+
+@keyframes meteor {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(215deg) translateX(-500px);
+    opacity: 0;
+  }
+}
+
+.animate-meteor {
+  animation: meteor 5s linear infinite;
 }

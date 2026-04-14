@@ -1,0 +1,352 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nod
+ejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], R 
+   emoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+> Build error occurred
+Error: Turbopack build failed with 4 errors:
+./node_modules/@salusoft89/planegcs/dist/planegcs_dist/plane
+gcs.wasm_.loader.mjs:1:1
+Module not found: Can't resolve 'a'
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { a
+[33m,[39m b[33m,[39m c[33m,[39m d[33m,[39m e[33m,[3
+9m f[33m,[39m g[33m,[39m h[33m,[39m i[33m,[39m j[33
+m,[39m k[33m,[39m l[33m,[39m m[33m,[39m n[33m,[39m 
+o[33m,[39m p[33m,[39m q[33m,[39m r[33m,[39m s[33m,
+[39m t[33m,[39m u[33m,[39m v[33m,[39m w[33m,[39m x[
+33m,[39m y[33m,[39m z } [36mfrom[39m [32m"a"[39m[33m
+;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m wasmPath [36mfrom[39m [3
+2m"WASM_PATH"[39m[33m;[39m
+ [90m 3 |[39m
+ [90m 4 |[39m [36mconst[39m { [33mA[39m[33m,[39m [3
+3mB[39m[33m,[39m [33mC[39m[33m,[39m [33mD[39m[33m,
+[39m [33mE[39m[33m,[39m [33mF[39m[33m,[39m [33mG[
+39m[33m,[39m [33mH[39m[33m,[39m [33mI[39m[33m,[39m
+ [33mJ[39m[33m,[39m [33mK[39m[33m,[39m [33mL[39m }
+ [33m=[39m [36mawait[39m __turbopack_wasm__(wasmPath[33
+m,[39m () [33m=>[39m wasm_45dac4b7454380bb[33m,[39m {[
+0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./node_modules/@salusoft89/planegcs/dist/planegcs_dist/plane
+gcs.js:10:44
+Module not found: Can't resolve 'module'
+[0m [90m  8 |[39m       [36mvar[39m h [33m=[39m modul
+eArg[33m,[39m aa[33m,[39m ba[33m;[39m h[33m.[39mread
+y [33m=[39m [36mnew[39m [33mPromise[39m((b[33m,[39m 
+a) [33m=>[39m { aa [33m=[39m b[33m;[39m ba [33m=[39m
+ a })[33m;[39m [36mvar[39m ca [33m=[39m [33mObject[3
+9m[33m.[39massign({}[33m,[39m h)[33m,[39m da [33m=[3
+9m [32m"./this.program"[39m[33m,[39m ea [33m=[39m [32
+m"object"[39m [33m==[39m [36mtypeof[39m window[33m,[3
+9m r [33m=[39m [32m"function"[39m [33m==[39m [36mtype
+of[39m importScripts[33m,[39m fa [33m=[39m [32m"object
+"[39m [33m==[39m [36mtypeof[39m process [33m&&[39m [
+32m"object"[39m [33m==[39m [36mtypeof[39m process[33m.
+[39mversions [33m&&[39m [32m"string"[39m [33m==[39m 
+[36mtypeof[39m process[33m.[39mversions[33m.[39mnode[3
+3m,[39m w [33m=[39m [32m""[39m[33m,[39m ha[33m,[39m
+ ia[33m,[39m ja[33m;[39m
+ [90m  9 |[39m       [36mif[39m (fa) {
+[31m[1m>[22m[39m[90m 10 |[39m         [36mconst[39m 
+{ createRequire[33m:[39m b } [33m=[39m [36mawait[39m 
+[36mimport[39m([32m"module"[39m)[33m;[39m [36mvar[39m
+ require [33m=[39m b([36mimport[39m[33m.[39mmeta[33m.
+[39murl)[33m,[39m fs [33m=[39m require([32m"fs"[39m)
+[33m,[39m ka [33m=[39m require([32m"path"[39m)[33m;[3
+9m r [33m?[39m w [33m=[39m ka[33m.[39mdirname(w) [33m
++[39m [32m"/"[39m [33m:[39m w [33m=[39m require([32m
+"url"[39m)[33m.[39mfileURLToPath([36mnew[39m [33mURL[
+39m([[32m'.'[39m[33m,[39m [32m'/'[39m][33m.[39mjoin(
+[32m''[39m)[33m,[39m [36mimport[39m[33m.[39mmeta[33
+m.[39murl))[33m;[39m ha [33m=[39m (a[33m,[39m c) [33
+m=>[39m { a [33m=[39m a[33m.[39mstartsWith([32m"file:/
+/"[39m) [33m?[39m [36mnew[39m [33mURL[39m(a) [33m:[
+39m ka[33m.[39mnormalize(a)[33m;[39m [36mreturn[39m fs
+[33m.[39mreadFileSync(a[33m,[39m c [33m?[39m [36mvoid
+[39m [35m0[39m [33m:[39m [32m"utf8"[39m) }[33m;[39m
+ ja [33m=[39m a [33m=>[39m { a [33m=[39m ha(a[33m,[3
+9m [33m![39m[35m0[39m)[33m;[39m a[33m.[39mbuffer [3
+3m||[39m (a [33m=[39m [36mnew[39m [33mUint8Array[39m(
+a))[33m;[39m [36mreturn[39m a }[33m;[39m ia [33m=[39
+m (a[33m,[39m c[33m,[39m d[33m,[39m f [33m=[39m [33
+m![39m[35m0[39m) [33m=>[39m {
+ [90m    |[39m                                            
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m
+ [90m 11 |[39m           a [33m=[39m a[33m.[39mstartsW
+ith([32m"file://"[39m) [33m?[39m [36mnew[39m [33mURL
+[39m(a) [33m:[39m ka[33m.[39mnormalize(a)[33m;[39m fs
+[33m.[39mreadFile(a[33m,[39m f [33m?[39m [36mvoid[39m
+ [35m0[39m [33m:[39m [32m"utf8"[39m[33m,[39m
+ [90m 12 |[39m             (g[33m,[39m l) [33m=>[39m {
+ g [33m?[39m d(g) [33m:[39m c(f [33m?[39m l[33m.[39m
+buffer [33m:[39m l) })
+ [90m 13 |[39m         }[33m;[39m [33m![39mh[33m.[39
+mthisProgram [33m&&[39m [35m1[39m [33m<[39m process[3
+3m.[39margv[33m.[39mlength [33m&&[39m (da [33m=[39m p
+rocess[33m.[39margv[[35m1[39m][33m.[39mreplace([35m/\
+\/g[39m[33m,[39m [32m"/"[39m))[33m;[39m process[33m.
+[39margv[33m.[39mslice([35m2[39m)[33m;[39m h[33m.[3
+9minspect [33m=[39m () [33m=>[39m [32m"[Emscripten Modu
+le object]"[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@salusoft89/planegcs/dist/planegcs_dist/p
+lanegcs.js [Client Component Browser]
+    ./node_modules/@salusoft89/planegcs/dist/index.js [Clien
+t Component Browser]
+    ./src/cad/constraints/SolverWrapper.ts [Client Component
+ Browser]
+    ./src/cad/store/cadStore.ts [Client Component Browser]
+    ./src/components/os/RibbonBar.tsx [Client Component Brow
+ser]
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./node_modules/@salusoft89/planegcs/dist/planegcs_dist/plane
+gcs.js:10:201
+Module not found: Can't resolve <dynamic>
+[0m [90m  8 |[39m       [36mvar[39m h [33m=[39m modul
+eArg[33m,[39m aa[33m,[39m ba[33m;[39m h[33m.[39mread
+y [33m=[39m [36mnew[39m [33mPromise[39m((b[33m,[39m 
+a) [33m=>[39m { aa [33m=[39m b[33m;[39m ba [33m=[39m
+ a })[33m;[39m [36mvar[39m ca [33m=[39m [33mObject[3
+9m[33m.[39massign({}[33m,[39m h)[33m,[39m da [33m=[3
+9m [32m"./this.program"[39m[33m,[39m ea [33m=[39m [32
+m"object"[39m [33m==[39m [36mtypeof[39m window[33m,[3
+9m r [33m=[39m [32m"function"[39m [33m==[39m [36mtype
+of[39m importScripts[33m,[39m fa [33m=[39m [32m"object
+"[39m [33m==[39m [36mtypeof[39m process [33m&&[39m [
+32m"object"[39m [33m==[39m [36mtypeof[39m process[33m.
+[39mversions [33m&&[39m [32m"string"[39m [33m==[39m 
+[36mtypeof[39m process[33m.[39mversions[33m.[39mnode[3
+3m,[39m w [33m=[39m [32m""[39m[33m,[39m ha[33m,[39m
+ ia[33m,[39m ja[33m;[39m
+ [90m  9 |[39m       [36mif[39m (fa) {
+[31m[1m>[22m[39m[90m 10 |[39m         [36mconst[39m 
+{ createRequire[33m:[39m b } [33m=[39m [36mawait[39m 
+[36mimport[39m([32m"module"[39m)[33m;[39m [36mvar[39m
+ require [33m=[39m b([36mimport[39m[33m.[39mmeta[33m.
+[39murl)[33m,[39m fs [33m=[39m require([32m"fs"[39m)
+[33m,[39m ka [33m=[39m require([32m"path"[39m)[33m;[3
+9m r [33m?[39m w [33m=[39m ka[33m.[39mdirname(w) [33m
++[39m [32m"/"[39m [33m:[39m w [33m=[39m require([32m
+"url"[39m)[33m.[39mfileURLToPath([36mnew[39m [33mURL[
+39m([[32m'.'[39m[33m,[39m [32m'/'[39m][33m.[39mjoin(
+[32m''[39m)[33m,[39m [36mimport[39m[33m.[39mmeta[33
+m.[39murl))[33m;[39m ha [33m=[39m (a[33m,[39m c) [33
+m=>[39m { a [33m=[39m a[33m.[39mstartsWith([32m"file:/
+/"[39m) [33m?[39m [36mnew[39m [33mURL[39m(a) [33m:[
+39m ka[33m.[39mnormalize(a)[33m;[39m [36mreturn[39m fs
+[33m.[39mreadFileSync(a[33m,[39m c [33m?[39m [36mvoid
+[39m [35m0[39m [33m:[39m [32m"utf8"[39m) }[33m;[39m
+ ja [33m=[39m a [33m=>[39m { a [33m=[39m ha(a[33m,[3
+9m [33m![39m[35m0[39m)[33m;[39m a[33m.[39mbuffer [3
+3m||[39m (a [33m=[39m [36mnew[39m [33mUint8Array[39m(
+a))[33m;[39m [36mreturn[39m a }[33m;[39m ia [33m=[39
+m (a[33m,[39m c[33m,[39m d[33m,[39m f [33m=[39m [33
+m![39m[35m0[39m) [33m=>[39m {
+ [90m    |[39m                                            
+                                                            
+                                                            
+                                     [31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 11 |[39m           a [33m=[39m a[33m.[39mstartsW
+ith([32m"file://"[39m) [33m?[39m [36mnew[39m [33mURL
+[39m(a) [33m:[39m ka[33m.[39mnormalize(a)[33m;[39m fs
+[33m.[39mreadFile(a[33m,[39m f [33m?[39m [36mvoid[39m
+ [35m0[39m [33m:[39m [32m"utf8"[39m[33m,[39m
+ [90m 12 |[39m             (g[33m,[39m l) [33m=>[39m {
+ g [33m?[39m d(g) [33m:[39m c(f [33m?[39m l[33m.[39m
+buffer [33m:[39m l) })
+ [90m 13 |[39m         }[33m;[39m [33m![39mh[33m.[39
+mthisProgram [33m&&[39m [35m1[39m [33m<[39m process[3
+3m.[39margv[33m.[39mlength [33m&&[39m (da [33m=[39m p
+rocess[33m.[39margv[[35m1[39m][33m.[39mreplace([35m/\
+\/g[39m[33m,[39m [32m"/"[39m))[33m;[39m process[33m.
+[39margv[33m.[39mslice([35m2[39m)[33m;[39m h[33m.[3
+9minspect [33m=[39m () [33m=>[39m [32m"[Emscripten Modu
+le object]"[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./node_modules/@salusoft89/planegcs/dist/planegcs_dist/p
+lanegcs.js [Client Component Browser]
+    ./node_modules/@salusoft89/planegcs/dist/index.js [Clien
+t Component Browser]
+    ./src/cad/constraints/SolverWrapper.ts [Client Component
+ Browser]
+    ./src/cad/store/cadStore.ts [Client Component Browser]
+    ./src/components/os/RibbonBar.tsx [Client Component Brow
+ser]
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./src/cad/constraints/SolverWrapper.ts:3:1
+Export default doesn't exist in target module
+[0m [90m 1 |[39m [36mimport[39m { [33mCadEntity[39m[
+33m,[39m [33mConstraint[39m } [36mfrom[39m [32m'../ker
+nel/types'[39m[33m;[39m
+ [90m 2 |[39m [90m// @ts-ignore[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m wasm_url
+ [36mfrom[39m [32m'@salusoft89/planegcs/dist/planegcs_dis
+t/planegcs.wasm?url'[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m
+ [90m 4 |[39m [36mimport[39m { useCadStore } [36mfrom[
+39m [32m'../store/cadStore'[39m[33m;[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mclass[39m [33mSolver
+Wrapper[39m {[0m
+
+The export default was not found in module [project]/node_mo
+dules/@salusoft89/planegcs/dist/planegcs_dist/planegcs.wasm?
+url [app-client] (wasm module).
+Did you mean to import L?
+All exports of the module are statically known (It doesn't h
+ave dynamic exports). So it's known statically that the requ
+ested export doesn't exist.
+
+Import traces:
+  App Route:
+    ./src/cad/constraints/SolverWrapper.ts
+    ./src/app/api/export-step/route.ts
+
+  Client Component Browser:
+    ./src/cad/constraints/SolverWrapper.ts [Client Component
+ Browser]
+    ./src/cad/store/cadStore.ts [Client Component Browser]
+    ./src/components/os/RibbonBar.tsx [Client Component Brow
+ser]
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/cad/constraints/SolverWrapper.ts [Client Component
+ SSR]
+    ./src/cad/store/cadStore.ts [Client Component SSR]
+    ./src/components/os/RibbonBar.tsx [Client Component SSR]
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+
+    at ./node_modules/ (salusoft89/planegcs/dist/planegcs_di
+st/planegcs.wasm_.loader.mjs:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-no
+t-found)
+    at ./node_modules/ (salusoft89/planegcs/dist/planegcs_di
+st/planegcs.js:10:44)
+    at <unknown> (https://nextjs.org/docs/messages/module-no
+t-found)
+    at ./node_modules/ (salusoft89/planegcs/dist/planegcs_di
+st/planegcs.js:10:201)
+    at <unknown> (https://nextjs.org/docs/messages/module-no
+t-found)
+    at <unknown> (./src/cad/constraints/SolverWrapper.ts:3:1
+)

@@ -1,0 +1,45 @@
+{
+  "id": "fatigue_analysis",
+  "name": "Fatigue & Endurance Limit Analysis",
+  "category": "mechanical",
+  "inputs": [
+    { "key": "S_ut", "type": "number", "unit": "MPa", "description": "Ultimate Tensile Strength" },
+    { "key": "S_y", "type": "number", "unit": "MPa", "description": "Yield Strength" },
+    { "key": "sigma_a", "type": "number", "unit": "MPa", "description": "Alternating Stress" },
+    { "key": "sigma_m", "type": "number", "unit": "MPa", "description": "Mean Stress" },
+    { "key": "k_a", "type": "number", "description": "Surface Condition Factor" },
+    { "key": "k_b", "type": "number", "description": "Size Factor" },
+    { "key": "k_c", "type": "number", "description": "Load Factor" }
+  ],
+  "steps": [
+    {
+      "id": "S_e_prime",
+      "formula": "0.5 * S_ut",
+      "description": "Ideal Endurance Limit (Steel approximation)",
+      "latex": "S_e' = 0.5 \\cdot S_{ut}"
+    },
+    {
+      "id": "S_e",
+      "formula": "k_a * k_b * k_c * S_e_prime",
+      "description": "Modified Endurance Limit (Marin Factors)",
+      "latex": "S_e = k_a k_b k_c S_e'"
+    },
+    {
+      "id": "n_Goodman",
+      "formula": "1 / ( (sigma_a / S_e) + (sigma_m / S_ut) )",
+      "description": "Factor of Safety (Modified Goodman)",
+      "latex": "n_f = \\frac{1}{\\frac{\\sigma_a}{S_e} + \\frac{\\sigma_m}{S_{ut}}}"
+    },
+    {
+      "id": "n_Yield",
+      "formula": "S_y / (sigma_a + sigma_m)",
+      "description": "Langer First-Cycle Yield Safety Factor",
+      "latex": "n_y = \\frac{S_y}{\\sigma_a + \\sigma_m}"
+    }
+  ],
+  "outputs": [
+    "S_e",
+    "n_Goodman",
+    "n_Yield"
+  ]
+}

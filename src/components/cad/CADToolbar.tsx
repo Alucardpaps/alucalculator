@@ -1,20 +1,18 @@
 /**
- * CAD Toolbar - Fixed Top Horizontal Bar
- * AutoCAD/Fusion-style fixed toolbar
+ * CAD Toolbar - Professional Design Interface
+ * Standardized for the Engineering Workstation environment.
  */
 
 'use client';
 
 import React, { useState } from 'react';
 import { useCADCanvasStore, CADTool, Unit, SnapMode } from '@/store/CADCanvasStore';
-import { useFlowStore } from '@/store/flowStore';
-import { getAllCalculators, getCalculatorsByDomain, DOMAIN_INFO } from '@/calculators/registry';
+import { useOSStore } from '@/store/osStore';
 import {
-    MousePointer2, Minus, Square, Circle, Ruler, Type, ArrowUpRight,
-    Grid3X3, Magnet, ZoomIn, ZoomOut, RotateCcw, Trash2, Download, Upload,
-    ChevronDown, Move, LucideIcon, X, Check, Scissors, Maximize, CornerUpRight,
-    Slash, Scan, Calculator, Youtube, FileText, StickyNote, Eye, BookOpen,
-    Search, Plus, Wrench, Database, Book, Box, Thermometer, Settings
+    MousePointer2, Minus, Square, Circle, Ruler, Type, 
+    Grid3X3, Magnet, ZoomIn, ZoomOut, RotateCcw, Trash2, Download,
+    ChevronDown, Move, LucideIcon, Check, Scissors, Maximize, CornerUpRight,
+    Slash, Scan, Calculator, Monitor
 } from 'lucide-react';
 
 // ============================================
@@ -48,13 +46,6 @@ const DIM_TOOLS: ToolDef[] = [
     { id: 'text', label: 'Text', Icon: Type },
 ];
 
-const SNAP_MODES: { mode: SnapMode; label: string }[] = [
-    { mode: 'grid', label: 'Grid' },
-    { mode: 'endpoint', label: 'Endpoint' },
-    { mode: 'midpoint', label: 'Midpoint' },
-    { mode: 'intersection', label: 'Intersection' },
-];
-
 const UNITS: { value: Unit; label: string }[] = [
     { value: 'mm', label: 'mm' },
     { value: 'cm', label: 'cm' },
@@ -67,10 +58,7 @@ const UNITS: { value: Unit; label: string }[] = [
 // ============================================
 
 export function CADToolbar() {
-    const [showCalcDropdown, setShowCalcDropdown] = useState(false);
-    const [showSnapMenu, setShowSnapMenu] = useState(false);
     const [showUnitMenu, setShowUnitMenu] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
 
     // CAD Store
     const {
@@ -80,7 +68,6 @@ export function CADToolbar() {
         setUnit,
         snapSettings,
         toggleSnap,
-        toggleSnapMode,
         showGrid,
         toggleGrid,
         zoomIn,
@@ -92,32 +79,7 @@ export function CADToolbar() {
         exportToDXF
     } = useCADCanvasStore();
 
-    // Flow Store
-    const { addCalculatorNode, addNoteNode, addMediaNode, addNotebookNode, addVisualizerNode } = useFlowStore();
-
-    // Get all calculators
-    const allCalculators = getAllCalculators();
-
-    // Filter calculators by search
-    const filteredCalculators = searchQuery
-        ? allCalculators.filter(c =>
-            c.metadata.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.domain.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : allCalculators;
-
-    // Group by domain
-    const groupedCalculators = filteredCalculators.reduce((acc, calc) => {
-        if (!acc[calc.domain]) acc[calc.domain] = [];
-        acc[calc.domain].push(calc);
-        return acc;
-    }, {} as Record<string, typeof allCalculators>);
-
-    const handleAddCalculator = (calcId: string) => {
-        addCalculatorNode(calcId, { x: 200 + Math.random() * 200, y: 100 + Math.random() * 200 });
-        setShowCalcDropdown(false);
-        setSearchQuery('');
-    };
+    const { openWindow } = useOSStore();
 
     const handleExportDXF = () => {
         const dxf = exportToDXF();
@@ -125,7 +87,7 @@ export function CADToolbar() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'drawing.dxf';
+        a.download = `ALUCAD_EXPORT_${Date.now()}.dxf`;
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -133,60 +95,18 @@ export function CADToolbar() {
     return (
         <div className="w-full bg-[#0a0e12]/95 backdrop-blur-md border-b border-[#1e2833] px-4 py-2">
             <div className="flex items-center gap-2 flex-wrap">
-                {/* ═══ Flow Tools Section ═══ */}
+                {/* ═══ Workstation Quick Access ═══ */}
                 <div className="flex items-center gap-1 pr-3 border-r border-[#2a3a4a]">
-                    {/* Calculator Dropdown */}
-                    <div className="relative">
-                        <ToolbarButton
-                            icon={Calculator}
-                            label="Add Calculator"
-                            isActive={showCalcDropdown}
-                            onClick={() => { setShowCalcDropdown(!showCalcDropdown); setShowSnapMenu(false); setShowUnitMenu(false); }}
-                            hasDropdown
-                        />
-                        {showCalcDropdown && (
-                            <div className="absolute top-full left-0 mt-2 w-72 bg-[#0a0e12] border border-[#2a3a4a] rounded-lg shadow-2xl z-[200] max-h-96 overflow-hidden">
-                                <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1e2833]">
-                                    <Search size={14} className="text-gray-500" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search calculators..."
-                                        className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 outline-none"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        autoFocus
-                                    />
-                                </div>
-                                <div className="max-h-72 overflow-y-auto">
-                                    {Object.entries(groupedCalculators).map(([domain, calcs]) => {
-                                        const info = DOMAIN_INFO[domain as keyof typeof DOMAIN_INFO];
-                                        return (
-                                            <div key={domain} className="border-b border-[#1e2833] last:border-0">
-                                                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider" style={{ color: info?.color || '#666' }}>
-                                                    {info?.label || domain}
-                                                </div>
-                                                {calcs.map(calc => (
-                                                    <button
-                                                        key={calc.id}
-                                                        className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:bg-[#1a2332] hover:text-white flex items-center justify-between"
-                                                        onClick={() => handleAddCalculator(calc.id)}
-                                                    >
-                                                        {calc.metadata.title}
-                                                        <Plus size={12} className="opacity-50" />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <ToolbarButton icon={Youtube} label="Media" onClick={() => addMediaNode('youtube', 'https://www.youtube.com', { x: 200, y: 200 })} />
-                    <ToolbarButton icon={StickyNote} label="Note" onClick={() => addNoteNode('New Note', { x: 200, y: 200 })} />
-                    <ToolbarButton icon={Eye} label="Visualizer" onClick={() => addVisualizerNode('gear', { x: 200, y: 200 })} />
-                    <ToolbarButton icon={BookOpen} label="Notebook" onClick={() => addNotebookNode('Notebook', { x: 200, y: 200 })} />
+                    <ToolbarButton 
+                        icon={Calculator} 
+                        label="Calculators" 
+                        onClick={() => openWindow('calculator')} 
+                    />
+                    <ToolbarButton 
+                        icon={Monitor} 
+                        label="Workstation" 
+                        onClick={() => openWindow('analytics-dashboard')} 
+                    />
                 </div>
 
                 {/* ═══ CAD Draw Tools ═══ */}
@@ -262,7 +182,7 @@ export function CADToolbar() {
                 {/* ═══ Unit Selector ═══ */}
                 <div className="relative">
                     <button
-                        onClick={() => { setShowUnitMenu(!showUnitMenu); setShowCalcDropdown(false); setShowSnapMenu(false); }}
+                        onClick={() => setShowUnitMenu(!showUnitMenu)}
                         className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-mono text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
                     >
                         {unit.toUpperCase()}

@@ -1,0 +1,26 @@
+{
+  "id": "v-belt-tension",
+  "category": "mechanical",
+  "title": "V-Belt Tension Calculator",
+  "slug": "v-belt-tension",
+  "meta": {
+    "title": "V-Belt Tension | AluCalc",
+    "description": "Static tension for drives."
+  },
+  "seo": {
+    "h1": "V-Belt Tension Calculator",
+    "intro": "Ensures belt drive efficiency.",
+    "formula": "T = ((2.5-G)/G)*(P/v)",
+    "variables": {
+      "T": "Tension",
+      "P": "Power",
+      "v": "Speed"
+    },
+    "practical": "Prevent slippage.",
+    "example": "v=20m/s."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=v-belt-tension"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "bolt_torque",
+  "name": "Bolted Joint Torque & Preload",
+  "category": "mechanical",
+  "inputs": [
+    { "key": "D", "type": "number", "unit": "mm", "description": "Nominal Bolt Diameter" },
+    { "key": "K", "type": "number", "description": "Torque Coefficient (Nut Factor)" },
+    { "key": "S_p", "type": "number", "unit": "MPa", "description": "Proof Strength of Bolt Material" },
+    { "key": "A_t", "type": "number", "unit": "mm^2", "description": "Tensile Stress Area" }
+  ],
+  "steps": [
+    {
+      "id": "F_i",
+      "formula": "0.75 * S_p * A_t",
+      "description": "Recommended Preload (Non-permanent joint)",
+      "latex": "F_i = 0.75 \\cdot S_p \\cdot A_t"
+    },
+    {
+      "id": "T",
+      "formula": "(K * F_i * D) / 1000",
+      "description": "Required Fastening Torque (Nm)",
+      "latex": "T = \\frac{K \\cdot F_i \\cdot D}{1000}"
+    }
+  ],
+  "outputs": [
+    "F_i",
+    "T"
+  ]
+}

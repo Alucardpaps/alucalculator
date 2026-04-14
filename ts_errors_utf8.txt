@@ -1,0 +1,15 @@
+﻿src/app/page.tsx(52,36): error TS2322: Type '"mechanical" | "civil" | "electrical" | "science" | "finance" | "software" | "flow" | "cam" | "desk" | "fea"' is not assignable to type '"flow" | "cad" | "cam" | "desk" | "fea" | undefined'.
+  Type '"mechanical"' is not assignable to type '"flow" | "cad" | "cam" | "desk" | "fea" | undefined'.
+src/components/CalculatorInput.tsx(15,13): error TS2339: Property 'getVariableValue' does not exist on type 'ProjectState'.
+src/components/CalculatorInput.tsx(15,31): error TS2339: Property 'variables' does not exist on type 'ProjectState'.
+src/components/calculators/UniversalCalcRenderer.tsx(163,13): error TS2339: Property 'getVariableValue' does not exist on type 'ProjectState'.
+src/components/flow/FlowVariableManager.tsx(17,54): error TS2339: Property 'variables' does not exist on type 'ProjectState'.
+src/components/flow/FlowVariableManager.tsx(38,57): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/components/modules/mechanical/BearingsModule.tsx(81,13): error TS2353: Object literal may only specify known properties, and 'weight' does not exist in type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+src/components/modules/mechanical/BearingsModule.tsx(105,46): error TS2339: Property 'label' does not exist on type '{ name: string; nameTr: string; icon: string; color: string; description: string; }'.
+src/components/os/VariableManager.tsx(2,27): error TS2305: Module '"@/store/projectStore"' has no exported member 'ProjectVariable'.
+src/components/os/VariableManager.tsx(8,13): error TS2339: Property 'variables' does not exist on type 'ProjectState'.
+src/components/os/VariableManager.tsx(8,24): error TS2339: Property 'addVariable' does not exist on type 'ProjectState'.
+src/components/os/VariableManager.tsx(8,37): error TS2339: Property 'updateVariable' does not exist on type 'ProjectState'.
+src/components/os/VariableManager.tsx(8,53): error TS2339: Property 'removeVariable' does not exist on type 'ProjectState'.
+src/components/os/VariableManager.tsx(95,40): error TS7006: Parameter 'v' implicitly has an 'any' type.

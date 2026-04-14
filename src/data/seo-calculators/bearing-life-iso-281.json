@@ -1,0 +1,88 @@
+{
+  "id": "bearing-life-iso-281",
+  "category": "mechanical",
+  "title": "Bearing Life Prediction (ISO 281 Guide)",
+  "slug": "bearing-life-iso-281",
+  "keyword": "bearing life calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Bearing Life Calculator | ISO 281 Technical Guide | AluCalc",
+    "description": "Calculate L10 bearing life using ISO 281 methodologies. Professional guide on dynamic load ratings, life adjustment factors, and reliability."
+  },
+  "seo": {
+    "h1": "Life Prediction for Rolling Bearings: The ISO 281 Standard",
+    "intro": "The life of a rolling element bearing is defined as the number of revolutions it can perform before the first sign of metal fatigue (spalling) appears on any of its races or rolling elements. ISO 281 provides the international mathematical framework for predicting this duration with industrial accuracy.",
+    "formula": "L10 = (Cr / Pr) ^ p",
+    "variables": {
+      "L10": "Basic Rating Life (Millions of Revolutions)",
+      "Cr": "Basic Dynamic Load Rating (Newtons)",
+      "Pr": "Equivalent Dynamic Bearing Load (Newtons)",
+      "p": "Life Exponent (3 for Ball, 10/3 for Roller Bearings)"
+    },
+    "practical": "Critical for rotating machinery design including high-speed spindles, electric motors, wind turbine gearboxes, and automotive axles.",
+    "example": "A ball bearing with a Dynamic Rating (Cr) of 20,000 N subjected to a 2,000 N load: L10 = (20,000 / 2,000)^3 = 1,000 Million Revolutions.",
+    "step_by_step": "1. Obtain the Dynamic Load Rating (Cr) from the bearing catalog.\n2. Calculate the Equivalent Load (Pr) based on Radial and Axial forces.\n3. Identify the bearing type (Ball or Roller) to set the exponent 'p'.\n4. Apply the ISO 281 formula to find the L10 life in revolutions."
+  },
+  "technicalSections": [
+    {
+      "title": "Understanding the L10 Statistical Limit",
+      "content": [
+        "Bearing life is statistical. A group of identical bearings will show a spread in fatigue life. The 'L10' (Basic Rating Life) represents the life that 90% of a group of apparently identical bearings will reach or exceed.",
+        "Engineering for 100% reliability is theoretically impossible; thus, L10 is the global industry standard for specifying machinery service intervals."
+      ],
+      "formulas": [
+        {
+          "label": "Basic Life in Hours",
+          "latex": "L_{10h} = \\frac{10^6}{60 \\cdot n} \\cdot \\left(\\frac{C_r}{P_r}\\right)^p"
+        }
+      ]
+    },
+    {
+      "title": "Bearing Type Exponents (p)",
+      "content": [
+        "The life exponent 'p' varies based on the contact geometry between the rolling element and the raceway. Point contact (ball bearings) is more sensitive to stress intensity changes than line contact (roller bearings)."
+      ],
+      "table": {
+        "headers": ["Bearing Geometry", "Exponent (p)", "Characteristic"],
+        "rows": [
+          ["Deep Groove Ball", "3.0", "Point Contact"],
+          ["Angular Contact Ball", "3.0", "High Speed / Combo Load"],
+          ["Cylindrical Roller", "3.33 (10/3)", "Line Contact / High Load"],
+          ["Tapered Roller", "3.33 (10/3)", "Highest Radial Efficiency"],
+          ["Spherical Roller", "3.33 (10/3)", "Self-Aligning / Heavy Duty"]
+        ]
+      }
+    },
+    {
+      "title": "Advanced Life Factors: ISO 281:2007",
+      "content": [
+        "Modern life prediction often requires the Adjusted Rating Life (Lnm), which accounts for lubrication film thickness, material cleanliness, and contamination.",
+        "The aiso factor integrates the fatigue limit stress of the material and the lubrication condition (kappa)."
+      ],
+      "formulas": [
+        {
+          "label": "Adjusted Life Formula",
+          "latex": "L_{nm} = a_1 \\cdot a_{iso} \\cdot L_{10}"
+        }
+      ],
+      "table": {
+        "headers": ["Reliability (%)", "Factor (a1)", "Industry Usage"],
+        "rows": [
+          ["90%", "1.00", "Standard Industrial"],
+          ["95%", "0.64", "Automotive Critical"],
+          ["99%", "0.25", "Aerospace / Medical"],
+          ["99.9%", "0.13", "Space Exploratory"]
+        ]
+      }
+    }
+  ],
+  "relatedCalculators": [
+    { "title": "Shaft Deflection Guide", "slug": "shaft-deflection-calculator" },
+    { "title": "Bolt Torque Specs", "slug": "bolt-torque-calculator" },
+    { "title": "Lubrication Viscosity", "slug": "viscosity-converter" }
+  ],
+  "cta": {
+    "label": "Select Bearings in 3D",
+    "link": "/workspace"
+  }
+}

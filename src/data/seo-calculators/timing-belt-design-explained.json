@@ -1,0 +1,34 @@
+{
+  "id": "timing-belt-design-explained",
+  "title": "Timing Belt Design Explained - AluCalc Engineering",
+  "slug": "timing-belt-design-explained",
+  "keyword": "timing belt design explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Timing Belt Design Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional timing belt design explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Timing Belt Design Explained",
+    "intro": "Comprehensive engineering guide for timing belt design explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for timing belt design)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for timing belt design.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Timing Belt Design is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical timing belt design scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-length-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "v-belt-length-calculator",
+    "timing-belt-design-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

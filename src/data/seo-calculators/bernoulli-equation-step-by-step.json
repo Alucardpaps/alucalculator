@@ -1,0 +1,34 @@
+{
+  "id": "bernoulli-equation-step-by-step",
+  "title": "Bernoulli Equation Step By Step - AluCalc Engineering",
+  "slug": "bernoulli-equation-step-by-step",
+  "keyword": "bernoulli equation step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Bernoulli Equation Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional bernoulli equation step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bernoulli Equation Step By Step",
+    "intro": "Comprehensive engineering guide for bernoulli equation step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bernoulli equation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bernoulli equation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bernoulli Equation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bernoulli equation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "flow-rate-calculator",
+    "reynolds-number-calculator",
+    "laminar-flow-calculator",
+    "turbulent-flow-calculator",
+    "bernoulli-equation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "id": "bolt-torque-calculator",
+  "category": "mechanical",
+  "title": "Bolt Torque Calculation & Specification Guide",
+  "slug": "bolt-torque-calculator",
+  "keyword": "bolt torque calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Bolt Torque Calculator | Professional Engineering Guide | AluCalc",
+    "description": "Master bolt torque calculation using the K-factor method. Professional guide on preloads, friction coefficients, and mechanical standards."
+  },
+  "seo": {
+    "h1": "Bolted Joint Integrity: The Science of Torque and Preload",
+    "intro": "Developing a reliable bolted joint requires more than just tightening a nut. It necessitates a precise understanding of the relationship between applied torque and the resulting axial clamp force (preload). This guide provides the technical foundation for specifying torque values in industrial applications.",
+    "formula": "T = K × F × d",
+    "variables": {
+      "T": "Required Tightening Torque (Nm)",
+      "K": "Nut Factor (Dimensionless)",
+      "F": "Desired Preload (Newtons)",
+      "d": "Nominal Bolt Diameter (m)"
+    },
+    "practical": "Essential for high-stress applications including engine cylinder heads, structural steel girders, and chemical pressure vessel flanges where joint separation can lead to catastrophic failure.",
+    "example": "To achieve a 45kN preload on an M12 (12mm) Grade 8.8 bolt with 'dry' surface conditions (K=0.20): T = 0.20 * 45,000 * 0.012 = 108 Nm.",
+    "step_by_step": "1. Identify the required Clamp Force for the application.\n2. Determine the Friction Profile (Nut Factor) of your hardware.\n3. Verify the Bolt Class/Grade to ensure yield limits aren't exceeded.\n4. Apply torque using a calibrated tool."
+  },
+  "technicalSections": [
+    {
+      "title": "The Physics of Axial Preload",
+      "content": [
+        "A bolted joint behaves as a spring system. When a bolt is tightened, it stretches elastically, creating a clamp force that holds the members together. This internal tension is called 'Preload'.",
+        "The primary goal of torque application is to achieve a preload that exceeds the maximum external service load. This prevents cyclic loading on the bolt, which is the leading cause of fatigue failure in machinery."
+      ],
+      "formulas": [
+        {
+          "label": "Torque-Preload Equation (Short Form)",
+          "latex": "T = K \\cdot F \\cdot d"
+        },
+        {
+          "label": "Tension Stress Area (Metric)",
+          "latex": "A_s = 0.7854 (d - 0.9382P)^2"
+        }
+      ]
+    },
+    {
+      "title": "The Friction Dilemma: Nut Factor (K)",
+      "content": [
+        "In a standard bolted assembly, approximately 90% of the input torque is consumed by friction—50% at the bolt head/nut face and 40% in the thread contact. Only 10% actually generates preload.",
+        "The 'Nut Factor' (K) is a simplified coefficient used to account for these variables. Using the wrong K-factor can lead to 50% errors in actual preload."
+      ],
+      "table": {
+        "headers": ["Surface Condition", "Nut Factor (K)", "Uncertainty"],
+        "rows": [
+          ["Steel (Dry / Plain)", "0.20", "±25%"],
+          ["Steel (Zinc Plated)", "0.19", "±25%"],
+          ["Cadmium Plated", "0.16", "±20%"],
+          ["Moly Disulphide Grease", "0.11", "±10%"],
+          ["Anti-Seize (Nickel)", "0.13", "±15%"]
+        ]
+      }
+    },
+    {
+      "title": "Mechanical Standards: ISO 898-1",
+      "content": [
+        "Designers must ensure that the target preload does not exceed the Proof Load of the bolt material. Typically, structural joints are tightened to 75-90% of the material's yield strength."
+      ],
+      "table": {
+        "headers": ["Property Class", "Yield Strength (MPa)", "Tensile Strength (MPa)", "Material"],
+        "rows": [
+          ["4.6", "240", "400", "Low Carbon Steel"],
+          ["8.8", "640", "800", "Medium Carbon Steel (Quenched)"],
+          ["10.9", "940", "1040", "Alloy Steel (Quenched)"],
+          ["12.9", "1100", "1220", "Alloy Steel (Precision)"]
+        ]
+      }
+    }
+  ],
+  "relatedCalculators": [
+    { "title": "Shaft Stress Analysis", "slug": "shaft-stress-calculator" },
+    { "title": "Bearing Life ISO 281", "slug": "bearing-life-iso-281" },
+    { "title": "Bolt Shearing Force", "slug": "bolt-shear-force-calculator" }
+  ],
+  "cta": {
+    "label": "Open Joint Simulator",
+    "link": "/workspace"
+  }
+}

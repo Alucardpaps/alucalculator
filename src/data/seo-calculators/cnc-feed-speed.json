@@ -1,0 +1,26 @@
+{
+  "id": "cnc-feed-speed",
+  "category": "manufacturing",
+  "title": "CNC Feed & Speed",
+  "slug": "cnc-feed-speed",
+  "meta": {
+    "title": "CNC Speeds | AluCalc",
+    "description": "RPM and Feed for machining."
+  },
+  "seo": {
+    "h1": "Machining Feed and Speed Calc",
+    "intro": "Optimize tool life.",
+    "formula": "RPM = Vc*1000/πD",
+    "variables": {
+      "Vc": "Speed",
+      "D": "Dia",
+      "RPM": "Spindle"
+    },
+    "practical": "Program CNCs.",
+    "example": "Aluminum vs Steel."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=cnc-feed-speed"
+  }
+}

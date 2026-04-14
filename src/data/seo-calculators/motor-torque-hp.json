@@ -1,0 +1,26 @@
+{
+  "id": "motor-torque-hp",
+  "category": "electrical",
+  "title": "Motor Torque & HP",
+  "slug": "motor-torque-hp",
+  "meta": {
+    "title": "Torque/HP | AluCalc",
+    "description": "Power conversion for motors."
+  },
+  "seo": {
+    "h1": "Motor Power and Torque Calc",
+    "intro": "Relates speed, force, power.",
+    "formula": "HP = T*RPM/5252",
+    "variables": {
+      "HP": "Power",
+      "T": "Torque",
+      "RPM": "Speed"
+    },
+    "practical": "Motor selection.",
+    "example": "57 HP typical."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=motor-torque-hp"
+  }
+}

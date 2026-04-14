@@ -1,38 +1,37 @@
-import { useState, useMemo } from 'react';
-import { useCADCanvasStore, CADShape } from '@/store/CADCanvasStore';
-import { MousePointer2, Plus, BookOpen } from 'lucide-react';
-import { useOSStore } from '@/store/osStore';
+import { useState, useMemo, useEffect } from 'react';
+import { useCADCanvasStore } from '@/store/CADCanvasStore';
+import { ShoppingCart, FileText, Plus, Layers, Scale, Box, CircleDot, ChevronDown, Gauge } from 'lucide-react';
+import { MATERIALS_DB, getMaterialCategories, getMaterialsByCategory } from '@/data/materialsData';
+import { CUTTING_METHODS, CuttingMethod, BASELINE_PRICES } from '@/data/productionParams';
+import { useProjectStore } from '@/store/projectStore';
+import { PDFReportEngine, ReportMetadata } from '@/lib/pdfReportEngine';
+import { ReportSettingsModal } from '@/components/ui/ReportSettingsModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type Shape = 'plate' | 'round' | 'tube' | 'hollow-rect' | 'angle' | 'channel' | 'i-beam' | 'hex';
 
-const SHAPES: { id: Shape; label: string }[] = [
-    { id: 'plate', label: 'Plate' },
-    { id: 'round', label: 'Round' },
-    { id: 'tube', label: 'Tube' },
-    { id: 'hollow-rect', label: 'Box' },
-    { id: 'angle', label: 'Angle' },
-    { id: 'channel', label: 'Channel' },
-    { id: 'i-beam', label: 'I-Beam' },
-    { id: 'hex', label: 'Hexagon' },
-];
-
-const MATERIALS_DB = [
-    { name: '6061-T6 (US Standard)', density: 2.70, category: 'Aluminum' },
-    { name: '6063-T5 (Architectural)', density: 2.69, category: 'Aluminum' },
-    { name: '7075-T6 (Aerospace)', density: 2.81, category: 'Aluminum' },
-    { name: '5083-H116 (Marine)', density: 2.66, category: 'Aluminum' },
-    { name: 'Steel (Mild)', density: 7.85, category: 'Steel' },
-    { name: 'Stainless Steel (304)', density: 8.00, category: 'Steel' },
+const SHAPES: { id: Shape; label: string; icon: string }[] = [
+    { id: 'plate', label: 'Plate', icon: '▬' },
+    { id: 'round', label: 'Round', icon: '●' },
+    { id: 'tube', label: 'Tube', icon: '◎' },
+    { id: 'hollow-rect', label: 'Box', icon: '▢' },
+    { id: 'angle', label: 'Angle', icon: '∟' },
+    { id: 'channel', label: 'Channel', icon: '⊓' },
+    { id: 'i-beam', label: 'I-Beam', icon: 'Ⅱ' },
+    { id: 'hex', label: 'Hex', icon: '⬡' },
 ];
 
 export default function ProfileWeightModule() {
     const { addShape } = useCADCanvasStore();
+    const { addItem } = useProjectStore();
+
     const [shape, setShape] = useState<Shape>('plate');
+    const [category, setCategory] = useState('Aluminum');
     const [material, setMaterial] = useState('6061-T6 (US Standard)');
     const [quantity, setQuantity] = useState(1);
-    const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [expandedSection, setExpandedSection] = useState<string | null>('dims');
 
-    // Dimensions
     const [length, setLength] = useState(1000);
     const [width, setWidth] = useState(100);
     const [thickness, setThickness] = useState(10);
@@ -44,408 +43,418 @@ export default function ProfileWeightModule() {
     const [flangeT, setFlangeT] = useState(8);
     const [webT, setWebT] = useState(6);
 
-    const materialData = MATERIALS_DB.find(m => m.name === material);
+    const [cuttingMethod, setCuttingMethod] = useState<CuttingMethod>('Laser');
+    const [nestingEfficiency, setNestingEfficiency] = useState(85);
+    const [pricePerKg, setPricePerKg] = useState<number>(4.50);
+
+    const categories = getMaterialCategories();
+    const availableMaterials = getMaterialsByCategory(category);
+
+    useEffect(() => {
+        if (availableMaterials.length > 0 && !availableMaterials.find(m => m.name === material)) {
+            setMaterial(availableMaterials[0].name);
+        }
+        const matData = availableMaterials.find(m => m.name === material) || availableMaterials[0];
+        if (matData?.basePrice) {
+            setPricePerKg(matData.basePrice);
+        } else {
+            const defaultPrice = (BASELINE_PRICES as Record<string, number>)[category] || 5.00;
+            setPricePerKg(defaultPrice);
+        }
+    }, [category, material]);
+
+    const materialData = useMemo(() => MATERIALS_DB.find(m => m.name === material), [material]);
     const density = materialData?.density || 2.7;
 
-    // Calculate result
     const result = useMemo(() => {
-        let volume = 0; // mm³
-        let surfaceArea = 0; // mm²
-
+        let netVolume = 0;
         switch (shape) {
-            case 'plate':
-                volume = length * width * thickness;
-                surfaceArea = 2 * (length * width + length * thickness + width * thickness);
-                break;
-            case 'round':
-                volume = Math.PI * Math.pow(diameter / 2, 2) * length;
-                surfaceArea = 2 * Math.PI * (diameter / 2) * length + 2 * Math.PI * Math.pow(diameter / 2, 2);
-                break;
-            case 'tube':
-                const outerR = diameter / 2;
-                const innerR = outerR - wallThickness;
-                volume = Math.PI * (outerR * outerR - innerR * innerR) * length;
-                surfaceArea = 2 * Math.PI * (outerR + innerR) * length;
-                break;
-            case 'hollow-rect':
-                const outerArea = width * height;
-                const innerArea = (width - 2 * wallThickness) * (height - 2 * wallThickness);
-                volume = (outerArea - innerArea) * length;
-                surfaceArea = 2 * (outerArea - innerArea) + 2 * (width + height) * length;
-                break;
-            case 'angle':
-                // L-angle: simple approx
-                volume = (width * thickness + (height - thickness) * thickness) * length;
-                surfaceArea = 2 * (width * height - (width - thickness) * (height - thickness)) + 2 * (width + height) * length;
-                break;
-            case 'channel':
-                // C-channel: web + 2 flanges
-                volume = (width * thickness * 2 + (height - 2 * thickness) * thickness) * length;
-                break;
-            case 'i-beam':
-                // I-beam: 2 flanges + web
-                volume = (2 * flangeW * flangeT + (webH - 2 * flangeT) * webT) * length;
-                break;
-            case 'hex':
-                // Regular hexagon
-                const hexArea = (3 * Math.sqrt(3) / 2) * Math.pow(diameter / 2, 2);
-                volume = hexArea * length;
-                break;
+            case 'plate': netVolume = length * width * thickness; break;
+            case 'round': netVolume = Math.PI * Math.pow(diameter / 2, 2) * length; break;
+            case 'tube': { const oR = diameter / 2; const iR = oR - wallThickness; netVolume = Math.PI * (oR * oR - iR * iR) * length; break; }
+            case 'hollow-rect': netVolume = (width * height - (width - 2 * wallThickness) * (height - 2 * wallThickness)) * length; break;
+            case 'angle': netVolume = (width * thickness + (height - thickness) * thickness) * length; break;
+            case 'channel': netVolume = (width * thickness * 2 + (height - 2 * thickness) * thickness) * length; break;
+            case 'i-beam': netVolume = (2 * flangeW * flangeT + (webH - 2 * flangeT) * webT) * length; break;
+            case 'hex': netVolume = (3 * Math.sqrt(3) / 2) * Math.pow(diameter / 2, 2) * length; break;
         }
 
-        const volumeCm3 = volume / 1000; // mm³ to cm³
-        const unitWeightKg = (volumeCm3 * density) / 1000;
-        const totalWeightKg = unitWeightKg * quantity;
+        const kerfSpec = CUTTING_METHODS.find(c => c.method === cuttingMethod);
+        const kerfWidth = kerfSpec ? kerfSpec.widthMm : 0;
+        let grossVolume = 0;
+        if (shape === 'plate') {
+            grossVolume = (length + kerfWidth) * (width + kerfWidth) * thickness;
+        } else {
+            grossVolume = (netVolume / length) * (length + kerfWidth);
+        }
+
+        const netWeightKg = (netVolume / 1000 * density) / 1000;
+        const grossWeightKg = (grossVolume / 1000 * density) / 1000;
+        const eff = Math.min(Math.max(nestingEfficiency, 10), 100) / 100;
+        const materialConsumedKg = grossWeightKg / eff;
+        const totalWeight = materialConsumedKg * quantity;
+        const totalCost = totalWeight * pricePerKg;
 
         return {
-            volumeCm3: volumeCm3.toFixed(2),
-            surfaceAreaCm2: (surfaceArea / 100).toFixed(2),
-            unitWeightKg: unitWeightKg.toFixed(3),
-            totalWeightKg: totalWeightKg.toFixed(3),
+            netWeightKg,
+            totalWeightKg: materialConsumedKg,
+            totalCost,
+            display: {
+                netWeight: (netWeightKg * quantity).toFixed(3),
+                totalWeight: totalWeight.toFixed(3),
+                totalCost: totalCost.toFixed(2),
+                scrapWeight: ((materialConsumedKg - netWeightKg) * quantity).toFixed(3),
+                scrapCost: ((materialConsumedKg - netWeightKg) * quantity * pricePerKg).toFixed(2),
+                partCost: (netWeightKg * quantity * pricePerKg).toFixed(2)
+            }
         };
-    }, [shape, length, width, thickness, diameter, wallThickness, height, flangeW, webH, flangeT, webT, density, quantity]);
+    }, [shape, length, width, thickness, diameter, wallThickness, height, flangeW, webH, flangeT, webT, density, quantity, cuttingMethod, nestingEfficiency, pricePerKg]);
+
+    const addToProject = () => {
+        addItem({
+            name: `${SHAPES.find(s => s.id === shape)?.label} ${width || diameter}x${height || thickness} L${length}`,
+            category, material, quantity,
+            weightPerUnit: result.totalWeightKg,
+            costPerUnit: result.totalWeightKg * pricePerKg
+        });
+    };
 
     const exportToCAD = () => {
         const shapes: any[] = [];
-
-        // Helper to create a shape
-        const createPolyline = (points: { x: number, y: number }[]) => ({
-            type: 'polyline',
-            points,
-            style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' },
-            locked: false,
-            visible: true,
-            layer: 'profile'
+        const createPolyline = (points: { x: number; y: number }[]) => ({
+            type: 'polyline', points, style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' }, locked: false, visible: true, layer: 'profile'
         });
-
-        const createCircle = (radius: number) => ({
-            type: 'circle',
-            points: [{ x: 0, y: 0 }, { x: radius, y: 0 }], // Center + radius point
-            style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' },
-            locked: false,
-            visible: true,
-            layer: 'profile'
-        });
-
         switch (shape) {
-            case 'plate':
-                // Rectangle
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -width / 2, y: -thickness / 2 }, { x: width / 2, y: thickness / 2 }],
-                    style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' },
-                    locked: false,
-                    visible: true,
-                    layer: 'profile'
-                });
-                break;
-            case 'round':
-                shapes.push(createCircle(diameter / 2));
-                break;
-            case 'tube':
-                shapes.push(createCircle(diameter / 2));
-                shapes.push(createCircle((diameter / 2) - wallThickness));
-                break;
-            case 'hollow-rect':
-                // Outer
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -width / 2, y: -height / 2 }, { x: width / 2, y: height / 2 }],
-                    style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' },
-                    visible: true, layer: 'profile', locked: false
-                });
-                // Inner
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -(width / 2 - wallThickness), y: -(height / 2 - wallThickness) }, { x: (width / 2 - wallThickness), y: (height / 2 - wallThickness) }],
-                    style: { strokeColor: '#00e5ff', strokeWidth: 2 },
-                    visible: true, layer: 'profile', locked: false
-                });
-                break;
-            case 'angle':
-                // L-shape
-                shapes.push(createPolyline([
-                    { x: 0, y: 0 },
-                    { x: width, y: 0 },
-                    { x: width, y: thickness },
-                    { x: thickness, y: thickness },
-                    { x: thickness, y: height },
-                    { x: 0, y: height },
-                    { x: 0, y: 0 } // Close
-                ]));
-                break;
-            case 'channel':
-                // C-shape
-                shapes.push(createPolyline([
-                    { x: 0, y: 0 },
-                    { x: width, y: 0 },
-                    { x: width, y: thickness },
-                    { x: thickness, y: thickness },
-                    { x: thickness, y: height - thickness },
-                    { x: width, y: height - thickness },
-                    { x: width, y: height },
-                    { x: 0, y: height },
-                    { x: 0, y: 0 }
-                ]));
-                break;
-            case 'i-beam':
-                // Top Flange
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -flangeW / 2, y: webH / 2 }, { x: flangeW / 2, y: webH / 2 + flangeT }],
-                    visible: true, layer: 'profile', locked: false, style: { strokeColor: '#00e5ff', strokeWidth: 2 }
-                });
-                // Bottom Flange
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -flangeW / 2, y: -webH / 2 - flangeT }, { x: flangeW / 2, y: -webH / 2 }],
-                    visible: true, layer: 'profile', locked: false, style: { strokeColor: '#00e5ff', strokeWidth: 2 }
-                });
-                // Web
-                shapes.push({
-                    type: 'rectangle',
-                    points: [{ x: -webT / 2, y: -webH / 2 }, { x: webT / 2, y: webH / 2 }],
-                    visible: true, layer: 'profile', locked: false, style: { strokeColor: '#00e5ff', strokeWidth: 2 }
-                });
-                break;
-            case 'hex':
-                const R = diameter / 2;
-                const points = [];
-                for (let i = 0; i < 6; i++) {
-                    const angle = (i * 60 - 30) * Math.PI / 180;
-                    points.push({ x: R * Math.cos(angle), y: R * Math.sin(angle) });
-                }
-                points.push(points[0]); // Close
-                shapes.push(createPolyline(points));
-                break;
+            case 'plate': shapes.push({ type: 'rectangle', points: [{ x: -width / 2, y: -thickness / 2 }, { x: width / 2, y: thickness / 2 }], style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' }, visible: true, layer: 'profile' }); break;
+            case 'round': shapes.push({ type: 'circle', points: [{ x: 0, y: 0 }, { x: diameter / 2, y: 0 }], style: { strokeColor: '#00e5ff', strokeWidth: 2, fillOpacity: 0.1, fillColor: '#00e5ff' }, locked: false, visible: true, layer: 'profile' }); break;
+            case 'angle': shapes.push(createPolyline([{ x: 0, y: 0 }, { x: width, y: 0 }, { x: width, y: thickness }, { x: thickness, y: thickness }, { x: thickness, y: height }, { x: 0, y: height }, { x: 0, y: 0 }])); break;
+            default: break;
         }
-
-        // Add all shapes to store
         shapes.forEach(s => addShape(s));
     };
 
-    const aluminumAlloys = MATERIALS_DB.filter(m => m.category === 'Aluminum');
+    const generateEnterpriseReport = async (metadata: ReportMetadata) => {
+        const engine = new PDFReportEngine(metadata);
+        let yPos = engine.addMetadataSection();
+        yPos = engine.addKPIs([
+            { label: "Material", value: material },
+            { label: "Quantity", value: quantity.toString() },
+            { label: "Total Cost", value: `$${result.totalCost.toFixed(2)}` }
+        ], yPos);
+        yPos = engine.addSectionTitle("Profile Parameters", yPos);
+        engine.addTable({
+            head: [["Parameter", "Value"]],
+            body: [
+                ["Shape", SHAPES.find(s => s.id === shape)?.label || shape],
+                ["Length", `${length} mm`],
+                ["Net Weight (ea)", `${result.netWeightKg.toFixed(3)} kg`],
+                ["Gross Weight (ea)", `${result.totalWeightKg.toFixed(3)} kg`],
+            ],
+            startY: yPos
+        });
+        engine.save(`Profile_DataSheet_${metadata.referenceNo}.pdf`);
+    };
+
+    const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
 
     return (
-        <div className="flex flex-col gap-3 h-full">
-            {/* Shape Selection */}
-            <div className="grid grid-cols-4 gap-1">
-                {SHAPES.map(s => (
-                    <button
-                        key={s.id}
-                        onClick={() => setShape(s.id)}
-                        className="py-1.5 px-2 rounded text-[9px] font-bold uppercase transition-all"
-                        style={{
-                            backgroundColor: shape === s.id ? 'var(--color-os-accent)' : 'var(--color-os-header)',
-                            color: shape === s.id ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
-                        }}
-                    >
-                        {s.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* 2D/3D Toggle + Visualization */}
-            <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-os-canvas)' }}>
-                <div className="flex justify-between items-center mb-2">
-                    <span className="text-[9px] font-bold uppercase" style={{ color: 'var(--color-os-text-secondary)' }}>Preview</span>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => useOSStore.getState().openWindow('handbook')}
-                            className="flex items-center gap-1 text-[9px] font-bold uppercase text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                            <BookOpen size={10} /> Handbook
-                        </button>
-                        <div className="flex gap-1">
-                            {(['2d', '3d'] as const).map(m => (
-                                <button key={m} onClick={() => setViewMode(m)}
-                                    className="px-2 py-0.5 rounded text-[9px] font-bold uppercase"
-                                    style={{
-                                        backgroundColor: viewMode === m ? 'var(--color-os-accent)' : 'var(--color-os-header)',
-                                        color: viewMode === m ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
-                                    }}
-                                >
-                                    {m}
-                                </button>
-                            ))}
+        <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
+            {/* ═══ LEFT PANEL — Controls (38%) ═══ */}
+            <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
+                {/* Header */}
+                <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-cyan-500/10 rounded-xl border border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                            <Scale size={20} strokeWidth={2} />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold tracking-tight text-gray-100">Profile Weight</h2>
+                            <p className="text-[10px] text-cyan-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Mass & Cost Calculator</p>
                         </div>
                     </div>
                 </div>
-                <ShapePreview shape={shape} viewMode={viewMode} w={width} h={height} t={thickness} d={diameter} wt={wallThickness} fW={flangeW} wH={webH} fT={flangeT} wT={webT} L={length} />
+
+                {/* Shape Selector */}
+                <div className="flex-none px-5 py-4 border-b border-white/5">
+                    <div className="grid grid-cols-4 gap-2">
+                        {SHAPES.map(s => (
+                            <button
+                                key={s.id}
+                                onClick={() => setShape(s.id)}
+                                className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border text-[9px] font-black uppercase transition-all duration-200
+                                    ${shape === s.id
+                                        ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                                        : 'bg-white/[0.02] text-gray-600 border-white/5 hover:bg-white/[0.05] hover:text-gray-400'
+                                    }`}
+                            >
+                                <span className="text-lg leading-none">{s.icon}</span>
+                                <span className="tracking-widest">{s.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Scrollable Sections */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-4 space-y-3">
+                    {/* Material */}
+                    <PanelSection id="material" title="Material" icon={<Layers size={14} />} isOpen={expandedSection === 'material'} onToggle={() => toggleSection('material')}>
+                        <div className="space-y-3">
+                            <PanelSelect label="Category" value={category} onChange={setCategory} options={categories.map(c => ({ value: c, label: c }))} />
+                            <PanelSelect label="Alloy / Grade" value={material} onChange={setMaterial} options={availableMaterials.map(m => ({ value: m.name, label: m.name }))} />
+                            <div className="flex items-center justify-between bg-cyan-900/15 border border-cyan-500/20 px-4 py-2.5 rounded-xl">
+                                <span className="text-[10px] font-black tracking-widest uppercase text-cyan-300/70">Density</span>
+                                <span className="text-lg font-black text-cyan-400 font-mono">{density.toFixed(3)} <span className="text-[10px] text-cyan-400/50">g/cm³</span></span>
+                            </div>
+                        </div>
+                    </PanelSection>
+
+                    {/* Dimensions */}
+                    <PanelSection id="dims" title="Dimensions" icon={<Box size={14} />} isOpen={expandedSection === 'dims'} onToggle={() => toggleSection('dims')}>
+                        <div className="space-y-3">
+                            <PanelInput label="Length" unit="mm" value={length} onChange={setLength} color="#06b6d4" />
+                            {shape === 'plate' && <>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <PanelInput label="Width" unit="mm" value={width} onChange={setWidth} color="#06b6d4" />
+                                    <PanelInput label="Thickness" unit="mm" value={thickness} onChange={setThickness} color="#06b6d4" />
+                                </div>
+                            </>}
+                            {(shape === 'round' || shape === 'hex') && <PanelInput label="Diameter" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />}
+                            {shape === 'tube' && <div className="grid grid-cols-2 gap-3">
+                                <PanelInput label="Outer Ø" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />
+                                <PanelInput label="Wall" unit="mm" value={wallThickness} onChange={setWallThickness} color="#06b6d4" />
+                            </div>}
+                            {shape === 'hollow-rect' && <>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <PanelInput label="Width" unit="mm" value={width} onChange={setWidth} color="#06b6d4" />
+                                    <PanelInput label="Height" unit="mm" value={height} onChange={setHeight} color="#06b6d4" />
+                                </div>
+                                <PanelInput label="Wall" unit="mm" value={wallThickness} onChange={setWallThickness} color="#06b6d4" />
+                            </>}
+                            {(shape === 'angle' || shape === 'channel') && <>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <PanelInput label="Width" unit="mm" value={width} onChange={setWidth} color="#06b6d4" />
+                                    <PanelInput label="Height" unit="mm" value={height} onChange={setHeight} color="#06b6d4" />
+                                </div>
+                                <PanelInput label="Thickness" unit="mm" value={thickness} onChange={setThickness} color="#06b6d4" />
+                            </>}
+                            {shape === 'i-beam' && <>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <PanelInput label="Flange W" unit="mm" value={flangeW} onChange={setFlangeW} color="#06b6d4" />
+                                    <PanelInput label="Web H" unit="mm" value={webH} onChange={setWebH} color="#06b6d4" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <PanelInput label="Flange T" unit="mm" value={flangeT} onChange={setFlangeT} color="#06b6d4" />
+                                    <PanelInput label="Web T" unit="mm" value={webT} onChange={setWebT} color="#06b6d4" />
+                                </div>
+                            </>}
+                            <PanelInput label="Quantity" unit="pcs" value={quantity} onChange={setQuantity} color="#f59e0b" />
+                        </div>
+                    </PanelSection>
+
+                    {/* Production */}
+                    <PanelSection id="production" title="Production" icon={<Gauge size={14} />} isOpen={expandedSection === 'production'} onToggle={() => toggleSection('production')}>
+                        <div className="space-y-3">
+                            <PanelSelect label="Cutting Method" value={cuttingMethod} onChange={(v) => setCuttingMethod(v as CuttingMethod)} options={CUTTING_METHODS.map(c => ({ value: c.method, label: `${c.method} (kerf ${c.widthMm}mm)` }))} />
+                            <PanelInput label="Nesting Eff." unit="%" value={nestingEfficiency} onChange={setNestingEfficiency} color="#10b981" />
+                            <PanelInput label="Price / kg" unit="$" value={pricePerKg} onChange={setPricePerKg} color="#f59e0b" />
+                        </div>
+                    </PanelSection>
+                </div>
             </div>
 
-            {/* Material */}
-            <div>
-                <label className="block text-[9px] font-bold uppercase mb-1" style={{ color: 'var(--color-os-text-secondary)' }}>Material</label>
-                <select value={material} onChange={e => setMaterial(e.target.value)}
-                    className="w-full px-2 py-1.5 rounded text-xs"
-                    style={{ backgroundColor: 'var(--color-os-header)', color: 'var(--color-os-text-primary)', border: '1px solid var(--color-os-border)' }}
-                >
-                    {aluminumAlloys.map(m => <option key={m.name} value={m.name}>{m.name} ({m.density})</option>)}
-                </select>
+            {/* ═══ RIGHT PANEL — Visualization & Results (62%) ═══ */}
+            <div className="w-[62%] h-full flex flex-col overflow-hidden">
+                {/* Giant KPI Header */}
+                <div className="flex-none px-8 pt-8 pb-4">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <div className="text-[11px] font-black uppercase tracking-[0.3em] mb-3 text-cyan-400/60 flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.5)]" />
+                                {SHAPES.find(s => s.id === shape)?.label?.toUpperCase()} — {material}
+                            </div>
+                            <div className="flex items-baseline gap-8">
+                                <div className="flex flex-col">
+                                    <motion.div
+                                        key={result.display.netWeight}
+                                        initial={{ opacity: 0.5, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                                        className="text-[5.5rem] font-black italic tracking-tighter leading-none text-white"
+                                        style={{ textShadow: '0 0 40px rgba(6,182,212,0.2)' }}
+                                    >
+                                        {result.display.netWeight}
+                                    </motion.div>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Net Weight (kg)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Side Stats */}
+                        <div className="flex flex-col gap-3 text-right pt-2">
+                            <SideStat label="Total Material" value={`${result.display.totalWeight} kg`} color="#06b6d4" />
+                            <SideStat label="Scrap Loss" value={`${result.display.scrapWeight} kg`} color="#ef4444" />
+                            <SideStat label="Total Cost" value={`$${result.display.totalCost}`} color="#10b981" />
+                            <SideStat label="Density" value={`${density.toFixed(3)} g/cm³`} color="#8b5cf6" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Cross-Section Visualization */}
+                <div className="flex-1 relative mx-6 my-4 rounded-[32px] overflow-hidden border border-white/5 bg-gradient-to-b from-[#0a1018] to-black shadow-inner">
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+                    
+                    <div className="absolute top-5 left-5 z-20 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <CircleDot size={14} className="text-cyan-500/30" /> CROSS-SECTION PREVIEW
+                    </div>
+
+                    <div className="w-full h-full flex items-center justify-center relative z-10 p-8">
+                        <PremiumShapePreview shape={shape} w={width} h={height} t={thickness} d={diameter} wt={wallThickness} fW={flangeW} wH={webH} fT={flangeT} wT={webT} />
+                    </div>
+                </div>
+
+                {/* Action Bar */}
+                <div className="flex-none mx-6 mb-6 flex gap-3">
+                    <button onClick={addToProject} className="flex-1 py-3.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 hover:border-cyan-500/50 font-black uppercase text-[10px] tracking-widest rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_0_20px_rgba(6,182,212,0.05)] hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]">
+                        <ShoppingCart size={14} /> Add to BOM
+                    </button>
+                    <button onClick={() => setIsReportModalOpen(true)} className="px-5 py-3.5 bg-white/[0.03] hover:bg-white/[0.06] text-gray-400 hover:text-white border border-white/5 hover:border-white/10 font-black uppercase text-[10px] tracking-widest rounded-xl flex items-center justify-center gap-2 transition-all">
+                        <FileText size={14} /> PDF
+                    </button>
+                    <button onClick={exportToCAD} className="px-5 py-3.5 bg-white/[0.03] hover:bg-white/[0.06] text-gray-400 hover:text-white border border-white/5 hover:border-white/10 font-black uppercase text-[10px] tracking-widest rounded-xl flex items-center justify-center gap-2 transition-all">
+                        <Plus size={14} /> CAD
+                    </button>
+                </div>
             </div>
 
-            {/* Dimensions */}
-            <div className="grid grid-cols-3 gap-2">
-                <InputField label="Length (mm)" value={length} onChange={setLength} />
-
-                {shape === 'plate' && (
-                    <>
-                        <InputField label="Width (mm)" value={width} onChange={setWidth} />
-                        <InputField label="Thickness (mm)" value={thickness} onChange={setThickness} />
-                    </>
-                )}
-                {shape === 'round' && <InputField label="Diameter (mm)" value={diameter} onChange={setDiameter} />}
-                {shape === 'hex' && <InputField label="Diameter (mm)" value={diameter} onChange={setDiameter} />}
-                {shape === 'tube' && (
-                    <>
-                        <InputField label="Outer Ø (mm)" value={diameter} onChange={setDiameter} />
-                        <InputField label="Wall (mm)" value={wallThickness} onChange={setWallThickness} />
-                    </>
-                )}
-                {shape === 'hollow-rect' && (
-                    <>
-                        <InputField label="Width (mm)" value={width} onChange={setWidth} />
-                        <InputField label="Height (mm)" value={height} onChange={setHeight} />
-                        <InputField label="Wall (mm)" value={wallThickness} onChange={setWallThickness} />
-                    </>
-                )}
-                {shape === 'angle' && (
-                    <>
-                        <InputField label="Leg A (mm)" value={width} onChange={setWidth} />
-                        <InputField label="Leg B (mm)" value={height} onChange={setHeight} />
-                        <InputField label="Thickness (mm)" value={thickness} onChange={setThickness} />
-                    </>
-                )}
-                {shape === 'channel' && (
-                    <>
-                        <InputField label="Width (mm)" value={width} onChange={setWidth} />
-                        <InputField label="Height (mm)" value={height} onChange={setHeight} />
-                        <InputField label="Thickness (mm)" value={thickness} onChange={setThickness} />
-                    </>
-                )}
-                {shape === 'i-beam' && (
-                    <>
-                        <InputField label="Flange W (mm)" value={flangeW} onChange={setFlangeW} />
-                        <InputField label="Web H (mm)" value={webH} onChange={setWebH} />
-                        <InputField label="Flange T (mm)" value={flangeT} onChange={setFlangeT} />
-                        <InputField label="Web T (mm)" value={webT} onChange={setWebT} />
-                    </>
-                )}
-                <InputField label="Qty" value={quantity} onChange={setQuantity} />
-            </div>
-
-            {/* Results */}
-            <div className="p-3 rounded-lg grid grid-cols-2 gap-2" style={{ backgroundColor: 'var(--color-os-header)', border: '1px solid var(--color-os-accent)' }}>
-                <ResultBlock label="Unit Weight" value={`${result.unitWeightKg} kg`} />
-                <ResultBlock label="Total Weight" value={`${result.totalWeightKg} kg`} accent big />
-                <ResultBlock label="Volume" value={`${result.volumeCm3} cm³`} />
-                <ResultBlock label="Surface" value={`${result.surfaceAreaCm2} cm²`} />
-
-                {/* Export Button */}
-                <button
-                    onClick={exportToCAD}
-                    className="col-span-2 mt-2 py-2 bg-[#00e5ff] hover:bg-[#00b8d4] text-black font-bold rounded flex items-center justify-center gap-2 text-xs uppercase transition-colors"
-                >
-                    <Plus size={14} /> Send to CAD Canvas
-                </button>
-            </div>
-        </div>
-    );
-}
-
-// Shape preview component with 2D/3D modes
-function ShapePreview({ shape, viewMode, w, h, t, d, wt, fW, wH, fT, wT, L }: {
-    shape: Shape; viewMode: '2d' | '3d';
-    w: number; h: number; t: number; d: number; wt: number;
-    fW: number; wH: number; fT: number; wT: number; L: number;
-}) {
-    const is3D = viewMode === '3d';
-    const skewX = is3D ? -10 : 0;
-    const skewY = is3D ? 10 : 0;
-
-    return (
-        <svg viewBox="0 0 140 80" className="w-full h-20" style={{ transform: is3D ? 'perspective(200px) rotateY(-10deg)' : undefined }}>
-            {/* Cross-section view */}
-            <g transform={`translate(70, 40)`}>
-                {shape === 'plate' && (
-                    <>
-                        <rect x={-30} y={-5} width={60} height={10} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        {is3D && <rect x={-30 + 5} y={-5 - 20} width={60} height={10} fill="var(--color-os-accent)" fillOpacity="0.2" stroke="var(--color-os-accent)" strokeWidth="0.5" />}
-                        {is3D && <line x1={-30} y1={-5} x2={-30 + 5} y2={-5 - 20} stroke="var(--color-os-accent)" strokeWidth="0.5" />}
-                        {is3D && <line x1={30} y1={-5} x2={30 + 5} y2={-5 - 20} stroke="var(--color-os-accent)" strokeWidth="0.5" />}
-                        <text x="0" y="25" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">{w}×{t}</text>
-                    </>
-                )}
-                {shape === 'round' && (
-                    <>
-                        <circle r={20} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1.5" />
-                        {is3D && <ellipse cx={5} cy={-15} rx={20} ry={10} fill="var(--color-os-accent)" fillOpacity="0.2" stroke="var(--color-os-accent)" strokeWidth="0.5" />}
-                        <text x="0" y="35" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">Ø{d}</text>
-                    </>
-                )}
-                {shape === 'tube' && (
-                    <>
-                        <circle r={22} fill="none" stroke="var(--color-os-accent)" strokeWidth="6" />
-                        {is3D && <ellipse cx={5} cy={-15} rx={22} ry={10} fill="none" stroke="var(--color-os-accent)" strokeWidth="3" strokeOpacity="0.5" />}
-                        <text x="0" y="35" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">Ø{d}×{wt}</text>
-                    </>
-                )}
-                {shape === 'hollow-rect' && (
-                    <>
-                        <rect x={-25} y={-15} width={50} height={30} fill="none" stroke="var(--color-os-accent)" strokeWidth="5" />
-                        {is3D && <rect x={-25 + 5} y={-15 - 15} width={50} height={30} fill="none" stroke="var(--color-os-accent)" strokeWidth="2" strokeOpacity="0.5" />}
-                        <text x="0" y="30" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">{w}×{h}×{wt}</text>
-                    </>
-                )}
-                {shape === 'angle' && (
-                    <>
-                        <path d={`M -20,15 L -20,-15 L -15,-15 L -15,10 L 20,10 L 20,15 Z`} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <text x="0" y="30" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">L{w}×{h}×{t}</text>
-                    </>
-                )}
-                {shape === 'channel' && (
-                    <>
-                        <path d={`M -15,-15 L 15,-15 L 15,-10 L -10,-10 L -10,10 L 15,10 L 15,15 L -15,15 Z`} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <text x="0" y="30" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">C{w}×{h}</text>
-                    </>
-                )}
-                {shape === 'i-beam' && (
-                    <>
-                        <rect x={-20} y={-20} width={40} height={5} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <rect x={-3} y={-15} width={6} height={30} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <rect x={-20} y={15} width={40} height={5} fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <text x="0" y="35" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">I{fW}×{wH}</text>
-                    </>
-                )}
-                {shape === 'hex' && (
-                    <>
-                        <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="var(--color-os-accent)" fillOpacity="0.4" stroke="var(--color-os-accent)" strokeWidth="1" />
-                        <text x="0" y="35" textAnchor="middle" fontSize="7" fill="var(--color-os-text-secondary)">Hex {d}</text>
-                    </>
-                )}
-            </g>
-        </svg>
-    );
-}
-
-function InputField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
-    return (
-        <div>
-            <label className="block text-[8px] font-bold uppercase mb-0.5" style={{ color: 'var(--color-os-text-secondary)' }}>{label}</label>
-            <input type="number" value={value} onChange={e => onChange(Number(e.target.value))}
-                className="w-full px-2 py-1 rounded text-xs font-mono"
-                style={{ backgroundColor: 'var(--color-os-header)', color: 'var(--color-os-text-primary)', border: '1px solid var(--color-os-border)' }}
+            <ReportSettingsModal
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                onGenerate={generateEnterpriseReport}
+                defaultTitle="Material Profile Datasheet"
             />
         </div>
     );
 }
 
-function ResultBlock({ label, value, accent, big }: { label: string; value: string; accent?: boolean; big?: boolean }) {
+// ═══════════════════════════════════════════════════════════════
+// SUB-COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+
+function SideStat({ label, value, color }: { label: string; value: string; color: string }) {
     return (
-        <div className="text-center">
-            <div className="text-[9px] uppercase" style={{ color: 'var(--color-os-text-secondary)' }}>{label}</div>
-            <div className={`font-mono font-bold ${big ? 'text-lg' : 'text-sm'}`} style={{ color: accent ? 'var(--color-os-accent)' : 'var(--color-os-text-primary)' }}>{value}</div>
+        <div>
+            <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest">{label}</div>
+            <div className="text-xl font-mono font-black" style={{ color }}>{value}</div>
         </div>
+    );
+}
+
+function PanelSection({ id, title, icon, isOpen, onToggle, children }: { id: string; title: string; icon: React.ReactNode; isOpen: boolean; onToggle: () => void; children: React.ReactNode }) {
+    return (
+        <div className="rounded-xl border border-white/5 bg-[#0a1018]/60 overflow-hidden">
+            <button onClick={onToggle} className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors">
+                <div className="flex items-center gap-2.5 text-cyan-400">
+                    {icon}
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">{title}</span>
+                </div>
+                <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                    <ChevronDown size={14} className="text-gray-600" />
+                </motion.div>
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="overflow-hidden">
+                        <div className="px-4 pb-4 pt-1">{children}</div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+function PanelInput({ label, unit, value, onChange, color }: { label: string; unit: string; value: number; onChange: (v: number) => void; color: string }) {
+    return (
+        <div className="group">
+            <div className="flex justify-between items-baseline mb-1.5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">{label}</span>
+            </div>
+            <div className="relative flex items-center bg-[#0e1622] border border-white/10 rounded-lg overflow-hidden transition-all duration-300 group-focus-within:border-cyan-500/40 group-focus-within:shadow-[0_0_15px_rgba(6,182,212,0.08)]">
+                <input
+                    type="number" value={value} onChange={(e) => onChange(Number(e.target.value))} step="any"
+                    className="w-full bg-transparent text-sm font-black font-mono px-3 py-2 text-white outline-none appearance-none"
+                />
+                {unit && (
+                    <div className="px-3 text-[9px] font-bold text-gray-600 border-l border-white/5 bg-white/[0.02]">
+                        <span style={{ color }}>{unit}</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function PanelSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+    return (
+        <div className="group">
+            <div className="mb-1.5"><span className="text-[9px] font-bold uppercase tracking-widest text-gray-500">{label}</span></div>
+            <select
+                className="w-full bg-[#0e1622] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white font-mono font-bold outline-none transition-all focus:border-cyan-500/40 focus:shadow-[0_0_15px_rgba(6,182,212,0.08)] appearance-none cursor-pointer"
+                value={value} onChange={(e) => onChange(e.target.value)}
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
+            >
+                {options.map(opt => <option key={opt.value} value={opt.value} className="bg-[#0a1018]">{opt.label}</option>)}
+            </select>
+        </div>
+    );
+}
+
+function PremiumShapePreview({ shape, w, h, t, d, wt, fW, wH, fT, wT }: any) {
+    const stroke = '#06b6d4';
+    const fill = 'rgba(6,182,212,0.08)';
+    const dimLine = 'rgba(255,255,255,0.12)';
+    const dimText = 'rgba(6,182,212,0.6)';
+
+    return (
+        <svg viewBox="0 0 300 200" className="w-full h-full max-w-[500px] max-h-[300px] profile-preview-svg" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+            </defs>
+            <g transform="translate(150, 100)" filter="url(#glow)">
+                {shape === 'plate' && <>
+                    <rect x={-60} y={-8} width={120} height={16} fill={fill} stroke={stroke} strokeWidth="2" rx="1" />
+                    <line x1={-60} y1={18} x2={60} y2={18} stroke={dimLine} strokeWidth="0.5" />
+                    <text x={0} y={28} textAnchor="middle" fill={dimText} fontSize="9" fontFamily="monospace">{w} mm</text>
+                    <line x1={68} y1={-8} x2={68} y2={8} stroke={dimLine} strokeWidth="0.5" />
+                    <text x={78} y={4} fill={dimText} fontSize="9" fontFamily="monospace">{t}</text>
+                </>}
+                {shape === 'round' && <>
+                    <circle r={40} fill={fill} stroke={stroke} strokeWidth="2" />
+                    <line x1={0} y1={0} x2={40} y2={0} stroke={dimLine} strokeWidth="0.5" />
+                    <text x={20} y={-6} textAnchor="middle" fill={dimText} fontSize="9" fontFamily="monospace">Ø{d}</text>
+                    <circle r={2} fill={stroke} opacity="0.6" />
+                </>}
+                {shape === 'tube' && <>
+                    <circle r={45} fill="none" stroke={stroke} strokeWidth="2" />
+                    <circle r={35} fill="none" stroke={stroke} strokeWidth="1" opacity="0.4" />
+                    <path d={`M 0 0 L 45 0`} stroke={dimLine} strokeWidth="0.5" />
+                    <text x={22} y={-6} textAnchor="middle" fill={dimText} fontSize="9" fontFamily="monospace">Ø{d}</text>
+                    <text x={40} y={14} textAnchor="middle" fill="rgba(239,68,68,0.5)" fontSize="8" fontFamily="monospace">t={wt}</text>
+                    {/* Fill between circles to show wall */}
+                    <circle r={45} fill={fill} />
+                    <circle r={35} fill="#03060a" />
+                </>}
+                {shape === 'hollow-rect' && <>
+                    <rect x={-50} y={-30} width={100} height={60} fill={fill} stroke={stroke} strokeWidth="2" rx="1" />
+                    <rect x={-42} y={-22} width={84} height={44} fill="#03060a" stroke={stroke} strokeWidth="1" opacity="0.4" rx="1" />
+                    <text x={0} y={44} textAnchor="middle" fill={dimText} fontSize="9" fontFamily="monospace">{w}×{h}</text>
+                </>}
+                {shape === 'angle' && <path d="M -40,-30 L -40,30 L 40,30 L 40,22 L -32,22 L -32,-30 Z" fill={fill} stroke={stroke} strokeWidth="2" />}
+                {shape === 'channel' && <path d="M -40,-30 L 40,-30 L 40,-22 L -32,-22 L -32,22 L 40,22 L 40,30 L -40,30 Z" fill={fill} stroke={stroke} strokeWidth="2" />}
+                {shape === 'i-beam' && <>
+                    <rect x={-40} y={-40} width={80} height={10} fill={fill} stroke={stroke} strokeWidth="2" />
+                    <rect x={-6} y={-30} width={12} height={60} fill={fill} stroke={stroke} strokeWidth="2" />
+                    <rect x={-40} y={30} width={80} height={10} fill={fill} stroke={stroke} strokeWidth="2" />
+                </>}
+                {shape === 'hex' && <polygon points="0,-40 35,-20 35,20 0,40 -35,20 -35,-20" fill={fill} stroke={stroke} strokeWidth="2" />}
+            </g>
+        </svg>
     );
 }

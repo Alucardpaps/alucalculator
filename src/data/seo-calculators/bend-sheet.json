@@ -1,0 +1,24 @@
+{
+  "id": "bend-sheet",
+  "category": "manufacturing",
+  "title": "Bend Allow",
+  "slug": "bend-sheet",
+  "meta": {
+    "title": "Bend | AluCalc",
+    "description": "BA Flat Length."
+  },
+  "seo": {
+    "h1": "Sheet Metal BA Calc",
+    "intro": "Develop flat patterns.",
+    "formula": "BA = f(t,r)",
+    "variables": {
+      "t": "Thickness"
+    },
+    "practical": "CNC brake.",
+    "example": "k-factor 0.4."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

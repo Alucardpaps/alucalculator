@@ -1,0 +1,34 @@
+{
+  "id": "fracture-mechanics-calculator",
+  "title": "Fracture Mechanics Calculator - AluCalc Engineering",
+  "slug": "fracture-mechanics-calculator",
+  "keyword": "fracture mechanics calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Fracture Mechanics Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional fracture mechanics calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Fracture Mechanics Calculator",
+    "intro": "Comprehensive engineering guide for fracture mechanics calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for fracture mechanics)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for fracture mechanics.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Fracture Mechanics is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical fracture mechanics scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "stress-strain-calculator",
+    "young-modulus-calculator",
+    "shear-modulus-calculator",
+    "poisson-ratio-calculator",
+    "fracture-mechanics-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

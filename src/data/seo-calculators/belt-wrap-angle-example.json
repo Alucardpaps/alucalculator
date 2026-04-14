@@ -1,0 +1,34 @@
+{
+  "id": "belt-wrap-angle-example",
+  "title": "Belt Wrap Angle Example - AluCalc Engineering",
+  "slug": "belt-wrap-angle-example",
+  "keyword": "belt wrap angle example",
+  "intent": "example",
+  "meta": {
+    "title": "Belt Wrap Angle Example | Free Engineering Tool | AluCalc",
+    "description": "Professional belt wrap angle example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Belt Wrap Angle Example",
+    "intro": "Comprehensive engineering guide for belt wrap angle example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for belt wrap angle)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for belt wrap angle.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Belt Wrap Angle is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical belt wrap angle scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-design-calculator",
+    "timing-belt-length-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "belt-wrap-angle-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

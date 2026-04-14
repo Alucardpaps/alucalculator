@@ -1,0 +1,24 @@
+{
+  "id": "reynolds",
+  "category": "fluid",
+  "title": "Reynolds",
+  "slug": "reynolds",
+  "meta": {
+    "title": "Reynolds | AluCalc",
+    "description": "Laminar vs Turbulent."
+  },
+  "seo": {
+    "h1": "Reynolds Number Calc",
+    "intro": "Flow regime transition.",
+    "formula": "Re = ρvD/μ",
+    "variables": {
+      "Re": "Num"
+    },
+    "practical": "Convection.",
+    "example": "2300 crit."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

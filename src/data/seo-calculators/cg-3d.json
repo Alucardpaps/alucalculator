@@ -1,0 +1,24 @@
+{
+  "id": "cg-3d",
+  "category": "science",
+  "title": "3D CG",
+  "slug": "cg-3d",
+  "meta": {
+    "title": "CG | AluCalc",
+    "description": "Center of Gravity 3D."
+  },
+  "seo": {
+    "h1": "Assembly Balance Calc",
+    "intro": "Multi-part mass CG.",
+    "formula": "X = Σmx/Σm",
+    "variables": {
+      "X": "Pos"
+    },
+    "practical": "Robots.",
+    "example": "Lifting safety."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

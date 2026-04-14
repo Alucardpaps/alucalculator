@@ -26,6 +26,18 @@ interface PartState {
     kerfLoss: number;
     meshRef: THREE.Mesh | null;
 
+    // Phase 6: Inspection & Assembly
+    sectionX: number; // Clipping Plane X (0 to 1)
+    sectionY: number; // Clipping Plane Y (0 to 1)
+    sectionZ: number; // Clipping Plane Z (0 to 1)
+    isSectionActive: boolean;
+    
+    measurePointA: THREE.Vector3 | null;
+    measurePointB: THREE.Vector3 | null;
+    isMeasuring: boolean;
+
+    visibleComponents: string[]; // List of active component IDs in assembly
+
     setDimensions: (dims: Partial<Omit<PartState, 'setDimensions' | 'setMeshRef'>>) => void;
     setMeshRef: (mesh: THREE.Mesh | null) => void;
 }
@@ -50,6 +62,16 @@ export const usePartStore = create<PartState>((set) => ({
 
     kerfLoss: 0,
     meshRef: null,
+
+    // Phase 6 defaults
+    sectionX: 0,
+    sectionY: 0,
+    sectionZ: 0,
+    isSectionActive: false,
+    measurePointA: null,
+    measurePointB: null,
+    isMeasuring: false,
+    visibleComponents: ['all'], // Default show all
 
     setDimensions: (dims) => set((state) => ({ ...state, ...dims })),
     setMeshRef: (mesh) => set({ meshRef: mesh })

@@ -1,0 +1,34 @@
+{
+  "id": "cable-sizing-explained",
+  "title": "Cable Sizing Explained - AluCalc Engineering",
+  "slug": "cable-sizing-explained",
+  "keyword": "cable sizing explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Cable Sizing Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional cable sizing explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Cable Sizing Explained",
+    "intro": "Comprehensive engineering guide for cable sizing explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for cable sizing)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for cable sizing.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Cable Sizing is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical cable sizing scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "motor-power-calculator",
+    "motor-current-calculator",
+    "transformer-calculation-calculator",
+    "wire-gauge-calculator",
+    "cable-sizing-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

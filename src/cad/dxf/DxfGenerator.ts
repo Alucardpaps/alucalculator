@@ -49,11 +49,13 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
 
         const layer = layers.find(l => l.id === entity.layerId);
         const layerName = layer ? layer.name : '0';
+        const entityColor = mapHexToDxfColor(entity.color);
 
         switch (entity.geometry.type) {
             case 'LINE':
                 dxf += `0${N}LINE${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `10${N}${entity.geometry.start.x}${N}`;
                 dxf += `20${N}${entity.geometry.start.y}${N}`;
                 dxf += `30${N}0.0${N}`; // Z start
@@ -65,6 +67,7 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
             case 'CIRCLE':
                 dxf += `0${N}CIRCLE${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `10${N}${entity.geometry.center.x}${N}`;
                 dxf += `20${N}${entity.geometry.center.y}${N}`;
                 dxf += `30${N}0.0${N}`;
@@ -81,6 +84,7 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
 
                 dxf += `0${N}LWPOLYLINE${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `100${N}AcDbEntity${N}`;
                 dxf += `100${N}AcDbPolyline${N}`;
                 dxf += `90${N}${entity.geometry.vertices.length}${N}`; // Num vertices
@@ -95,6 +99,7 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
             case 'ARC':
                 dxf += `0${N}ARC${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `10${N}${entity.geometry.center.x}${N}`;
                 dxf += `20${N}${entity.geometry.center.y}${N}`;
                 dxf += `30${N}0.0${N}`;
@@ -107,6 +112,7 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
             case 'POINT':
                 dxf += `0${N}POINT${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `10${N}${entity.geometry.x}${N}`;
                 dxf += `20${N}${entity.geometry.y}${N}`;
                 dxf += `30${N}0.0${N}`;
@@ -122,6 +128,7 @@ export function generateDXF(entities: CadEntity[], layers: Layer[]): string {
                 // Simplified generic DIMENSION for now.
                 dxf += `0${N}DIMENSION${N}`;
                 dxf += `8${N}${layerName}${N}`;
+                dxf += `62${N}${entityColor}${N}`;
                 dxf += `2${N}*D${entity.id}${N}`; // Block name (pseudo)
                 dxf += `10${N}${entity.geometry.start.x}${N}`; // Def point
                 dxf += `20${N}${entity.geometry.start.y}${N}`;

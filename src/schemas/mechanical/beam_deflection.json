@@ -1,0 +1,22 @@
+{
+  "id": "beam_deflection",
+  "name": "Cantilever Beam Deflection",
+  "category": "civil",
+  "inputs": [
+    { "key": "F", "type": "number", "unit": "N" },
+    { "key": "L", "type": "number", "unit": "m" },
+    { "key": "E", "type": "number", "unit": "Pa" },
+    { "key": "I", "type": "number", "unit": "m4" }
+  ],
+  "steps": [
+    {
+      "id": "deflection",
+      "formula": "(F * L^3) / (3 * E * I)",
+      "description": "Calculate maximum end deflection",
+      "latex": "\\delta_{max} = \\frac{F \\cdot L^3}{3 \\cdot E \\cdot I}"
+    }
+  ],
+  "outputs": [
+    "deflection"
+  ]
+}

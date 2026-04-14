@@ -1,0 +1,34 @@
+{
+  "id": "structural-column-design-step-by-step",
+  "title": "Structural Column Design Step By Step - AluCalc Engineering",
+  "slug": "structural-column-design-step-by-step",
+  "keyword": "structural column design step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Structural Column Design Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional structural column design step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Structural Column Design Step By Step",
+    "intro": "Comprehensive engineering guide for structural column design step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for structural column design)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for structural column design.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Structural Column Design is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical structural column design scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "column-buckling-calculator",
+    "euler-buckling-calculator",
+    "johnson-buckling-calculator",
+    "column-load-capacity-calculator",
+    "structural-column-design-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

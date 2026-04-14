@@ -40,6 +40,14 @@ export class Transformer {
                     vertices: geom.vertices.map(v => add(v, vector))
                 }
             };
+        } else if (geom.type === 'ARC') {
+            return {
+                ...entity,
+                geometry: {
+                    ...geom,
+                    center: add(geom.center, vector)
+                }
+            };
         } else if (geom.type === 'POINT') {
             return {
                 ...entity,
@@ -86,6 +94,16 @@ export class Transformer {
                     vertices: geom.vertices.map(v => rotatePoint(v, center, angleRad))
                 }
             };
+        } else if (geom.type === 'ARC') {
+            return {
+                ...entity,
+                geometry: {
+                    ...geom,
+                    center: rotatePoint(geom.center, center, angleRad),
+                    startAngle: geom.startAngle + angleRad,
+                    endAngle: geom.endAngle + angleRad
+                }
+            };
         } else if (geom.type === 'POINT') {
             const p = rotatePoint({ x: geom.x, y: geom.y }, center, angleRad);
             return {
@@ -122,6 +140,27 @@ export class Transformer {
                 geometry: {
                     ...geom,
                     vertices: geom.vertices.map(v => mirrorPoint(v, axisStart, axisEnd))
+                }
+            };
+        } else if (geom.type === 'ARC') {
+            const axisAngle = Math.atan2(axisEnd.y - axisStart.y, axisEnd.x - axisStart.x);
+            // new angle = 2*axisAngle - oldAngle
+            let newStart = 2 * axisAngle - geom.endAngle;
+            let newEnd = 2 * axisAngle - geom.startAngle;
+
+            // Normalize
+            while (newStart < 0) newStart += 2 * Math.PI;
+            while (newEnd < 0) newEnd += 2 * Math.PI;
+            while (newStart >= 2 * Math.PI) newStart -= 2 * Math.PI;
+            while (newEnd >= 2 * Math.PI) newEnd -= 2 * Math.PI;
+
+            return {
+                ...entity,
+                geometry: {
+                    ...geom,
+                    center: mirrorPoint(geom.center, axisStart, axisEnd),
+                    startAngle: newStart,
+                    endAngle: newEnd
                 }
             };
         } else if (geom.type === 'POINT') {

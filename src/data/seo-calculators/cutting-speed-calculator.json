@@ -1,0 +1,34 @@
+{
+  "id": "cutting-speed-calculator",
+  "title": "Cutting Speed Calculator - AluCalc Engineering",
+  "slug": "cutting-speed-calculator",
+  "keyword": "cutting speed calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Cutting Speed Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional cutting speed calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Cutting Speed Calculator",
+    "intro": "Comprehensive engineering guide for cutting speed calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for cutting speed)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for cutting speed.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Cutting Speed is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical cutting speed scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "machining-time-calculator",
+    "tool-life-calculator",
+    "cutting-speed-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

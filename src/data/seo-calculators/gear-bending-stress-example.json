@@ -1,0 +1,34 @@
+{
+  "id": "gear-bending-stress-example",
+  "title": "Gear Bending Stress Example - AluCalc Engineering",
+  "slug": "gear-bending-stress-example",
+  "keyword": "gear bending stress example",
+  "intent": "example",
+  "meta": {
+    "title": "Gear Bending Stress Example | Free Engineering Tool | AluCalc",
+    "description": "Professional gear bending stress example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Bending Stress Example",
+    "intro": "Comprehensive engineering guide for gear bending stress example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear bending stress)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear bending stress.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Bending Stress is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear bending stress scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-ratio-calculator",
+    "gear-module-calculator",
+    "gear-pitch-calculator",
+    "gear-design-calculator",
+    "gear-bending-stress-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

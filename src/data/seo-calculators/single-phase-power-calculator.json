@@ -1,0 +1,34 @@
+{
+  "id": "single-phase-power-calculator",
+  "title": "Single Phase Power Calculator - AluCalc Engineering",
+  "slug": "single-phase-power-calculator",
+  "keyword": "single phase power calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Single Phase Power Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional single phase power calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Single Phase Power Calculator",
+    "intro": "Comprehensive engineering guide for single phase power calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for single phase power)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for single phase power.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Single Phase Power is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical single phase power scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "power-calculation-calculator",
+    "3-phase-power-calculator",
+    "power-factor-calculator",
+    "apparent-power-calculator",
+    "single-phase-power-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "voltage-3p",
+  "category": "electrical",
+  "title": "Volt Drop 3P",
+  "slug": "voltage-3p",
+  "meta": {
+    "title": "Volt Drop | AluCalc",
+    "description": "3-Phase distribution."
+  },
+  "seo": {
+    "h1": "AC Voltage Drop Calc",
+    "intro": "Minimize line loss.",
+    "formula": "V = √3ILR",
+    "variables": {
+      "I": "Amps"
+    },
+    "practical": "Plant power.",
+    "example": "Copper vs AL."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

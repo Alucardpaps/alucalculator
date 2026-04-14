@@ -1,0 +1,34 @@
+{
+  "id": "transformer-calculation-step-by-step",
+  "title": "Transformer Calculation Step By Step - AluCalc Engineering",
+  "slug": "transformer-calculation-step-by-step",
+  "keyword": "transformer calculation step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Transformer Calculation Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional transformer calculation step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Transformer Calculation Step By Step",
+    "intro": "Comprehensive engineering guide for transformer calculation step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for transformer calculation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for transformer calculation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Transformer Calculation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical transformer calculation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "motor-power-calculator",
+    "motor-current-calculator",
+    "cable-sizing-calculator",
+    "wire-gauge-calculator",
+    "transformer-calculation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

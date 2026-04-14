@@ -1,0 +1,24 @@
+{
+  "id": "press-tolerance",
+  "category": "manufacturing",
+  "title": "Press Fit",
+  "slug": "press-tolerance",
+  "meta": {
+    "title": "Press Fit | AluCalc",
+    "description": "Interference stress."
+  },
+  "seo": {
+    "h1": "Press Fit Stress Calc",
+    "intro": "Force vs Temp fit.",
+    "formula": "P = f(δ,E)",
+    "variables": {
+      "δ": "Inter"
+    },
+    "practical": "Dovetails.",
+    "example": "Shrink fit."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

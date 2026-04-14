@@ -1,0 +1,7 @@
+{
+  "name": "Steel AISI 1020",
+  "density": 7870,
+  "young_modulus": 200e9,
+  "yield_strength": 350e6,
+  "thermal_conductivity": 51.9
+}

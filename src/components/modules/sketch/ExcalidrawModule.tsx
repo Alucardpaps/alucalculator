@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useOSStore } from '@/store/osStore';
+import '@excalidraw/excalidraw/index.css';
 
 // Safer dynamic import with type casting to bypass strict checks during rapid iteration
 const Excalidraw = dynamic(

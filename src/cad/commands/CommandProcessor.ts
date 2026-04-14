@@ -4,7 +4,9 @@ import { useCadStore } from '../store/cadStore';
 import { Point } from '../kernel/types';
 import { LineTool } from './tools/LineTool';
 import { CircleTool } from './tools/CircleTool';
+import { ArcTool } from './tools/ArcTool';
 import { RectangleTool } from './tools/RectangleTool';
+import { HexagonTool } from './tools/HexagonTool';
 import { OffsetTool } from './tools/OffsetTool';
 import { TrimTool } from './tools/TrimTool';
 import { ExtendTool } from './tools/ExtendTool';
@@ -13,6 +15,9 @@ import { MoveTool } from './tools/MoveTool';
 import { CopyTool } from './tools/CopyTool';
 import { RotateTool } from './tools/RotateTool';
 import { MirrorTool } from './tools/MirrorTool';
+import { FilletTool } from './tools/FilletTool';
+import { ChamferTool } from './tools/ChamferTool';
+import { RectArrayTool, CircArrayTool } from './tools/ArrayTools';
 import { findEntityAtPoint } from '../geometry/GeometryUtils';
 
 /**
@@ -31,12 +36,16 @@ export class CommandProcessor {
     public startCommand(commandId: string) {
         let command: Command | null = null;
 
-        if (commandId === 'LINE') {
+        if (commandId === 'LINE' || commandId === 'PLINE') {
             command = new LineTool();
         } else if (commandId === 'CIRCLE') {
             command = new CircleTool();
+        } else if (commandId === 'ARC') {
+            command = new ArcTool();
         } else if (commandId === 'RECTANGLE') {
             command = new RectangleTool();
+        } else if (commandId === 'HEXAGON') {
+            command = new HexagonTool();
         } else if (commandId === 'OFFSET') {
             command = new OffsetTool();
         } else if (commandId === 'TRIM') {
@@ -53,6 +62,14 @@ export class CommandProcessor {
             command = new RotateTool();
         } else if (commandId === 'MIRROR') {
             command = new MirrorTool();
+        } else if (commandId === 'FILLET') {
+            command = new FilletTool();
+        } else if (commandId === 'CHAMFER') {
+            command = new ChamferTool();
+        } else if (commandId === 'RECTARRAY') {
+            command = new RectArrayTool();
+        } else if (commandId === 'CIRCARRAY') {
+            command = new CircArrayTool();
         } else {
             console.warn(`Unknown command: ${commandId}`);
             // Don't clear current command if unknown
@@ -154,31 +171,34 @@ export class CommandProcessor {
         if (this.activeCommand) {
             this.activeCommand.onValueInput(resolvedValue);
         } else {
-            // CLI command parsing
+            // CLI command parsing — try alias match first
             const cmd = resolvedValue.trim().toUpperCase();
 
-            // Check for variable assignment (e.g. "$x = 10") - Future feature
+            const ALIASES: Record<string, string> = {
+                'L': 'LINE', 'LINE': 'LINE',
+                'PL': 'PLINE', 'PLINE': 'PLINE',
+                'C': 'CIRCLE', 'CIRCLE': 'CIRCLE',
+                'A': 'ARC', 'ARC': 'ARC',
+                'REC': 'RECTANGLE', 'RECTANGLE': 'RECTANGLE',
+                'TR': 'TRIM', 'TRIM': 'TRIM',
+                'EX': 'EXTEND', 'EXTEND': 'EXTEND',
+                'O': 'OFFSET', 'OFFSET': 'OFFSET',
+                'M': 'MOVE', 'MOVE': 'MOVE',
+                'CO': 'COPY', 'COPY': 'COPY',
+                'RO': 'ROTATE', 'ROTATE': 'ROTATE',
+                'MI': 'MIRROR', 'MIRROR': 'MIRROR',
+                'F': 'FILLET', 'FILLET': 'FILLET',
+                'CHA': 'CHAMFER', 'CHAMFER': 'CHAMFER',
+                'D': 'DIMENSION', 'DIM': 'DIMENSION', 'DIMENSION': 'DIMENSION',
+                'RECTARRAY': 'RECTARRAY', 'CIRCARRAY': 'CIRCARRAY',
+                'HEX': 'HEXAGON', 'HEXAGON': 'HEXAGON',
+            };
 
-            if (cmd === 'L' || cmd === 'LINE') {
-                this.startCommand('LINE');
-            } else if (cmd === 'PL' || cmd === 'PLINE') {
-                this.startCommand('PLINE');
-            } else if (cmd === 'C' || cmd === 'CIRCLE') {
-                this.startCommand('CIRCLE');
-            } else if (cmd === 'REC' || cmd === 'RECTANGLE') {
-                this.startCommand('RECTANGLE');
-            } else if (cmd === 'D' || cmd === 'DIM') {
-                this.startCommand('DIMENSION');
+            const resolved = ALIASES[cmd];
+            if (resolved) {
+                this.startCommand(resolved);
             } else {
-                // If it's just a number or point command without active tool?
-                // For now, warn
-                console.warn('Unknown command:', cmd);
-                // But if we resolved a variable, maybe show it?
-                if (value !== resolvedValue) {
-                    useCadStore.setState({ commandPrompt: `Resolved: ${resolvedValue}` });
-                } else {
-                    useCadStore.setState({ commandPrompt: 'Unknown command' });
-                }
+                useCadStore.setState({ commandPrompt: `Unknown: ${cmd}` });
             }
         }
     }

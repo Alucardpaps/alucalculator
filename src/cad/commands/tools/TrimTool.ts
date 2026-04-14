@@ -3,6 +3,7 @@ import { Point, CadEntity, createLineEntity } from '../../kernel/types';
 import { distance } from '../../kernel/GeometryKernel';
 import { useCadStore } from '../../store/cadStore';
 import { findEntityAtPoint } from '../../geometry/GeometryUtils';
+import { getEntityIntersections } from '../../geometry/SnapEngine';
 import { trimLineByCutter } from '../../kernel/GeometryKernel';
 
 export class TrimTool extends BaseCommand {
@@ -75,12 +76,37 @@ export class TrimTool extends BaseCommand {
         // Cut against ALL cutters
         this.cuttingEdges.forEach(cutter => {
             if (cutter.id === entity.id) return;
-            if (cutter.geometry.type !== 'LINE') return; // Only line cutters for now
 
             const newSegments: { start: Point, end: Point }[] = [];
             segments.forEach(seg => {
-                const result = trimLineByCutter(seg, cutter.geometry as any);
-                newSegments.push(...result);
+                // Mock an entity for the segment to use getEntityIntersections
+                const mockEntity = {
+                    id: 'mock',
+                    layerId: 'mock',
+                    color: 'mock',
+                    isVisible: true,
+                    isSelected: false,
+                    geometry: { type: 'LINE', start: seg.start, end: seg.end }
+                } as CadEntity;
+
+                const points = getEntityIntersections(mockEntity, cutter);
+
+                if (points.length === 0) {
+                    newSegments.push(seg);
+                } else {
+                    // Split the segment by all intersection points
+                    // Sort points by distance from seg.start
+                    const sortedPoints = points
+                        .filter(p => distance(seg.start, p) > 0.001 && distance(seg.end, p) > 0.001) // ignore endpoints
+                        .sort((a, b) => distance(seg.start, a) - distance(seg.start, b));
+
+                    let currStart = seg.start;
+                    sortedPoints.forEach(p => {
+                        newSegments.push({ start: currStart, end: p });
+                        currStart = p;
+                    });
+                    newSegments.push({ start: currStart, end: seg.end });
+                }
             });
             segments = newSegments;
         });

@@ -133,7 +133,32 @@ export interface PointGeometry {
     y: number;
 }
 
-export type GeometryType = LineGeometry | CircleGeometry | PolylineGeometry | ArcGeometry | DimensionGeometry | PointGeometry;
+export interface RectangleGeometry {
+    type: 'RECTANGLE';
+    center: Point;
+    width: number;
+    height: number;
+    rotation?: number;
+}
+
+export interface HexagonGeometry {
+    type: 'HEXAGON';
+    center: Point;
+    radius: number;
+    rotation?: number;
+}
+
+export type GeometryType = LineGeometry | CircleGeometry | PolylineGeometry | ArcGeometry | DimensionGeometry | PointGeometry | RectangleGeometry | HexagonGeometry;
+
+export interface MachiningModifier {
+    type: 'HOLE' | 'SURFACE_MILLED' | 'THREADED' | 'WELDED';
+    x?: number;
+    y?: number;
+    diameter?: number;
+    depth?: number;
+    description?: string;
+    weldSize?: number;
+}
 
 export interface CadEntity {
     id: string;
@@ -142,6 +167,8 @@ export interface CadEntity {
     geometry: GeometryType;
     isVisible: boolean;
     isSelected: boolean;
+    isFixed?: boolean;
+    modifiers?: MachiningModifier[];
 }
 
 // Factory Functions
@@ -189,6 +216,30 @@ export function createPolylineEntity(vertices: Point[], closed: boolean, layerId
     };
 }
 
+export function createRectangleEntity(center: Point, width: number, height: number, layerId: string, color: string, id?: string): CadEntity {
+    return {
+        id: id || crypto.randomUUID(),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { type: 'RECTANGLE', center, width, height, rotation: 0 },
+        modifiers: []
+    };
+}
+
+export function createHexagonEntity(center: Point, radius: number, layerId: string, color: string, id?: string): CadEntity {
+    return {
+        id: id || crypto.randomUUID(),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { type: 'HEXAGON', center, radius, rotation: 0 },
+        modifiers: []
+    };
+}
+
 // --------------------------------------------------------
 // SNAPPING
 // --------------------------------------------------------
@@ -200,3 +251,8 @@ export interface SnapResult {
     mode: OSnapMode;
     entityId?: string;
 }
+// --------------------------------------------------------
+// UNITS
+// --------------------------------------------------------
+
+export type CadUnit = 'mm' | 'm' | 'in' | 'ft';

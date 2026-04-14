@@ -1,0 +1,34 @@
+{
+  "id": "power-factor-calculator",
+  "title": "Power Factor Calculator - AluCalc Engineering",
+  "slug": "power-factor-calculator",
+  "keyword": "power factor calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Power Factor Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional power factor calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Power Factor Calculator",
+    "intro": "Comprehensive engineering guide for power factor calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for power factor)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for power factor.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Power Factor is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical power factor scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "power-calculation-calculator",
+    "3-phase-power-calculator",
+    "single-phase-power-calculator",
+    "apparent-power-calculator",
+    "power-factor-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

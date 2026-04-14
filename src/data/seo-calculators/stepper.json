@@ -1,0 +1,24 @@
+{
+  "id": "stepper",
+  "category": "electrical",
+  "title": "Stepper T",
+  "slug": "stepper",
+  "meta": {
+    "title": "Stepper | AluCalc",
+    "description": "Speed-Torque curve."
+  },
+  "seo": {
+    "h1": "Stepper Motor Dynamics",
+    "intro": "Pull-out torque calc.",
+    "formula": "T = f(PPS)",
+    "variables": {
+      "T": "Torque"
+    },
+    "practical": "3D Printers.",
+    "example": "High V = Speed."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

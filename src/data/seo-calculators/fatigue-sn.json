@@ -1,0 +1,24 @@
+{
+  "id": "fatigue-sn",
+  "category": "science",
+  "title": "Fatigue SN",
+  "slug": "fatigue-sn",
+  "meta": {
+    "title": "SN Curve | AluCalc",
+    "description": "Cyclic life prediction."
+  },
+  "seo": {
+    "h1": "S-N Fatigue Life Calc",
+    "intro": "Endurance limit pred.",
+    "formula": "N = f(S)",
+    "variables": {
+      "N": "Cycles"
+    },
+    "practical": "Vibration.",
+    "example": "Basquin eqn."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

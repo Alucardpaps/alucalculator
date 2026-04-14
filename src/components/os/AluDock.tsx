@@ -22,9 +22,10 @@ import { useI18nStore } from '@/store/i18nStore';
 import {
     Calculator, Settings, Layers, Grid3X3, Pencil, Layout,
     Scissors, Wrench, BookOpen, Atom, Zap, Receipt,
-    MessageSquare, Folder, Palette, Globe, Cpu,
+    MessageSquare, Folder, Palette, Globe, Cpu, CircleDot,
     MousePointer2, Play, BarChart3, Waves,
-    LucideIcon, LayoutGrid, Activity, Terminal
+    LucideIcon, LayoutGrid, Activity, Terminal, Database, Thermometer,
+    FileText, PowerOff, Gamepad2, Hammer, Scan, Shield
 } from 'lucide-react';
 import { NeonIcon } from '@/components/ui/NeonIcon';
 
@@ -43,8 +44,8 @@ interface DockItem {
 }
 
 interface AluDockProps {
-    currentMode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea';
-    onSwitchMode: (mode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea') => void;
+    currentMode: 'cad' | 'cam' | 'desk' | 'fea';
+    onSwitchMode: (mode: 'cad' | 'cam' | 'desk' | 'fea') => void;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -60,7 +61,7 @@ const DOCK_PADDING = 10;          // px
 // ═══════════════════════════════════════════════════════════════
 
 export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
-    const { windows, activeWindowId, openWindow, startMenuOpen, toggleStartMenu } = useOSStore();
+    const { windows, activeWindowId, openWindow, startMenuOpen, toggleStartMenu, closeAllWindows } = useOSStore();
     const { t, language, setLanguage } = useI18nStore();
     const [isHovered, setIsHovered] = useState(false);
     const [mouseX, setMouseX] = useState<number | null>(null);
@@ -80,6 +81,11 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             isRunning: windows.some(w => w.type === 'profile-weight')
         },
         {
+            id: 'project-manager', label: t.modules['project-manager']?.title || 'Project BOM', icon: FileText,
+            action: () => openWindow('project-manager'), color: '#10b981',
+            isRunning: windows.some(w => w.type === 'project-manager')
+        },
+        {
             id: 'gears', label: t.modules['gears-bearings'].title, icon: Settings,
             action: () => openWindow('gears-bearings'), color: '#8b5cf6',
             isRunning: windows.some(w => w.type === 'gears-bearings')
@@ -94,6 +100,11 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             action: () => openWindow('fasteners'), color: '#ef4444',
             isRunning: windows.some(w => w.type === 'fasteners')
         },
+        {
+            id: 'bearings', label: t.modules.bearings.title, icon: CircleDot,
+            action: () => openWindow('bearings'), color: '#0ea5e9',
+            isRunning: windows.some(w => w.type === 'bearings')
+        },
 
         {
             id: 'materials', label: t.modules['materials-db'].title, icon: Atom,
@@ -101,16 +112,38 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             isRunning: windows.some(w => w.type === 'materials-db')
         },
         {
+            id: 'materials-explorer', label: 'AI Materials Intelligence', icon: Scan,
+            action: () => openWindow('materials-explorer'), color: '#00e5ff',
+            isRunning: windows.some(w => w.type === 'materials-explorer')
+        },
+        {
             id: 'cutting', label: t.modules['cutting-optimizer'].title, icon: Scissors,
             action: () => openWindow('cutting-optimizer'), color: '#14b8a6',
             isRunning: windows.some(w => w.type === 'cutting-optimizer')
         },
+        {
+            id: 'thermal-expansion', label: t.modules['thermal-expansion'].title, icon: Thermometer,
+            action: () => openWindow('thermal-expansion'), color: '#f97316',
+            isRunning: windows.some(w => w.type === 'thermal-expansion')
+        },
     ];
 
     const workspaceItems = [
-        { id: 'flow', label: t.viewFlow, icon: Grid3X3, action: () => onSwitchMode('flow'), color: '#00e5ff', isActiveMode: currentMode === 'flow' },
         { id: 'cad', label: t.viewCad, icon: MousePointer2, action: () => onSwitchMode('cad'), color: '#3b82f6', isActiveMode: currentMode === 'cad' },
+        {
+            id: 'engineering-selection',
+            label: t.modules?.['engineering-selection']?.title || 'Engineering Database',
+            icon: Database,
+            action: () => openWindow('engineering-selection'),
+            color: '#f59e0b',
+            isRunning: windows.some(w => w.type === 'engineering-selection')
+        },
         { id: 'fea', label: t.viewFea, icon: Activity, action: () => onSwitchMode('fea'), color: '#f59e0b', isActiveMode: currentMode === 'fea' },
+        {
+            id: 'physics-solver', label: 'Physics CAS Solver', icon: Activity,
+            action: () => openWindow('physics-solver'), color: '#22c55e',
+            isRunning: windows.some(w => w.type === 'physics-solver')
+        },
         { id: 'desk', label: t.viewDesk, icon: Terminal, action: () => onSwitchMode('desk'), color: '#a855f7', isActiveMode: currentMode === 'desk' },
     ];
 
@@ -119,6 +152,11 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             id: 'file-explorer', label: t.modules['file-explorer'].title, icon: Folder,
             action: () => openWindow('file-explorer'), color: '#f59e0b',
             isRunning: windows.some(w => w.type === 'file-explorer')
+        },
+        {
+            id: 'project-vault', label: 'Engineering Vault', icon: Shield,
+            action: () => openWindow('project-vault'), color: '#3b82f6',
+            isRunning: windows.some(w => w.type === 'project-vault')
         },
 
         {
@@ -132,7 +170,11 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             action: () => openWindow('paint'), color: '#ec4899',
             isRunning: windows.some(w => w.type === 'paint')
         },
-
+        {
+            id: 'close-all', label: t.closeAll || 'Close All Apps', icon: PowerOff,
+            action: () => closeAllWindows(), color: '#ef4444',
+            isRunning: false
+        }
     ];
 
     // ─── MAGNIFICATION CALCULATION ───

@@ -436,13 +436,13 @@ export const WeldingVisualization3D = ({
     const commonProps = { legSize, thickness, length, grooveAngle, mat1, mat2 };
 
     return (
-        <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-slate-100 rounded-2xl animate-pulse" />}>
-            <div className={`w-full h-full min-h-[300px] cursor-move bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-slate-800`}>
-                <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
+        <ClientOnly fallback={<div className="w-full h-full min-h-[400px] bg-[#0a1018] rounded-3xl animate-pulse" />}>
+            <div className={`w-full h-full min-h-[400px] cursor-move bg-transparent rounded-3xl overflow-hidden relative group border border-white/5 shadow-inner`}>
+                <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true, antialias: true }}>
                     {is2D ? (
-                        <OrthographicCamera makeDefault position={[0, 0, 100]} zoom={3} />
+                        <OrthographicCamera makeDefault position={[0, 0, 100]} zoom={4} />
                     ) : (
-                        <PerspectiveCamera makeDefault position={[50, 50, 50]} fov={50} />
+                        <PerspectiveCamera makeDefault position={[60, 60, 60]} fov={45} />
                     )}
 
                     {is2D ? (
@@ -458,7 +458,7 @@ export const WeldingVisualization3D = ({
                             {jointType === 'corner' && <CornerJoint {...commonProps} />}
                         </Center>
                     ) : (
-                        <Stage environment="city" intensity={0.6} adjustCamera={true} preset="rembrandt" shadows="contact">
+                        <Stage environment="apartment" intensity={0.5} adjustCamera={true} preset="rembrandt" shadows="contact">
                             <Center>
                                 {jointType === 'fillet' && <FilletTJoint {...commonProps} />}
                                 {jointType === 'tee' && <FilletTJoint {...commonProps} />}
@@ -476,24 +476,25 @@ export const WeldingVisualization3D = ({
                 </Canvas>
 
                 {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur p-3 rounded-lg text-[10px] font-mono space-y-1 z-10 pointer-events-none select-none shadow-sm dark:bg-slate-800/90 dark:text-white">
-                    <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded" style={{ backgroundColor: mat1.color }}></span>
-                        <span>{mat1.name} ({mat1.shape})</span>
+                <div className="absolute bottom-6 left-6 bg-[#080d14]/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl text-[10px] font-mono space-y-2 z-10 pointer-events-none select-none shadow-xl">
+                    <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: mat1.color, boxShadow: `0 0 8px ${mat1.color}40` }}></span>
+                        <span className="text-gray-300">{mat1.name} <span className="text-gray-600">({mat1.shape})</span></span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded" style={{ backgroundColor: mat2.color }}></span>
-                        <span>{mat2.name} ({mat2.shape})</span>
+                    <div className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: mat2.color, boxShadow: `0 0 8px ${mat2.color}40` }}></span>
+                        <span className="text-gray-300">{mat2.name} <span className="text-gray-600">({mat2.shape})</span></span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-amber-500"></span>
-                        <span>Weld Bead</span>
+                    <div className="flex items-center gap-2.5 pt-1 border-t border-white/5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]"></span>
+                        <span className="text-amber-400 font-bold uppercase tracking-widest">Weld Bead</span>
                     </div>
                 </div>
 
                 {/* Joint Type Badge */}
-                <div className="absolute top-4 left-4 bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider z-10 shadow-sm">
-                    {jointType} Joint • {is2D ? '2D View' : '3D View'}
+                <div className="absolute top-6 left-6 bg-[#080d14]/80 backdrop-blur-md border border-white/10 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] z-10 shadow-lg flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                    {jointType} Joint <span className="text-white/20 px-2">|</span> {is2D ? 'Schematic' : 'ISO Perspective'}
                 </div>
             </div>
         </ClientOnly>

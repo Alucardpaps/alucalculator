@@ -1,0 +1,84 @@
+{
+  "id": "3-phase-power-calculator",
+  "category": "electrical",
+  "title": "Industrial 3-Phase Power Distribution Guide",
+  "slug": "3-phase-power-calculator",
+  "keyword": "3 phase power calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "3-Phase Power Calculator | Electrical Engineering Guide | AluCalc",
+    "description": "Calculate active, reactive, and apparent power in 3-phase systems. Professional guide on Star (Wye) and Delta configurations."
+  },
+  "seo": {
+    "h1": "Industrial Electrical: Fundamentals of 3-Phase Systems",
+    "intro": "3-phase power is the backbone of industrial electrical distribution, providing a more efficient way to transmit electricity and power large motors compared to single-phase systems. This guide dives into the vector math and configurations of balanced 3-phase circuits.",
+    "formula": "P = √3 · V · I · cos(φ)",
+    "variables": {
+      "P": "Active Power (Watts)",
+      "V": "Line-to-Line Voltage (Volts)",
+      "I": "Line Current (Amperes)",
+      "cos(φ)": "Power Factor (Dimensionless)"
+    },
+    "practical": "Essential for sizing industrial generators, high-power HVAC systems, manufacturing plant floor distribution, and large electric motor specifications.",
+    "example": "Scenario: A 480V motor drawing 100A with a power factor of 0.85: P = 1.732 * 480 * 100 * 0.85 = 70,665 W (approx 70.7 kW).",
+    "step_by_step": "1. Identify the Line-to-Line Voltage (V).\n2. Measure the Line Current (I) passing through the conductors.\n3. Determine the system Power Factor (cos φ).\n4. Apply the √3 multiplier for 3-phase summation."
+  },
+  "technicalSections": [
+    {
+      "title": "Wye (Star) vs. Delta Configurations",
+      "content": [
+        "In a Wye (Y) configuration, all three phases connect at a common neutral point. This is ideal for mixed single and 3-phase loads as it provides two voltage levels.",
+        "In a Delta (Δ) configuration, phases are connected in a loop. Delta is commonly used in high-power industrial motors and transmission because it provides high starting torque and doesn't require a neutral wire."
+      ],
+      "formulas": [
+        {
+          "label": "Wye Voltage Relation",
+          "latex": "V_{Line} = \\sqrt{3} \\cdot V_{Phase}"
+        },
+        {
+          "label": "Delta Current Relation",
+          "latex": "I_{Line} = \\sqrt{3} \\cdot I_{Phase}"
+        }
+      ]
+    },
+    {
+      "title": "Power Component Relationships",
+      "content": [
+        "Modern electrical engineering distinguishes between three types of power: Active (Real) Power, Reactive Power (Magnetic/Inductive), and Apparent Power (Total Vector Sum)."
+      ],
+      "table": {
+        "headers": ["Power Type", "Symbol", "Unit", "Physical Meaning"],
+        "rows": [
+          ["Active Power", "P", "Watts (W)", "Actual work performed"],
+          ["Reactive Power", "Q", "VARs", "Magnetic field oscillations"],
+          ["Apparent Power", "S", "VA", "Total grid demand"],
+          ["Power Factor", "pf", "unitless", "Efficiency ratio (P/S)"]
+        ]
+      }
+    },
+    {
+      "title": "Efficiency and Load Balancing",
+      "content": [
+        "Phase imbalance occurs when current flows unevenly across L1, L2, and L3. This causes heating in the neutral conductor and significantly reduces motor lifespan due to opposing torque vectors."
+      ],
+      "table": {
+        "headers": ["Load Type", "Power Factor", "Characteristic"],
+        "rows": [
+          ["Incandescent / Heating", "1.00", "Purely Resistive"],
+          ["Standard Induction Motor", "0.80 - 0.90", "Highly Inductive"],
+          ["LED Lighting Arrays", "0.90 - 0.98", "Capacitive / Non-linear"],
+          ["Computer Server Farms", "0.95+", "Active PFC Corrected"]
+        ]
+      }
+    }
+  ],
+  "relatedCalculators": [
+    { "title": "Voltage Drop Analysis", "slug": "voltage-drop-calculator" },
+    { "title": "Ohm's Law Master", "slug": "ohm-law-calculator" },
+    { "title": "Motor Current Spec", "slug": "motor-current-calculator" }
+  ],
+  "cta": {
+    "label": "Open Circuit Simulator",
+    "link": "/workspace"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "bolt-fatigue-calculator",
+  "title": "Bolt Fatigue Calculator - AluCalc Engineering",
+  "slug": "bolt-fatigue-calculator",
+  "keyword": "bolt fatigue calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Bolt Fatigue Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional bolt fatigue calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bolt Fatigue Calculator",
+    "intro": "Comprehensive engineering guide for bolt fatigue calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bolt fatigue)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bolt fatigue.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bolt Fatigue is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bolt fatigue scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bolt-torque-calculator",
+    "bolt-preload-calculator",
+    "bolt-stress-calculator",
+    "bolt-shear-force-calculator",
+    "bolt-fatigue-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -26,7 +26,7 @@ export interface OSWindow {
     size: WindowSize;
     zIndex: number;
     minimized: boolean;
-    maximized: boolean;
+    maximized: boolean | 'left' | 'right';
 }
 
 // ============================================
@@ -48,8 +48,15 @@ interface OSState {
     showWelcomeModal: boolean;
     startMenuOpen: boolean;
     activeSettingsTab: string;
+    isChaosMode: boolean; // Avant-Garde Overdrive State
+    isFocusMode: boolean; // Zen / Deep Work State
+    isAudioEnabled: boolean; // Cyber-Acoustic Feedback
+    isSelfDestructing: boolean; // Theatrical self-destruct state
+    isDockHidden: boolean; // Taskbar visibility
 }
 
+
+export type WorkspaceMode = 'cad' | 'cam' | 'desk' | 'fea' | 'mechanical' | 'manufacturing' | 'civil' | 'electrical' | 'science' | 'finance' | 'software';
 
 interface OSActions {
     openWindow: (type: ModuleType, maximized?: boolean) => void;
@@ -58,6 +65,7 @@ interface OSActions {
     minimizeWindow: (id: string) => void;
     restoreWindow: (id: string) => void;
     toggleMaximize: (id: string) => void;
+    snapWindow: (id: string, mode: 'left' | 'right') => void;
     updateWindowPosition: (id: string, position: WindowPosition) => void;
     updateWindowSize: (id: string, size: WindowSize) => void;
     closeAllWindows: () => void;
@@ -74,14 +82,25 @@ interface OSActions {
     resetWelcome: () => void; // Debug
 
     // Workspace Mode
-    workspaceMode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea';
-    setWorkspaceMode: (mode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea') => void;
+    workspaceMode: WorkspaceMode;
+    setWorkspaceMode: (mode: WorkspaceMode) => void;
 
     // Start Menu
     toggleStartMenu: () => void;
     setStartMenuOpen: (open: boolean) => void;
     setActiveSettingsTab: (tab: string) => void;
+    toggleChaosMode: () => void;
+    toggleFocusMode: () => void;
+    toggleAudio: () => void;
+    initiateSelfDestruct: () => void;
+
+    // Unit System
+    unitSystem: 'metric' | 'imperial';
+    setUnitSystem: (sys: 'metric' | 'imperial') => void;
+
+    toggleDock: () => void;
 }
+
 
 
 // ============================================
@@ -103,17 +122,40 @@ export const useOSStore = create<OSState & OSActions>()(
             fontFamily: 'sans',
             hasSeenWelcome: true, // Skip Welcome Screen by default
             showWelcomeModal: false,
-            workspaceMode: 'flow',
+            workspaceMode: 'desk',
             startMenuOpen: false, // Global Start Menu State
             activeSettingsTab: 'appearance',
+            unitSystem: 'metric',
+            isChaosMode: false, // Default off
+            isFocusMode: false, // Default off
+            isAudioEnabled: false, // Default off to prevent sudden loud noises
+            isSelfDestructing: false,
+            isDockHidden: false,
 
 
             setDictionary: (dict: any) => set({ dictionary: dict }),
-            setWorkspaceMode: (mode: 'cad' | 'flow' | 'cam' | 'desk' | 'fea') => set({ workspaceMode: mode }),
+            setWorkspaceMode: (mode: 'cad' | 'cam' | 'desk' | 'fea' | 'mechanical' | 'manufacturing' | 'civil' | 'electrical' | 'science' | 'finance' | 'software') => set({ workspaceMode: mode }),
+            setUnitSystem: (sys: 'metric' | 'imperial') => set({ unitSystem: sys }),
 
             toggleStartMenu: () => set(state => ({ startMenuOpen: !state.startMenuOpen })),
             setStartMenuOpen: (open: boolean) => set({ startMenuOpen: open }),
             setActiveSettingsTab: (tab: string) => set({ activeSettingsTab: tab }),
+            toggleChaosMode: () => set(state => ({ isChaosMode: !state.isChaosMode })),
+            toggleFocusMode: () => set(state => ({ isFocusMode: !state.isFocusMode })),
+            toggleAudio: () => set(state => {
+                const newState = !state.isAudioEnabled;
+                import('@/lib/audioEngine').then(m => m.sysAudio.setEnabled(newState));
+                return { isAudioEnabled: newState };
+            }),
+            initiateSelfDestruct: () => {
+                set({ isSelfDestructing: true });
+                // Reset after 12 seconds (10s countdown + 2s crash)
+                setTimeout(() => {
+                    set({ isSelfDestructing: false });
+                }, 13000);
+            },
+
+            toggleDock: () => set(state => ({ isDockHidden: !state.isDockHidden })),
 
 
             bringToFront: (id: string) => get().focusWindow(id),
@@ -135,6 +177,11 @@ export const useOSStore = create<OSState & OSActions>()(
                 const { windows, nextZIndex } = get();
                 const moduleDef = MODULE_REGISTRY[type];
 
+                if (!moduleDef) {
+                    console.error(`Attempted to open undefined module: ${type}`);
+                    return;
+                }
+
                 // Check if window of this type already exists
                 const existing = windows.find(w => w.type === type);
                 if (existing) {
@@ -146,6 +193,7 @@ export const useOSStore = create<OSState & OSActions>()(
                     if (maximized && !existing.maximized) {
                         get().toggleMaximize(existing.id);
                     }
+                    import('@/lib/audioEngine').then(m => m.sysAudio.playSwoosh());
                     return;
                 }
 
@@ -167,6 +215,8 @@ export const useOSStore = create<OSState & OSActions>()(
                     maximized: maximized
                 };
 
+                import('@/lib/audioEngine').then(m => m.sysAudio.playSwoosh());
+
                 set({
                     windows: [...windows, newWindow],
                     activeWindowId: newWindow.id,
@@ -187,6 +237,8 @@ export const useOSStore = create<OSState & OSActions>()(
                     activeWindowId: nextActiveId
                 });
 
+                import('@/lib/audioEngine').then(m => m.sysAudio.playSwoosh());
+
                 if (nextActiveId) {
                     get().focusWindow(nextActiveId);
                 } else {
@@ -202,10 +254,17 @@ export const useOSStore = create<OSState & OSActions>()(
                 // Sync workspace mode based on window type for contextual tools and sidebar highlight
                 let mode: any = 'desk';
                 if (win.type === 'cad-editor') mode = 'cad';
-                else if (win.type === 'flow-editor') mode = 'flow';
                 else if (win.type === 'cutting-optimizer') mode = 'cam';
                 else if (win.type === 'simulation-fea') mode = 'fea';
                 else if (win.type === 'manufacturing-sandbox') mode = 'cam'; // Sandbox belongs to CAM/Mfg workspace
+                else if (win.type === 'engineering-selection') mode = 'mechanical';
+                else if (win.type === 'thermal-expansion') mode = 'mechanical';
+                else {
+                    const category = MODULE_REGISTRY[win.type].category;
+                    if (['mechanical', 'manufacturing', 'civil', 'electrical', 'science', 'finance', 'software'].includes(category)) {
+                        mode = category;
+                    }
+                }
 
                 set({
                     windows: windows.map(w =>
@@ -250,9 +309,23 @@ export const useOSStore = create<OSState & OSActions>()(
 
             toggleMaximize: (id: string) => {
                 set(state => ({
+                    windows: state.windows.map(w => {
+                        if (w.id === id) {
+                            const isMax = w.maximized === true || w.maximized === 'left' || w.maximized === 'right';
+                            return { ...w, maximized: !isMax };
+                        }
+                        return w;
+                    })
+                }));
+            },
+
+            snapWindow: (id: string, mode: 'left' | 'right') => {
+                set(state => ({
                     windows: state.windows.map(w =>
-                        w.id === id ? { ...w, maximized: !w.maximized } : w
-                    )
+                        w.id === id ? { ...w, maximized: mode, minimized: false, zIndex: state.nextZIndex } : w
+                    ),
+                    activeWindowId: id,
+                    nextZIndex: state.nextZIndex + 1
                 }));
             },
 
@@ -324,6 +397,10 @@ export const useOSStore = create<OSState & OSActions>()(
                 theme: state.theme,
                 hasSeenWelcome: state.hasSeenWelcome,
                 workspaceMode: state.workspaceMode,
+                isChaosMode: state.isChaosMode,
+                isFocusMode: state.isFocusMode,
+                isAudioEnabled: state.isAudioEnabled,
+                isDockHidden: state.isDockHidden,
             })
         }
     )

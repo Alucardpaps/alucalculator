@@ -1,10 +1,8 @@
-'use client';
-
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, X, Pin, Clock, Settings, Power,
-    ChevronRight, ArrowUpRight, Grid3X3, Layers, Globe, Terminal
+    ChevronRight, ArrowUpRight, Grid3X3, Layers, Globe, Terminal, Briefcase, Zap, Calculator, Database, Folder, Hexagon
 } from 'lucide-react';
 import { MODULE_REGISTRY, ModuleType, ModuleCategory, getModuleIcon } from '@/config/modules';
 import { useOSStore } from '@/store/osStore';
@@ -12,102 +10,80 @@ import { useWorkspaceStore } from '@/store/workspaceStore';
 import { useUtilityStore } from '@/store/utilityStore';
 import { useI18nStore } from '@/store/i18nStore';
 
-// Module hints are now pulled from i18nStore t.moduleHints
-
 interface StartMenuProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-// Helper component for app grid items (defined outside to avoid re-renders)
 const AppGridItem = ({ id, title, hint, icon: Icon, accentColor, onSelect }: {
     id: string;
     title: string;
     hint?: string;
-    icon: any; // Using any to bypass complex Lucide type inference in this mixed context
+    icon: any;
     accentColor: string;
     onSelect: () => void;
 }) => (
     <button
         key={id}
         onClick={onSelect}
-        className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-white/10 transition-all group text-center"
+        role="menuitem"
+        aria-label={title}
+        className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl hover:bg-white/10 transition-all group text-center relative overflow-hidden"
     >
         <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all overflow-hidden relative"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative shrink-0"
             style={{
-                background: `linear-gradient(145deg, ${accentColor}cc, ${accentColor}40 50%, ${accentColor}20)`,
+                background: `linear-gradient(135deg, ${accentColor}cc, ${accentColor}40 50%, ${accentColor}10)`,
                 border: `1px solid ${accentColor}40`,
-                boxShadow: `0 2px 8px ${accentColor}20, inset 0 1px 0 rgba(255,255,255,0.15)`,
+                boxShadow: `0 4px 12px ${accentColor}20, inset 0 1px 0 rgba(255,255,255,0.2)`,
             }}
         >
-            {/* Glass reflection */}
             <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 40%, transparent 50%)' }}
+                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 40%)' }}
             />
-            <Icon size={24} className="text-white relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }} />
+            <Icon size={28} className="text-white relative z-10" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }} />
         </div>
-        <span className="text-[9px] uppercase tracking-widest font-bold text-cyan-50/70 group-hover:text-[#00e5ff] leading-tight line-clamp-2 mt-1 transition-colors">
-            {title}
-        </span>
-        {hint && (
-            <span className="text-[8px] tracking-wide text-cyan-900/60 leading-tight line-clamp-1">
-                {hint}
+        <div className="flex flex-col flex-1 min-w-0 items-center justify-start mt-1">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-[#e2e8f0] group-hover:text-white leading-tight line-clamp-2 transition-colors w-full">
+                {title}
             </span>
-        )}
+            {hint && (
+                <span className="text-[9px] tracking-wide text-slate-400 group-hover:text-cyan-200/80 leading-tight line-clamp-2 mt-1 transition-colors w-full px-1">
+                    {hint}
+                </span>
+            )}
+        </div>
     </button>
 );
 
-
 export function StartMenu({ isOpen, onClose }: StartMenuProps) {
     const { openWindow } = useOSStore();
-    const { t, language, setLanguage } = useI18nStore();
+    const { t } = useI18nStore();
     const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState<string>('all');
 
-    // Define pinned apps (example)
+    useEffect(() => {
+        if (!isOpen) {
+            setSearchQuery('');
+            setActiveCategory('all');
+        }
+    }, [isOpen]);
+
     const pinnedApps = useMemo(() => [
-        { id: 'calculator', title: t.modules.calculator?.title || 'Calc', icon: getModuleIcon('Calculator'), accentColor: '#06b6d4' },
-        { id: 'unit-converter', title: t.modules['unit-converter']?.title || 'Units', icon: getModuleIcon('RefreshCw'), accentColor: '#8b5cf6' },
-        { id: 'ai-copilot', title: t.modules['ai-copilot']?.title || 'AI', icon: getModuleIcon('Bot'), accentColor: '#6366f1' },
-        { id: 'file-explorer', title: t.modules['file-explorer']?.title || 'Files', icon: getModuleIcon('Folder'), accentColor: '#f59e0b' },
         { id: 'settings', title: t.modules.settings?.title || 'Settings', icon: getModuleIcon('Settings'), accentColor: '#64748b' },
+        { id: 'file-explorer', title: t.modules['file-explorer']?.title || 'Files', icon: getModuleIcon('Folder'), accentColor: '#f59e0b' },
+        { id: 'calculator', title: t.modules.calculator?.title || 'Calc', icon: getModuleIcon('Calculator'), accentColor: '#06b6d4' },
     ], [t]);
 
-    // Filter modules
     const filteredModules = useMemo(() => {
         const query = searchQuery.toLowerCase();
         return Object.values(MODULE_REGISTRY).filter(m => {
-            const title = (t.modules?.[m.type]?.title || m.title).toLowerCase();
-            const hint = (t.moduleHints?.[m.type] || '').toLowerCase();
+            // ensure type exists in dictionary
+            const title = (t.modules?.[m.type as keyof typeof t.modules]?.title || m.title).toLowerCase();
+            const hint = (t.moduleHints?.[m.type as keyof typeof t.moduleHints] || '').toLowerCase();
             return title.includes(query) || hint.includes(query);
         });
     }, [searchQuery, t]);
-
-    // Group by category if no search
-    const grouped = useMemo(() => {
-        if (searchQuery) return { [t.searchResults]: filteredModules };
-
-
-        const groups: Record<string, typeof filteredModules> = {};
-        filteredModules.forEach(m => {
-            const cat = m.category || t.categoryOther;
-            if (!groups[cat]) groups[cat] = [];
-
-            groups[cat].push(m);
-        });
-        return groups;
-    }, [filteredModules, searchQuery]);
-
-    const handleLaunch = (type: ModuleType) => {
-        if (type === 'calculator') {
-            useUtilityStore.getState().setCalcOpen(true);
-        } else if (type === 'unit-converter') {
-            useUtilityStore.getState().setUnitOpen(true);
-        } else {
-            openWindow(type, true); // Open maximized
-        }
-        onClose();
-    };
 
     const moduleColors: Record<string, string> = {
         'calculator': '#06b6d4', 'profile-weight': '#3b82f6', 'gears-bearings': '#8b5cf6',
@@ -126,157 +102,238 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
         'analytics-dashboard': '#8b5cf6', 'simulation-fea': '#f59e0b',
         'sketch-pad': '#ec4899', 'project-variables': '#6366f1',
         'terminal': '#22c55e', 'feedback': '#3b82f6', 'news': '#f59e0b',
+        'physics-kinematics': '#8b5cf6', 'chemistry-reactions': '#10b981',
+        'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6',
+        'aerospace-dynamics': '#f97316', 'naval-hydrostatics': '#06b6d4'
     };
 
-    const categories = [
-        { id: 'mechanical', name: t.categories.mechanical, color: '#f59e0b' },
-        { id: 'structural', name: t.categories.structural, color: '#3b82f6' },
-        { id: 'utilities', name: t.categories.utilities, color: '#10b981' },
-        { id: 'reference', name: t.categories.reference, color: '#8b5cf6' },
-    ];
+    // Extract all unique categories present in the current OS
+    const categories = useMemo(() => {
+        const cats = Array.from(new Set(Object.values(MODULE_REGISTRY).map(m => m.category)));
+        return cats.map(c => ({
+            id: c,
+            name: t.categories?.[c as keyof typeof t.categories] || c
+        })).sort((a, b) => a.name.localeCompare(b.name));
+    }, [t]);
+
+    const handleLaunch = (type: ModuleType | string) => {
+        if (type === 'calculator') {
+            useUtilityStore.getState().setCalcOpen(true);
+        } else if (type === 'unit-converter') {
+            useUtilityStore.getState().setUnitOpen(true);
+        } else {
+            openWindow(type as ModuleType, true); // Open maximized
+        }
+        onClose();
+    };
+
+    // Determine what to show in the main grid
+    const displayedModules = useMemo(() => {
+        if (searchQuery) return filteredModules;
+        if (activeCategory === 'all') return filteredModules;
+        if (activeCategory === 'pinned') return pinnedApps as any; // mock
+        return filteredModules.filter(m => m.category === activeCategory);
+    }, [searchQuery, activeCategory, filteredModules, pinnedApps]);
+
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-40 bg-black/5"
+                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
                     />
 
-                    {/* Menu Panel */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        transition={{ type: "spring", duration: 0.2 }}
-                        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-[640px] h-[500px] bg-[#05090e]/85 backdrop-blur-3xl border border-cyan-900/40 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden"
+                        exit={{ opacity: 0, y: 30, scale: 0.98 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed bottom-[60px] sm:bottom-[80px] left-1/2 -translate-x-1/2 z-50 w-[98vw] sm:w-[500px] md:w-[760px] lg:w-[940px] xl:w-[1100px] h-[85vh] max-h-[750px] bg-[#0c1017]/95 backdrop-blur-3xl border border-cyan-500/30 rounded-2xl shadow-[0_30px_100px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1)] flex overflow-hidden ring-1 ring-black/50"
+                        role="menu"
+                        aria-label="Start Menu"
                     >
-                        {/* Search Bar */}
-                        <div className="p-4 border-b border-cyan-900/30 bg-black/20">
-                            <div className="flex bg-[#020408]/60 border border-cyan-900/30 rounded-lg overflow-hidden focus-within:border-[#00e5ff]/50 transition-colors shadow-inner">
-                                <div className="pl-3 py-2.5 text-cyan-900 flex items-center">
-                                    <Search size={16} />
+                        {/* LEFT SIDEBAR - CATEGORIES */}
+                        <div className="w-[180px] sm:w-[220px] shrink-0 bg-black/40 border-r border-white/5 flex flex-col pt-4">
+                            <div className="px-4 mb-6">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <div className="relative w-7 h-7 flex items-center justify-center rounded-lg bg-gradient-to-br from-cyan-950 to-blue-900 border border-cyan-500/30">
+                                        <Hexagon size={16} className="text-cyan-400" />
+                                    </div>
+                                    <h2 className="text-sm font-black text-white italic tracking-widest">{t.osName}</h2>
                                 </div>
-                                <input
-                                    type="text"
-                                    placeholder={t.searchApps}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-transparent border-none text-cyan-50 text-[11px] font-mono tracking-widest px-3 py-2.5 outline-none placeholder:text-cyan-900/50"
-                                />
-                                {searchQuery && (
+                                <p className="text-[9px] text-cyan-500/70 font-mono tracking-widest uppercase pl-8">{t.version}</p>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto scrollbar-none px-3 space-y-1">
+                                <button
+                                    onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
+                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all flex items-center gap-2 ${activeCategory === 'all' && !searchQuery ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'}`}
+                                >
+                                    <Grid3X3 size={15} className={activeCategory === 'all' && !searchQuery ? 'text-cyan-400' : 'text-slate-500'} />
+                                    {t.allApps || 'All Apps'}
+                                </button>
+
+                                <div className="h-px w-full bg-white/5 my-2" />
+
+                                <div className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-2 px-3 mt-4">Disciplines</div>
+
+                                {categories.map(cat => (
                                     <button
-                                        onClick={() => setSearchQuery('')}
-                                        className="pr-3 py-2.5 text-slate-500 hover:text-white transition-colors"
+                                        key={cat.id}
+                                        onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
+                                        className={`w-full text-left px-3 py-2 rounded-lg text-[11px] font-bold tracking-wide transition-all flex items-center justify-between group ${activeCategory === cat.id && !searchQuery ? 'bg-white/10 text-white border border-white/10 shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'}`}
                                     >
-                                        <X size={16} />
+                                        <span className="truncate">{cat.name}</span>
+                                        {activeCategory === cat.id && !searchQuery && <ChevronRight size={12} className="text-cyan-400 opacity-60" />}
                                     </button>
+                                ))}
+                            </div>
+
+                            {/* System Actions Area */}
+                            <div className="p-3 border-t border-white/5 bg-black/20 space-y-1">
+                                <button
+                                    onClick={() => handleLaunch('settings')}
+                                    className="w-full text-left px-3 py-2 rounded-md text-[11px] font-semibold tracking-wide text-slate-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2"
+                                >
+                                    <Settings size={14} /> {t.modules.settings?.title || 'Settings'}
+                                </button>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="w-full text-left px-3 py-2 rounded-md text-[11px] font-semibold tracking-wide text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2 group"
+                                >
+                                    <Power size={14} className="group-hover:animate-pulse" /> Shut Down
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* RIGHT MAIN AREA */}
+                        <div className="flex-1 flex flex-col bg-gradient-to-br from-transparent to-black/40">
+                            {/* Top Search Bar */}
+                            <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] sticky top-0 z-10 backdrop-blur-md flex items-center gap-4">
+                                <div className="flex-1 flex items-center bg-black/40 border border-cyan-500/20 rounded-xl overflow-hidden focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(34,211,238,0.1)] transition-all h-11">
+                                    <div className="pl-4 pr-2 text-cyan-600">
+                                        <Search size={18} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder={t.searchApps}
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full h-full bg-transparent border-none text-white text-sm font-sans tracking-wide px-2 outline-none placeholder:text-slate-600"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery('')}
+                                            className="px-4 text-slate-500 hover:text-white transition-colors h-full"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => useWorkspaceStore.getState().toggleDebugMode()}
+                                    className={`w-11 h-11 shrink-0 rounded-xl transition-all border flex items-center justify-center ${useWorkspaceStore.getState().debugMode
+                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                                        : 'bg-black/40 hover:bg-white/10 text-slate-500 border-white/5'
+                                        }`}
+                                    title={t.toggleDevMode}
+                                >
+                                    <Terminal size={18} />
+                                </button>
+                            </div>
+
+                            {/* Mobile Category Selector (Dropdown or Scroll) */}
+                            <div className="md:hidden px-4 py-2 border-b border-white/5 flex overflow-x-auto scrollbar-none gap-2">
+                                <button
+                                    onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
+                                    className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors border ${activeCategory === 'all' && !searchQuery ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-black/50 text-slate-400 border-white/10'}`}
+                                >
+                                    All
+                                </button>
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
+                                        className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors border ${activeCategory === cat.id && !searchQuery ? 'bg-white/20 text-white border-white/30' : 'bg-black/50 text-slate-400 border-white/10'}`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* App Grid Content */}
+                            <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                                {searchQuery && (
+                                    <h3 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">
+                                        {t.searchResults} ({displayedModules.length})
+                                    </h3>
+                                )}
+                                {!searchQuery && activeCategory === 'all' && (
+                                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
+                                        Engineering & Science Nexus
+                                    </h3>
+                                )}
+                                {!searchQuery && activeCategory !== 'all' && (
+                                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-2">
+                                        {categories.find(c => c.id === activeCategory)?.name} Instruments
+                                    </h3>
+                                )}
+
+                                {displayedModules.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center pt-20 pb-10 text-center opacity-60">
+                                        <Search size={48} className="text-slate-600 mb-4" />
+                                        <h3 className="text-lg font-bold text-slate-400 mb-1">No modules found</h3>
+                                        <p className="text-sm text-slate-500">Try adjusting your search query.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-2 gap-y-6">
+                                        {displayedModules.map((mod: any) => {
+                                            if ('type' in mod) {
+                                                const Icon = getModuleIcon(mod.iconName);
+                                                const title = t.modules?.[mod.type as keyof typeof t.modules]?.title || mod.title;
+                                                const hint = t.moduleHints?.[mod.type as keyof typeof t.moduleHints];
+                                                const accentColor = moduleColors[mod.type] || '#3b82f6';
+
+                                                return (
+                                                    <AppGridItem
+                                                        key={mod.type}
+                                                        id={mod.type}
+                                                        title={title}
+                                                        hint={hint}
+                                                        icon={Icon}
+                                                        accentColor={accentColor}
+                                                        onSelect={() => handleLaunch(mod.type as ModuleType)}
+                                                    />
+                                                );
+                                            } else {
+                                                // Handling pinned mock items
+                                                const app = mod as any;
+                                                return (
+                                                    <AppGridItem
+                                                        key={app.id}
+                                                        id={app.id}
+                                                        title={app.title}
+                                                        icon={app.icon}
+                                                        accentColor={app.accentColor}
+                                                        onSelect={() => handleLaunch(app.id)}
+                                                    />
+                                                );
+                                            }
+                                        })}
+                                    </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* App Grid */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-white/10">
-                            {!searchQuery && (
-                                <div className="mb-4">
-                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">{t.pinned}</h3>
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {pinnedApps.map(app => (
-                                            <AppGridItem
-                                                key={app.id}
-                                                id={app.id}
-                                                title={app.title}
-                                                icon={app.icon}
-                                                accentColor={app.accentColor}
-                                                onSelect={() => handleLaunch(app.id as ModuleType)}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {Object.entries(grouped).map(([category, modules]) => (
-                                <div key={category}>
-                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-2">
-                                        {t.categories?.[category as ModuleCategory] || category}
-                                    </h3>
-
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {modules.map(mod => {
-                                            const Icon = getModuleIcon(mod.iconName);
-                                            const title = t.modules?.[mod.type]?.title || mod.title;
-                                            const hint = t.moduleHints?.[mod.type];
-                                            const accentColor = moduleColors[mod.type] || '#3b82f6';
-
-
-                                            return (
-                                                <AppGridItem
-                                                    key={mod.type}
-                                                    id={mod.type}
-                                                    title={title}
-                                                    hint={hint}
-                                                    icon={Icon}
-                                                    accentColor={accentColor}
-                                                    onSelect={() => handleLaunch(mod.type as ModuleType)}
-                                                />
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Bottom User Bar */}
-                        <div className="p-4 border-t border-cyan-900/30 bg-black/40 flex items-center justify-between">
-                            {/* User / Settings Profile */}
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-1 ring-white/10">
-                                    <span className="text-white font-bold text-xs">ALU</span>
-                                </div>
-                                <div className="font-sans">
-                                    <p className="text-[11px] font-bold text-white tracking-wide">{t.userPro}</p>
-                                    <p className="text-[9px] text-slate-500 tracking-wider uppercase">{t.osName} {t.version}</p>
-                                </div>
-
-                            </div>
-
-                            {/* OS Controls */}
-                            <div className="flex items-center gap-1">
-
-                                {/* Dev Mode Toggle */}
-                                <button
-                                    onClick={() => useWorkspaceStore.getState().toggleDebugMode()}
-                                    className={`p-2 rounded-lg transition-colors border ${useWorkspaceStore.getState().debugMode
-                                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                        : 'hover:bg-white/10 text-slate-400 border-transparent'
-                                        }`}
-                                    title={t.toggleDevMode}
-                                >
-
-                                    <Terminal size={16} />
-                                </button>
-                                <button
-                                    onClick={() => { useOSStore.getState().openWindow('settings'); onClose(); }}
-                                    className="p-2 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
-                                >
-                                    <Settings size={16} />
-                                </button>
-                                <button
-                                    onClick={() => window.location.reload()}
-                                    className="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-lg text-slate-400 transition-colors"
-                                >
-                                    <Power size={16} />
-                                </button>
-                            </div>
-                        </div>
                     </motion.div>
                 </>
-            )}
-        </AnimatePresence>
+            )
+            }
+        </AnimatePresence >
     );
 }

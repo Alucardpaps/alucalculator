@@ -1,0 +1,34 @@
+{
+  "id": "electrical-power-formula",
+  "title": "Electrical Power Formula - AluCalc Engineering",
+  "slug": "electrical-power-formula",
+  "keyword": "electrical power formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Electrical Power Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional electrical power formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Electrical Power Formula",
+    "intro": "Comprehensive engineering guide for electrical power formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for electrical power)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for electrical power.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Electrical Power is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical electrical power scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "power-calculation-calculator",
+    "3-phase-power-calculator",
+    "single-phase-power-calculator",
+    "power-factor-calculator",
+    "electrical-power-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

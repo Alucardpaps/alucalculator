@@ -10,6 +10,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useCadStore } from '../store/cadStore';
 import { useOSStore } from '../../store/osStore';
 import { CAD_COLORS } from '../kernel/constants';
+import { commandProcessor } from '../commands/CommandProcessor';
 
 // ═══════════════════════════════════════════════════════════════
 // COMMAND ALIASES (AutoCAD Style)
@@ -114,38 +115,46 @@ export function CommandLine({ className }: CommandLineProps) {
 
     // Process command input
     const processCommand = useCallback((input: string) => {
-        const trimmed = input.trim().toUpperCase();
+        const trimmed = input.trim();
+        const upper = trimmed.toUpperCase();
 
         if (!trimmed) {
-            // Empty Enter: finish current command
+            // Empty Enter: finish/cancel current command
             if (activeCommand) {
-                cancelCommand();
+                // Send Enter key to active command for state transitions
+                commandProcessor.getActiveCommand()?.onKeyInput('Enter');
             }
             return;
         }
 
+        // If a command is active, route input to it
+        if (activeCommand) {
+            commandProcessor.handleValueInput(trimmed);
+            setHistory(prev => [...prev, trimmed]);
+            return;
+        }
+
         // Check for alias
-        const command = COMMAND_ALIASES[trimmed];
+        const command = COMMAND_ALIASES[upper];
 
         if (command) {
             // Handle immediate commands
-            if (command === 'UNDO') {
-                undo();
-                return;
-            }
-            if (command === 'REDO') {
-                redo();
+            if (command === 'UNDO') { undo(); return; }
+            if (command === 'REDO') { redo(); return; }
+            if (command === 'ERASE') {
+                const { selectedIds, removeEntity } = useCadStore.getState();
+                selectedIds.forEach(id => removeEntity(id));
                 return;
             }
 
-            // Start command
-            setActiveCommand(command);
-            setHistory(prev => [...prev, trimmed]);
+            // Route through CommandProcessor — THIS creates the actual tool instance
+            commandProcessor.startCommand(command);
+            setHistory(prev => [...prev, upper]);
         } else {
-            // Unknown command
-            console.warn(`Unknown command: ${trimmed}`);
+            // Try forwarding as value input (might be a coordinate)
+            commandProcessor.handleValueInput(trimmed);
         }
-    }, [activeCommand, cancelCommand, setActiveCommand, undo, redo]);
+    }, [activeCommand, undo, redo]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         // Enter: Execute

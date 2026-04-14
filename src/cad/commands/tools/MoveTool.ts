@@ -26,11 +26,14 @@ export class MoveTool extends BaseCommand {
     }
 
     onMouseMove(point: Point): void {
+        const state = useCadStore.getState();
         if (this.draggingPointId) {
-            const solver = useCadStore.getState().solverInterface;
-            if (solver) {
-                // Real-time Solve!
-                solver.dragPoint(this.draggingPointId, point.x, point.y);
+            const entity = state.entities.find(e => e.id === this.draggingPointId);
+            if (entity && entity.geometry.type === 'POINT') {
+                state.updateEntity(this.draggingPointId, {
+                    geometry: { ...entity.geometry, x: point.x, y: point.y }
+                });
+                state.solveConstraints();
             }
         }
     }

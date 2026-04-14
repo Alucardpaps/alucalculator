@@ -1,38 +1,25 @@
-/**
- * AluCAD Canvas - Main CAD Drawing Surface
- * 
- * Paper.js based infinite canvas with pan/zoom, grid, and entity rendering.
- */
-
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
-import paper from 'paper';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { useCadStore } from '../store/cadStore';
 import { commandProcessor } from '../commands/CommandProcessor';
 import {
     worldToScreen,
     screenToWorld,
     panViewport,
-    zoomViewportAt,
-    calculateGridSpacing,
-    getVisibleGridLines,
-    constrainToOrtho
+    zoomViewportAt
 } from '../kernel/CoordinateSystem';
-import { findSnapPoint, findIntersections } from '../geometry/SnapEngine';
-import { CAD_COLORS, MAJOR_GRID_INTERVAL } from '../kernel/constants';
+import { findSnapPoint } from '../geometry/SnapEngine';
+import { findEntityAtPoint } from '../geometry/GeometryUtils';
+import { CAD_COLORS } from '../kernel/constants';
 import {
     CadEntity,
     Point,
-    LineGeometry,
-    CircleGeometry,
-    ArcGeometry,
-    PolylineGeometry,
-    PointGeometry,
-    createLineEntity,
-    Constraint
+    PointGeometry
 } from '../kernel/types';
 import { useSketchSolver } from '../hooks/useSketchSolver';
+import { RenderPipeline, RenderContext } from '../render/RenderPipeline';
+import { spatialIndex } from '../geometry/SpatialIndex';
 
 // ═══════════════════════════════════════════════════════════════
 // CAD CANVAS COMPONENT
@@ -43,10 +30,16 @@ interface CadCanvasProps {
 }
 
 export function CadCanvas({ className }: CadCanvasProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const paperScopeRef = useRef<paper.PaperScope | null>(null);
+    const pipelineRef = useRef<RenderPipeline | null>(null);
+
     const isPanningRef = useRef(false);
     const lastMousePosRef = useRef<Point>({ x: 0, y: 0 });
+
+    // Touch state
+    const lastTouchDistanceRef = useRef<number | null>(null);
+    const lastTouchCenterRef = useRef<Point | null>(null);
 
     // Initialize Solver Integration
     useSketchSolver();
@@ -58,58 +51,51 @@ export function CadCanvas({ className }: CadCanvasProps) {
         setViewport,
         updateViewport,
         showGrid,
-        gridSpacing: storeGridSpacing,
+        gridSpacing,
         activeCommand,
-        commandPoints,
-        addCommandPoint,
-        setCommandPrompt,
-        addEntity,
-        cancelCommand,
         snapEnabled,
         activeSnaps,
         currentSnap,
         setCurrentSnap,
         orthoEnabled,
         previewEntity,
-        setPreviewEntity,
         setCursor,
-        cursorWorld
+        selectedIds,
+        selectEntity,
+        deselectAll,
+        selectEntitiesInRect,
+        constraints
     } = useCadStore();
 
+    // Selection Box State
+    const [selectionBox, setSelectionBoxState] = React.useState<{ start: Point; current: Point } | null>(null);
+
+    // Dimension Editing State
+    const [editingDimension, setEditingDimension] = React.useState<{ id: string, value: number, screenX: number, screenY: number, isConstraint: boolean } | null>(null);
+
     // ─────────────────────────────────────────────────────────────
-    // INITIALIZATION
+    // PIPELINE LIFECYCLE
     // ─────────────────────────────────────────────────────────────
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Initialize Paper.js
-        if (!paperScopeRef.current) {
-            const scope = new paper.PaperScope();
-            scope.setup(canvas);
-            paperScopeRef.current = scope;
-        }
+        // Initialize Pipeline
+        const pipeline = new RenderPipeline();
+        pipeline.attach(canvas);
+        pipeline.startLoop();
+        pipelineRef.current = pipeline;
 
-        const scope = paperScopeRef.current;
-
-        // Resize Observer for robust layout tracking
+        // Resize Observer
         const resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const { width, height } = entry.contentRect;
-
                 if (width === 0 || height === 0) return;
 
-                // Sync Canvas Buffer Size
                 canvas.width = width;
                 canvas.height = height;
-
-                // Sync Paper.js View
-                if (scope && scope.view) {
-                    scope.view.viewSize = new paper.Size(width, height);
-                }
-
-                // Sync Store Viewport
+                pipeline.resize(width, height);
                 updateViewport({ width, height });
             }
         });
@@ -117,116 +103,82 @@ export function CadCanvas({ className }: CadCanvasProps) {
         resizeObserver.observe(canvas);
 
         return () => {
+            pipeline.detach();
             resizeObserver.disconnect();
         };
     }, [updateViewport]);
 
     // ─────────────────────────────────────────────────────────────
-    // RENDERING
+    // SPATIAL INDEX & RENDER CONTEXT SYNC
     // ─────────────────────────────────────────────────────────────
 
+    // Memoize render context to prevent unnecessary pipeline updates
+    const renderContext = useMemo((): RenderContext => ({
+        viewport,
+        zoom: viewport.zoom,
+        entities,
+        entityMap: new Map(entities.map(e => [e.id, e])),
+        selectedIds: new Set(selectedIds),
+        spatialIndex,
+        worldToScreen: (p: Point) => worldToScreen(p, viewport),
+        screenToWorld: (p: Point) => screenToWorld(p, viewport),
+    }), [viewport, entities, selectedIds]);
+
     useEffect(() => {
-        const scope = paperScopeRef.current;
-        const canvas = canvasRef.current;
-        if (!scope || !canvas) return;
+        if (!pipelineRef.current) return;
+        pipelineRef.current.setRenderContext(renderContext);
 
-        // Ensure canvas buffer dimensions match DOM size
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
+        // Rebuild spatial index on entity change
+        spatialIndex.rebuild(entities);
+        pipelineRef.current.onEntitiesChanged();
+    }, [renderContext, entities]);
 
-        if (canvas.width !== Math.round(rect.width) || canvas.height !== Math.round(rect.height)) {
-            canvas.width = Math.round(rect.width);
-            canvas.height = Math.round(rect.height);
-        }
+    useEffect(() => {
+        if (!pipelineRef.current) return;
+        pipelineRef.current.onViewportChanged();
+    }, [viewport]);
 
-        scope.activate();
+    useEffect(() => {
+        if (!pipelineRef.current) return;
+        pipelineRef.current.setPreviewEntity(previewEntity);
+    }, [previewEntity]);
 
-        // Sync Paper.js view size with canvas
-        if (scope.view) {
-            scope.view.viewSize = new paper.Size(canvas.width, canvas.height);
-        }
+    useEffect(() => {
+        if (!pipelineRef.current) return;
+        pipelineRef.current.setSnapIndicator(currentSnap);
+    }, [currentSnap]);
 
-        scope.project.clear();
+    useEffect(() => {
+        if (!pipelineRef.current) return;
 
-        // Create layers
-        const gridLayer = new paper.Layer({ name: 'grid' });
-        const entityLayer = new paper.Layer({ name: 'entities' });
-        const previewLayer = new paper.Layer({ name: 'preview' });
-        const uiLayer = new paper.Layer({ name: 'ui' });
+        // Map constraints to glyphs for RenderPipeline
+        const glyphs = constraints.filter(c => c.active).map(c => {
+            let pos: Point = { x: 0, y: 0 };
+            const entIds = (c as any).entityIds || (c as any).entities || [];
+            const involved = entIds.map((id: string) => entities.find(e => e.id === id)).filter(Boolean) as CadEntity[];
 
-        // ═══ GRID ═══
-        if (showGrid) {
-            gridLayer.activate();
-            const spacing = calculateGridSpacing(viewport.zoom, storeGridSpacing);
-            const gridLines = getVisibleGridLines(viewport, spacing, MAJOR_GRID_INTERVAL);
-
-            // Vertical lines
-            for (const { x, isMajor } of gridLines.vertical) {
-                const screenX = worldToScreen({ x, y: 0 }, viewport).x;
-                const line = new paper.Path.Line(
-                    new paper.Point(screenX, 0),
-                    new paper.Point(screenX, viewport.height)
-                );
-                line.strokeColor = new paper.Color(isMajor ? CAD_COLORS.GRID_MAJOR : CAD_COLORS.GRID_MINOR);
-                line.strokeWidth = isMajor ? 1 : 0.5;
+            if (involved.length > 0) {
+                const e0 = involved[0];
+                if (e0.geometry.type === 'LINE') {
+                    const line = e0.geometry as any;
+                    pos = { x: (line.start.x + line.end.x) / 2, y: (line.start.y + line.end.y) / 2 };
+                } else if (e0.geometry.type === 'CIRCLE' || e0.geometry.type === 'ARC') {
+                    pos = (e0.geometry as any).center;
+                } else if (e0.geometry.type === 'POINT') {
+                    pos = { x: e0.geometry.x, y: e0.geometry.y };
+                }
             }
 
-            // Horizontal lines
-            for (const { y, isMajor } of gridLines.horizontal) {
-                const screenY = worldToScreen({ x: 0, y }, viewport).y;
-                const line = new paper.Path.Line(
-                    new paper.Point(0, screenY),
-                    new paper.Point(viewport.width, screenY)
-                );
-                line.strokeColor = new paper.Color(isMajor ? CAD_COLORS.GRID_MAJOR : CAD_COLORS.GRID_MINOR);
-                line.strokeWidth = isMajor ? 1 : 0.5;
-            }
+            return {
+                position: pos,
+                type: c.type,
+                entityIds: entIds,
+                value: c.value
+            };
+        });
 
-            // Origin crosshair
-            const origin = worldToScreen({ x: 0, y: 0 }, viewport);
-            const crossSize = 15;
-            const crossX = new paper.Path.Line(
-                new paper.Point(origin.x - crossSize, origin.y),
-                new paper.Point(origin.x + crossSize, origin.y)
-            );
-            crossX.strokeColor = new paper.Color(CAD_COLORS.CROSSHAIR);
-            crossX.strokeWidth = 1;
-
-            const crossY = new paper.Path.Line(
-                new paper.Point(origin.x, origin.y - crossSize),
-                new paper.Point(origin.x, origin.y + crossSize)
-            );
-            crossY.strokeColor = new paper.Color(CAD_COLORS.CROSSHAIR);
-            crossY.strokeWidth = 1;
-        }
-
-        // ═══ ENTITIES ═══
-        entityLayer.activate();
-        for (const entity of entities) {
-            renderEntity(entity, viewport, scope);
-        }
-
-        // ═══ CONSTRAINTS ═══
-        uiLayer.activate();
-        const { constraints } = useCadStore.getState();
-        for (const constraint of constraints) {
-            renderConstraintGlyph(constraint, entities, viewport, scope);
-        }
-
-        // ═══ PREVIEW ENTITY ═══
-        if (previewEntity) {
-            previewLayer.activate();
-            renderEntity(previewEntity, viewport, scope, true);
-        }
-
-        // ═══ SNAP MARKER ═══
-        if (currentSnap) {
-            uiLayer.activate();
-            renderSnapMarker(currentSnap.point, currentSnap.mode, viewport, scope);
-        }
-
-        scope.view.update();
-    }, [entities, viewport, showGrid, storeGridSpacing, previewEntity, currentSnap]);
+        pipelineRef.current.setConstraintGlyphs(glyphs as any);
+    }, [constraints, entities]);
 
     // ─────────────────────────────────────────────────────────────
     // MOUSE HANDLERS
@@ -234,7 +186,7 @@ export function CadCanvas({ className }: CadCanvasProps) {
 
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas || !pipelineRef.current) return;
 
         const rect = canvas.getBoundingClientRect();
         const screenPoint: Point = {
@@ -266,17 +218,14 @@ export function CadCanvas({ className }: CadCanvasProps) {
             setCurrentSnap(null);
         }
 
-        // Ortho constraint (handled by SnapEngine or Tool, but can keep global logic if needed)
-        // For now, let's pass raw worldPoint to commandProcessor, or ortho-constrained if we want global ortho
-        // Better: let Command handle Ortho if it wants, OR helper function
-        // But LineTool doesn't know about Ortho yet easily without store access.
-        // Let's keep Ortho logic here for cursor display?
-        // Actually, let's pass the point to commandProcessor.
-
         commandProcessor.handleMouseMove(worldPoint);
 
+        // UI Layer Updates (No React state trigger)
+        pipelineRef.current.setCursorWorld(worldPoint);
+        pipelineRef.current.setSelectionBox(selectionBox ? { start: selectionBox.start, end: worldPoint } : null);
+
         setCursor(worldPoint, screenPoint);
-    }, [viewport, entities, activeSnaps, snapEnabled, orthoEnabled, setViewport, setCurrentSnap, setCursor]);
+    }, [viewport, entities, activeSnaps, snapEnabled, setViewport, setCurrentSnap, setCursor, selectionBox]);
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         const canvas = canvasRef.current;
@@ -288,7 +237,6 @@ export function CadCanvas({ className }: CadCanvasProps) {
             y: e.clientY - rect.top
         };
 
-        // Middle mouse or Space+Left: Start panning
         if (e.button === 1 || (e.button === 0 && e.altKey)) {
             isPanningRef.current = true;
             lastMousePosRef.current = screenPoint;
@@ -296,34 +244,51 @@ export function CadCanvas({ className }: CadCanvasProps) {
             return;
         }
 
-        // Left click: Handle command input
         if (e.button === 0) {
             const worldPoint = currentSnap ? currentSnap.point : screenToWorld(screenPoint, viewport);
-            commandProcessor.handleMouseDown(worldPoint);
-            commandProcessor.handlePointInput(worldPoint);
+
+            if (!activeCommand) {
+                const clickedEntity = findEntityAtPoint(worldPoint, entities, viewport.zoom);
+                if (clickedEntity) {
+                    selectEntity(clickedEntity.id, e.shiftKey || e.ctrlKey);
+                } else {
+                    if (!e.shiftKey && !e.ctrlKey) deselectAll();
+                    setSelectionBoxState({ start: worldPoint, current: worldPoint });
+                }
+            } else {
+                commandProcessor.handleMouseDown(worldPoint);
+                commandProcessor.handlePointInput(worldPoint);
+            }
         }
 
-        // Right click: Finish command (Enter)
         if (e.button === 2) {
             e.preventDefault();
             commandProcessor.handleCancel();
         }
-    }, [currentSnap, viewport, activeCommand]); // activeCommand dependency kept to re-bind if needed, or remove if strictly processor driven
+    }, [currentSnap, viewport, activeCommand, entities, deselectAll, selectEntity]);
 
     const handleMouseUp = useCallback((e: React.MouseEvent) => {
         if (e.button === 1 || isPanningRef.current) {
             isPanningRef.current = false;
             const canvas = canvasRef.current;
-            if (canvas) {
-                canvas.style.cursor = 'crosshair';
-            }
+            if (canvas) canvas.style.cursor = 'crosshair';
             commandProcessor.handleMouseUp();
         }
-    }, []);
+
+        if (selectionBox) {
+            const p1 = selectionBox.start;
+            const rect = canvasRef.current?.getBoundingClientRect();
+            const p2 = screenToWorld({ x: e.clientX - (rect?.left || 0), y: e.clientY - (rect?.top || 0) }, viewport);
+
+            const fullyContained = p2.x > p1.x;
+            selectEntitiesInRect(p1, p2, fullyContained);
+            setSelectionBoxState(null);
+            pipelineRef.current?.setSelectionBox(null);
+        }
+    }, [selectionBox, viewport, selectEntitiesInRect]);
 
     const handleWheel = useCallback((e: React.WheelEvent) => {
         e.preventDefault();
-
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -336,11 +301,156 @@ export function CadCanvas({ className }: CadCanvasProps) {
         const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
         const newViewport = zoomViewportAt(viewport, screenPoint, zoomFactor);
         setViewport(newViewport);
-    }, [viewport, setViewport]);
+
+        if (editingDimension) setEditingDimension(null);
+    }, [viewport, setViewport, editingDimension]);
 
     const handleContextMenu = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
     }, []);
+
+    // ─────────────────────────────────────────────────────────────
+    // TOUCH HANDLERS (Mobile/Tablet)
+    // ─────────────────────────────────────────────────────────────
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        if (e.touches.length === 1) {
+            // Potential single finger pan or point input
+            const rect = canvas.getBoundingClientRect();
+            const screenPoint = {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+            lastTouchCenterRef.current = screenPoint;
+
+            // If in a command, treat as point input
+            if (activeCommand) {
+                const worldPoint = screenToWorld(screenPoint, viewport);
+                commandProcessor.handleMouseDown(worldPoint);
+                commandProcessor.handlePointInput(worldPoint);
+            } else {
+                isPanningRef.current = true;
+            }
+        } else if (e.touches.length === 2) {
+            // Pinch-zoom start
+            isPanningRef.current = false;
+            const p1 = e.touches[0];
+            const p2 = e.touches[1];
+            const dist = Math.sqrt(Math.pow(p2.clientX - p1.clientX, 2) + Math.pow(p2.clientY - p1.clientY, 2));
+            lastTouchDistanceRef.current = dist;
+
+            const rect = canvas.getBoundingClientRect();
+            lastTouchCenterRef.current = {
+                x: (p1.clientX + p2.clientX) / 2 - rect.left,
+                y: (p1.clientY + p2.clientY) / 2 - rect.top
+            };
+        }
+    }, [activeCommand, viewport]);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // Prevent default scrolling only if we are handling the touch
+        if (e.touches.length <= 2) {
+            e.preventDefault();
+        }
+
+        if (e.touches.length === 1 && isPanningRef.current) {
+            const rect = canvas.getBoundingClientRect();
+            const screenPoint = {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+
+            if (lastTouchCenterRef.current) {
+                const delta = {
+                    x: screenPoint.x - lastTouchCenterRef.current.x,
+                    y: screenPoint.y - lastTouchCenterRef.current.y
+                };
+                const newViewport = panViewport(viewport, delta.x, delta.y);
+                setViewport(newViewport);
+            }
+            lastTouchCenterRef.current = screenPoint;
+        } else if (e.touches.length === 2 && lastTouchDistanceRef.current && lastTouchCenterRef.current) {
+            const p1 = e.touches[0];
+            const p2 = e.touches[1];
+            const dist = Math.sqrt(Math.pow(p2.clientX - p1.clientX, 2) + Math.pow(p2.clientY - p1.clientY, 2));
+
+            const rect = canvas.getBoundingClientRect();
+            const center = {
+                x: (p1.clientX + p2.clientX) / 2 - rect.left,
+                y: (p1.clientY + p2.clientY) / 2 - rect.top
+            };
+
+            // Zoom
+            const zoomFactor = dist / lastTouchDistanceRef.current;
+            let newViewport = zoomViewportAt(viewport, center, zoomFactor);
+
+            // Pan to keep center stable
+            const deltaX = center.x - lastTouchCenterRef.current.x;
+            const deltaY = center.y - lastTouchCenterRef.current.y;
+            newViewport = panViewport(newViewport, deltaX, deltaY);
+
+            setViewport(newViewport);
+            lastTouchDistanceRef.current = dist;
+            lastTouchCenterRef.current = center;
+        }
+    }, [viewport, setViewport]);
+
+    const handleTouchEnd = useCallback(() => {
+        isPanningRef.current = false;
+        lastTouchDistanceRef.current = null;
+        lastTouchCenterRef.current = null;
+        commandProcessor.handleMouseUp();
+    }, []);
+
+    const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const screenPoint: Point = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+        const worldPoint = screenToWorld(screenPoint, viewport);
+
+        // 1. Check if clicked on a constraint text
+        for (const c of constraints) {
+            if (c.type === 'DISTANCE' && c.value !== undefined) {
+                const entIds = (c as any).entityIds || [];
+                const involved = entIds.map((id: string) => entities.find(e => e.id === id)).filter(Boolean) as CadEntity[];
+                if (involved.length >= 2) {
+                    const e1 = involved[0].geometry as any;
+                    const e2 = involved[1].geometry as any;
+                    const p1 = e1.type === 'POINT' ? e1 : e1.center || e1.start;
+                    const p2 = e2.type === 'POINT' ? e2 : e2.center || e2.start;
+                    if (p1 && p2) {
+                        const midWorld = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+                        const sp = worldToScreen(midWorld, viewport);
+                        if (Math.abs(screenPoint.x - sp.x) < 25 && Math.abs(screenPoint.y - sp.y) < 25) {
+                            setEditingDimension({ id: c.id, value: c.value, screenX: sp.x, screenY: sp.y, isConstraint: true });
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Check if clicked on a DIMENSION entity
+        const clickedEntity = findEntityAtPoint(worldPoint, entities, viewport.zoom);
+        if (clickedEntity && clickedEntity.geometry.type === 'DIMENSION') {
+            const geom = clickedEntity.geometry as any;
+            const midX = (geom.start.x + geom.end.x) / 2;
+            const midY = (geom.start.y + geom.end.y) / 2;
+            const sp = worldToScreen({ x: midX, y: midY }, viewport);
+            setEditingDimension({ id: clickedEntity.id, value: geom.value, screenX: sp.x, screenY: sp.y - 10, isConstraint: false });
+        }
+    }, [viewport, entities, constraints]);
 
     // ─────────────────────────────────────────────────────────────
     // KEYBOARD HANDLERS
@@ -348,348 +458,72 @@ export function CadCanvas({ className }: CadCanvasProps) {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // ESC: Cancel command
-            if (e.key === 'Escape') {
-                cancelCommand();
-            }
-
-            // F8: Toggle Ortho
-            if (e.key === 'F8') {
-                e.preventDefault();
-                useCadStore.getState().toggleOrtho();
-            }
-
-            // F3: Toggle OSNAP
-            if (e.key === 'F3') {
-                e.preventDefault();
-                useCadStore.getState().toggleSnap();
-            }
-
-            // Ctrl+Z: Undo
-            if (e.ctrlKey && e.key === 'z') {
-                e.preventDefault();
-                useCadStore.getState().undo();
-            }
-
-            // Ctrl+Y: Redo
-            if (e.ctrlKey && e.key === 'y') {
-                e.preventDefault();
-                useCadStore.getState().redo();
-            }
+            if (e.key === 'Escape') useCadStore.getState().cancelCommand();
+            if (e.key === 'F8') { e.preventDefault(); useCadStore.getState().toggleOrtho(); }
+            if (e.key === 'F3') { e.preventDefault(); useCadStore.getState().toggleSnap(); }
+            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); useCadStore.getState().undo(); }
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); useCadStore.getState().redo(); }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [cancelCommand]);
+    }, []);
 
     // ─────────────────────────────────────────────────────────────
     // RENDER
     // ─────────────────────────────────────────────────────────────
 
     return (
-        <canvas
-            ref={canvasRef}
-            className={`w-full h-full cursor-crosshair ${className}`}
-            style={{ background: CAD_COLORS.BACKGROUND }}
-            onMouseMove={handleMouseMove}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onWheel={handleWheel}
-            onContextMenu={handleContextMenu}
-        />
+        <div ref={containerRef} className={`relative w-full h-full overflow-hidden ${className}`}>
+            <canvas
+                id="cad-canvas"
+                ref={canvasRef}
+                className="w-full h-full cursor-crosshair touch-none"
+                style={{ background: CAD_COLORS.BACKGROUND }}
+                onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onWheel={handleWheel}
+                onContextMenu={handleContextMenu}
+                onDoubleClick={handleDoubleClick}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            />
+            {editingDimension && (
+                <input
+                    type="number"
+                    autoFocus
+                    className="absolute z-10 bg-slate-900/90 text-cyan-400 border border-cyan-500/50 rounded px-1.5 py-0.5 outline-none font-mono text-sm shadow-xl backdrop-blur-md"
+                    style={{
+                        left: editingDimension.screenX - 35,
+                        top: editingDimension.screenY - 15,
+                        width: '70px'
+                    }}
+                    defaultValue={editingDimension.value.toFixed(2)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            const val = parseFloat(e.currentTarget.value);
+                            if (!isNaN(val)) {
+                                if (editingDimension.isConstraint) {
+                                    useCadStore.getState().editDimension(editingDimension.id, val);
+                                } else {
+                                    const entity = entities.find(en => en.id === editingDimension.id);
+                                    if (entity) {
+                                        useCadStore.getState().updateEntity(editingDimension.id, {
+                                            geometry: { ...entity.geometry, value: val, text: val.toFixed(2) } as any
+                                        });
+                                    }
+                                }
+                            }
+                            setEditingDimension(null);
+                        } else if (e.key === 'Escape') setEditingDimension(null);
+                    }}
+                    onBlur={() => setEditingDimension(null)}
+                />
+            )}
+        </div>
     );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ENTITY RENDERING
-// ═══════════════════════════════════════════════════════════════
-
-function renderEntity(
-    entity: CadEntity,
-    viewport: any,
-    scope: paper.PaperScope,
-    isPreview: boolean = false
-) {
-    const geom = entity.geometry;
-    const color = isPreview ? CAD_COLORS.PREVIEW : entity.color;
-    const strokeColor = entity.isSelected ? CAD_COLORS.SELECTION : color;
-
-    switch (geom.type) {
-        case 'LINE':
-            renderLine(geom, viewport, scope, strokeColor, isPreview);
-            break;
-        case 'CIRCLE':
-            renderCircle(geom, viewport, scope, strokeColor, isPreview);
-            break;
-        case 'ARC':
-            renderArc(geom, viewport, scope, strokeColor, isPreview);
-            break;
-        case 'POLYLINE':
-            renderPolyline(geom, viewport, scope, strokeColor, isPreview);
-            break;
-        case 'POINT':
-            renderPoint(geom as PointGeometry, viewport, scope, strokeColor, isPreview);
-            break;
-    }
-}
-
-function renderLine(
-    geom: LineGeometry,
-    viewport: any,
-    scope: paper.PaperScope,
-    color: string,
-    isPreview: boolean
-) {
-    const start = worldToScreen(geom.start, viewport);
-    const end = worldToScreen(geom.end, viewport);
-
-    const line = new paper.Path.Line(
-        new paper.Point(start.x, start.y),
-        new paper.Point(end.x, end.y)
-    );
-    line.strokeColor = new paper.Color(color);
-    line.strokeWidth = isPreview ? 1 : 2;
-    if (isPreview) {
-        line.dashArray = [5, 3];
-    }
-}
-
-function renderCircle(
-    geom: CircleGeometry,
-    viewport: any,
-    scope: paper.PaperScope,
-    color: string,
-    isPreview: boolean
-) {
-    const center = worldToScreen(geom.center, viewport);
-    const radiusScreen = geom.radius * viewport.zoom;
-
-    const circle = new paper.Path.Circle(
-        new paper.Point(center.x, center.y),
-        radiusScreen
-    );
-    circle.strokeColor = new paper.Color(color);
-    circle.strokeWidth = isPreview ? 1 : 2;
-    if (isPreview) {
-        circle.dashArray = [5, 3];
-    }
-}
-
-function renderArc(
-    geom: ArcGeometry,
-    viewport: any,
-    scope: paper.PaperScope,
-    color: string,
-    isPreview: boolean
-) {
-    const center = worldToScreen(geom.center, viewport);
-    const radiusScreen = geom.radius * viewport.zoom;
-
-    // Convert angles to degrees for Paper.js
-    const startDeg = geom.startAngle * (180 / Math.PI);
-    const endDeg = geom.endAngle * (180 / Math.PI);
-
-    const arc = new paper.Path.Arc(
-        new paper.Point(
-            center.x + radiusScreen * Math.cos(geom.startAngle),
-            center.y - radiusScreen * Math.sin(geom.startAngle)
-        ),
-        new paper.Point(
-            center.x + radiusScreen * Math.cos((geom.startAngle + geom.endAngle) / 2),
-            center.y - radiusScreen * Math.sin((geom.startAngle + geom.endAngle) / 2)
-        ),
-        new paper.Point(
-            center.x + radiusScreen * Math.cos(geom.endAngle),
-            center.y - radiusScreen * Math.sin(geom.endAngle)
-        )
-    );
-    arc.strokeColor = new paper.Color(color);
-    arc.strokeWidth = isPreview ? 1 : 2;
-}
-
-function renderPolyline(
-    geom: PolylineGeometry,
-    viewport: any,
-    scope: paper.PaperScope,
-    color: string,
-    isPreview: boolean
-) {
-    const points = geom.vertices.map(v => {
-        const screen = worldToScreen(v, viewport);
-        return new paper.Point(screen.x, screen.y);
-    });
-
-    const path = new paper.Path(points);
-    if (geom.closed) {
-        path.closePath();
-    }
-    path.strokeColor = new paper.Color(color);
-    path.strokeWidth = isPreview ? 1 : 2;
-}
-
-function renderPoint(
-    geom: PointGeometry,
-    viewport: any,
-    scope: paper.PaperScope,
-    color: string,
-    isPreview: boolean
-) {
-    const screen = worldToScreen({ x: geom.x, y: geom.y }, viewport);
-    const circle = new paper.Path.Circle(new paper.Point(screen.x, screen.y), 3);
-    circle.fillColor = new paper.Color(color);
-    circle.strokeColor = new paper.Color('black');
-    circle.strokeWidth = 1;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SNAP MARKER RENDERING
-// ═══════════════════════════════════════════════════════════════
-
-function renderSnapMarker(
-    point: Point,
-    mode: string,
-    viewport: any,
-    scope: paper.PaperScope
-) {
-    const screenPoint = worldToScreen(point, viewport);
-    const size = 8;
-    const color = new paper.Color(CAD_COLORS.SNAP_MARKER);
-
-    switch (mode) {
-        case 'END': {
-            // Square
-            const rect = new paper.Path.Rectangle(
-                new paper.Point(screenPoint.x - size, screenPoint.y - size),
-                new paper.Point(screenPoint.x + size, screenPoint.y + size)
-            );
-            rect.strokeColor = color;
-            rect.strokeWidth = 2;
-            break;
-        }
-        case 'MID': {
-            // Triangle
-            const tri = new paper.Path.RegularPolygon(
-                new paper.Point(screenPoint.x, screenPoint.y),
-                3, size
-            );
-            tri.strokeColor = color;
-            tri.strokeWidth = 2;
-            break;
-        }
-        case 'CEN': {
-            // Circle
-            const circle = new paper.Path.Circle(
-                new paper.Point(screenPoint.x, screenPoint.y),
-                size
-            );
-            circle.strokeColor = color;
-            circle.strokeWidth = 2;
-            break;
-        }
-        case 'INT': {
-            // X cross
-            const line1 = new paper.Path.Line(
-                new paper.Point(screenPoint.x - size, screenPoint.y - size),
-                new paper.Point(screenPoint.x + size, screenPoint.y + size)
-            );
-            const line2 = new paper.Path.Line(
-                new paper.Point(screenPoint.x - size, screenPoint.y + size),
-                new paper.Point(screenPoint.x + size, screenPoint.y - size)
-            );
-            line1.strokeColor = color;
-            line2.strokeColor = color;
-            line1.strokeWidth = 2;
-            line2.strokeWidth = 2;
-            break;
-        }
-        default: {
-            // Diamond
-            const diamond = new paper.Path.RegularPolygon(
-                new paper.Point(screenPoint.x, screenPoint.y),
-                4, size
-            );
-            diamond.strokeColor = color;
-            diamond.strokeWidth = 2;
-        }
-    }
-}
-
-
-// ═══════════════════════════════════════════════════════════════
-// CONSTRAINT GLYPH RENDERING
-// ═══════════════════════════════════════════════════════════════
-
-function renderConstraintGlyph(
-    constraint: Constraint,
-    entities: CadEntity[],
-    viewport: any,
-    scope: paper.PaperScope
-) {
-    if (!constraint.active) return;
-
-    // Find representative point for the glyph
-    let pos: Point = { x: 0, y: 0 };
-    const entIds = (constraint as any).entityIds || (constraint as any).entities || [];
-    const involvedEntities = entIds.map((id: string) => entities.find(e => e.id === id)).filter(Boolean) as CadEntity[];
-
-    if (involvedEntities.length === 0) return;
-
-    const type = constraint.type.toUpperCase();
-
-    // Logic to find placement position
-    if (type === 'HORIZONTAL' || type === 'VERTICAL') {
-        const line = involvedEntities[0].geometry as LineGeometry;
-        pos = {
-            x: (line.start.x + line.end.x) / 2,
-            y: (line.start.y + line.end.y) / 2
-        };
-    } else if (type === 'PARALLEL' || type === 'PERPENDICULAR') {
-        const line1 = involvedEntities[0].geometry as LineGeometry;
-        pos = {
-            x: (line1.start.x + line1.end.x) / 2,
-            y: (line1.start.y + line1.end.y) / 2
-        };
-    } else if (type === 'COINCIDENT') {
-        const geom = involvedEntities[0].geometry;
-        if (geom.type === 'POINT') {
-            pos = { x: geom.x, y: geom.y };
-        } else if (geom.type === 'LINE') {
-            pos = geom.start;
-        }
-    } else {
-        return;
-    }
-
-    const screenPos = worldToScreen(pos, viewport);
-    const color = '#3b82f6';
-    const size = 6;
-
-    switch (type) {
-        case 'HORIZONTAL': {
-            const hLine = new paper.Path.Line(
-                new paper.Point(screenPos.x - size, screenPos.y + size + 4),
-                new paper.Point(screenPos.x + size, screenPos.y + size + 4)
-            );
-            hLine.strokeColor = new paper.Color(color);
-            hLine.strokeWidth = 2;
-            break;
-        }
-        case 'VERTICAL': {
-            const vLine = new paper.Path.Line(
-                new paper.Point(screenPos.x + size + 4, screenPos.y - size),
-                new paper.Point(screenPos.x + size + 4, screenPos.y + size)
-            );
-            vLine.strokeColor = new paper.Color(color);
-            vLine.strokeWidth = 2;
-            break;
-        }
-        case 'COINCIDENT': {
-            const circle = new paper.Path.Circle(new paper.Point(screenPos.x, screenPos.y), 4);
-            circle.strokeColor = new paper.Color(color);
-            circle.strokeWidth = 1;
-            break;
-        }
-    }
 }
 
 export default CadCanvas;

@@ -75,6 +75,43 @@ export function distanceToEntity(point: Point, entity: CadEntity): number {
                 if (d < minDist) minDist = d;
             }
             return minDist;
+        case 'RECTANGLE': {
+            const g = geom as any;
+            const hw = g.width / 2;
+            const hh = g.height / 2;
+            const cx = g.center.x;
+            const cy = g.center.y;
+            // Distance to 4 edges of the rectangle (ignoring rotation for simplicity)
+            const corners = [
+                { x: cx - hw, y: cy - hh },
+                { x: cx + hw, y: cy - hh },
+                { x: cx + hw, y: cy + hh },
+                { x: cx - hw, y: cy + hh },
+            ];
+            let dMin = Infinity;
+            for (let i = 0; i < 4; i++) {
+                const d = distanceToLine(point, corners[i], corners[(i + 1) % 4]);
+                if (d < dMin) dMin = d;
+            }
+            return dMin;
+        }
+        case 'HEXAGON': {
+            const g = geom as any;
+            const hexVertices: Point[] = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i + (g.rotation || 0);
+                hexVertices.push({
+                    x: g.center.x + g.radius * Math.cos(angle),
+                    y: g.center.y + g.radius * Math.sin(angle),
+                });
+            }
+            let dMin = Infinity;
+            for (let i = 0; i < 6; i++) {
+                const d = distanceToLine(point, hexVertices[i], hexVertices[(i + 1) % 6]);
+                if (d < dMin) dMin = d;
+            }
+            return dMin;
+        }
         default:
             return Infinity;
     }
@@ -211,6 +248,29 @@ export function offsetEntity(
                 entity.layerId,
                 entity.color
             );
+        }
+        else if (geom.type === 'ARC') {
+            const distToCenter = distance(sidePoint, geom.center);
+            let newRadius = distToCenter > geom.radius
+                ? geom.radius + offsetDist
+                : geom.radius - offsetDist;
+
+            if (newRadius <= 0) return null;
+
+            return {
+                id: crypto.randomUUID(),
+                layerId: entity.layerId,
+                color: entity.color,
+                isVisible: true,
+                isSelected: false,
+                geometry: {
+                    type: 'ARC',
+                    center: geom.center,
+                    radius: newRadius,
+                    startAngle: geom.startAngle,
+                    endAngle: geom.endAngle
+                }
+            };
         }
     } catch (e) {
         console.error('Offset error', e);

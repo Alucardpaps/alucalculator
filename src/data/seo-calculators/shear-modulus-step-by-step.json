@@ -1,0 +1,34 @@
+{
+  "id": "shear-modulus-step-by-step",
+  "title": "Shear Modulus Step By Step - AluCalc Engineering",
+  "slug": "shear-modulus-step-by-step",
+  "keyword": "shear modulus step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Shear Modulus Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional shear modulus step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Shear Modulus Step By Step",
+    "intro": "Comprehensive engineering guide for shear modulus step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for shear modulus)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for shear modulus.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Shear Modulus is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical shear modulus scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "stress-strain-calculator",
+    "young-modulus-calculator",
+    "poisson-ratio-calculator",
+    "yield-strength-calculator",
+    "shear-modulus-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

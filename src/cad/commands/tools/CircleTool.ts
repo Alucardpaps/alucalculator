@@ -23,8 +23,6 @@ export class CircleTool extends BaseCommand {
 
         if (this.centerPoint) {
             const radius = distance(this.centerPoint, point);
-
-            // Update preview
             const previewCircle = createCircleEntity(
                 this.centerPoint,
                 radius,
@@ -37,30 +35,65 @@ export class CircleTool extends BaseCommand {
 
     onPointInput(point: Point): void {
         if (!this.centerPoint) {
-            // First point: Center
             this.centerPoint = point;
-            this.setPrompt('Specify radius of circle:');
+            this.setPrompt('Specify radius (click or type value):');
         } else {
-            // Second point: Radius definition
             const radius = distance(this.centerPoint, point);
-
-            const layerId = useCadStore.getState().activeLayerId;
-            const circle = createCircleEntity(this.centerPoint, radius, layerId, '#ffffff');
-
-            useCadStore.getState().addEntity(circle);
-
-            // Command finished, restart for next circle or finish?
-            // AutoCAD usually finishes circles after one. But repeating is useful.
-            // Let's restart.
-            this.centerPoint = null;
-            this.setPrompt('Specify center point for circle:');
-
-            // Clear preview until next move
-            // useCadStore.getState().setPreviewEntity(null); 
-            // Better to let onMouseMove handle it, but since centerPoint is null now, 
-            // we should clear preview to avoid ghost circle.
-            useCadStore.getState().setPreviewEntity(null);
+            this.createCircle(radius);
         }
+    }
+
+    onValueInput(value: string): void {
+        const trimmed = value.trim();
+
+        // If center not set yet, try as coordinates
+        if (!this.centerPoint) {
+            const parts = trimmed.split(',');
+            if (parts.length === 2) {
+                const x = parseFloat(parts[0].trim());
+                const y = parseFloat(parts[1].trim());
+                if (!isNaN(x) && !isNaN(y)) {
+                    this.centerPoint = { x, y };
+                    this.setPrompt('Specify radius (click or type value):');
+                    return;
+                }
+            }
+            useCadStore.getState().setCommandPrompt('Invalid center point. Use x,y format.');
+            return;
+        }
+
+        // Center is set — expect radius value
+        const radius = parseFloat(trimmed);
+        if (!isNaN(radius) && radius > 0) {
+            this.createCircle(radius);
+        } else {
+            // Could be x,y for radius point
+            const parts = trimmed.split(',');
+            if (parts.length === 2) {
+                const x = parseFloat(parts[0].trim());
+                const y = parseFloat(parts[1].trim());
+                if (!isNaN(x) && !isNaN(y)) {
+                    const r = distance(this.centerPoint, { x, y });
+                    this.createCircle(r);
+                    return;
+                }
+            }
+            useCadStore.getState().setCommandPrompt('Invalid radius. Type a number or click.');
+        }
+    }
+
+    private createCircle(radius: number): void {
+        if (!this.centerPoint) return;
+
+        const layerId = useCadStore.getState().activeLayerId;
+        const circle = createCircleEntity(this.centerPoint, radius, layerId, '#ffffff');
+        useCadStore.getState().addEntity(circle);
+
+        // Restart
+        this.centerPoint = null;
+        this.currentPoint = null;
+        this.setPrompt('Specify center point for circle:');
+        useCadStore.getState().setPreviewEntity(null);
     }
 
     cancel(): void {

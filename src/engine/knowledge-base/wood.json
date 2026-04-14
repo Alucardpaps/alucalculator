@@ -1,0 +1,26 @@
+{
+  "alloys": {
+    "Structural Pine": {
+      "name": "Structural Pine",
+      "density": 500,
+      "youngsModulus": 11000,
+      "yieldStrength": 40,
+      "ultimateTensileStrength": 80,
+      "poissonRatio": 0.35,
+      "thermalExpansion": 5.0,
+      "default": true,
+      "description": "Standard soft wood used in structural engineering. Values are representative averages."
+    },
+    "Oak": {
+      "name": "Oak",
+      "density": 750,
+      "youngsModulus": 12500,
+      "yieldStrength": 50,
+      "ultimateTensileStrength": 95,
+      "poissonRatio": 0.35,
+      "thermalExpansion": 4.5,
+      "default": false,
+      "description": "Hardwood with high density and strength properties."
+    }
+  }
+}

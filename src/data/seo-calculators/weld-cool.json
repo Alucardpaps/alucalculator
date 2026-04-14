@@ -1,0 +1,24 @@
+{
+  "id": "weld-cool",
+  "category": "manufacturing",
+  "title": "Weld Cool",
+  "slug": "weld-cool",
+  "meta": {
+    "title": "Cooling | AluCalc",
+    "description": "T8/5 cooling time."
+  },
+  "seo": {
+    "h1": "Weld Cooling Rate Calc",
+    "intro": "Predict hardness.",
+    "formula": "t85 = f(HI,T)",
+    "variables": {
+      "HI": "Heat"
+    },
+    "practical": "Hardening.",
+    "example": "Preheat help."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

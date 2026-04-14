@@ -11,11 +11,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { bootEngineeringOS } from '@/runtime/boot';
 import { useOSStore } from '@/store/osStore';
 import { commandProcessor } from '@/cad/commands/CommandProcessor';
-import { useFlowStore } from '@/store/flowStore';
+
 import { RibbonBar } from '@/components/os/RibbonBar';
 import { Taskbar } from '@/components/os/Taskbar';
-import { AluDrawCanvas } from '@/components/canvas/AluDrawCanvas';
-import FlowCanvas from '@/components/flow/FlowCanvas';
+// import { AluDrawCanvas } from '@/components/canvas/AluDrawCanvas'; // DELETED
+
 import { DeskCanvas } from '@/components/desk/DeskCanvas';
 import { CamWindow } from '@/components/cam/CamWindow';
 import { SplitViewport } from '@/cad/presentation';
@@ -24,14 +24,22 @@ import { WelcomeModal } from '@/components/os/WelcomeModal';
 import { CanvasErrorBoundary } from '@/components/os/ErrorBoundary';
 import { AluDock } from '@/components/os/AluDock';
 import { FEAWindow } from '@/components/modules/fea/FEAWindow';
+import { ChaosToggle } from '@/components/ui/ChaosToggle';
+import { AnimatePresence } from 'framer-motion';
+import { Flame } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
 const AluCAD = dynamic(() => import('@/cad/components/AluCAD').then(mod => mod.AluCAD), { ssr: false });
-// MusicPlayer removed
+import { ActionTerminal } from '@/components/os/ActionTerminal';
+import { EngineeringOven } from '@/components/os/EngineeringOven';
+import { AutoCADCommandBar } from '@/components/os/AutoCADCommandBar';
+import { AutoCADCrosshair } from '@/components/os/AutoCADCrosshair';
 
 export default function DesktopEnvironment() {
     const [kernelReady, setKernelReady] = useState(false);
-    const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'flow' | 'fea'>('flow');
+    const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'fea' | 'cam'>('desk');
+    const [isOvenOpen, setIsOvenOpen] = useState(false);
     const { setLanguage, openWindow } = useOSStore();
 
     // Ctrl+Shift+P → Open Terminal
@@ -47,36 +55,9 @@ export default function DesktopEnvironment() {
     }, [openWindow]);
 
     useEffect(() => {
-        // Connect Flow Variables to CAD Command Processor
+        // Connect OS Storage to CAD Command Processor if needed
         commandProcessor.setVariableProvider((varName) => {
-            const { nodes } = useFlowStore.getState();
-
-            // Search strategy:
-            // 1. Check for exact node ID match: $node-123.output
-            // 2. Check for node title match: $WidthCalc.L
-            // 3. Since user can't easily type IDs, we need a better way. 
-            //    For now, let's flatten all outputs from all calculator nodes 
-            //    and match by key property if unique? 
-            //    Or better: strict "$NodeTitle.OutputKey" format.
-
-            for (const node of nodes) {
-                if (node.data.type === 'calculator' || node.data.type === 'standard-calculator') {
-                    const data = node.data as any;
-                    // Check if variable name matches any output key
-                    if (data.outputs && data.outputs[varName] !== undefined) {
-                        return data.outputs[varName];
-                    }
-
-                    // Check NodeTitle.OutputKey
-                    if (data.schema?.metadata?.title) {
-                        const cleanTitle = data.schema.metadata.title.replace(/\s+/g, '');
-                        if (varName.startsWith(cleanTitle + '.')) {
-                            const key = varName.split('.')[1];
-                            return data.outputs[key];
-                        }
-                    }
-                }
-            }
+            // Flow nodes are deprecated. Variables should come from VariableManager or OS Store.
             return undefined;
         });
 
@@ -113,17 +94,12 @@ export default function DesktopEnvironment() {
             {/* 1. Command Ribbon */}
             <div className="flex flex-col z-20">
                 <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border-b border-cyan-900/30 backdrop-blur-md">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-4">
                         <span className="text-[10px] font-bold text-cyan-900/80 uppercase tracking-[0.2em] font-mono">AluCalc OS v5.0</span>
+                        <ChaosToggle />
                     </div>
                     {/* View Switcher */}
                     <div className="flex bg-[#0a0f16]/60 rounded p-0.5 border border-cyan-900/30 backdrop-blur">
-                        <button
-                            onClick={() => setViewMode('flow')}
-                            className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'flow' ? 'bg-[#00e5ff] text-black font-bold shadow-[0_0_10px_rgba(0,229,255,0.4)]' : 'text-cyan-900/60 hover:text-cyan-400 font-bold uppercase'}`}
-                        >
-                            FLOW
-                        </button>
                         <button
                             onClick={() => setViewMode('cad')}
                             className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'cad' ? 'bg-[#00e5ff] text-black font-bold shadow-[0_0_10px_rgba(0,229,255,0.4)]' : 'text-cyan-900/60 hover:text-cyan-400 font-bold uppercase'}`}
@@ -144,30 +120,64 @@ export default function DesktopEnvironment() {
                         </button>
                     </div>
                 </div>
-                <RibbonBar mode={viewMode} />
+                {viewMode !== 'cad' && <RibbonBar mode={viewMode} />}
             </div>
 
             {/* 2. Infinite Engineering Canvas */}
             <div className="relative flex-1 bg-[#050505] overflow-hidden">
                 <CanvasErrorBoundary
-                    fallbackMode={viewMode === 'desk' ? 'Flow' : 'Desk'}
+                    fallbackMode="Desk"
                     onSwitchMode={() => setViewMode('desk')}
                 >
                     {viewMode === 'cad' && <AluCAD />}
                     {viewMode === 'desk' && <DeskCanvas />}
-                    {viewMode === 'flow' && <FlowCanvas className="absolute inset-0" />}
                     {viewMode === 'fea' && <FEAWindow />}
                 </CanvasErrorBoundary>
 
                 {/* CAM Floating Window (Isolated) */}
                 <CamWindow />
+
+                {/* macOS Style Quick Launch Dock */}
+                <AluDock currentMode={viewMode} onSwitchMode={setViewMode} />
             </div>
 
-            {/* 3. System Taskbar */}
-            <Taskbar />
+            {/* 3. System Taskbar & Command Bar */}
+            <div className="relative z-50 flex flex-col">
+                <AutoCADCommandBar />
+                <Taskbar />
+            </div>
 
-            {/* 4. Welcome/Onboarding Modal */}
+            {/* 4. Global Engineering Layer */}
+            <AutoCADCrosshair />
+
+            {/* 5. Welcome/Onboarding Modal */}
             <WelcomeModal />
+
+            {/* 5. Engineering Workstation Tools (Floating) */}
+            <div className="absolute bottom-16 left-4 z-40 flex flex-col gap-4 pointer-events-none">
+                <AnimatePresence>
+                    {isOvenOpen && (
+                        <div className="pointer-events-auto">
+                            <EngineeringOven onClose={() => setIsOvenOpen(false)} />
+                        </div>
+                    )}
+                </AnimatePresence>
+                <div className="pointer-events-auto">
+                    <ActionTerminal className="w-[380px] h-[220px]" />
+                </div>
+            </div>
+
+            {/* 6. Workstation Quick Access */}
+            <button 
+                onClick={() => setIsOvenOpen(!isOvenOpen)}
+                className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-2 bg-orange-600/20 border border-orange-500/30 rounded-full text-orange-400 hover:bg-orange-500 hover:text-white transition-all shadow-[0_0_20px_rgba(255,87,34,0.2)] group"
+                title="Sistem Fırınını Aç"
+            >
+                <div className="relative">
+                    <Flame size={20} className={cn(isOvenOpen && "animate-pulse")} />
+                    <div className="absolute -right-1 -top-1 w-2 h-2 bg-orange-500 rounded-full animate-ping opacity-75"></div>
+                </div>
+            </button>
         </div>
     );
 }

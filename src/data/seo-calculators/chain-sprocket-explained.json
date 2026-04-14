@@ -1,0 +1,34 @@
+{
+  "id": "chain-sprocket-explained",
+  "title": "Chain Sprocket Explained - AluCalc Engineering",
+  "slug": "chain-sprocket-explained",
+  "keyword": "chain sprocket explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Chain Sprocket Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional chain sprocket explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Chain Sprocket Explained",
+    "intro": "Comprehensive engineering guide for chain sprocket explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for chain sprocket)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for chain sprocket.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Chain Sprocket is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical chain sprocket scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-design-calculator",
+    "timing-belt-length-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "chain-sprocket-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

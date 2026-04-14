@@ -1,0 +1,18 @@
+﻿src/components/modules/Education/AluForge/AluForgeModule.tsx(17,16): error TS2307: Cannot find module 'phaser' or its corresponding type declarations.
+src/components/modules/Education/AluForge/AluForgeModule.tsx(21,31): error TS2503: Cannot find namespace 'Phaser'.
+src/components/modules/Education/AluForge/MainScene.ts(1,20): error TS2307: Cannot find module 'phaser' or its corresponding type declarations.
+src/components/modules/Education/AluForge/MainScene.ts(21,14): error TS2339: Property 'add' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(24,30): error TS2339: Property 'add' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(28,29): error TS2339: Property 'add' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(29,14): error TS2339: Property 'physics' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(32,14): error TS2339: Property 'input' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(33,14): error TS2339: Property 'input' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(34,14): error TS2339: Property 'input' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(42,18): error TS2339: Property 'scene' does not exist on type 'MainScene'.
+src/components/modules/Education/AluForge/MainScene.ts(96,31): error TS2339: Property 'add' does not exist on type 'MainScene'.
+src/components/modules/presentation/HolographicViewer.tsx(65,21): error TS2322: Type '{ color: string; metalness: number; roughness: number; envMapIntensity: number; clearcoat: number; clearcoatRoughness: number; }' is not assignable to type 'Mutable<Overwrite<Partial<Overwrite<MeshStandardMaterial, MathProps<MeshStandardMaterial> & ReactProps<MeshStandardMaterial>>>, Omit<...>>>'.
+  Property 'clearcoat' does not exist on type 'Mutable<Overwrite<Partial<Overwrite<MeshStandardMaterial, MathProps<MeshStandardMaterial> & ReactProps<MeshStandardMaterial>>>, Omit<...>>>'.
+src/components/os/WindowManager.tsx(22,21): error TS2322: Type 'boolean | "left" | "right"' is not assignable to type 'boolean | undefined'.
+  Type '"left"' is not assignable to type 'boolean | undefined'.
+src/hooks/useCADTools.ts(128,61): error TS2339: Property 'x' does not exist on type 'never'.
+src/hooks/useCADTools.ts(129,61): error TS2339: Property 'y' does not exist on type 'never'.

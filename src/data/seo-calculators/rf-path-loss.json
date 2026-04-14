@@ -1,0 +1,24 @@
+{
+  "id": "rf-path-loss",
+  "category": "electrical",
+  "title": "Path Loss",
+  "slug": "rf-path-loss",
+  "meta": {
+    "title": "RF Loss | AluCalc",
+    "description": "Free space path loss."
+  },
+  "seo": {
+    "h1": "Wireless Path Loss Calc",
+    "intro": "Signal attenuation.",
+    "formula": "FSPL = f(d,f)",
+    "variables": {
+      "f": "Freq"
+    },
+    "practical": "Telemetry.",
+    "example": "Log scale dB."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

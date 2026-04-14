@@ -1,0 +1,34 @@
+{
+  "id": "turning-speed-explained",
+  "title": "Turning Speed Explained - AluCalc Engineering",
+  "slug": "turning-speed-explained",
+  "keyword": "turning speed explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Turning Speed Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional turning speed explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Turning Speed Explained",
+    "intro": "Comprehensive engineering guide for turning speed explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for turning speed)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for turning speed.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Turning Speed is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical turning speed scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "turning-speed-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

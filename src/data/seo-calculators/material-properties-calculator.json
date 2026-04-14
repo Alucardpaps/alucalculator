@@ -1,0 +1,86 @@
+{
+  "id": "material-properties-calculator",
+  "category": "science",
+  "title": "Material Science: Aluminum & Steel Engineering Matrix",
+  "slug": "material-properties-calculator",
+  "keyword": "material properties calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Material Properties Guide | Aluminum & Steel Science | AluCalc",
+    "description": "Deep-dive into engineering material properties. Technical guide on stress-strain curves, aluminum tempers, and material selection criteria."
+  },
+  "seo": {
+    "h1": "Metallurgy & Science: Engineering Material Selection",
+    "intro": "The performance of any mechanical or structural system is limited by its material properties. Selecting the right alloy requires a deep understanding of Young's Modulus, Yield Strength, and how thermal treatments like tempering (T4/T6) fundamentally alter the crystal lattice of professional-grade metals.",
+    "formula": "σ = E · ε",
+    "variables": {
+      "σ": "Stress (Force / Area)",
+      "E": "Young's Modulus (Elasticity)",
+      "ε": "Strain (Change in Length / Length)"
+    },
+    "practical": "Critical for selecting structural beams (Steel S355), lightweight chassis (Aluminum 6061-T6), and durable shafts (Alloy Steel 4140).",
+    "example": "Scenario: Applying 100 MPa of stress to an aluminum rod (E=69 GPa). The elastic strain is ε = 100e6 / 69e9 ≈ 0.00145 (0.145%).",
+    "step_by_step": "1. Identify the Service Environment (Temperature, Corrosion, Load).\n2. Select a Base Alloy (e.g., 6000 series Aluminum or Carbon Steel).\n3. Match the Temper or Heat Treatment to the required Yield Strength.\n4. Verify the Safety Factor against the material's Ultimate Tensile Strength (UTS)."
+  },
+  "technicalSections": [
+    {
+      "title": "The Stress-Strain Relationship",
+      "content": [
+        "In the Elastic Region, materials follow Hooke's Law (Linear). Once the Yield Point is exceeded, the material enters the Plastic Region, where permanent deformation occurs.",
+        "Engineering designers primarily focus on the Yield Strength (σy) for safety, while manufacturing engineers focus on the Plastic Region for forming, bending, and forging operations."
+      ],
+      "formulas": [
+        {
+          "label": "Hooke's Law (1D)",
+          "latex": "\\sigma = E \\cdot \\epsilon"
+        },
+        {
+          "label": "Shear Modulus Relation",
+          "latex": "G = \\frac{E}{2(1 + \\nu)}"
+        }
+      ]
+    },
+    {
+      "title": "Aluminum Tempering: Understanding the 'T' Suffix",
+      "content": [
+        "Aluminum's strength is rarely derived from the alloy alone; it is the heat treatment process that dictates performance. The 'T6' temper signifies solution heat treatment followed by artificial aging (precipitation hardening).",
+        "T4 (Natural Aging) offers higher ductility but lower strength, making it better for parts that require post-casting forming."
+      ],
+      "table": {
+        "headers": ["Temper", "Condition", "Strength Benefit", "Ductility"],
+        "rows": [
+          ["O", "Annealed (Soft)", "Baseline", "Highest"],
+          ["T4", "Solution Heat Treated", "++ Medium", "High"],
+          ["T6", "Artificially Aged", "+++ High", "Low"],
+          ["H14", "Strain Hardened (½ Hard)", "+ Low", "Medium"],
+          ["T651", "Stress Relieved", "+++ High", "Very Low"]
+        ]
+      }
+    },
+    {
+      "title": "Comparative Engineering Matrix",
+      "content": [
+        "Aluminum offers roughly 1/3 the density of steel but also 1/3 the stiffness (Young's Modulus). For weight-sensitive designs, the strength-to-weight ratio of high-grade aluminum often exceeds that of structural steel."
+      ],
+      "table": {
+        "headers": ["Material", "Young's Modulus (GPa)", "Yield Strength (MPa)", "Density (kg/m³)"],
+        "rows": [
+          ["Steel (S235)", "210", "235", "7850"],
+          ["Steel (S355)", "210", "355", "7850"],
+          ["Alum (6061-T6)", "69", "275", "2700"],
+          ["Alum (7075-T6)", "72", "503", "2810"],
+          ["Titanium (G5)", "114", "880", "4430"]
+        ]
+      }
+    }
+  ],
+  "relatedCalculators": [
+    { "title": "Yield Strength Calculator", "slug": "yield-strength-calculator" },
+    { "title": "Young's Modulus Theory", "slug": "young-modulus-calculator" },
+    { "title": "Weight & Density Analysis", "slug": "mass-property-calculator" }
+  ],
+  "cta": {
+    "label": "Compare Materials in 3D",
+    "link": "/learn"
+  }
+}

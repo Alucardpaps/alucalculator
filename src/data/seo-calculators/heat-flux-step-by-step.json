@@ -1,0 +1,34 @@
+{
+  "id": "heat-flux-step-by-step",
+  "title": "Heat Flux Step By Step - AluCalc Engineering",
+  "slug": "heat-flux-step-by-step",
+  "keyword": "heat flux step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Heat Flux Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional heat flux step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Heat Flux Step By Step",
+    "intro": "Comprehensive engineering guide for heat flux step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for heat flux)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for heat flux.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Heat Flux is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical heat flux scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "heat-transfer-calculator",
+    "conduction-heat-transfer-calculator",
+    "convection-heat-transfer-calculator",
+    "radiation-heat-transfer-calculator",
+    "heat-flux-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "air-flow-leak",
+  "category": "fluid",
+  "title": "Air Leak",
+  "slug": "air-flow-leak",
+  "meta": {
+    "title": "Leak | AluCalc",
+    "description": "Sonic orifice leak."
+  },
+  "seo": {
+    "h1": "Compressed Air Leak Calc",
+    "intro": "Audit energy waste.",
+    "formula": "Q = f(P,d)",
+    "variables": {
+      "d": "Hole"
+    },
+    "practical": "Audits.",
+    "example": "SCFM loss."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

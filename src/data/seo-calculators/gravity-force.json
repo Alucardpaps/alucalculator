@@ -1,0 +1,24 @@
+{
+  "id": "gravity-force",
+  "category": "science",
+  "title": "Grav Force",
+  "slug": "gravity-force",
+  "meta": {
+    "title": "Gravity | AluCalc",
+    "description": "Newtonian gravity."
+  },
+  "seo": {
+    "h1": "Universal Gravity Calc",
+    "intro": "Force between masses.",
+    "formula": "F = Gmm/r^2",
+    "variables": {
+      "G": "Const"
+    },
+    "practical": "Orbit.",
+    "example": "Planetary pull."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

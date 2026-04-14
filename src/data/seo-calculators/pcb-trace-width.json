@@ -1,0 +1,26 @@
+{
+  "id": "pcb-trace-width",
+  "category": "electrical",
+  "title": "PCB Trace Width",
+  "slug": "pcb-trace-width",
+  "meta": {
+    "title": "PCB Trace | AluCalc",
+    "description": "IPC-2111 Current sizing."
+  },
+  "seo": {
+    "h1": "PCB Trace Width (IPC) Calc",
+    "intro": "Ensures no overheating.",
+    "formula": "I = kΔT^bA^c",
+    "variables": {
+      "I": "Amps",
+      "ΔT": "Temp",
+      "A": "Area"
+    },
+    "practical": "Safe electronics.",
+    "example": "k depends on layer."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=pcb-trace-width"
+  }
+}

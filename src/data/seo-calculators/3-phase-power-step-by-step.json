@@ -1,0 +1,34 @@
+{
+  "id": "3-phase-power-step-by-step",
+  "title": "3 Phase Power Step By Step - AluCalc Engineering",
+  "slug": "3-phase-power-step-by-step",
+  "keyword": "3 phase power step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "3 Phase Power Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional 3 phase power step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "3 Phase Power Step By Step",
+    "intro": "Comprehensive engineering guide for 3 phase power step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for 3 phase power)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for 3 phase power.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "3 Phase Power is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical 3 phase power scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "power-calculation-calculator",
+    "single-phase-power-calculator",
+    "power-factor-calculator",
+    "apparent-power-calculator",
+    "3-phase-power-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

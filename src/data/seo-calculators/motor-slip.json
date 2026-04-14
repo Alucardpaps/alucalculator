@@ -1,0 +1,24 @@
+{
+  "id": "motor-slip",
+  "category": "electrical",
+  "title": "Motor Slip",
+  "slug": "motor-slip",
+  "meta": {
+    "title": "Slip | AluCalc",
+    "description": "Induction motor slip."
+  },
+  "seo": {
+    "h1": "Induction Motor Slip Calc",
+    "intro": "Speed vs Sync freq.",
+    "formula": "s = (Ns-N)/Ns",
+    "variables": {
+      "Ns": "Sync"
+    },
+    "practical": "Analyzers.",
+    "example": "2-5% typical."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

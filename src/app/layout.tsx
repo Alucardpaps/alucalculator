@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-// Import Excalidraw styles globally to fix giant icons issue
-import '@excalidraw/excalidraw/index.css';
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
-import { DeploymentGuard } from "@/components/os/DeploymentGuard";
-import { ThemeSettingsProvider } from "@/components/os/ThemeSettingsProvider";
-import Script from "next/script";
+import { GoogleAnalytics } from "@/components/os/GoogleAnalytics";
+import { CookieConsent } from "@/components/os/CookieConsent";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -21,23 +18,53 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const viewport: Viewport = {
-    themeColor: '#1e1e1e',
+    themeColor: '#020408',
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 1,
 };
 
 export const metadata: Metadata = {
-    title: "AluCalc OS | Engineering Workstation",
-    description: "Browser-based engineering operating system with CAD-style interface.",
-    manifest: '/manifest.json',
-    appleWebApp: {
-        capable: true,
-        statusBarStyle: 'black-translucent',
-        title: 'AluCalc OS',
+    title: {
+        default: "AluCalc OS | Engineering Intelligence Platform",
+        template: "%s | AluCalc OS"
     },
-    formatDetection: {
-        telephone: false,
+    description: "AluCalc OS is a deterministic engineering engine for mechanical designers. Design, calculate, and build inside a single browser environment. Featuring 3D assembly workspace, 100+ engineering calculators, and real-time BOM generation.",
+    applicationName: "AluCalc OS",
+    authors: [{ name: "Alucard", url: "https://alucalculator.com" }],
+    keywords: [
+        "engineering calculator", "mechanical analysis", "aluminum profile",
+        "3D assembly", "bill of materials", "BOM generator",
+        "ISO 281", "bearing life", "bolt torque", "shaft design",
+        "beam deflection", "gear calculator", "CAD browser"
+    ],
+    category: "Engineering / CAD",
+    manifest: '/manifest.json',
+    openGraph: {
+        type: 'website',
+        locale: 'en_US',
+        url: 'https://alucalculator.com',
+        siteName: 'AluCalc OS',
+        title: 'AluCalc OS | Engineering Intelligence Platform',
+        description: 'Design, calculate, and build inside a single browser environment.',
+        images: [{
+            url: '/images/og-image.png',
+            width: 1200,
+            height: 630,
+            alt: 'AluCalc OS — Engineering Intelligence Platform',
+        }],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'AluCalc OS | Engineering Intelligence',
+        description: 'Deterministic engineering engine in your browser.',
+        images: ['/images/og-image.png'],
+    },
+    robots: {
+        index: true,
+        follow: true,
+    },
+    alternates: {
+        canonical: 'https://alucalculator.com',
     },
 };
 
@@ -47,22 +74,21 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" suppressHydrationWarning={true} className={`${inter.variable} ${jetbrainsMono.variable}`}>
-            <body className={`${inter.className} h-full w-full overflow-hidden bg-[#0a0e14]`} suppressHydrationWarning={true}>
-                <ThemeSettingsProvider />
+        <html lang="en" className="dark">
+            <body
+                className={`${inter.className} ${jetbrainsMono.variable} h-full w-full bg-[#020408] text-slate-200 selection:bg-blue-500/30`}
+                suppressHydrationWarning
+            >
+                <GoogleAnalytics gaId="G-ALUCALC-001" />
                 <ServiceWorkerRegistration />
-                <Script
-                    async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2335208371281126"
-                    crossOrigin="anonymous"
-                    strategy="afterInteractive"
-                />
 
                 {children}
 
+                <CookieConsent />
+
                 {/* System Version Badge */}
-                <div className="fixed bottom-2 right-2 z-[9999] bg-black/60 text-white/50 px-2 py-1 text-[10px] font-mono rounded pointer-events-none select-none backdrop-blur-sm">
-                    v2.1.0 — BUILD {process.env.NEXT_PUBLIC_BUILD_TIMESTAMP?.split('T')[0] || 'DEV'}
+                <div className="fixed bottom-2 right-2 z-[9999] bg-black/60 text-white/50 px-2 py-1 text-[10px] font-mono rounded pointer-events-none select-none backdrop-blur-sm border border-white/5">
+                    v5.0.0 — BUILD {process.env.NEXT_PUBLIC_BUILD_TIMESTAMP?.split('T')[0] || 'DEV'}
                 </div>
             </body>
         </html>

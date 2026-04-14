@@ -14,12 +14,20 @@ import {
     OSnapMode,
     SnapResult,
     Constraint,
-    createLineEntity,
     createPointEntity,
-    createCircleEntity
+    createCircleEntity,
+    CadUnit,
+    MachiningModifier
 } from '../kernel/types';
 import { DEFAULT_LAYER } from '../kernel/constants';
 import { Body, createBody } from '../kernel/Body';
+import {
+    distance, distanceSquared, rotatePoint, mirrorPoint,
+    isPointInRect, isLineInRect
+} from '../kernel/GeometryKernel';
+import { constraintGraph } from '../kernel/ConstraintGraph';
+import { spatialIndex, computeEntityBBox } from '../geometry/SpatialIndex';
+import { solverWrapper } from '../constraints/SolverWrapper';
 
 // ═══════════════════════════════════════════════════════════════
 // STATE INTERFACE
@@ -40,6 +48,11 @@ interface CadStore {
     removeEntity: (id: string) => void;
     updateEntity: (id: string, updates: Partial<CadEntity>) => void;
     clearEntities: () => void;
+
+    // Constraints
+    addConstraint: (constraint: Constraint) => void;
+    removeConstraint: (id: string) => void;
+    solveConstraints: () => void;
 
     // ─────────────────────────────────────────────────────────────
     // BODIES (Multibody)
@@ -79,6 +92,7 @@ interface CadStore {
     selectAll: () => void;
     deselectAll: () => void;
     toggleSelection: (id: string) => void;
+    selectEntitiesInRect: (p1: Point, p2: Point, fullyContained: boolean) => void;
 
     // ─────────────────────────────────────────────────────────────
     // COMMAND STATE
@@ -138,22 +152,29 @@ interface CadStore {
     cursorScreen: Point;
     setCursor: (world: Point, screen: Point) => void;
     // ─────────────────────────────────────────────────────────────
-    // SOLVER INTEGRATION
-    // ─────────────────────────────────────────────────────────────
-    sketchModel: any | null; // Typed as any to avoid circular import issues in store definition if needed, or import SketchModel
-    setSketchModel: (model: any | null) => void;
-    solverInterface: {
-        addConstraint: (type: any, entityIds: string[], value?: number) => void;
-        dragPoint: (pointId: string, newX: number, newY: number) => void;
-        solve: () => void;
-    } | null;
-    setSolverInterface: (intf: any | null) => void;
-    syncFromModel: () => void;
-
-    // ─────────────────────────────────────────────────────────────
     // PARAMETRIC DIMENSIONS
     // ─────────────────────────────────────────────────────────────
     editDimension: (constraintId: string, newValue: number) => void;
+
+    // ─────────────────────────────────────────────────────────────
+    // UNITS
+    // ─────────────────────────────────────────────────────────────
+    units: CadUnit;
+    setUnits: (unit: CadUnit) => void;
+
+    // ─────────────────────────────────────────────────────────────
+    // MCP INTEGRATION (AI TOOLS)
+    // ─────────────────────────────────────────────────────────────
+    isMcpPanelOpen: boolean;
+    activeMcpTool: string | null;
+    setMcpPanelOpen: (isOpen: boolean) => void;
+    setActiveMcpTool: (toolName: string | null) => void;
+
+    // ─────────────────────────────────────────────────────────────
+    // MACHINING MODIFIERS
+    // ─────────────────────────────────────────────────────────────
+    addModifier: (entityId: string, modifier: MachiningModifier) => void;
+    removeModifier: (entityId: string, modifierIndex: number) => void;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -168,102 +189,85 @@ export const useCadStore = create<CadStore>((set, get) => ({
     constraints: [],
     bodies: [],
     activeBodyId: null,
-    sketchModel: null,
+    // ─────────────────────────────────────────────────────────────
+    // CONSTRAINTS & SOLVER
+    // ─────────────────────────────────────────────────────────────
+    addConstraint: (constraint) => {
+        get().pushHistory('Add constraint');
+        set(state => ({ constraints: [...state.constraints, constraint] }));
+        get().solveConstraints();
+    },
 
-    setSketchModel: (model) => set({ sketchModel: model }),
+    removeConstraint: (id) => {
+        get().pushHistory('Remove constraint');
+        set(state => ({ constraints: state.constraints.filter(c => c.id !== id) }));
+        get().solveConstraints();
+    },
 
-    solverInterface: null,
-    setSolverInterface: (intf) => set({ solverInterface: intf }),
+    solveConstraints: () => {
+        const { entities, constraints } = get();
+        if (constraints.length === 0) return; // Nothing to solve
 
-    syncFromModel: () => {
-        const model = get().sketchModel;
-        if (!model) return;
+        // Ensure solver is initialized before solving
+        solverWrapper.init().then(() => {
+            const solvedEntities = solverWrapper.solve(get().entities, get().constraints);
 
-        // Convert model state to entities
-        // We need to map model.points and model.lines to CadEntities
-        // This is a simplified sync (replaces all)
-        const newEntities: CadEntity[] = [];
+            // Rebuild spatial index with updated geometries
+            spatialIndex.clear();
+            solvedEntities.forEach(e => {
+                if (e.isVisible !== false) {
+                    const bbox = computeEntityBBox(e);
+                    if (bbox) spatialIndex.insert(e.id, bbox);
+                }
+            });
 
-        // Lines
-        model.lines.forEach((line: any) => {
-            const p1 = model.points.get(line.p1);
-            const p2 = model.points.get(line.p2);
-            if (p1 && p2) {
-                newEntities.push(createLineEntity(
-                    { x: p1.x.value, y: p1.y.value },
-                    { x: p2.x.value, y: p2.y.value },
-                    '0', // Layer
-                    '#ffffff',
-                    line.id // Use Model ID
-                ));
-            }
+            set({ entities: solvedEntities });
         });
-
-        // Points
-        model.points.forEach((point: any) => {
-            // Only show points if they are NOT endpoints of lines? 
-            // OR show all points so they can be selected for constraints.
-            // Showing all points (endpoints) is crucial for "Coincident" constraint.
-            newEntities.push(createPointEntity(
-                point.x.value,
-                point.y.value,
-                '0',
-                '#00ff00', // Green points
-                point.id
-            ));
-        });
-
-        // Constraints
-        const newConstraints: Constraint[] = [];
-        model.constraints.forEach((c: Constraint) => {
-            newConstraints.push({ ...c });
-        });
-
-        set({ entities: newEntities, constraints: newConstraints });
     },
 
     addEntity: (entity) => {
-        const model = get().sketchModel;
-
-        if (model) {
-            get().pushHistory('Add entity (Solver)');
-
-            // Import to Solver
-            if (entity.geometry.type === 'LINE') {
-                const g = entity.geometry;
-                const p1 = model.addPoint(g.start.x, g.start.y);
-                const p2 = model.addPoint(g.end.x, g.end.y);
-                model.addLine(p1.id, p2.id);
-            }
-            // Add other types here
-
-            // Sync back to store
-            get().syncFromModel();
-        } else {
-            // Classic Mode
-            get().pushHistory('Add entity');
-            set(state => ({ entities: [...state.entities, entity] }));
-        }
+        get().pushHistory('Add entity');
+        const newEntities = [...get().entities, entity];
+        set({ entities: newEntities });
+        spatialIndex.rebuild(newEntities);
     },
 
     removeEntity: (id) => {
         get().pushHistory('Remove entity');
-        set(state => ({
-            entities: state.entities.filter(e => e.id !== id),
-            selectedIds: state.selectedIds.filter(sid => sid !== id)
-        }));
+        set(state => {
+            const newEntities = state.entities.filter(e => e.id !== id);
+            spatialIndex.remove(id);
+            return {
+                entities: newEntities,
+                selectedIds: state.selectedIds.filter(sid => sid !== id)
+            };
+        });
     },
 
     updateEntity: (id, updates) => {
-        set(state => ({
-            entities: state.entities.map(e =>
-                e.id === id ? { ...e, ...updates } : e
-            )
-        }));
+        set(state => {
+            const newEntities = state.entities.map(e => {
+                if (e.id === id) {
+                    const updated = { ...e, ...updates };
+                    // If geometry/visibility changed, update spatial index
+                    if (updates.geometry || 'isVisible' in updates) {
+                        spatialIndex.remove(id);
+                        if (updated.isVisible !== false) {
+                            const bbox = computeEntityBBox(updated);
+                            if (bbox) spatialIndex.insert(id, bbox);
+                        }
+                    }
+                    return updated;
+                }
+                return e;
+            });
+            return { entities: newEntities };
+        });
     },
 
     clearEntities: () => {
         get().pushHistory('Clear all');
+        spatialIndex.clear();
         set({ entities: [], selectedIds: [] });
     },
 
@@ -383,6 +387,45 @@ export const useCadStore = create<CadStore>((set, get) => ({
             state.selectEntity(id, true);
         }
     },
+
+    selectEntitiesInRect: (p1, p2, fullyContained) => set(state => {
+        const selected: string[] = [];
+        const newEntities = state.entities.map(entity => {
+            let isSelected = false;
+            const geom = entity.geometry;
+
+            if (geom.type === 'LINE') {
+                isSelected = isLineInRect(geom.start, geom.end, p1, p2, fullyContained);
+            } else if (geom.type === 'CIRCLE' || geom.type === 'ARC') {
+                isSelected = isPointInRect(geom.center, p1, p2);
+            } else if (geom.type === 'POINT') {
+                isSelected = isPointInRect({ x: geom.x, y: geom.y }, p1, p2);
+            } else if (geom.type === 'POLYLINE') {
+                // Check if any segment is in rect
+                isSelected = geom.vertices.some((v, i) => {
+                    if (i === 0) return isPointInRect(v, p1, p2);
+                    return isLineInRect(geom.vertices[i - 1], v, p1, p2, fullyContained);
+                });
+            } else if (geom.type === 'DIMENSION') {
+                if (geom.start && geom.end) {
+                    isSelected = isLineInRect(geom.start, geom.end, p1, p2, fullyContained);
+                }
+            } else if (geom.type === 'RECTANGLE' || geom.type === 'HEXAGON') {
+                isSelected = isPointInRect((geom as any).center, p1, p2);
+            }
+
+            if (isSelected) {
+                selected.push(entity.id);
+            }
+
+            return { ...entity, isSelected };
+        });
+
+        return {
+            entities: newEntities,
+            selectedIds: selected
+        };
+    }),
 
     // ─────────────────────────────────────────────────────────────
     // COMMAND STATE
@@ -525,20 +568,55 @@ export const useCadStore = create<CadStore>((set, get) => ({
     // PARAMETRIC DIMENSIONS
     // ─────────────────────────────────────────────────────────────
     editDimension: (constraintId, newValue) => {
-        const model = get().sketchModel;
-        if (!model) return;
+        set(state => ({
+            constraints: state.constraints.map(c =>
+                c.id === constraintId ? { ...c, value: newValue } : c
+            )
+        }));
+        get().solveConstraints();
+    },
 
-        // Update the constraint value in the model
-        const constraint = model.constraints.get(constraintId);
-        if (constraint && constraint.type === 'DISTANCE') {
-            constraint.value = newValue;
-            // Re-solve to update geometry
-            const solver = get().solverInterface;
-            if (solver) {
-                solver.solve();
-            }
-            get().syncFromModel();
-        }
+    // ─────────────────────────────────────────────────────────────
+    // UNITS
+    // ─────────────────────────────────────────────────────────────
+    units: 'mm',
+    setUnits: (units) => set({ units }),
+
+    // ─────────────────────────────────────────────────────────────
+    // MCP INTEGRATION
+    // ─────────────────────────────────────────────────────────────
+    isMcpPanelOpen: false,
+    activeMcpTool: null,
+    setMcpPanelOpen: (isOpen) => set({ isMcpPanelOpen: isOpen }),
+    setActiveMcpTool: (toolName) => set({ activeMcpTool: toolName, isMcpPanelOpen: !!toolName }),
+
+    // ─────────────────────────────────────────────────────────────
+    // MACHINING MODIFIERS
+    // ─────────────────────────────────────────────────────────────
+    addModifier: (entityId, modifier) => {
+        get().pushHistory('Add modifier');
+        set(state => ({
+            entities: state.entities.map(e => {
+                if (e.id === entityId) {
+                    return { ...e, modifiers: [...(e.modifiers || []), modifier] };
+                }
+                return e;
+            })
+        }));
+    },
+
+    removeModifier: (entityId, modifierIndex) => {
+        get().pushHistory('Remove modifier');
+        set(state => ({
+            entities: state.entities.map(e => {
+                if (e.id === entityId && e.modifiers) {
+                    const newMods = [...e.modifiers];
+                    newMods.splice(modifierIndex, 1);
+                    return { ...e, modifiers: newMods };
+                }
+                return e;
+            })
+        }));
     },
 }));
 
@@ -547,15 +625,27 @@ export const useCadStore = create<CadStore>((set, get) => ({
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Approximate DOF count.
- * Each point brings 2 DOF, each constraint removes ~1.
+ * Accurate DOF count using ConstraintGraph.
+ * Falls back to naive estimation if graph not available.
  */
 export const useDOFCount = () => {
     const entities = useCadStore(s => s.entities);
     const constraints = useCadStore(s => s.constraints);
-    const pointCount = entities.filter(e => e.geometry.type === 'POINT').length;
-    const activeConstraints = constraints.filter(c => c.active).length;
-    return Math.max(0, pointCount * 2 - activeConstraints);
+
+    try {
+        constraintGraph.rebuild(entities, constraints);
+        const analysis = constraintGraph.analyzeDOF();
+        return analysis.totalDOF;
+    } catch (e) {
+        console.error("Error calculating DOF with ConstraintGraph, falling back to naive estimation:", e);
+        // Fallback: naive estimation
+        const pointCount = entities.filter(e => e.geometry.type === 'POINT').length;
+        const lineCount = entities.filter(e => e.geometry.type === 'LINE').length;
+        const circleCount = entities.filter(e => e.geometry.type === 'CIRCLE').length;
+        const totalVars = pointCount * 2 + lineCount * 4 + circleCount * 3;
+        const activeConstraints = constraints.filter(c => c.active).length;
+        return Math.max(0, totalVars - activeConstraints);
+    }
 };
 
 export const useConstraintStatus = () => {

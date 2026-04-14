@@ -1,0 +1,24 @@
+{
+  "id": "peltier-cop",
+  "category": "science",
+  "title": "Peltier COP",
+  "slug": "peltier-cop",
+  "meta": {
+    "title": "TEC COP | AluCalc",
+    "description": "Cooling efficiency."
+  },
+  "seo": {
+    "h1": "Thermoelectric COP Calc",
+    "intro": "Analyze power waste.",
+    "formula": "COP = Q/P",
+    "variables": {
+      "Q": "Cool"
+    },
+    "practical": "Compact.",
+    "example": "Low COP typical."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

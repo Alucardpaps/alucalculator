@@ -10,7 +10,9 @@ export type ConstraintType =
     | 'FIXED'
     | 'EQUAL_LENGTH'
     | 'CONCENTRIC'
-    | 'MIDPOINT';
+    | 'MIDPOINT'
+    | 'RADIUS'
+    | 'DIAMETER';
 
 export interface Constraint {
     id: string;

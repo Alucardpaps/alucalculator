@@ -1,0 +1,34 @@
+{
+  "id": "bearing-load-step-by-step",
+  "title": "Bearing Load Step By Step - AluCalc Engineering",
+  "slug": "bearing-load-step-by-step",
+  "keyword": "bearing load step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Bearing Load Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional bearing load step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bearing Load Step By Step",
+    "intro": "Comprehensive engineering guide for bearing load step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bearing load)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bearing load.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bearing Load is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bearing load scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bearing-life-calculator",
+    "bearing-selection-calculator",
+    "bearing-lubrication-calculator",
+    "bearing-clearance-calculator",
+    "bearing-load-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "bolt-torque",
+  "category": "mechanical",
+  "title": "Bolt Torque Calculator",
+  "slug": "bolt-torque",
+  "meta": {
+    "title": "Bolt Torque Calculator | AluCalc",
+    "description": "Calculate tightening torque."
+  },
+  "seo": {
+    "h1": "Bolt Torque Calculator",
+    "intro": "Ensures proper preload in fasteners.",
+    "formula": "T = K × F × d",
+    "variables": {
+      "T": "Torque",
+      "K": "Factor",
+      "F": "Preload",
+      "d": "Dia"
+    },
+    "practical": "Prevent loosening.",
+    "example": "T = 20 Nm."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=bolt-torque"
+  }
+}

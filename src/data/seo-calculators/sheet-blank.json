@@ -1,0 +1,24 @@
+{
+  "id": "sheet-blank",
+  "category": "manufacturing",
+  "title": "Blank Force",
+  "slug": "sheet-blank",
+  "meta": {
+    "title": "Blanking | AluCalc",
+    "description": "Punch force req."
+  },
+  "seo": {
+    "h1": "Sheet Punching Force Calc",
+    "intro": "Size the press ton.",
+    "formula": "F = L*t*τ",
+    "variables": {
+      "τ": "Shear"
+    },
+    "practical": "Stamping.",
+    "example": "Steel 400MPa."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

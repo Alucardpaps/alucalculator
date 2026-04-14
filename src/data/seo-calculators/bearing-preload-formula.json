@@ -1,0 +1,34 @@
+{
+  "id": "bearing-preload-formula",
+  "title": "Bearing Preload Formula - AluCalc Engineering",
+  "slug": "bearing-preload-formula",
+  "keyword": "bearing preload formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Bearing Preload Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional bearing preload formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bearing Preload Formula",
+    "intro": "Comprehensive engineering guide for bearing preload formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bearing preload)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bearing preload.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bearing Preload is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bearing preload scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bearing-life-calculator",
+    "bearing-load-calculator",
+    "bearing-selection-calculator",
+    "bearing-lubrication-calculator",
+    "bearing-preload-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

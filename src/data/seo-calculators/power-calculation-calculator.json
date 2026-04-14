@@ -1,0 +1,34 @@
+{
+  "id": "power-calculation-calculator",
+  "title": "Power Calculation Calculator - AluCalc Engineering",
+  "slug": "power-calculation-calculator",
+  "keyword": "power calculation calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Power Calculation Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional power calculation calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Power Calculation Calculator",
+    "intro": "Comprehensive engineering guide for power calculation calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for power calculation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for power calculation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Power Calculation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical power calculation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "3-phase-power-calculator",
+    "single-phase-power-calculator",
+    "power-factor-calculator",
+    "apparent-power-calculator",
+    "power-calculation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

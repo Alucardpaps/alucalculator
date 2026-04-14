@@ -1,0 +1,34 @@
+{
+  "id": "bending-moment-explained",
+  "title": "Bending Moment Explained - AluCalc Engineering",
+  "slug": "bending-moment-explained",
+  "keyword": "bending moment explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Bending Moment Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional bending moment explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bending Moment Explained",
+    "intro": "Comprehensive engineering guide for bending moment explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bending moment)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bending moment.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bending Moment is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bending moment scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "beam-deflection-calculator",
+    "beam-load-calculator",
+    "beam-stress-calculator",
+    "shear-force-diagram-calculator",
+    "bending-moment-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

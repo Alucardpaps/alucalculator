@@ -233,6 +233,66 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
         },
     },
 
+    'sfd-bmd-academic': {
+        loader: () => import('./schemas-v2/sfd-bmd-academic'),
+        metadata: {
+            title: 'SFD / BMD Academic',
+            description: 'Shear Force and Bending Moment Diagrams for simply supported beams',
+            category: 'mechanical',
+            icon: 'Activity',
+        },
+    },
+
+    'mohrs-circle': {
+        loader: () => import('./schemas-v2/mohrs-circle'),
+        metadata: {
+            title: 'Mohr\'s Circle (2D)',
+            description: 'Principal stresses and orientation from stress transformation',
+            category: 'mechanical',
+            icon: 'Circle',
+        },
+    },
+
+    'column-buckling': {
+        loader: () => import('./schemas-v2/column-buckling' as any),
+        metadata: {
+            title: 'Column Buckling',
+            description: 'Euler and Johnson buckling theories for structural members',
+            category: 'mechanical',
+            icon: 'ArrowDownToLine',
+        },
+    },
+
+    'thread-geometry': {
+        loader: () => import('./schemas-v2/thread-geometry' as any),
+        metadata: {
+            title: 'Thread Geometry',
+            description: 'ISO Metric and Unified thread series technical details',
+            category: 'mechanical',
+            icon: 'Settings',
+        },
+    },
+
+    'vat-calculator': {
+        loader: () => import('./schemas-v2/vat-calculator' as any),
+        metadata: {
+            title: 'VAT / Tax Calculator',
+            description: 'Professional financial tax and margin calculator',
+            category: 'math',
+            icon: 'Calculator',
+        },
+    },
+
+    'torque_calculation': {
+        loader: () => import('./schemas-v2/torque_calculation'),
+        metadata: {
+            title: 'Torque Calculation',
+            description: 'Determine shaft torque from motor power and speed.',
+            category: 'mechanical',
+            icon: 'Zap',
+        },
+    },
+
     // ==========================================
     // FABRICATION
     // ==========================================

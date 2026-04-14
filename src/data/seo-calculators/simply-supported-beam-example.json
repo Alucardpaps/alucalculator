@@ -1,0 +1,34 @@
+{
+  "id": "simply-supported-beam-example",
+  "title": "Simply Supported Beam Example - AluCalc Engineering",
+  "slug": "simply-supported-beam-example",
+  "keyword": "simply supported beam example",
+  "intent": "example",
+  "meta": {
+    "title": "Simply Supported Beam Example | Free Engineering Tool | AluCalc",
+    "description": "Professional simply supported beam example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Simply Supported Beam Example",
+    "intro": "Comprehensive engineering guide for simply supported beam example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for simply supported beam)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for simply supported beam.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Simply Supported Beam is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical simply supported beam scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "beam-deflection-calculator",
+    "beam-load-calculator",
+    "beam-stress-calculator",
+    "bending-moment-calculator",
+    "simply-supported-beam-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

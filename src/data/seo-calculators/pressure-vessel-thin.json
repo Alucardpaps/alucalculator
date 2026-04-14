@@ -1,0 +1,26 @@
+{
+  "id": "pressure-vessel-thin",
+  "category": "fluid",
+  "title": "Pressure Vessel (Thin)",
+  "slug": "pressure-vessel-thin",
+  "meta": {
+    "title": "Thin Vessel | AluCalc",
+    "description": "Hoop stress calc."
+  },
+  "seo": {
+    "h1": "Thin Wall Vessel Calc",
+    "intro": "Safety for air tanks.",
+    "formula": "σ = PD/2t",
+    "variables": {
+      "P": "Press",
+      "D": "Dia",
+      "t": "Thick"
+    },
+    "practical": "Aero tanks.",
+    "example": "Hoop is 2x Long."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=pressure-vessel-thin"
+  }
+}

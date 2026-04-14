@@ -1,0 +1,34 @@
+{
+  "id": "gear-design-example",
+  "title": "Gear Design Example - AluCalc Engineering",
+  "slug": "gear-design-example",
+  "keyword": "gear design example",
+  "intent": "example",
+  "meta": {
+    "title": "Gear Design Example | Free Engineering Tool | AluCalc",
+    "description": "Professional gear design example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Design Example",
+    "intro": "Comprehensive engineering guide for gear design example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear design)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear design.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Design is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear design scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-ratio-calculator",
+    "gear-module-calculator",
+    "gear-pitch-calculator",
+    "gear-contact-stress-calculator",
+    "gear-design-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

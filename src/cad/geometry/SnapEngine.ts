@@ -15,6 +15,7 @@ import {
     ArcGeometry,
     PolylineGeometry
 } from '../kernel/types';
+import { spatialIndex } from './SpatialIndex';
 import {
     distance,
     midpoint,
@@ -47,7 +48,15 @@ export function findSnapPoint(
     let bestSnap: SnapResult | null = null;
     let bestDistance = snapThreshold;
 
-    for (const entity of entities) {
+    // Use Spatial Index to limit entities checked
+    const nearbyIds = spatialIndex.queryRadius(cursorWorld, snapThreshold);
+    // If spatialIndex is empty (e.g., not populated yet), fallback to all entities.
+    // In a fully integrated system, the store would rebuild indexing on changes.
+    const candidates = nearbyIds.length > 0
+        ? entities.filter(e => nearbyIds.includes(e.id))
+        : entities;
+
+    for (const entity of candidates) {
         if (!entity.isVisible) continue;
 
         const snaps = getEntitySnapPoints(entity, cursorWorld, activeSnaps);
@@ -129,7 +138,14 @@ function getLineSnaps(
     }
 
     // PER - Perpendicular (requires origin point context)
-    // This is handled separately in command context
+    // When drawing, we often drop a perpendicular from the previous point to this line segment
+    // But as a standard snap, we provide the perpendicular projection of cursor onto line
+    if (activeSnaps.includes('PER')) {
+        const perpPoint = nearestPointOnLine(cursor, geom.start, geom.end);
+        if (perpPoint) {
+            snaps.push({ point: perpPoint, mode: 'PER', entityId });
+        }
+    }
 
     return snaps;
 }
@@ -190,8 +206,8 @@ function getCircleSnaps(
         snaps.push({ point: nearest, mode: 'NEA', entityId });
     }
 
-    // QUADRANT points (0°, 90°, 180°, 270°)
-    if (activeSnaps.includes('END')) {
+    // QUADRANT (QUA) points (0°, 90°, 180°, 270°)
+    if (activeSnaps.includes('QUA')) {
         const quadrants: Point[] = [
             { x: geom.center.x + geom.radius, y: geom.center.y },
             { x: geom.center.x, y: geom.center.y + geom.radius },
@@ -199,8 +215,36 @@ function getCircleSnaps(
             { x: geom.center.x, y: geom.center.y - geom.radius }
         ];
         for (const q of quadrants) {
-            snaps.push({ point: q, mode: 'END', entityId });
+            snaps.push({ point: q, mode: 'QUA', entityId });
         }
+    }
+
+    // TANGENT (TAN) - rough approximation cursor to circle tangent
+    // A true tangent snap is contextual (from previous point), but we can snap to 
+    // the two tangent points on the circle from the cursor
+    if (activeSnaps.includes('TAN')) {
+        const dist = distance(cursor, geom.center);
+        if (dist > geom.radius) {
+            const angleC = Math.acos(geom.radius / dist);
+            const angleCursor = Math.atan2(cursor.y - geom.center.y, cursor.x - geom.center.x);
+
+            const p1 = {
+                x: geom.center.x + geom.radius * Math.cos(angleCursor + angleC),
+                y: geom.center.y + geom.radius * Math.sin(angleCursor + angleC)
+            };
+            const p2 = {
+                x: geom.center.x + geom.radius * Math.cos(angleCursor - angleC),
+                y: geom.center.y + geom.radius * Math.sin(angleCursor - angleC)
+            };
+            snaps.push({ point: p1, mode: 'TAN', entityId });
+            snaps.push({ point: p2, mode: 'TAN', entityId });
+        }
+    }
+
+    // PERPENDICULAR (PER) - center to cursor projected to edge
+    if (activeSnaps.includes('PER')) {
+        const pt = nearestPointOnCircle(cursor, geom.center, geom.radius);
+        snaps.push({ point: pt, mode: 'PER', entityId });
     }
 
     return snaps;
@@ -266,6 +310,91 @@ function getArcSnaps(
             y: geom.center.y + geom.radius * Math.sin(midAngle)
         };
         snaps.push({ point: midPoint, mode: 'MID', entityId });
+    }
+
+    // NEA - Nearest on arc
+    if (activeSnaps.includes('NEA') || activeSnaps.includes('PER')) {
+        // Nearest point on full circle
+        const nearestOnCircle = nearestPointOnCircle(cursor, geom.center, geom.radius);
+
+        // Calculate angle of this point
+        let angle = Math.atan2(nearestOnCircle.y - geom.center.y, nearestOnCircle.x - geom.center.x);
+        if (angle < 0) angle += 2 * Math.PI;
+
+        // Check if angle is within arc sweep
+        let sweep = geom.endAngle - geom.startAngle;
+        if (sweep < 0) sweep += 2 * Math.PI;
+
+        let relativeAngle = angle - geom.startAngle;
+        if (relativeAngle < 0) relativeAngle += 2 * Math.PI;
+
+        if (relativeAngle <= sweep) {
+            if (activeSnaps.includes('NEA')) {
+                snaps.push({ point: nearestOnCircle, mode: 'NEA', entityId });
+            }
+            if (activeSnaps.includes('PER')) {
+                snaps.push({ point: nearestOnCircle, mode: 'PER', entityId });
+            }
+        }
+    }
+
+    // QUADRANT (QUA) points
+    if (activeSnaps.includes('QUA')) {
+        const quads = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
+        for (const q of quads) {
+            // Check if quadrant angle is within arc
+            let sweep = geom.endAngle - geom.startAngle;
+            if (sweep < 0) sweep += 2 * Math.PI;
+
+            let relativeAngle = q - geom.startAngle;
+            if (relativeAngle < 0) relativeAngle += 2 * Math.PI;
+
+            if (relativeAngle <= sweep) {
+                const qPoint = {
+                    x: geom.center.x + geom.radius * Math.cos(q),
+                    y: geom.center.y + geom.radius * Math.sin(q)
+                };
+                snaps.push({ point: qPoint, mode: 'QUA', entityId });
+            }
+        }
+    }
+
+    // TANGENT (TAN)
+    if (activeSnaps.includes('TAN')) {
+        const dist = distance(cursor, geom.center);
+        if (dist > geom.radius) {
+            const angleC = Math.acos(geom.radius / dist);
+            const angleCursor = Math.atan2(cursor.y - geom.center.y, cursor.x - geom.center.x);
+
+            const p1Angle = angleCursor + angleC;
+            const p2Angle = angleCursor - angleC;
+
+            const checkTangent = (tAngle: number) => {
+                let norm = tAngle;
+                while (norm < 0) norm += 2 * Math.PI;
+                while (norm >= 2 * Math.PI) norm -= 2 * Math.PI;
+
+                let sweep = geom.endAngle - geom.startAngle;
+                if (sweep < 0) sweep += 2 * Math.PI;
+
+                let rel = norm - geom.startAngle;
+                if (rel < 0) rel += 2 * Math.PI;
+
+                if (rel <= sweep) {
+                    snaps.push({
+                        point: {
+                            x: geom.center.x + geom.radius * Math.cos(norm),
+                            y: geom.center.y + geom.radius * Math.sin(norm)
+                        },
+                        mode: 'TAN',
+                        entityId
+                    });
+                }
+            };
+
+            checkTangent(p1Angle);
+            checkTangent(p2Angle);
+        }
     }
 
     return snaps;

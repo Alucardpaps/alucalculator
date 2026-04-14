@@ -1,0 +1,24 @@
+{
+  "id": "sound-gain",
+  "category": "science",
+  "title": "Sound Gain",
+  "slug": "sound-gain",
+  "meta": {
+    "title": "Sound | AluCalc",
+    "description": "Attenuation vs distance."
+  },
+  "seo": {
+    "h1": "Acoustic Transmission Calc",
+    "intro": "Inverse square loss.",
+    "formula": "dB2 = dB1 - 20log",
+    "variables": {
+      "dB": "Level"
+    },
+    "practical": "Industrial.",
+    "example": "Barrier effect."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

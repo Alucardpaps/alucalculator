@@ -1,0 +1,24 @@
+{
+  "id": "drill-torq",
+  "category": "manufacturing",
+  "title": "Drill Torq",
+  "slug": "drill-torq",
+  "meta": {
+    "title": "Drill | AluCalc",
+    "description": "Drilling Torque req."
+  },
+  "seo": {
+    "h1": "Drilling Torque and Power",
+    "intro": "Select motor size.",
+    "formula": "T = 0.25*kc*D^2*f",
+    "variables": {
+      "kc": "Spec"
+    },
+    "practical": "Automation.",
+    "example": "Big D = Big T."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

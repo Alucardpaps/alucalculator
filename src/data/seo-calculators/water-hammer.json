@@ -1,0 +1,24 @@
+{
+  "id": "water-hammer",
+  "category": "fluid",
+  "title": "Water Hammer",
+  "slug": "water-hammer",
+  "meta": {
+    "title": "Hammer | AluCalc",
+    "description": "Surge pressure spikes."
+  },
+  "seo": {
+    "h1": "Fluid Surge Analysis",
+    "intro": "Joukowsky pressure rise.",
+    "formula": "dP = ρav",
+    "variables": {
+      "a": "Wave"
+    },
+    "practical": "Fire mains.",
+    "example": "Valve speed."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

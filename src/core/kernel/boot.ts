@@ -8,6 +8,10 @@
  */
 
 import { KERNEL, registerCalculator, registerEngine, registerExporter } from './KernelRegistry';
+import { ENGINE_REGISTRY, registerDefaultEngines } from '@/engine/engineRegistry';
+import { validateDependencyGraph } from '@/engine/dependencyResolver';
+import { initializeTelemetry } from '@/system/telemetryStore';
+import { EVENT_BUS, EVENT_TYPES } from '@/system/eventBus';
 
 // ============================================
 // STATIC REGISTRATION (MIGRATION BRIDGE)
@@ -29,28 +33,20 @@ async function registerLegacyCalculators(): Promise<void> {
  * Register math engines
  */
 function registerMathEngines(): void {
-    // Involute engine
-    registerEngine('involute', {
-        title: 'Involute Math Engine',
-        description: 'True parametric involute curve generation (DIN 3960)',
-        version: '1.0.0',
-        standards: ['DIN 3960', 'ISO 21771'],
-    }, null); // Instance loaded on demand
+    const engines = [
+        { id: 'involute', title: 'Involute Math Engine', standards: ['DIN 3960', 'ISO 21771'] },
+        { id: 'gear-geometry', title: 'Gear Geometry Engine', standards: ['ISO 6336', 'AGMA 2001'] },
+        { id: 'primitives', title: 'Math Primitives', standards: [] }
+    ];
 
-    // Gear geometry engine
-    registerEngine('gear-geometry', {
-        title: 'Gear Geometry Engine',
-        description: 'Mesh analysis, contact ratio, interference detection',
-        version: '1.0.0',
-        standards: ['ISO 6336', 'AGMA 2001'],
-    }, null);
-
-    // Primitives engine
-    registerEngine('primitives', {
-        title: 'Math Primitives',
-        description: 'Core geometric types and operations',
-        version: '1.0.0',
-    }, null);
+    engines.forEach(e => {
+        registerEngine(e.id, {
+            title: e.title,
+            description: `${e.title} Description Placeholder`,
+            version: '1.0.0',
+            standards: e.standards,
+        }, null);
+    });
 }
 
 /**
@@ -142,6 +138,20 @@ export async function bootKernel(): Promise<void> {
             console.log('[KERNEL] Phase 4: Registering graph nodes...');
             registerGraphNodes();
 
+            // Phase 5: Initialize Engine Registry with manifests
+            console.log('[KERNEL] Phase 5: Initializing Engine Registry...');
+            registerDefaultEngines();
+            const depValidation = validateDependencyGraph();
+            if (depValidation.hasCycles) {
+                KERNEL.logError(`Dependency cycle detected: ${depValidation.cycleParticipants.join(' → ')}`);
+            }
+            ENGINE_REGISTRY.seal();
+            console.log(`[KERNEL] 📋 Engine Registry: ${ENGINE_REGISTRY.size} engines registered`);
+
+            // Phase 6: Initialize Telemetry & Event Bus
+            console.log('[KERNEL] Phase 6: Initializing Telemetry & Event Bus...');
+            initializeTelemetry();
+
             // INVARIANT CHECK: If we got here but nothing registered, something is broken
             const registeredCount = KERNEL.getAll().length;
             if (registeredCount === 0) {
@@ -159,9 +169,17 @@ export async function bootKernel(): Promise<void> {
             console.log(`[KERNEL] ✅ Boot complete in ${elapsed}ms`);
             console.log(`[KERNEL] 📦 Modules: ${status.moduleCount}`);
             console.log(`[KERNEL] 🏷️ Build: ${status.buildId}`);
+            console.log(`[KERNEL] 🔧 Engines: ${ENGINE_REGISTRY.size}`);
 
             // Expose to window for debugging
             KERNEL.exposeGlobals();
+
+            // Emit kernel booted event
+            EVENT_BUS.emit({
+                type: EVENT_TYPES.KERNEL_BOOTED,
+                payload: { modules: status.moduleCount, engines: ENGINE_REGISTRY.size, elapsed },
+                sourceModule: 'kernel',
+            });
 
         } catch (error) {
             KERNEL.logError(`Boot failed: ${error}`);

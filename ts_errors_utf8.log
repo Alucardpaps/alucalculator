@@ -1,0 +1,28 @@
+﻿out/_next/static/media/generativeWorker.74f7b731.ts(8,7): error TS2451: Cannot redeclare block-scoped variable 'ctx'.
+src/cad/commands/tools/MoveTool.ts(30,51): error TS2339: Property 'solverInterface' does not exist on type 'CadStore'.
+src/cad/hooks/useSketchSolver.ts(135,32): error TS2339: Property 'setSolverInterface' does not exist on type 'CadStore'.
+src/cad/hooks/useSketchSolver.ts(154,36): error TS2339: Property 'setSolverInterface' does not exist on type 'CadStore'.
+src/cad/presentation/components/ValidationPanel.tsx(25,36): error TS2339: Property 'solverInterface' does not exist on type 'CadStore'.
+src/cad/presentation/components/ValidationPanel.tsx(25,53): error TS2339: Property 'syncFromModel' does not exist on type 'CadStore'.
+src/cad/presentation/components/ValidationPanel.tsx(36,46): error TS2339: Property 'sketchModel' does not exist on type 'CadStore'.
+src/cad/presentation/components/ValidationPanel.tsx(105,94): error TS2339: Property 'sketchModel' does not exist on type 'CadStore'.
+src/engine/workers/generativeWorker.ts(8,7): error TS2451: Cannot redeclare block-scoped variable 'ctx'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(9,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(18,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(24,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(27,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(32,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(33,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(36,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(39,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(40,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(41,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(42,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(43,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(44,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(45,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(48,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(52,9): error TS2304: Cannot find name 'expect'.
+src/modules/mechanical/SheetMetal/tests/engine.test.ts(53,9): error TS2304: Cannot find name 'expect'.
+src/store/osStore.ts(100,23): error TS2322: Type '{ windows: never[]; activeWindowId: null; nextZIndex: number; currentLanguage: string; dictionary: {}; theme: "dark"; fontSize: "medium"; fontFamily: "sans"; hasSeenWelcome: true; showWelcomeModal: false; ... 25 more ...; resetWelcome: () => unknown; }' is not assignable to type 'OSState & OSActions'.
+  Type '{ windows: never[]; activeWindowId: null; nextZIndex: number; currentLanguage: string; dictionary: {}; theme: "dark"; fontSize: "medium"; fontFamily: "sans"; hasSeenWelcome: true; showWelcomeModal: false; ... 25 more ...; resetWelcome: () => unknown; }' is missing the following properties from type 'OSActions': unitSystem, setUnitSystem

@@ -1,0 +1,73 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+node.exe : ÔÜá Specified "headers" will not automatically
+ work with "output: export". See more info here: https://
+nextjs.org/docs/messages/export-no-custom-routes
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá Specifi 
+   ed "...o-custom-routes:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ÔÜá Warning: Next.js inferred your workspace root, but it
+ may not be correct.
+ We detected multiple lockfiles and selected the director
+y of C:\Users\apo_q\package-lock.json as the root directo
+ry.
+ To silence this warning, set `turbopack.root` in your Ne
+xt.js config, or consider removing one of the lockfiles i
+f it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/n
+ext-config-js/turbopack#root-directory for more informati
+on.
+ Detected additional lockfiles: 
+   * C:\Users\apo_q\.gemini\antigravity\scratch\alucalcul
+ator\package-lock.json
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+ÔÜá Specified "headers" will not automatically work with 
+"output: export". See more info here: https://nextjs.org/
+docs/messages/export-no-custom-routes
+Ô£ô Compiled successfully in 9.7s
+  Running TypeScript ...
+Failed to compile.
+
+.next/dev/types/validator.ts:24:44
+Type error: Type 'Route' does not satisfy the constraint 
+'"/"'.
+  Type 'LayoutRoutes' is not assignable to type '"/"'.
+    Type '"/[lang]"' is not assignable to type '"/"'.
+
+[0m [90m 22 |[39m
+ [90m 23 |[39m type [33mLayoutConfig[39m[33m<[39m[
+33mRoute[39m [36mextends[39m [33mLayoutRoutes[39m [
+33m=[39m [33mLayoutRoutes[39m[33m>[39m [33m=[39m {
+[31m[1m>[22m[39m[90m 24 |[39m   [36mdefault[39m[
+33m:[39m [33mReact[39m[33m.[39m[33mComponentType[3
+9m[33m<[39m[33mLayoutProps[39m[33m<[39m[33mRoute[
+39m[33m>>[39m [33m|[39m ((props[33m:[39m [33mLayou
+tProps[39m[33m<[39m[33mRoute[39m[33m>[39m) [33m=>
+[39m [33mReact[39m[33m.[39m[33mReactNode[39m [33m
+|[39m [33mPromise[39m[33m<[39m[33mReact[39m[33m.
+[39m[33mReactNode[39m[33m>[39m [33m|[39m never [33
+m|[39m [36mvoid[39m [33m|[39m [33mPromise[39m[33m
+<[39m[36mvoid[39m[33m>[39m)
+ [90m    |[39m                                         
+   [31m[1m^[22m[39m
+ [90m 25 |[39m   generateStaticParams[33m?[39m[33m:
+[39m (props[33m:[39m { params[33m:[39m [33mParamMap
+[39m[[33mRoute[39m] }) [33m=>[39m [33mPromise[39m[
+33m<[39m[33many[39m[][33m>[39m [33m|[39m any[]
+ [90m 26 |[39m   generateMetadata[33m?[39m[33m:[39m
+ (
+ [90m 27 |[39m     props[33m:[39m { params[33m:[39m
+ [33mPromise[39m[33m<[39m[33mParamMap[39m[[33mRout
+e[39m][33m>[39m } [33m&[39m any[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null

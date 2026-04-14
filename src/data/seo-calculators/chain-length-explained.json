@@ -1,0 +1,34 @@
+{
+  "id": "chain-length-explained",
+  "title": "Chain Length Explained - AluCalc Engineering",
+  "slug": "chain-length-explained",
+  "keyword": "chain length explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Chain Length Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional chain length explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Chain Length Explained",
+    "intro": "Comprehensive engineering guide for chain length explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for chain length)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for chain length.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Chain Length is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical chain length scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-design-calculator",
+    "timing-belt-length-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "chain-length-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

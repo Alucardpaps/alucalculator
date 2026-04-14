@@ -1,10 +1,10 @@
 
 import { BaseCommand } from '../BaseCommand';
 import { Point, CadEntity, createLineEntity } from '../../kernel/types';
-import { distance } from '../../kernel/GeometryKernel';
 import { useCadStore } from '../../store/cadStore';
 import { findEntityAtPoint } from '../../geometry/GeometryUtils';
-import { extendLineToBoundary } from '../../kernel/GeometryKernel';
+import { getEntityIntersections } from '../../geometry/SnapEngine';
+import { extendLineToBoundary, distance, vector, dot, normalize } from '../../kernel/GeometryKernel';
 
 export class ExtendTool extends BaseCommand {
     public id = 'EXTEND';
@@ -76,25 +76,57 @@ export class ExtendTool extends BaseCommand {
 
         this.boundaries.forEach(boundary => {
             if (boundary.id === entity.id) return;
-            if (boundary.geometry.type !== 'LINE') return;
 
-            const extended = extendLineToBoundary(targetGeo, boundary.geometry as any);
+            // To extend a line to ANY boundary, we treat the line as an infinite line
+            // and find intersections with the boundary.
+            // Then we pick the intersection that lies *outside* the line segment,
+            // in the direction of the end we are extending.
 
-            if (extended) {
-                // Calculate how much we extended
-                const oldLen = distance(targetGeo.start, targetGeo.end);
-                const newLen = distance(extended.start, extended.end);
-                const diff = newLen - oldLen;
+            // 1. Determine which end we are picking based on pickPoint
+            const dStart = distance(pickPoint, targetGeo.start);
+            const dEnd = distance(pickPoint, targetGeo.end);
+            const isExtendingEnd = dEnd < dStart;
 
-                // If diff is practically 0 or negative, skip
-                if (diff < 0.001) return;
+            const rayDir = isExtendingEnd
+                ? normalize(vector(targetGeo.start, targetGeo.end))
+                : normalize(vector(targetGeo.end, targetGeo.start));
 
-                // We want the smallest positive extension (nearest boundary)
-                if (diff < bestDistChange) {
-                    bestDistChange = diff;
-                    bestNewGeo = extended;
+            const rayOrigin = isExtendingEnd ? targetGeo.end : targetGeo.start;
+
+            // Mock infinite line (large enough to intersect everything we see)
+            const mockInfiniteGeo = {
+                type: 'LINE',
+                start: targetGeo.start,
+                end: {
+                    x: rayOrigin.x + rayDir.x * 1000000,
+                    y: rayOrigin.y + rayDir.y * 1000000
                 }
-            }
+            } as any;
+
+            const mockEntity = {
+                id: 'mock',
+                geometry: mockInfiniteGeo
+            } as CadEntity;
+
+            const points = getEntityIntersections(mockEntity, boundary);
+
+            points.forEach(pt => {
+                // Determine if point is in the "forward" direction of the ray
+                const vPt = vector(rayOrigin, pt);
+                const projection = dot(vPt, rayDir);
+
+                if (projection > 0.001) { // Positive projection = in front
+                    const diff = distance(rayOrigin, pt);
+                    if (diff < bestDistChange) {
+                        bestDistChange = diff;
+                        if (isExtendingEnd) {
+                            bestNewGeo = { start: targetGeo.start, end: pt };
+                        } else {
+                            bestNewGeo = { start: pt, end: targetGeo.end };
+                        }
+                    }
+                }
+            });
         });
 
         if (bestNewGeo) {

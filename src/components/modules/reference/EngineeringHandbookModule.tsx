@@ -82,9 +82,9 @@ export function EngineeringHandbookModule() {
     const displayEntries = currentSection?.entries || currentChapter?.sections.flatMap(s => s.entries) || [];
 
     return (
-        <div className="flex h-full bg-[#03070b] text-gray-300 font-sans overflow-hidden select-none">
+        <div className="flex flex-col md:flex-row h-full bg-[#03070b] text-gray-300 font-sans overflow-hidden select-none">
             {/* ─── LEFT SIDEBAR: NAVIGATION ─── */}
-            <div className="w-72 border-r border-[#1a1f26] bg-[#080d13] flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-10 relative">
+            <div className="w-full md:w-72 h-[35vh] md:h-full border-b md:border-b-0 md:border-r border-[#1a1f26] bg-[#080d13] flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.5)] z-20 relative shrink-0">
                 {/* Header */}
                 <div className="px-5 py-5 border-b border-[#1a1f26] bg-gradient-to-b from-[#0e141a] to-[#080d13]">
                     <div

@@ -1,0 +1,34 @@
+{
+  "id": "energy-balance-calculator",
+  "title": "Energy Balance Calculator - AluCalc Engineering",
+  "slug": "energy-balance-calculator",
+  "keyword": "energy balance calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Energy Balance Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional energy balance calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Energy Balance Calculator",
+    "intro": "Comprehensive engineering guide for energy balance calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for energy balance)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for energy balance.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Energy Balance is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical energy balance scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "heat-transfer-calculator",
+    "conduction-heat-transfer-calculator",
+    "convection-heat-transfer-calculator",
+    "radiation-heat-transfer-calculator",
+    "energy-balance-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

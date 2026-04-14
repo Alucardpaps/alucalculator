@@ -1,0 +1,24 @@
+{
+  "id": "xl-react",
+  "category": "electrical",
+  "title": "XL React",
+  "slug": "xl-react",
+  "meta": {
+    "title": "XL | AluCalc",
+    "description": "Inductive Reactance."
+  },
+  "seo": {
+    "h1": "Inductor AC Impedance",
+    "intro": "Opposition to AC.",
+    "formula": "XL = 2πfL",
+    "variables": {
+      "f": "Hz"
+    },
+    "practical": "Chokes.",
+    "example": "Filter noise."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

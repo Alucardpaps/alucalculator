@@ -1,7 +1,7 @@
 'use client';
 
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
-import { X, Minus, Maximize2, Move, Minimize2 } from 'lucide-react';
+import { X, Minus, Maximize2, Move, Minimize2, ChevronLeft } from 'lucide-react';
 import { useOSStore, OSWindow } from '@/store/osStore';
 import { ReactNode, useRef, useState, useEffect, useMemo } from 'react';
 import { WindowSize } from '@/config/modules';
@@ -201,7 +201,7 @@ export function CanvasWindow({
     return (
         <Draggable
             handle=".window-header"
-            position={isMaximized ? { x: 0, y: 0 } : currentPosition}
+            position={(isMaximized || isMobile) ? { x: 0, y: 0 } : currentPosition}
             scale={scale}
             nodeRef={nodeRef}
             onStart={() => {
@@ -215,18 +215,20 @@ export function CanvasWindow({
                     onPositionChange(currentPosition);
                 }
             }}
-            disabled={isMaximized || isResizing}
+            disabled={isMaximized || isMobile || isResizing}
         >
             <div
                 ref={nodeRef}
                 id={id}
+                role="dialog"
+                aria-labelledby={`${id}-title`}
                 data-window-type={id.includes('settings') ? 'settings' : 'other'}
                 data-min-width={minWidth}
                 data-current-width={currentSize.width}
                 style={{
                     zIndex,
                     width: isMaximized || isMobile ? '100%' : `${currentSize.width}px`,
-                    height: isMaximized || isMobile ? '100%' : `${currentSize.height}px`,
+                    height: isMaximized ? '100%' : isMobile ? 'calc(100% - 85px)' : `${currentSize.height}px`,
                     left: isMaximized || isMobile ? 0 : undefined,
                     top: isMaximized || isMobile ? 0 : undefined,
                     position: 'absolute',
@@ -238,10 +240,29 @@ export function CanvasWindow({
                     ${(isMaximized || isMobile) ? 'canvas-window-max border-none rounded-none' : 'border rounded-xl'}
                     flex flex-col overflow-hidden pointer-events-auto ${interactionClass}
                 `}
-                onClick={() => focusWindow(id)}
+                onPointerDownCapture={() => focusWindow(id)}
             >
-                {/* Header - Only show if not maximized */}
-                {!isMaximized && (
+                {/* MOBILE HEADER — Full-width touch-friendly bar */}
+                {isMobile && (
+                    <div className="window-header h-14 flex-none flex items-center gap-3 px-4 bg-[#0a0e14] border-b border-white/10 select-none">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
+                            aria-label="Close and go back"
+                            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center active:bg-white/10 transition-colors"
+                        >
+                            <ChevronLeft size={20} className="text-white/70" />
+                        </button>
+                        <span
+                            id={`${id}-title`}
+                            className="text-sm font-semibold text-white/90 truncate flex-1"
+                        >
+                            {title}
+                        </span>
+                    </div>
+                )}
+
+                {/* DESKTOP HEADER — macOS style (unchanged behavior) */}
+                {!isMobile && !isMaximized && (
                     <div
                         className={`window-header h-10 flex-none flex items-center justify-between px-3 cursor-grab active:cursor-grabbing border-b select-none
                             ${isActive
@@ -252,10 +273,10 @@ export function CanvasWindow({
                         style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)' }}
                         onDoubleClick={() => toggleMaximize(id)}
                     >
-                        {/* macOS-style traffic light controls */}
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
+                                aria-label="Close Window"
                                 className="w-3.5 h-3.5 rounded-full bg-[#ff5f57] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
@@ -263,6 +284,7 @@ export function CanvasWindow({
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); minimizeWindow(id); }}
+                                aria-label="Minimize Window"
                                 className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
@@ -270,19 +292,19 @@ export function CanvasWindow({
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
+                                aria-label="Toggle Maximize"
                                 className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
                                 <Maximize2 size={7} className="opacity-0 group-hover:opacity-100 text-[#006500] transition-opacity" />
                             </button>
                         </div>
-
-                        {/* Title */}
-                        <span className={`text-[11px] font-semibold tracking-wide truncate max-w-[250px] ${isActive ? 'text-white/80' : 'text-white/30'}`}>
+                        <span 
+                            id={`${id}-title`}
+                            className={`text-[11px] font-semibold tracking-wide truncate max-w-[250px] ${isActive ? 'text-white/80' : 'text-white/30'}`}
+                        >
                             {title}
                         </span>
-
-                        {/* Spacer to balance layout */}
                         <div className="w-[56px]" />
                     </div>
                 )}
@@ -292,8 +314,8 @@ export function CanvasWindow({
                     {children}
                 </div>
 
-                {/* Resize Handle */}
-                {!isMaximized && (
+                {/* Resize Handle — hidden on mobile */}
+                {!isMaximized && !isMobile && (
                     <div
                         onMouseDown={handleResizeStart}
                         className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize z-50 flex items-end justify-end p-1 group"

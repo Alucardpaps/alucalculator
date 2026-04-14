@@ -1,0 +1,34 @@
+{
+  "id": "timing-belt-length-formula",
+  "title": "Timing Belt Length Formula - AluCalc Engineering",
+  "slug": "timing-belt-length-formula",
+  "keyword": "timing belt length formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Timing Belt Length Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional timing belt length formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Timing Belt Length Formula",
+    "intro": "Comprehensive engineering guide for timing belt length formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for timing belt length)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for timing belt length.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Timing Belt Length is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical timing belt length scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "timing-belt-design-calculator",
+    "timing-belt-tension-calculator",
+    "timing-belt-pulley-ratio-calculator",
+    "v-belt-length-calculator",
+    "timing-belt-length-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

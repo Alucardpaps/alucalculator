@@ -62,6 +62,34 @@
     "handbook": {
       "title": "Handbook",
       "desc": "Bearing tables, ISO Tolerances, G-Code reference."
+    },
+    "thermalExpansion": {
+      "title": "Thermal Expansion",
+      "desc": "Dimensional Stability Analysis"
+    },
+    "manufacturingSandbox": {
+      "title": "Mfg. Sandbox",
+      "desc": "Virtual Production Line"
+    },
+    "simulationFea": {
+      "title": "FEA Simulation",
+      "desc": "Stress & Deformation"
+    },
+    "analytics": {
+      "title": "Analytics Dashboard",
+      "desc": "System Performance Data"
+    },
+    "fileExplorer": {
+      "title": "File Explorer",
+      "desc": "OS File System"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "desc": "Command Line Interface"
+    },
+    "settings": {
+      "title": "Settings",
+      "desc": "System Configuration"
     }
   },
   "common": {
@@ -657,5 +685,12 @@
     "bladeKerf": "Blade Kerf",
     "trimStart": "Trim Start",
     "trimEnd": "Trim End"
+  },
+  "thermal": {
+    "initialLength": "Initial Length",
+    "tempDelta": "Temperature Delta",
+    "finalLength": "Final Length",
+    "expansion": "Expansion Amount",
+    "strain": "Strain Rate"
   }
 }

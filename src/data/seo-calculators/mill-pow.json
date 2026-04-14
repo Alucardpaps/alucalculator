@@ -1,0 +1,24 @@
+{
+  "id": "mill-pow",
+  "category": "manufacturing",
+  "title": "Mill Power",
+  "slug": "mill-pow",
+  "meta": {
+    "title": "Milling | AluCalc",
+    "description": "Spindle power req."
+  },
+  "seo": {
+    "h1": "CNC Milling Power Calc",
+    "intro": "Avoid stall roughing.",
+    "formula": "P = Qkc/e",
+    "variables": {
+      "Q": "MRR"
+    },
+    "practical": "Tooling.",
+    "example": "Steel > Al."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "laminar-flow-formula",
+  "title": "Laminar Flow Formula - AluCalc Engineering",
+  "slug": "laminar-flow-formula",
+  "keyword": "laminar flow formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Laminar Flow Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional laminar flow formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Laminar Flow Formula",
+    "intro": "Comprehensive engineering guide for laminar flow formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for laminar flow)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for laminar flow.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Laminar Flow is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical laminar flow scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "flow-rate-calculator",
+    "reynolds-number-calculator",
+    "turbulent-flow-calculator",
+    "velocity-calculation-calculator",
+    "laminar-flow-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "gear-ratio",
+  "category": "mechanical",
+  "title": "Gear Ratio Calculator",
+  "slug": "gear-ratio",
+  "meta": {
+    "title": "Gear Ratio Calculator | AluCalc",
+    "description": "Calculate speed/torque conversion."
+  },
+  "seo": {
+    "h1": "Gear Ratio Calculator",
+    "intro": "Defines speed relationships.",
+    "formula": "Ratio = N2 / N1",
+    "variables": {
+      "N1": "Teeth 1",
+      "N2": "Teeth 2"
+    },
+    "practical": "Control torque.",
+    "example": "Ratio 2:1."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=gear-ratio"
+  }
+}

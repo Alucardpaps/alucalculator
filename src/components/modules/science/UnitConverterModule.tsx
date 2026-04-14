@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRightLeft, Hexagon, Activity } from 'lucide-react';
 
 type Category = 'length' | 'mass' | 'temperature' | 'pressure' | 'force' | 'torque' | 'area' | 'volume' | 'velocity' | 'flow';
 
@@ -59,7 +60,7 @@ const CONVERSIONS: Record<Category, { units: string[]; base: string; factors: Re
 };
 
 const CATEGORY_LABELS: Record<Category, string> = {
-    length: 'Length', mass: 'Mass', temperature: 'Temp',
+    length: 'Length', mass: 'Mass', temperature: 'Temperature',
     pressure: 'Pressure', force: 'Force', torque: 'Torque',
     area: 'Area', volume: 'Volume', velocity: 'Speed', flow: 'Flow'
 };
@@ -92,26 +93,19 @@ export default function UnitConverterModule() {
         const newConfig = CONVERSIONS[cat];
         setFromUnit(newConfig.units[0]);
         setToUnit(newConfig.units[1]);
-        setValue(1);
     };
 
-    const result = useMemo(() =>
-        convertValue(value, fromUnit, toUnit, category),
-        [value, fromUnit, toUnit, category]
-    );
+    const result = useMemo(() => convertValue(value || 0, fromUnit, toUnit, category), [value, fromUnit, toUnit, category]);
 
-    // Swap units
     const handleSwap = () => {
         const tmp = fromUnit;
         setFromUnit(toUnit);
         setToUnit(tmp);
     };
 
-    // Show all conversions from the input value
     const allConversions = useMemo(() =>
         config.units.filter(u => u !== fromUnit).map(u => ({
-            unit: u,
-            value: convertValue(value, fromUnit, u, category)
+            unit: u, value: convertValue(value || 0, fromUnit, u, category)
         })),
         [value, fromUnit, category, config.units]
     );
@@ -119,89 +113,139 @@ export default function UnitConverterModule() {
     const formatNum = (v: number): string => {
         if (v === 0) return '0';
         if (Math.abs(v) >= 1e9 || Math.abs(v) < 1e-6) return v.toExponential(4);
-        const s = v.toPrecision(8);
-        return parseFloat(s).toString();
+        return parseFloat(v.toPrecision(8)).toString();
     };
 
     return (
-        <div className="flex flex-col gap-3 h-full select-none">
-            {/* Category Switcher — 2 rows of 5 */}
-            <div className="grid grid-cols-5 gap-1">
-                {(Object.keys(CONVERSIONS) as Category[]).map(cat => (
-                    <button key={cat} onClick={() => handleCategoryChange(cat)}
-                        className={`py-1.5 rounded-lg text-[8px] font-bold uppercase tracking-wider transition-all
-                            ${category === cat
-                                ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(6,182,212,0.3)]'
-                                : 'bg-white/5 text-slate-500 hover:text-white hover:bg-white/10'}`}
-                    >
-                        {CATEGORY_LABELS[cat]}
-                    </button>
-                ))}
-            </div>
+        <div className="flex flex-col w-full h-full bg-[#03060a] overflow-hidden select-none relative">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-[#03060a] to-[#03060a] pointer-events-none z-0" />
+            <div className="absolute inset-0 bg-[url('/noise.png')] mix-blend-overlay opacity-5 pointer-events-none z-0" />
 
-            {/* Input Section */}
-            <div className="space-y-1.5">
-                <div className="flex items-center bg-[#05070a] rounded-xl border border-white/5 overflow-hidden group focus-within:border-cyan-500/30 transition-colors">
-                    <input
-                        type="number"
-                        value={value}
-                        onChange={e => setValue(Number(e.target.value))}
-                        className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm font-black font-mono text-white outline-none"
-                    />
-                    <div className="h-4 w-[1px] bg-white/10" />
-                    <select
-                        value={fromUnit}
-                        onChange={e => setFromUnit(e.target.value)}
-                        className="bg-transparent px-2 py-2 text-[10px] font-bold text-slate-400 outline-none w-[80px] cursor-pointer hover:bg-white/5 transition-colors"
-                    >
-                        {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
-                    </select>
+            <div className="relative z-10 flex flex-col h-full p-6 max-w-4xl mx-auto w-full">
+                
+                {/* Header */}
+                <header className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                                <Activity className="text-cyan-400" size={20} />
+                            </div>
+                            <h1 className="text-2xl font-black italic tracking-tighter uppercase text-white">Dimension Engine</h1>
+                        </div>
+                        <p className="text-slate-500 text-xs mt-2 ml-14 font-mono tracking-widest">ISO / ANSI Conversion Protocol Active</p>
+                    </div>
+                </header>
+
+                {/* Categories */}
+                <div className="mb-8">
+                    <div className="flex flex-wrap gap-2">
+                        {(Object.keys(CONVERSIONS) as Category[]).map(cat => (
+                            <button key={cat} onClick={() => handleCategoryChange(cat)}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all
+                                    ${category === cat
+                                        ? 'bg-cyan-500 text-[#03060a] shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-105'
+                                        : 'bg-white/[0.02] border border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                            >
+                                {CATEGORY_LABELS[cat]}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Swap Button */}
-                <div className="flex justify-center -my-0.5">
-                    <button onClick={handleSwap} className="text-cyan-500/40 hover:text-cyan-400 transition-colors text-lg">
-                        ⇅
-                    </button>
-                </div>
+                <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
+                    
+                    {/* Main Interaction Area */}
+                    <div className="flex-1 flex flex-col gap-4">
+                        {/* FROM BOX */}
+                        <motion.div layout className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group focus-within:border-slate-500/50 transition-colors">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none text-9xl font-black -translate-y-10 translate-x-4">
+                                {fromUnit}
+                            </div>
+                            <label className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4">Input Magnitude</label>
+                            <div className="flex items-end gap-4 relative z-10">
+                                <input
+                                    type="number"
+                                    value={value}
+                                    onChange={e => setValue(Number(e.target.value))}
+                                    className="bg-transparent text-5xl md:text-7xl font-black tracking-tighter text-white outline-none w-full placeholder:text-slate-800"
+                                    placeholder="0"
+                                />
+                                <select
+                                    value={fromUnit}
+                                    onChange={e => setFromUnit(e.target.value)}
+                                    className="bg-slate-900/50 backdrop-blur-md border border-white/10 px-4 py-3 rounded-xl text-lg font-bold text-slate-300 outline-none cursor-pointer hover:bg-slate-800 transition-colors"
+                                >
+                                    {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
+                                </select>
+                            </div>
+                        </motion.div>
 
-                <div className="flex items-center bg-cyan-950/20 rounded-xl border border-cyan-500/20 overflow-hidden group focus-within:border-cyan-500/40 transition-colors">
-                    <input
-                        type="text"
-                        value={formatNum(result)}
-                        readOnly
-                        className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm font-black font-mono text-cyan-400 outline-none"
-                    />
-                    <div className="h-4 w-[1px] bg-cyan-500/20" />
-                    <select
-                        value={toUnit}
-                        onChange={e => setToUnit(e.target.value)}
-                        className="bg-transparent px-2 py-2 text-[10px] font-bold text-cyan-300 outline-none w-[80px] cursor-pointer hover:bg-cyan-500/10 transition-colors"
-                    >
-                        {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
-                    </select>
-                </div>
-            </div>
+                        {/* SWAP BUTTON */}
+                        <div className="flex justify-center -my-6 relative z-20">
+                            <button onClick={handleSwap} className="w-14 h-14 rounded-full bg-[#03060a] border border-white/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all">
+                                <ArrowRightLeft size={20} />
+                            </button>
+                        </div>
 
-            {/* All Conversions Reference */}
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 flex-1 overflow-y-auto custom-scrollbar">
-                <div className="mb-2 text-[8px] font-black uppercase tracking-[1.5px] text-slate-500 flex items-center gap-1.5">
-                    <div className="w-1 h-1 rounded-full bg-cyan-500/40" />
-                    All Conversions
-                </div>
-                <div className="grid grid-cols-2 gap-y-1.5 gap-x-3">
-                    {allConversions.map(({ unit, value: v }) => (
-                        <button
-                            key={unit}
-                            onClick={() => setToUnit(unit)}
-                            className={`flex flex-col min-w-0 overflow-hidden text-left rounded-lg px-1.5 py-1 transition-colors ${toUnit === unit ? 'bg-cyan-500/10' : 'hover:bg-white/5'}`}
-                        >
-                            <span className="text-[11px] font-black font-mono text-slate-200 truncate">
-                                {formatNum(v)}
-                            </span>
-                            <span className={`text-[8px] font-bold uppercase truncate ${toUnit === unit ? 'text-cyan-400' : 'text-slate-500'}`}>{unit}</span>
-                        </button>
-                    ))}
+                        {/* TO BOX */}
+                        <motion.div layout className="bg-cyan-500/5 border border-cyan-500/20 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group focus-within:border-cyan-400/50 transition-colors">
+                            <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none text-9xl font-black -translate-y-10 translate-x-4 text-cyan-500">
+                                {toUnit}
+                            </div>
+                            <label className="text-xs font-mono text-cyan-600 uppercase tracking-widest mb-4">Converted Output</label>
+                            <div className="flex items-end gap-4 relative z-10">
+                                <input
+                                    type="text"
+                                    value={formatNum(result)}
+                                    readOnly
+                                    className="bg-transparent text-5xl md:text-7xl font-black tracking-tighter text-cyan-400 outline-none w-full"
+                                />
+                                <select
+                                    value={toUnit}
+                                    onChange={e => setToUnit(e.target.value)}
+                                    className="bg-cyan-950/50 backdrop-blur-md border border-cyan-500/20 px-4 py-3 rounded-xl text-lg font-bold text-cyan-300 outline-none cursor-pointer hover:bg-cyan-900 transition-colors"
+                                >
+                                    {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
+                                </select>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Right Panel: All Results Matrix */}
+                    <div className="w-full lg:w-80 bg-white/[0.01] border border-white/5 rounded-[2rem] p-6 flex flex-col h-full overflow-hidden">
+                        <div className="flex items-center gap-2 mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                            <div className="w-2 h-2 rounded-full bg-slate-600" />
+                            Relational Matrix
+                        </div>
+                        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 relative z-10">
+                            <AnimatePresence mode="popLayout">
+                                {allConversions.map(({ unit, value: v }) => (
+                                    <motion.button
+                                        key={unit}
+                                        layout
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        onClick={() => setToUnit(unit)}
+                                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all
+                                            ${toUnit === unit 
+                                                ? 'bg-cyan-500/10 border-cyan-500/30' 
+                                                : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10'}`}
+                                    >
+                                        <div className="flex flex-col text-left overflow-hidden">
+                                            <span className={`text-lg font-black font-mono truncate ${toUnit === unit ? 'text-cyan-400' : 'text-slate-300'}`}>
+                                                {formatNum(v)}
+                                            </span>
+                                        </div>
+                                        <div className={`text-xs font-bold uppercase ${toUnit === unit ? 'text-cyan-500' : 'text-slate-500'}`}>
+                                            {unit}
+                                        </div>
+                                    </motion.button>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -1,0 +1,24 @@
+{
+  "id": "heat-lmtd",
+  "category": "science",
+  "title": "LMTD",
+  "slug": "heat-lmtd",
+  "meta": {
+    "title": "LMTD | AluCalc",
+    "description": "Log Mean Temp Diff."
+  },
+  "seo": {
+    "h1": "Heat Exchanger Efficiency",
+    "intro": "Thermal driving force.",
+    "formula": "LMTD = dT/ln(dT)",
+    "variables": {
+      "dT": "Delta"
+    },
+    "practical": "Condensers.",
+    "example": "Counter-flow."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

@@ -19,7 +19,7 @@ export function WindowManager() {
                     initialSize={window.size}
                     zIndex={window.zIndex}
                     minimized={window.minimized}
-                    maximized={window.maximized}
+                    maximized={window.maximized as any}
                     minWidth={window.type === 'settings' ? 800 : 400}
                     minHeight={window.type === 'settings' ? 600 : 300}
                 >

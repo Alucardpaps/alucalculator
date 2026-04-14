@@ -1,0 +1,24 @@
+{
+  "id": "plate-buckle",
+  "category": "structural",
+  "title": "Plate Buckling",
+  "slug": "plate-buckle",
+  "meta": {
+    "title": "Plate Buckle | AluCalc",
+    "description": "Aero/Marine skin stability."
+  },
+  "seo": {
+    "h1": "Flat Plate Buckling Calc",
+    "intro": "Local instability analysis.",
+    "formula": "σcr = kE(t/b)^2",
+    "variables": {
+      "σcr": "Limit"
+    },
+    "practical": "Hull ribs.",
+    "example": "Shear buckle."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

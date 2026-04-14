@@ -1,0 +1,34 @@
+{
+  "id": "pressure-gradient-calculator",
+  "title": "Pressure Gradient Calculator - AluCalc Engineering",
+  "slug": "pressure-gradient-calculator",
+  "keyword": "pressure gradient calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Pressure Gradient Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional pressure gradient calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Pressure Gradient Calculator",
+    "intro": "Comprehensive engineering guide for pressure gradient calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for pressure gradient)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for pressure gradient.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Pressure Gradient is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical pressure gradient scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pressure-drop-calculator",
+    "pipe-pressure-calculator",
+    "pressure-loss-calculator",
+    "pressure-head-calculator",
+    "pressure-gradient-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

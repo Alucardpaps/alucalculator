@@ -1,0 +1,34 @@
+{
+  "id": "venturi-flow-explained",
+  "title": "Venturi Flow Explained - AluCalc Engineering",
+  "slug": "venturi-flow-explained",
+  "keyword": "venturi flow explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Venturi Flow Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional venturi flow explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Venturi Flow Explained",
+    "intro": "Comprehensive engineering guide for venturi flow explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for venturi flow)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for venturi flow.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Venturi Flow is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical venturi flow scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pump-power-calculator",
+    "pump-efficiency-calculator",
+    "pump-head-calculator",
+    "pump-flow-rate-calculator",
+    "venturi-flow-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -92,7 +92,7 @@ export function VariableManager() {
                             </tr>
                         )}
 
-                        {variables.map(v => (
+                        {variables.map((v: ProjectVariable) => (
                             <VariableRow key={v.id} variable={v} onUpdate={updateVariable} onRemove={removeVariable} />
                         ))}
                     </tbody>

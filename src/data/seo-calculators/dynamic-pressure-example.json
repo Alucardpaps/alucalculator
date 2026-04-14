@@ -1,0 +1,34 @@
+{
+  "id": "dynamic-pressure-example",
+  "title": "Dynamic Pressure Example - AluCalc Engineering",
+  "slug": "dynamic-pressure-example",
+  "keyword": "dynamic pressure example",
+  "intent": "example",
+  "meta": {
+    "title": "Dynamic Pressure Example | Free Engineering Tool | AluCalc",
+    "description": "Professional dynamic pressure example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Dynamic Pressure Example",
+    "intro": "Comprehensive engineering guide for dynamic pressure example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for dynamic pressure)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for dynamic pressure.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Dynamic Pressure is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical dynamic pressure scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pressure-drop-calculator",
+    "pipe-pressure-calculator",
+    "pressure-loss-calculator",
+    "pressure-head-calculator",
+    "dynamic-pressure-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

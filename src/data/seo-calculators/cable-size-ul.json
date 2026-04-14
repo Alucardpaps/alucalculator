@@ -1,0 +1,24 @@
+{
+  "id": "cable-size-ul",
+  "category": "electrical",
+  "title": "Cable Sizing",
+  "slug": "cable-size-ul",
+  "meta": {
+    "title": "Cable | AluCalc",
+    "description": "NEC/UL Ampacity."
+  },
+  "seo": {
+    "h1": "Electric Cable Capacity",
+    "intro": "Safe conductor amp.",
+    "formula": "I = f(AWG,T)",
+    "variables": {
+      "AWG": "Size"
+    },
+    "practical": "Panel build.",
+    "example": "Temp derating."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

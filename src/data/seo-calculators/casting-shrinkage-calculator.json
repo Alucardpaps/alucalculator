@@ -1,0 +1,34 @@
+{
+  "id": "casting-shrinkage-calculator",
+  "title": "Casting Shrinkage Calculator - AluCalc Engineering",
+  "slug": "casting-shrinkage-calculator",
+  "keyword": "casting shrinkage calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Casting Shrinkage Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional casting shrinkage calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Casting Shrinkage Calculator",
+    "intro": "Comprehensive engineering guide for casting shrinkage calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for casting shrinkage)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for casting shrinkage.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Casting Shrinkage is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical casting shrinkage scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "casting-shrinkage-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

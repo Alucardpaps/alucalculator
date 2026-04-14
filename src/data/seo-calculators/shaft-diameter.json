@@ -1,0 +1,26 @@
+{
+  "id": "shaft-diameter",
+  "category": "mechanical",
+  "title": "Shaft Diameter Calculator",
+  "slug": "shaft-diameter",
+  "meta": {
+    "title": "Shaft Diameter Calculator | AluCalc",
+    "description": "Calculate shaft dia based on torque."
+  },
+  "seo": {
+    "h1": "Shaft Diameter Calculator",
+    "intro": "Determines required dia for torsion.",
+    "formula": "d = ((16*T)/(π*τ))^(1/3)",
+    "variables": {
+      "d": "Dia",
+      "T": "Torque",
+      "τ": "Stress"
+    },
+    "practical": "Power transmission.",
+    "example": "d = 46mm."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=shaft-diameter"
+  }
+}

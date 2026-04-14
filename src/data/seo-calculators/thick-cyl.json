@@ -1,0 +1,24 @@
+{
+  "id": "thick-cyl",
+  "category": "fluid",
+  "title": "Thick Cyl",
+  "slug": "thick-cyl",
+  "meta": {
+    "title": "Thick Cyl | AluCalc",
+    "description": "Lame stress equations."
+  },
+  "seo": {
+    "h1": "Thick Wall Pressure Vessel",
+    "intro": "High pressure gradients.",
+    "formula": "σ = f(r)",
+    "variables": {
+      "r": "Rad"
+    },
+    "practical": "Hydraulics.",
+    "example": "Max at ID."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "thermal-conduction",
+  "category": "science",
+  "title": "Thermal Conduction",
+  "slug": "thermal-conduction",
+  "meta": {
+    "title": "Conduction | AluCalc",
+    "description": "Fourier's Law Heat Rate."
+  },
+  "seo": {
+    "h1": "Fourier Conduction Calc",
+    "intro": "Heat travel in solids.",
+    "formula": "Q = kAΔT/L",
+    "variables": {
+      "Q": "Rate",
+      "k": "K-val",
+      "A": "Area"
+    },
+    "practical": "Insulation.",
+    "example": "Copper higher k."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=thermal-conduction"
+  }
+}

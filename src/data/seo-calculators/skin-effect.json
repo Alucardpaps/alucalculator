@@ -1,0 +1,24 @@
+{
+  "id": "skin-effect",
+  "category": "electrical",
+  "title": "Skin Effect",
+  "slug": "skin-effect",
+  "meta": {
+    "title": "Skin | AluCalc",
+    "description": "AC Resistance surge."
+  },
+  "seo": {
+    "h1": "AC Skin Depth Calc",
+    "intro": "Current at high freq.",
+    "formula": "δ = f(ρ,f)",
+    "variables": {
+      "δ": "Depth"
+    },
+    "practical": "RF Coax.",
+    "example": "Center unused."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

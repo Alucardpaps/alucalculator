@@ -1,0 +1,34 @@
+{
+  "id": "shaft-bending-stress-explained",
+  "title": "Shaft Bending Stress Explained - AluCalc Engineering",
+  "slug": "shaft-bending-stress-explained",
+  "keyword": "shaft bending stress explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Shaft Bending Stress Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional shaft bending stress explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Shaft Bending Stress Explained",
+    "intro": "Comprehensive engineering guide for shaft bending stress explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for shaft bending stress)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for shaft bending stress.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Shaft Bending Stress is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical shaft bending stress scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "shaft-diameter-calculator",
+    "shaft-stress-calculator",
+    "shaft-torsion-calculator",
+    "shaft-deflection-calculator",
+    "shaft-bending-stress-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

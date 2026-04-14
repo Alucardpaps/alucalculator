@@ -1,0 +1,24 @@
+{
+  "id": "spline",
+  "category": "mechanical",
+  "title": "Spline Torque",
+  "slug": "spline",
+  "meta": {
+    "title": "Spline | AluCalc",
+    "description": "ANSI/DIN Capacity."
+  },
+  "seo": {
+    "h1": "Spline Load Capacity",
+    "intro": "High torque centering.",
+    "formula": "T = SsAsD/2",
+    "variables": {
+      "T": "Cap"
+    },
+    "practical": "Axles.",
+    "example": "Involute spline."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

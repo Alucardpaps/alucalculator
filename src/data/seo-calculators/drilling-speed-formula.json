@@ -1,0 +1,34 @@
+{
+  "id": "drilling-speed-formula",
+  "title": "Drilling Speed Formula - AluCalc Engineering",
+  "slug": "drilling-speed-formula",
+  "keyword": "drilling speed formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Drilling Speed Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional drilling speed formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Drilling Speed Formula",
+    "intro": "Comprehensive engineering guide for drilling speed formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for drilling speed)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for drilling speed.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Drilling Speed is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical drilling speed scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "drilling-speed-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

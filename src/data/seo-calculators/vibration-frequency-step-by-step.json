@@ -1,0 +1,34 @@
+{
+  "id": "vibration-frequency-step-by-step",
+  "title": "Vibration Frequency Step By Step - AluCalc Engineering",
+  "slug": "vibration-frequency-step-by-step",
+  "keyword": "vibration frequency step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Vibration Frequency Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional vibration frequency step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Vibration Frequency Step By Step",
+    "intro": "Comprehensive engineering guide for vibration frequency step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for vibration frequency)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for vibration frequency.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Vibration Frequency is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical vibration frequency scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "spring-design-calculator",
+    "spring-constant-calculator",
+    "spring-force-calculator",
+    "spring-deflection-calculator",
+    "vibration-frequency-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

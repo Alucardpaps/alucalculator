@@ -33,60 +33,72 @@ export function StatusBar() {
     const commandPrompt = useCadStore(s => s.commandPrompt);
 
     return (
-        <div className="flex items-center h-6 bg-[#0d1117] border-t border-white/10 px-3 gap-4 text-[10px] font-mono select-none shrink-0">
+        <div className="flex items-center h-8 bg-[#020408]/80 backdrop-blur-md border-t border-white/5 px-4 gap-6 text-[10px] font-mono select-none shrink-0 text-slate-400">
 
             {/* Constraint Status */}
-            <div className={`flex items-center gap-1 ${STATUS_COLORS[status]}`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${status === 'FULLY_CONSTRAINED' ? 'bg-green-400' : status === 'OVER_CONSTRAINED' ? 'bg-red-400' : 'bg-amber-400'}`} />
-                {STATUS_LABELS[status]}
+            <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/5 ${STATUS_COLORS[status]}`}>
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor] ${status === 'FULLY_CONSTRAINED' ? 'bg-green-400' : status === 'OVER_CONSTRAINED' ? 'bg-red-400' : 'bg-amber-400'}`} />
+                <span className="tracking-widest uppercase text-[9px]">{STATUS_LABELS[status]}</span>
             </div>
 
             {/* DOF */}
-            <div className="text-slate-500">
-                DOF: <span className={STATUS_COLORS[status]}>{dof}</span>
+            <div className="flex items-center gap-2">
+                <span className="text-slate-600 uppercase tracking-widest text-[9px]">DOF</span>
+                <span className={`font-bold ${STATUS_COLORS[status]}`}>{dof}</span>
             </div>
 
-            {/* Separator */}
-            <div className="w-px h-3 bg-white/10" />
+            <div className="w-[1px] h-3 bg-white/5" />
 
             {/* Entity / Constraint Count */}
-            <div className="text-slate-500">
-                Ent: <span className="text-slate-300">{entities.length}</span>
-                {' · '}
-                Con: <span className="text-slate-300">{constraints.length}</span>
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                    <span className="text-slate-600 uppercase tracking-widest text-[9px]">Entities</span>
+                    <span className="text-slate-300">{entities.length}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <span className="text-slate-600 uppercase tracking-widest text-[9px]">Constraints</span>
+                    <span className="text-slate-300">{constraints.length}</span>
+                </div>
             </div>
 
-            {/* Separator */}
-            <div className="w-px h-3 bg-white/10" />
+            <div className="w-[1px] h-3 bg-white/5" />
 
             {/* Toggle Indicators */}
-            <div className="flex items-center gap-2">
-                <span className={`flex items-center gap-0.5 ${snapEnabled ? 'text-cyan-400' : 'text-slate-600'}`}>
-                    <Magnet size={10} /> SNAP
-                </span>
-                <span className={`flex items-center gap-0.5 ${orthoEnabled ? 'text-cyan-400' : 'text-slate-600'}`}>
-                    <Crosshair size={10} /> ORTHO
-                </span>
-                <span className={`flex items-center gap-0.5 ${showGrid ? 'text-cyan-400' : 'text-slate-600'}`}>
-                    <Grid3X3 size={10} /> GRID
-                </span>
+            <div className="flex items-center gap-4">
+                <button className={`flex items-center gap-1.5 transition-colors ${snapEnabled ? 'text-cyan-400' : 'text-slate-700 hover:text-slate-500'}`}>
+                    <Magnet size={12} strokeWidth={snapEnabled ? 2.5 : 1.5} />
+                    <span className="uppercase tracking-[0.2em] text-[9px]">Snap</span>
+                </button>
+                <button className={`flex items-center gap-1.5 transition-colors ${orthoEnabled ? 'text-cyan-400' : 'text-slate-700 hover:text-slate-500'}`}>
+                    <Crosshair size={12} strokeWidth={orthoEnabled ? 2.5 : 1.5} />
+                    <span className="uppercase tracking-[0.2em] text-[9px]">Ortho</span>
+                </button>
+                <button className={`flex items-center gap-1.5 transition-colors ${showGrid ? 'text-cyan-400' : 'text-slate-700 hover:text-slate-500'}`}>
+                    <Grid3X3 size={12} strokeWidth={showGrid ? 2.5 : 1.5} />
+                    <span className="uppercase tracking-[0.2em] text-[9px]">Grid</span>
+                </button>
             </div>
 
             {/* Spacer */}
             <div className="flex-1" />
 
-            {/* Active Command */}
-            {activeCommand && (
-                <div className="text-cyan-400 truncate max-w-[200px]">
-                    {commandPrompt || activeCommand}
+            {/* Active Command Prompt */}
+            {commandPrompt && (
+                <div className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded text-cyan-400 text-[9px] uppercase tracking-[0.2em] animate-in fade-in slide-in-from-right-4">
+                    {commandPrompt}
                 </div>
             )}
 
             {/* Cursor Coordinates */}
-            <div className="text-slate-500 tabular-nums">
-                X: <span className="text-slate-300">{cursorWorld.x.toFixed(2)}</span>
-                {' '}
-                Y: <span className="text-slate-300">{cursorWorld.y.toFixed(2)}</span>
+            <div className="flex items-center gap-3 tabular-nums bg-white/[0.02] px-3 py-1 rounded-md border border-white/5">
+                <div className="flex items-center gap-1">
+                    <span className="text-slate-600 text-[9px]">X</span>
+                    <span className="text-slate-200 w-12 text-right">{cursorWorld.x.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <span className="text-slate-600 text-[9px]">Y</span>
+                    <span className="text-slate-200 w-12 text-right">{cursorWorld.y.toFixed(2)}</span>
+                </div>
             </div>
         </div>
     );

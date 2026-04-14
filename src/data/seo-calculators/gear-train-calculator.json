@@ -1,0 +1,34 @@
+{
+  "id": "gear-train-calculator",
+  "title": "Gear Train Calculator - AluCalc Engineering",
+  "slug": "gear-train-calculator",
+  "keyword": "gear train calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Gear Train Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional gear train calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Train Calculator",
+    "intro": "Comprehensive engineering guide for gear train calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear train)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear train.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Train is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear train scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-ratio-calculator",
+    "gear-module-calculator",
+    "gear-pitch-calculator",
+    "gear-design-calculator",
+    "gear-train-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "acceleration-calculation-formula",
+  "title": "Acceleration Calculation Formula - AluCalc Engineering",
+  "slug": "acceleration-calculation-formula",
+  "keyword": "acceleration calculation formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Acceleration Calculation Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional acceleration calculation formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Acceleration Calculation Formula",
+    "intro": "Comprehensive engineering guide for acceleration calculation formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for acceleration calculation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for acceleration calculation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Acceleration Calculation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical acceleration calculation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "velocity-calculation-calculator",
+    "force-calculation-calculator",
+    "kinetic-energy-calculator",
+    "potential-energy-calculator",
+    "acceleration-calculation-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

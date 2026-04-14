@@ -1,0 +1,34 @@
+{
+  "id": "current-calculation-example",
+  "title": "Current Calculation Example - AluCalc Engineering",
+  "slug": "current-calculation-example",
+  "keyword": "current calculation example",
+  "intent": "example",
+  "meta": {
+    "title": "Current Calculation Example | Free Engineering Tool | AluCalc",
+    "description": "Professional current calculation example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Current Calculation Example",
+    "intro": "Comprehensive engineering guide for current calculation example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for current calculation)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for current calculation.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Current Calculation is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical current calculation scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "voltage-drop-calculator",
+    "resistance-calculation-calculator",
+    "ohm-law-calculator",
+    "circuit-analysis-calculator",
+    "current-calculation-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,62 @@
+﻿
+> alucalculator@0.1.0 build
+> next build
+
+node.exe : ÔÜá `skipMiddlewareUrlNormalize` is deprecated
+. Please use `skipProxyUrlNormalize` instead in next.conf
+ig.ts.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ÔÜá `skipMi 
+   ddle...next.config.ts.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ÔÜá `eslint` configuration in next.config.ts is no longer
+ supported. See more info here: https://nextjs.org/docs/a
+pp/api-reference/cli/next#next-lint-options
+ÔÜá Invalid next.config.ts options detected: 
+ÔÜá     Unrecognized key(s) in object: 'eslint'
+ÔÜá See more info here: https://nextjs.org/docs/messages/
+invalid-next-config
+ÔÜá Warning: Next.js inferred your workspace root, but it
+ may not be correct.
+ We detected multiple lockfiles and selected the director
+y of C:\Users\apo_q\package-lock.json as the root directo
+ry.
+ To silence this warning, set `turbopack.root` in your Ne
+xt.js config, or consider removing one of the lockfiles i
+f it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/n
+ext-config-js/turbopack#root-directory for more informati
+on.
+ Detected additional lockfiles: 
+   * C:\Users\apo_q\.gemini\antigravity\scratch\alucalcul
+ator\package-lock.json
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 5.6s
+  Running TypeScript ...
+Failed to compile.
+
+./src/types/engineering.ts:312:9
+Type error: The left-hand side of an arithmetic operation
+ must be of type 'any', 'number', 'bigint' or an enum typ
+e.
+
+[0m [90m 310 |[39m
+ [90m 311 |[39m     [36mreturn[39m createValidatedVal
+ue(
+[31m[1m>[22m[39m[90m 312 |[39m         val[33m.[3
+9mvalue [33m*[39m conv[33m.[39mtoSI[33m,[39m
+ [90m     |[39m         [31m[1m^[22m[39m
+ [90m 313 |[39m         conv[33m.[39msiUnit[33m,[39
+m
+ [90m 314 |[39m         [32m'derived'[39m[33m,[39m
+ [90m 315 |[39m         { precision[33m:[39m val[33m
+.[39mprecision }[0m
+Next.js build worker exited with code: 1 and signal: null

@@ -1,0 +1,24 @@
+{
+  "id": "bolt-grade",
+  "category": "mechanical",
+  "title": "Bolt Grade",
+  "slug": "bolt-grade",
+  "meta": {
+    "title": "Bolt Grade | AluCalc",
+    "description": "Proof/Metric strength."
+  },
+  "seo": {
+    "h1": "Bolt Class Strength Calc",
+    "intro": "Choose 8.8 vs 12.9.",
+    "formula": "Fp = 0.9AsSy",
+    "variables": {
+      "Sy": "Yield"
+    },
+    "practical": "Assembly.",
+    "example": "10.9 standard."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

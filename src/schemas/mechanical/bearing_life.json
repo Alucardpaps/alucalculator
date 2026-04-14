@@ -1,0 +1,27 @@
+{
+  "id": "bearing_life",
+  "name": "Bearing L10 Life",
+  "category": "mechanical",
+  "inputs": [
+    { "key": "C", "type": "number", "unit": "N", "description": "Basic Dynamic Load Rating" },
+    { "key": "P", "type": "number", "unit": "N", "description": "Equivalent Dynamic Bearing Load" },
+    { "key": "n", "type": "number", "description": "RPM" }
+  ],
+  "steps": [
+    {
+      "id": "L10_millions",
+      "formula": "(C / P)^3",
+      "description": "Calculate basic rating life (millions of revolutions)",
+      "latex": "L_{10} = \\left( \\frac{C}{P} \\right)^3"
+    },
+    {
+      "id": "L10h",
+      "formula": "(1000000 / (60 * n)) * L10_millions",
+      "description": "Calculate life in hours based on RPM",
+      "latex": "L_{10h} = \\frac{10^6}{60 \\cdot n} \\cdot L_{10}"
+    }
+  ],
+  "outputs": [
+    "L10h"
+  ]
+}

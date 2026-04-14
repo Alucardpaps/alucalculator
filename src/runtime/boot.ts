@@ -5,6 +5,8 @@
  * Guarantees that the Kernel spins up only in a valid Browser environment.
  */
 
+import { ENGINE_REGISTRY } from '@/engine/engineRegistry';
+
 export function bootEngineeringOS() {
     if (typeof window === 'undefined') {
         throw new Error('CRITICAL: Engineering OS attempted to boot in Server Environment. SSR Firewall breached.');
@@ -26,7 +28,9 @@ export function bootEngineeringOS() {
         security: {
             ssr: 'BLOCKED',
             hydration: 'BYPASSED'
-        }
+        },
+        /** Engine registry reference for debug introspection */
+        engineRegistry: ENGINE_REGISTRY,
     };
 
     console.log(

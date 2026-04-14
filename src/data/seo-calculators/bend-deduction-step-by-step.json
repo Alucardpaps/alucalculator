@@ -1,0 +1,34 @@
+{
+  "id": "bend-deduction-step-by-step",
+  "title": "Bend Deduction Step By Step - AluCalc Engineering",
+  "slug": "bend-deduction-step-by-step",
+  "keyword": "bend deduction step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Bend Deduction Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional bend deduction step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bend Deduction Step By Step",
+    "intro": "Comprehensive engineering guide for bend deduction step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bend deduction)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bend deduction.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bend Deduction is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bend deduction scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "bend-deduction-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

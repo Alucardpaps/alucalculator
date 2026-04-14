@@ -1,0 +1,24 @@
+{
+  "id": "pv-string",
+  "category": "electrical",
+  "title": "PV String",
+  "slug": "pv-string",
+  "meta": {
+    "title": "PV Volt | AluCalc",
+    "description": "Solar series sizing."
+  },
+  "seo": {
+    "h1": "Solar String Voltage Calc",
+    "intro": "Cold weather surge.",
+    "formula": "V = Voc*N*k",
+    "variables": {
+      "N": "Panels"
+    },
+    "practical": "Inverters.",
+    "example": "Avoid over-V."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

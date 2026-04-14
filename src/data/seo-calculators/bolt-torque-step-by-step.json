@@ -1,0 +1,34 @@
+{
+  "id": "bolt-torque-step-by-step",
+  "title": "Bolt Torque Step By Step - AluCalc Engineering",
+  "slug": "bolt-torque-step-by-step",
+  "keyword": "bolt torque step by step",
+  "intent": "step-by-step",
+  "meta": {
+    "title": "Bolt Torque Step By Step | Free Engineering Tool | AluCalc",
+    "description": "Professional bolt torque step by step tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bolt Torque Step By Step",
+    "intro": "Comprehensive engineering guide for bolt torque step by step. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bolt torque)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bolt torque.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bolt Torque is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bolt torque scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bolt-preload-calculator",
+    "bolt-stress-calculator",
+    "bolt-shear-force-calculator",
+    "bolt-tension-calculator",
+    "bolt-torque-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

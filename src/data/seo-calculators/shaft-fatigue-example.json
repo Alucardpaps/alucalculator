@@ -1,0 +1,34 @@
+{
+  "id": "shaft-fatigue-example",
+  "title": "Shaft Fatigue Example - AluCalc Engineering",
+  "slug": "shaft-fatigue-example",
+  "keyword": "shaft fatigue example",
+  "intent": "example",
+  "meta": {
+    "title": "Shaft Fatigue Example | Free Engineering Tool | AluCalc",
+    "description": "Professional shaft fatigue example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Shaft Fatigue Example",
+    "intro": "Comprehensive engineering guide for shaft fatigue example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for shaft fatigue)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for shaft fatigue.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Shaft Fatigue is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical shaft fatigue scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "shaft-diameter-calculator",
+    "shaft-stress-calculator",
+    "shaft-torsion-calculator",
+    "shaft-deflection-calculator",
+    "shaft-fatigue-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "pressure-head-formula",
+  "title": "Pressure Head Formula - AluCalc Engineering",
+  "slug": "pressure-head-formula",
+  "keyword": "pressure head formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Pressure Head Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional pressure head formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Pressure Head Formula",
+    "intro": "Comprehensive engineering guide for pressure head formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for pressure head)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for pressure head.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Pressure Head is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical pressure head scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pressure-drop-calculator",
+    "pipe-pressure-calculator",
+    "pressure-loss-calculator",
+    "fluid-pressure-calculator",
+    "pressure-head-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

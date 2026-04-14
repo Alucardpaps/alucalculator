@@ -1,0 +1,24 @@
+{
+  "id": "spring-fatigue",
+  "category": "mechanical",
+  "title": "Spring Fat",
+  "slug": "spring-fatigue",
+  "meta": {
+    "title": "Spring Fat | AluCalc",
+    "description": "Mod Goodman pred."
+  },
+  "seo": {
+    "h1": "Spring Fatigue Life Calc",
+    "intro": "High cycle valve spr.",
+    "formula": "Sa = f(Sm,Se)",
+    "variables": {
+      "Se": "Limit"
+    },
+    "practical": "Engines.",
+    "example": "Shot peening."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

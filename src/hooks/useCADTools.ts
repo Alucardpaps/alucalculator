@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useCADCanvasStore, Point, CADShape } from '@/store/CADCanvasStore';
 import { getShapeIntersections, dist, intersectLineLine } from '@/lib/GeometryEngine';
+import { useOSStore } from '@/store/osStore';
 
 export const useCADTools = () => {
     const {
@@ -11,6 +12,7 @@ export const useCADTools = () => {
         addDimension,
         currentTool
     } = useCADCanvasStore();
+    const { isChaosMode } = useOSStore();
 
     const [pendingShapeId, setPendingShapeId] = useState<string | null>(null);
 
@@ -114,10 +116,59 @@ export const useCADTools = () => {
         });
 
         if (bestInt) {
-            const newPoints = extendStart ? [bestInt, fixedPoint] : [fixedPoint, bestInt];
-            updateShape(shape.id, { points: newPoints });
+            if (isChaosMode) {
+                // CHAOS MODE: FRACTAL EXTENSION
+                // Instead of a clean extension, generation an aggressive jagged "lightning" path to the intersection
+                const segmentCount = Math.floor(Math.random() * 5) + 3;
+                const pathVariants: Point[] = [fixedPoint];
+
+                let currentPoint = fixedPoint;
+                for (let i = 1; i <= segmentCount; i++) {
+                    const ratio = i / (segmentCount + 1);
+                    const targetX = fixedPoint.x + ((bestInt as any).x - fixedPoint.x) * ratio;
+                    const targetY = fixedPoint.y + ((bestInt as any).y - fixedPoint.y) * ratio;
+
+                    // Add violent perpendicular jitter
+                    const jitterAmp = 20; // 20 units of chaos
+                    const perpX = -dir.y;
+                    const perpY = dir.x;
+
+                    const jX = targetX + perpX * (Math.random() * jitterAmp - jitterAmp / 2);
+                    const jY = targetY + perpY * (Math.random() * jitterAmp - jitterAmp / 2);
+
+                    const pNext: Point = { x: jX as number, y: jY as number };
+                    pathVariants.push(pNext);
+
+                    addShape({
+                        type: 'line',
+                        points: [currentPoint, pNext],
+                        style: { ...shape.style, strokeColor: '#e11d48', strokeWidth: shape.style?.strokeWidth ? shape.style.strokeWidth * 1.5 : 3 }, // Brutal red
+                        locked: false,
+                        visible: true,
+                        layer: shape.layer
+                    });
+                    currentPoint = pNext;
+                }
+
+                // Final segment
+                addShape({
+                    type: 'line',
+                    points: [currentPoint, bestInt],
+                    style: { ...shape.style, strokeColor: '#e11d48' },
+                    locked: false,
+                    visible: true,
+                    layer: shape.layer
+                });
+
+                // Delete original shape as it's been replaced by chaos
+                deleteShape(shape.id);
+
+            } else {
+                const newPoints = extendStart ? [bestInt, fixedPoint] : [fixedPoint, bestInt];
+                updateShape(shape.id, { points: newPoints });
+            }
         }
-    }, [shapes, updateShape]);
+    }, [shapes, updateShape, isChaosMode, addShape, deleteShape]);
 
     // ============================================
     // Smart Dimension

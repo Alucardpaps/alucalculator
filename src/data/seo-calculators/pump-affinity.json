@@ -1,0 +1,25 @@
+{
+  "id": "pump-affinity",
+  "category": "fluid",
+  "title": "Pump Affinity Laws",
+  "slug": "pump-affinity",
+  "meta": {
+    "title": "Pump Laws | AluCalc",
+    "description": "Speed vs Power scaling."
+  },
+  "seo": {
+    "h1": "Pump Affinity Laws Calc",
+    "intro": "Energy saving with VFDs.",
+    "formula": "P2/P1 = (N2/N1)^3",
+    "variables": {
+      "P": "Power",
+      "N": "RPM"
+    },
+    "practical": "Variable speed.",
+    "example": "87.5% saving."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=pump-affinity"
+  }
+}

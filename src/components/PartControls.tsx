@@ -21,11 +21,13 @@ export function PartControls() {
         profileType, width, height, thickness, holeRadius,
         webHeight, flangeWidth, webThickness, flangeThickness, length, materialId,
         kerfLoss, meshRef,
+        sectionX, sectionY, sectionZ, isSectionActive, visibleComponents,
         setDimensions
     } = usePartStore();
 
     const [isExporting2D, setIsExporting2D] = useState(false);
     const [isExporting3D, setIsExporting3D] = useState(false);
+    const [exportTrigger, setExportTrigger] = useState<number | 'stl'>(0);
 
     const handleExport2D = async () => {
         setIsExporting2D(true);
@@ -92,27 +94,13 @@ export function PartControls() {
     };
 
     const handleExportSTL = () => {
-        if (!meshRef) return alert('3D Mesh is not fully initialized yet.');
+        setExportTrigger('stl');
+        setTimeout(() => setExportTrigger(0), 100);
+    };
 
-        try {
-            const exporter = new STLExporter();
-            const stlString = exporter.parse(meshRef);
-
-            const blob = new Blob([stlString], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = profileType === 'flat'
-                ? `AluCalc_Plate_${width}x${height}x${thickness}.stl`
-                : `AluCalc_${profileType}_${flangeWidth}x${webHeight}x${length}.stl`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (err) {
-            console.error('STL Export Error:', err);
-            alert('Failed to generate STL file from 3D canvas.');
-        }
+    const handleQuickGLTF = () => {
+        setExportTrigger(Date.now());
+        setTimeout(() => setExportTrigger(0), 100);
     };
 
     // --- MOD 2: Live Mass, Volume and Cost Engine ---
@@ -336,7 +324,60 @@ export function PartControls() {
                         </div>
                     </>
                 )}
-            </div>
+                {/* Phase 6: Inspection Tools */}
+                <div className="pt-4 border-t border-white/10 space-y-4">
+                    <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span className="flex items-center gap-2 italic uppercase">Industrial Inspection</span>
+                        <input 
+                            type="checkbox" 
+                            checked={isSectionActive} 
+                            onChange={(e) => setDimensions({ isSectionActive: e.target.checked })}
+                            className="w-4 h-4 rounded bg-slate-800 border-white/10 accent-blue-500"
+                        />
+                    </div>
+                    
+                    {isSectionActive && (
+                        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <div className="space-y-2">
+                                <span className="text-[10px] text-slate-500 font-mono uppercase">X-Section</span>
+                                <input type="range" min="0" max="1" step="0.01" value={sectionX} onChange={(e) => setDimensions({ sectionX: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-[10px] text-slate-500 font-mono uppercase">Y-Section</span>
+                                <input type="range" min="0" max="1" step="0.01" value={sectionY} onChange={(e) => setDimensions({ sectionY: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-[10px] text-slate-500 font-mono uppercase">Z-Section</span>
+                                <input type="range" min="0" max="1" step="0.01" value={sectionZ} onChange={(e) => setDimensions({ sectionZ: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Assembly Visibility Tree (Simplified for now) */}
+                <div className="pt-4 border-t border-white/10">
+                    <div className="text-xs font-mono text-slate-400 mb-3 flex items-center gap-2 uppercase tracking-widest">
+                        <IconLayers /> Scene Tree
+                    </div>
+                    <div className="space-y-2">
+                        {['main', 'gears', 'bearing', 'fastener'].map((node) => (
+                            <div key={node} className="flex items-center justify-between text-[11px] font-mono hover:bg-white/5 p-1 rounded transition-colors group">
+                                <span className="text-slate-400 group-hover:text-white capitalize">{node} Body</span>
+                                <button 
+                                    onClick={() => {
+                                        const next = visibleComponents.includes(node) 
+                                            ? visibleComponents.filter(c => c !== node)
+                                            : [...visibleComponents, node];
+                                        setDimensions({ visibleComponents: next });
+                                    }}
+                                    className={`px-2 py-0.5 rounded text-[10px] ${visibleComponents.includes(node) || visibleComponents.includes('all') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}
+                                >
+                                    {visibleComponents.includes(node) || visibleComponents.includes('all') ? 'V' : 'H'}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
             {/* Live Mod 2 Metrics Head-Up Display */}
             <div className="bg-black/40 border border-white/5 rounded-lg p-4 grid grid-cols-2 gap-4 my-2 relative overflow-hidden">
@@ -397,6 +438,7 @@ export function PartControls() {
                     <span><IconDownload /></span>
                     <span>Instant STL Export (3D Print)</span>
                 </button>
+            </div>
             </div>
         </div>
     );

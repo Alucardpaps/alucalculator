@@ -1,0 +1,34 @@
+{
+  "id": "work-and-energy-formula",
+  "title": "Work And Energy Formula - AluCalc Engineering",
+  "slug": "work-and-energy-formula",
+  "keyword": "work and energy formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Work And Energy Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional work and energy formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Work And Energy Formula",
+    "intro": "Comprehensive engineering guide for work and energy formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for work and energy)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for work and energy.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Work And Energy is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical work and energy scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "velocity-calculation-calculator",
+    "acceleration-calculation-calculator",
+    "force-calculation-calculator",
+    "kinetic-energy-calculator",
+    "work-and-energy-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

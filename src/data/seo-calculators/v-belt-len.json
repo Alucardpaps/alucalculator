@@ -1,0 +1,24 @@
+{
+  "id": "v-belt-len",
+  "category": "mechanical",
+  "title": "Belt Length",
+  "slug": "v-belt-len",
+  "meta": {
+    "title": "Belt Len | AluCalc",
+    "description": "Center distance len."
+  },
+  "seo": {
+    "h1": "V-Belt Length Calc",
+    "intro": "Order the right belt.",
+    "formula": "L = 2C + D+d...",
+    "variables": {
+      "C": "Center"
+    },
+    "practical": "Motors.",
+    "example": "Exact match."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

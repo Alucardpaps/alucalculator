@@ -1,0 +1,34 @@
+{
+  "id": "tool-life-example",
+  "title": "Tool Life Example - AluCalc Engineering",
+  "slug": "tool-life-example",
+  "keyword": "tool life example",
+  "intent": "example",
+  "meta": {
+    "title": "Tool Life Example | Free Engineering Tool | AluCalc",
+    "description": "Professional tool life example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Tool Life Example",
+    "intro": "Comprehensive engineering guide for tool life example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for tool life)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for tool life.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Tool Life is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical tool life scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "cnc-speed-calculator",
+    "cnc-feed-rate-calculator",
+    "cutting-speed-calculator",
+    "machining-time-calculator",
+    "tool-life-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

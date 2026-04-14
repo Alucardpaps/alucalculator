@@ -15,6 +15,8 @@
  * - Pressure Vessel (Thin/Thick Wall)
  */
 
+import { MATERIALS_DB, MaterialProp } from '@/data/materialsData';
+
 // ==================== TYPES ====================
 
 export type AnalysisType =
@@ -61,19 +63,16 @@ export interface MaterialStrength {
 
 // ==================== MATERIAL DATABASE ====================
 
-export const STRENGTH_MATERIALS: MaterialStrength[] = [
-    { name: 'Steel AISI 1020', Sy: 350, Su: 450, E: 200, Se: 225, G: 79, v: 0.29 },
-    { name: 'Steel AISI 1045', Sy: 530, Su: 625, E: 200, Se: 312, G: 79, v: 0.29 },
-    { name: 'Steel AISI 4140', Sy: 655, Su: 1020, E: 200, Se: 410, G: 79, v: 0.29 },
-    { name: 'Stainless 304', Sy: 215, Su: 505, E: 193, Se: 170, G: 77, v: 0.29 },
-    { name: 'Stainless 316', Sy: 290, Su: 580, E: 193, Se: 200, G: 77, v: 0.29 },
-    { name: 'Aluminum 6061-T6', Sy: 275, Su: 310, E: 69, Se: 95, G: 26, v: 0.33 },
-    { name: 'Aluminum 7075-T6', Sy: 503, Su: 572, E: 71, Se: 160, G: 27, v: 0.33 },
-    { name: 'Titanium Ti-6Al-4V', Sy: 880, Su: 950, E: 114, Se: 350, G: 44, v: 0.34 },
-    { name: 'Cast Iron (Gray)', Sy: 150, Su: 200, E: 100, Se: 60, G: 41, v: 0.26 },
-    { name: 'Brass C36000', Sy: 140, Su: 340, E: 97, Se: 100, G: 37, v: 0.34 },
-    { name: 'Bronze C93200', Sy: 125, Su: 240, E: 100, Se: 80, G: 38, v: 0.34 },
-];
+// Map MATERIALS_DB to MaterialStrength for backward compatibility
+export const STRENGTH_MATERIALS = MATERIALS_DB.map(m => ({
+    name: m.name,
+    Sy: m.yield,
+    Su: m.tensile,
+    E: m.youngsModulus,
+    Se: m.enduranceLimit,
+    G: m.shearModulus,
+    v: m.poissonsRatio
+})) as MaterialStrength[];
 
 // ==================== ANALYSIS FUNCTIONS ====================
 
@@ -100,12 +99,10 @@ export function calculatePrincipalStresses2D(state: StressState2D): PrincipalStr
 
 /**
  * Calculate Principal Stresses from 3D stress state
- * Uses eigenvalue solution of stress tensor
  */
 export function calculatePrincipalStresses3D(state: StressState3D): PrincipalStresses {
     const { sigmaX, sigmaY, sigmaZ, tauXY, tauYZ, tauXZ } = state;
 
-    // Stress invariants
     const I1 = sigmaX + sigmaY + sigmaZ;
     const I2 = sigmaX * sigmaY + sigmaY * sigmaZ + sigmaZ * sigmaX
         - tauXY * tauXY - tauYZ * tauYZ - tauXZ * tauXZ;
@@ -115,19 +112,20 @@ export function calculatePrincipalStresses3D(state: StressState3D): PrincipalStr
         - sigmaY * tauXZ * tauXZ
         - sigmaZ * tauXY * tauXY;
 
-    // Solve cubic equation using trigonometric method
     const Q = (3 * I2 - I1 * I1) / 9;
     const R = (2 * I1 * I1 * I1 - 9 * I1 * I2 + 27 * I3) / 54;
 
     const theta = Math.acos(R / Math.sqrt(-Q * Q * Q));
     const sqrtQ = 2 * Math.sqrt(-Q);
 
-    let sigma1 = sqrtQ * Math.cos(theta / 3) + I1 / 3;
-    let sigma2 = sqrtQ * Math.cos((theta + 2 * Math.PI) / 3) + I1 / 3;
-    let sigma3 = sqrtQ * Math.cos((theta + 4 * Math.PI) / 3) + I1 / 3;
+    let s1 = sqrtQ * Math.cos(theta / 3) + I1 / 3;
+    let s2 = sqrtQ * Math.cos((theta + 2 * Math.PI) / 3) + I1 / 3;
+    let s3 = sqrtQ * Math.cos((theta + 4 * Math.PI) / 3) + I1 / 3;
 
-    // Sort descending
-    [sigma1, sigma2, sigma3] = [sigma1, sigma2, sigma3].sort((a, b) => b - a);
+    let res = [s1, s2, s3].sort((a, b) => b - a);
+    const sigma1 = res[0];
+    const sigma2 = res[1];
+    const sigma3 = res[2];
 
     const tauMax = (sigma1 - sigma3) / 2;
 
@@ -217,11 +215,10 @@ export interface FatigueResult {
 
 /**
  * Goodman Fatigue Criterion
- * σa/Se + σm/Su = 1/n
  */
 export function calculateGoodman(
-    sigmaA: number,    // Alternating stress amplitude
-    sigmaM: number,    // Mean stress
+    sigmaA: number,
+    sigmaM: number,
     material: MaterialStrength
 ): FatigueResult {
     const Se = material.Se || material.Sy * 0.5;
@@ -231,7 +228,7 @@ export function calculateGoodman(
     const safe = n >= 1.5;
 
     return {
-        Nf: safe ? Infinity : Math.pow(10, 6 * n), // Simplified
+        Nf: safe ? Infinity : Math.pow(10, 6 * n),
         safetyCycles: n,
         criterion: 'Goodman',
         safe
@@ -239,8 +236,7 @@ export function calculateGoodman(
 }
 
 /**
- * Soderberg Fatigue Criterion (more conservative)
- * σa/Se + σm/Sy = 1/n
+ * Soderberg Fatigue Criterion
  */
 export function calculateSoderberg(
     sigmaA: number,
@@ -264,60 +260,56 @@ export function calculateSoderberg(
 // ==================== BUCKLING ANALYSIS ====================
 
 export interface BucklingResult {
-    Pcr: number;           // Critical load (N)
-    Scr: number;           // Critical stress (MPa)
+    Pcr: number;
+    Scr: number;
     slendernessRatio: number;
     mode: 'Euler' | 'Johnson';
     safe: boolean;
 }
 
 /**
- * Column Buckling Analysis (Euler/Johnson)
+ * Column Buckling Analysis
  */
 export function calculateBuckling(
-    length: number,        // Effective length (mm)
-    I: number,             // Moment of inertia (mm⁴)
-    A: number,             // Cross-section area (mm²)
+    length: number,
+    I: number,
+    A: number,
     material: MaterialStrength,
     endCondition: 'fixed-fixed' | 'fixed-pinned' | 'pinned-pinned' | 'fixed-free' = 'pinned-pinned',
     appliedLoad: number = 0
 ): BucklingResult {
-    const E = material.E * 1000; // Convert GPa to MPa
+    const E = material.E * 1000;
     const Sy = material.Sy;
 
-    // End condition factor K
-    const K: Record<string, number> = {
+    const KMap: Record<string, number> = {
         'fixed-fixed': 0.5,
         'fixed-pinned': 0.7,
         'pinned-pinned': 1.0,
         'fixed-free': 2.0
     };
-    const k = K[endCondition];
+    const kFactor = KMap[endCondition];
 
-    const Le = k * length; // Effective length
-    const r = Math.sqrt(I / A); // Radius of gyration
-    const slendernessRatio = Le / r;
+    const Le = kFactor * length;
+    const r = Math.sqrt(I / A);
+    const sl = Le / r;
 
-    // Transition slenderness ratio
     const Cc = Math.sqrt((2 * Math.PI * Math.PI * E) / Sy);
 
     let Scr: number;
     let mode: 'Euler' | 'Johnson';
 
-    if (slendernessRatio > Cc) {
-        // Euler (long column)
-        Scr = (Math.PI * Math.PI * E) / (slendernessRatio * slendernessRatio);
+    if (sl > Cc) {
+        Scr = (Math.PI * Math.PI * E) / (sl * sl);
         mode = 'Euler';
     } else {
-        // Johnson (intermediate column)
-        Scr = Sy * (1 - (Sy * slendernessRatio * slendernessRatio) / (4 * Math.PI * Math.PI * E));
+        Scr = Sy * (1 - (Sy * sl * sl) / (4 * Math.PI * Math.PI * E));
         mode = 'Johnson';
     }
 
     const Pcr = Scr * A;
     const safe = appliedLoad > 0 ? (Pcr / appliedLoad) >= 2.5 : true;
 
-    return { Pcr, Scr, slendernessRatio, mode, safe };
+    return { Pcr, Scr, slendernessRatio: sl, mode, safe };
 }
 
 // ==================== BEAM ANALYSIS ====================
@@ -326,10 +318,10 @@ export type BeamType = 'cantilever' | 'simply_supported' | 'fixed_both' | 'fixed
 export type LoadType = 'point_end' | 'point_center' | 'point_any' | 'distributed';
 
 export interface BeamResult {
-    maxDeflection: number;     // mm
-    maxStress: number;         // MPa
-    maxMoment: number;         // N·mm
-    maxShear: number;          // N
+    maxDeflection: number;
+    maxStress: number;
+    maxMoment: number;
+    maxShear: number;
     deflectionLocation: string;
     formula: string;
 }
@@ -340,111 +332,100 @@ export interface BeamResult {
 export function calculateBeam(
     beamType: BeamType,
     loadType: LoadType,
-    length: number,        // mm
-    load: number,          // N (point) or N/mm (distributed)
-    E: number,             // GPa
-    I: number,             // mm⁴
-    W: number,             // mm³ (section modulus)
-    loadPosition?: number  // mm from left (for point_any)
+    length: number,
+    load: number,
+    E: number,
+    I: number,
+    W: number
 ): BeamResult {
-    const E_MPa = E * 1000;
-    let maxDeflection = 0;
-    let maxMoment = 0;
-    let maxShear = 0;
-    let formula = '';
-    let deflectionLocation = '';
+    const EMpa = E * 1000;
+    let delta = 0;
+    let M = 0;
+    let V = 0;
+    let f = '';
+    let loc = '';
 
     if (beamType === 'cantilever') {
         if (loadType === 'point_end') {
-            maxDeflection = (load * Math.pow(length, 3)) / (3 * E_MPa * I);
-            maxMoment = load * length;
-            maxShear = load;
-            formula = 'δ = PL³/3EI';
-            deflectionLocation = 'Free end';
+            delta = (load * Math.pow(length, 3)) / (3 * EMpa * I);
+            M = load * length;
+            V = load;
+            f = 'δ = PL³/3EI';
+            loc = 'Free end';
         } else if (loadType === 'distributed') {
-            maxDeflection = (load * Math.pow(length, 4)) / (8 * E_MPa * I);
-            maxMoment = (load * length * length) / 2;
-            maxShear = load * length;
-            formula = 'δ = wL⁴/8EI';
-            deflectionLocation = 'Free end';
+            delta = (load * Math.pow(length, 4)) / (8 * EMpa * I);
+            M = (load * length * length) / 2;
+            V = load * length;
+            f = 'δ = wL⁴/8EI';
+            loc = 'Free end';
         }
     } else if (beamType === 'simply_supported') {
         if (loadType === 'point_center') {
-            maxDeflection = (load * Math.pow(length, 3)) / (48 * E_MPa * I);
-            maxMoment = (load * length) / 4;
-            maxShear = load / 2;
-            formula = 'δ = PL³/48EI';
-            deflectionLocation = 'Center';
+            delta = (load * Math.pow(length, 3)) / (48 * EMpa * I);
+            M = (load * length) / 4;
+            V = load / 2;
+            f = 'δ = PL³/48EI';
+            loc = 'Center';
         } else if (loadType === 'distributed') {
-            maxDeflection = (5 * load * Math.pow(length, 4)) / (384 * E_MPa * I);
-            maxMoment = (load * length * length) / 8;
-            maxShear = (load * length) / 2;
-            formula = 'δ = 5wL⁴/384EI';
-            deflectionLocation = 'Center';
+            delta = (5 * load * Math.pow(length, 4)) / (384 * EMpa * I);
+            M = (load * length * length) / 8;
+            V = (load * length) / 2;
+            f = 'δ = 5wL⁴/384EI';
+            loc = 'Center';
         }
     } else if (beamType === 'fixed_both') {
         if (loadType === 'point_center') {
-            maxDeflection = (load * Math.pow(length, 3)) / (192 * E_MPa * I);
-            maxMoment = (load * length) / 8;
-            maxShear = load / 2;
-            formula = 'δ = PL³/192EI';
-            deflectionLocation = 'Center';
+            delta = (load * Math.pow(length, 3)) / (192 * EMpa * I);
+            M = (load * length) / 8;
+            V = load / 2;
+            f = 'δ = PL³/192EI';
+            loc = 'Center';
         } else if (loadType === 'distributed') {
-            maxDeflection = (load * Math.pow(length, 4)) / (384 * E_MPa * I);
-            maxMoment = (load * length * length) / 12;
-            maxShear = (load * length) / 2;
-            formula = 'δ = wL⁴/384EI';
-            deflectionLocation = 'Center';
+            delta = (load * Math.pow(length, 4)) / (384 * EMpa * I);
+            M = (load * length * length) / 12;
+            V = (load * length) / 2;
+            f = 'δ = wL⁴/384EI';
+            loc = 'Center';
         }
     }
 
-    const maxStress = W > 0 ? maxMoment / W : 0;
+    const stress = W > 0 ? M / W : 0;
 
-    return { maxDeflection, maxStress, maxMoment, maxShear, deflectionLocation, formula };
+    return { maxDeflection: delta, maxStress: stress, maxMoment: M, maxShear: V, deflectionLocation: loc, formula: f };
 }
 
 // ==================== TORSION ANALYSIS ====================
 
 export interface TorsionResult {
-    maxShearStress: number;   // MPa
-    angleOfTwist: number;     // radians
-    angleOfTwistDeg: number;  // degrees
+    maxShearStress: number;
+    angleOfTwist: number;
+    angleOfTwistDeg: number;
 }
 
 /**
  * Torsion Analysis for Circular Shafts
  */
 export function calculateTorsion(
-    torque: number,        // N·mm
-    length: number,        // mm
-    diameter: number,      // mm (outer)
-    innerDiameter: number = 0, // mm (for hollow shafts)
-    G: number              // GPa (shear modulus)
+    torque: number,
+    length: number,
+    diameter: number,
+    innerDiameter: number = 0,
+    G: number
 ): TorsionResult {
-    const G_MPa = G * 1000;
-    const d = diameter;
-    const di = innerDiameter;
-
-    // Polar moment of inertia
-    const J = (Math.PI / 32) * (Math.pow(d, 4) - Math.pow(di, 4));
-
-    // Maximum shear stress at outer surface
-    const maxShearStress = (torque * (d / 2)) / J;
-
-    // Angle of twist
-    const angleOfTwist = (torque * length) / (G_MPa * J);
-    const angleOfTwistDeg = angleOfTwist * (180 / Math.PI);
-
-    return { maxShearStress, angleOfTwist, angleOfTwistDeg };
+    const GMpa = G * 1000;
+    const J = (Math.PI / 32) * (Math.pow(diameter, 4) - Math.pow(innerDiameter, 4));
+    const tau = (torque * (diameter / 2)) / J;
+    const theta = (torque * length) / (GMpa * J);
+    return { maxShearStress: tau, angleOfTwist: theta, angleOfTwistDeg: theta * (180 / Math.PI) };
 }
 
 // ==================== PRESSURE VESSEL ====================
 
 export interface PressureVesselResult {
-    hoopStress: number;      // σh (MPa) - Circumferential
-    axialStress: number;     // σa (MPa) - Longitudinal
-    radialStress: number;    // σr (MPa)
-    vonMises: number;        // MPa
+    hoopStress: number;
+    axialStress: number;
+    radialStress: number;
+    vonMises: number;
     method: 'thin-wall' | 'thick-wall';
 }
 
@@ -452,114 +433,64 @@ export interface PressureVesselResult {
  * Pressure Vessel Stress Analysis
  */
 export function calculatePressureVessel(
-    innerPressure: number,   // MPa
-    outerPressure: number,   // MPa (usually 0)
-    innerRadius: number,     // mm
-    outerRadius: number,     // mm
-    position: 'inner' | 'outer' = 'inner'
+    pi: number,
+    po: number,
+    ri: number,
+    ro: number,
+    pos: 'inner' | 'outer' = 'inner'
 ): PressureVesselResult {
-    const ri = innerRadius;
-    const ro = outerRadius;
     const t = ro - ri;
-    const pi = innerPressure;
-    const po = outerPressure;
+    const isThin = t / ri < 0.1;
 
-    // Check if thin-wall approximation is valid (t/r < 0.1)
-    const isThinWall = t / ri < 0.1;
+    let sh: number, sa: number, sr: number;
 
-    let hoopStress: number;
-    let axialStress: number;
-    let radialStress: number;
-
-    if (isThinWall && po === 0) {
-        // Thin-wall approximation
-        hoopStress = (pi * ri) / t;
-        axialStress = (pi * ri) / (2 * t);
-        radialStress = -pi / 2; // Average
+    if (isThin && po === 0) {
+        sh = (pi * ri) / t;
+        sa = (pi * ri) / (2 * t);
+        sr = -pi / 2;
     } else {
-        // Thick-wall (Lamé equations)
-        const r = position === 'inner' ? ri : ro;
-        const k = (ro * ro) / (ri * ri);
-
+        const r = pos === 'inner' ? ri : ro;
         const A = (pi * ri * ri - po * ro * ro) / (ro * ro - ri * ri);
         const B = (pi - po) * ri * ri * ro * ro / (ro * ro - ri * ri);
-
-        hoopStress = A + B / (r * r);
-        radialStress = A - B / (r * r);
-        axialStress = (pi * ri * ri - po * ro * ro) / (ro * ro - ri * ri); // Capped ends
+        sh = A + B / (r * r);
+        sr = A - B / (r * r);
+        sa = (pi * ri * ri - po * ro * ro) / (ro * ro - ri * ri);
     }
 
-    // Von Mises for pressure vessel
-    const vonMises = Math.sqrt(
-        hoopStress * hoopStress
-        + axialStress * axialStress
-        + radialStress * radialStress
-        - hoopStress * axialStress
-        - axialStress * radialStress
-        - radialStress * hoopStress
-    );
+    const vm = Math.sqrt(sh * sh + sa * sa + sr * sr - sh * sa - sa * sr - sr * sh);
 
-    return {
-        hoopStress,
-        axialStress,
-        radialStress,
-        vonMises,
-        method: isThinWall ? 'thin-wall' : 'thick-wall'
-    };
+    return { hoopStress: sh, axialStress: sa, radialStress: sr, vonMises: vm, method: isThin ? 'thin-wall' : 'thick-wall' };
 }
 
 // ==================== COMBINED LOADING ====================
 
 export interface CombinedLoadResult {
-    normalStress: number;      // From axial + bending
-    shearStress: number;       // From torsion + transverse shear
+    normalStress: number;
+    shearStress: number;
     vonMises: number;
     principal: PrincipalStresses;
     safetyFactor: number;
 }
 
 /**
- * Combined Loading Analysis (Axial + Bending + Torsion)
+ * Combined Loading Analysis
  */
 export function calculateCombinedLoading(
-    axialLoad: number,       // N (+ tension, - compression)
-    bendingMoment: number,   // N·mm
-    torque: number,          // N·mm
-    area: number,            // mm²
-    I: number,               // mm⁴ (moment of inertia)
-    J: number,               // mm⁴ (polar moment of inertia)
-    distanceFromNA: number,  // mm (distance from neutral axis)
-    outerRadius: number,     // mm (for torsional stress)
-    material: MaterialStrength
+    P: number,
+    M: number,
+    T: number,
+    A: number,
+    I: number,
+    J: number,
+    y: number,
+    r: number,
+    mat: MaterialStrength
 ): CombinedLoadResult {
-    // Normal stress from axial load
-    const sigmaAxial = axialLoad / area;
-
-    // Normal stress from bending (My/I)
-    const sigmaBending = (bendingMoment * distanceFromNA) / I;
-
-    // Total normal stress
-    const normalStress = sigmaAxial + sigmaBending;
-
-    // Shear stress from torsion (Tr/J)
-    const shearStress = (torque * outerRadius) / J;
-
-    // 2D stress state at critical location
-    const stressState: StressState2D = {
-        sigmaX: normalStress,
-        sigmaY: 0,
-        tauXY: shearStress
-    };
-
-    const principal = calculatePrincipalStresses2D(stressState);
-    const vonMises = calculateVonMises2D(stressState);
-    const { fos } = calculateSafetyFactor(vonMises, material);
-
-    return {
-        normalStress,
-        shearStress,
-        vonMises,
-        principal,
-        safetyFactor: fos
-    };
+    const sn = (P / A) + (M * y / I);
+    const ss = (T * r) / J;
+    const state = { sigmaX: sn, sigmaY: 0, tauXY: ss };
+    const p = calculatePrincipalStresses2D(state);
+    const vm = calculateVonMises2D(state);
+    const { fos } = calculateSafetyFactor(vm, mat);
+    return { normalStress: sn, shearStress: ss, vonMises: vm, principal: p, safetyFactor: fos };
 }

@@ -1,0 +1,34 @@
+{
+  "id": "pipe-friction-calculator",
+  "title": "Pipe Friction Calculator - AluCalc Engineering",
+  "slug": "pipe-friction-calculator",
+  "keyword": "pipe friction calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Pipe Friction Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional pipe friction calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Pipe Friction Calculator",
+    "intro": "Comprehensive engineering guide for pipe friction calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for pipe friction)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for pipe friction.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Pipe Friction is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical pipe friction scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "pump-power-calculator",
+    "pump-efficiency-calculator",
+    "pump-head-calculator",
+    "pump-flow-rate-calculator",
+    "pipe-friction-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

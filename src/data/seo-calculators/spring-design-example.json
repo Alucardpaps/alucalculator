@@ -1,0 +1,34 @@
+{
+  "id": "spring-design-example",
+  "title": "Spring Design Example - AluCalc Engineering",
+  "slug": "spring-design-example",
+  "keyword": "spring design example",
+  "intent": "example",
+  "meta": {
+    "title": "Spring Design Example | Free Engineering Tool | AluCalc",
+    "description": "Professional spring design example tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Spring Design Example",
+    "intro": "Comprehensive engineering guide for spring design example. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for spring design)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for spring design.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Spring Design is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical spring design scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "spring-constant-calculator",
+    "spring-force-calculator",
+    "spring-deflection-calculator",
+    "spring-energy-calculator",
+    "spring-design-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "id": "fatigue_life_sn",
+  "name": "Fatigue Life Prediction (S-N / Basquin)",
+  "category": "mechanical",
+  "description": "Estimate fatigue life using the Basquin equation (S-N curve). Supports both high-cycle and low-cycle fatigue regimes.",
+  "inputs": [
+    { "key": "S_ut", "type": "number", "unit": "MPa", "description": "Ultimate Tensile Strength", "default": 500 },
+    { "key": "sigma_a", "type": "number", "unit": "MPa", "description": "Applied Alternating Stress", "default": 200 },
+    { "key": "S_e", "type": "number", "unit": "MPa", "description": "Corrected Endurance Limit", "default": 225 },
+    { "key": "N_e", "type": "number", "unit": "cycles", "description": "Endurance Limit Cycle Count (typically 1e6)", "default": 1000000 }
+  ],
+  "steps": [
+    {
+      "id": "f",
+      "formula": "S_ut <= 490 ? 0.9 : (S_ut <= 1400 ? 1.0 - 2.0e-4 * S_ut : 0.72)",
+      "description": "Fatigue strength fraction at 1e3 cycles",
+      "latex": "f \\approx 0.9 \\text{ (for typical steels)}"
+    },
+    {
+      "id": "a_coeff",
+      "formula": "((f * S_ut)^2) / S_e",
+      "description": "Basquin coefficient 'a'",
+      "latex": "a = \\frac{(f \\cdot S_{ut})^2}{S_e}"
+    },
+    {
+      "id": "b_exp",
+      "formula": "(-1/3) * log10((f * S_ut) / S_e) / log10(1)",
+      "description": "Basquin exponent 'b' (simplified calc follows)",
+      "latex": "b = -\\frac{1}{3} \\log\\left(\\frac{f \\cdot S_{ut}}{S_e}\\right)"
+    },
+    {
+      "id": "b_basquin",
+      "formula": "log10(f * S_ut / S_e) / log10(N_e / 1000) * (-1)",
+      "description": "Basquin exponent b (precise)",
+      "latex": "b = -\\frac{\\log(f \\cdot S_{ut} / S_e)}{\\log(N_e / 10^3)}"
+    },
+    {
+      "id": "N_life",
+      "formula": "sigma_a >= S_e ? 10^((log10(sigma_a) - log10(a_coeff)) / b_basquin) : 1e9",
+      "description": "Predicted life in cycles (infinite if below endurance limit)",
+      "latex": "N = \\left(\\frac{\\sigma_a}{a}\\right)^{1/b}"
+    },
+    {
+      "id": "safety_factor",
+      "formula": "S_e / sigma_a",
+      "description": "Fatigue safety factor (infinite life criterion)",
+      "latex": "n_f = \\frac{S_e}{\\sigma_a}"
+    },
+    {
+      "id": "regime",
+      "formula": "sigma_a >= S_e ? (N_life < 1000 ? 1 : 2) : 3",
+      "description": "Fatigue regime: 1=LCF, 2=HCF finite life, 3=Infinite life",
+      "latex": "\\text{Regime classification}"
+    }
+  ],
+  "outputs": ["N_life", "safety_factor", "regime", "a_coeff", "b_basquin"]
+}

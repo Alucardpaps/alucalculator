@@ -1,0 +1,24 @@
+{
+  "id": "rough-mach",
+  "category": "manufacturing",
+  "title": "Roughness",
+  "slug": "rough-mach",
+  "meta": {
+    "title": "Roughness | AluCalc",
+    "description": "Ra/Rz Finish map."
+  },
+  "seo": {
+    "h1": "Surface Finish Ra/Rz",
+    "intro": "Quality standards.",
+    "formula": "Ra = sum|y|/L",
+    "variables": {
+      "Ra": "μm"
+    },
+    "practical": "Seals.",
+    "example": "1.6μm typical."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

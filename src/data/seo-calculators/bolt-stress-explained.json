@@ -1,0 +1,34 @@
+{
+  "id": "bolt-stress-explained",
+  "title": "Bolt Stress Explained - AluCalc Engineering",
+  "slug": "bolt-stress-explained",
+  "keyword": "bolt stress explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Bolt Stress Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional bolt stress explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Bolt Stress Explained",
+    "intro": "Comprehensive engineering guide for bolt stress explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for bolt stress)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for bolt stress.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Bolt Stress is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical bolt stress scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "bolt-torque-calculator",
+    "bolt-preload-calculator",
+    "bolt-shear-force-calculator",
+    "bolt-tension-calculator",
+    "bolt-stress-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

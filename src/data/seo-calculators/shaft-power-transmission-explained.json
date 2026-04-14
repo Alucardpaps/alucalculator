@@ -1,0 +1,34 @@
+{
+  "id": "shaft-power-transmission-explained",
+  "title": "Shaft Power Transmission Explained - AluCalc Engineering",
+  "slug": "shaft-power-transmission-explained",
+  "keyword": "shaft power transmission explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Shaft Power Transmission Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional shaft power transmission explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Shaft Power Transmission Explained",
+    "intro": "Comprehensive engineering guide for shaft power transmission explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for shaft power transmission)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for shaft power transmission.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Shaft Power Transmission is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical shaft power transmission scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "shaft-diameter-calculator",
+    "shaft-stress-calculator",
+    "shaft-torsion-calculator",
+    "shaft-deflection-calculator",
+    "shaft-power-transmission-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

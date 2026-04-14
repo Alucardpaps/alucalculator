@@ -62,6 +62,34 @@
     "handbook": {
       "title": "El Kitabı",
       "desc": "Rulman tabloları, ISO Toleranslar, G-Code referansı."
+    },
+    "thermalExpansion": {
+      "title": "Termal Genleşme",
+      "desc": "Boyutsal Kararlılık Analizi"
+    },
+    "manufacturingSandbox": {
+      "title": "Üretim Simülatörü",
+      "desc": "Sanal İmalat Hattı"
+    },
+    "simulationFea": {
+      "title": "FEA Simülasyonu",
+      "desc": "Gerilme & Deformasyon"
+    },
+    "analytics": {
+      "title": "Analitik Paneli",
+      "desc": "Sistem Performans Verileri"
+    },
+    "fileExplorer": {
+      "title": "Dosya Gezgini",
+      "desc": "OS Dosya Sistemi"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "desc": "Komut Satırı Arayüzü"
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "desc": "Sistem Yapılandırması"
     }
   },
   "common": {
@@ -657,5 +685,12 @@
     "bladeKerf": "Testere Payı",
     "trimStart": "Baş Kesimi",
     "trimEnd": "Son Kesimi"
+  },
+  "thermal": {
+    "initialLength": "İlk Uzunluk",
+    "tempDelta": "Sıcaklık Farkı",
+    "finalLength": "Son Uzunluk",
+    "expansion": "Genleşme Miktarı",
+    "strain": "Birim Şekil Değişimi"
   }
 }

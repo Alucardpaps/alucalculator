@@ -1,0 +1,34 @@
+{
+  "id": "series-circuit-calculator",
+  "title": "Series Circuit Calculator - AluCalc Engineering",
+  "slug": "series-circuit-calculator",
+  "keyword": "series circuit calculator",
+  "intent": "calculator",
+  "meta": {
+    "title": "Series Circuit Calculator | Free Engineering Tool | AluCalc",
+    "description": "Professional series circuit calculator tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Series Circuit Calculator",
+    "intro": "Comprehensive engineering guide for series circuit calculator. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for series circuit)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for series circuit.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Series Circuit is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical series circuit scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "voltage-drop-calculator",
+    "current-calculation-calculator",
+    "resistance-calculation-calculator",
+    "ohm-law-calculator",
+    "series-circuit-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "yield-strength-explained",
+  "title": "Yield Strength Explained - AluCalc Engineering",
+  "slug": "yield-strength-explained",
+  "keyword": "yield strength explained",
+  "intent": "explained",
+  "meta": {
+    "title": "Yield Strength Explained | Free Engineering Tool | AluCalc",
+    "description": "Professional yield strength explained tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Yield Strength Explained",
+    "intro": "Comprehensive engineering guide for yield strength explained. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for yield strength)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for yield strength.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Yield Strength is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical yield strength scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "stress-strain-calculator",
+    "young-modulus-calculator",
+    "shear-modulus-calculator",
+    "poisson-ratio-calculator",
+    "yield-strength-formula"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

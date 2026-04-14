@@ -1,0 +1,24 @@
+{
+  "id": "period-prop",
+  "category": "science",
+  "title": "Periodic Prop",
+  "slug": "period-prop",
+  "meta": {
+    "title": "Element | AluCalc",
+    "description": "Property lookup."
+  },
+  "seo": {
+    "h1": "Element Property Calc",
+    "intro": "Standard chemical ref.",
+    "formula": "Prop = f(Z)",
+    "variables": {
+      "Z": "Atomic"
+    },
+    "practical": "Materials.",
+    "example": "Phase state."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

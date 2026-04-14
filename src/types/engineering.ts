@@ -316,9 +316,10 @@ export function toSI(val: ValidatedEngineeringValue): ValidatedEngineeringValue 
     if (typeof val.value !== 'number') return val;
 
     return createValidatedValue(
-        val.value * conv.toSI,
+        (val.value as number) * conv.toSI,
         conv.siUnit,
         'derived',
         { precision: val.precision }
     );
 }
+

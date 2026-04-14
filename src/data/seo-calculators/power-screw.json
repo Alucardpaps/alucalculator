@@ -1,0 +1,24 @@
+{
+  "id": "power-screw",
+  "category": "mechanical",
+  "title": "Power Screw",
+  "slug": "power-screw",
+  "meta": {
+    "title": "Power Screw | AluCalc",
+    "description": "Efficiency and locking."
+  },
+  "seo": {
+    "h1": "Screw Drive Efficiency",
+    "intro": "Rotary to linear force.",
+    "formula": "η = tanL/tan(L+F)",
+    "variables": {
+      "η": "Eff"
+    },
+    "practical": "CNC leadscrews.",
+    "example": "Self-locking."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "pcb-imp",
+  "category": "electrical",
+  "title": "PCB Imp",
+  "slug": "pcb-imp",
+  "meta": {
+    "title": "Impedance | AluCalc",
+    "description": "Differential stripline."
+  },
+  "seo": {
+    "h1": "PCB Impedance Match Calc",
+    "intro": "50 ohm trace design.",
+    "formula": "Zo = f(w,h,er)",
+    "variables": {
+      "er": "Diel"
+    },
+    "practical": "High-speed.",
+    "example": "Microstrip."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

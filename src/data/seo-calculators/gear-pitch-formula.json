@@ -1,0 +1,34 @@
+{
+  "id": "gear-pitch-formula",
+  "title": "Gear Pitch Formula - AluCalc Engineering",
+  "slug": "gear-pitch-formula",
+  "keyword": "gear pitch formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Gear Pitch Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional gear pitch formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Pitch Formula",
+    "intro": "Comprehensive engineering guide for gear pitch formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear pitch)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear pitch.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Pitch is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear pitch scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-ratio-calculator",
+    "gear-module-calculator",
+    "gear-design-calculator",
+    "gear-contact-stress-calculator",
+    "gear-pitch-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

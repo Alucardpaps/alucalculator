@@ -1,0 +1,27 @@
+{
+  "id": "beam-deflection",
+  "category": "structural",
+  "title": "Beam Deflection Calculator",
+  "slug": "beam-deflection",
+  "meta": {
+    "title": "Beam Deflection Calculator | AluCalc",
+    "description": "Calculate displacement under load."
+  },
+  "seo": {
+    "h1": "Beam Deflection Calculator",
+    "intro": "Estimates deflection in structural beams.",
+    "formula": "δ = (F*L^3)/(48*E*I)",
+    "variables": {
+      "F": "Force",
+      "L": "Length",
+      "E": "Modulus",
+      "I": "Inertia"
+    },
+    "practical": "Building safety.",
+    "example": "δ = 2mm."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/?module=beam-deflection"
+  }
+}

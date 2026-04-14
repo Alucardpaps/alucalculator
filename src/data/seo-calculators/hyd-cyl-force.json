@@ -1,0 +1,24 @@
+{
+  "id": "hyd-cyl-force",
+  "category": "fluid",
+  "title": "Cyl Force",
+  "slug": "hyd-cyl-force",
+  "meta": {
+    "title": "Hyd Cyl | AluCalc",
+    "description": "Extend/Retract force."
+  },
+  "seo": {
+    "h1": "Hydraulic Force Calc",
+    "intro": "Actuator capacity.",
+    "formula": "F = P*A",
+    "variables": {
+      "A": "Area"
+    },
+    "practical": "Presses.",
+    "example": "Rod diff."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

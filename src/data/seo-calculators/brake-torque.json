@@ -1,0 +1,24 @@
+{
+  "id": "brake-torque",
+  "category": "mechanical",
+  "title": "Brake Torque",
+  "slug": "brake-torque",
+  "meta": {
+    "title": "Brake | AluCalc",
+    "description": "Torque and heat dissipation."
+  },
+  "seo": {
+    "h1": "Braking Torque Analysis",
+    "intro": "Friction energy to heat.",
+    "formula": "T = 2μFR",
+    "variables": {
+      "T": "Torque"
+    },
+    "practical": "Auto brakes.",
+    "example": "Disc fade study."
+  },
+  "cta": {
+    "label": "Open",
+    "link": "/"
+  }
+}

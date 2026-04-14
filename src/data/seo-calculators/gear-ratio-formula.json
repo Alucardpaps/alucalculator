@@ -1,0 +1,34 @@
+{
+  "id": "gear-ratio-formula",
+  "title": "Gear Ratio Formula - AluCalc Engineering",
+  "slug": "gear-ratio-formula",
+  "keyword": "gear ratio formula",
+  "intent": "formula",
+  "meta": {
+    "title": "Gear Ratio Formula | Free Engineering Tool | AluCalc",
+    "description": "Professional gear ratio formula tool. Real formulas, worked examples, and step-by-step engineering explanations."
+  },
+  "seo": {
+    "h1": "Gear Ratio Formula",
+    "intro": "Comprehensive engineering guide for gear ratio formula. Use this resource to determine specifications, validate designs, and review standards.",
+    "formula": "(Placeholder formula for gear ratio)",
+    "variables": {
+      "var1": "Input parameter 1",
+      "var2": "Input parameter 2"
+    },
+    "step_by_step": "1. Identify inputs for gear ratio.\n2. Apply the governing equation.\n3. Validate against engineering standards.",
+    "practical": "Gear Ratio is critical in real-world engineering for system reliability and safety.",
+    "example": "Example: For a typical gear ratio scenario, substituting standard values yields a result within acceptable limits."
+  },
+  "related": [
+    "gear-module-calculator",
+    "gear-pitch-calculator",
+    "gear-design-calculator",
+    "gear-contact-stress-calculator",
+    "gear-ratio-example"
+  ],
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}
