@@ -1,0 +1,32 @@
+{
+  "id": "bending-moment",
+  "title": "Bending Moment Calculator & Guide - AluCalc",
+  "slug": "bending-moment",
+  "keyword": "bending moment calculator",
+  "intent": "unified_guide",
+  "meta": {
+    "title": "Bending Moment Calculator & Guide - AluCalc | Professional Engineering Tool",
+    "description": "Unique bending moment calculator and engineering guide. Includes General Engineering Practice formulas, worked examples, and step-by-step logic."
+  },
+  "seo": {
+    "h1": "Bending Moment Calculator & Guide - AluCalc",
+    "intro": "Advanced calculation for bending moment within the Alucalc OS suite.",
+    "formula": "Result = f(Inputs, K)",
+    "variables": {
+      "Input_1": "Primary parameter",
+      "Input_2": "Secondary parameter"
+    },
+    "step_by_step": "1. Identify the input constants for bending moment.\n2. Apply the specific General Engineering Practice formula.\n3. Validate results against mechanical safety factors.",
+    "practical": "In beams applications, bending moment is essential for ensuring structural integrity and operational efficiency.",
+    "example": "A typical example involves substituting standard material properties into the Result = f(Inputs, K) equation to determine optimal sizing."
+  },
+  "related": [
+    "bending-moment-formula",
+    "engineering-standards",
+    "material-science"
+  ],
+  "cta": {
+    "label": "Launch AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,68 @@
+{
+    "slug": "how-to-calculate-bolt-torque",
+    "meta": {
+        "title": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
+        "description": "Learn how to calculate bolt torque for mechanical assembly using preload force, friction coefficient, and bolt diameter. Includes formula, examples, and VDI 2230 methodology."
+    },
+    "hero": {
+        "h1": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
+        "intro": "Bolt torque calculation is one of the most critical aspects of mechanical assembly. Incorrect torque leads to joint failure, loosening, or even catastrophic structural damage. In real-world engineering, torque must be calculated using preload force, friction coefficient, and bolt diameter — not guesswork."
+    },
+    "formula": {
+        "equation": "T = K × F × d",
+        "variables": {
+            "T": "Torque (Nm)",
+            "K": "Friction coefficient (0.18–0.25 typical)",
+            "F": "Preload force (N)",
+            "d": "Nominal bolt diameter (m)"
+        }
+    },
+    "stepByStep": [
+        "Determine bolt size (e.g., M10).",
+        "Find recommended preload (from standards or tables).",
+        "Estimate friction coefficient (lubricated vs dry).",
+        "Convert diameter to meters.",
+        "Apply the formula: T = K × F × d.",
+        "Verify against torque tables."
+    ],
+    "example": {
+        "inputs": [
+            "Bolt: M10 → d = 0.01 m",
+            "Preload: 20,000 N",
+            "K = 0.2"
+        ],
+        "calculation": "T = 0.2 × 20000 × 0.01 = 40 Nm"
+    },
+    "whyThisMatters": [
+        "Improper torque leads to bolt fatigue, joint separation, and uneven load distribution.",
+        "In industries like automotive and aerospace, torque accuracy is critical for safety and reliability."
+    ],
+    "commonMistakes": [
+        "Ignoring lubrication effects on friction coefficient.",
+        "Using generic torque tables blindly without considering specific application context.",
+        "Not accounting for friction variation between threads and under-head surfaces."
+    ],
+    "engineeringTip": "Always validate torque with preload-based calculations, not just tables.",
+    "calculatorCta": {
+        "targetSlug": "bolt-torque-calc",
+        "label": "Use the Bolt Torque Calculator to instantly compute torque for your application"
+    },
+    "faq": [
+        {
+            "question": "What happens if torque is too high?",
+            "answer": "Over-torquing a bolt causes it to exceed its yield strength, leading to plastic deformation, thread stripping, or sudden failure."
+        },
+        {
+            "question": "How does lubrication affect bolt torque?",
+            "answer": "Lubrication drastically reduces the friction coefficient (K). A lubricated bolt requires significantly less torque to achieve the same preload compared to a dry bolt."
+        },
+        {
+            "question": "Why use preload instead of just torque?",
+            "answer": "Torque is an indirect measure. The actual goal is to achieve clamping force (preload) to hold the joint together securely. Using preload calculation ensures accurate joint strength."
+        }
+    ],
+    "relatedArticles": [
+        "bearing-life-calculation-explained",
+        "beam-deflection-formula-explained"
+    ]
+}

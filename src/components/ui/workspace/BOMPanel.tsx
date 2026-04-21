@@ -7,9 +7,10 @@
  * Auto-updates from Zustand derived selectors.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAssemblyStore } from '@/lib/store/assemblyStore';
 import type { ComponentType, WorkspaceComponent, BOMEntry, BOMSummary, StructureHealth, ValidationMessage } from '@/lib/types/v5-types';
+import { QRModal } from './QRModal';
 
 // ════════════════════════════════════════════
 // Component Type Config
@@ -155,6 +156,7 @@ const HealthBar = () => {
 
 export const BOMPanel = () => {
   const components = useAssemblyStore((s) => s.components);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
   const bom = useMemo((): BOMSummary => {
     const comps = Object.values(components);
@@ -250,6 +252,34 @@ export const BOMPanel = () => {
 
           {/* Health */}
           <HealthBar />
+
+          {/* Production QR Button */}
+          <button
+            onClick={() => setIsQRModalOpen(true)}
+            className="w-full mt-4 py-3 px-4 rounded-xl border border-[#66FCF1]/20 bg-[#66FCF1]/5 text-[#66FCF1] text-[9px] font-bold uppercase tracking-[0.2em] font-mono hover:bg-[#66FCF1]/10 hover:border-[#66FCF1]/40 transition-all group flex items-center justify-center gap-2"
+          >
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
+              <rect x="9" y="9" width="1" height="1" /><rect x="14" y="9" width="1" height="1" />
+              <rect x="9" y="14" width="1" height="1" />
+            </svg>
+            Generate Production QR
+          </button>
+
+          <QRModal
+            isOpen={isQRModalOpen}
+            onClose={() => setIsQRModalOpen(false)}
+            title="BOM_V50_EXPORT"
+            data={{
+              timestamp: new Date().toISOString(),
+              summary: {
+                parts: bom.totalComponents,
+                weight: bom.totalWeight.toFixed(2),
+                cost: bom.totalCost.toFixed(2)
+              },
+              entries: bom.entries.map(e => ({ type: e.type, count: e.count }))
+            }}
+          />
         </div>
       )}
     </div>

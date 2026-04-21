@@ -3,16 +3,47 @@ module.exports = {
   siteUrl: process.env.SITE_URL || 'https://www.alucalculator.com',
   generateRobotsTxt: true,
   sitemapSize: 7000,
-  changefreq: 'daily',
+  changefreq: 'weekly',
   priority: 0.7,
-  // Otomatik üretilen dinamik sayfalara öncelik vermek için
+  exclude: ['/api/*', '/dashboard', '/login', '/workspace', '/lite'],
   transform: async (config, path) => {
+    // Homepage = highest priority
+    if (path === '/') {
+      return {
+        loc: path,
+        changefreq: 'daily',
+        priority: 1.0,
+        lastmod: new Date().toISOString(),
+      };
+    }
+
+    // Calculator pages = high priority (SEO traffic drivers)
+    if (path.includes('/calculators/')) {
+      return {
+        loc: path,
+        changefreq: 'weekly',
+        priority: 0.9,
+        lastmod: new Date().toISOString(),
+      };
+    }
+
+    // Learn/Academy pages = high priority
+    if (path.includes('/learn/')) {
+      return {
+        loc: path,
+        changefreq: 'weekly',
+        priority: 0.8,
+        lastmod: new Date().toISOString(),
+      };
+    }
+
+    // Default
     return {
-      loc: path, 
+      loc: path,
       changefreq: config.changefreq,
-      priority: path.includes('/learn/') ? 0.9 : config.priority,
+      priority: config.priority,
       lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
       alternateRefs: config.alternateRefs ?? [],
-    }
+    };
   },
-}
+};

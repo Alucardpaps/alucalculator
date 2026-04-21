@@ -89,16 +89,16 @@ export const WorkspaceHeader = () => {
           onClick={() => setToolMode('select')}
         />
         <ToolButton
-          label="Move"
+          label="Translate"
           icon="✥"
-          isActive={toolMode === 'move'}
-          onClick={() => setToolMode('move')}
+          isActive={toolMode === 'translate'}
+          onClick={() => setToolMode('translate')}
         />
         <ToolButton
-          label="Connect"
-          icon="⟗"
-          isActive={toolMode === 'connect'}
-          onClick={() => setToolMode('connect')}
+          label="Rotate"
+          icon="↻"
+          isActive={toolMode === 'rotate'}
+          onClick={() => setToolMode('rotate')}
         />
       </div>
 

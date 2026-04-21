@@ -70,6 +70,8 @@ export interface ThreadStandard {
 
 export const THREAD_STANDARDS: ThreadStandard[] = [
     // --- Metric Coarse (ISO 262) ---
+    { type: 'Metric Coarse', size: 'M2', diameter: 2, pitch: 0.4, area_tensile: 2.07, tapDrill: 1.6 },
+    { type: 'Metric Coarse', size: 'M2.5', diameter: 2.5, pitch: 0.45, area_tensile: 3.39, tapDrill: 2.05 },
     { type: 'Metric Coarse', size: 'M3', diameter: 3, pitch: 0.5, area_tensile: 5.03, tapDrill: 2.5 },
     { type: 'Metric Coarse', size: 'M4', diameter: 4, pitch: 0.7, area_tensile: 8.78, tapDrill: 3.3 },
     { type: 'Metric Coarse', size: 'M5', diameter: 5, pitch: 0.8, area_tensile: 14.2, tapDrill: 4.2 },
@@ -77,32 +79,81 @@ export const THREAD_STANDARDS: ThreadStandard[] = [
     { type: 'Metric Coarse', size: 'M8', diameter: 8, pitch: 1.25, area_tensile: 36.6, minorDiameter: 6.47, tapDrill: 6.8 },
     { type: 'Metric Coarse', size: 'M10', diameter: 10, pitch: 1.5, area_tensile: 58.0, minorDiameter: 8.16, tapDrill: 8.5 },
     { type: 'Metric Coarse', size: 'M12', diameter: 12, pitch: 1.75, area_tensile: 84.3, minorDiameter: 9.85, tapDrill: 10.2 },
+    { type: 'Metric Coarse', size: 'M14', diameter: 14, pitch: 2.0, area_tensile: 115, tapDrill: 12.0 },
     { type: 'Metric Coarse', size: 'M16', diameter: 16, pitch: 2.0, area_tensile: 157, minorDiameter: 13.55, tapDrill: 14.0 },
+    { type: 'Metric Coarse', size: 'M18', diameter: 18, pitch: 2.5, area_tensile: 192, tapDrill: 15.5 },
     { type: 'Metric Coarse', size: 'M20', diameter: 20, pitch: 2.5, area_tensile: 245, minorDiameter: 16.93, tapDrill: 17.5 },
+    { type: 'Metric Coarse', size: 'M22', diameter: 22, pitch: 2.5, area_tensile: 303, tapDrill: 19.5 },
     { type: 'Metric Coarse', size: 'M24', diameter: 24, pitch: 3.0, area_tensile: 353, minorDiameter: 20.32, tapDrill: 21.0 },
+    { type: 'Metric Coarse', size: 'M27', diameter: 27, pitch: 3.0, area_tensile: 459, tapDrill: 24.0 },
     { type: 'Metric Coarse', size: 'M30', diameter: 30, pitch: 3.5, area_tensile: 561, minorDiameter: 25.71, tapDrill: 26.5 },
+    { type: 'Metric Coarse', size: 'M33', diameter: 33, pitch: 3.5, area_tensile: 694, tapDrill: 29.5 },
+    { type: 'Metric Coarse', size: 'M36', diameter: 36, pitch: 4.0, area_tensile: 817, tapDrill: 32.0 },
+    { type: 'Metric Coarse', size: 'M42', diameter: 42, pitch: 4.5, area_tensile: 1120, tapDrill: 37.5 },
+    { type: 'Metric Coarse', size: 'M48', diameter: 48, pitch: 5.0, area_tensile: 1470, tapDrill: 43.0 },
 
     // --- Metric Fine ---
+    { type: 'Metric Fine', size: 'M8x1', diameter: 8, pitch: 1.0, area_tensile: 39.2, tapDrill: 7.0 },
     { type: 'Metric Fine', size: 'M10x1.25', diameter: 10, pitch: 1.25, area_tensile: 61.2, tapDrill: 8.8 },
     { type: 'Metric Fine', size: 'M12x1.25', diameter: 12, pitch: 1.25, area_tensile: 92.1, tapDrill: 10.8 },
     { type: 'Metric Fine', size: 'M12x1.5', diameter: 12, pitch: 1.5, area_tensile: 88.1, tapDrill: 10.5 },
+    { type: 'Metric Fine', size: 'M16x1.5', diameter: 16, pitch: 1.5, area_tensile: 167, tapDrill: 14.5 },
+    { type: 'Metric Fine', size: 'M20x1.5', diameter: 20, pitch: 1.5, area_tensile: 272, tapDrill: 18.5 },
+    { type: 'Metric Fine', size: 'M24x2', diameter: 24, pitch: 2.0, area_tensile: 384, tapDrill: 22.0 },
 
     // --- UNC (Unified Coarse) ---
+    { type: 'UNC', size: '#4-40', diameter: 2.84, tpi: 40, area_tensile: 3.89, tapDrill: 2.35 },
+    { type: 'UNC', size: '#6-32', diameter: 3.5, tpi: 32, area_tensile: 5.86, tapDrill: 2.85 },
+    { type: 'UNC', size: '#8-32', diameter: 4.16, tpi: 32, area_tensile: 9.03, tapDrill: 3.5 },
+    { type: 'UNC', size: '#10-24', diameter: 4.82, tpi: 24, area_tensile: 11.3, tapDrill: 3.9 },
     { type: 'UNC', size: '1/4-20', diameter: 6.35, tpi: 20, area_tensile: 20.5, tapDrill: 5.1 },
+    { type: 'UNC', size: '5/16-18', diameter: 7.93, tpi: 18, area_tensile: 33.8, tapDrill: 6.6 },
     { type: 'UNC', size: '3/8-16', diameter: 9.53, tpi: 16, area_tensile: 50.1, tapDrill: 8.0 },
     { type: 'UNC', size: '1/2-13', diameter: 12.7, tpi: 13, area_tensile: 91.5, tapDrill: 10.8 },
     { type: 'UNC', size: '5/8-11', diameter: 15.88, tpi: 11, area_tensile: 145.8, tapDrill: 13.5 },
     { type: 'UNC', size: '3/4-10', diameter: 19.05, tpi: 10, area_tensile: 215.5, tapDrill: 16.5 },
+    { type: 'UNC', size: '7/8-9', diameter: 22.22, tpi: 9, area_tensile: 298, tapDrill: 19.5 },
+    { type: 'UNC', size: '1-8', diameter: 25.4, tpi: 8, area_tensile: 391, tapDrill: 22.25 },
+    { type: 'UNC', size: '1 1/4-7', diameter: 31.75, tpi: 7, area_tensile: 625, tapDrill: 28.0 },
 
     // --- UNF (Unified Fine) ---
+    { type: 'UNF', size: '#10-32', diameter: 4.82, tpi: 32, area_tensile: 12.9, tapDrill: 4.1 },
     { type: 'UNF', size: '1/4-28', diameter: 6.35, tpi: 28, area_tensile: 23.2, tapDrill: 5.5 },
+    { type: 'UNF', size: '5/16-24', diameter: 7.93, tpi: 24, area_tensile: 37.4, tapDrill: 6.9 },
     { type: 'UNF', size: '3/8-24', diameter: 9.53, tpi: 24, area_tensile: 56.7, tapDrill: 8.5 },
     { type: 'UNF', size: '1/2-20', diameter: 12.7, tpi: 20, area_tensile: 103.1, tapDrill: 11.5 },
+    { type: 'UNF', size: '5/8-18', diameter: 15.88, tpi: 18, area_tensile: 165, tapDrill: 14.5 },
+    { type: 'UNF', size: '3/4-16', diameter: 19.05, tpi: 16, area_tensile: 241, tapDrill: 17.5 },
+    { type: 'UNF', size: '1-12', diameter: 25.4, tpi: 12, area_tensile: 434, tapDrill: 23.25 },
 
     // --- Trapezoidal (ISO 2901) ---
+    { type: 'Trapezoidal', size: 'TR10x2', diameter: 10, pitch: 2.0, area_tensile: 45, tapDrill: 8.0 },
     { type: 'Trapezoidal', size: 'TR12x3', diameter: 12, pitch: 3.0, area_tensile: 68.5, tapDrill: 9.0 },
     { type: 'Trapezoidal', size: 'TR16x4', diameter: 16, pitch: 4.0, area_tensile: 125.1, tapDrill: 12.0 },
     { type: 'Trapezoidal', size: 'TR20x4', diameter: 20, pitch: 4.0, area_tensile: 211.5, tapDrill: 16.0 },
+    { type: 'Trapezoidal', size: 'TR24x5', diameter: 24, pitch: 5.0, area_tensile: 298, tapDrill: 19.0 },
+    { type: 'Trapezoidal', size: 'TR30x6', diameter: 30, pitch: 6.0, area_tensile: 480, tapDrill: 24.0 },
+    { type: 'Trapezoidal', size: 'TR36x6', diameter: 36, pitch: 6.0, area_tensile: 720, tapDrill: 30.0 },
+
+    // --- Pipe Threads (BSP/G, NPT) ---
+    { type: 'Pipe', size: 'G 1/8', diameter: 9.728, tpi: 28, area_tensile: 55, tapDrill: 8.6 },
+    { type: 'Pipe', size: 'G 1/4', diameter: 13.157, tpi: 19, area_tensile: 104, tapDrill: 11.8 },
+    { type: 'Pipe', size: 'G 3/8', diameter: 16.662, tpi: 19, area_tensile: 172, tapDrill: 15.2 },
+    { type: 'Pipe', size: 'G 1/2', diameter: 20.955, tpi: 14, area_tensile: 245, tapDrill: 19.0 },
+    { type: 'Pipe', size: 'G 3/4', diameter: 26.441, tpi: 14, area_tensile: 405, tapDrill: 24.5 },
+    { type: 'Pipe', size: 'G 1', diameter: 33.249, tpi: 11, area_tensile: 640, tapDrill: 30.5 },
+    { type: 'Pipe', size: 'G 1 1/4', diameter: 41.910, tpi: 11, area_tensile: 1050, tapDrill: 39.5 },
+    { type: 'Pipe', size: 'G 1 1/2', diameter: 47.803, tpi: 11, area_tensile: 1400, tapDrill: 45.0 },
+    { type: 'Pipe', size: 'G 2', diameter: 59.614, tpi: 11, area_tensile: 2250, tapDrill: 57.0 },
+
+    { type: 'Pipe', size: 'NPT 1/8', diameter: 10.287, tpi: 27, area_tensile: 58, tapDrill: 8.5 },
+    { type: 'Pipe', size: 'NPT 1/4', diameter: 13.716, tpi: 18, area_tensile: 108, tapDrill: 11.0 },
+    { type: 'Pipe', size: 'NPT 3/8', diameter: 17.145, tpi: 18, area_tensile: 180, tapDrill: 14.5 },
+    { type: 'Pipe', size: 'NPT 1/2', diameter: 21.223, tpi: 14, area_tensile: 250, tapDrill: 17.8 },
+    { type: 'Pipe', size: 'NPT 3/4', diameter: 26.67, tpi: 14, area_tensile: 410, tapDrill: 23.0 },
+    { type: 'Pipe', size: 'NPT 1', diameter: 33.401, tpi: 11.5, area_tensile: 645, tapDrill: 29.0 },
+    { type: 'Pipe', size: 'NPT 1 1/2', diameter: 48.260, tpi: 11.5, area_tensile: 1420, tapDrill: 44.0 },
+    { type: 'Pipe', size: 'NPT 2', diameter: 60.325, tpi: 11.5, area_tensile: 2280, tapDrill: 56.0 },
 ];
 
 // ============================================
@@ -149,13 +200,28 @@ export const HEX_BOLT_GEOMETRY: FastenerGeometry[] = [
     { size: 'M30', s: 46, k: 18.7, e: 51.28 },
 ];
 
-export function getFastenerGeometry(size: string): FastenerGeometry {
+export function getFastenerGeometry(size: string, overrideDiameter?: number): FastenerGeometry {
     const found = HEX_BOLT_GEOMETRY.find(g => g.size === size);
     if (found) return found;
     
     // Heuristic scaling if not in DB
-    const dStr = size.replace(/[^\d.]/g, '');
-    const d = parseFloat(dStr) || 10;
+    let d = overrideDiameter;
+    if (!d) {
+        // match the first set of contiguous digits/decimals, ignoring leading characters like M or 1/2 if formatted strangely.
+        const match = size.match(/[\d.]+/);
+        d = match ? parseFloat(match[0]) : 10;
+        
+        // Very basic fraction parsing for sizes like "1/2" or "3/4"
+        if (size.includes('1/2')) d = 12.7;
+        else if (size.includes('1/4')) d = 6.35;
+        else if (size.includes('3/8')) d = 9.53;
+        else if (size.includes('5/8')) d = 15.88;
+        else if (size.includes('3/4')) d = 19.05;
+        
+        // If it's a pipe size, the nominal size string isn't the true outer diameter. Let THREAD_STANDARDS dictate diameter where possible, but if we fall back to this, let's just make it proportional to something reasonable.
+        if (size.includes('G ') || size.includes('NPT')) d = d * 25.4 + 10; 
+    }
+    
     return {
         size,
         s: d * 1.6,

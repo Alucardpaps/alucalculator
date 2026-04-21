@@ -9,6 +9,7 @@ import { ArrowLeftRight, CheckCircle, AlertTriangle, Plus, FileText } from 'luci
 import { useProjectStore } from "@/store/projectStore";
 import { PDFReportEngine, ReportMetadata } from "@/lib/pdfReportEngine";
 import { ReportSettingsModal } from "@/components/ui/ReportSettingsModal";
+import { SaveButton } from "@/components/calculation/SaveButton";
 
 export function FastenersModule({ lang, dict }: { lang: string, dict: any }) {
     const {
@@ -88,8 +89,14 @@ export function FastenersModule({ lang, dict }: { lang: string, dict: any }) {
         <div className="flex flex-col h-full bg-transparent text-slate-200 select-none p-6">
             {/* Toolbar */}
             <div className="flex items-center gap-2 mb-6 justify-end">
-                <div className="mr-auto">
-                    <span className="text-[10px] font-black uppercase text-orange-500 tracking-[0.3em] bg-orange-500/10 px-3 py-1.5 rounded-full border border-orange-500/20">Thread Selection Engine</span>
+                <div className="mr-auto flex items-center gap-4">
+                    <span className="text-[10px] font-black uppercase text-orange-500 tracking-[0.3em] bg-orange-500/10 px-3 py-1.5 rounded-full border border-orange-500/20">Bölüm J: Fastener Analysis</span>
+                    <SaveButton 
+                        type="fasteners"
+                        inputData={{ standard, size, fastenerType, length }}
+                        engineVersion="v2.0"
+                        resultJson={results}
+                    />
                 </div>
 
                 <div className="flex gap-2">

@@ -87,12 +87,12 @@ export const FASTENERS_DB: Fastener[] = [
 
     // --- BSPP (G) Parallel Pipe ---
     // Pitch is TPI. Angle 55.
-    { standard: 'BSPP (G)', size: 'G 1/8', pitch: 28, majorDia: 9.728, minorDia: 8.566, pitchDia: 9.147, tapDrill: 8.8, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 1/4', pitch: 19, majorDia: 13.157, minorDia: 11.445, pitchDia: 12.301, tapDrill: 11.8, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 3/8', pitch: 19, majorDia: 16.662, minorDia: 14.950, pitchDia: 15.806, tapDrill: 15.25, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 19.0, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 24.5, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 30.75, stressArea: 0 },
+    { standard: 'BSPP (G)', size: 'G 1/8', pitch: 28, majorDia: 9.728, minorDia: 8.566, pitchDia: 9.147, tapDrill: 8.8, stressArea: 61.6 },
+    { standard: 'BSPP (G)', size: 'G 1/4', pitch: 19, majorDia: 13.157, minorDia: 11.445, pitchDia: 12.301, tapDrill: 11.8, stressArea: 110.7 },
+    { standard: 'BSPP (G)', size: 'G 3/8', pitch: 19, majorDia: 16.662, minorDia: 14.950, pitchDia: 15.806, tapDrill: 15.25, stressArea: 185.8 },
+    { standard: 'BSPP (G)', size: 'G 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 19.0, stressArea: 290.0 },
+    { standard: 'BSPP (G)', size: 'G 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 24.5, stressArea: 479.1 },
+    { standard: 'BSPP (G)', size: 'G 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 30.75, stressArea: 756.2 },
     { standard: 'BSPP (G)', size: 'G 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 39.5, stressArea: 0 },
     { standard: 'BSPP (G)', size: 'G 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 45.0, stressArea: 0 },
     { standard: 'BSPP (G)', size: 'G 2', pitch: 11, majorDia: 59.614, minorDia: 56.656, pitchDia: 58.135, tapDrill: 57.0, stressArea: 0 },
@@ -101,12 +101,12 @@ export const FASTENERS_DB: Fastener[] = [
 
     // --- BSPT (R) Tapered Pipe (ISO 7) ---
     // Pitch is TPI. Angle 55. Major Dia is Gauge Plane Diameter.
-    { standard: 'BSPT (R)', size: 'R 1/16', pitch: 28, majorDia: 7.723, minorDia: 6.561, pitchDia: 7.142, tapDrill: 6.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 1/8', pitch: 28, majorDia: 9.728, minorDia: 8.566, pitchDia: 9.147, tapDrill: 8.2, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 1/4', pitch: 19, majorDia: 13.157, minorDia: 11.445, pitchDia: 12.301, tapDrill: 11.1, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 3/8', pitch: 19, majorDia: 16.662, minorDia: 14.950, pitchDia: 15.806, tapDrill: 14.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 18.0, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 23.5, stressArea: 0 },
+    { standard: 'BSPT (R)', size: 'R 1/16', pitch: 28, majorDia: 7.723, minorDia: 6.561, pitchDia: 7.142, tapDrill: 6.5, stressArea: 37.5 },
+    { standard: 'BSPT (R)', size: 'R 1/8', pitch: 28, majorDia: 9.728, minorDia: 8.566, pitchDia: 9.147, tapDrill: 8.2, stressArea: 61.6 },
+    { standard: 'BSPT (R)', size: 'R 1/4', pitch: 19, majorDia: 13.157, minorDia: 11.445, pitchDia: 12.301, tapDrill: 11.1, stressArea: 110.7 },
+    { standard: 'BSPT (R)', size: 'R 3/8', pitch: 19, majorDia: 16.662, minorDia: 14.950, pitchDia: 15.806, tapDrill: 14.5, stressArea: 185.8 },
+    { standard: 'BSPT (R)', size: 'R 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 18.0, stressArea: 290.0 },
+    { standard: 'BSPT (R)', size: 'R 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 23.5, stressArea: 479.1 },
     { standard: 'BSPT (R)', size: 'R 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 29.5, stressArea: 0 },
     { standard: 'BSPT (R)', size: 'R 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 38.0, stressArea: 0 },
     { standard: 'BSPT (R)', size: 'R 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 44.0, stressArea: 0 },

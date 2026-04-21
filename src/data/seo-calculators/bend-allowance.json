@@ -1,0 +1,37 @@
+{
+  "id": "bend-allowance",
+  "title": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc",
+  "slug": "bend-allowance",
+  "keyword": "sheet metal bend allowance calculator",
+  "category": "manufacturing",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Sheet Metal Bend Allowance guide with ANSI Standard formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the flat blank length for precision sheet metal bending.",
+    "formula": "BA = A (R + K \\cdot T)",
+    "variables": {
+      "BA": "Bend allowance",
+      "A": "Angle",
+      "R": "Rad",
+      "K": "K-factor"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify K-factor for material",
+      "Check bend radius limit"
+    ],
+    "pitfalls": [
+      "Ignoring springback"
+    ],
+    "step_by_step": "1. Define system parameters for Sheet Metal Bend Allowance.\n2. Consult the technical reference table for material constants.\n3. Apply the ANSI Standard formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Manufacturing applications, accurate Sheet Metal Bend Allowance analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

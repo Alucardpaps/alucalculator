@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { evaluate } from 'mathjs';
 
+
+
 interface InteractiveFormulaProps {
   formula: string;
   variables: Record<string, string>;
@@ -41,6 +43,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ formula,
 
   const [result, setResult] = useState<number | null>(null);
   const [errorChart, setErrorChart] = useState<string | null>(null);
+
 
   // Re-calculate when inputs change
   useEffect(() => {
@@ -113,6 +116,8 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ formula,
              <div className="text-xs text-emerald-500/50 w-1/3 truncate">{variables[resultVar] || "Result"}</div>
           </div>
         </div>
+
+
       </div>
     </div>
   );

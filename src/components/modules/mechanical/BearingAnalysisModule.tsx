@@ -9,6 +9,7 @@ import {
     Layers, PenTool, Box, Zap, Search,
     ArrowRight, Activity, Gauge
 } from 'lucide-react';
+import { SaveButton } from "@/components/calculation/SaveButton";
 import { 
     BEARING_CATALOG, 
     BearingData, 
@@ -86,14 +87,22 @@ export default function BearingAnalysisModule() {
             {/* CONFIGURATION SIDEBAR (38%) */}
             <div className="w-[38%] h-full flex flex-col bg-[#0b121d]/80 rounded-2xl border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl">
                 
-                <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                    <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400">
-                        <Activity size={20} strokeWidth={2} />
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400">
+                            <Activity size={20} strokeWidth={2} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold tracking-tight text-gray-100 uppercase">ISO 281 Suite</h2>
+                            <p className="text-[10px] text-indigo-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Bearing Analytics & Life Prediction</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold tracking-tight text-gray-100 uppercase">ISO 281 Suite</h2>
-                        <p className="text-[10px] text-indigo-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Bearing Analytics & Life Prediction</p>
-                    </div>
+                    <SaveButton 
+                        type="bearings"
+                        inputData={{ searchQuery, radialLoad, axialLoad, rpm, reliability, viscosity }}
+                        engineVersion="v2.5"
+                        resultJson={results}
+                    />
                 </div>
 
                 <div className="space-y-8">

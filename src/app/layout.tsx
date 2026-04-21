@@ -4,6 +4,8 @@ import './globals.css';
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { GoogleAnalytics } from "@/components/os/GoogleAnalytics";
 import { CookieConsent } from "@/components/os/CookieConsent";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -24,6 +26,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://www.alucalculator.com'),
     title: {
         default: "AluCalc OS | Engineering Intelligence Platform",
         template: "%s | AluCalc OS"
@@ -79,10 +82,14 @@ export default function RootLayout({
                 className={`${inter.className} ${jetbrainsMono.variable} h-full w-full bg-[#020408] text-slate-200 selection:bg-blue-500/30`}
                 suppressHydrationWarning
             >
-                <GoogleAnalytics gaId="G-ALUCALC-001" />
+                <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
                 <ServiceWorkerRegistration />
 
-                {children}
+                <AuthProvider>
+                    <ErrorBoundary>
+                        {children}
+                    </ErrorBoundary>
+                </AuthProvider>
 
                 <CookieConsent />
 

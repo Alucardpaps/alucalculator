@@ -1,0 +1,34 @@
+{
+  "id": "ohms-law",
+  "title": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc",
+  "slug": "ohms-law",
+  "keyword": "ohm's law (advanced dc/ac) calculator",
+  "category": "electrical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Ohm's Law (Advanced DC/AC) guide with IEC 60038 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc",
+    "intro": "Fundamental relationship between potential difference, flow, and combined resistance/reactance.",
+    "formula": "V = I \\cdot Z",
+    "variables": {
+      "V": "Voltage",
+      "I": "Current",
+      "Z": "Impedance"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify resistor power rating (P=I²R)",
+      "Check voltage drop limits"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Ohm's Law (Advanced DC/AC).\n2. Consult the technical reference table for material constants.\n3. Apply the IEC 60038 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Electrical applications, accurate Ohm's Law (Advanced DC/AC) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

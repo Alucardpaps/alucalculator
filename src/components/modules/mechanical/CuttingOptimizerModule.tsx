@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
-import { Plus, Trash2, Calculator, Settings, RotateCcw, Copy, Code, Layers, FileCode, ChevronDown, Scissors } from 'lucide-react';
+import { Plus, Trash2, Calculator, Settings, RotateCcw, Copy, Code, Layers, FileCode, ChevronDown, Scissors, FileText } from 'lucide-react';
 import { calculateNesting, type CutItem, type NestingResult, type NestingOptions } from '@/utils/nestingAlgorithm';
 import { NestingVisualization } from '@/components/NestingVisualization';
 import { generateGCodeToolpath, type CNCConfig } from './CamToolpathGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -55,6 +57,63 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
         setGcode(generateGCodeToolpath(r, cfg));
         setViewMode('result'); setResultTab('nested');
     }, [parts, stockLength, kerf, trimStart, trimEnd, algorithm, materialId, feedRate, plungeRate, safeZ, cutZ]);
+
+    const generatePDF = () => {
+        if (!result) return;
+        const doc = new jsPDF();
+        const mat = MATERIALS.find(m => m.id === materialId)?.label || 'Unknown';
+        
+        doc.setFontSize(22);
+        doc.setTextColor(16, 185, 129);
+        doc.text('CUTTING OPTIMIZER REPORT', 14, 22);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`ALUCALC OS v5.0 | ${new Date().toLocaleString()}`, 14, 30);
+        
+        doc.setDrawColor(230);
+        doc.line(14, 35, 196, 35);
+
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text('PRODUCTION SUMMARY', 14, 45);
+        
+        const summaryData = [
+            ['Material', mat],
+            ['Stock Length', `${stockLength} mm`],
+            ['Blade Kerf', `${kerf} mm`],
+            ['Efficiency', `${(100 - result.totalWastePct).toFixed(2)}%`],
+            ['Total Bars Used', String(result.totalStockUsed)],
+            ['Total Waste', `${result.totalWaste.toFixed(0)} mm`],
+            ['Total Cuts', String(result.stats.totalCuts)]
+        ];
+
+        autoTable(doc, {
+            startY: 50,
+            head: [['Metric', 'Value']],
+            body: summaryData,
+            theme: 'striped',
+            headStyles: { fillColor: [16, 185, 129] },
+        });
+
+        doc.text('CUTTING PATTERNS (BAR BY BAR)', 14, (doc as any).lastAutoTable.finalY + 15);
+        
+        const patternData = result.patterns.map((pat, i) => [
+            `Bar ${i + 1}`,
+            pat.cuts.map(c => c.length).join(' + '),
+            `${pat.waste.toFixed(0)} mm`
+        ]);
+
+        autoTable(doc, {
+            startY: (doc as any).lastAutoTable.finalY + 20,
+            head: [['Stock Unit', 'Cuts (mm)', 'Waste (mm)']],
+            body: patternData,
+            theme: 'grid',
+            headStyles: { fillColor: [59, 130, 246] },
+        });
+
+        doc.save(`AluCalc_CutPlan_${new Date().getTime()}.pdf`);
+    };
 
     const effectiveLength = stockLength - trimStart - trimEnd;
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
@@ -184,10 +243,20 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-2 text-right pt-2">
-                                        <SideStat label="Bars Used" value={String(result.totalStockUsed)} color="#10b981" />
-                                        <SideStat label="Total Waste" value={`${result.totalWaste.toFixed(0)} mm`} color="#f59e0b" />
-                                        <SideStat label="Total Cuts" value={String(result.stats.totalCuts)} color="#8b5cf6" />
+                                    <div className="flex flex-col gap-2 text-right pt-2 items-end">
+                                        <div className="flex gap-2 mb-4">
+                                            <button 
+                                                onClick={generatePDF}
+                                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-emerald-400 transition-all shadow-lg shadow-emerald-900/10"
+                                            >
+                                                <FileText size={14} /> Export Technical PDF
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <SideStat label="Bars Used" value={String(result.totalStockUsed)} color="#10b981" />
+                                            <SideStat label="Total Waste" value={`${result.totalWaste.toFixed(0)} mm`} color="#f59e0b" />
+                                            <SideStat label="Total Cuts" value={String(result.stats.totalCuts)} color="#8b5cf6" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

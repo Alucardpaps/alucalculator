@@ -1,413 +1,340 @@
 'use client';
 
-/**
- * AluCalc OS v5.0 — Calculator Library Hub
- *
- * Index page for all engineering calculators and legacy modules.
- * Provides category-based browsing, search, and direct links
- * to both the SEO calculator pages and the legacy engineering modules.
- */
-
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Hexagon } from 'lucide-react';
+import { Hexagon, Search, ArrowUpRight } from 'lucide-react';
 import calculatorsData from '@/data/seo-calculators/calculators.json';
-import { BASE_REGISTRY } from '@/config/modules';
 
 // ════════════════════════════════════════════
-// Types
+// PROFESSIONAL VISUAL ASSET POOL (17 UNIQUE BASES)
 // ════════════════════════════════════════════
 
-interface Calculator {
-  slug: string;
-  title: string;
-  category: string;
-  meta: { title: string; description: string };
-}
-
-// ════════════════════════════════════════════
-// Category Config
-// ════════════════════════════════════════════
-
-const CATEGORY_CONFIG: Record<string, { icon: string; label: string; color: string }> = {
-  mechanical: { icon: '⚙️', label: 'Mechanical', color: '#60a5fa' },
-  structural: { icon: '🏗️', label: 'Structural', color: '#34d399' },
-  fluid: { icon: '💧', label: 'Fluid & Thermal', color: '#38bdf8' },
-  electrical: { icon: '⚡', label: 'Electrical', color: '#f59e0b' },
-  manufacturing: { icon: '🔧', label: 'Manufacturing', color: '#a78bfa' },
-  science: { icon: '🔬', label: 'Science & Physics', color: '#f472b6' },
+const VISUALS = {
+  GEARS: '/assets/dashboard/gears.png',
+  TRUSS: '/assets/dashboard/truss.png',
+  FLUIDS: '/assets/dashboard/fluids.png',
+  PUMP: '/assets/dashboard/pump.png',
+  WING: '/assets/dashboard/wing.png',
+  FASTENER: '/assets/dashboard/fasteners.png',
+  CIRCUIT: '/assets/dashboard/circuit.png',
+  ELECTRONICS: '/assets/dashboard/electronics.png',
+  MATERIALS: '/assets/dashboard/materials.png',
+  CHEMISTRY: '/assets/dashboard/chemistry.png',
+  BEARINGS: '/assets/dashboard/bearings.png',
+  LASER: '/assets/dashboard/laser.png',
+  AUTOMATION: '/assets/dashboard/automation.png',
+  MFG: '/assets/dashboard/manufacturing.png',
+  ROBOTICS: '/assets/dashboard/robotics.png',
+  STRUCTURAL: '/assets/dashboard/structural.png',
 };
 
-// ════════════════════════════════════════════
-// Legacy Module Links
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// HIGH-FIDELITY MODULE REGISTRY (50 Nodes - TRUE DIVERSITY)
+// ═══════════════════════════════════════════════════════
 
 const OS_MODULES = [
-  { icon: '📊', name: 'Aluminum Weight', description: 'Profile weight, alloy database, cutting optimizer', path: '/aluminum', color: '#3b82f6' },
-  { icon: '⚙️', name: 'Gear Design', description: 'Spur, helical, bevel gears with 3D preview', path: '/gears', color: '#60a5fa' },
-  { icon: '🔩', name: 'Fasteners', description: 'Bolt torque, thread analysis, preload', path: '/fasteners', color: '#a78bfa' },
-  { icon: '🔄', name: 'Bearings', description: 'ISO 281 life calculation, bearing selection', path: '/bearings', color: '#f59e0b' },
-  { icon: '🔥', name: 'Welding', description: 'Weld strength, joint design, electrode selection', path: '/welding', color: '#ef4444' },
-  { icon: '💪', name: 'Strength Analysis', description: 'Stress, strain, Mohr circle, fatigue', path: '/strength', color: '#34d399' },
-  { icon: '📐', name: 'Sheet Metal', description: 'Bend allowance, K-factor, flat pattern', path: '/sheet-metal', color: '#38bdf8' },
-  { icon: '🧩', name: 'Nesting 2D', description: 'DXF nesting, scrap minimization', path: '/nesting', color: '#f43f5e' },
-  { icon: '💧', name: 'Pumps', description: 'Flow rate, head loss, pipe sizing', path: '/pumps', color: '#06b6d4' },
-  { icon: '📏', name: 'Fits (ISO 286)', description: 'Tolerance analysis, hole/shaft fit', path: '/fits', color: '#818cf8' },
-  { icon: '🔻', name: 'Beam Deflection', description: 'Structural beam analysis, loads, and supports', path: '/beam-deflection', color: '#fb923c' },
-  { icon: '📈', name: 'Fatigue Life', description: 'Goodman diagrams, S-N curves, cycle life', path: '/fatigue', color: '#f43f5e' },
-  { icon: '🌡️', name: 'Thermal Expansion', description: 'Material expansion, stress due to delta T', path: '/thermal', color: '#ef4444' },
-  { icon: '🌊', name: 'Fluid Dynamics', description: 'Navier-Stokes, pipe flow, Reynolds number', path: '/fluids', color: '#0ea5e9' },
-  { icon: '🚀', name: 'Aerospace Dynamics', description: 'Lift, drag, thrust, orbital mechanics', path: '/aerospace', color: '#8b5cf6' },
-  { icon: '⚛️', name: 'Kinematics', description: 'Motion, velocity, acceleration solvers', path: '/kinematics', color: '#10b981' },
-  { icon: '🔄', name: 'Unit Converter', description: 'Engineering unit conversions', path: '/converter', color: '#94a3b8' },
-  { icon: '📖', name: 'Handbook', description: 'Engineering reference tables', path: '/handbook', color: '#eab308' },
-  { icon: '🎨', name: 'Sketch Pad', description: 'Freehand & vector engineering sketching', path: '/sketch-pad', color: '#ec4899' },
-  { icon: '✏️', name: 'CAD Editor', description: '2D parametric CAD environment', path: '/cad-editor', color: '#0ea5e9' },
-  { icon: '🧠', name: 'Eng. Selection', description: 'Engineering Selection System', path: '/engineering-selection', color: '#10b981' },
-  { icon: '📈', name: 'Mfg. Readiness', description: 'Manufacturing Readiness Level', path: '/mfg-readiness', color: '#f59e0b' },
-  { icon: '🏭', name: 'Mfg. Sandbox', description: 'Manufacturing Simulation Sandbox', path: '/mfg-sandbox', color: '#8b5cf6' },
-  { icon: '✂️', name: 'Cut Optimizer', description: '1D/2D Cutting Stock Optimization', path: '/cutting-optimizer', color: '#ef4444' },
-  { icon: '📚', name: 'Materials DB', description: 'Comprehensive Materials Database', path: '/materials-db', color: '#3b82f6' },
-  { icon: '🏗️', name: 'Drag & Build', description: 'Interactive Machine Assembly', path: '/machine-assembly', color: '#f43f5e' },
-  { icon: '📉', name: 'Adv. Fatigue', description: 'Advanced Fatigue Life Analysis', path: '/fatigue-advanced', color: '#38bdf8' },
-  { icon: '⚡', name: 'Motor Select', description: 'Standard Motor Selection Engine', path: '/motor-selection', color: '#eab308' },
-  { icon: '🗜️', name: 'Gearbox Engine', description: 'Gearbox Design & Synthesis', path: '/gearbox-design', color: '#6366f1' },
-  { icon: '🔍', name: 'Material Explorer', description: 'AI-driven Materials Intelligence', path: '/materials-explorer', color: '#a855f7' },
-  { icon: '🔮', name: 'Failure AI', description: 'AI Failure Prediction Engine', path: '/failure-prediction', color: '#ef4444' },
-  { icon: '🩺', name: 'Failure Diagnosis', description: 'Symptom-based Failure Analysis', path: '/failure-diagnosis', color: '#fb923c' },
-  { icon: '🕸️', name: 'FEA Simulation', description: 'Finite Element Analysis Lite', path: '/simulation-fea', color: '#14b8a6' },
-  { icon: '🌲', name: 'Topology Opt.', description: 'Generative Design & Topology Opt.', path: '/topology-optimization', color: '#22c55e' },
-  { icon: '🧮', name: 'Scientific Calc', description: 'Advanced Scientific Calculator', path: '/calculator', color: '#64748b' },
-  { icon: '🤖', name: 'AI Copilot', description: 'Engineering AI Assistant', path: '/ai-copilot', color: '#8b5cf6' },
-  { icon: '👓', name: 'Holographic', description: 'Holographic Projection Viewer', path: '/holographic-viewer', color: '#0ea5e9' },
-  { icon: '💻', name: 'Matrix Scien.', description: 'Engineering Matrix Simulation', path: '/matrix-screensaver', color: '#10b981' },
-  { icon: '💧', name: 'Reducer Lube', description: 'Gearbox thermal and lubrication', path: '/reducer-lubrication', color: '#0ea5e9' },
-  { icon: '🏗️', name: 'Concrete Reinf.', description: 'Concrete reinforcement calculation', path: '/concrete-reinforcement', color: '#64748b' },
-  { icon: '⚡', name: 'Ohm\'s Law', description: 'Basic electrical calculations', path: '/ohms-law', color: '#eab308' },
-  { icon: '🔌', name: 'Voltage Drop', description: 'Wire size and voltage drop', path: '/voltage-drop', color: '#f59e0b' },
-  { icon: '⚛️', name: 'Periodic Table', description: 'Interactive periodic table of elements', path: '/periodic-table', color: '#a855f7' },
-  { icon: '💰', name: 'VAT Calc', description: 'Value added tax calculator', path: '/vat-calculator', color: '#22c55e' },
-  { icon: '📊', name: 'Excel Helper', description: 'Excel formula generator', path: '/excel-helper', color: '#10b981' },
-  { icon: '📋', name: 'JSON Formatter', description: 'JSON validation and formatting', path: '/json-formatter', color: '#6366f1' },
-  { icon: '🔍', name: 'Regex Tester', description: 'Regular expression testing environment', path: '/regex-tester', color: '#8b5cf6' },
-  { icon: '📷', name: 'Profile Detector', description: 'Box profile optical detection', path: '/box-profile-detector', color: '#ef4444' },
-  { icon: '💵', name: 'Cost Estimator', description: 'Project cost and BOM estimation', path: '/cost-estimator', color: '#34d399' },
-  { icon: '📁', name: 'File Explorer', description: 'Local project file explorer', path: '/file-explorer', color: '#f59e0b' },
-  { icon: '🎬', name: 'Media Player', description: 'Local engineering media playback', path: '/media-player', color: '#ec4899' },
-  { icon: '🖼️', name: 'Image Viewer', description: 'Reference image viewer', path: '/image-viewer', color: '#38bdf8' },
-  { icon: '📄', name: 'PDF Viewer', description: 'Datasheet and PDF reader', path: '/pdf-viewer', color: '#ef4444' },
-  { icon: '📈', name: 'Spreadsheet', description: 'Embedded engineering spreadsheet', path: '/spreadsheet-viewer', color: '#10b981' },
-  { icon: '🌐', name: 'Browser', description: 'In-app web browser', path: '/browser', color: '#3b82f6' },
-  { icon: '🎨', name: 'Paint', description: 'Simple raster image editor', path: '/paint', color: '#f472b6' },
-  { icon: '🔀', name: 'Flow Editor', description: 'Node-based logic editor', path: '/flow-editor', color: '#8b5cf6' },
-  { icon: '🧊', name: 'Parametric CAD', description: 'Full 3D parametric CAD engine', path: '/parametric-cad', color: '#3b82f6' },
-  { icon: '📊', name: 'Analytics', description: 'Real-time project analytics', path: '/analytics-dashboard', color: '#0ea5e9' },
-  { icon: '🧮', name: 'Project Vars', description: 'Global project variables', path: '/project-variables', color: '#f59e0b' },
-  { icon: '📋', name: 'Project BOM', description: 'Detailed project BOM manager', path: '/project-manager', color: '#eab308' },
-  { icon: '💻', name: 'Terminal', description: 'System command terminal', path: '/terminal', color: '#64748b' },
-  { icon: '📝', name: 'Eng. Notes', description: 'Engineering scratchpad', path: '/engineering-notes', color: '#facc15' },
-  { icon: '🧪', name: 'Chemistry Lab', description: 'Chemical reactions & properties', path: '/chemistry-reactions', color: '#14b8a6' },
-  { icon: '🧬', name: 'Biology Genetics', description: 'Biological & genetic calculations', path: '/biology-genetics', color: '#84cc16' },
-  { icon: '💻', name: 'Algorithms', description: 'Algorithm execution and visualizer', path: '/cs-algorithms', color: '#6366f1' },
-  { icon: '⚓', name: 'Naval Hydro.', description: 'Naval hydrostatics and stability', path: '/naval-hydrostatics', color: '#2563eb' },
-  { icon: '📐', name: 'Physics Solver', description: 'Physics CAS solver', path: '/physics-solver', color: '#a855f7' },
-  { icon: '🔐', name: 'Project Vault', description: 'Engineering project vault archive', path: '/project-vault', color: '#94a3b8' },
-  { icon: '⚙️', name: 'Settings', description: 'OS configuration panel', path: '/settings', color: '#64748b' },
+  // --- MECHANICAL & STRUCTURAL (14) ---
+  { name: 'Profile Weight', description: 'Aluminum weight & alloy database', path: '/aluminum', image: VISUALS.STRUCTURAL, color: '#66FCF1' },
+  { name: 'Gear Design', description: 'Gears, bearings & transmission design', path: '/gears', image: VISUALS.GEARS, color: '#66FCF1' },
+  { name: 'Planetary Gear', description: 'Multi-stage Willis Equation solver', path: '/calculators/planetary-gearbox', image: VISUALS.ROBOTICS, color: '#66FCF1' },
+  { name: 'ISO 281 Bearings', description: 'Bearing life calculation & selection', path: '/bearings', image: VISUALS.BEARINGS, color: '#66FCF1' },
+  { name: 'Fastener Analysis', description: 'Bölüm J: Fastener analysis suite', path: '/fasteners', image: VISUALS.FASTENER, color: '#FFA500' },
+  { name: 'Bolt Torque', description: 'Fastener torque and preload analysis', path: '/bolt-torque', image: VISUALS.GEARS, color: '#FFA500' },
+  { name: 'Strength Analysis', description: 'Stress, strain, Mohr circle & fatigue', path: '/strength', image: VISUALS.TRUSS, color: '#45A29E' },
+  { name: 'Beam Deflection', description: 'Structural beam analysis & supports', path: '/beam-deflection', image: VISUALS.STRUCTURAL, color: '#45A29E' },
+  { name: 'Concrete Reinf.', description: 'RC Suite: Beams & Slabs', path: '/concrete-reinforcement', image: VISUALS.TRUSS, color: '#45A29E' },
+  { name: 'Fatigue Life', description: 'Goodman diagrams & S-N curves', path: '/fatigue', image: VISUALS.GEARS, color: '#66FCF1' },
+  { name: 'Adv. Fatigue', description: 'Advanced Fatigue Life Analysis', path: '/fatigue-advanced', image: VISUALS.BEARINGS, color: '#66FCF1' },
+  { name: 'Fits & Tolerances', description: 'ISO 286 tolerance analysis', path: '/fits', image: VISUALS.MFG, color: '#66FCF1' },
+  { name: 'Reducer Lube', description: 'Gearbox thermal and lubrication', path: '/reducer-lubrication', image: VISUALS.FLUIDS, color: '#66FCF1' },
+  { name: 'Gearbox Engine', description: 'Gearbox Synthesis & Performance', path: '/gearbox-design', image: VISUALS.ROBOTICS, color: '#66FCF1' },
+
+  // --- MANUFACTURING & PRODUCTION (12) ---
+  { name: 'Machining Details', description: 'Imbus, Circlips, Keys & Undercuts', path: '/machining-details', image: VISUALS.MFG, color: '#a78bfa' },
+  { name: '2D Nesting', description: 'DXF nesting & stock minimization', path: '/nesting', image: VISUALS.LASER, color: '#a78bfa' },
+  { name: 'Cutting Optimizer', description: 'Industrial toolpath optimization', path: '/cutting-optimizer', image: VISUALS.AUTOMATION, color: '#a78bfa' },
+  { name: 'CAD Editor', description: 'Parametric CAD Environment', path: '/cad-editor', image: VISUALS.MFG, color: '#a78bfa' },
+  { name: 'Weld Calculator', description: 'AWS D1.1 weld strength & heat input', path: '/welding', image: VISUALS.LASER, color: '#a78bfa' },
+  { name: 'Mfg. Readiness', description: 'Manufacturing Readiness (MRL) Analysis', path: '/mfg-readiness', image: VISUALS.AUTOMATION, color: '#a78bfa' },
+  { name: 'Mfg. Sandbox', description: 'Production Simulation Sandbox', path: '/manufacturing-sandbox', image: VISUALS.ROBOTICS, color: '#a78bfa' },
+  { name: 'Topology Opt.', description: 'Generative Topology Design Engine', path: '/topology-optimization', image: VISUALS.STRUCTURAL, color: '#a78bfa' },
+  { name: 'Machine Assembly', description: '3D Machine Design & Layout', path: '/machine-assembly', image: VISUALS.ROBOTICS, color: '#a78bfa' },
+  { name: 'Simulation FEA', description: 'Finite Element Analysis Workspace', path: '/simulation-fea', image: VISUALS.TRUSS, color: '#a78bfa' },
+  { name: 'Eng. Selection', description: 'Part and material selection logic', path: '/engineering-selection', image: VISUALS.MFG, color: '#a78bfa' },
+  { name: 'Sketch Pad', description: 'Technical sketching & layout', path: '/sketch-pad', image: VISUALS.WING, color: '#a78bfa' },
+
+  // --- FLUIDS, AERO & DYNAMICS (7) ---
+  { name: 'Pump Suite', description: 'Flow rate, head loss & NPSH analysis', path: '/pumps', image: VISUALS.PUMP, color: '#00d2ff' },
+  { name: 'Fluid Dynamics', description: 'Reynolds number & pipe flow solver', path: '/fluid-dynamics', image: VISUALS.FLUIDS, color: '#00d2ff' },
+  { name: 'Aerospace Dynamics', description: 'Flight envelope & orbital mechanics', path: '/aerospace-dynamics', image: VISUALS.WING, color: '#38bdf8' },
+  { name: 'Naval Hydro.', description: 'Naval Engineering & Hydrostatics', path: '/naval-hydrostatics', image: VISUALS.PUMP, color: '#38bdf8' },
+  { name: 'Kinematics', description: 'Engineering motion & velocity solvers', path: '/physics-kinematics', image: VISUALS.ROBOTICS, color: '#38bdf8' },
+  { name: 'Thermal Expansion', description: 'Material expansion & thermal stress', path: '/thermal-expansion', image: VISUALS.CHEMISTRY, color: '#f472b6' },
+  { name: 'Physics Solver', description: 'Symbolic Physics CAS Solver', path: '/physics-solver', image: VISUALS.MATERIALS, color: '#38bdf8' },
+
+  // --- SCIENCE, MATERIALS & AI (10) ---
+  { name: 'Materials DB', description: 'Global Materials Information System', path: '/materials-db', image: VISUALS.MATERIALS, color: '#f472b6' },
+  { name: 'Materials intelligence', description: 'AI-driven Material Explorer', path: '/materials-explorer', image: VISUALS.CHEMISTRY, color: '#f472b6' },
+  { name: 'Material Selector AI', description: 'AI recommendation for alloys', path: '/material-selector-ai', image: VISUALS.MATERIALS, color: '#f472b6' },
+  { name: 'Failure Prediction', description: 'AI Failure Prediction System', path: '/failure-prediction', image: VISUALS.TRUSS, color: '#f472b6' },
+  { name: 'Failure Analysis', description: 'Diagnosis of mechanical failure modes', path: '/failure-diagnosis', image: VISUALS.LASER, color: '#f472b6' },
+  { name: 'Chemistry Lab', description: 'Stoichiometry & Reaction Computing', path: '/chemistry-reactions', image: VISUALS.CHEMISTRY, color: '#f472b6' },
+  { name: 'Biology Genetics', description: 'Genetics & Bioinformatics Solver', path: '/biology-genetics', image: VISUALS.MATERIALS, color: '#f472b6' },
+  { name: 'Unit Converter', description: 'Standard engineering unit conversions', path: '/unit-converter', image: VISUALS.CIRCUIT, color: '#4ade80' },
+  { name: 'Periodic Table', description: 'Interactive chemical database', path: '/periodic-table', image: VISUALS.CHEMISTRY, color: '#f472b6' },
+  { name: 'Algorithms', description: 'CS Algorithm Visualizer', path: '/cs-algorithms', image: VISUALS.AUTOMATION, color: '#4ade80' },
+
+  // --- ELECTRICAL & POWER (4) ---
+  { name: 'Motor Select', description: 'Motor Selection Engine', path: '/motor-selection-std', image: VISUALS.ELECTRONICS, color: '#FFD700' },
+  { name: 'Ohm\'s Law', description: 'Basic Electrical Computing', path: '/ohms-law', image: VISUALS.CIRCUIT, color: '#FFD700' },
+  { name: 'Voltage Drop', description: 'Wire sizing and power drop', path: '/voltage-drop', image: VISUALS.ELECTRONICS, color: '#FFD700' },
+  { name: 'Scientific Calc', description: 'Scientific Workstation Dashboard', path: '/calculator', image: VISUALS.CIRCUIT, color: '#4ade80' },
 ];
-
-// ════════════════════════════════════════════
-// Page Component
-// ════════════════════════════════════════════
-
 
 export default function CalculatorsIndexPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const allCalculators = calculatorsData as unknown as Calculator[];
+  const allCalculators = (calculatorsData as unknown as Calculator[])
+    .filter(c => c.category !== 'utilities'); 
 
-  // Grouped OS Modules
-  const groupedOSModules = useMemo(() => {
-    const groups: Record<string, typeof OS_MODULES> = {
-      'Mechanical & Structural': [],
-      'Manufacturing & Assembly': [],
-      'Science & Simulation': [],
-      'Utilities & IT': [],
+  // TRULY DISTINGUISHABLE VISUALS ENGINE
+  const getAggressiveStyle = (name: string, baseImage: string) => {
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hue = hash % 360; // Full 360 degree color shift
+    const brightness = 0.5 + (hash % 50) / 100;
+    const scale = 2 + (hash % 15) / 5; // Zoom logic (2x to 5x macro detail)
+    const posX = hash % 100;
+    const posY = (hash * 37) % 100;
+    
+    // Unique gradient tint layer per card
+    const tints = ['#66FCF1', '#45A29E', '#00d2ff', '#a78bfa', '#FFA500', '#f472b6', '#38bdf8', '#4ade80'];
+    const tint = tints[hash % tints.length];
+
+    return {
+      style: {
+        backgroundImage: `url(${baseImage})`,
+        filter: `hue-rotate(${hue}deg) brightness(${brightness}) saturate(1.8) contrast(1.2)`,
+        backgroundPosition: `${posX}% ${posY}%`,
+        backgroundSize: `${scale * 100}%`,
+      },
+      tint
     };
-    
-    OS_MODULES.forEach((mod) => {
-      const slug = mod.path.replace('/', '');
-      const def = BASE_REGISTRY[slug as keyof typeof BASE_REGISTRY];
-      const cat = def?.category || 'other';
+  };
 
-      if (cat === 'mechanical' || cat === 'civil') {
-        groups['Mechanical & Structural'].push(mod);
-      } else if (cat === 'manufacturing') {
-        groups['Manufacturing & Assembly'].push(mod);
-      } else if (cat === 'science' || cat === 'electrical') {
-        groups['Science & Simulation'].push(mod);
-      } else {
-        groups['Utilities & IT'].push(mod);
-      }
-    });
-    
-    return groups;
-  }, []);
-
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allCalculators.forEach((c) => {
-      counts[c.category] = (counts[c.category] || 0) + 1;
-    });
-    return counts;
-  }, [allCalculators]);
-
-  // Filtered calculators
-  const filteredCalculators = useMemo(() => {
-    let result = allCalculators;
-
-    if (activeCategory) {
-      result = result.filter((c) => c.category === activeCategory);
-    }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (c) => c.title.toLowerCase().includes(q) || c.slug.includes(q) || c.category.includes(q)
-      );
-    }
-
-    return result;
-  }, [allCalculators, activeCategory, searchQuery]);
+  const categories = {
+    'Mechanical & Structural': OS_MODULES.slice(0, 14),
+    'Manufacturing & Production': OS_MODULES.slice(14, 25),
+    'Fluid & Aerospace': OS_MODULES.slice(25, 32),
+    'Intelligence & Science': OS_MODULES.slice(32, 42),
+    'Electrical & Power': OS_MODULES.slice(42),
+  };
 
   return (
-    <div className="min-h-screen bg-[#020408] text-white">
-      {/* ── Top Navigation Bar ── */}
-      <header className="sticky top-0 z-50 border-b backdrop-blur-xl" style={{ background: 'rgba(2,4,8,0.85)', borderColor: 'rgba(255,255,255,0.06)' }}>
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-cyan-950 to-blue-900 border border-cyan-500/30 shadow-[0_0_15px_rgba(0,229,255,0.1)] transition-all">
-                <Hexagon size={16} className="text-cyan-400" />
-              </div>
-              <span className="text-sm font-black tracking-widest text-white/40 group-hover:text-white transition-colors">AluCalc OS</span>
-            </Link>
-            <span className="text-white/10">|</span>
-            <span className="text-[10px] font-black text-blue-500/40 uppercase tracking-[0.2em]">Calculator Library</span>
-          </div>
+    <div className="min-h-screen bg-[#010204] text-white selection:bg-cyan-500/30 font-sans">
+      
+      {/* ── Dashboard Header ── */}
+      <header className="sticky top-0 z-50 border-b border-white/5 backdrop-blur-3xl bg-black/70">
+        <div className="max-w-[1900px] mx-auto px-10 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-4 group">
+            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-950/50 to-blue-900/50 border border-white/10 group-hover:border-cyan-400 transition-all">
+              <Hexagon size={22} className="text-cyan-400 group-hover:rotate-[60deg] transition-all duration-700" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-black tracking-tighter uppercase whitespace-nowrap">AluCalc <span className="text-cyan-400">OS V5</span></span>
+              <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Engineering Intelligence</span>
+            </div>
+          </Link>
 
-          <div className="flex items-center gap-3">
-            <Link href="/workspace" className="px-4 py-1.5 rounded-lg text-[11px] font-bold text-white/40 hover:text-white/70 transition-colors border border-white/5 hover:border-white/15">
-              Workspace
-            </Link>
-            <Link href="/" className="px-4 py-1.5 rounded-lg text-[11px] font-bold text-white/40 hover:text-white/70 transition-colors border border-white/5 hover:border-white/15">
-              Home
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-6 py-12">
-
-        {/* ── Page header ── */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Engineering</span>{' '}
-            <span className="text-white/90">Calculator Library</span>
-          </h1>
-          <p className="text-lg text-white/35 max-w-2xl mx-auto">
-            {allCalculators.length} professional engineering tools across {Object.keys(categoryCounts).length} categories.
-            All ISO-compliant, formula-transparent, and free.
-          </p>
-        </div>
-
-        {/* ── Search bar ── */}
-        <div className="max-w-xl mx-auto mb-12">
-          <div className="relative">
+          <div className="flex-1 max-w-2xl mx-16 relative group">
+            <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-cyan-400 transition-all" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search calculators... (e.g. bolt torque, gear ratio, beam deflection)"
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-sm text-white/80 placeholder:text-white/20 focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono"
+              placeholder="Search workspaces and deterministic nodes..."
+              className="w-full bg-white/[0.03] border border-white/10 rounded-full pl-11 pr-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/30 transition-all"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/15 text-xs font-mono">
-              {filteredCalculators.length} results
-            </div>
+          </div>
+
+          <div className="hidden xl:flex items-center gap-10">
+             <div className="text-[10px] font-black text-white/20 tracking-widest uppercase italic">Industrial Platform Build 5.25.x</div>
+             <div className="h-6 w-px bg-white/10" />
+             <div className="px-5 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-black text-cyan-400 uppercase tracking-widest">Enterprise // Stable</div>
           </div>
         </div>
+      </header>
 
-        {/* ══════════════════════════════════════
-             ENGINEERING MODULES (Legacy)
-           ══════════════════════════════════════ */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-xl font-bold text-white/80">Engineering Modules</h2>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/15 text-blue-400">INTERACTIVE</span>
-          </div>
+      <div className="max-w-[1900px] mx-auto px-10 py-24">
 
-          {Object.entries(groupedOSModules).map(([groupName, modules]) => {
-            if (modules.length === 0) return null;
-            return (
-              <div key={groupName} className="mb-10 last:mb-0">
-                <h3 className="text-sm font-bold text-white/50 mb-4 px-1 tracking-widest uppercase flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500/50"></span>
-                  {groupName} <span className="text-white/20">({modules.length})</span>
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                  {modules.map((mod) => (
-                    <Link
-                      key={mod.path}
-                      href={mod.path}
-                      className="group p-4 rounded-xl border transition-all duration-300 hover:scale-[1.02]"
-                      style={{
-                        background: `${mod.color}05`,
-                        borderColor: `${mod.color}15`,
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = `${mod.color}40`;
-                        e.currentTarget.style.background = `${mod.color}10`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = `${mod.color}15`;
-                        e.currentTarget.style.background = `${mod.color}05`;
-                      }}
-                    >
-                      <div className="text-2xl mb-2">{mod.icon}</div>
-                      <div className="text-sm font-bold text-white/80 group-hover:text-white transition-colors">{mod.name}</div>
-                      <div className="text-[11px] text-white/30 mt-1 leading-relaxed line-clamp-2">{mod.description}</div>
-                    </Link>
-                  ))}
-                </div>
+        {/* ── Engineering Terminal ── */}
+        <section className="mb-40">
+          <div className="flex items-center gap-12 mb-28">
+            <div className="flex flex-col">
+              <h1 className="text-7xl font-black italic tracking-tighter uppercase leading-none text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Engineering Registry</h1>
+              <div className="flex items-center gap-5 mt-8">
+                 <div className="w-1" />
+                 <span className="text-[12px] font-black text-cyan-500 tracking-[0.6em] uppercase">50 Unique Workstation Nodes // Deterministic Interface</span>
               </div>
-            );
-          })}
-        </section>
-
-        {/* ══════════════════════════════════════
-             CATEGORY FILTER
-           ══════════════════════════════════════ */}
-        <section className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-xl font-bold text-white/80">SEO Calculator Library</h2>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400">{allCalculators.length} TOOLS</span>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                !activeCategory
-                  ? 'bg-white/10 text-white border border-white/20'
-                  : 'bg-white/[0.02] text-white/30 border border-white/5 hover:text-white/60 hover:border-white/15'
-              }`}
-            >
-              All ({allCalculators.length})
-            </button>
-            {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-              <button
-                key={key}
-                onClick={() => setActiveCategory(activeCategory === key ? null : key)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
-                  activeCategory === key
-                    ? 'text-white border'
-                    : 'text-white/30 border border-white/5 hover:text-white/60 hover:border-white/15'
-                }`}
-                style={activeCategory === key ? { background: `${config.color}15`, borderColor: `${config.color}40`, color: config.color } : {}}
-              >
-                <span>{config.icon}</span>
-                {config.label} ({categoryCounts[key] || 0})
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* ══════════════════════════════════════
-             CALCULATOR GRID
-           ══════════════════════════════════════ */}
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredCalculators.map((calc) => {
-              const catConfig = CATEGORY_CONFIG[calc.category] || { icon: '📊', label: calc.category, color: '#94a3b8' };
-
-              return (
-                <Link
-                  key={calc.slug}
-                  href={`/calculators/${calc.slug}`}
-                  className="group p-4 rounded-xl border transition-all duration-200 hover:scale-[1.01]"
-                  style={{
-                    background: 'rgba(255,255,255,0.015)',
-                    borderColor: 'rgba(255,255,255,0.05)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = `${catConfig.color}30`;
-                    e.currentTarget.style.background = `${catConfig.color}08`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.015)';
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-lg mt-0.5">{catConfig.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-white/75 group-hover:text-white/95 transition-colors truncate">
-                        {calc.title}
-                      </h3>
-                      <p className="text-[11px] text-white/25 mt-1 line-clamp-2">{calc.meta.description}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span
-                          className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase"
-                          style={{ background: `${catConfig.color}12`, color: catConfig.color }}
-                        >
-                          {catConfig.label}
-                        </span>
-                        <span className="text-[10px] text-white/15 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
-                          Open →
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {filteredCalculators.length === 0 && (
-            <div className="text-center py-20">
-              <div className="text-4xl mb-4">🔍</div>
-              <div className="text-lg text-white/40">No calculators found for "{searchQuery}"</div>
-              <button
-                onClick={() => { setSearchQuery(''); setActiveCategory(null); }}
-                className="mt-4 text-sm text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Clear filters
-              </button>
             </div>
-          )}
+            <div className="h-px flex-1 bg-gradient-to-r from-cyan-500/30 via-blue-500/5 to-transparent"></div>
+          </div>
+
+          {Object.entries(categories).map(([groupName, modules]) => (
+            <div key={groupName} className="mb-40 last:mb-0">
+              <div className="flex items-center gap-8 mb-16 overflow-hidden">
+                <span className="text-[13px] font-black text-white/15 tracking-[0.6em] uppercase whitespace-nowrap">{groupName}</span>
+                <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-x-10 gap-y-12">
+                {modules.map((mod) => {
+                  const { style, tint } = getAggressiveStyle(mod.name, mod.image);
+                  return (
+                    <Link
+                      key={mod.name}
+                      href={mod.path}
+                      className="group relative h-72 rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#030406] transition-all duration-700 hover:scale-[1.06] hover:shadow-[0_60px_120px_rgba(0,0,0,0.98)]"
+                    >
+                      {/* TRULY UNIQUE INDIVIDUAL VISUALS */}
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 group-hover:scale-150 opacity-40 group-hover:opacity-100 group-hover:saturate-[2.5]"
+                        style={style}
+                      >
+                         <div className="absolute inset-0 bg-gradient-to-t from-[#010204] via-[#010204]/60 to-transparent opacity-95 group-hover:opacity-40 transition-opacity" />
+                      </div>
+
+                      {/* Glass Layer with Tint */}
+                      <div className="absolute inset-0 bg-transparent transition-all duration-700 opacity-20 group-hover:opacity-40 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 50%, ${tint}30 0%, transparent 100%)` }} />
+
+                      {/* Info Frame */}
+                      <div className="absolute inset-0 p-9 flex flex-col justify-between z-10">
+                        <div className="flex justify-end items-start">
+                           <ArrowUpRight size={22} className="text-white/0 group-hover:text-cyan-400 transition-all -translate-y-2 translate-x-2 group-hover:translate-x-0 group-hover:translate-y-0" />
+                        </div>
+
+                        <div className="space-y-5 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+                          <h4 className="text-2xl font-black italic tracking-tighter text-white uppercase group-hover:text-cyan-400 transition-all leading-none drop-shadow-2xl">
+                            {mod.name}
+                          </h4>
+                          <p className="text-[11px] text-white/30 leading-relaxed font-bold italic line-clamp-2 opacity-0 group-hover:opacity-100 transition-all delay-100">
+                            {mod.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Interactive Visual Polish */}
+                      <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/10 rounded-[2.5rem] transition-all" />
+                      <div className="absolute inset-x-0 bottom-0 h-2 bg-transparent overflow-hidden">
+                         <div className="w-full h-full bg-cyan-400 translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-700 ease-out" style={{ backgroundColor: tint }} />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </section>
+
+        {/* ── Deterministic Handbook Browser ── */}
+        <section className="mt-[20rem] p-16 md:p-24 lg:p-32 rounded-[4rem] bg-gradient-to-br from-[#06070a] to-transparent border border-white/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-cyan-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
+          
+          <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-16 mb-24 relative z-10">
+            <div className="space-y-6">
+              <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-white italic leading-[0.9]">
+                Engineering <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 bg-[length:200%_auto] animate-gradient-x">
+                  Knowledge Base
+                </span>
+              </h2>
+              <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.5em]">ISO 9001 Standardized Documentation</p>
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <button 
+                onClick={() => setActiveCategory(null)}
+                className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${!activeCategory ? 'bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.2)]' : 'bg-white/5 border-white/10 text-white/30 hover:bg-white/10'}`}
+              >
+                All Domains
+              </button>
+              {['Mechanical', 'Structural', 'Fluid', 'Manufacturing', 'Electrical', 'Science'].map((label) => (
+                <button
+                  key={label}
+                  onClick={() => setActiveCategory(label.toLowerCase())}
+                  className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+                    activeCategory === label.toLowerCase()
+                      ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_20px_rgba(0,255,255,0.15)]'
+                      : 'bg-white/5 border-white/10 text-white/30 hover:border-white/20 hover:text-white'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 relative z-10">
+            {allCalculators
+              .filter(c => !activeCategory || c.category === activeCategory)
+              .map((calc, idx) => (
+                <Link 
+                  key={calc.slug} 
+                  href={`/calculators/${calc.slug}`} 
+                  className="group relative flex flex-col justify-between p-8 h-56 rounded-3xl bg-white/[0.01] hover:bg-white/[0.04] transition-all border border-white/5 hover:border-cyan-500/30 overflow-hidden"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="text-[9px] font-black text-cyan-500/40 group-hover:text-cyan-400 uppercase tracking-[0.4em] transition-colors">
+                      {calc.category}
+                    </span>
+                    <span className="text-[9px] font-mono text-white/10 group-hover:text-white/30 transition-colors">
+                      #{String(idx + 1).padStart(3, '0')}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h5 className="text-lg font-bold text-white/50 group-hover:text-white transition-all tracking-tight leading-tight">
+                      {calc.title}
+                    </h5>
+                    <div className="h-0.5 w-8 group-hover:w-full bg-cyan-500/30 group-hover:bg-cyan-500 transition-all duration-700 rounded-full" />
+                  </div>
+
+                  {/* Subtle Background Icon */}
+                  <Hexagon size={80} className="absolute -bottom-6 -right-6 text-white/[0.02] group-hover:text-cyan-500/[0.05] transition-all duration-1000 -rotate-12 group-hover:rotate-12" />
+                </Link>
+              ))}
+          </div>
+        </section>
+
       </div>
 
-      {/* ── Footer ── */}
-      <footer className="border-t py-12 px-6 mt-16" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-cyan-950 to-blue-900 border border-cyan-500/30">
-              <Hexagon size={18} className="text-cyan-400/70" />
+      <footer className="py-52 border-t border-white/5 mt-[15rem] bg-[#010203]">
+        <div className="max-w-[1900px] mx-auto px-16 flex flex-col xl:flex-row justify-between items-center gap-32 opacity-40">
+          <div className="flex items-center gap-14">
+            <Hexagon size={64} className="text-cyan-400 opacity-20" />
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-[0.8em] text-white/30 uppercase italic">AluCalc OS Neural Core</span>
+              <span className="text-sm font-bold text-white/10 uppercase tracking-[0.4em] mt-6">Hyper-Deterministic Industrial Interface // Build 5.25.0</span>
             </div>
-            <span className="text-sm font-black tracking-widest text-white/40">AluCalc OS</span>
           </div>
-          
-          <div className="flex items-center gap-6">
-            <Link href="/" className="text-[11px] text-white/20 hover:text-emerald-400 font-mono transition-colors">Home</Link>
-            <Link href="/workspace" className="text-[11px] text-white/20 hover:text-emerald-400 font-mono transition-colors">Workspace</Link>
-            <Link href="/calculators" className="text-[11px] text-emerald-500 font-mono">Library</Link>
-          </div>
-
-          <p className="text-[10px] font-mono text-white/10">v5.2 — © {new Date().getFullYear()} AluCalc OS</p>
+          <p className="text-xs font-black text-white/10 uppercase tracking-[0.6em] text-center italic max-w-2xl leading-relaxed">© 2026 AluCalc Intelligence Engineering. All rights reserved. Secure terminal session active.</p>
         </div>
       </footer>
+
+      <style jsx global>{`
+        .scrollbar-custom::-webkit-scrollbar { width: 6px; }
+        .scrollbar-custom::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-custom::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.05); border-radius: 40px; }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 255, 0.3); }
+
+        @keyframes gradient-x {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient-x {
+          animation: gradient-x 15s ease infinite;
+        }
+      `}</style>
     </div>
   );
 }

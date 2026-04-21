@@ -1,0 +1,33 @@
+{
+  "id": "topology-optimization",
+  "title": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc",
+  "slug": "topology-optimization",
+  "keyword": "generative topology optimization calculator",
+  "category": "manufacturing",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Generative Topology Optimization guide with Advanced Design Optimization formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc",
+    "intro": "Mathematics of material distribution to optimize stiffness while minimizing mass for 3D printing and advanced casting.",
+    "formula": "\\min C(\\rho) = \\int f(x) (\\rho(x))^p dx",
+    "variables": {
+      "C": "Compliance",
+      "rho": "Material density distribution"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify manufacturing constraints (Overhangs)",
+      "Check minimum member size"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Generative Topology Optimization.\n2. Consult the technical reference table for material constants.\n3. Apply the Advanced Design Optimization formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Manufacturing applications, accurate Generative Topology Optimization analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

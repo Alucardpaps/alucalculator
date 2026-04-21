@@ -71,17 +71,15 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
 
     const pinnedApps = useMemo(() => [
         { id: 'settings', title: t.modules.settings?.title || 'Settings', icon: getModuleIcon('Settings'), accentColor: '#64748b' },
-        { id: 'file-explorer', title: t.modules['file-explorer']?.title || 'Files', icon: getModuleIcon('Folder'), accentColor: '#f59e0b' },
         { id: 'calculator', title: t.modules.calculator?.title || 'Calc', icon: getModuleIcon('Calculator'), accentColor: '#06b6d4' },
     ], [t]);
 
     const filteredModules = useMemo(() => {
         const query = searchQuery.toLowerCase();
         return Object.values(MODULE_REGISTRY).filter(m => {
-            // ensure type exists in dictionary
             const title = (t.modules?.[m.type as keyof typeof t.modules]?.title || m.title).toLowerCase();
             const hint = (t.moduleHints?.[m.type as keyof typeof t.moduleHints] || '').toLowerCase();
-            return title.includes(query) || hint.includes(query);
+            return (title.includes(query) || hint.includes(query)) && m.type !== 'settings';
         });
     }, [searchQuery, t]);
 
@@ -93,23 +91,20 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
         'pumps': '#0891b2', 'manufacturing': '#7c3aed', 'reducer-lubrication': '#a855f7',
         'nesting-2d': '#2563eb', 'beam-deflection': '#d97706', 'concrete-reinforcement': '#64748b',
         'ohms-law': '#eab308', 'voltage-drop': '#f97316', 'periodic-table': '#06b6d4',
-        'unit-converter': '#8b5cf6', 'vat-calculator': '#10b981', 'excel-helper': '#22c55e',
-        'json-formatter': '#f59e0b', 'regex-tester': '#ef4444', 'ai-copilot': '#6366f1',
-        'box-profile-detector': '#14b8a6', 'cost-estimator': '#10b981',
-        'file-explorer': '#f59e0b', 'browser': '#3b82f6', 'paint': '#ec4899',
-        'media-player': '#8b5cf6', 'image-viewer': '#06b6d4', 'pdf-viewer': '#ef4444',
-        'spreadsheet-viewer': '#22c55e', 'flow-editor': '#06b6d4', 'cad-editor': '#3b82f6',
-        'analytics-dashboard': '#8b5cf6', 'simulation-fea': '#f59e0b',
-        'sketch-pad': '#ec4899', 'project-variables': '#6366f1',
-        'terminal': '#22c55e', 'feedback': '#3b82f6', 'news': '#f59e0b',
-        'physics-kinematics': '#8b5cf6', 'chemistry-reactions': '#10b981',
-        'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6',
-        'aerospace-dynamics': '#f97316', 'naval-hydrostatics': '#06b6d4'
+        'unit-converter': '#8b5cf6', 'cad-editor': '#3b82f6', 'simulation-fea': '#f59e0b',
+        'sketch-pad': '#ec4899', 'physics-kinematics': '#8b5cf6', 'chemistry-reactions': '#10b981',
+        'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6', 'aerospace-dynamics': '#f97316', 
+        'naval-hydrostatics': '#06b6d4', 'three-phase-power': '#f59e0b',
+        'digital-logic': '#10b981', 'filter-design': '#3b82f6',
+        'failure-diagnosis': '#ef4444', 'fatigue-advanced': '#dc2626',
+        'planetary-gearbox': '#8b5cf6', 'material-selector-ai': '#ec4899',
+        'materials-explorer': '#14b8a6', 'physics-solver': '#0ea5e9',
+        'gearbox-design': '#7c3aed', 'motor-selection-std': '#f97316'
     };
 
-    // Extract all unique categories present in the current OS
     const categories = useMemo(() => {
-        const cats = Array.from(new Set(Object.values(MODULE_REGISTRY).map(m => m.category)));
+        const cats = Array.from(new Set(Object.values(MODULE_REGISTRY).map(m => m.category)))
+            .filter(c => c !== 'utilities'); // Completely drop utilities category
         return cats.map(c => ({
             id: c,
             name: t.categories?.[c as keyof typeof t.categories] || c
@@ -122,18 +117,16 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
         } else if (type === 'unit-converter') {
             useUtilityStore.getState().setUnitOpen(true);
         } else {
-            openWindow(type as ModuleType, true); // Open maximized
+            openWindow(type as ModuleType, true);
         }
         onClose();
     };
 
-    // Determine what to show in the main grid
     const displayedModules = useMemo(() => {
         if (searchQuery) return filteredModules;
         if (activeCategory === 'all') return filteredModules;
-        if (activeCategory === 'pinned') return pinnedApps as any; // mock
         return filteredModules.filter(m => m.category === activeCategory);
-    }, [searchQuery, activeCategory, filteredModules, pinnedApps]);
+    }, [searchQuery, activeCategory, filteredModules]);
 
 
     return (
@@ -157,7 +150,6 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                         role="menu"
                         aria-label="Start Menu"
                     >
-                        {/* LEFT SIDEBAR - CATEGORIES */}
                         <div className="w-[180px] sm:w-[220px] shrink-0 bg-black/40 border-r border-white/5 flex flex-col pt-4">
                             <div className="px-4 mb-6">
                                 <div className="flex items-center gap-2 mb-1">
@@ -179,7 +171,6 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 </button>
 
                                 <div className="h-px w-full bg-white/5 my-2" />
-
                                 <div className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-2 px-3 mt-4">Disciplines</div>
 
                                 {categories.map(cat => (
@@ -194,7 +185,6 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 ))}
                             </div>
 
-                            {/* System Actions Area */}
                             <div className="p-3 border-t border-white/5 bg-black/20 space-y-1">
                                 <button
                                     onClick={() => handleLaunch('settings')}
@@ -211,9 +201,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                             </div>
                         </div>
 
-                        {/* RIGHT MAIN AREA */}
                         <div className="flex-1 flex flex-col bg-gradient-to-br from-transparent to-black/40">
-                            {/* Top Search Bar */}
                             <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] sticky top-0 z-10 backdrop-blur-md flex items-center gap-4">
                                 <div className="flex-1 flex items-center bg-black/40 border border-cyan-500/20 rounded-xl overflow-hidden focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(34,211,238,0.1)] transition-all h-11">
                                     <div className="pl-4 pr-2 text-cyan-600">
@@ -247,43 +235,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 </button>
                             </div>
 
-                            {/* Mobile Category Selector (Dropdown or Scroll) */}
-                            <div className="md:hidden px-4 py-2 border-b border-white/5 flex overflow-x-auto scrollbar-none gap-2">
-                                <button
-                                    onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
-                                    className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors border ${activeCategory === 'all' && !searchQuery ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-black/50 text-slate-400 border-white/10'}`}
-                                >
-                                    All
-                                </button>
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
-                                        className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors border ${activeCategory === cat.id && !searchQuery ? 'bg-white/20 text-white border-white/30' : 'bg-black/50 text-slate-400 border-white/10'}`}
-                                    >
-                                        {cat.name}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* App Grid Content */}
                             <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                                {searchQuery && (
-                                    <h3 className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.2em] mb-4">
-                                        {t.searchResults} ({displayedModules.length})
-                                    </h3>
-                                )}
-                                {!searchQuery && activeCategory === 'all' && (
-                                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
-                                        Engineering & Science Nexus
-                                    </h3>
-                                )}
-                                {!searchQuery && activeCategory !== 'all' && (
-                                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-6 border-b border-white/10 pb-2">
-                                        {categories.find(c => c.id === activeCategory)?.name} Instruments
-                                    </h3>
-                                )}
-
                                 {displayedModules.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center pt-20 pb-10 text-center opacity-60">
                                         <Search size={48} className="text-slate-600 mb-4" />
@@ -293,43 +245,27 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-2 gap-y-6">
                                         {displayedModules.map((mod: any) => {
-                                            if ('type' in mod) {
-                                                const Icon = getModuleIcon(mod.iconName);
-                                                const title = t.modules?.[mod.type as keyof typeof t.modules]?.title || mod.title;
-                                                const hint = t.moduleHints?.[mod.type as keyof typeof t.moduleHints];
-                                                const accentColor = moduleColors[mod.type] || '#3b82f6';
+                                            const Icon = getModuleIcon(mod.iconName);
+                                            const title = t.modules?.[mod.type as keyof typeof t.modules]?.title || mod.title;
+                                            const hint = t.moduleHints?.[mod.type as keyof typeof t.moduleHints];
+                                            const accentColor = moduleColors[mod.type] || '#3b82f6';
 
-                                                return (
-                                                    <AppGridItem
-                                                        key={mod.type}
-                                                        id={mod.type}
-                                                        title={title}
-                                                        hint={hint}
-                                                        icon={Icon}
-                                                        accentColor={accentColor}
-                                                        onSelect={() => handleLaunch(mod.type as ModuleType)}
-                                                    />
-                                                );
-                                            } else {
-                                                // Handling pinned mock items
-                                                const app = mod as any;
-                                                return (
-                                                    <AppGridItem
-                                                        key={app.id}
-                                                        id={app.id}
-                                                        title={app.title}
-                                                        icon={app.icon}
-                                                        accentColor={app.accentColor}
-                                                        onSelect={() => handleLaunch(app.id)}
-                                                    />
-                                                );
-                                            }
+                                            return (
+                                                <AppGridItem
+                                                    key={mod.type}
+                                                    id={mod.type}
+                                                    title={title}
+                                                    hint={hint}
+                                                    icon={Icon}
+                                                    accentColor={accentColor}
+                                                    onSelect={() => handleLaunch(mod.type as ModuleType)}
+                                                />
+                                            );
                                         })}
                                     </div>
                                 )}
                             </div>
                         </div>
-
                     </motion.div>
                 </>
             )

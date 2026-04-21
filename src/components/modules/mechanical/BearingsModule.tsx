@@ -19,6 +19,7 @@ import { Search, Info, CheckCircle, AlertTriangle, Plus, FileText } from 'lucide
 import { useProjectStore } from "@/store/projectStore";
 import { PDFReportEngine, ReportMetadata } from "@/lib/pdfReportEngine";
 import { ReportSettingsModal } from "@/components/ui/ReportSettingsModal";
+import { SaveButton } from "@/components/calculation/SaveButton";
 
 const BEARING_TYPE_FILTERS: { id: BearingType | 'all'; label: string }[] = [
     { id: 'all', label: 'All' },
@@ -137,13 +138,21 @@ export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
         <div className="flex flex-col h-full bg-transparent text-slate-200 select-none p-6">
             {/* Toolbar */}
             <div className="flex items-center gap-2 mb-6 justify-end">
-                <button
-                    onClick={addToProject}
-                    className="mr-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-all shadow-[0_4px_20px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95"
-                >
-                    <Plus size={16} />
-                    ADD TO PROJECT
-                </button>
+                <div className="mr-auto flex items-center gap-4">
+                    <button
+                        onClick={addToProject}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-all shadow-[0_4px_20px_rgba(6,182,212,0.3)] hover:scale-105 active:scale-95"
+                    >
+                        <Plus size={16} />
+                        ADD TO PROJECT
+                    </button>
+                    <SaveButton 
+                        type="bearings"
+                        inputData={{ searchCode, fr, fa, rpm, reliability }}
+                        engineVersion="v2.5"
+                        resultJson={results}
+                    />
+                </div>
 
                 <button
                     onClick={() => setIsReportModalOpen(true)}

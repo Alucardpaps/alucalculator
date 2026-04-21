@@ -12,8 +12,6 @@ const RUNTIME_CACHE = `alucalc-runtime-${CACHE_VERSION}`;
 const STATIC_ASSETS = [
     '/',
     '/offline.html',
-    '/data/aluminum_alloys.json',
-    '/data/kerf_tables.json',
     '/manifest.json'
 ];
 

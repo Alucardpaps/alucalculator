@@ -1,0 +1,348 @@
+[
+  {
+    "id": "74fea9e4-d85c-46e6-9438-c62bb129285c",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "seo_bolt-torque",
+    "input_json": {
+      "boltDiameter": 12,
+      "boltClass": 8.8,
+      "nutFactor": 0.2,
+      "targetLoadPercentage": 0.75
+    },
+    "engine_version": "v1.0.0",
+    "result_json": {
+      "torque": 116.453376,
+      "clampLoad": 48522.24,
+      "proofStrength": 576,
+      "safetyMargin": 1.3333333333333333,
+      "status": "SAFE",
+      "engineInfo": {
+        "id": "bolt-torque",
+        "version": "1.0.0"
+      }
+    },
+    "created_at": "2026-04-18T13:54:30.438Z"
+  },
+  {
+    "id": "f4336fa2-59a3-4b62-a7ad-f6026d843d45",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "seo_bolt-torque",
+    "input_json": {
+      "boltDiameter": 12,
+      "boltClass": 8.8,
+      "nutFactor": 0.2,
+      "targetLoadPercentage": 0.75
+    },
+    "engine_version": "v1.0.0",
+    "result_json": {
+      "torque": 116.453376,
+      "clampLoad": 48522.24,
+      "proofStrength": 576,
+      "safetyMargin": 1.3333333333333333,
+      "status": "SAFE",
+      "engineInfo": {
+        "id": "bolt-torque",
+        "version": "1.0.0"
+      }
+    },
+    "created_at": "2026-04-18T13:55:13.744Z"
+  },
+  {
+    "id": "baa9b066-95ea-45df-8306-fe26234ed744",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "seo_bolt-torque",
+    "input_json": {
+      "boltDiameter": 12,
+      "boltClass": 8.8,
+      "nutFactor": 0.2,
+      "targetLoadPercentage": 0.75
+    },
+    "engine_version": "v1.0.0",
+    "result_json": {
+      "torque": 116.453376,
+      "clampLoad": 48522.24,
+      "proofStrength": 576,
+      "safetyMargin": 1.3333333333333333,
+      "status": "SAFE",
+      "engineInfo": {
+        "id": "bolt-torque",
+        "version": "1.0.0"
+      }
+    },
+    "created_at": "2026-04-18T13:57:31.990Z"
+  },
+  {
+    "id": "f19a3356-aecb-4ec1-9e0e-170044c803d8",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bearings",
+    "input_json": {
+      "searchCode": "",
+      "fr": 5000,
+      "fa": 1000,
+      "rpm": 3000,
+      "reliability": 90
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "P": 5,
+      "L10": 44.966103616000005,
+      "L10h": 249.81168675555557,
+      "Lna": 249.81168675555557,
+      "staticSafety": 1.738
+    },
+    "created_at": "2026-04-18T14:14:16.547Z"
+  },
+  {
+    "id": "a0209c39-3029-4971-85ca-421bfcfe6dc7",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bearings",
+    "input_json": {
+      "searchCode": "",
+      "fr": 5000,
+      "fa": 1000,
+      "rpm": 3000,
+      "reliability": 90
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "P": 5,
+      "L10": 44.966103616000005,
+      "L10h": 249.81168675555557,
+      "Lna": 249.81168675555557,
+      "staticSafety": 1.738
+    },
+    "created_at": "2026-04-18T14:14:18.939Z"
+  },
+  {
+    "id": "bea1250c-4bfd-4f1e-88dd-3e8c7890c545",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "fasteners",
+    "input_json": {
+      "standard": "ISO Metric",
+      "size": "M1.6",
+      "fastenerType": "bolt",
+      "length": 50
+    },
+    "engine_version": "v2.0",
+    "result_json": {
+      "standard": "ISO Metric",
+      "size": "M1.6",
+      "pitch": 0.35,
+      "majorDia": 1.6,
+      "minorDia": 1.075,
+      "pitchDia": 1.373,
+      "tapDrill": "1.250",
+      "stressArea": "1.2700",
+      "unit": "mm",
+      "clearance": "1.680",
+      "displayPitch": "0.35 mm",
+      "angle": 60,
+      "isTapered": false
+    },
+    "created_at": "2026-04-18T14:14:23.247Z"
+  },
+  {
+    "id": "1779d2f9-0b05-4893-bc75-320a542dfb0b",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bearings",
+    "input_json": {
+      "searchQuery": "6204",
+      "radialLoad": 2.5,
+      "axialLoad": 0.5,
+      "rpm": 1500,
+      "reliability": 90,
+      "viscosity": 32
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "P": 2.5,
+      "P0": 2.5,
+      "L10": 157.46400000000003,
+      "L10h": 1749.6000000000004,
+      "Lna": 2203.8651391375934,
+      "staticSafety": 2.62,
+      "viscosityRatio": 1.7808019111708766,
+      "status": "critical"
+    },
+    "created_at": "2026-04-20T19:31:45.569Z"
+  },
+  {
+    "id": "aac34d59-3ab0-4b38-9c88-97069524941c",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bearings",
+    "input_json": {
+      "searchQuery": "6204",
+      "radialLoad": 2.5,
+      "axialLoad": 0.5,
+      "rpm": 1500,
+      "reliability": 90,
+      "viscosity": 32
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "P": 2.5,
+      "P0": 2.5,
+      "L10": 157.46400000000003,
+      "L10h": 1749.6000000000004,
+      "Lna": 2203.8651391375934,
+      "staticSafety": 2.62,
+      "viscosityRatio": 1.7808019111708766,
+      "status": "critical"
+    },
+    "created_at": "2026-04-20T19:31:49.965Z"
+  },
+  {
+    "id": "e27cb75a-87f2-488e-b2c7-07cb28f937c0",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bolt-torque",
+    "input_json": {
+      "size": "M12",
+      "pitch": 1.75,
+      "grade": "8.8",
+      "muThread": 0.15,
+      "muHead": 0.15,
+      "yieldUtilization": 90
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "d_nom": 12,
+      "d2": 10.863375,
+      "d3": 9.853275,
+      "As": 84.26921489305663,
+      "Fm_max": 48.53906777840063,
+      "MA": 124.67138726940347,
+      "stress": 576.0000000000001,
+      "safety": 1.111111111111111
+    },
+    "created_at": "2026-04-20T19:38:21.742Z"
+  },
+  {
+    "id": "bd8b15ab-45de-431e-80d5-66a8cd578a22",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "bolt-torque",
+    "input_json": {
+      "size": "M12",
+      "pitch": 1.75,
+      "grade": "8.8",
+      "muThread": 0.15,
+      "muHead": 0.15,
+      "yieldUtilization": 90
+    },
+    "engine_version": "v2.5",
+    "result_json": {
+      "d_nom": 12,
+      "d2": 10.863375,
+      "d3": 9.853275,
+      "As": 84.26921489305663,
+      "Fm_max": 48.53906777840063,
+      "MA": 124.67138726940347,
+      "stress": 576.0000000000001,
+      "safety": 1.111111111111111
+    },
+    "created_at": "2026-04-20T19:38:22.721Z"
+  },
+  {
+    "id": "b2d3661a-4351-43b8-a8b6-c43a5a748190",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "gears-bearings",
+    "input_json": {
+      "selectedPower": 4,
+      "gearModule": 3,
+      "z1": 20,
+      "z2": 60,
+      "helixAngle": 0,
+      "faceWidth": 40,
+      "materialName": "16MnCr5 (Case Hardened)",
+      "x1": 0,
+      "x2": 0
+    },
+    "engine_version": "v3.0",
+    "result_json": {
+      "motorSpeed": 1460,
+      "motorTorque": 26.164383561643834,
+      "outputSpeed": 486.6666666666667,
+      "outputTorque": 76.92328767123287,
+      "ratio": 3,
+      "d1": 60,
+      "d2": 180,
+      "da1": 66,
+      "da2": 186,
+      "df1": 52.5,
+      "df2": 172.5,
+      "a": 120,
+      "Ft": 872.1461187214611,
+      "Fr": 317.4352271454093,
+      "Fa": 0,
+      "estBendingStress": 18.169710806697104,
+      "estContactStress": 132.25496185996354,
+      "SF_bending": 23.66575916230367,
+      "SF_contact": 11.34172948148634,
+      "Wk1": {
+        "k": 3,
+        "W": 22.981318127951415
+      },
+      "Wk2": {
+        "k": 7,
+        "W": 60.0875600815736
+      },
+      "M1": 75.46973296417957,
+      "M2": 197.39788468781967,
+      "requiredFs": 1,
+      "Fr_shaft_load": 854.703196347032,
+      "loadClass": "U"
+    },
+    "created_at": "2026-04-20T19:38:58.221Z"
+  },
+  {
+    "id": "628a9fe4-eff1-4e87-8eee-c19d95d1535e",
+    "project_id": "2b393d6e-0b6c-4148-b4e3-7b956a885f9c",
+    "type": "gears-bearings",
+    "input_json": {
+      "selectedPower": 4,
+      "gearModule": 3,
+      "z1": 20,
+      "z2": 60,
+      "helixAngle": 0,
+      "faceWidth": 40,
+      "materialName": "16MnCr5 (Case Hardened)",
+      "x1": 0.3,
+      "x2": -0.6
+    },
+    "engine_version": "v3.0",
+    "result_json": {
+      "motorSpeed": 1460,
+      "motorTorque": 26.164383561643834,
+      "outputSpeed": 486.6666666666667,
+      "outputTorque": 76.92328767123287,
+      "ratio": 3,
+      "d1": 61.8,
+      "d2": 176.4,
+      "da1": 67.8,
+      "da2": 182.4,
+      "df1": 54.3,
+      "df2": 168.9,
+      "a": 119.07214993178135,
+      "Ft": 1831.5068493150684,
+      "Fr": 666.6139770053596,
+      "Fa": 0,
+      "estBendingStress": 38.156392694063925,
+      "estContactStress": 191.65564788656468,
+      "SF_bending": 11.269409124906508,
+      "SF_contact": 7.826536898551541,
+      "Wk1": {
+        "k": 3,
+        "W": 23.59695438593762
+      },
+      "Wk2": {
+        "k": 7,
+        "W": 58.85628756560119
+      },
+      "M1": 76.48573088401417,
+      "M2": 194.7451712884785,
+      "requiredFs": 2.1,
+      "Fr_shaft_load": 2136.75799086758,
+      "loadClass": "H"
+    },
+    "created_at": "2026-04-20T19:49:10.777Z"
+  }
+]

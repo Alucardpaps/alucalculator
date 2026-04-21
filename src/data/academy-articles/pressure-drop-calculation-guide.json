@@ -1,0 +1,71 @@
+{
+    "slug": "pressure-drop-calculation-guide",
+    "meta": {
+        "title": "Pressure Drop Calculation in Pipes (Step-by-Step Guide)",
+        "description": "Learn how to calculate pipe pressure drop using the Darcy-Weisbach equation. Step-by-step fluid dynamics guide for pump sizing and efficiency."
+    },
+    "hero": {
+        "h1": "Pressure Drop Calculation in Pipes (Step-by-Step Guide)",
+        "intro": "Pressure drop is a key parameter in fluid systems. It affects pump sizing, energy consumption, and overall system efficiency. Understanding how fluid friction reduces pressure is critical for designing piping networks in HVAC, chemical plants, and municipal water systems."
+    },
+    "formula": {
+        "equation": "ΔP = f × (L / D) × (ρ × v^2 / 2)",
+        "variables": {
+            "ΔP": "Pressure drop (Pa)",
+            "f": "Darcy friction factor",
+            "L": "Pipe length (m)",
+            "D": "Internal pipe diameter (m)",
+            "ρ": "Fluid density (kg/m^3)",
+            "v": "Flow velocity (m/s)"
+        }
+    },
+    "stepByStep": [
+        "Determine the flow velocity based on volumetric flow rate and pipe area.",
+        "Identify the internal pipe diameter (D).",
+        "Calculate the Reynolds number to determine if flow is laminar or turbulent.",
+        "Find the friction factor (f) using the Moody chart or Colebrook equation.",
+        "Apply the Darcy-Weisbach formula to find the pressure drop."
+    ],
+    "example": {
+        "inputs": [
+            "L = 10 m",
+            "D = 0.05 m",
+            "v = 2 m/s",
+            "ρ = 1000 kg/m^3 (Water)",
+            "f = 0.02"
+        ],
+        "calculation": "ΔP = 0.02 × (10 / 0.05) × (1000 × 2^2 / 2) = 4 × 2000 = 8000 Pa"
+    },
+    "whyThisMatters": [
+        "Critical for selecting the right pump size to overcome frictional losses.",
+        "Optimizes energy efficiency; excessively small pipes lead to massive energy waste.",
+        "Ensures fluid reaches its destination with the required residual pressure."
+    ],
+    "commonMistakes": [
+        "Ignoring the difference between laminar and turbulent flow regimes.",
+        "Using the wrong friction factor (confusing Fanning with Darcy friction factors).",
+        "Failing to account for temperature effects on fluid density and viscosity."
+    ],
+    "engineeringTip": "Minor losses from fittings and valves often contribute more to total pressure drop than straight pipe friction in complex networks. Always include an equivalent length for fittings.",
+    "calculatorCta": {
+        "targetSlug": "pressure-drop-calc",
+        "label": "Use the Pressure Drop Calculator for precise results"
+    },
+    "faq": [
+        {
+            "question": "What is the difference between major and minor pressure drops?",
+            "answer": "Major losses are due to friction in straight lengths of pipe. Minor losses are caused by changes in geometry, such as bends, valves, expansions, and contractions."
+        },
+        {
+            "question": "How does pipe diameter affect pressure drop?",
+            "answer": "Pressure drop is inversely proportional to the fifth power of the pipe diameter. A small decrease in diameter causes a massive increase in pressure drop."
+        },
+        {
+            "question": "What is the Reynolds number?",
+            "answer": "It is a dimensionless quantity used to predict fluid flow patterns. Re < 2000 is generally laminar flow, while Re > 4000 is turbulent flow."
+        }
+    ],
+    "relatedArticles": [
+        "motor-power-calculation"
+    ]
+}

@@ -53,6 +53,7 @@ interface OSState {
     isAudioEnabled: boolean; // Cyber-Acoustic Feedback
     isSelfDestructing: boolean; // Theatrical self-destruct state
     isDockHidden: boolean; // Taskbar visibility
+    isWebGLSupported: boolean; // Hardware capability flag
 }
 
 
@@ -99,6 +100,7 @@ interface OSActions {
     setUnitSystem: (sys: 'metric' | 'imperial') => void;
 
     toggleDock: () => void;
+    setWebGLSupported: (supported: boolean) => void;
 }
 
 
@@ -131,6 +133,7 @@ export const useOSStore = create<OSState & OSActions>()(
             isAudioEnabled: false, // Default off to prevent sudden loud noises
             isSelfDestructing: false,
             isDockHidden: false,
+            isWebGLSupported: true, // Default to true until checked
 
 
             setDictionary: (dict: any) => set({ dictionary: dict }),
@@ -156,6 +159,7 @@ export const useOSStore = create<OSState & OSActions>()(
             },
 
             toggleDock: () => set(state => ({ isDockHidden: !state.isDockHidden })),
+            setWebGLSupported: (supported: boolean) => set({ isWebGLSupported: supported }),
 
 
             bringToFront: (id: string) => get().focusWindow(id),

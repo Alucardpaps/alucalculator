@@ -3,8 +3,11 @@ import Script from 'next/script';
 
 /**
  * GoogleAnalytics - Production GA4 integration with IP anonymization.
+ * Only renders when a valid GA measurement ID is provided.
  */
 export const GoogleAnalytics = ({ gaId }: { gaId: string }) => {
+  if (!gaId || gaId.startsWith('G-ALUCALC')) return null;
+
   return (
     <>
       <Script

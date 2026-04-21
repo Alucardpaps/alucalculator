@@ -1,24 +1,33 @@
 {
   "id": "truss-analysis",
-  "category": "structural",
-  "title": "Truss Analysis",
+  "title": "Truss Member Analysis Calculator & Engineering Guide - AluCalc",
   "slug": "truss-analysis",
+  "keyword": "truss member analysis calculator",
+  "category": "structures",
+  "intent": "professional_handbook",
   "meta": {
-    "title": "Truss | AluCalc",
-    "description": "Method of Joints."
+    "title": "Truss Member Analysis Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Truss Member Analysis guide with ASCE 7 formulas, technical tables, and design checklists."
   },
   "seo": {
-    "h1": "Truss Force Analysis (Joints)",
-    "intro": "Internal axial forces.",
-    "formula": "ΣFx=0, ΣFy=0",
+    "h1": "Truss Member Analysis Calculator & Engineering Guide - AluCalc",
+    "intro": "Analysis of pinned structures where members only carry axial loads.",
+    "formula": "\\sum F_x = 0, \\sum F_y = 0",
     "variables": {
-      "ΣF": "Force sum"
+      "Fx": "Horizontal forces",
+      "Fy": "Vertical forces"
     },
-    "practical": "Bridges.",
-    "example": "Tension/Comp check."
+    "technical_data": [],
+    "checklist": [
+      "Identify zero-force members",
+      "Check nodal stability"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Truss Member Analysis.\n2. Consult the technical reference table for material constants.\n3. Apply the ASCE 7 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Structures applications, accurate Truss Member Analysis analysis is vital for safety and performance."
   },
   "cta": {
     "label": "Open in AluCalc OS",
-    "link": "/?module=truss-analysis"
+    "link": "/os?module=calculator"
   }
 }

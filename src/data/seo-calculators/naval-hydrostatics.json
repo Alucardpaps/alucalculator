@@ -1,0 +1,37 @@
+{
+  "id": "naval-hydrostatics",
+  "title": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc",
+  "slug": "naval-hydrostatics",
+  "keyword": "naval hydrostatics & stability calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Naval Hydrostatics & Stability guide with IMO Code on Intact Stability formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc",
+    "intro": "Analysis of ship stability and buoyancy including transverse/longitudinal metacentric height calculations.",
+    "formula": "GM = KB + BM - KG",
+    "variables": {
+      "GM": "Metacentric height",
+      "KB": "Center of buoyancy",
+      "BM": "Metacentric radius",
+      "KG": "Center of gravity"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check righting lever (GZ) curve",
+      "Verify floodpoint height"
+    ],
+    "pitfalls": [
+      "Ignoring free surface effect of tanks"
+    ],
+    "step_by_step": "1. Define system parameters for Naval Hydrostatics & Stability.\n2. Consult the technical reference table for material constants.\n3. Apply the IMO Code on Intact Stability formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Naval Hydrostatics & Stability analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

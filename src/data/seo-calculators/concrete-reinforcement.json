@@ -1,0 +1,51 @@
+{
+  "id": "concrete-reinforcement",
+  "title": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc",
+  "slug": "concrete-reinforcement",
+  "keyword": "reinforced concrete (rc) design calculator",
+  "category": "civil",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Reinforced Concrete (RC) Design guide with ACI 318 / Eurocode 2 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the required reinforcement steel for concrete structural elements according to limit state design.",
+    "formula": "M_u = \\phi A_s f_y (d - \\frac{a}{2})",
+    "variables": {
+      "Mu": "Flexural strength",
+      "As": "Rebar area",
+      "fy": "Yield strength",
+      "d": "Effective depth"
+    },
+    "technical_data": [
+      {
+        "name": "Standard Rebar Sizes",
+        "rows": [
+          {
+            "Bar #": "4",
+            "Dia (mm)": 12.7
+          },
+          {
+            "Bar #": "8",
+            "Dia (mm)": 25.4
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Check minimum steel ratio",
+      "Verify crack width limits"
+    ],
+    "pitfalls": [
+      "Ignoring compression steel in deep beams"
+    ],
+    "step_by_step": "1. Define system parameters for Reinforced Concrete (RC) Design.\n2. Consult the technical reference table for material constants.\n3. Apply the ACI 318 / Eurocode 2 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Civil applications, accurate Reinforced Concrete (RC) Design analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

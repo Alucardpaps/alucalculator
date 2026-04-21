@@ -1,0 +1,34 @@
+{
+  "id": "thermal-expansion",
+  "title": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc",
+  "slug": "thermal-expansion",
+  "keyword": "linear thermal expansion calculator",
+  "category": "thermal",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Linear Thermal Expansion guide with Standard Thermal Sci formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the dimensional change due to temperature variation.",
+    "formula": "\\Delta L = \\alpha L_0 \\Delta T",
+    "variables": {
+      "alpha": "Exp coeff",
+      "L0": "Init length",
+      "dT": "Temp diff"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check stress if fixed",
+      "Verify gap clearance"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Linear Thermal Expansion.\n2. Consult the technical reference table for material constants.\n3. Apply the Standard Thermal Sci formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Thermal applications, accurate Linear Thermal Expansion analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

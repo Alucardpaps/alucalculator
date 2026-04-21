@@ -10,6 +10,17 @@ export function WelcomeModal() {
     const { showWelcomeModal, completeWelcome, hasSeenWelcome, openWelcome, setWorkspaceMode } = useOSStore();
     const { t } = useI18nStore();
     const [bootState, setBootState] = useState<'init' | 'select' | 'complete'>('init');
+    const [showSkip, setShowSkip] = useState(false);
+
+    // Skip timer (Fail-safe)
+    useEffect(() => {
+        if (bootState === 'init' && showWelcomeModal) {
+            const skipTimer = setTimeout(() => setShowSkip(true), 5000);
+            return () => clearTimeout(skipTimer);
+        } else {
+            setShowSkip(false);
+        }
+    }, [bootState, showWelcomeModal]);
 
     // Boot Sequence Timer
     useEffect(() => {
@@ -107,6 +118,20 @@ export function WelcomeModal() {
                                 }}
                             />
                         </div>
+
+                        {/* Emergency Skip Button */}
+                        <AnimatePresence>
+                            {showSkip && (
+                                <motion.button
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={() => setBootState('select')}
+                                    className="mt-8 px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-white/40 hover:bg-white/10 hover:text-white transition-all uppercase tracking-[0.2em]"
+                                >
+                                    Skip Boot Sequence
+                                </motion.button>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
 

@@ -1,6 +1,7 @@
+export const dynamic = 'force-static';
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import guides from '@/data/seo-calculators/guides.json';
+import calculators from '@/data/seo-calculators/calculators.json';
 
 // Initialize SDK securely
 const getGenAI = () => {
@@ -27,14 +28,14 @@ export async function POST(req: Request) {
         }
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
+            model: "gemini-2.0-flash",
             generationConfig: {
                 temperature: 0.3, 
             }
         });
 
         // Basic RAG logic: Extract theoretical guidelines to inject into system prompt
-        const guideContext = guides.map(g => `Topic: ${g.article.h1}\nSummary: ${g.article.intro}\nFormula: ${g.article.sections.map(s => s.content).join(' ')}`).join('\n---\n');
+        const guideContext = calculators.map(c => `Topic: ${c.seo.h1}\nSummary: ${c.seo.intro}\nFormula: ${c.seo.formula}`).join('\n---\n');
 
         const systemPrompt = `You are AluCalc Copilot, a brilliant, elite Software Architect and Structural Engineer Assistant built for the inside of a web-based Engineering OS.
 Respond in plain text. Format your logic cleanly. You are calculating numbers or providing engineering theory.

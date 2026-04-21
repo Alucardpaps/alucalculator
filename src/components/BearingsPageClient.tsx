@@ -13,7 +13,8 @@ import {
 } from "@/data/skfBearings";
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
-import { Search, Info, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Search, Info, AlertTriangle, CheckCircle, Save } from 'lucide-react';
+import { SaveButton } from '@/components/calculation/SaveButton';
 
 const BEARING_TYPE_FILTERS: { id: BearingType | 'all'; label: string; labelTr: string }[] = [
     { id: 'all', label: 'All Types', labelTr: 'Tüm Tipler' },
@@ -92,11 +93,19 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                     </div>
                 </div>
 
-                {/* Type Badge */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
-                    style={{ backgroundColor: `${typeInfo.color}20`, color: typeInfo.color }}>
-                    <span>{typeInfo.icon}</span>
-                    <span>{lang === 'tr' ? typeInfo.nameTr : typeInfo.name}</span>
+                {/* Type Badge & Save */}
+                <div className="flex items-center gap-4">
+                    <SaveButton 
+                        type="bearings"
+                        inputData={{ code: selectedBearing.code, fr, fa, rpm, reliability }}
+                        engineVersion="v2.0"
+                        resultJson={results}
+                    />
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
+                        style={{ backgroundColor: `${typeInfo.color}20`, color: typeInfo.color }}>
+                        <span>{typeInfo.icon}</span>
+                        <span>{lang === 'tr' ? typeInfo.nameTr : typeInfo.name}</span>
+                    </div>
                 </div>
             </header>
 

@@ -1,0 +1,37 @@
+{
+  "id": "roller-chain-drive",
+  "title": "Roller Chain Drive Calculator & Engineering Guide - AluCalc",
+  "slug": "roller-chain-drive",
+  "keyword": "roller chain drive calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Roller Chain Drive Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Roller Chain Drive guide with ANSI B29.1 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Roller Chain Drive Calculator & Engineering Guide - AluCalc",
+    "intro": "Industrial chain drive analysis for heavy load transmission.",
+    "formula": "P = 0.0022 \\cdot p^2 \\cdot n \\cdot T^{1.5}",
+    "variables": {
+      "P": "Power (kW)",
+      "p": "Pitch",
+      "n": "RPM",
+      "T": "Teeth"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check elongation limit",
+      "Lubrication type"
+    ],
+    "pitfalls": [
+      "Using odd number of links"
+    ],
+    "step_by_step": "1. Define system parameters for Roller Chain Drive.\n2. Consult the technical reference table for material constants.\n3. Apply the ANSI B29.1 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Roller Chain Drive analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

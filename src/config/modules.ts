@@ -6,7 +6,7 @@ import {
     Folder, File, Image, Video, Music, FileText, Palette, Globe, GitGraph,
     Bot, Scan, DollarSign, Droplet, BarChart3, Box, Factory, PenTool, Variable,
     Terminal, Sparkles, Thermometer, Activity,
-    Rocket, FlaskConical, Dna, Code, Plane, Anchor
+    Rocket, FlaskConical, Dna, Code, Plane, Anchor, Cpu, ShieldCheck
 } from 'lucide-react';
 
 export type ModuleType =
@@ -33,34 +33,9 @@ export type ModuleType =
     | 'periodic-table'
     | 'unit-converter'
     | 'calculator'
-    | 'vat-calculator'
-    | 'excel-helper'
-    | 'feedback'
-    | 'news'
-    | 'json-formatter'
-    | 'regex-tester'
-    | 'ai-copilot'
-    | 'ai-copilot'
-    | 'holographic-viewer'
-    | 'matrix-screensaver'
-    | 'box-profile-detector'
-    | 'cost-estimator'
-    | 'file-explorer'
-    | 'media-player'
-    | 'image-viewer'
-    | 'pdf-viewer'
-    | 'spreadsheet-viewer'
-    | 'browser'
-    | 'paint'
-    | 'flow-editor'
-    | 'parametric-cad'
     | 'cad-editor'
-    | 'analytics-dashboard'
     | 'simulation-fea'
     | 'sketch-pad'
-    | 'project-variables'
-    | 'project-manager'
-    | 'terminal'
     | 'manufacturing-sandbox'
     | 'engineering-selection'
     | 'manufacturing-readiness'
@@ -70,7 +45,6 @@ export type ModuleType =
     | 'fatigue-analysis'
     | 'fluid-dynamics'
     | 'bolt-torque'
-    | 'engineering-notes'
     | 'physics-kinematics'
     | 'chemistry-reactions'
     | 'biology-genetics'
@@ -79,12 +53,21 @@ export type ModuleType =
     | 'naval-hydrostatics'
     | 'materials-explorer'
     | 'physics-solver'
-    | 'project-vault'
     | 'gearbox-design'
     | 'motor-selection-std'
     | 'material-selector-ai'
     | 'failure-diagnosis'
     | 'fatigue-advanced'
+    | 'planetary-gearbox'
+    | 'three-phase-power'
+    | 'digital-logic'
+    | 'filter-design'
+    | 'machining-details'
+    | 'ai-copilot'
+    | 'holographic-viewer'
+    | 'matrix-screensaver'
+    | 'parametric-cad'
+    | 'cost-estimator'
     | 'settings';
 
 export interface WindowSize {
@@ -152,6 +135,13 @@ export const BASE_REGISTRY = {
         title: 'Bölüm J: Fastener Analysis',
         category: 'mechanical',
         iconName: 'Wrench',
+        defaultSize: { width: 1300, height: 850 }
+    },
+    'machining-details': {
+        type: 'machining-details',
+        title: 'Machining Details',
+        category: 'mechanical',
+        iconName: 'Scissors',
         defaultSize: { width: 1300, height: 850 }
     },
     'bearings': {
@@ -240,10 +230,10 @@ export const BASE_REGISTRY = {
     },
     'concrete-reinforcement': {
         type: 'concrete-reinforcement',
-        title: 'Concrete Reinforcement',
+        title: 'RC Concrete Suite',
         category: 'civil',
-        iconName: 'Grid3X3',
-        defaultSize: { width: 1000, height: 800 }
+        iconName: 'Layers',
+        defaultSize: { width: 1100, height: 850 }
     },
     'ohms-law': {
         type: 'ohms-law',
@@ -280,146 +270,6 @@ export const BASE_REGISTRY = {
         iconName: 'Calculator',
         defaultSize: { width: 700, height: 850 }
     },
-    'vat-calculator': {
-        type: 'vat-calculator',
-        title: 'VAT Calculator',
-        category: 'finance',
-        iconName: 'Receipt',
-        defaultSize: { width: 600, height: 700 }
-    },
-    'excel-helper': {
-        type: 'excel-helper',
-        title: 'Excel Formula Helper',
-        category: 'finance',
-        iconName: 'Table',
-        defaultSize: { width: 900, height: 750 }
-    },
-    'json-formatter': {
-        type: 'json-formatter',
-        title: 'JSON Formatter',
-        category: 'software',
-        iconName: 'Braces',
-        defaultSize: { width: 1000, height: 800 }
-    },
-    'regex-tester': {
-        type: 'regex-tester',
-        title: 'Regex Tester',
-        category: 'software',
-        iconName: 'Regex',
-        defaultSize: { width: 1100, height: 800 }
-    },
-    'ai-copilot': {
-        type: 'ai-copilot',
-        title: 'AI Co-Pilot',
-        category: 'software',
-        iconName: 'Bot',
-        defaultSize: { width: 600, height: 800 }
-    },
-    'holographic-viewer': {
-        type: 'holographic-viewer',
-        title: 'Holographic Projection',
-        category: 'other',
-        iconName: 'Box',
-        defaultSize: { width: 800, height: 600 }
-    },
-    'matrix-screensaver': {
-        type: 'matrix-screensaver',
-        title: 'Engineering Matrix',
-        category: 'other',
-        iconName: 'Code',
-        defaultSize: { width: 800, height: 600 }
-    },
-    'box-profile-detector': {
-        type: 'box-profile-detector',
-        title: 'Box Profile Detector',
-        category: 'manufacturing',
-        iconName: 'Scan',
-        defaultSize: { width: 700, height: 700 }
-    },
-    'cost-estimator': {
-        type: 'cost-estimator',
-        title: 'Cost Estimator',
-        category: 'finance',
-        iconName: 'DollarSign',
-        defaultSize: { width: 900, height: 700 }
-    },
-    'feedback': {
-        type: 'feedback',
-        title: 'Feedback',
-        category: 'other',
-        iconName: 'MessageSquare',
-        defaultSize: { width: 600, height: 700 }
-    },
-    'news': {
-        type: 'news',
-        title: 'Industry News',
-        category: 'other',
-        iconName: 'Newspaper',
-        defaultSize: { width: 600, height: 700 }
-    },
-    'file-explorer': {
-        type: 'file-explorer',
-        title: 'File Explorer',
-        category: 'other',
-        iconName: 'Folder',
-        defaultSize: { width: 900, height: 600 }
-    },
-    'media-player': {
-        type: 'media-player',
-        title: 'Media Player',
-        category: 'other',
-        iconName: 'Video',
-        defaultSize: { width: 800, height: 600 }
-    },
-    'image-viewer': {
-        type: 'image-viewer',
-        title: 'Image Viewer',
-        category: 'other',
-        iconName: 'Image',
-        defaultSize: { width: 1000, height: 800 }
-    },
-    'pdf-viewer': {
-        type: 'pdf-viewer',
-        title: 'PDF Viewer',
-        category: 'other',
-        iconName: 'FileText',
-        defaultSize: { width: 1000, height: 900 }
-    },
-    'spreadsheet-viewer': {
-        type: 'spreadsheet-viewer',
-        title: 'Spreadsheet',
-        category: 'finance',
-        iconName: 'Table',
-        defaultSize: { width: 1000, height: 800 }
-    },
-    'browser': {
-        type: 'browser',
-        title: 'Web Browser',
-        category: 'software',
-        iconName: 'Globe',
-        defaultSize: { width: 1000, height: 800 }
-    },
-    'paint': {
-        type: 'paint',
-        title: 'Paint',
-        category: 'other',
-        iconName: 'Palette',
-        defaultSize: { width: 1200, height: 900 }
-    },
-    'flow-editor': {
-        type: 'flow-editor',
-        title: 'Flow Editor',
-        category: 'manufacturing',
-        iconName: 'GitGraph',
-        defaultSize: { width: 1400, height: 900 }
-    },
-    'parametric-cad': {
-        type: 'parametric-cad',
-        title: 'Parametric CAD',
-        category: 'manufacturing',
-        iconName: 'Box',
-        defaultSize: { width: 1400, height: 900 }
-    },
     'cad-editor': {
         type: 'cad-editor',
         title: 'CAD Editor',
@@ -427,19 +277,12 @@ export const BASE_REGISTRY = {
         iconName: 'Ruler',
         defaultSize: { width: 1400, height: 900 }
     },
-    'analytics-dashboard': {
-        type: 'analytics-dashboard',
-        title: 'Analytics Dashboard',
-        category: 'other',
-        iconName: 'BarChart3',
-        defaultSize: { width: 900, height: 700 }
-    },
     'simulation-fea': {
         type: 'simulation-fea',
-        title: 'Simulation / FEA Lite',
+        title: 'Finite Element Analysis (FEA)',
         category: 'manufacturing',
         iconName: 'Box',
-        defaultSize: { width: 950, height: 750 }
+        defaultSize: { width: 1100, height: 850 }
     },
     'sketch-pad': {
         type: 'sketch-pad',
@@ -447,27 +290,6 @@ export const BASE_REGISTRY = {
         category: 'other',
         iconName: 'PenTool',
         defaultSize: { width: 1200, height: 850 }
-    },
-    'project-variables': {
-        type: 'project-variables',
-        title: 'Project Variables',
-        category: 'other',
-        iconName: 'Variable',
-        defaultSize: { width: 600, height: 500 }
-    },
-    'project-manager': {
-        type: 'project-manager',
-        title: 'Project BOM Manager',
-        category: 'other',
-        iconName: 'Layers',
-        defaultSize: { width: 900, height: 750 }
-    },
-    'terminal': {
-        type: 'terminal',
-        title: 'Terminal',
-        category: 'software',
-        iconName: 'Terminal',
-        defaultSize: { width: 800, height: 500 }
     },
     'settings': {
         type: 'settings',
@@ -478,10 +300,10 @@ export const BASE_REGISTRY = {
     },
     'failure-prediction': {
         type: 'failure-prediction',
-        title: 'Failure Prediction',
+        title: 'AI Failure Prediction',
         category: 'manufacturing',
         iconName: 'Activity',
-        defaultSize: { width: 1000, height: 800 }
+        defaultSize: { width: 1100, height: 850 }
     },
     'fatigue-analysis': {
         type: 'fatigue-analysis',
@@ -503,13 +325,6 @@ export const BASE_REGISTRY = {
         category: 'mechanical',
         iconName: 'Zap',
         defaultSize: { width: 1300, height: 850 }
-    },
-    'engineering-notes': {
-        type: 'engineering-notes',
-        title: 'Engineering Scratchpad',
-        category: 'other',
-        iconName: 'FileText',
-        defaultSize: { width: 600, height: 600 }
     },
     'physics-kinematics': {
         type: 'physics-kinematics',
@@ -548,10 +363,10 @@ export const BASE_REGISTRY = {
     },
     'naval-hydrostatics': {
         type: 'naval-hydrostatics',
-        title: 'Naval Hydrostatics',
+        title: 'Naval Engineering & Hydro',
         category: 'mechanical',
         iconName: 'Anchor',
-        defaultSize: { width: 1100, height: 850 }
+        defaultSize: { width: 1200, height: 900 }
     },
     'manufacturing-readiness': {
         type: 'manufacturing-readiness',
@@ -569,10 +384,10 @@ export const BASE_REGISTRY = {
     },
     'machine-assembly': {
         type: 'machine-assembly',
-        title: 'Machine Assembly',
+        title: 'Advanced Machine Assembly',
         category: 'manufacturing',
         iconName: 'Wrench',
-        defaultSize: { width: 1200, height: 900 }
+        defaultSize: { width: 1300, height: 950 }
     },
     'materials-explorer': {
         type: 'materials-explorer',
@@ -587,13 +402,6 @@ export const BASE_REGISTRY = {
         category: 'science',
         iconName: 'Activity',
         defaultSize: { width: 1000, height: 800 }
-    },
-    'project-vault': {
-        type: 'project-vault',
-        title: 'Engineering Project Vault',
-        category: 'software',
-        iconName: 'Folder',
-        defaultSize: { width: 1100, height: 800 }
     },
     'gearbox-design': {
         type: 'gearbox-design',
@@ -629,6 +437,69 @@ export const BASE_REGISTRY = {
         category: 'mechanical',
         iconName: 'Activity',
         defaultSize: { width: 1200, height: 850 }
+    },
+    'planetary-gearbox': {
+        type: 'planetary-gearbox',
+        title: 'Planetary Gearbox Solver',
+        category: 'mechanical',
+        iconName: 'Settings',
+        defaultSize: { width: 1300, height: 900 }
+    },
+    'three-phase-power': {
+        type: 'three-phase-power',
+        title: '3-Phase Power Workstation',
+        category: 'electrical',
+        iconName: 'Zap',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'digital-logic': {
+        type: 'digital-logic',
+        title: 'Digital Logic Lab',
+        category: 'software',
+        iconName: 'Cpu',
+        defaultSize: { width: 1100, height: 800 }
+    },
+    'filter-design': {
+        type: 'filter-design',
+        title: 'Filter Design Engine',
+        category: 'electrical',
+        iconName: 'Activity',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'ai-copilot': {
+        type: 'ai-copilot',
+        title: 'AI Copilot',
+        category: 'other',
+        iconName: 'Bot',
+        defaultSize: { width: 800, height: 700 }
+    },
+    'holographic-viewer': {
+        type: 'holographic-viewer',
+        title: 'Holographic Viewer',
+        category: 'other',
+        iconName: 'Scan',
+        defaultSize: { width: 1100, height: 850 }
+    },
+    'matrix-screensaver': {
+        type: 'matrix-screensaver',
+        title: 'Matrix Screensaver',
+        category: 'other',
+        iconName: 'Code',
+        defaultSize: { width: 1200, height: 900 }
+    },
+    'parametric-cad': {
+        type: 'parametric-cad',
+        title: 'Parametric CAD 3D',
+        category: 'manufacturing',
+        iconName: 'Box',
+        defaultSize: { width: 1400, height: 950 }
+    },
+    'cost-estimator': {
+        type: 'cost-estimator',
+        title: 'Cost Estimator',
+        category: 'finance',
+        iconName: 'DollarSign',
+        defaultSize: { width: 1000, height: 750 }
     }
 } as Record<string, ModuleDefinition>;
 
@@ -701,6 +572,8 @@ export const getModuleIcon = (name: string) => {
         case 'Code': return Code;
         case 'Plane': return Plane;
         case 'Anchor': return Anchor;
+        case 'Cpu': return Cpu;
+        case 'ShieldCheck': return ShieldCheck;
         default: return Circle;
     }
 };

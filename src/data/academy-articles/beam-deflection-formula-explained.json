@@ -1,0 +1,69 @@
+{
+    "slug": "beam-deflection-formula-explained",
+    "meta": {
+        "title": "Beam Deflection Formula Explained (With Real Example)",
+        "description": "Learn the Euler-Bernoulli beam deflection formula for simply supported beams. Step-by-step structural engineering guide with real-world examples."
+    },
+    "hero": {
+        "h1": "Beam Deflection Formula Explained (With Real Example)",
+        "intro": "Beam deflection determines how much a structural element bends under load. Excessive deflection can lead to structural failure, cracking in supported materials, or serviceability issues. Proper calculation ensures structural integrity and safety."
+    },
+    "formula": {
+        "equation": "δ = 5wL^4 / (384EI)",
+        "variables": {
+            "δ": "Maximum deflection (m)",
+            "w": "Uniform load per unit length (N/m)",
+            "L": "Beam length or span (m)",
+            "E": "Modulus of Elasticity (Pa)",
+            "I": "Area moment of inertia (m^4)"
+        }
+    },
+    "stepByStep": [
+        "Define the beam type (e.g., simply supported, cantilever).",
+        "Identify the loading condition (uniform vs point load).",
+        "Calculate the area moment of inertia (I) based on beam cross-section.",
+        "Insert the material's modulus of elasticity (E) and span length (L).",
+        "Compute the maximum deflection using the appropriate formula."
+    ],
+    "example": {
+        "inputs": [
+            "w = 1000 N/m",
+            "L = 2 m",
+            "E = 200 GPa (200,000,000,000 Pa)",
+            "I = 8×10^-6 m^4"
+        ],
+        "calculation": "δ = (5 × 1000 × 2^4) / (384 × 200e9 × 8e-6) = 0.00013 m (0.13 mm)"
+    },
+    "whyThisMatters": [
+        "Prevents structural collapse and material fatigue.",
+        "Ensures comfort and serviceability in buildings and bridges.",
+        "Required by local and international structural design codes."
+    ],
+    "commonMistakes": [
+        "Using incorrect boundary conditions for the beam supports.",
+        "Calculating moment of inertia incorrectly for asymmetric profiles.",
+        "Unit mismatch errors (mixing millimeters with meters in the E and I values)."
+    ],
+    "engineeringTip": "Deflection is often the governing factor in beam design rather than yield stress, especially for long spans.",
+    "calculatorCta": {
+        "targetSlug": "beam-deflection-calc",
+        "label": "Use the Beam Deflection Calculator for instant results"
+    },
+    "faq": [
+        {
+            "question": "What is the acceptable limit for beam deflection?",
+            "answer": "Acceptable limits depend on the building code and application. A common limit for floor beams supporting plaster ceilings is L/360, where L is the span length."
+        },
+        {
+            "question": "How do you reduce beam deflection?",
+            "answer": "Deflection is highly sensitive to span length and depth. Increasing the height (depth) of the beam significantly increases its moment of inertia, effectively reducing deflection."
+        },
+        {
+            "question": "Does material strength affect deflection?",
+            "answer": "No. Deflection is governed by the Modulus of Elasticity (E), which is a measure of stiffness, not yield strength. For example, all standard steel grades have roughly the same E (200 GPa) regardless of their yield strength."
+        }
+    ],
+    "relatedArticles": [
+        "how-to-calculate-bolt-torque"
+    ]
+}

@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const buildTimestamp = new Date().toISOString();
 const buildId = `build-${Date.now()}`;
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
   env: {
@@ -14,6 +14,18 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    unoptimized: true,
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber', '@react-three/drei'],
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  // To use webpack config in Next.js 16/Turbopack, we explicitly declare turbopack empty or use --webpack
   turbopack: {},
   webpack: (config: any, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
@@ -29,6 +41,5 @@ const nextConfig = {
     return config;
   },
 };
-
 
 export default nextConfig;

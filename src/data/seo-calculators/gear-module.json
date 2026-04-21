@@ -1,0 +1,34 @@
+{
+  "id": "gear-module",
+  "title": "Gear Module Calculator & Engineering Guide - AluCalc",
+  "slug": "gear-module",
+  "keyword": "gear module calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Gear Module Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Gear Module guide with DIN 867 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Gear Module Calculator & Engineering Guide - AluCalc",
+    "intro": "Fundamental gear size parameter defining pitch and geometry.",
+    "formula": "m = \\frac{d}{N}",
+    "variables": {
+      "m": "Module (mm)",
+      "d": "Pitch Dia",
+      "N": "Teeth"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify profile shift",
+      "Check addendum height"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Gear Module.\n2. Consult the technical reference table for material constants.\n3. Apply the DIN 867 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Gear Module analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { Command } from 'cmdk';
 import { useOSStore } from '@/store/osStore';
 import { MODULE_REGISTRY } from '@/config/modules';
-import { Search, Monitor, Terminal, Bot, Settings, Zap, X, Eye, Focus, Volume2, VolumeX, AlertTriangle, Code } from 'lucide-react';
+import { ENGINEERING_CONSTANTS, EngineeringConstant } from '@/data/engineering-constants';
+import { Search, Monitor, Terminal, Bot, Settings, Zap, X, Eye, Focus, Volume2, VolumeX, AlertTriangle, Code, Clock, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function GlobalCommandPalette() {
@@ -23,17 +24,41 @@ export function GlobalCommandPalette() {
         closeAllWindows
     } = useOSStore();
 
-    // Toggle the menu when ⌘K or Ctrl+K is pressed
+    const [recentModules, setRecentModules] = useState<string[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [instantAnswer, setInstantAnswer] = useState<EngineeringConstant | null>(null);
+
+    // Track recent modules from local storage or store
+    useEffect(() => {
+        const saved = localStorage.getItem('alucalc-recent-modules');
+        if (saved) setRecentModules(JSON.parse(saved));
+    }, []);
+
+    // Instant Answer Logic
+    useEffect(() => {
+        if (!searchQuery || searchQuery.length < 2) {
+            setInstantAnswer(null);
+            return;
+        }
+
+        const q = searchQuery.toLowerCase();
+        const match = ENGINEERING_CONSTANTS.find(c => 
+            c.keywords.some(k => q.includes(k) || k.includes(q))
+        );
+        setInstantAnswer(match || null);
+    }, [searchQuery]);
+
+    // Toggle the menu when Alt+S is pressed
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+            if (e.altKey && e.key.toLowerCase() === 's') {
                 e.preventDefault();
                 setOpen((open) => !open);
             }
         };
 
-        document.addEventListener('keydown', down);
-        return () => document.removeEventListener('keydown', down);
+        document.addEventListener('keydown', down, true); // Use capture phase for higher priority
+        return () => document.removeEventListener('keydown', down, true);
     }, []);
 
     if (!open) return null;
@@ -41,6 +66,11 @@ export function GlobalCommandPalette() {
     const handleSelectModule = (type: any) => {
         openWindow(type);
         setOpen(false);
+        
+        // Update recent modules
+        const updatedRecent = [type, ...recentModules.filter(m => m !== type)].slice(0, 5);
+        setRecentModules(updatedRecent);
+        localStorage.setItem('alucalc-recent-modules', JSON.stringify(updatedRecent));
     };
 
     return (
@@ -75,6 +105,8 @@ export function GlobalCommandPalette() {
                                 <Search className="w-5 h-5 text-cyan-400 mr-3" />
                                 <Command.Input
                                     autoFocus
+                                    value={searchQuery}
+                                    onValueChange={setSearchQuery}
                                     placeholder="Type a command or search modules..."
                                     className="flex-1 bg-transparent outline-none placeholder:text-cyan-800 text-lg font-mono"
                                 />
@@ -83,14 +115,58 @@ export function GlobalCommandPalette() {
                                 </button>
                             </div>
 
+                            {/* Instant AI Answer Section */}
+                            <AnimatePresence>
+                                {instantAnswer && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="overflow-hidden bg-gradient-to-r from-amber-500/10 to-transparent border-b border-amber-500/20"
+                                    >
+                                        <div className="p-4 flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
+                                                <Lightbulb size={20} className="animate-pulse" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex items-baseline gap-2 mb-1">
+                                                    <span className="text-xl font-black text-amber-400 font-mono tracking-tighter">{instantAnswer.value}</span>
+                                                    <span className="text-xs font-bold text-amber-600 uppercase italic">{instantAnswer.unit}</span>
+                                                </div>
+                                                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">{instantAnswer.description}</div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <Command.List className="max-h-[60vh] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-cyan-900 scrollbar-track-transparent">
                                 <Command.Empty className="py-6 text-center text-cyan-700 font-mono text-sm">
                                     No results found. Try "vat" or "cad".
                                 </Command.Empty>
 
+                                {recentModules.length > 0 && (
+                                    <Command.Group heading="Recent Tools" className="px-2 py-3 text-xs font-mono text-amber-500 uppercase tracking-widest border-b border-cyan-900/10 mb-2">
+                                        {recentModules.map((id) => {
+                                            const mod = MODULE_REGISTRY[id];
+                                            if (!mod) return null;
+                                            return (
+                                                <Command.Item
+                                                    key={`recent-${id}`}
+                                                    onSelect={() => handleSelectModule(id)}
+                                                    className="flex items-center px-3 py-2.5 mt-1 rounded-lg cursor-pointer hover:bg-amber-900/10 aria-selected:bg-amber-900/20 transition-colors"
+                                                >
+                                                    <Clock className="w-4 h-4 mr-3 text-amber-600" />
+                                                    <span className="font-medium text-sm text-amber-100">{mod.title}</span>
+                                                </Command.Item>
+                                            );
+                                        })}
+                                    </Command.Group>
+                                )}
+
                                 <Command.Group heading="Engineering Modules" className="px-2 py-3 text-xs font-mono text-cyan-600 uppercase tracking-widest">
                                     {Object.values(MODULE_REGISTRY)
-                                        .filter(m => m.category === 'mechanical' || m.category === 'manufacturing' || m.category === 'civil' || m.category === 'finance')
+                                        .filter(m => ['mechanical', 'manufacturing', 'civil', 'electrical', 'science', 'software'].includes(m.category))
                                         .map((module) => (
                                             <Command.Item
                                                 key={module.type}

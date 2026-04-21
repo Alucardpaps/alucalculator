@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useDriveTrainCalculator } from "@/hooks/useDriveTrainCalculator";
 import { IEC_MOTORS } from "@/data/motorData";
 import { GEAR_MATERIALS } from "@/data/gearsData";
@@ -8,8 +8,11 @@ import { PresentationControls, Stage } from "@react-three/drei";
 import { Gear3D } from "@/components/3d/Gear3D";
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Settings, ShieldCheck, ShieldAlert, Zap, Layers, Cog, Gauge, Wrench, ChevronDown
+    Settings, ShieldCheck, ShieldAlert, Zap, Layers, Cog, Gauge, Wrench, ChevronDown, Download, RotateCcw
 } from 'lucide-react';
+import { SaveButton } from "@/components/calculation/SaveButton";
+import { toPng } from 'html-to-image';
+import jsPDF from 'jspdf';
 
 export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
     const {
@@ -33,6 +36,9 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
 
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('3D');
     const [expandedSection, setExpandedSection] = useState<string | null>('geometry');
+    const [isExporting, setIsExporting] = useState(false);
+    
+    const printRef = useRef<HTMLDivElement>(null);
 
     const isSafe = results.SF_bending > 1.4 && results.SF_contact > 1.0;
     const activeColor = isSafe ? '#a855f7' : '#ef4444';
@@ -41,13 +47,49 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
         setExpandedSection(expandedSection === id ? null : id);
     };
 
+    const exportToPDF = async () => {
+        if (!printRef.current) return;
+        try {
+            setIsExporting(true);
+            
+            // Show temporarily for capture
+            printRef.current.style.display = 'block';
+            printRef.current.style.position = 'absolute';
+            printRef.current.style.top = '-9999px';
+            printRef.current.style.left = '-9999px';
+            
+            const dataUrl = await toPng(printRef.current, { 
+                quality: 1, 
+                pixelRatio: 2,
+                backgroundColor: '#ffffff'
+            });
+            
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            pdf.addImage(dataUrl, 'PNG', 0, 0, 297, 210);
+            pdf.save(`Gear_Production_Drawing_m${gearModule}_z${z1}_z${z2}.pdf`);
+            
+        } catch (err) {
+            console.error('PDF export failed', err);
+        } finally {
+            if (printRef.current) {
+                printRef.current.style.display = 'none';
+            }
+            setIsExporting(false);
+        }
+    };
+
     return (
         <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
             {/* ═══ LEFT PANEL — Control Center (38%) ═══ */}
             <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
                 
                 {/* Header */}
-                <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
+                <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-purple-500/10 rounded-xl border border-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
                             <Cog size={20} strokeWidth={2} />
@@ -56,6 +98,22 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                             <h2 className="text-lg font-bold tracking-tight text-gray-100">Gear Design</h2>
                             <p className="text-[10px] text-purple-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">ISO 6336 Spur & Helical</p>
                         </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <SaveButton 
+                            type="gears-bearings"
+                            inputData={{ selectedPower, gearModule, z1, z2, helixAngle, faceWidth, materialName, x1, x2 }}
+                            engineVersion="v3.0"
+                            resultJson={results}
+                        />
+                        <button 
+                            onClick={exportToPDF}
+                            disabled={isExporting}
+                            className={`px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 ${isExporting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}`}
+                        >
+                            {isExporting ? <RotateCcw size={14} className="animate-spin" /> : <Download size={14} />} 
+                            PDF
+                        </button>
                     </div>
                 </div>
 
@@ -212,7 +270,7 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                             </Canvas>
                         ) : (
                             <div className="flex items-center justify-center h-full">
-                                <GearSVG2D z1={z1} z2={z2} m={gearModule} a={results.a} />
+                                <GearSVG2D z1={z1} z2={z2} m={gearModule} a={results.a} isPrint={false} />
                             </div>
                         )}
                     </div>
@@ -253,9 +311,95 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* HIDDEN PRINT CONTAINER */}
+            <div ref={printRef} style={{ display: 'none', width: '297mm', height: '210mm', backgroundColor: 'white', padding: '15mm', color: 'black', fontFamily: 'sans-serif' }}>
+                <div style={{ border: '2px solid #000', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', padding: '10mm', boxSizing: 'border-box' }}>
+                    
+                    {/* Header Block */}
+                    <div style={{ display: 'flex', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '20px' }}>
+                        <div style={{ flex: 1 }}>
+                            <h1 style={{ fontSize: '24pt', fontWeight: 900, margin: 0, textTransform: 'uppercase' }}>PRODUCTION DRAWING</h1>
+                            <h2 style={{ fontSize: '14pt', margin: 0, color: '#555' }}>GEAR STAGE: m={gearModule} | z1={z1} | z2={z2}</h2>
+                        </div>
+                        <div style={{ width: '200px', borderLeft: '2px solid #000', paddingLeft: '10px' }}>
+                            <div style={{ fontSize: '10pt', fontWeight: 'bold' }}>DATE: {new Date().toLocaleDateString()}</div>
+                            <div style={{ fontSize: '10pt', fontWeight: 'bold' }}>MATERIAL: {materialName}</div>
+                            <div style={{ fontSize: '10pt', fontWeight: 'bold' }}>QUALITY: ISO 6336</div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div style={{ display: 'flex', flex: 1, gap: '20px' }}>
+                        
+                        {/* Blueprint Drawing */}
+                        <div style={{ flex: 2, border: '1px solid #ccc', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9f9f9' }}>
+                            <div style={{ width: '90%', height: '90%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <GearSVG2D z1={z1} z2={z2} m={gearModule} a={results.a} isPrint={true} />
+                            </div>
+                        </div>
+
+                        {/* Data Tables */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000' }}>
+                                <thead>
+                                    <tr style={{ backgroundColor: '#eee' }}>
+                                        <th style={{ border: '1px solid #000', padding: '6px', textAlign: 'left', fontSize: '10pt' }}>Parameter</th>
+                                        <th style={{ border: '1px solid #000', padding: '6px', textAlign: 'center', fontSize: '10pt' }}>Pinion (z1)</th>
+                                        <th style={{ border: '1px solid #000', padding: '6px', textAlign: 'center', fontSize: '10pt' }}>Gear (z2)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td style={tdStyle}>Module (m)</td><td colSpan={2} style={{...tdStyle, textAlign: 'center'}}>{gearModule}</td></tr>
+                                    <tr><td style={tdStyle}>Face Width (b)</td><td colSpan={2} style={{...tdStyle, textAlign: 'center'}}>{faceWidth}</td></tr>
+                                    <tr><td style={tdStyle}>Number of Teeth (z)</td><td style={tdStyleCenter}>{z1}</td><td style={tdStyleCenter}>{z2}</td></tr>
+                                    <tr><td style={tdStyle}>Profile Shift (x)</td><td style={tdStyleCenter}>{x1}</td><td style={tdStyleCenter}>{x2}</td></tr>
+                                    <tr><td style={tdStyle}>Reference Dia (d)</td><td style={tdStyleCenter}>{(gearModule * z1).toFixed(2)}</td><td style={tdStyleCenter}>{(gearModule * z2).toFixed(2)}</td></tr>
+                                    <tr><td style={tdStyle}>Tip Dia (da)</td><td style={tdStyleCenter}>{results.da1.toFixed(2)}</td><td style={tdStyleCenter}>{results.da2.toFixed(2)}</td></tr>
+                                    <tr><td style={tdStyle}>Root Dia (df)</td><td style={tdStyleCenter}>{results.df1.toFixed(2)}</td><td style={tdStyleCenter}>{results.df2.toFixed(2)}</td></tr>
+                                    <tr><td style={tdStyle}>Dimension Over Pins (M)</td><td style={tdStyleCenter}>{results.M1.toFixed(3)}</td><td style={tdStyleCenter}>{results.M2.toFixed(3)}</td></tr>
+                                    <tr><td style={tdStyle}>Pin Diameter</td><td style={tdStyleCenter}>{pinDia1.toFixed(3)}</td><td style={tdStyleCenter}>{pinDia2.toFixed(3)}</td></tr>
+                                </tbody>
+                            </table>
+
+                            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000' }}>
+                                <thead>
+                                    <tr style={{ backgroundColor: '#eee' }}>
+                                        <th colSpan={2} style={{ border: '1px solid #000', padding: '6px', textAlign: 'left', fontSize: '10pt' }}>SYSTEM PROPERTIES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td style={tdStyle}>Center Distance (a)</td><td style={tdStyleCenter}>{results.a.toFixed(2)} mm</td></tr>
+                                    <tr><td style={tdStyle}>Transmission Ratio (i)</td><td style={tdStyleCenter}>{results.ratio.toFixed(3)}</td></tr>
+                                    <tr><td style={tdStyle}>Helix Angle (β)</td><td style={tdStyleCenter}>{helixAngle}°</td></tr>
+                                </tbody>
+                            </table>
+                            
+                            <div style={{ marginTop: 'auto', border: '2px solid ' + (isSafe ? '#10b981' : '#ef4444'), padding: '10px' }}>
+                                <div style={{ fontSize: '10pt', fontWeight: 'bold', marginBottom: '5px' }}>SAFETY FACTORS</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12pt' }}>
+                                    <span>Root Bending (SF_F):</span>
+                                    <strong>{results.SF_bending.toFixed(2)}</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12pt' }}>
+                                    <span>Flank Contact (SF_H):</span>
+                                    <strong>{results.SF_contact.toFixed(2)}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style={{ marginTop: '20px', fontSize: '9pt', color: '#666', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+                        * Generated by AluCalc Engineering Workstation. Values calculated per ISO 6336 standards.
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
+
+const tdStyle = { border: '1px solid #000', padding: '6px', fontSize: '9pt' };
+const tdStyleCenter = { ...tdStyle, textAlign: 'center' as const };
 
 // ═══════════════════════════════════════════════════════════════
 // SUB-COMPONENTS
@@ -359,31 +503,37 @@ function GearSelect({ label, value, onChange, options, color }: { label: string;
     );
 }
 
-function GearSVG2D({ z1, z2, m, a }: { z1: number; z2: number; m: number; a: number }) {
+function GearSVG2D({ z1, z2, m, a, isPrint = false }: { z1: number; z2: number; m: number; a: number; isPrint?: boolean }) {
     const r1 = (m * z1) / 2;
     const r2 = (m * z2) / 2;
     const cx1 = 250 - a / 2;
     const cx2 = 250 + a / 2;
+    
+    const color1 = isPrint ? '#000000' : '#6366f1';
+    const color2 = isPrint ? '#000000' : '#a855f7';
+    const textColor = isPrint ? '#000000' : 'rgba(255,255,255,0.3)';
+    const strokeWidth = isPrint ? "1.5" : "3";
+    const opacity = isPrint ? "1" : "0.6";
 
     return (
         <svg viewBox="0 0 500 300" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
             {/* Pinion */}
-            <circle cx={cx1} cy={150} r={r1} fill="none" stroke="#6366f1" strokeWidth="3" opacity="0.6" />
-            <circle cx={cx1} cy={150} r={r1 + m} fill="none" stroke="#6366f1" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.3" />
-            <circle cx={cx1} cy={150} r={2} fill="#6366f1" />
+            <circle cx={cx1} cy={150} r={r1} fill="none" stroke={color1} strokeWidth={strokeWidth} opacity={opacity} />
+            <circle cx={cx1} cy={150} r={r1 + m} fill="none" stroke={color1} strokeWidth={isPrint ? "0.5" : "1.5"} strokeDasharray="4,4" opacity={isPrint ? "0.8" : "0.3"} />
+            <circle cx={cx1} cy={150} r={2} fill={color1} />
             
             {/* Gear */}
-            <circle cx={cx2} cy={150} r={r2} fill="none" stroke="#a855f7" strokeWidth="3" opacity="0.6" />
-            <circle cx={cx2} cy={150} r={r2 + m} fill="none" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.3" />
-            <circle cx={cx2} cy={150} r={2} fill="#a855f7" />
+            <circle cx={cx2} cy={150} r={r2} fill="none" stroke={color2} strokeWidth={strokeWidth} opacity={opacity} />
+            <circle cx={cx2} cy={150} r={r2 + m} fill="none" stroke={color2} strokeWidth={isPrint ? "0.5" : "1.5"} strokeDasharray="4,4" opacity={isPrint ? "0.8" : "0.3"} />
+            <circle cx={cx2} cy={150} r={2} fill={color2} />
 
             {/* Center distance line */}
-            <line x1={cx1} y1={150} x2={cx2} y2={150} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="6,6" />
+            <line x1={cx1} y1={150} x2={cx2} y2={150} stroke={textColor} strokeWidth="1" strokeDasharray="6,6" />
             
             {/* Labels */}
-            <text x={cx1} y={150 + r1 + 20} textAnchor="middle" fill="#6366f1" fontSize="12" fontWeight="bold" fontFamily="monospace">z₁={z1}</text>
-            <text x={cx2} y={150 + r2 + 20} textAnchor="middle" fill="#a855f7" fontSize="12" fontWeight="bold" fontFamily="monospace">z₂={z2}</text>
-            <text x={250} y={138} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="10" fontFamily="monospace">a={a.toFixed(1)}</text>
+            <text x={cx1} y={150 + r1 + 20} textAnchor="middle" fill={color1} fontSize="12" fontWeight="bold" fontFamily="monospace">z₁={z1}</text>
+            <text x={cx2} y={150 + r2 + 20} textAnchor="middle" fill={color2} fontSize="12" fontWeight="bold" fontFamily="monospace">z₂={z2}</text>
+            <text x={250} y={138} textAnchor="middle" fill={textColor} fontSize="10" fontFamily="monospace">a={a.toFixed(1)}</text>
         </svg>
     );
 }

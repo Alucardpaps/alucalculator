@@ -5,12 +5,13 @@
   "inputs": [
     { "key": "C", "type": "number", "unit": "N", "description": "Basic Dynamic Load Rating" },
     { "key": "P", "type": "number", "unit": "N", "description": "Equivalent Dynamic Bearing Load" },
-    { "key": "n", "type": "number", "description": "RPM" }
+    { "key": "n", "type": "number", "description": "RPM" },
+    { "key": "lifeFactor", "type": "number", "default": 3, "description": "3 for ball, 3.33 for roller" }
   ],
   "steps": [
     {
       "id": "L10_millions",
-      "formula": "(C / P)^3",
+      "formula": "(C / P)^lifeFactor",
       "description": "Calculate basic rating life (millions of revolutions)",
       "latex": "L_{10} = \\left( \\frac{C}{P} \\right)^3"
     },

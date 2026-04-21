@@ -8,6 +8,7 @@ import { IEC_MOTORS } from "@/data/motorData";
 import { GEAR_MODULES_ISO, GEAR_MATERIALS, APPLICATION_FACTORS } from "@/data/gearsData";
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { UndercutDiagram, ServiceFactorDiagram } from "@/components/mechanical/EducationalAssets";
+import { SaveButton } from "@/components/calculation/SaveButton";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function GearsPageClient({ dict, lang }: { dict: any, lang: string }) {
@@ -70,9 +71,17 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                         </div>
                     </div>
 
-                    <div className="flex bg-slate-800/50 rounded p-1">
-                        <button onClick={() => setUnit('metric')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'metric' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>MM</button>
-                        <button onClick={() => setUnit('imperial')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'imperial' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>IN</button>
+                    <div className="flex items-center gap-4">
+                        <SaveButton 
+                            type="gears"
+                            inputData={{ force, module: gearModule, faceWidth, teethCount, z1, z2, x1, x2, materialName }}
+                            engineVersion="v2.5"
+                            resultJson={results}
+                        />
+                        <div className="flex bg-slate-800/50 rounded p-1">
+                            <button onClick={() => setUnit('metric')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'metric' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>MM</button>
+                            <button onClick={() => setUnit('imperial')} className={`px-3 py-1 text-[10px] font-bold rounded transition-all ${unit === 'imperial' ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-400'}`}>IN</button>
+                        </div>
                     </div>
                 </div>
             </header>

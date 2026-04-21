@@ -1,12 +1,11 @@
-/**
- * Nesting2D Component
- * Main container for 2D True Shape Nesting with DXF import
- */
-
 "use client";
 
 import { useState, useCallback } from 'react';
-import { Settings, Play, Download, AlertCircle, CheckCircle2, Loader2, Grid2x2 } from 'lucide-react';
+import { 
+    Settings, Play, Download, AlertCircle, CheckCircle2, 
+    Loader2, Grid2x2, Layers, Cpu, Maximize2, RotateCcw, Activity
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { NestingCanvas } from './NestingCanvas';
 import { PartUploader } from './DxfUploader';
@@ -15,11 +14,11 @@ import { exportToDXF, downloadDXF } from '@/utils/dxfExporter';
 import type { Part2D, Sheet2D, NestingOptions } from '@/types/nesting2d.types';
 
 interface Nesting2DProps {
-    dict: Record<string, unknown>;
-    lang: string;
+    dict?: Record<string, unknown>;
+    lang?: string;
 }
 
-export function Nesting2D({ dict, lang }: Nesting2DProps) {
+export function Nesting2D({ dict = {}, lang = 'en' }: Nesting2DProps) {
     // State
     const [parts, setParts] = useState<Part2D[]>([]);
     const [sheet, setSheet] = useState<Sheet2D>({ width: 2500, height: 1250, kerf: 3 });
@@ -36,260 +35,199 @@ export function Nesting2D({ dict, lang }: Nesting2DProps) {
     // Worker hook
     const { run, progress, result, error, isRunning, reset } = useNestingWorker();
 
-    // i18n helper
     const t = (key: string): string => {
         const keys = key.split('.');
-        let value: unknown = dict;
-        for (const k of keys) {
-            value = (value as Record<string, unknown>)?.[k];
-        }
-        return (value as string) || key;
+        let value: any = dict;
+        for (const k of keys) { value = value?.[k]; }
+        return value || key;
     };
 
-    // Run optimization
     const handleOptimize = useCallback(() => {
         if (parts.length === 0) return;
-
         reset();
         setCurrentSheetIndex(0);
         run({ parts, sheet, options });
     }, [parts, sheet, options, run, reset]);
 
-    // Export DXF
     const handleExportDXF = useCallback(() => {
         if (!result || result.sheets.length === 0) return;
-
         result.sheets.forEach((sheetResult, index) => {
             const dxfContent = exportToDXF(sheetResult, sheet);
-            const filename = result.sheets.length > 1
-                ? `nested_sheet_${index + 1}.dxf`
-                : 'nested_parts.dxf';
+            const filename = result.sheets.length > 1 ? `nested_sheet_${index + 1}.dxf` : 'nested_parts.dxf';
             downloadDXF(dxfContent, filename);
         });
     }, [result, sheet]);
 
-    // Handle parts change from uploader
     const handlePartsChange = useCallback((newParts: Part2D[]) => {
         setParts(newParts);
-        // Reset result when parts change
         if (result) reset();
     }, [result, reset]);
 
-    // Calculate total parts needed
     const totalPartsCount = parts.reduce((sum, p) => sum + p.quantity, 0);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* LEFT PANEL: Upload & Settings */}
-            <div className="space-y-6">
-                {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <div className="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center">
-                            <Grid2x2 className="w-5 h-5 text-white" />
-                        </div>
-                        {t('nesting2d.title') !== 'nesting2d.title' ? t('nesting2d.title') : '2D Nesting'}
-                    </h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        {t('nesting2d.subtitle') !== 'nesting2d.subtitle' ? t('nesting2d.subtitle') : 'True Shape Nesting for Laser/Plasma/Waterjet'}
-                    </p>
-                </div>
+        <div className="flex flex-col lg:flex-row w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-violet-500/30">
+            {/* Visual Grid Layer */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-                {/* Part Uploader (DXF + SVG) */}
-                <PartUploader
-                    parts={parts}
-                    onPartsChange={handlePartsChange}
-                />
-
-                {/* Sheet Settings */}
-                <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                    <h3 className="font-medium text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-                        <Settings className="w-4 h-4" />
-                        Sheet Settings
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs text-slate-500 mb-1">Width (mm)</label>
-                            <input
-                                type="number"
-                                value={sheet.width}
-                                onChange={(e) => setSheet(s => ({ ...s, width: parseFloat(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                            />
+            {/* LEFT PANEL: Controls */}
+            <div className="w-full lg:w-[400px] bg-[#05080f]/95 backdrop-blur-2xl border-r border-white/5 flex flex-col z-20 shadow-[20px_0_50px_rgba(0,0,0,0.5)] overflow-y-auto custom-scrollbar">
+                <div className="p-8 border-b border-white/5 bg-gradient-to-b from-violet-500/10 to-transparent">
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-500/40 flex items-center justify-center text-violet-400 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                            <Grid2x2 size={24} />
                         </div>
                         <div>
-                            <label className="block text-xs text-slate-500 mb-1">Height (mm)</label>
-                            <input
-                                type="number"
-                                value={sheet.height}
-                                onChange={(e) => setSheet(s => ({ ...s, height: parseFloat(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                            />
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Nesting Engine</h1>
+                            <p className="text-[10px] text-violet-500/60 font-mono tracking-widest uppercase mt-1">Geometric Optimization</p>
                         </div>
-                        <div>
-                            <label className="block text-xs text-slate-500 mb-1">
-                                Kerf / Beam Width (mm)
-                                <span className="ml-1 text-slate-400 font-normal">(Lazer: 0.1-0.3 | Plazma: 1-3)</span>
-                            </label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                value={sheet.kerf}
-                                onChange={(e) => setSheet(s => ({ ...s, kerf: parseFloat(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs text-slate-500 mb-1">Part Spacing (mm)</label>
-                            <input
-                                type="number"
-                                step="0.5"
-                                value={options.spacing}
-                                onChange={(e) => setOptions(o => ({ ...o, spacing: parseFloat(e.target.value) || 0 }))}
-                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Rotation */}
-                    <div className="mt-4">
-                        <label className="block text-xs text-slate-500 mb-1">Rotation Step</label>
-                        <select
-                            value={options.rotationStep}
-                            onChange={(e) => setOptions(o => ({ ...o, rotationStep: parseInt(e.target.value) }))}
-                            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                        >
-                            <option value={0}>No rotation</option>
-                            <option value={90}>90° (4 rotations)</option>
-                            <option value={45}>45° (8 rotations)</option>
-                            <option value={30}>30° (12 rotations)</option>
-                            <option value={15}>15° (24 rotations)</option>
-                        </select>
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                    <button
-                        onClick={handleOptimize}
-                        disabled={parts.length === 0 || isRunning}
-                        className={`
-                            flex-1 py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2
-                            transition-all duration-200
-                            ${parts.length === 0 || isRunning
-                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
-                                : 'bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-600/20'
-                            }
-                        `}
-                    >
-                        {isRunning ? (
-                            <>
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                                Optimizing... {progress?.percent || 0}%
-                            </>
-                        ) : (
-                            <>
-                                <Play className="w-5 h-5" />
-                                Optimize ({totalPartsCount} parts)
-                            </>
-                        )}
-                    </button>
-
-                    {result && (
-                        <button
-                            onClick={handleExportDXF}
-                            className="py-3 px-4 rounded-xl font-medium bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 shadow-lg shadow-blue-600/20"
-                        >
-                            <Download className="w-5 h-5" />
-                            DXF
-                        </button>
-                    )}
-                </div>
-
-                {/* Worker Error */}
-                {error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
-                            <AlertCircle className="w-4 h-4" />
-                            {error}
+                <div className="p-8 space-y-8 flex-1">
+                    {/* Part Uploader Area */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                            <Layers size={12} /> Resource Loading
+                        </h2>
+                        <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden p-1">
+                             <PartUploader parts={parts} onPartsChange={handlePartsChange} />
                         </div>
                     </div>
-                )}
+
+                    <div className="w-full h-px bg-white/5" />
+
+                    {/* Stock & Algorithm Settings */}
+                    <div className="space-y-6">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                            <Settings size={12} /> Compute Parameters
+                        </h2>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                             <ParameterInput label="Sheet Width" unit="mm" value={sheet.width} onChange={(v: any) => setSheet(s => ({ ...s, width: v }))} icon={<Maximize2 size={12}/>} />
+                             <ParameterInput label="Sheet Height" unit="mm" value={sheet.height} onChange={(v: any) => setSheet(s => ({ ...s, height: v }))} icon={<Maximize2 size={12}/>} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                             <ParameterInput label="Kerf Width" unit="mm" value={sheet.kerf} onChange={(v: any) => setSheet(s => ({ ...s, kerf: v }))} icon={<Cpu size={12}/>} />
+                             <ParameterInput label="Min Spacing" unit="mm" value={options.spacing} onChange={(v: any) => setOptions(o => ({ ...o, spacing: v }))} icon={<Layers size={12}/>} />
+                        </div>
+
+                        <div className="space-y-2">
+                             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Optimization Rotation</div>
+                             <select
+                                value={options.rotationStep}
+                                onChange={(e) => setOptions(o => ({ ...o, rotationStep: parseInt(e.target.value) }))}
+                                className="w-full bg-[#0a0f18] border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-violet-500/50"
+                            >
+                                <option value={0}>Fixed (0° Degree)</option>
+                                <option value={90}>Ortho (90° Step)</option>
+                                <option value={45}>Precision (45° Step)</option>
+                                <option value={15}>Hyper (15° Step)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Action Panel */}
+                    <div className="pt-4 flex gap-3">
+                         <button onClick={handleOptimize} disabled={parts.length === 0 || isRunning}
+                            className={`flex-[2] py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl ${parts.length === 0 || isRunning ? 'bg-white/5 text-slate-600' : 'bg-violet-600 hover:bg-violet-500 text-white shadow-violet-900/20'}`}>
+                            {isRunning ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} fill="currentColor" />}
+                            {isRunning ? `Solving: ${progress?.percent || 0}%` : `Run Solver (${totalPartsCount})`}
+                         </button>
+                         {result && (
+                             <button onClick={handleExportDXF} className="w-16 h-14 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl flex items-center justify-center hover:bg-blue-600 transition-all">
+                                <Download size={20} />
+                             </button>
+                         )}
+                    </div>
+                </div>
+
+                <div className="p-6 border-t border-white/5 bg-violet-500/[0.02]">
+                    <div className="flex gap-4 items-center">
+                        <div className="w-10 h-10 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+                            <Activity size={18} />
+                        </div>
+                        <div>
+                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Worker Thread</div>
+                            <div className="text-xs font-bold text-white italic">{isRunning ? 'COMPUTING TOPOLOGY' : 'READY TO ANALYZE'}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* RIGHT PANEL: Canvas Preview */}
-            <div className="space-y-4">
-                <NestingCanvas
-                    sheet={sheet}
-                    result={result?.sheets[currentSheetIndex] || null}
-                    currentSheetIndex={currentSheetIndex}
-                    className="aspect-[4/3] lg:aspect-auto lg:h-[600px]"
-                />
+            {/* MAIN AREA */}
+            <div className="flex-1 flex flex-col p-8 lg:p-12 gap-8 overflow-hidden z-10">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-500/5 blur-[150px] rounded-full pointer-events-none" />
 
-                {/* Results Summary */}
-                {result && (
-                    <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-3">
-                            <CheckCircle2 className="w-5 h-5" />
-                            <span className="font-medium">Optimization Complete</span>
-                            <span className="text-xs text-slate-400 ml-auto">
-                                {result.computeTimeMs.toFixed(0)}ms
-                            </span>
-                        </div>
+                {/* Results Widget */}
+                <AnimatePresence>
+                    {result && (
+                        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-20">
+                            <ValueCard label="Sheet Usage" value={String(result.totalSheets)} unit="QTY" color="#8b5cf6" />
+                            <ValueCard label="Efficiency" value={result.totalEfficiency.toFixed(1)} unit="%" sub="NESTED AREA" color="#10b981" />
+                            <ValueCard label="Waste Produced" value={(result.totalWaste / 1000000).toFixed(3)} unit="m²" color="#f59e0b" />
+                            <ValueCard label="Compute Time" value={String(result.computeTimeMs.toFixed(0))} unit="ms" sub="HEURISTIC" color="#3b82f6" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                                <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    {result.totalSheets}
-                                </p>
-                                <p className="text-xs text-slate-500">Sheets</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                                    {result.totalEfficiency.toFixed(1)}%
-                                </p>
-                                <p className="text-xs text-slate-500">Efficiency</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                                    {(result.totalWaste / 1000000).toFixed(3)} m²
-                                </p>
-                                <p className="text-xs text-slate-500">Waste</p>
-                            </div>
-                        </div>
-
-                        {result.unplacedParts.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                                <p className="text-xs text-red-500 dark:text-red-400">
-                                    ⚠️ {result.unplacedParts.length} part(s) could not be placed
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Sheet Navigation (for multi-sheet) */}
-                {result && result.sheets.length > 1 && (
-                    <div className="flex items-center justify-center gap-2">
-                        <span className="text-xs text-slate-500 mr-2">Sheet:</span>
-                        {result.sheets.map((s, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentSheetIndex(index)}
-                                className={`
-                                    w-8 h-8 rounded-full text-sm font-medium transition-all
-                                    ${index === currentSheetIndex
-                                        ? 'bg-violet-600 text-white shadow-lg'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                    }
-                                `}
-                            >
-                                {index + 1}
-                            </button>
+                {/* Simulation Canvas Viewport */}
+                <div className="flex-1 bg-black/40 border border-white/10 rounded-[3rem] p-8 flex flex-col relative overflow-hidden backdrop-blur-md shadow-2xl">
+                    <div className="absolute top-0 right-0 p-8 z-30 flex gap-2">
+                        {result && result.sheets.length > 1 && result.sheets.map((_, i) => (
+                             <button key={i} onClick={() => setCurrentSheetIndex(i)} 
+                                className={`w-8 h-8 rounded-lg text-[10px] font-black border transition-all ${currentSheetIndex === i ? 'bg-violet-600 border-violet-500 text-white' : 'bg-white/5 border-white/10 text-slate-500'}`}>
+                                {i+1}
+                             </button>
                         ))}
                     </div>
-                )}
+
+                    <div className="flex-1 flex items-center justify-center relative">
+                        {/* The Custom Nesting Canvas */}
+                        <div className="w-full h-full max-w-5xl rounded-2xl overflow-hidden border border-white/5 bg-[#080d14]/40 shadow-inner">
+                             <NestingCanvas
+                                sheet={sheet}
+                                result={result?.sheets[currentSheetIndex] || null}
+                                currentSheetIndex={currentSheetIndex}
+                                className="w-full h-full"
+                            />
+                        </div>
+                    </div>
+
+                    {result?.unplacedParts?.length ? (
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-red-500/10 border border-red-500/30 rounded-full text-[10px] font-bold text-red-400 uppercase tracking-widest flex items-center gap-2">
+                             <AlertCircle size={12} /> {result.unplacedParts.length} Critical Overflow Parts Detected
+                        </div>
+                    ) : null}
+                </div>
             </div>
+        </div>
+    );
+}
+
+function ParameterInput({ label, unit, value, onChange, icon }: any) {
+    return (
+        <div className="space-y-2 group">
+            <div className="flex justify-between items-center px-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">{icon} {label}</span>
+                <span className="text-[10px] font-mono text-violet-400">{value} {unit}</span>
+            </div>
+            <input type="range" min="1" max={label.includes('Width') && label.length > 5 ? 5000 : 1000} step="1" value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-violet-500" />
+        </div>
+    );
+}
+
+function ValueCard({ label, value, unit, sub, color }: any) {
+    return (
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity"><Layers size={64}/></div>
+            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{label}</div>
+            <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-black font-mono text-white leading-none tracking-tighter" style={{ color: color }}>{value}</div>
+                {unit && <span className="text-sm font-bold text-slate-600 uppercase italic">{unit}</span>}
+            </div>
+            {sub && <div className="text-[9px] font-bold mt-1 uppercase tracking-widest text-slate-600">{sub}</div>}
         </div>
     );
 }

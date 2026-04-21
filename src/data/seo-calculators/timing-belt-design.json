@@ -1,0 +1,51 @@
+{
+  "id": "timing-belt-design",
+  "title": "Timing Belt Design Calculator & Engineering Guide - AluCalc",
+  "slug": "timing-belt-design",
+  "keyword": "timing belt design calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Timing Belt Design Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Timing Belt Design guide with ISO 5296 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Timing Belt Design Calculator & Engineering Guide - AluCalc",
+    "intro": "Synchronous power transmission design focusing on precise positioning and load distribution.",
+    "formula": "L = 2C + 1.57(D+d) + \\frac{(D-d)^2}{4C}",
+    "variables": {
+      "L": "Belt length",
+      "C": "Center distance",
+      "D": "Pulley 1 Dia",
+      "d": "Pulley 2 Dia"
+    },
+    "technical_data": [
+      {
+        "name": "Service Factors",
+        "rows": [
+          {
+            "Load": "Uniform",
+            "SF": 1
+          },
+          {
+            "Load": "Heavy",
+            "SF": 1.7
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Check tooth shear",
+      "Validate tensioner range"
+    ],
+    "pitfalls": [
+      "Underestimating startup torque"
+    ],
+    "step_by_step": "1. Define system parameters for Timing Belt Design.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 5296 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Timing Belt Design analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

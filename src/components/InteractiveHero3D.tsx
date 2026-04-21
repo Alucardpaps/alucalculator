@@ -91,18 +91,41 @@ const Scene = () => {
 };
 
 import ClientOnly from './ClientOnly';
+import { useOSStore } from '@/store/osStore';
+import { useWebGLDetector } from '@/hooks/useWebGLDetector';
 
 export const InteractiveHero3D = ({ lang, dict }: { lang: string, dict: any }) => {
+    useWebGLDetector();
+    const { isWebGLSupported } = useOSStore();
+
     return (
         <ClientOnly fallback={<div className="w-full h-[600px] bg-slate-950" />}>
             <section className="relative w-full h-[600px] bg-slate-950 overflow-hidden flex items-center justify-center">
-
-                {/* 3D Background */}
+                
+                {/* 3D Background with Fallback */}
                 <div className="absolute inset-0 z-0">
-                    <Canvas dpr={[1, 2]}>
-                        <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-                        <Scene />
-                    </Canvas>
+                    {isWebGLSupported ? (
+                        <Canvas dpr={[1, 2]}>
+                            <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
+                            <Scene />
+                        </Canvas>
+                    ) : (
+                        <div className="absolute inset-0 bg-[#020408]">
+                            <div className="absolute inset-0 opacity-[0.1]" 
+                                style={{ 
+                                    backgroundImage: 'radial-gradient(circle at 50% 50%, #3b82f6 0%, transparent 70%)',
+                                    filter: 'blur(100px)'
+                                }} 
+                            />
+                            {/* Static Grid Fallback */}
+                            <div className="absolute inset-0 opacity-[0.05]"
+                                style={{
+                                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                                    backgroundSize: '100px 100px',
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Overlay Gradient for Text Readability */}

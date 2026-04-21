@@ -1,0 +1,34 @@
+{
+  "id": "transformer-calculation",
+  "title": "Transformer Scaling Calculator & Engineering Guide - AluCalc",
+  "slug": "transformer-calculation",
+  "keyword": "transformer scaling calculator",
+  "category": "electrical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Transformer Scaling Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Transformer Scaling guide with IEC 60076 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Transformer Scaling Calculator & Engineering Guide - AluCalc",
+    "intro": "Basic induction-based voltage and current scaling.",
+    "formula": "\\frac{V_p}{V_s} = \\frac{N_p}{N_s}",
+    "variables": {
+      "Vp": "Prim Volts",
+      "Vs": "Sec Volts",
+      "Np": "Prim Turns"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check efficiency loss",
+      "Verify core saturation"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Transformer Scaling.\n2. Consult the technical reference table for material constants.\n3. Apply the IEC 60076 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Electrical applications, accurate Transformer Scaling analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

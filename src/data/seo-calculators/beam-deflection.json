@@ -1,27 +1,53 @@
 {
   "id": "beam-deflection",
-  "category": "structural",
-  "title": "Beam Deflection Calculator",
+  "title": "Beam Deflection Calculator & Engineering Guide - AluCalc",
   "slug": "beam-deflection",
+  "keyword": "beam deflection calculator",
+  "category": "structures",
+  "intent": "professional_handbook",
   "meta": {
-    "title": "Beam Deflection Calculator | AluCalc",
-    "description": "Calculate displacement under load."
+    "title": "Beam Deflection Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Beam Deflection guide with AISC Steel Manual formulas, technical tables, and design checklists."
   },
   "seo": {
-    "h1": "Beam Deflection Calculator",
-    "intro": "Estimates deflection in structural beams.",
-    "formula": "δ = (F*L^3)/(48*E*I)",
+    "h1": "Beam Deflection Calculator & Engineering Guide - AluCalc",
+    "intro": "Predicts the vertical displacement of a beam under uniform load.",
+    "formula": "\\delta = \\frac{5 w L^4}{384 E I}",
     "variables": {
-      "F": "Force",
-      "L": "Length",
+      "delta": "Deflection",
+      "w": "Load",
+      "L": "Span",
       "E": "Modulus",
       "I": "Inertia"
     },
-    "practical": "Building safety.",
-    "example": "δ = 2mm."
+    "technical_data": [
+      {
+        "name": "Modulus (E)",
+        "rows": [
+          {
+            "Material": "Steel",
+            "E": "200 GPa"
+          },
+          {
+            "Material": "Alu",
+            "E": "69 GPa"
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Check L/360 limit",
+      "Shear stress check"
+    ],
+    "pitfalls": [
+      "Mixing units",
+      "Ignoring self-weight"
+    ],
+    "step_by_step": "1. Define system parameters for Beam Deflection.\n2. Consult the technical reference table for material constants.\n3. Apply the AISC Steel Manual formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Structures applications, accurate Beam Deflection analysis is vital for safety and performance."
   },
   "cta": {
     "label": "Open in AluCalc OS",
-    "link": "/?module=beam-deflection"
+    "link": "/os?module=calculator"
   }
 }

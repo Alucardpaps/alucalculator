@@ -1,0 +1,32 @@
+{
+  "id": "machine-assembly",
+  "title": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc",
+  "slug": "machine-assembly",
+  "keyword": "precision machine assembly calculator",
+  "category": "manufacturing",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Precision Machine Assembly guide with ISO 1101 / ASME Y14.5 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc",
+    "intro": "Geometric and dimensional analysis for complex mechanical assemblies and fit-up sequences.",
+    "formula": "T_{assem} = \\sqrt{\\sum Tol_i^2}",
+    "variables": {
+      "Tol": "Component tolerances"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify datum precedence",
+      "Check clearance at max material condition"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Precision Machine Assembly.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 1101 / ASME Y14.5 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Manufacturing applications, accurate Precision Machine Assembly analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

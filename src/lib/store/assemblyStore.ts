@@ -40,7 +40,7 @@ interface AssemblyState {
   /** Selected component ID */
   selectedId: string | null;
   /** Workspace tool mode */
-  toolMode: 'select' | 'move' | 'connect';
+  toolMode: 'select' | 'translate' | 'rotate';
 }
 
 // ════════════════════════════════════════════
@@ -73,7 +73,7 @@ interface AssemblyActions {
   selectComponent: (id: string | null) => void;
 
   // ── Tools ──
-  setToolMode: (mode: 'select' | 'move' | 'connect') => void;
+  setToolMode: (mode: 'select' | 'translate' | 'rotate') => void;
 
   // ── Snap Config ──
   setSnapEnabled: (enabled: boolean) => void;

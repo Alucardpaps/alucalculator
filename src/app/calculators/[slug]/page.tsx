@@ -20,11 +20,13 @@ export default async function CalculatorSEOPage({ params }: PageProps) {
     notFound();
   }
 
-  // Programmatic Internal Linking: Find 3 related calculators in same category
-  const related = allCalculators
-    .filter((c) => c.category === calculator.category && c.slug !== calculator.slug)
-    .slice(0, 3)
-    .map((c) => ({ title: c.title, slug: c.slug }));
+  // Cross-category internal linking: prefer pre-defined, fallback to same-category
+  const related = (calculator as any).relatedCalculators?.length
+    ? (calculator as any).relatedCalculators
+    : allCalculators
+        .filter((c) => c.category === calculator.category && c.slug !== calculator.slug)
+        .slice(0, 4)
+        .map((c) => ({ title: c.title, slug: c.slug }));
 
   return <SEOPage data={{ ...calculator, relatedCalculators: related }} />;
 }

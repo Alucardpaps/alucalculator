@@ -1,297 +1,263 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Droplets, Activity, Ruler, Cylinder } from 'lucide-react';
-import { useI18nStore } from '@/store/i18nStore';
-import { motion } from 'framer-motion';
+'use client';
 
-// Common Fluid Properties (approximate at 20 C)
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Droplets, Wind, Activity, Ruler, Cylinder, 
+    Gauge, Thermometer, Zap, Info, ArrowRight,
+    Play, RotateCcw, Shield, Maximize2
+} from 'lucide-react';
+
 const FLUIDS = [
-    { id: 'water', name: { en: 'Water', tr: 'Su' }, density: 998, dynViscosity: 0.001002 },
-    { id: 'air', name: { en: 'Air', tr: 'Hava' }, density: 1.204, dynViscosity: 0.0000181 },
-    { id: 'oil_iso32', name: { en: 'Hydraulic Oil ISO 32', tr: 'Hidrolik Yağ ISO 32' }, density: 870, dynViscosity: 0.027 },
-    { id: 'gasoline', name: { en: 'Gasoline', tr: 'Benzin' }, density: 720, dynViscosity: 0.0006 },
-    { id: 'honey', name: { en: 'Honey', tr: 'Bal' }, density: 1420, dynViscosity: 10.0 }
+    { id: 'water', label: 'Water', p: 998, u: 0.001, color: '#3b82f6' },
+    { id: 'oil', label: 'Hydraulic Oil', p: 870, u: 0.027, color: '#f59e0b' },
+    { id: 'air', label: 'Air (STP)', p: 1.22, u: 0.000018, color: '#94a3b8' },
+    { id: 'custom', label: 'Custom Fluid', p: 1000, u: 0.001, color: '#10b981' }
 ];
 
-// Common Pipe Roughness (mm)
-const PIPES = [
-    { id: 'smooth', name: { en: 'Smooth Pipe (Glass/Plastic)', tr: 'Pürüzsüz (Cam/Plastik)' }, roughness: 0.0015 },
-    { id: 'commercial_steel', name: { en: 'Commercial Steel', tr: 'Ticari Çelik' }, roughness: 0.045 },
-    { id: 'cast_iron', name: { en: 'Cast Iron', tr: 'Dökme Demir' }, roughness: 0.26 },
-    { id: 'concrete', name: { en: 'Concrete', tr: 'Beton' }, roughness: 1.0 }
+const ROUGHNESS = [
+    { label: 'PVC/Glass', e: 0.0015 },
+    { label: 'Steel (Comm)', e: 0.045 },
+    { label: 'Cast Iron', e: 0.26 },
+    { label: 'Concrete', e: 1.0 }
 ];
 
-const FluidDynamicsModule: React.FC = () => {
-    const { language } = useI18nStore();
-    const isTr = language === 'tr';
-
-    // State
+export default function FluidDynamics() {
+    // Inputs
     const [fluidId, setFluidId] = useState('water');
-    const [pipeId, setPipeId] = useState('commercial_steel');
-    const [diameter, setDiameter] = useState<number>(0.1); // m
-    const [length, setLength] = useState<number>(100); // m
-    const [velocity, setVelocity] = useState<number>(2.0); // m/s
-    const [elevation, setElevation] = useState<number>(0); // m
-
-    const fluid = useMemo(() => FLUIDS.find(f => f.id === fluidId) || FLUIDS[0], [fluidId]);
-    const pipe = useMemo(() => PIPES.find(p => p.id === pipeId) || PIPES[0], [pipeId]);
-
-    // Calculations
+    const [diameter, setDiameter] = useState(100); // mm
+    const [length, setLength] = useState(50); // m
+    const [flowRate, setFlowRate] = useState(20); // m3/h
+    const [roughnessIdx, setRoughnessIdx] = useState(1);
+    const [elevation, setElevation] = useState(0); // m
+    
+    // Logic
     const results = useMemo(() => {
-        const area = Math.PI * Math.pow(diameter / 2, 2);
-        const flowRate = area * velocity; // m3/s
-
-        // Reynolds Number: Re = (density * velocity * diameter) / dynamicViscosity
-        const reynolds = (fluid.density * velocity * diameter) / fluid.dynViscosity;
-
+        const fluid = FLUIDS.find(f => f.id === fluidId) || FLUIDS[0];
+        const rho = fluid.p;
+        const mu = fluid.u;
+        const d_m = diameter / 1000;
+        const area = (Math.PI * Math.pow(d_m, 2)) / 4;
+        const q_m3s = flowRate / 3600;
+        const velocity = q_m3s / area;
+        
+        // Reynolds Number
+        const re = (rho * velocity * d_m) / mu;
+        
+        // Friction Factor (Haaland)
+        const eps = ROUGHNESS[roughnessIdx].e / 1000;
+        const relRough = eps / d_m;
+        let headLoss = 0;
         let frictionFactor = 0;
-        let flowType = 'Laminar';
-
-        // Friction Factor using Colebrook-White or Haaland approximation
-        if (reynolds < 2300) {
-            frictionFactor = 64 / reynolds;
-            flowType = 'Laminar';
-        } else if (reynolds > 4000) {
-            flowType = 'Turbulent';
-            // Haaland approximation for Darcy friction factor
-            const relRoughness = (pipe.roughness / 1000) / diameter;
-            const arg = Math.pow(relRoughness / 3.7, 1.11) + (6.9 / reynolds);
-            frictionFactor = Math.pow(-1.8 * Math.log10(arg), -2);
+        
+        if (re < 2300) {
+            frictionFactor = 64 / re;
         } else {
-            flowType = 'Transitional';
-            // Linear interpolation for transitional (simplified)
-            const fLam = 64 / 2300;
-            const relRoughness = (pipe.roughness / 1000) / diameter;
-            const arg = Math.pow(relRoughness / 3.7, 1.11) + (6.9 / 4000);
-            const fTurb = Math.pow(-1.8 * Math.log10(arg), -2);
-            frictionFactor = fLam + (fTurb - fLam) * ((reynolds - 2300) / (4000 - 2300));
+            const h_term = Math.pow(relRough / 3.7, 1.11) + (6.9 / re);
+            frictionFactor = Math.pow(-1.8 * Math.log10(h_term), -2);
         }
-
-        // Pressure Drop (Darcy-Weisbach): dP = f * (L/D) * (rho * v^2 / 2)
-        const dpFriction = frictionFactor * (length / diameter) * (fluid.density * Math.pow(velocity, 2) / 2); // Pascals
-
-        // Hydrostatic Pressure Drop: dP = rho * g * dz
-        const dpElevation = fluid.density * 9.81 * elevation;
-
-        const totalPressureDrop = dpFriction + dpElevation; // Pascals
-
-        return {
-            flowRate: (flowRate * 3600).toFixed(2), // m3/h
-            reynolds: reynolds.toFixed(0),
-            flowType: isTr ? (flowType === 'Laminar' ? 'Laminer' : flowType === 'Turbulent' ? 'Türbülanslı' : 'Geçiş') : flowType,
-            frictionFactor: frictionFactor.toFixed(5),
-            dpFriction: (dpFriction / 100000).toFixed(4), // bar
-            dpElevation: (dpElevation / 100000).toFixed(4), // bar
-            totalPressureDrop: (totalPressureDrop / 100000).toFixed(4), // bar
-            kineticPower: ((totalPressureDrop * flowRate) / 1000).toFixed(2) // kW to overcome
+        
+        // Darcy-Weisbach: hf = f * (L/D) * (v^2/2g)
+        const g = 9.81;
+        headLoss = frictionFactor * (length / d_m) * (Math.pow(velocity, 2) / (2 * g));
+        
+        const pressureDrop = (headLoss * rho * g) / 1000; // kPa
+        const pumpPower = (pressureDrop * 1000 * q_m3s) / 1000; // kW
+        
+        return { 
+            velocity, 
+            re, 
+            frictionFactor, 
+            headLoss, 
+            pressureDrop, 
+            pumpPower,
+            isLaminar: re < 2300,
+            fluidColor: fluid.color
         };
-    }, [fluid, pipe, diameter, length, velocity, elevation, isTr]);
+    }, [fluidId, diameter, length, flowRate, roughnessIdx, elevation]);
 
     return (
-        <div className="flex w-full h-full bg-[#0a0a0c] text-white">
-            {/* Left Column: Inputs */}
-            <div className="w-[400px] border-r border-white/10 p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+        <div className="flex w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-blue-500/30">
+            {/* Visual Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-                <h2 className="text-xl font-medium text-white/90 flex items-center gap-2">
-                    <Droplets className="w-5 h-5 text-blue-400" />
-                    {isTr ? 'Akışkanlar Dinamiği' : 'Fluid Dynamics'}
-                </h2>
+            {/* LEFT PANEL */}
+            <div className="w-[340px] bg-[#05080f]/90 backdrop-blur-2xl border-r border-white/5 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar">
+                <div className="p-8 border-b border-white/5 bg-gradient-to-b from-blue-500/10 to-transparent">
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                            <Droplets size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Fluid Workstation</h1>
+                            <p className="text-[10px] text-blue-500/60 font-mono tracking-widest uppercase mt-1">Hydraulic Analysis Engine</p>
+                        </div>
+                    </div>
+                </div>
 
-                <div className="space-y-4">
-                    {/* Fluid Selection */}
-                    <div>
-                        <label className="block text-xs font-medium text-white/50 mb-1">
-                            {isTr ? 'Akışkan Türü' : 'Fluid Type'}
-                        </label>
-                        <select
-                            value={fluidId}
-                            onChange={(e) => setFluidId(e.target.value)}
-                            className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
-                        >
+                <div className="p-8 space-y-8 flex-1">
+                    {/* Fluid Profile */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                           <Shield size={12} /> Fluid Profile
+                        </h2>
+                        <div className="grid grid-cols-2 gap-2">
                             {FLUIDS.map(f => (
-                                <option key={f.id} value={f.id}>{isTr ? f.name.tr : f.name.en}</option>
+                                <button key={f.id} onClick={() => setFluidId(f.id)}
+                                    className={`p-3 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all ${fluidId === f.id ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' : 'bg-white/[0.02] border-white/5 text-slate-500 hover:text-white hover:bg-white/5'}`}>
+                                    {f.label}
+                                </button>
                             ))}
-                        </select>
-                        <div className="flex justify-between mt-1 text-[10px] text-white/40">
-                            <span>ρ: {fluid.density} kg/m³</span>
-                            <span>μ: {fluid.dynViscosity} Pa·s</span>
                         </div>
                     </div>
 
-                    {/* Pipe Material */}
-                    <div>
-                        <label className="block text-xs font-medium text-white/50 mb-1">
-                            {isTr ? 'Boru Malzemesi' : 'Pipe Material'}
-                        </label>
-                        <select
-                            value={pipeId}
-                            onChange={(e) => setPipeId(e.target.value)}
-                            className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
-                        >
-                            {PIPES.map(p => (
-                                <option key={p.id} value={p.id}>{isTr ? p.name.tr : p.name.en}</option>
-                            ))}
-                        </select>
-                        <p className="mt-1 text-[10px] text-white/40">ε: {pipe.roughness} mm</p>
-                    </div>
+                    <div className="w-full h-px bg-white/5" />
 
-                    <div className="h-px bg-white/10 my-2" />
-
-                    {/* Geometry */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'İç Çap (m)' : 'Inner Diameter (m)'}
-                            </label>
-                            <input
-                                type="number"
-                                value={diameter}
-                                onChange={(e) => setDiameter(parseFloat(e.target.value) || 0)}
-                                step="0.01"
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500/50"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'Uzunluk (m)' : 'Length (m)'}
-                            </label>
-                            <input
-                                type="number"
-                                value={length}
-                                onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
-                                step="10"
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500/50"
-                            />
+                    {/* Mechanical Geometry */}
+                    <div className="space-y-4">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                           <Cylinder size={12} /> Pipe Geometry
+                        </h2>
+                        
+                        <div className="space-y-4">
+                            <ParameterInput label="Inside Diameter" unit="mm" value={diameter} onChange={setDiameter} icon={<Maximize2 size={12}/>} />
+                            <ParameterInput label="Total Length" unit="m" value={length} onChange={setLength} icon={<Activity size={12}/>} />
+                            
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Internal Roughness</span>
+                                <select value={roughnessIdx} onChange={(e) => setRoughnessIdx(Number(e.target.value))}
+                                    className="w-full bg-[#0a0f18] border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-blue-500/50">
+                                    {ROUGHNESS.map((r, i) => (
+                                        <option key={i} value={i}>{r.label} ({r.e}mm)</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'Akış Hızı (m/s)' : 'Flow Velocity (m/s)'}
-                            </label>
-                            <input
-                                type="number"
-                                value={velocity}
-                                onChange={(e) => setVelocity(parseFloat(e.target.value) || 0)}
-                                step="0.1"
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500/50"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'Yükseklik Farkı (m)' : 'Elevation Diff (m)'}
-                            </label>
-                            <input
-                                type="number"
-                                value={elevation}
-                                onChange={(e) => setElevation(parseFloat(e.target.value) || 0)}
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500/50"
-                            />
-                        </div>
+                    <div className="w-full h-px bg-white/5" />
+
+                    {/* Operational Dynamics */}
+                    <div className="space-y-4 pb-8">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                           <Gauge size={12} /> Flow Ops
+                        </h2>
+                        <ParameterInput label="Target Flow" unit="m³/h" value={flowRate} onChange={setFlowRate} icon={<Zap size={12}/>} />
+                        <ParameterInput label="Elevation Gain" unit="m" value={elevation} onChange={setElevation} icon={<Info size={12}/>} />
                     </div>
                 </div>
             </div>
 
-            {/* Right Column: Visualization & Results */}
-            <div className="flex-1 p-8 flex flex-col gap-8">
+            {/* MAIN DASHBOARD */}
+            <div className="flex-1 flex flex-col p-8 lg:p-12 gap-8 overflow-y-auto z-10">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-                {/* Result Cards */}
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-[#111115] border border-white/5 rounded-xl p-5 relative overflow-hidden group">
-                        <div className="absolute right-0 top-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-150" />
-                        <h3 className="text-xs text-white/40 mb-1 uppercase tracking-wider">{isTr ? 'Reynolds Sayısı' : 'Reynolds Number'}</h3>
-                        <div className="text-3xl font-light text-blue-400">
-                            {results.reynolds}
-                        </div>
-                        <p className="text-sm mt-2 font-medium" style={{
-                            color: results.flowType === (isTr ? 'Laminer' : 'Laminar') ? '#4ade80' :
-                                results.flowType === (isTr ? 'Türbülanslı' : 'Turbulent') ? '#f87171' : '#facc15'
-                        }}>
-                            {results.flowType}
-                        </p>
-                    </div>
-
-                    <div className="bg-[#111115] border border-white/5 rounded-xl p-5 relative overflow-hidden group shadow-lg shadow-black/50">
-                        <div className="absolute right-0 top-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-150" />
-                        <h3 className="text-xs text-white/40 mb-1 uppercase tracking-wider">{isTr ? 'Basınç Düşümü' : 'Pressure Drop'}</h3>
-                        <div className="text-3xl font-light text-purple-400">
-                            {results.totalPressureDrop} <span className="text-sm text-purple-400/50">bar</span>
-                        </div>
-                        <p className="text-sm mt-2 font-medium text-white/50">
-                            Friction: {results.dpFriction} bar
-                        </p>
-                    </div>
-
-                    <div className="bg-[#111115] border border-white/5 rounded-xl p-5 relative overflow-hidden group">
-                        <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-150" />
-                        <h3 className="text-xs text-white/40 mb-1 uppercase tracking-wider">{isTr ? 'Gerekli Pompa Gücü' : 'Req. Pump Power'}</h3>
-                        <div className="text-3xl font-light text-emerald-400">
-                            {results.kineticPower} <span className="text-sm text-emerald-400/50">kW</span>
-                        </div>
-                        <p className="text-sm mt-2 font-medium text-white/50">
-                            {results.flowRate} m³/h
-                        </p>
-                    </div>
+                {/* KPI Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                    <ValueCard label="Reynolds Number" value={results.re.toFixed(0)} sub={results.isLaminar ? 'LAMINAR' : 'TURBULENT'} color={results.isLaminar ? '#10b981' : '#3b82f6'} />
+                    <ValueCard label="Pressure Drop" value={results.pressureDrop.toFixed(2)} unit="kPa" sub={(results.pressureDrop / 100).toFixed(3) + ' bar'} color="#8b5cf6" />
+                    <ValueCard label="Required Power" value={results.pumpPower.toFixed(2)} unit="kW" sub={(results.pumpPower * 1.34).toFixed(2) + ' HP'} color="#f59e0b" />
                 </div>
 
-                {/* Flow Visualizer */}
-                <div className="flex-1 bg-[#111115] border border-white/5 rounded-xl p-6 relative flex flex-col">
-                    <h3 className="text-sm font-medium text-white/60 mb-6 flex items-center gap-2">
-                        <Activity className="w-4 h-4" />
-                        {isTr ? 'Akış Simülasyonu' : 'Flow Simulation'}
+                {/* Flow Visualizer Viewport */}
+                <div className="flex-1 min-h-[440px] bg-black/40 border border-white/10 rounded-[3rem] p-12 flex flex-col relative overflow-hidden backdrop-blur-md shadow-2xl">
+                    <div className="absolute top-0 right-0 p-8 flex gap-4">
+                        <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-blue-400">
+                           Sim Speed: {results.velocity.toFixed(2)} m/s
+                        </div>
+                    </div>
+
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-3">
+                        <Activity size={14} className="text-blue-500" />
+                        Cross-Section X-Ray Visualization
                     </h3>
 
-                    <div className="flex-1 flex items-center justify-center relative w-full h-full max-h-[300px]">
-                        {/* Pipe Body */}
-                        <div className="w-full h-32 border-y-4 border-white/20 relative overflow-hidden bg-gradient-to-b from-white/5 to-transparent">
+                    <div className="flex-1 flex items-center justify-center relative">
+                        {/* Pipe Rendering */}
+                        <div className="w-full h-48 relative border-y-2 border-white/10 overflow-hidden bg-gradient-to-b from-white/[0.02] to-transparent">
+                            {/* Turbulence Pattern Overlay */}
+                            <div className={`absolute inset-0 transition-opacity duration-1000 ${results.isLaminar ? 'opacity-0' : 'opacity-10'}`} style={{
+                                backgroundImage: 'radial-gradient(circle at 50% 50%, white 1px, transparent 1px)',
+                                backgroundSize: '10px 10px'
+                            }} />
 
-                            {/* Fluid Flow Particles Animation */}
-                            {[...Array(40)].map((_, i) => {
-                                // For Laminar: Straight lines. For Turbulent: Random waves
-                                const isTurbulent = parseFloat(results.reynolds) > 4000;
-                                const speed = Math.max(0.2, (10 - velocity) * 0.5); // Faster velocity = smaller duration
+                            {/* Streamline Particles */}
+                            {[...Array(30)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute h-0.5 rounded-full"
+                                    style={{
+                                        width: results.isLaminar ? '120px' : '40px',
+                                        backgroundColor: results.fluidColor,
+                                        opacity: results.isLaminar ? 0.3 : 0.6,
+                                        top: `${10 + Math.random() * 80}%`,
+                                        left: '-20%'
+                                    }}
+                                    animate={{ 
+                                        x: ['0%', '150%'],
+                                        y: results.isLaminar ? 0 : [0, Math.random() * 6 - 3, 0]
+                                    }}
+                                    transition={{
+                                        duration: Math.max(0.3, 3 / (results.velocity || 1)),
+                                        repeat: Infinity,
+                                        ease: 'linear',
+                                        delay: Math.random() * 2
+                                    }}
+                                />
+                            ))}
 
-                                return (
-                                    <motion.div
-                                        key={i}
-                                        className="absolute h-1 rounded-full bg-blue-500/60"
-                                        style={{
-                                            width: isTurbulent ? Math.random() * 40 + 10 : Math.random() * 100 + 50,
-                                            top: `${Math.random() * 80 + 10}%`,
-                                            left: '-10%'
-                                        }}
-                                        animate={{
-                                            x: ['0vw', '110vw'],
-                                            y: isTurbulent ? [0, Math.random() * 20 - 10, 0, Math.random() * -20 + 10, 0] : 0
-                                        }}
-                                        transition={{
-                                            duration: speed + Math.random(),
-                                            repeat: Infinity,
-                                            ease: 'linear',
-                                            delay: Math.random() * 2
-                                        }}
-                                    />
-                                );
-                            })}
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#03060a] via-transparent to-[#03060a]" />
                         </div>
 
-                        {/* Labels */}
-                        <div className="absolute top-1/2 -mt-4 left-0 w-full flex justify-between px-4 opacity-50 text-xs">
-                            <div className="flex flex-col items-center">
-                                <span>P1</span>
-                                <span className="font-mono">{velocity} m/s</span>
+                        {/* Central Flow Line Detail */}
+                        <div className="absolute inset-x-0 h-px bg-blue-500/20 shadow-[0_0_20px_blue]" />
+                    </div>
+
+                    <div className="mt-8 flex justify-between items-end">
+                        <div className="flex gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Velocity</span>
+                                <span className="text-xl font-black text-blue-400">{results.velocity.toFixed(2)} <span className="text-xs text-slate-600 font-sans tracking-normal">m/s</span></span>
                             </div>
-                            <div className="flex flex-col items-center">
-                                <span>P2</span>
-                                <span className="font-mono text-purple-400">ΔP = {results.totalPressureDrop} bar</span>
+                            <div className="w-px h-8 bg-white/10 self-end mb-1" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Flow Type</span>
+                                <span className="text-xl font-black text-white italic">{results.isLaminar ? 'Laminar' : 'Turbulent'}</span>
                             </div>
+                        </div>
+                        <div className="text-right">
+                             <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Friction Coeff (f)</span>
+                             <div className="text-2xl font-black font-mono text-blue-400">{results.frictionFactor.toFixed(5)}</div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );
-};
+}
 
-export default FluidDynamicsModule;
+function ParameterInput({ label, unit, value, onChange, icon }: any) {
+    return (
+        <div className="space-y-2 group">
+            <div className="flex justify-between items-center px-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">{icon} {label}</span>
+                <span className="text-[10px] font-mono text-blue-400">{value} {unit}</span>
+            </div>
+            <input type="range" min="1" max={label.includes('Length') ? 500 : 1000} step="1" value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-blue-500" />
+        </div>
+    );
+}
+
+function ValueCard({ label, value, unit, sub, color }: any) {
+    return (
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 transition-opacity"><Activity size={64}/></div>
+            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{label}</div>
+            <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-black font-mono text-white" style={{ color: value === '0' ? '#475569' : 'white' }}>{value}</div>
+                {unit && <span className="text-sm font-bold text-slate-600 uppercase">{unit}</span>}
+            </div>
+            <div className="text-[10px] font-bold mt-1 uppercase tracking-widest" style={{ color: color || '#64748b' }}>{sub}</div>
+        </div>
+    );
+}

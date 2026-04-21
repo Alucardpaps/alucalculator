@@ -1,0 +1,32 @@
+{
+  "id": "biology-genetics",
+  "title": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc",
+  "slug": "biology-genetics",
+  "keyword": "population genetics (hardy-weinberg) calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Population Genetics (Hardy-Weinberg) guide with Statistical Genetics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc",
+    "intro": "Mathematical model for predicting genetic variation in populations under equilibrium.",
+    "formula": "p^2 + 2pq + q^2 = 1",
+    "variables": {
+      "p/q": "Allele frequencies"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify random mating assumption",
+      "Account for mutation rate"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Population Genetics (Hardy-Weinberg).\n2. Consult the technical reference table for material constants.\n3. Apply the Statistical Genetics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Population Genetics (Hardy-Weinberg) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

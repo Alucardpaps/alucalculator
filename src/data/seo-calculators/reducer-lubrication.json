@@ -1,0 +1,52 @@
+{
+  "id": "reducer-lubrication",
+  "title": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc",
+  "slug": "reducer-lubrication",
+  "keyword": "gearbox lubrication & thermal calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Gearbox Lubrication & Thermal guide with AGMA 9005-F16 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the thermal capacity and lubrication requirements for industrial gear reducers.",
+    "formula": "Q = P(1-\\eta)",
+    "variables": {
+      "Q": "Heat generated",
+      "P": "Input Power",
+      "eta": "Efficiency"
+    },
+    "technical_data": [
+      {
+        "name": "ISO Viscosity Grades",
+        "rows": [
+          {
+            "Ambient": "0-10C",
+            "ISO VG": 150
+          },
+          {
+            "Ambient": "10-30C",
+            "ISO VG": 220
+          },
+          {
+            "Ambient": "30-50C",
+            "ISO VG": 320
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Check oil splash level",
+      "Verify breather capacity"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Gearbox Lubrication & Thermal.\n2. Consult the technical reference table for material constants.\n3. Apply the AGMA 9005-F16 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Gearbox Lubrication & Thermal analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

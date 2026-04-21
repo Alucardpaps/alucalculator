@@ -1,0 +1,66 @@
+{
+    "slug": "bearing-life-calculation-explained",
+    "meta": {
+        "title": "Bearing Life Calculation Explained (ISO 281 with Example)",
+        "description": "Master bearing life prediction for rotating machinery. Learn ISO 281 L10 calculations, equivalent load formulas, and real-world engineering examples."
+    },
+    "hero": {
+        "h1": "Bearing Life Calculation Explained (ISO 281 with Example)",
+        "intro": "Bearing life prediction is essential in rotating machinery. Engineers rely on ISO 281 to estimate how long a bearing will operate before fatigue failure occurs. Proper sizing prevents unplanned machine downtime and reduces maintenance costs."
+    },
+    "formula": {
+        "equation": "L10 = (C / P)^p × 10^6",
+        "variables": {
+            "C": "Dynamic load rating (from catalog)",
+            "P": "Equivalent dynamic bearing load",
+            "p": "3 (for ball bearings), 10/3 (for roller bearings)"
+        }
+    },
+    "stepByStep": [
+        "Identify the bearing type (ball or roller) to determine exponent p.",
+        "Obtain the dynamic load rating (C) from the manufacturer's catalog.",
+        "Calculate the equivalent dynamic load (P) considering radial and axial forces.",
+        "Apply the basic rating life formula to find revolutions.",
+        "Convert the result from revolutions to operating hours based on rotational speed."
+    ],
+    "example": {
+        "inputs": [
+            "C = 25 kN",
+            "P = 5 kN",
+            "p = 3"
+        ],
+        "calculation": "L10 = (25 / 5)^3 × 10^6 = 125 × 10^6 revolutions"
+    },
+    "whyThisMatters": [
+        "Incorrect bearing selection leads to early failure, sudden machine downtime, and drastically increased maintenance costs.",
+        "Ensures machinery meets expected warranty and service life requirements."
+    ],
+    "commonMistakes": [
+        "Ignoring dynamic load factors and impact forces.",
+        "Using static load ratings for rotating applications.",
+        "Failing to convert calculated revolutions into realistic operating hours."
+    ],
+    "engineeringTip": "Always include real operating conditions like temperature, misalignment, and contamination by adjusting with modified life rating factors (a1, a2, a3).",
+    "calculatorCta": {
+        "targetSlug": "bearing-life-calc",
+        "label": "Calculate instantly using the Bearing Life Calculator (ISO 281)"
+    },
+    "faq": [
+        {
+            "question": "What does L10 life mean?",
+            "answer": "L10 is the basic rating life in millions of revolutions that 90% of a group of identical bearings will complete or exceed before the first evidence of fatigue develops."
+        },
+        {
+            "question": "What is the difference between static and dynamic load rating?",
+            "answer": "Static load (C0) applies when the bearing is stationary or rotating extremely slowly. Dynamic load (C) is used for calculating the fatigue life of a rotating bearing."
+        },
+        {
+            "question": "How do roller bearings compare to ball bearings?",
+            "answer": "Roller bearings have line contact instead of point contact, allowing them to carry significantly higher loads, hence the life exponent is 10/3 instead of 3."
+        }
+    ],
+    "relatedArticles": [
+        "how-to-calculate-bolt-torque",
+        "motor-power-calculation"
+    ]
+}

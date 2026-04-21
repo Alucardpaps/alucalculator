@@ -1,27 +1,51 @@
 {
   "id": "bolt-torque",
-  "category": "mechanical",
-  "title": "Bolt Torque Calculator",
+  "title": "Bolt Torque Calculator & Engineering Guide - AluCalc",
   "slug": "bolt-torque",
+  "keyword": "bolt torque calculator",
+  "category": "fasteners",
+  "intent": "professional_handbook",
   "meta": {
-    "title": "Bolt Torque Calculator | AluCalc",
-    "description": "Calculate tightening torque."
+    "title": "Bolt Torque Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Bolt Torque guide with ASME B18.2.1 formulas, technical tables, and design checklists."
   },
   "seo": {
-    "h1": "Bolt Torque Calculator",
-    "intro": "Ensures proper preload in fasteners.",
-    "formula": "T = K × F × d",
+    "h1": "Bolt Torque Calculator & Engineering Guide - AluCalc",
+    "intro": "Determines the required torque to produce a specific clamp force while overcoming friction.",
+    "formula": "T = K \\cdot D \\cdot F_p",
     "variables": {
       "T": "Torque",
-      "K": "Factor",
-      "F": "Preload",
-      "d": "Dia"
+      "K": "Nut factor",
+      "D": "Diameter",
+      "Fp": "Preload"
     },
-    "practical": "Prevent loosening.",
-    "example": "T = 20 Nm."
+    "technical_data": [
+      {
+        "name": "Nut Factor (K)",
+        "rows": [
+          {
+            "Condition": "Zinc-plated",
+            "K": 0.22
+          },
+          {
+            "Condition": "Lubricated",
+            "K": 0.15
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Verify bolt grade",
+      "Check engagement length"
+    ],
+    "pitfalls": [
+      "Using K=0.2 for lubricated bolts"
+    ],
+    "step_by_step": "1. Define system parameters for Bolt Torque.\n2. Consult the technical reference table for material constants.\n3. Apply the ASME B18.2.1 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Fasteners applications, accurate Bolt Torque analysis is vital for safety and performance."
   },
   "cta": {
     "label": "Open in AluCalc OS",
-    "link": "/?module=bolt-torque"
+    "link": "/os?module=calculator"
   }
 }

@@ -1,0 +1,34 @@
+{
+  "id": "centripetal-force",
+  "title": "Centripetal Force Calculator & Engineering Guide - AluCalc",
+  "slug": "centripetal-force",
+  "keyword": "centripetal force calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Centripetal Force Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Centripetal Force guide with Circular Motion formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Centripetal Force Calculator & Engineering Guide - AluCalc",
+    "intro": "The force necessary to keep an object moving in a curved path.",
+    "formula": "F_c = \\frac{m v^2}{r}",
+    "variables": {
+      "m": "Mass",
+      "v": "Tangential velocity",
+      "r": "Radius of curve"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check bank angle requirements",
+      "Verify friction limits"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Centripetal Force.\n2. Consult the technical reference table for material constants.\n3. Apply the Circular Motion formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Centripetal Force analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

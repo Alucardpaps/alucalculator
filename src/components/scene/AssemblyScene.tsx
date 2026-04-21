@@ -14,7 +14,7 @@
 
 import { useCallback, useRef, useMemo } from 'react';
 import { Canvas, useThree, ThreeEvent } from '@react-three/fiber';
-import { OrbitControls, Environment, Grid, GizmoHelper, GizmoViewport } from '@react-three/drei';
+import { OrbitControls, Environment, Grid, GizmoHelper, GizmoViewport, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -38,130 +38,58 @@ interface ComponentRendererProps {
 }
 
 const ComponentRenderer = ({ component, isSelected, isSnappable, isGhost }: ComponentRendererProps) => {
-  const startDrag = useAssemblyStore((s) => s.startDrag);
   const selectComponent = useAssemblyStore((s) => s.selectComponent);
+  const toolMode = useAssemblyStore((s) => s.toolMode);
+  const updateTransform = useAssemblyStore((s) => s.updateTransform);
+  const meshRef = useRef<THREE.Group>(null);
 
   const handlePointerDown = useCallback(
     (e: ThreeEvent<PointerEvent>) => {
       e.stopPropagation();
       selectComponent(component.id);
-      startDrag(component.id);
     },
-    [component.id, selectComponent, startDrag]
+    [component.id, selectComponent]
   );
 
   const meshProps = {
     id: component.id,
-    position: component.position,
-    rotation: component.rotation,
     isSelected,
     isSnappable,
     isGhost,
     onPointerDown: handlePointerDown,
   };
 
-  switch (component.type) {
-    case 'profile':
-      return <ProfileMesh {...meshProps} length={component.metadata.length} />;
-    case 'bracket':
-      return <BracketMesh {...meshProps} />;
-    case 'bolt':
-      return <BoltMesh {...meshProps} />;
-    default:
-      return null;
-  }
-};
-
-// ════════════════════════════════════════════
-// Drag Handler (runs snap engine on pointer move)
-// ════════════════════════════════════════════
-
-const DragHandler = () => {
-  const { camera, raycaster, gl } = useThree();
-  const groundPlane = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), []);
-  const intersectPoint = useMemo(() => new THREE.Vector3(), []);
-
-  // Read only primitives and stable action refs
-  const isDragging = useAssemblyStore((s) => s.dragState.isDragging);
-  const draggedId = useAssemblyStore((s) => s.dragState.draggedComponentId);
-  const updateDragPreview = useAssemblyStore((s) => s.updateDragPreview);
-  const commitDrag = useAssemblyStore((s) => s.commitDrag);
-
-  const handlePointerMove = useCallback(
-    (e: ThreeEvent<PointerEvent>) => {
-      if (!isDragging || !draggedId) return;
-
-      // Read latest state directly (not via subscription)
-      const state = useAssemblyStore.getState();
-
-      raycaster.setFromCamera(
-        new THREE.Vector2(
-          (e.nativeEvent.clientX / gl.domElement.clientWidth) * 2 - 1,
-          -(e.nativeEvent.clientY / gl.domElement.clientHeight) * 2 + 1
-        ),
-        camera
-      );
-      raycaster.ray.intersectPlane(groundPlane, intersectPoint);
-
-      const worldPos: Vec3 = [intersectPoint.x, 0, intersectPoint.z];
-
-      const draggedComponent = state.components[draggedId];
-      if (!draggedComponent) return;
-
-      const allComps = Object.values(state.components).filter(
-        (c) => c.id !== draggedId
-      );
-
-      const snapResult = calculateSnap(
-        draggedComponent,
-        worldPos,
-        allComps,
-        state.connectionRules,
-        state.snapConfig
-      );
-
-      updateDragPreview(
-        snapResult.isSnapped ? snapResult.position : worldPos,
-        snapResult.isSnapped ? snapResult.rotation : draggedComponent.rotation,
-        snapResult
-      );
-    },
-    [isDragging, draggedId, updateDragPreview, camera, raycaster, gl, groundPlane, intersectPoint]
-  );
-
-  const handlePointerUp = useCallback(() => {
-    if (isDragging) {
-      commitDrag();
-    }
-  }, [isDragging, commitDrag]);
-
   return (
-    <mesh
-      visible={false}
-      position={[0, 0, 0]}
-      rotation={[-Math.PI / 2, 0, 0]}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-    >
-      <planeGeometry args={[100, 100]} />
-      <meshBasicMaterial transparent opacity={0} />
-    </mesh>
+    <>
+      <group ref={meshRef} position={component.position} rotation={component.rotation}>
+        {component.type === 'profile' && <ProfileMesh {...meshProps} length={component.metadata.length} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'bracket' && <BracketMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'bolt' && <BoltMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
+      </group>
+
+      {isSelected && toolMode !== 'select' && !isGhost && (
+        <TransformControls
+          object={meshRef}
+          mode={toolMode as any}
+          onObjectChange={() => {
+            if (meshRef.current) {
+              updateTransform(
+                component.id,
+                meshRef.current.position.toArray(),
+                meshRef.current.rotation.toArray()
+              );
+            }
+          }}
+        />
+      )}
+    </>
   );
 };
-
-// ════════════════════════════════════════════
-// Scene Content
-// ════════════════════════════════════════════
 
 const SceneContent = () => {
   // Subscribe to component IDs only (stable string array comparison via useShallow)
   const componentIds = useAssemblyStore(useShallow((s) => Object.keys(s.components)));
   const selectedId = useAssemblyStore((s) => s.selectedId);
-  const dragIsDragging = useAssemblyStore((s) => s.dragState.isDragging);
-  const draggedComponentId = useAssemblyStore((s) => s.dragState.draggedComponentId);
-  const dragPreviewPosition = useAssemblyStore(useShallow((s) => s.dragState.previewPosition));
-  const dragPreviewRotation = useAssemblyStore(useShallow((s) => s.dragState.previewRotation));
-  const snapIsSnapped = useAssemblyStore((s) => s.dragState.snapResult?.isSnapped ?? false);
   const selectComponent = useAssemblyStore((s) => s.selectComponent);
 
   return (
@@ -201,45 +129,15 @@ const SceneContent = () => {
         const comp = useAssemblyStore.getState().components[id];
         if (!comp) return null;
 
-        const isDragged = dragIsDragging && draggedComponentId === id;
-        const displayPosition = isDragged ? dragPreviewPosition : comp.position;
-        const displayRotation = isDragged ? dragPreviewRotation : comp.rotation;
-
         return (
           <ComponentRenderer
             key={id}
-            component={{
-              ...comp,
-              position: displayPosition,
-              rotation: displayRotation,
-            }}
+            component={comp}
             isSelected={selectedId === id}
-            isSnappable={isDragged && snapIsSnapped}
+            isSnappable={false}
           />
         );
       })}
-
-      {/* Ghost preview at snap target */}
-      {dragIsDragging && snapIsSnapped && draggedComponentId && (() => {
-        const snapResult = useAssemblyStore.getState().dragState.snapResult;
-        const ghostComp = useAssemblyStore.getState().components[draggedComponentId];
-        if (!snapResult || !ghostComp) return null;
-        return (
-          <ComponentRenderer
-            component={{
-              ...ghostComp,
-              position: snapResult.position,
-              rotation: snapResult.rotation,
-            }}
-            isSelected={false}
-            isSnappable={true}
-            isGhost={true}
-          />
-        );
-      })()}
-
-      {/* Drag interaction plane */}
-      <DragHandler />
 
       {/* Click on void → deselect */}
       <mesh

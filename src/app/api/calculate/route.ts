@@ -1,3 +1,4 @@
+export const dynamic = 'force-static';
 import { NextRequest, NextResponse } from 'next/server';
 import { HeadlessEngine } from '../../../headless-engine/engine';
 import { SchemaLoader } from '../../../calculator-system/schema-loader';
