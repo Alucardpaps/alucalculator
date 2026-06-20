@@ -36,6 +36,7 @@ import sfdBmdAcademicSchema from './schemas-v2/sfd-bmd-academic';
 import { threadGeometrySchema } from './schemas-v2/thread-geometry';
 import goldenRatioSchema from './schemas-v2/golden-ratio';
 import beltDriveSchema from './schemas-v2/belt-drive';
+import chainDriveSchema from './schemas-v2/chain-drive';
 import brakesClutchesSchema from './schemas-v2/brakes-clutches';
 import heatTransferSchema from './schemas-v2/heat-transfer';
 import aerodynamicsSchema from './schemas-v2/aerodynamics';
@@ -92,6 +93,7 @@ export const CALCULATOR_REGISTRY: CalculatorRegistry = {
     'machining-grinding': machiningGrindingSchema as unknown as CalculatorSchema,
     'golden-ratio': goldenRatioSchema as unknown as CalculatorSchema,
     'belt-drive': beltDriveSchema as unknown as CalculatorSchema,
+    'chain-drive': chainDriveSchema as unknown as CalculatorSchema,
     'brakes-clutches': brakesClutchesSchema as unknown as CalculatorSchema,
     'heat-transfer': heatTransferSchema as unknown as CalculatorSchema,
     'aerodynamics': aerodynamicsSchema as unknown as CalculatorSchema,

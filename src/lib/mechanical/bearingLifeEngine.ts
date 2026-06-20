@@ -5,7 +5,7 @@
  * and safety factors.
  */
 
-import { BearingData } from '@/data/skfBearings';
+import { BearingData, computeEquivalentLoadsAndWarnings } from '@/data/skfBearings';
 
 export interface LifeResults {
     P: number;            // Equivalent dynamic load (kN)
@@ -16,6 +16,7 @@ export interface LifeResults {
     staticSafety: number; // s0 factor
     viscosityRatio?: number; // kappa
     status: 'safe' | 'warning' | 'critical';
+    warnings?: string[];
 }
 
 export interface LifeInput {
@@ -54,14 +55,8 @@ const getLifeExponent = (code: string): number => {
  * Calculate Equivalent Dynamic Load (P)
  */
 export function calculateEquivalentLoad(fr: number, fa: number, bearing: BearingData): number {
-    const e = bearing.e || 0.25;
-    const Y = bearing.Y || 1.6;
-    
-    if (fa / fr > e) {
-        // Combined load (X=0.56, Y=bearing value)
-        return 0.56 * fr + Y * fa;
-    }
-    return fr; // Pure radial (X=1, Y=0)
+    const { P } = computeEquivalentLoadsAndWarnings(bearing, fr, fa);
+    return P;
 }
 
 /**
@@ -82,14 +77,13 @@ export function analyzeBearingLife(input: LifeInput): LifeResults {
     const p = getLifeExponent(bearing.code);
     const dm = (bearing.d + bearing.D) / 2;
 
-    // Dynamic Analysis
-    const P = calculateEquivalentLoad(fr, fa, bearing);
-    const L10 = Math.pow(bearing.C / P, p);
+    // Unified Analysis
+    const { P, P0, warnings } = computeEquivalentLoadsAndWarnings(bearing, fr, fa);
+    const L10 = Math.pow(bearing.C / Math.max(0.1, P), p);
     const L10h = (L10 * 1e6) / (60 * (rpm || 1));
     
-    // Static Analysis
-    const P0 = Math.max(fr, 0.6 * fr + (bearing.Y0 || 1) * fa || fr);
-    const s0 = bearing.C0 / P0;
+    // Static Analysis Safety
+    const s0 = bearing.C0 / Math.max(0.1, P0);
     
     // Adjusted Life (a1)
     const a1 = RELIABILITY_FACTORS[reliability] || 1.0;
@@ -102,14 +96,12 @@ export function analyzeBearingLife(input: LifeInput): LifeResults {
     }
 
     // Advanced Life Factor a_iso (Simple estimate)
-    // In a real sys, this is a complex curve f(kappa, etac * Cu/P)
-    // We'll use a simplified model for the UI demonstration
     const a_iso = Math.min(Math.max(0.1, Math.pow(kappa, 0.4)), 3.0);
     const Lnm = a1 * a_iso * L10h;
 
     // Status logic
     let status: LifeResults['status'] = 'safe';
-    if (s0 < 1.0 || Lnm < 5000) status = 'critical';
+    if (s0 < 1.0 || Lnm < 5000 || warnings.length > 0) status = 'critical';
     else if (s0 < 2.0 || Lnm < 20000) status = 'warning';
 
     return {
@@ -120,7 +112,8 @@ export function analyzeBearingLife(input: LifeInput): LifeResults {
         Lna: Lnm, // Using Lnm (ISO model) as Lna
         staticSafety: s0,
         viscosityRatio: kappa,
-        status
+        status,
+        warnings
     };
 }
 

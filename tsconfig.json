@@ -46,6 +46,8 @@
     "node_modules",
     "out",
     "dist",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "scratch",
+    "scripts"
   ]
 }

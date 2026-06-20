@@ -36,6 +36,7 @@ function calculateGearGeometry(
     const z1 = inputs.z1.value as number;     // Pinion teeth
     const z2 = inputs.z2.value as number;     // Gear teeth
     const alpha = inputs.alpha.value as number; // Pressure angle [deg]
+    const beta = (inputs.helixAngle?.value as number) ?? 0; // Helix angle [deg]
     const b = inputs.b.value as number;       // Face width [mm]
     const T = inputs.T.value as number;       // Torque [Nm]
     const Sy = inputs.Sy.value as number;     // Yield strength [MPa]
@@ -72,11 +73,15 @@ function calculateGearGeometry(
 
     // ===== GEOMETRY CALCULATIONS =====
 
-    // Pitch diameters
-    const d1 = m * z1;
-    const d2 = m * z2;
-    formulaTrace['d1'] = 'd_1 = m \\cdot z_1';
-    formulaTrace['d2'] = 'd_2 = m \\cdot z_2';
+    const betaRad = beta * (Math.PI / 180);
+    const mt = m / Math.cos(betaRad); // Transverse module
+    formulaTrace['mt'] = 'm_t = \\frac{m}{\\cos\\beta}';
+
+    // Pitch diameters (transverse)
+    const d1 = mt * z1;
+    const d2 = mt * z2;
+    formulaTrace['d1'] = 'd_1 = m_t \\cdot z_1';
+    formulaTrace['d2'] = 'd_2 = m_t \\cdot z_2';
 
     // Tip diameters (with profile shift)
     const da1 = m * (z1 + 2 + 2 * x1);
@@ -94,18 +99,21 @@ function calculateGearGeometry(
     const ratio = z2 / z1;
     formulaTrace['ratio'] = 'i = \\frac{z_2}{z_1}';
 
-    // Center distance (approximate for shifted gears)
-    const a = (m * (z1 + z2)) / 2 + m * (x1 + x2);
-    formulaTrace['a'] = 'a = \\frac{m(z_1 + z_2)}{2} + m(x_1 + x_2)';
+    // Center distance (with profile shift)
+    const a = (mt * (z1 + z2)) / 2 + m * (x1 + x2);
+    formulaTrace['a'] = 'a = \\frac{m_t(z_1 + z_2)}{2} + m(x_1 + x_2)';
 
     // ===== FORCE & STRESS CALCULATIONS =====
 
-    // Tangential force at pitch circle
+    // Tangential force at pitch circle (transverse)
     const Ft = (2 * T * 1000) / d1; // N (T in Nm, d1 in mm)
     formulaTrace['Ft'] = 'F_t = \\frac{2T}{d_1}';
 
-    // Lewis form factor (simplified)
-    const Y = 0.32; // Approximate for 20° pressure angle, 20 teeth
+    // Lewis form factor (z- and pressure-angle dependent, Shigley approximation)
+    const alphaRad = alpha * (Math.PI / 180);
+    const Y20 = 0.484 - 2.87 / z1;
+    const Y = Math.max(0.1, Y20 * Math.pow(Math.cos(20 * Math.PI / 180) / Math.cos(alphaRad), 2));
+    formulaTrace['Y'] = 'Y \\approx (0.484 - 2.87/z_1) \\cdot (\\cos 20° / \\cos\\alpha)^2';
 
     // Bending stress (Lewis formula)
     const sigmaBending = Ft / (b * m * Y);
@@ -137,6 +145,7 @@ function calculateGearGeometry(
     const verified = warnings.filter(w => w.severity === 'critical').length === 0;
 
     const outputs: Record<string, ValidatedEngineeringValue> = {
+        mt: createValidatedValue(mt, 'mm', 'derived', { precision: 3 }),
         d1: createValidatedValue(d1, 'mm', 'derived', { precision: 2 }),
         d2: createValidatedValue(d2, 'mm', 'derived', { precision: 2 }),
         da1: createValidatedValue(da1, 'mm', 'derived', { precision: 2 }),
@@ -251,6 +260,20 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             description: 'Pressure angle. Standard is 20°.',
         },
         {
+            key: 'helixAngle',
+            label: 'Helix Angle (β)',
+            unit: 'deg',
+            defaultValue: 0,
+            validation: {
+                min: 0,
+                max: 45,
+                required: false,
+                step: 1,
+            },
+            description: 'Helix angle for helical gears. Increases transverse module mt = m/cos(β) and center distance.',
+            group: 'advanced',
+        },
+        {
             key: 'b',
             label: 'Face Width (b)',
             unit: 'mm',
@@ -321,10 +344,18 @@ const gearSpurSchema: CalculatorSchemaV2 = {
 
     outputs: [
         {
+            key: 'mt',
+            label: 'Transverse Module (mt)',
+            unit: 'mm',
+            formulaLatex: 'm_t = \\frac{m}{\\cos\\beta}',
+            description: 'Transverse module for helical gears.',
+            precision: 3,
+        },
+        {
             key: 'd1',
             label: 'Pinion Pitch Diameter',
             unit: 'mm',
-            formulaLatex: 'd_1 = m \\cdot z_1',
+            formulaLatex: 'd_1 = m_t \\cdot z_1',
             description: 'Pitch circle diameter of pinion.',
             precision: 2,
             affectsGeometry: true,
@@ -333,7 +364,7 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             key: 'd2',
             label: 'Gear Pitch Diameter',
             unit: 'mm',
-            formulaLatex: 'd_2 = m \\cdot z_2',
+            formulaLatex: 'd_2 = m_t \\cdot z_2',
             description: 'Pitch circle diameter of gear.',
             precision: 2,
             affectsGeometry: true,
@@ -424,7 +455,7 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             },
             {
                 id: 'lewis-simplified',
-                text: 'Bending stress uses simplified Lewis formula (Y=0.32) without dynamic factors.',
+                text: 'Bending stress uses Lewis formula with z- and α-dependent form factor Y; dynamic factors not included.',
                 impact: 'medium',
                 source: 'Lewis 1892',
             },
@@ -457,6 +488,9 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             const x1 = inputs.x1 ?? 0;
             const x2 = inputs.x2 ?? 0;
             const b = inputs.b ?? 10;
+            const beta = inputs.helixAngle ?? 0;
+            const mt = m / Math.cos(beta * Math.PI / 180);
+            const a = (mt * (z1 + z2)) / 2 + m * (x1 + x2);
 
             // Generate Pinion
             const pinionGeo = getProfile({
@@ -492,9 +526,6 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             });
 
             // Gear Entity (shifted by center distance a)
-            // a = m * (z1 + z2) / 2 + m * (x1 + x2)
-            const a = (m * (z1 + z2)) / 2 + m * (x1 + x2);
-
             entities.push({
                 id: 'e_gear',
                 layerId: 'l_gear',
@@ -524,7 +555,9 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             const x1 = inputs.x1 ?? 0;
             const x2 = inputs.x2 ?? 0;
             const b = inputs.b ?? 10;
-            const a = (m * (z1 + z2)) / 2 + m * (x1 + x2);
+            const beta = inputs.helixAngle ?? 0;
+            const mt = m / Math.cos(beta * Math.PI / 180);
+            const a = (mt * (z1 + z2)) / 2 + m * (x1 + x2);
 
             const writer = new step.STEPWriter({
                 filename: 'AluGear_Assembly',

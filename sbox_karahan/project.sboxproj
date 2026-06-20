@@ -1,0 +1,22 @@
+{
+  "Title": "C.T.O. Karahan",
+  "Type": "game",
+  "Org": "karahan",
+  "Ident": "karahan.game",
+  "Schema": 1,
+  "IncludeSourceFiles": false,
+  "Resources": "/shaders/*.hlsl\n/fonts/*\n",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Metadata": {
+    "MaxPlayers": 1,
+    "MinPlayers": 1,
+    "GameNetworkType": "Singleplayer",
+    "MapSelect": "Unrestricted",
+    "Compiler": {
+      "RootNamespace": "Karahan",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;"
+    }
+  }
+}

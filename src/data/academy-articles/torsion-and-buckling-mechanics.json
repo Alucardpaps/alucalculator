@@ -1,0 +1,98 @@
+{
+    "slug": "torsion-and-buckling-mechanics",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Intermediate",
+    "readingTime": 15,
+    "prerequisites": [
+        "mechanics-of-materials-fundamentals"
+    ],
+    "meta": {
+        "title": "Torsion and Buckling: Shaft and Column Stability",
+        "description": "An analysis of rotational twisting (torsion) in shafts and sudden failure in columns (buckling) under compressive loads. Based on Euler's formula."
+    },
+    "hero": {
+        "h1": "Torsion and Buckling: Shaft and Column Stability",
+        "intro": "Not all failures are caused by direct stress. Torsion causes shafts to twist and shear, while Buckling causes slender columns to suddenly collapse under loads they would otherwise carry. Understanding these two phenomena is critical for machine and structural stability.\n\nShafts fail in shear from torsion; slender columns fail in buckling at loads far below material yield. Euler's Pcr = π²EI/(KL)² depends on end conditions through K and always uses the minimum moment of inertia.\n\nThe Column Buckling engine in AluCalc applies this same stability check with your actual boundary conditions."
+    },
+    "formula": {
+        "equation": "Pcr = (π² × E × I) / (K × L)²",
+        "variables": {
+            "Pcr": "Critical Buckling Load (N)",
+            "E": "Modulus of Elasticity (Pa)",
+            "I": "Least Moment of Inertia (m⁴)",
+            "L": "Unsupported length (m)",
+            "K": "Column effective length factor"
+        }
+    },
+    "stepByStep": [
+        "For Torsion: Calculate the polar moment of inertia (J).",
+        "Apply the torsion formula: τ = (T × r) / J.",
+        "For Buckling: Determine the column end conditions (Fixed, Pinned).",
+        "Identify the least moment of inertia (weak axis).",
+        "Calculate the critical buckling load (Pcr) using Euler's formula.",
+        "Compute polar moment J for solid and hollow shafts under torque.",
+        "Check slenderness ratio L/r against code limits for Euler validity."
+    ],
+    "example": {
+        "inputs": [
+            "E = 210 GPa (Steel)",
+            "L = 2 m",
+            "End condition: Pinned-Pinned (K=1.0)",
+            "I = 1,000,000 mm⁴"
+        ],
+        "calculation": "Pcr = (π² × 210e9 × 1e-6) / (2)² ≈ 518,000 N"
+    },
+    "whyThisMatters": [
+        "Prevents catastrophic collapse of long structural members.",
+        "Ensures power transmission shafts can handle rotational torque without failure."
+    ],
+    "commonMistakes": [
+        "Using the strongest axis for buckling (it always fails on the weakest).",
+        "Neglecting the slenderness ratio (L/r) limits.",
+        "Ignoring combined loading (Torsion + Bending)."
+    ],
+    "engineeringTip": "Always design columns with a high safety factor against buckling, as initial imperfections can trigger failure early.",
+    "calculatorCta": {
+        "targetSlug": "beam-deflection-calc",
+        "label": "Analyze structural stability with our column tools"
+    },
+    "faq": [
+        {
+            "question": "What is polar moment of inertia (J)?",
+            "answer": "It is a quantity used to describe resistance to torsional deformation of a cylindrical object."
+        },
+        {
+            "question": "What is effective length factor K?",
+            "answer": "Multiplier on actual length: K=1 pinned-pinned, K=0.5 fixed-fixed, K=2 cantilever."
+        },
+        {
+            "question": "Can a column fail below yield stress?",
+            "answer": "Yes — buckling is stability failure, not material overload."
+        },
+        {
+            "question": "How does combined bending affect shafts?",
+            "answer": "Use equivalent torque and bending moment interaction — pure torsion analysis is insufficient."
+        }
+    ],
+    "relatedArticles": [
+        "mechanics-of-materials-fundamentals",
+        "mohrs-circle-stress-analysis"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Burulma (Torsion) ve Burkulma (Buckling) Ders Notları",
+            "filename": "9-burulma_(torsion)-burkulma_(bucling)_28eylul.ppt"
+        }
+    ],
+    "learningObjectives": [
+        "Calculate shear stress in shafts under torsion using τ = Tr/J",
+        "Determine Euler critical load Pcr for slender columns",
+        "Select effective length factor K from end support conditions"
+    ],
+    "keyTakeaways": [
+        "Buckling fails on the weakest axis — always use minimum I",
+        "Slenderness ratio L/r determines whether Euler theory applies",
+        "Combined torsion and bending require interaction checks beyond this lesson"
+    ]
+}

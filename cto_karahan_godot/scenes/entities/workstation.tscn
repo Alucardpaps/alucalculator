@@ -1,0 +1,60 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxv8q6o4hpd4x"]
+
+[ext_resource type="Script" path="res://scripts/entities/workstation.gd" id="1_r4v5c"]
+[ext_resource type="Script" path="res://scripts/entities/workstation_visual.gd" id="2_ws_vis"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ws1"]
+bg_color = Color(0.129412, 0.14902, 0.192157, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.243137, 0.282353, 0.352941, 1)
+
+[node name="Workstation" type="Node2D"]
+script = ExtResource("1_r4v5c")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Panel" type="Panel" parent="Visual"]
+visible = false
+offset_left = -70.0
+offset_top = -60.0
+offset_right = 70.0
+offset_bottom = 50.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ws1")
+
+[node name="WorkstationVisual" type="Node2D" parent="Visual"]
+script = ExtResource("2_ws_vis")
+
+[node name="IconLabel" type="Label" parent="Visual"]
+offset_left = -60.0
+offset_top = -105.0
+offset_right = 60.0
+offset_bottom = -45.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 40
+text = "🏢"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="Visual"]
+offset_left = -65.0
+offset_top = -135.0
+offset_right = 65.0
+offset_bottom = -105.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "İstasyon"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+
+[node name="WorkersContainer" type="Node2D" parent="."]
+position = Vector2(0, 75)

@@ -7,7 +7,7 @@ export interface EngineMetadata {
     id: string;
     name: string;
     version: string;
-    domain: 'mechanical' | 'electrical' | 'thermal' | 'civil';
+    domain: 'mechanical' | 'electrical' | 'thermal' | 'civil' | 'diagnostics' | 'marine';
 }
 
 export interface IEngine<I = any, O = any> {

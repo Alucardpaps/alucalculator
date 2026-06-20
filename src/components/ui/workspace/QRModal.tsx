@@ -33,12 +33,12 @@ export const QRModal = ({ isOpen, onClose, data, title }: QRModalProps) => {
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative w-full max-w-md bg-[#0F131A] border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+            className="relative w-full max-w-md bg-[#0a1018] border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
           >
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-white/5">
               <div className="space-y-1">
-                <h3 className="text-sm font-black uppercase tracking-widest text-[#66FCF1]">
+                <h3 className="text-sm font-black uppercase tracking-widest text-[#00e5ff]">
                   Production Vector
                 </h3>
                 <p className="text-[10px] text-white/40 font-mono uppercase">{title}</p>
@@ -53,7 +53,7 @@ export const QRModal = ({ isOpen, onClose, data, title }: QRModalProps) => {
 
             {/* QR Body */}
             <div className="p-8 flex flex-col items-center">
-              <div className="p-4 bg-white rounded-xl shadow-[0_0_30px_rgba(102,252,241,0.2)] mb-8">
+              <div className="p-4 bg-white rounded-xl shadow-[0_0_30px_rgba(0,229,255,0.2)] mb-8">
                 <QRCodeSVG
                   value={qrString}
                   size={200}
@@ -79,15 +79,15 @@ export const QRModal = ({ isOpen, onClose, data, title }: QRModalProps) => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
-                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#66FCF1] transition-all group">
+                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#00e5ff] transition-all group">
                     <Download size={16} />
                     <span className="text-[8px] uppercase tracking-widest font-bold">Vector</span>
                   </button>
-                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#66FCF1] transition-all group">
+                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#00e5ff] transition-all group">
                     <Printer size={16} />
                     <span className="text-[8px] uppercase tracking-widest font-bold">Label</span>
                   </button>
-                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#66FCF1] transition-all group">
+                  <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/5 hover:bg-white/5 text-white/40 hover:text-[#00e5ff] transition-all group">
                     <Share2 size={16} />
                     <span className="text-[8px] uppercase tracking-widest font-bold">Cloud</span>
                   </button>
@@ -96,7 +96,7 @@ export const QRModal = ({ isOpen, onClose, data, title }: QRModalProps) => {
             </div>
 
             {/* Bottom Accent */}
-            <div className="h-1 bg-gradient-to-r from-transparent via-[#66FCF1] to-transparent opacity-30" />
+            <div className="h-1 bg-gradient-to-r from-transparent via-[#00e5ff] to-transparent opacity-30" />
           </motion.div>
         </div>
       )}

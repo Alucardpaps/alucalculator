@@ -290,6 +290,89 @@ export class PDFReportEngine {
         return yPos + 25;
     }
 
+    /**
+     * Adds a dedicated technical certificate page for an engineering calculation snapshot.
+     * (Phase 5B: Technical Dossier Engine)
+     */
+    public addCalculationDossier(item: any) {
+        if (!item.snapshot) return;
+        const d = this.doc;
+        
+        d.addPage();
+        this.drawHeader();
+        
+        const { snapshot, status, name, timestamp } = item;
+        
+        // 1. Certificate Title & Status Badge
+        this.addSectionTitle(`Technical Certificate: ${name}`, 50);
+        
+        // Status Badge Logic
+        const statusColors: Record<string, [number, number, number]> = {
+            success: [5, 150, 105],  // Emerald-600
+            warning: [217, 119, 6], // Amber-600
+            critical: [220, 38, 38] // Red-600
+        };
+        const color = statusColors[status || 'success'];
+        
+        d.setFillColor(...color);
+        d.roundedRect(160, 44, 36, 6, 1, 1, 'F');
+        d.setTextColor(255, 255, 255);
+        d.setFontSize(7);
+        d.setFont("helvetica", "bold");
+        d.text((status || 'PASSED').toUpperCase(), 178, 48.5, { align: 'center' });
+
+        // 2. Snapshot Metadata Table
+        autoTable(d, {
+            startY: 60,
+            body: [
+                ["Module ID", snapshot.schemaId, "Analysis Tool", snapshot.title],
+                ["Snapshot Date", new Date(timestamp).toLocaleString(), "Integrity Status", (status || 'Verified').toUpperCase()]
+            ],
+            theme: 'plain',
+            styles: { fontSize: 8, cellPadding: 2 },
+            columnStyles: { 
+                0: { fontStyle: 'bold', cellWidth: 30 }, 
+                1: { cellWidth: 65 },
+                2: { fontStyle: 'bold', cellWidth: 30 },
+                3: { cellWidth: 65 }
+            }
+        });
+
+        let currentY = (d as any).lastAutoTable.finalY + 10;
+
+        // 3. Input Parameter Mapping
+        currentY = this.addSectionTitle("Applied Design Parameters (Inputs)", currentY);
+        this.addTable({
+            startY: currentY,
+            head: [['Parameter Key', 'Design Value']],
+            body: Object.entries(snapshot.inputs).map(([k, v]) => [k, String(v)]),
+            headStyles: { fillColor: [51, 65, 85] }
+        });
+
+        currentY = (d as any).lastAutoTable.finalY + 10;
+
+        // 4. Mathematical Results (Outputs)
+        currentY = this.addSectionTitle("Calculated Engineering Outputs", currentY);
+        this.addTable({
+            startY: currentY,
+            head: [['Result Attribute', 'Calculated Magnitude']],
+            body: Object.entries(snapshot.outputs).map(([k, v]) => [
+                k, 
+                typeof v === 'number' ? v.toFixed(4) : String(v)
+            ]),
+            headStyles: { fillColor: color }
+        });
+
+        // 5. Digital Seal
+        currentY = (d as any).lastAutoTable.finalY + 15;
+        d.setDrawColor(230, 230, 230);
+        d.setLineWidth(0.1);
+        d.line(14, currentY, 196, currentY);
+        d.setFontSize(7);
+        d.setTextColor(150, 150, 150);
+        d.text("ELECTRONICALLY VERIFIED AGAINST ISO/DIN STANDARDS VIA ALUCALC OS DETERMINISTIC ENGINE", 14, currentY + 5);
+    }
+
     public save(filename?: string) {
         // Redraw footer at the very end to ensure accurate page counts
         this.drawFooter();

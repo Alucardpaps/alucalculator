@@ -36,8 +36,8 @@ const MathGraph = ({ engineExpression }: { engineExpression: string }) => {
             .replace(/sqrt/g, 'Math.sqrt')
             .replace(/pow/g, 'Math.pow')
             .replace(/\^/g, '**')
-            .replace(/pi/g, 'Math.PI')
-            .replace(/e/g, 'Math.E');
+            .replace(/(?<![a-zA-Z])pi(?![a-zA-Z])/g, 'Math.PI')
+            .replace(/(?<![a-zA-Z])e(?![a-zA-Z0-9.])/g, 'Math.E');
 
         try {
             const f = new Function('x', `return ${expr}`);
@@ -45,7 +45,7 @@ const MathGraph = ({ engineExpression }: { engineExpression: string }) => {
                 const y = f(x);
                 if (!isNaN(y) && isFinite(y)) pts.push({ x, y });
             }
-        } catch (e) { return []; }
+        } catch (_err) { return []; }
         return pts;
     }, [engineExpression]);
 
@@ -95,25 +95,41 @@ export default function UltimateMathWorkspace() {
     const [history, setHistory] = useState<CalculationEntry[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isSidebarOpen, setSidebarOpen] = useState(true);
+    const [angleMode, setAngleMode] = useState<'rad' | 'deg'>('rad');
 
     // Matrix State
     const [matrixA, setMatrixA] = useState([['0', '0'], ['0', '0']]);
     const [matrixB, setMatrixB] = useState([['0', '0'], ['0', '0']]);
+    const [matrixOp, setMatrixOp] = useState<'multiply' | 'determinant' | 'transpose' | 'inverse'>('multiply');
     
     // Calculus State
     const [calcX, setCalcX] = useState('2');
     const [calcRange, setCalcRange] = useState('0, 3.1415');
 
+    /** Wraps trig calls for degree mode conversion */
+    const applyAngleMode = useCallback((expr: string): string => {
+        if (angleMode === 'deg') {
+            return expr
+                .replace(/Math\.sin\(/g, 'Math.sin((Math.PI/180)*(')
+                .replace(/Math\.cos\(/g, 'Math.cos((Math.PI/180)*(')
+                .replace(/Math\.tan\(/g, 'Math.tan((Math.PI/180)*(');
+        }
+        return expr;
+    }, [angleMode]);
+
     const solveCalculus = useCallback((type: 'diff' | 'int') => {
         if (!expression.trim()) return;
         try {
-            const expr = expression.toLowerCase()
+            let expr = expression.toLowerCase()
                 .replace(/x/g, '(x)')
                 .replace(/sin/g, 'Math.sin')
                 .replace(/cos/g, 'Math.cos')
                 .replace(/tan/g, 'Math.tan')
                 .replace(/sqrt/g, 'Math.sqrt')
-                .replace(/\^/g, '**');
+                .replace(/\^/g, '**')
+                .replace(/(?<![a-zA-Z])pi(?![a-zA-Z])/g, 'Math.PI')
+                .replace(/(?<![a-zA-Z])e(?![a-zA-Z0-9.])/g, 'Math.E');
+            expr = applyAngleMode(expr);
 
             const f = new Function('x', `return ${expr}`);
             let resultText = '';
@@ -135,8 +151,8 @@ export default function UltimateMathWorkspace() {
             setHistory(prev => [{ expression: `${type === 'diff' ? 'd/dx' : '∫'}(${expression})`, result: resultText, type: 'calculus', timestamp: Date.now() }, ...prev]);
             setExpression(resultText);
             setError(null);
-        } catch (e) { setError('CALCULUS ERROR'); }
-    }, [expression, calcX, calcRange]);
+        } catch (_err) { setError('CALCULUS ERROR'); }
+    }, [expression, calcX, calcRange, applyAngleMode]);
 
     const solveStandard = useCallback(() => {
         if (!expression.trim()) return;
@@ -146,31 +162,71 @@ export default function UltimateMathWorkspace() {
                 .replace(/÷/g, '/')
                 .replace(/\^/g, '**')
                 .replace(/π/g, 'Math.PI')
-                .replace(/e/g, 'Math.E')
+                .replace(/(?<![a-zA-Z])e(?![a-zA-Z0-9.])/g, 'Math.E')
                 .replace(/sin\(/g, 'Math.sin(')
-                .replace(/cos\(/g, 'Math.cos(');
+                .replace(/cos\(/g, 'Math.cos(')
+                .replace(/tan\(/g, 'Math.tan(');
+            sanitized = applyAngleMode(sanitized);
 
             const resultVal = new Function(`return ${sanitized}`)();
             const formatted = resultVal.toString();
             setHistory(prev => [{ expression, result: formatted, type: tab, timestamp: Date.now() }, ...prev]);
             setExpression(formatted);
             setError(null);
-        } catch (e) { setError('MATH ERROR'); }
-    }, [expression, tab]);
+        } catch (_err) { setError('MATH ERROR'); }
+    }, [expression, tab, applyAngleMode]);
 
     const solveMatrix = () => {
         try {
             const getM = (m: string[][]) => m.map(row => row.map(cell => parseFloat(cell)));
-            const mA = getM(matrixA), mB = getM(matrixB);
-            // Simple 2x2 multi for demo
-            const res = [
-                [(mA[0][0] * mB[0][0] + mA[0][1] * mB[1][0]).toString(), (mA[0][0] * mB[0][1] + mA[0][1] * mB[1][1]).toString()],
-                [(mA[1][0] * mB[0][0] + mA[1][1] * mB[1][0]).toString(), (mA[1][0] * mB[0][1] + mA[1][1] * mB[1][1]).toString()]
-            ];
-            setHistory(prev => [{ expression: 'MAT_A × MAT_B', result: JSON.stringify(res), type: 'matrix', timestamp: Date.now() }, ...prev]);
+            const mA = getM(matrixA);
+            let resultLabel = '';
+            let res: string[][] = [['0', '0'], ['0', '0']];
+
+            switch (matrixOp) {
+                case 'multiply': {
+                    const mB = getM(matrixB);
+                    res = [
+                        [(mA[0][0] * mB[0][0] + mA[0][1] * mB[1][0]).toString(), (mA[0][0] * mB[0][1] + mA[0][1] * mB[1][1]).toString()],
+                        [(mA[1][0] * mB[0][0] + mA[1][1] * mB[1][0]).toString(), (mA[1][0] * mB[0][1] + mA[1][1] * mB[1][1]).toString()]
+                    ];
+                    resultLabel = 'MAT_A × MAT_B';
+                    break;
+                }
+                case 'determinant': {
+                    const det = mA[0][0] * mA[1][1] - mA[0][1] * mA[1][0];
+                    res = [[det.toString(), ''], ['', '']];
+                    resultLabel = `det(A) = ${det}`;
+                    break;
+                }
+                case 'transpose': {
+                    res = [
+                        [mA[0][0].toString(), mA[1][0].toString()],
+                        [mA[0][1].toString(), mA[1][1].toString()]
+                    ];
+                    resultLabel = 'Aᵀ';
+                    break;
+                }
+                case 'inverse': {
+                    const det = mA[0][0] * mA[1][1] - mA[0][1] * mA[1][0];
+                    if (Math.abs(det) < 1e-12) {
+                        setError('SINGULAR MATRIX — No inverse exists');
+                        return;
+                    }
+                    const invDet = 1 / det;
+                    res = [
+                        [(mA[1][1] * invDet).toString(), (-mA[0][1] * invDet).toString()],
+                        [(-mA[1][0] * invDet).toString(), (mA[0][0] * invDet).toString()]
+                    ];
+                    resultLabel = 'A⁻¹';
+                    break;
+                }
+            }
+
+            setHistory(prev => [{ expression: resultLabel, result: JSON.stringify(res), type: 'matrix', timestamp: Date.now() }, ...prev]);
             setMatrixA(res);
             setError(null);
-        } catch (e) { setError('MATRIX ERROR'); }
+        } catch (_err) { setError('MATRIX ERROR'); }
     };
 
     const categories = [
@@ -232,6 +288,16 @@ export default function UltimateMathWorkspace() {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Engine Mode: {tab.toUpperCase()}</span>
                             </div>
                             <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => setAngleMode(prev => prev === 'rad' ? 'deg' : 'rad')}
+                                    className={`px-3 py-1.5 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all ${
+                                        angleMode === 'deg'
+                                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                                            : 'bg-black/40 border-white/10 text-slate-500 hover:text-white'
+                                    }`}
+                                >
+                                    {angleMode === 'rad' ? 'RAD' : 'DEG'}
+                                </button>
                                 <span className="px-3 py-1 rounded bg-black/40 border border-white/5 text-[9px] font-mono text-slate-500 uppercase tracking-widest">Active Runtime</span>
                                 <button onClick={() => setHistory([])} className="p-2 text-slate-600 hover:text-red-400 transition-colors"><Trash2 size={16}/></button>
                             </div>
@@ -245,7 +311,7 @@ export default function UltimateMathWorkspace() {
                                  <div className="absolute top-0 right-0 p-8 opacity-5"><Calculator size={120}/></div>
                                  
                                  {tab === 'matrix' ? (
-                                    <MatrixWorkspace matrixA={matrixA} setMatrixA={setMatrixA} matrixB={matrixB} setMatrixB={setMatrixB} solve={solveMatrix} />
+                                    <MatrixWorkspace matrixA={matrixA} setMatrixA={setMatrixA} matrixB={matrixB} setMatrixB={setMatrixB} solve={solveMatrix} matrixOp={matrixOp} setMatrixOp={setMatrixOp} />
                                  ) : (
                                     <div className="space-y-6 flex-1 flex flex-col">
                                         <div className="space-y-2">
@@ -338,7 +404,7 @@ export default function UltimateMathWorkspace() {
 // Small UI Helpers
 // ════════════════════════════════════════════
 
-function MatrixWorkspace({ matrixA, setMatrixA, matrixB, setMatrixB, solve }: any) {
+function MatrixWorkspace({ matrixA, setMatrixA, matrixB, setMatrixB, solve, matrixOp, setMatrixOp }: any) {
     const update = (m: string[][], setM: any, r: number, c: number, val: string) => {
         const next = [...m];
         next[r] = [...next[r]];
@@ -346,19 +412,47 @@ function MatrixWorkspace({ matrixA, setMatrixA, matrixB, setMatrixB, solve }: an
         setM(next);
     };
 
+    const opButtons: { key: 'multiply' | 'determinant' | 'transpose' | 'inverse'; label: string }[] = [
+        { key: 'multiply', label: 'A × B' },
+        { key: 'determinant', label: 'det(A)' },
+        { key: 'transpose', label: 'Aᵀ' },
+        { key: 'inverse', label: 'A⁻¹' },
+    ];
+
     return (
         <div className="flex-1 flex flex-col gap-8">
             <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center"><FlaskConical size={20} className="text-orange-400" /></div>
                 <h2 className="text-xl font-black italic">Matrix Interaction</h2>
             </div>
+
+            {/* Operation Selector */}
+            <div className="grid grid-cols-4 gap-2">
+                {opButtons.map(op => (
+                    <button
+                        key={op.key}
+                        onClick={() => setMatrixOp(op.key)}
+                        className={`py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-all ${
+                            matrixOp === op.key
+                                ? 'bg-orange-500/20 border-orange-500/40 text-orange-400'
+                                : 'bg-white/[0.03] border-white/5 text-slate-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        {op.label}
+                    </button>
+                ))}
+            </div>
             
-            <div className="grid grid-cols-2 gap-8">
+            <div className={`grid gap-8 ${matrixOp === 'multiply' ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 <MatrixInput label="Matrix A" data={matrixA} onChange={(r: number, c: number, v: string) => update(matrixA, setMatrixA, r, c, v)} />
-                <MatrixInput label="Matrix B" data={matrixB} onChange={(r: number, c: number, v: string) => update(matrixB, setMatrixB, r, c, v)} />
+                {matrixOp === 'multiply' && (
+                    <MatrixInput label="Matrix B" data={matrixB} onChange={(r: number, c: number, v: string) => update(matrixB, setMatrixB, r, c, v)} />
+                )}
             </div>
 
-            <button onClick={solve} className="mt-auto h-16 rounded-3xl bg-orange-500 text-black font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_30px_rgba(249,115,22,0.2)]">Execute Multiply</button>
+            <button onClick={solve} className="mt-auto h-16 rounded-3xl bg-orange-500 text-black font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+                Execute {matrixOp === 'multiply' ? 'Multiply' : matrixOp === 'determinant' ? 'Determinant' : matrixOp === 'transpose' ? 'Transpose' : 'Inverse'}
+            </button>
         </div>
     );
 }

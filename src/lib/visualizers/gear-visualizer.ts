@@ -10,9 +10,10 @@
 // ============================================
 
 export interface GearVisualizerParams {
-    module: number;              // Module in mm (m = D/z)
+    module: number;              // Normal module in mm (m)
     teeth: number;               // Number of teeth (z)
     gearTeeth?: number;          // Number of teeth for gear (z2)
+    helixAngle?: number;         // Helix angle β in degrees (0 = spur)
     pressureAngle?: number;      // Pressure angle in degrees (default 20°)
     profileShift?: number;       // Profile shift coefficient (x1)
     gearShift?: number;          // Gear shift coefficient (x2)
@@ -180,11 +181,12 @@ function getStressColor(ratio: number): string {
 export function generateGearSVG(params: GearVisualizerParams): GearVisualizerOutput {
     // Map schema keys to visualizer params
     const mod = params.module || (params as any).m;
-    const z1 = params.teeth || (params as any).z1 || 20; // Pinion teeth
-    const z2 = params.gearTeeth || (params as any).z2 || 40; // Gear teeth (new param)
+    const z1 = params.teeth || (params as any).z1 || 20;
+    const z2 = params.gearTeeth || (params as any).z2 || 40;
     const angle = params.pressureAngle || (params as any).alpha || 20;
-    const x1 = params.profileShift || (params as any).x1 || 0; // Pinion shift
-    const x2 = (params as any).x2 || 0; // Gear shift
+    const beta = params.helixAngle ?? (params as any).helixAngle ?? 0;
+    const x1 = params.profileShift || (params as any).x1 || 0;
+    const x2 = (params as any).x2 || 0;
 
     // Optional params
     const showAnnotations = params.showAnnotations !== false;
@@ -212,17 +214,18 @@ export function generateGearSVG(params: GearVisualizerParams): GearVisualizerOut
     }
 
     const alphaRad = angle * Math.PI / 180;
+    const betaRad = beta * Math.PI / 180;
+    const mt = mod / Math.cos(betaRad);
 
-    // Helper to calc specs
     const calcSpecs = (z: number, x: number): GearSpecs => {
-        const d = mod * z;
+        const d = mt * z;
         return {
             pitchDiameter: d,
             baseDiameter: d * Math.cos(alphaRad),
             outsideDiameter: d + 2 * mod * (1 + x),
             rootDiameter: d - 2 * mod * (1.25 - x),
-            circularPitch: Math.PI * mod,
-            toothThickness: (Math.PI * mod / 2) + (2 * x * mod * Math.tan(alphaRad)),
+            circularPitch: Math.PI * mt,
+            toothThickness: (Math.PI * mt / 2) + (2 * x * mod * Math.tan(alphaRad)),
             addendum: mod * (1 + x),
             dedendum: mod * (1.25 - x),
         };
@@ -234,7 +237,7 @@ export function generateGearSVG(params: GearVisualizerParams): GearVisualizerOut
     // Center Distance
     // Center Distance with Profile Shift
     // a = (d1 + d2) / 2 + (x1 + x2) * m
-    const centerDist = (pinionSpecs.pitchDiameter + gearSpecs.pitchDiameter) / 2 + mod * (x1 + x2);
+    const centerDist = (mt * (z1 + z2)) / 2 + mod * (x1 + x2);
 
     // Layout
     const maxRadius = Math.max(pinionSpecs.outsideDiameter, gearSpecs.outsideDiameter) / 2;

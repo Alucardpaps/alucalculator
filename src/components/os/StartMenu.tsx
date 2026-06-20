@@ -84,27 +84,29 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
     }, [searchQuery, t]);
 
     const moduleColors: Record<string, string> = {
-        'calculator': '#06b6d4', 'profile-weight': '#3b82f6', 'gears-bearings': '#8b5cf6',
+        'calculator': '#00e5ff', 'profile-weight': '#06b6d4', 'gears-bearings': '#8b5cf6',
         'welding': '#f59e0b', 'fasteners': '#ef4444', 'materials-db': '#ec4899',
         'cutting-optimizer': '#14b8a6', 'handbook': '#10b981', 'sheet-metal': '#6366f1',
-        'bearings': '#f97316', 'fits-tolerances': '#0ea5e9', 'strength-analysis': '#dc2626',
-        'pumps': '#0891b2', 'manufacturing': '#7c3aed', 'reducer-lubrication': '#a855f7',
-        'nesting-2d': '#2563eb', 'beam-deflection': '#d97706', 'concrete-reinforcement': '#64748b',
+        'bearings': '#f97316', 'fits-tolerances': '#00e5ff', 'strength-analysis': '#dc2626',
+        'pumps': '#06b6d4', 'manufacturing': '#7c3aed', 'reducer-lubrication': '#a855f7',
+        'nesting-2d': '#00e5ff', 'beam-deflection': '#d97706', 'concrete-reinforcement': '#64748b',
         'ohms-law': '#eab308', 'voltage-drop': '#f97316', 'periodic-table': '#06b6d4',
-        'unit-converter': '#8b5cf6', 'cad-editor': '#3b82f6', 'simulation-fea': '#f59e0b',
+        'unit-converter': '#8b5cf6', 'cad-editor': '#06b6d4', 'simulation-fea': '#f59e0b',
         'sketch-pad': '#ec4899', 'physics-kinematics': '#8b5cf6', 'chemistry-reactions': '#10b981',
-        'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6', 'aerospace-dynamics': '#f97316', 
+        'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6', 'aerospace-dynamics': '#f97316',
         'naval-hydrostatics': '#06b6d4', 'three-phase-power': '#f59e0b',
-        'digital-logic': '#10b981', 'filter-design': '#3b82f6',
+        'digital-logic': '#10b981', 'filter-design': '#06b6d4',
         'failure-diagnosis': '#ef4444', 'fatigue-advanced': '#dc2626',
         'planetary-gearbox': '#8b5cf6', 'material-selector-ai': '#ec4899',
-        'materials-explorer': '#14b8a6', 'physics-solver': '#0ea5e9',
-        'gearbox-design': '#7c3aed', 'motor-selection-std': '#f97316'
+        'materials-explorer': '#14b8a6', 'physics-solver': '#00e5ff',
+        'gearbox-design': '#7c3aed', 'motor-selection-std': '#f97316',
+        'chain-drive': '#00e5ff',
+        'belt-drive': '#f59e0b',
     };
 
     const categories = useMemo(() => {
         const cats = Array.from(new Set(Object.values(MODULE_REGISTRY).map(m => m.category)))
-            .filter(c => c !== 'utilities'); // Completely drop utilities category
+            .filter(c => c !== ('utilities' as any)); // Completely drop utilities category
         return cats.map(c => ({
             id: c,
             name: t.categories?.[c as keyof typeof t.categories] || c
@@ -248,7 +250,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                             const Icon = getModuleIcon(mod.iconName);
                                             const title = t.modules?.[mod.type as keyof typeof t.modules]?.title || mod.title;
                                             const hint = t.moduleHints?.[mod.type as keyof typeof t.moduleHints];
-                                            const accentColor = moduleColors[mod.type] || '#3b82f6';
+                                            const accentColor = moduleColors[mod.type] || '#00e5ff';
 
                                             return (
                                                 <AppGridItem

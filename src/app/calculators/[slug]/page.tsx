@@ -1,47 +1,115 @@
+export const revalidate = 86400;
+
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SEOCalculatorData, SEOPage } from '@/components/os/SEOPage';
+import Redirector from './Redirector';
 import calculators from '@/data/seo-calculators/calculators.json';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-/**
- * Dynamic SEO Page for Engineering Calculators.
- * Pre-renders at build time for maximum speed and SEO performance.
- */
-export default async function CalculatorSEOPage({ params }: PageProps) {
-  const { slug } = await params;
-  const allCalculators = calculators as unknown as SEOCalculatorData[];
-  const calculator = allCalculators.find((c) => c.slug === slug);
+const EXTRA_SLUGS = [
+  'bolt-torque-calc',
+  'bearing-life-calc',
+  'gear-ratio-calc',
+  'shaft-diameter-calc',
+  'spring-constant-calc',
+  'motor-power-calc',
+  'beam-deflection-calc',
+  'concrete-reinforcement',
+  'simulation-fea',
+  'topology-optimization',
+  'machine-assembly',
+  'pressure-drop-calc',
+  'heat-transfer-calc',
+  'pumps',
+  'reducer-lubrication',
+  'naval-hydrostatics',
+  'power-electrical-calc',
+  'ohms-law',
+  'voltage-drop',
+  'three-phase-power',
+  'filter-design',
+  'physics-solver',
+  'failure-prediction',
+  'failure-diagnosis',
+  'biology-genetics',
+  'digital-logic'
+];
 
-  if (!calculator) {
-    notFound();
+function getNormalizedModuleRoute(slug: string): string | null {
+  const clean = slug.toLowerCase().replace(/\/$/, '').replace(/-calc$/, '');
+  
+  if (clean === 'three-phase-power' || clean === 'power-electrical') return 'three-phase-power';
+  if (clean === 'bearing-life') return 'bearings';
+  if (clean === 'vdi2230') return 'bolt-torque';
+  if (clean === 'tolerance-stackup') return 'fits';
+  if (clean === 'fits-tolerances') return 'fits';
+  if (clean === 'spring-constant') return 'strength';
+  if (clean === 'shaft-diameter') return 'strength';
+  if (clean === 'heat-transfer') return 'thermal';
+  if (clean === 'pressure-drop') return 'fluid-dynamics';
+  if (clean === 'motor-power') return 'motor-selection-std';
+  
+  const validModules = [
+    'profile-weight', 'gears-bearings', 'reducer-lubrication', 'nesting-2d', 'materials-db',
+    'welding', 'fasteners', 'bearings', 'fits-tolerances', 'strength-analysis',
+    'cutting-optimizer', 'pumps', 'sheet-metal', 'thermal-expansion', 'manufacturing',
+    'handbook', 'beam-deflection', 'concrete-reinforcement', 'ohms-law', 'voltage-drop',
+    'periodic-table', 'unit-converter', 'calculator', 'cad-editor', 'simulation-fea',
+    'sketch-pad', 'manufacturing-sandbox', 'engineering-selection', 'manufacturing-readiness',
+    'topology-optimization', 'machine-assembly', 'failure-prediction', 'fatigue-analysis',
+    'fluid-dynamics', 'bolt-torque', 'physics-kinematics', 'chemistry-reactions',
+    'biology-genetics', 'cs-algorithms', 'aerospace-dynamics', 'naval-hydrostatics',
+    'materials-explorer', 'physics-solver', 'gearbox-design', 'motor-selection-std',
+    'material-selector-ai', 'failure-diagnosis', 'fatigue-advanced', 'planetary-gearbox',
+    'three-phase-power', 'digital-logic', 'filter-design', 'machining-details',
+    'chain-drive', 'belt-drive', 'ai-copilot', 'holographic-viewer', 'matrix-screensaver',
+    'parametric-cad', 'cost-estimator'
+  ];
+  
+  if (validModules.includes(clean)) {
+    return clean;
   }
-
-  // Cross-category internal linking: prefer pre-defined, fallback to same-category
-  const related = (calculator as any).relatedCalculators?.length
-    ? (calculator as any).relatedCalculators
-    : allCalculators
-        .filter((c) => c.category === calculator.category && c.slug !== calculator.slug)
-        .slice(0, 4)
-        .map((c) => ({ title: c.title, slug: c.slug }));
-
-  return <SEOPage data={{ ...calculator, relatedCalculators: related }} />;
+  return null;
 }
 
-/**
- * Generate metadata for search engines.
- * Includes Title and Description with dynamic mapping.
- */
+export default async function CalculatorSEOPage({ params }: PageProps) {
+  const { slug } = await params;
+  const allCalculators = calculators as any[];
+  const calculator = allCalculators.find((c) => c.slug === slug);
+
+  if (calculator) {
+    let target = slug;
+    if (slug === 'bearing-life') target = 'bearings';
+    else if (slug === 'vdi2230') target = 'bolt-torque';
+    else if (slug === 'tolerance-stackup') target = 'fits';
+    return <Redirector target={target} />;
+  }
+
+  const targetModule = getNormalizedModuleRoute(slug);
+  if (targetModule) {
+    return <Redirector target={targetModule} />;
+  }
+
+  notFound();
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const calculator = (calculators as unknown as SEOCalculatorData[]).find((c) => c.slug === slug);
+  const calculator = (calculators as any[]).find((c) => c.slug === slug);
 
   if (!calculator) {
+    const targetModule = getNormalizedModuleRoute(slug);
+    if (targetModule) {
+      return {
+        title: `${targetModule.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} Calculator | AeGiS`,
+        description: `Professional online engineering calculator for ${targetModule.replace(/-/g, ' ')}.`,
+      };
+    }
     return {
-      title: 'Calculator Not Found | AluCalc',
+      title: 'Calculator Not Found | AeGiS',
     };
   }
 
@@ -54,7 +122,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: calculator.meta.title,
       description: calculator.meta.description,
       type: 'website',
-      url: `https://alucalculator.com/calculators/${slug}`,
+      url: `https://www.alucalculator.com/calculators/${slug}`,
       images: [
         {
           url: ogImage,
@@ -71,17 +139,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [ogImage],
     },
     alternates: {
-      canonical: `https://alucalculator.com/calculators/${slug}`,
+      canonical: `https://www.alucalculator.com/calculators/${slug}`,
     }
   };
 }
 
-/**
- * Pre-generate all calculator paths during static export.
- * This is critical for the 'output: export' configuration.
- */
 export async function generateStaticParams() {
-  return calculators.map((c) => ({
+  const jsonSlugs = calculators.map((c) => ({
     slug: c.slug,
   }));
+  const extraSlugs = EXTRA_SLUGS.map((slug) => ({
+    slug,
+  }));
+  return [...jsonSlugs, ...extraSlugs];
 }

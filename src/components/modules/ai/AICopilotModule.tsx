@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, BrainCircuit } from 'lucide-react';
+import { Send, User, Sparkles } from 'lucide-react';
 import { useOSStore } from '@/store/osStore';
+import { AegisIcon } from '@/components/copilot/AegisIcon';
 
 interface Message {
     id: string;
@@ -16,7 +17,7 @@ export function AICopilotModule() {
         {
             id: '1',
             role: 'assistant',
-            content: "AluCalc Engineering Brain initialized. I can assist with material selection, stress calculations, or workflow automation. What are we building today?",
+            content: "AeGiS online — Agentic Engineering Intelligence System initialized. I can assist with material selection, stress calculations, or workflow automation. What are we building today?",
             timestamp: new Date()
         }
     ]);
@@ -52,11 +53,28 @@ export function AICopilotModule() {
                 return;
             }
 
-            const res = await fetch('/api/ai/copilot', {
+            let res = await fetch('/api/ai/copilot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: inputValue })
+            }).catch(async (err) => {
+                console.warn("[Copilot Module] Primary API route failed, trying PHP fallback:", err);
+                return await fetch('/api/ai/copilot/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: inputValue })
+                });
             });
+
+            if (res.status === 404) {
+                console.warn("[Copilot Module] Primary API route returned 404, trying PHP fallback.");
+                res = await fetch('/api/ai/copilot/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: inputValue })
+                });
+            }
+
             const data = await res.json();
             
             setMessages(prev => [...prev, {
@@ -87,12 +105,10 @@ export function AICopilotModule() {
             {/* Header */}
             <div className="z-10 px-4 py-3 border-b flex items-center justify-between bg-black/40 backdrop-blur-md border-indigo-500/30">
                 <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-indigo-500/20 rounded-md">
-                        <BrainCircuit className="w-5 h-5 text-indigo-400" />
-                    </div>
+                    <AegisIcon size={36} mode="active" />
                     <div>
-                        <h2 className="text-sm font-bold tracking-wider text-indigo-100 uppercase">AluCalc Brain</h2>
-                        <p className="text-[10px] font-mono text-indigo-400/80">LLM Engine v4.0.0-rc2</p>
+                        <h2 className="text-sm font-black tracking-widest text-[#00e5ff] uppercase">AeGiS</h2>
+                        <p className="text-[10px] font-mono text-[#00e5ff]/50 tracking-widest">Agentic Engineering Intelligence</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -148,7 +164,7 @@ export function AICopilotModule() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                        placeholder="Ask the engineering copilot..."
+                        placeholder="Ask AeGiS anything..."
                         className="w-full bg-[#111] border border-indigo-900/50 rounded-xl py-3 pl-4 pr-12 text-sm text-indigo-100 placeholder:text-indigo-900/70 focus:outline-none focus:border-indigo-500/50 transition-colors shadow-inner"
                     />
                     <button

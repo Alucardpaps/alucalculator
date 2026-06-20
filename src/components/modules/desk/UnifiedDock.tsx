@@ -12,6 +12,7 @@ import {
 import { useUtilityStore } from '@/store/utilityStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AegisIcon } from '@/components/copilot/AegisIcon';
 
 const DOCK_GROUPS = [
     {
@@ -391,8 +392,8 @@ export function UnifiedDock() {
 
                                                 {/* SYSTEM ACTIONS */}
                                                 <DockItem
-                                                    label="AI Copilot"
-                                                    icon={<Bot size={20} strokeWidth={1.5} />}
+                                                    label="AeGiS"
+                                                    icon={<AegisIcon size={20} mode="idle" />}
                                                     onClick={() => { openWindow('ai-copilot', true); setActiveGroup(null); }}
                                                     isActive={windows.some(w => w.type === 'ai-copilot')} color="indigo"
                                                 />

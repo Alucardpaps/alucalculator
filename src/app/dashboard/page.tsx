@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useWorkspace } from '@/store/useWorkspace';
+import { useI18nStore } from '@/store/i18nStore';
+import { getDashboardPage } from '@/locales/dashboardTranslations';
 
 import { 
     Folder, Plus, ArrowRight, Activity, 
     Shield, Terminal, Zap, Cog, Database, 
-    Search, LayoutGrid, List, Filter, GitBranch, Box
+    GitBranch, Box
 } from 'lucide-react';
 import Link from 'next/link';
 import { UserMenu } from '@/components/auth/UserMenu';
@@ -18,6 +20,8 @@ import { DependencyGraph } from '@/components/dashboard/DependencyGraph';
  */
 
 export default function DashboardPage() {
+    const { language } = useI18nStore();
+    const d = getDashboardPage(language);
     const session = null as any; // Static export: auth disabled
     const { currentProjectId, setCurrentProject } = useWorkspace();
     const [projects, setProjects] = useState<any[]>([]);
@@ -91,7 +95,7 @@ export default function DashboardPage() {
 
     const handleCreateProject = async (name: string = "New Project") => {
         const projectName = name === "New Project" ? 
-            prompt("Enter Project Name:", "Project Alpha") : name;
+            prompt(d.promptProjectName, d.defaultProjectName) : name;
         
         if (!projectName) return;
 
@@ -109,13 +113,11 @@ export default function DashboardPage() {
                 setCurrentProject(newProject.id);
             }
         } catch (error) {
-            alert("Project creation failed. Please try again.");
+            alert(d.createFailed);
         } finally {
             setIsCreating(false);
         }
     };
-
-    if (!session) return null;
 
     return (
         <div className="min-h-screen bg-[#020408] text-slate-400 selection:bg-blue-500/20 font-sans">
@@ -131,14 +133,14 @@ export default function DashboardPage() {
                         <div className="h-4 w-[1px] bg-slate-800"></div>
                         <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 rounded-lg border border-slate-800">
                             <Database size={12} className="text-slate-500" />
-                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter">Instance: US-EAST-1</span>
+                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter">{d.instanceLabel}</span>
                         </div>
                     </div>
                     
                     <div className="flex items-center gap-4">
                         <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span className="text-[10px] text-emerald-500 font-bold uppercase">Core Stable</span>
+                            <span className="text-[10px] text-emerald-500 font-bold uppercase">{d.coreStable}</span>
                         </div>
                         <UserMenu />
                     </div>
@@ -153,30 +155,30 @@ export default function DashboardPage() {
                         <div>
                             <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-6">
                                 <Activity size={12} className="text-blue-500" />
-                                Execution Metrics
+                                {d.executionMetrics}
                             </h2>
                             <div className="space-y-6">
                                 <div className="flex justify-between items-baseline">
-                                    <span className="text-[10px] text-slate-600 uppercase">Avg Latency</span>
+                                    <span className="text-[10px] text-slate-600 uppercase">{d.avgLatency}</span>
                                     <span className="text-xl font-mono font-bold text-emerald-500">14.2ms</span>
                                 </div>
                                 <div className="flex justify-between items-baseline">
-                                    <span className="text-[10px] text-slate-600 uppercase">Success Rate</span>
+                                    <span className="text-[10px] text-slate-600 uppercase">{d.successRate}</span>
                                     <span className="text-xl font-mono font-bold text-white">100%</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="pt-6 border-t border-slate-800 space-y-4">
-                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Identity</h3>
+                            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{d.systemIdentity}</h3>
                             <div className="space-y-2">
                                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 flex items-center gap-3">
                                     <Shield size={14} className="text-blue-500" />
-                                    <span className="text-[10px] font-mono text-slate-400 uppercase">Encrypted Session</span>
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase">{d.encryptedSession}</span>
                                 </div>
                                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 flex items-center gap-3">
                                     <Terminal size={14} className="text-slate-600" />
-                                    <span className="text-[10px] font-mono text-slate-400 uppercase">Auth v2.0-JWT</span>
+                                    <span className="text-[10px] font-mono text-slate-400 uppercase">{d.authJwt}</span>
                                 </div>
                             </div>
                         </div>
@@ -184,19 +186,19 @@ export default function DashboardPage() {
 
                     {/* Quick Launchpad */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Active Modules</h3>
+                        <h3 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{d.activeModules}</h3>
                         <div className="grid grid-cols-1 gap-2">
                             <Link href="/bearings" className="flex items-center justify-between p-4 bg-slate-900/20 border border-slate-800/50 rounded-xl hover:bg-slate-800/50 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <Zap size={14} className="text-blue-500" />
-                                    <span className="text-xs font-bold text-slate-300">Bearings</span>
+                                    <span className="text-xs font-bold text-slate-300">{d.bearings}</span>
                                 </div>
                                 <ArrowRight size={12} />
                             </Link>
                             <Link href="/gears" className="flex items-center justify-between p-4 bg-slate-900/20 border border-slate-800/50 rounded-xl hover:bg-slate-800/50 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <Cog size={14} className="text-blue-500" />
-                                    <span className="text-xs font-bold text-slate-300">Gears</span>
+                                    <span className="text-xs font-bold text-slate-300">{d.gears}</span>
                                 </div>
                                 <ArrowRight size={12} />
                             </Link>
@@ -216,10 +218,9 @@ export default function DashboardPage() {
                                 <div className="p-4 bg-blue-600/10 rounded-3xl w-fit mx-auto border border-blue-500/20">
                                     <Box className="w-8 h-8 text-blue-500" />
                                 </div>
-                                <h2 className="text-3xl font-black text-white tracking-tight uppercase">Initialize Your First Assembly</h2>
+                                <h2 className="text-3xl font-black text-white tracking-tight uppercase">{d.emptyTitle}</h2>
                                 <p className="text-sm text-slate-500 leading-relaxed">
-                                    Welcome to the AluCalc Engineering OS. Your repository is currently empty. 
-                                    Create your first project to activate the Truth Ledger and begin multi-module simulation.
+                                    {d.emptyDescription}
                                 </p>
                             </div>
 
@@ -229,7 +230,7 @@ export default function DashboardPage() {
                                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-600/20 flex items-center gap-3 group disabled:opacity-50"
                             >
                                 <Plus size={16} />
-                                {isCreating ? "Initializing..." : "Initialize Project Alpha"}
+                                {isCreating ? d.initializing : d.initializeProject}
                                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
@@ -239,8 +240,8 @@ export default function DashboardPage() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-8">
                                     <div>
-                                        <h1 className="text-2xl font-black tracking-tight text-white uppercase">Command Center</h1>
-                                        <p className="text-xs text-slate-500 mt-1">Multi-module engineering assembly & truth ledger.</p>
+                                        <h1 className="text-2xl font-black tracking-tight text-white uppercase">{d.commandCenter}</h1>
+                                        <p className="text-xs text-slate-500 mt-1">{d.commandCenterSubtitle}</p>
                                     </div>
                                     <div className="h-10 w-[1px] bg-slate-900 hidden md:block"></div>
                                     <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-800">
@@ -248,13 +249,13 @@ export default function DashboardPage() {
                                             onClick={() => setViewMode('ledger')}
                                             className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'ledger' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                                         >
-                                            Project Ledger
+                                            {d.projectLedger}
                                         </button>
                                         <button 
                                             onClick={() => setViewMode('flow')}
                                             className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'flow' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                                         >
-                                            Assembly Flow
+                                            {d.assemblyFlow}
                                         </button>
                                     </div>
                                 </div>
@@ -265,7 +266,7 @@ export default function DashboardPage() {
                                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold text-white transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
                                     >
                                         <Plus size={16} />
-                                        {isCreating ? "Creating..." : "New Project"}
+                                        {isCreating ? d.creating : d.newProject}
                                     </button>
                                 </div>
                             </div>
@@ -277,7 +278,7 @@ export default function DashboardPage() {
                                         <div className="p-8 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl">
                                             <div className="flex items-center gap-3 mb-8">
                                                 <GitBranch size={18} className="text-blue-500" />
-                                                <h3 className="text-sm font-bold text-white uppercase tracking-tight">Project Dependency Graph</h3>
+                                                <h3 className="text-sm font-bold text-white uppercase tracking-tight">{d.dependencyGraph}</h3>
                                             </div>
                                             <DependencyGraph 
                                                 calculations={activeModules} 
@@ -297,7 +298,7 @@ export default function DashboardPage() {
                                                         <div className="absolute top-0 right-0 p-3">
                                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                                                                 <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                                                                <span className="text-[8px] text-emerald-500 font-bold uppercase">Verified</span>
+                                                                <span className="text-[8px] text-emerald-500 font-bold uppercase">{d.verified}</span>
                                                             </div>
                                                         </div>
                                                         <div className="space-y-6">
@@ -307,7 +308,7 @@ export default function DashboardPage() {
                                                                 </div>
                                                                 <div>
                                                                     <h4 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">{node.name}</h4>
-                                                                    <p className="text-[10px] text-slate-600 uppercase font-bold tracking-widest">{node.type} Module</p>
+                                                                    <p className="text-[10px] text-slate-600 uppercase font-bold tracking-widest">{node.type} {d.moduleSuffix}</p>
                                                                 </div>
                                                             </div>
                                                             <div className="flex items-baseline gap-2">
@@ -321,7 +322,7 @@ export default function DashboardPage() {
 
                                             {/* Project Repository Ledger */}
                                             <div className="space-y-4">
-                                                <h3 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-2">Project Repository History</h3>
+                                                <h3 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-2">{d.projectHistory}</h3>
                                                 <div className="bg-[#0f172a] border border-slate-800 rounded-xl overflow-hidden">
                                                     <table className="w-full text-left border-collapse">
                                                         <tbody className="divide-y divide-slate-900">
@@ -354,7 +355,7 @@ export default function DashboardPage() {
                                     <div className="w-96 flex-shrink-0 animate-in slide-in-from-right duration-500">
                                         <div className="sticky top-24 p-6 bg-[#0f172a] border border-blue-500/20 rounded-3xl shadow-2xl space-y-8">
                                             <div className="flex items-center justify-between">
-                                                <h3 className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Node Quick Inspect</h3>
+                                                <h3 className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">{d.nodeQuickInspect}</h3>
                                                 <button onClick={() => setSelectedNode(null)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-white transition-colors">
                                                     <Plus size={14} className="rotate-45" />
                                                 </button>
@@ -367,13 +368,13 @@ export default function DashboardPage() {
 
                                             <div className="space-y-4">
                                                 <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-800 space-y-3">
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Input Payload</span>
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">{d.inputPayload}</span>
                                                     <pre className="text-[10px] font-mono text-blue-400 overflow-auto max-h-32 scrollbar-hide">
                                                         {JSON.stringify(selectedNode.input_json || {}, null, 2)}
                                                     </pre>
                                                 </div>
                                                 <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-800 space-y-3">
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Execution Result</span>
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">{d.executionResult}</span>
                                                     <pre className="text-[10px] font-mono text-emerald-400 overflow-auto max-h-32 scrollbar-hide">
                                                         {JSON.stringify(selectedNode.result_json || {}, null, 2)}
                                                     </pre>
@@ -384,7 +385,7 @@ export default function DashboardPage() {
                                                 href={`/${selectedNode.type}?id=${selectedNode.id}`}
                                                 className="flex items-center justify-center gap-2 w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-xs font-bold text-white transition-all group"
                                             >
-                                                Launch Workstation
+                                                {d.launchWorkstation}
                                                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                             </Link>
                                         </div>
@@ -397,12 +398,12 @@ export default function DashboardPage() {
                     {/* System Status Footer */}
                     <footer className="pt-12 border-t border-slate-900 flex justify-between items-center text-[8px] font-bold text-slate-600 uppercase tracking-[0.3em]">
                         <div className="flex items-center gap-4">
-                            <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> System Online</span>
-                            <span>v5.0.0-Beta</span>
+                            <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500"></div> {d.systemOnline}</span>
+                            <span>{d.versionLabel}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                            <span>Truth Ledger Verified</span>
-                            <span>Latency: 14ms</span>
+                            <span>{d.truthLedgerVerified}</span>
+                            <span>{d.latencyLabel}</span>
                         </div>
                     </footer>
                 </div>

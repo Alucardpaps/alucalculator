@@ -1,0 +1,111 @@
+{
+    "slug": "chip-breaker-logic",
+    "academicYear": 3,
+    "department": "Manufacturing",
+    "difficulty": "Advanced",
+    "readingTime": 10,
+    "prerequisites": [
+        "thread-geometry-standards"
+    ],
+    "meta": {
+        "title": "Chip Breaker Logic: TQ Geometry & Cutting Forces",
+        "description": "An advanced machining module exploring chip control in threading. Learn about asymmetric point design, radial feed vs. modified flank feed, and cutting force reduction."
+    },
+    "hero": {
+        "h1": "Chip Breaker Logic: Mastering the Physics of Metal Removal",
+        "intro": "In high-speed CNC threading, the chip is your enemy. If it doesn't break, it nests around the tool, destroying the surface finish and the insert. Modern TQ geometries solve this with asymmetric pressure points. This course breaks down the fluid-like behavior of metal during the cut.\n\nCNC threading is a controlled metal-cutting process. Chip form determines whether you get short broken chips or a bird's nest wrapped around the tool. TQ geometries use asymmetric points to steer chip flow and cut cutting forces by 15–21%.\n\nThis lesson connects Kyocera threading data to the Machining Time engine in AluCalc."
+    },
+    "formula": {
+        "equation": "Cutting Force (Fc) ∝ (ap × f × Kc)",
+        "variables": {
+            "ap": "Depth of Cut (mm)",
+            "f": "Feed per Revolution (mm/rev)",
+            "Kc": "Specific Cutting Force (N/mm²)"
+        }
+    },
+    "stepByStep": [
+        "Select the chip breaker geometry based on the material (e.g., TF for general, TQ for stability).",
+        "Choose the feed method: Radial Infeed vs. Flank Infeed (3°–5°).",
+        "Determine the number of passes based on thread pitch (from tables).",
+        "Monitor chip flow direction using the asymmetric point logic.",
+        "Adjust cutting speed (Vc) based on tool wear patterns.",
+        "Set first threading pass depth above minimum chip breaker activation ap.",
+        "Apply high-pressure coolant for internal threads (SINR/CINR operations)."
+    ],
+    "example": {
+        "inputs": [
+            "Material: 15CrMo4",
+            "Tool: 16ER150 ISO-TQ",
+            "Feed: Radial"
+        ],
+        "calculation": "Using TQ geometry: Cutting force reduced by 15%, Vibration suppressed."
+    },
+    "whyThisMatters": [
+        "Incorrect chip control leads to 'bird-nesting', which is the #1 cause of tool failure.",
+        "Modified flank feed (3°–5°) significantly improves tool life by distributing heat."
+    ],
+    "commonMistakes": [
+        "Using constant depth of cut for all passes (the first pass must be deeper).",
+        "Failing to use high-pressure coolant in internal threading (SINR/CINR).",
+        "Neglecting the minimum depth of cut (ap) required to trigger the chip breaker."
+    ],
+    "textbookInsights": [
+        {
+            "page": "J6",
+            "insight": "TQ talaş kırıcı, asimetrik nokta tasarımı sayesinde talaş akış yönünü kontrol eder ve kesme kuvvetlerini %15-21 oranında bastırır.",
+            "source": "Kyocera Bolum-J"
+        },
+        {
+            "page": "J37",
+            "insight": "Paslanmaz çelikte diş açarken, standart tablo değerlerinden 2-3 paso daha fazla ayarlanması stabilite için tavsiye edilir.",
+            "source": "Kyocera Bolum-J"
+        },
+        {
+            "page": "J47",
+            "insight": "İç çap diş açmada 'Dengeleme Deliği Çapı' ucu korumak için kritik öneme sahiptir. İlk pasoda '0' kesme (sıfır kesme) yapılmalıdır.",
+            "source": "Kyocera Bolum-J"
+        }
+    ],
+    "calculatorCta": {
+        "targetSlug": "reducer-lubrication",
+        "label": "Analyze tool load in the Gearbox Simulation suite"
+    },
+    "faq": [
+        {
+            "question": "Why use modified flank feed?",
+            "answer": "It ensures that only one edge of the insert is doing the heavy work, reducing heat and preventing vibration (chatter)."
+        },
+        {
+            "question": "Radial vs flank infeed?",
+            "answer": "Radial loads both edges equally; modified flank (3°–5°) loads one edge for stability and heat control."
+        },
+        {
+            "question": "What is specific cutting force Kc?",
+            "answer": "Force per unit chip area — material property used to estimate Fc = ap × f × Kc."
+        },
+        {
+            "question": "Why extra passes for stainless?",
+            "answer": "Work hardening and springback require 2–3 more passes than carbon steel tables suggest."
+        }
+    ],
+    "relatedArticles": [
+        "thread-geometry-standards",
+        "mechanics-of-materials-fundamentals"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Kyocera Machining Standards",
+            "filename": "bolum-j.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Select chip breaker geometry (TF, TQ) based on material and operation",
+        "Compare radial infeed vs modified flank infeed for threading stability",
+        "Relate depth of cut, feed, and specific cutting force to tool load"
+    ],
+    "keyTakeaways": [
+        "Uncontrolled chips cause bird-nesting — the primary threading failure mode",
+        "Modified flank feed reduces heat load on one insert edge",
+        "Minimum depth of cut is required to activate the chip breaker groove"
+    ]
+}

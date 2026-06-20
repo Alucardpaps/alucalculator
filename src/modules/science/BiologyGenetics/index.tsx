@@ -220,7 +220,7 @@ export default function BiologyGenetics() {
                                      <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-cyan-500/40 mx-12 relative">
                                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"></div>
                                      </div>
-                                     <AlleleControl label="Recessive (q)" value={1 - pFreq} onChange={(val) => setPFreq(1 - val)} />
+                                     <AlleleControl label="Recessive (q)" value={1 - pFreq} onChange={(val: number) => setPFreq(1 - val)} />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">

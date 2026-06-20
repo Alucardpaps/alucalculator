@@ -54,12 +54,12 @@ export function Taskbar() {
                 {/* System Status */}
                 <div className="px-4 border-r border-white/5 flex items-center gap-2.5">
                     <div className="relative">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]" />
-                        <div className="absolute inset-0 w-2 h-2 rounded-full bg-blue-400 animate-ping opacity-40" />
+                        <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_12px_rgba(0,229,255,0.8)]" />
+                        <div className="absolute inset-0 w-2 h-2 rounded-full bg-cyan-400 animate-ping opacity-40" />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-black text-gray-100 uppercase tracking-widest">{formatTime(time)}</span>
-                        <span className="text-[7px] font-black text-blue-500/60 uppercase tracking-[0.3em]">OS CORE V6.2</span>
+                        <span className="text-[7px] font-black text-cyan-500/60 uppercase tracking-[0.3em]">OS CORE V6.2</span>
                     </div>
                 </div>
 
@@ -81,16 +81,16 @@ export function Taskbar() {
                                     className={`
                                         group relative flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all duration-300 whitespace-nowrap
                                         ${isActive 
-                                            ? 'bg-blue-500/20 border border-blue-500/30 text-white shadow-[0_0_30px_rgba(59,130,246,0.15)]' 
+                                            ? 'bg-cyan-500/20 border border-cyan-500/30 text-white shadow-[0_0_30px_rgba(0,229,255,0.15)]' 
                                             : 'bg-white/5 border border-transparent text-gray-500 hover:bg-white/10 hover:text-gray-300'
                                         }
                                     `}
                                 >
-                                    <Activity size={14} className={isActive ? 'text-blue-400' : 'text-gray-600'} />
+                                    <Activity size={14} className={isActive ? 'text-cyan-400' : 'text-gray-600'} />
                                     <span className="text-[11px] font-black tracking-tight">{title}</span>
 
                                     {/* App indicator dot */}
-                                    <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500 transition-all ${isActive ? 'opacity-100' : 'opacity-0 scale-0'}`} />
+                                    <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-cyan-500 transition-all ${isActive ? 'opacity-100' : 'opacity-0 scale-0'}`} />
 
                                     <div 
                                         className="ml-2 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-all"
@@ -114,7 +114,7 @@ export function Taskbar() {
                 <div className="flex items-center gap-2 border-l border-white/5 pl-4 ml-2">
                     <button 
                         onClick={() => useOSStore.getState().openWindow('engineering-selection')}
-                        className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-400 hover:bg-blue-500 hover:text-white hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all"
+                        className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl text-cyan-400 hover:bg-cyan-500 hover:text-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all"
                         title="Open Database"
                     >
                         <Database size={16} />

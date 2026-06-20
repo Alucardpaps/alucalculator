@@ -1,0 +1,137 @@
+[gd_scene load_steps=5 format=3 uid="uid://c414q6o4hpd4w"]
+
+[ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
+bg_color = Color(0.0588235, 0.0784314, 0.117647, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.235294, 0.431373, 0.745098, 0.25)
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crunch"]
+bg_color = Color(0.8, 0.15, 0.15, 0.95)
+border_width_bottom = 1
+border_color = Color(0.9, 0.3, 0.3, 1)
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.12, 0.35, 0.65, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.55, 0.95, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[node name="HUD" type="Panel"]
+custom_minimum_size = Vector2(0, 60)
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+script = ExtResource("1_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="TimeContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="TimeLabel" type="Label" parent="MarginContainer/HBoxContainer/TimeContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.94, 0.96, 1)
+theme_override_font_sizes/font_size = 18
+text = "GÜN 1 — 08:00"
+vertical_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="StatsContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 30
+
+[node name="MoneyLabel" type="Label" parent="MarginContainer/HBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.24, 0.81, 0.45, 1)
+theme_override_font_sizes/font_size = 16
+text = "💰 Bakiye: 75.000 ₺"
+vertical_alignment = 1
+
+[node name="RatingLabel" type="Label" parent="MarginContainer/HBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.77, 0.25, 1)
+theme_override_font_sizes/font_size = 16
+text = "⭐ Ün: % 100"
+vertical_alignment = 1
+
+[node name="BossTrustLabel" type="Label" parent="MarginContainer/HBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.94, 0.96, 1)
+theme_override_font_sizes/font_size = 16
+text = "🤝 Patron Güveni: 0/10"
+vertical_alignment = 1
+
+[node name="VSeparator2" type="VSeparator" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_font_sizes/font_size = 14
+text = "📦 Malzeme Satın Al"
+
+[node name="CrunchBanner" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+offset_bottom = 28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_crunch")
+
+[node name="CrunchLabel" type="Label" parent="CrunchBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 13
+text = "🚨 Crunch Başladı! Üretim Hızı 2x! Acil teknik sorular geliyor!"
+horizontal_alignment = 1
+vertical_alignment = 1

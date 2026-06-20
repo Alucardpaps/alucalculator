@@ -1,0 +1,237 @@
+[gd_scene load_steps=15 format=3 uid="uid://cy2tq6o4hpd4o"]
+
+[ext_resource type="Script" path="res://scenes/game.gd" id="1_game"]
+[ext_resource type="PackedScene" uid="uid://c414q6o4hpd4w" path="res://scenes/ui/hud.tscn" id="2_hud"]
+[ext_resource type="PackedScene" uid="uid://bw1tq6o4hpd4u" path="res://scenes/ui/worker_panel.tscn" id="3_wkpnl"]
+[ext_resource type="PackedScene" uid="uid://be1tq6o4hpd4t" path="res://scenes/ui/order_panel.tscn" id="4_ordpnl"]
+[ext_resource type="PackedScene" uid="uid://cb1tq6o4hpd4s" path="res://scenes/ui/log_panel.tscn" id="5_logpnl"]
+[ext_resource type="PackedScene" uid="uid://df1tq6o4hpd4r" path="res://scenes/ui/chat_modal.tscn" id="6_chtmd"]
+[ext_resource type="PackedScene" uid="uid://df1tq6o4hpd4q" path="res://scenes/ui/purchase_modal.tscn" id="7_prcmd"]
+[ext_resource type="PackedScene" uid="uid://df1tq6o4hpd4p" path="res://scenes/ui/assign_modal.tscn" id="8_asgmd"]
+[ext_resource type="PackedScene" uid="uid://cx1tq6o4hpd4p" path="res://scenes/ui/factory_select.tscn" id="9_fctsl"]
+[ext_resource type="Script" path="res://scripts/entities/factory_floor.gd" id="10_floor"]
+[ext_resource type="Script" path="res://scripts/camera.gd" id="11_camera"]
+[ext_resource type="PackedScene" uid="uid://df1tq6o4hpd4z" path="res://scenes/ui/hire_modal.tscn" id="12_hrmdl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_handbook"]
+bg_color = Color(0.0823529, 0.0941176, 0.12549, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.917647, 0.721569, 0.227451, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gameover"]
+bg_color = Color(0.121569, 0.0784314, 0.0784314, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9, 0.2, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 16
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_game")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(1000, 300)
+script = ExtResource("11_camera")
+
+[node name="Map" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="FactoryFloor" type="Node2D" parent="Map"]
+script = ExtResource("10_floor")
+
+[node name="Workstations" type="Node2D" parent="Map"]
+y_sort_enabled = true
+
+[node name="Workers" type="Node2D" parent="Map"]
+y_sort_enabled = true
+
+[node name="Animals" type="Node2D" parent="Map"]
+y_sort_enabled = true
+
+[node name="Preys" type="Node2D" parent="Map"]
+y_sort_enabled = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUD" parent="CanvasLayer/UI" instance=ExtResource("2_hud")]
+layout_mode = 1
+
+[node name="WorkerPanel" parent="CanvasLayer/UI" instance=ExtResource("3_wkpnl")]
+layout_mode = 1
+
+[node name="OrderPanel" parent="CanvasLayer/UI" instance=ExtResource("4_ordpnl")]
+layout_mode = 1
+
+[node name="LogPanel" parent="CanvasLayer/UI" instance=ExtResource("5_logpnl")]
+layout_mode = 1
+
+[node name="OpenHandbookBtn" type="Button" parent="CanvasLayer/UI"]
+custom_minimum_size = Vector2(180, 32)
+layout_mode = 0
+offset_left = 295.0
+offset_top = 70.0
+offset_right = 475.0
+offset_bottom = 102.0
+theme_override_font_sizes/font_size = 12
+text = "📖 Teknik El Kitabı"
+mouse_default_cursor_shape = 2
+
+[node name="ChatModal" parent="CanvasLayer/UI" instance=ExtResource("6_chtmd")]
+visible = false
+layout_mode = 1
+
+[node name="PurchaseModal" parent="CanvasLayer/UI" instance=ExtResource("7_prcmd")]
+visible = false
+layout_mode = 1
+
+[node name="HireModal" parent="CanvasLayer/UI" instance=ExtResource("12_hrmdl")]
+visible = false
+layout_mode = 1
+
+[node name="AssignModal" parent="CanvasLayer/UI" instance=ExtResource("8_asgmd")]
+visible = false
+layout_mode = 1
+
+[node name="HandbookPanel" type="Panel" parent="CanvasLayer/UI"]
+visible = false
+custom_minimum_size = Vector2(600, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_handbook")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UI/HandbookPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/HandbookPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/UI/HandbookPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.917647, 0.721569, 0.227451, 1)
+theme_override_font_sizes/font_size = 18
+text = "📖 TEKNİK EL KİTABI"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/UI/HandbookPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HandbookText" type="RichTextLabel" parent="CanvasLayer/UI/HandbookPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "El kitabı içeriği yükleniyor..."
+
+[node name="CloseBtn" type="Button" parent="CanvasLayer/UI/HandbookPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Kapat"
+mouse_default_cursor_shape = 2
+
+[node name="GameOverPanel" type="Panel" parent="CanvasLayer/UI"]
+visible = false
+custom_minimum_size = Vector2(500, 300)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -150.0
+offset_right = 250.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gameover")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UI/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/GameOverPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/UI/GameOverPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 24
+text = "🚨 OYUN BİTTİ"
+horizontal_alignment = 1
+
+[node name="ReasonLabel" type="Label" parent="CanvasLayer/UI/GameOverPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Fabrika yönetimi başarısız oldu."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="CanvasLayer/UI/GameOverPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="RestartBtn" type="Button" parent="CanvasLayer/UI/GameOverPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 14
+text = "Ana Menüye Dön"
+mouse_default_cursor_shape = 2
+
+[node name="FactorySelect" parent="CanvasLayer/UI" instance=ExtResource("9_fctsl")]
+layout_mode = 1

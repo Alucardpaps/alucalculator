@@ -37,14 +37,14 @@ export const gasLawsSchema: CalculatorSchemaV2 = {
     },
     inputs: [
         { key: 'T', label: 'Temperature (T)', unit: 'K', defaultValue: 298.15, description: 'Absolute Temperature', validation: { required: true, min: 1 } },
-        { key: 'V', label: 'Volume (V)', unit: 'mm3' as any, defaultValue: 10, description: 'Volume in Liters', validation: { required: true, min: 0.001 } },
+        { key: 'V', label: 'Volume (V)', unit: 'L' as any, defaultValue: 10, description: 'Volume in Liters', validation: { required: true, min: 0.001 } },
         { key: 'n', label: 'Moles (n)', unit: 'mol' as any, defaultValue: 1, description: 'Amount of substance', validation: { required: true, min: 0.0001 } },
         { key: 'a', label: 'VDW Constant a', unit: '-' as any, defaultValue: 1.370, description: 'L^2*bar/mol^2', validation: { required: true, min: 0 } },
         { key: 'b', label: 'VDW Constant b', unit: '-' as any, defaultValue: 0.0387, description: 'L/mol', validation: { required: true, min: 0 } }
     ],
     outputs: [
-        { key: 'P_ideal', label: 'Ideal Pressure', unit: 'MPa' as any, description: 'Pressure calculated by Ideal Gas Law (in bar)', precision: 3, formulaLatex: 'P_{id}' },
-        { key: 'P_real', label: 'Real Pressure', unit: 'MPa' as any, description: 'Pressure calculated by Van der Waals Eq (in bar)', precision: 3, formulaLatex: 'P_{real}' },
+        { key: 'P_ideal', label: 'Ideal Pressure', unit: 'bar' as any, description: 'Pressure calculated by Ideal Gas Law', precision: 3, formulaLatex: 'P_{id}' },
+        { key: 'P_real', label: 'Real Pressure', unit: 'bar' as any, description: 'Pressure calculated by Van der Waals Eq', precision: 3, formulaLatex: 'P_{real}' },
         { key: 'Z', label: 'Compressibility Factor', unit: '-', description: 'Z = P_real * V / (nRT)', precision: 3, formulaLatex: 'Z' }
     ],
     calculationEngine: (inputs: Record<string, any>) => {
@@ -63,8 +63,8 @@ export const gasLawsSchema: CalculatorSchemaV2 = {
 
         return {
             outputs: {
-                P_ideal: createValidatedValue(P_ideal, 'MPa' as any, 'derived'), // outputting as 'bar' conceptually but mapping to MPa unit symbol 
-                P_real: createValidatedValue(P_real, 'MPa' as any, 'derived'),
+                P_ideal: createValidatedValue(P_ideal, 'bar' as any, 'derived'),
+                P_real: createValidatedValue(P_real, 'bar' as any, 'derived'),
                 Z: createValidatedValue(Z, '-', 'derived')
             },
             verified: true,

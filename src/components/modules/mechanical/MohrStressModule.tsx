@@ -42,12 +42,12 @@ export default function MohrStressModule() {
                 {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
                             <Activity size={24} />
                         </div>
                         <div>
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Stress Node</h1>
-                            <p className="text-[10px] text-purple-500/60 font-mono tracking-widest uppercase mt-1">Mohr Circle Analytics v4.1</p>
+                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase mt-1">Mohr Circle Analytics v4.1</p>
                         </div>
                     </div>
                 </div>
@@ -67,9 +67,9 @@ export default function MohrStressModule() {
                                         type="range" min={-90} max={90} step={1} 
                                         value={angle} 
                                         onChange={(e) => setAngle(Number(e.target.value))}
-                                        className="flex-1 accent-purple-500 bg-white/5 h-1.5 rounded-full" 
+                                        className="flex-1 accent-cyan-500 bg-white/5 h-1.5 rounded-full" 
                                     />
-                                    <span className="text-sm font-black text-purple-400 font-mono w-12 text-right">{angle}°</span>
+                                    <span className="text-sm font-black text-cyan-400 font-mono w-12 text-right">{angle}°</span>
                                 </div>
                             </div>
                         </EngineeringVisualization>
@@ -83,19 +83,19 @@ export default function MohrStressModule() {
 
                     {/* Results & Analysis */}
                     <div className="space-y-8">
-                        <div className="bg-[#0a0c10] rounded-[3rem] p-10 border border-purple-500/20 shadow-2xl relative overflow-hidden">
+                        <div className="bg-[#0a0c10] rounded-[3rem] p-10 border border-cyan-500/20 shadow-2xl relative overflow-hidden">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-10">Analysis Indicators</h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <ResultCard label="Von Mises Equivalent" value={results.vonMises.toFixed(1)} unit="MPa" color="#a855f7" icon={<Shield size={16}/>} />
+                                <ResultCard label="Von Mises Equivalent" value={results.vonMises.toFixed(1)} unit="MPa" color="#00e5ff" icon={<Shield size={16}/>} />
                                 <ResultCard label="Principal Stress σ₁" value={results.sigma1.toFixed(1)} unit="MPa" color="#22c55e" icon={<Target size={16}/>} />
                                 <ResultCard label="Principal Stress σ₂" value={results.sigma2.toFixed(1)} unit="MPa" color="#ef4444" icon={<Target size={16}/>} />
                                 <ResultCard label="Max Shear τ_max" value={results.tauMax.toFixed(1)} unit="MPa" color="#f59e0b" icon={<Activity size={16}/>} />
                             </div>
 
                             <div className="mt-10 pt-10 border-t border-white/5 space-y-6">
-                                <div className="bg-purple-500/5 border border-purple-500/20 rounded-3xl p-6">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-4 flex items-center gap-2">
+                                <div className="bg-cyan-500/5 border border-cyan-500/20 rounded-3xl p-6">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-cyan-400 mb-4 flex items-center gap-2">
                                         <Compass size={14} /> Rotated State at {angle}°
                                     </div>
                                     <div className="flex justify-between items-center">
@@ -151,9 +151,9 @@ function MohrCircleSVG({ results, angle }: any) {
             <motion.circle 
                 layoutId="mohr-circle"
                 cx={circleCx} cy={cy} r={circleR} 
-                fill="none" stroke="#a855f7" strokeWidth="2" strokeOpacity="0.6" 
+                fill="none" stroke="#00e5ff" strokeWidth="2" strokeOpacity="0.6" 
             />
-            <circle cx={circleCx} cy={cy} r={circleR} fill="#a855f7" fillOpacity="0.03" />
+            <circle cx={circleCx} cy={cy} r={circleR} fill="#00e5ff" fillOpacity="0.03" />
 
             {/* Diameter Line */}
             <motion.line 
@@ -169,12 +169,12 @@ function MohrCircleSVG({ results, angle }: any) {
             <motion.line 
                 animate={{ x2: pointX, y2: pointY }} 
                 x1={circleCx} y1={cy} 
-                stroke="#a855f7" strokeWidth="1.5" strokeDasharray="4 2" 
+                stroke="#00e5ff" strokeWidth="1.5" strokeDasharray="4 2" 
             />
             <motion.circle 
                 animate={{ cx: pointX, cy: pointY }} 
-                r="6" fill="#a855f7" stroke="#020408" strokeWidth="2" 
-                className="shadow-[0_0_20px_#a855f7]"
+                r="6" fill="#00e5ff" stroke="#020408" strokeWidth="2" 
+                className="shadow-[0_0_20px_#00e5ff]"
             />
         </svg>
     );
@@ -184,7 +184,7 @@ function ResultCard({ label, value, unit, color, icon }: any) {
     return (
         <div className="bg-white/[0.03] border border-white/5 p-6 rounded-3xl hover:bg-white/[0.05] transition-all group">
             <div className="flex items-center gap-3 text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">
-                <span className="p-1.5 rounded-lg bg-white/5 text-slate-400 group-hover:text-purple-400 transition-colors">{icon}</span> {label}
+                <span className="p-1.5 rounded-lg bg-white/5 text-slate-400 group-hover:text-cyan-400 transition-colors">{icon}</span> {label}
             </div>
             <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-black font-mono tracking-tighter" style={{ color }}>{value}</span>

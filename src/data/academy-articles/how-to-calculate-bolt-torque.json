@@ -1,12 +1,17 @@
 {
     "slug": "how-to-calculate-bolt-torque",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Intermediate",
+    "readingTime": 10,
+    "prerequisites": [],
     "meta": {
         "title": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
         "description": "Learn how to calculate bolt torque for mechanical assembly using preload force, friction coefficient, and bolt diameter. Includes formula, examples, and VDI 2230 methodology."
     },
     "hero": {
         "h1": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
-        "intro": "Bolt torque calculation is one of the most critical aspects of mechanical assembly. Incorrect torque leads to joint failure, loosening, or even catastrophic structural damage. In real-world engineering, torque must be calculated using preload force, friction coefficient, and bolt diameter — not guesswork."
+        "intro": "Bolt torque calculation is one of the most critical aspects of mechanical assembly. Incorrect torque leads to joint failure, loosening, or even catastrophic structural damage. In real-world engineering, torque must be calculated using preload force, friction coefficient, and bolt diameter — not guesswork.\n\nClamp force — not torque — is the design output of a bolted joint. Torque is merely the shop-floor input, distorted by friction at the threads and under the head. VDI 2230 formalizes the relationship between torque, preload, and thread utilization.\n\nThis lesson connects handbook shortcuts (T = K·F·d) to the full friction model in the AluCalc Fastener Engine."
     },
     "formula": {
         "equation": "T = K × F × d",
@@ -23,7 +28,9 @@
         "Estimate friction coefficient (lubricated vs dry).",
         "Convert diameter to meters.",
         "Apply the formula: T = K × F × d.",
-        "Verify against torque tables."
+        "Verify against torque tables.",
+        "Select μ_thread and μ_head from lubrication condition tables.",
+        "Verify yield utilization and thread stripping for both internal and external threads."
     ],
     "example": {
         "inputs": [
@@ -59,10 +66,38 @@
         {
             "question": "Why use preload instead of just torque?",
             "answer": "Torque is an indirect measure. The actual goal is to achieve clamping force (preload) to hold the joint together securely. Using preload calculation ensures accurate joint strength."
+        },
+        {
+            "question": "What is a typical K factor for dry steel?",
+            "answer": "K ≈ 0.20 for unlubricated steel-on-steel; drops to ~0.12 with moly or oil."
+        },
+        {
+            "question": "Does torque control guarantee preload?",
+            "answer": "No — scatter of ±25% is common. Torque + angle or ultrasonic measurement improves control."
+        },
+        {
+            "question": "When is VDI 2230 required?",
+            "answer": "Critical joints in automotive, pressure vessels, and aerospace where proof of clamp force is mandatory."
         }
     ],
     "relatedArticles": [
         "bearing-life-calculation-explained",
         "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+        {
+            "title": "VDI 2230 Systematic Calculation of High Strength Bolted Joints",
+            "filename": "bolum-j.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Relate applied torque to bolt preload via friction coefficients (K or μ)",
+        "Apply VDI 2230 concepts: yield utilization and thread stripping checks",
+        "Select lubrication strategy and its effect on required tightening torque"
+    ],
+    "keyTakeaways": [
+        "Torque is an indirect measure of preload — friction dominates scatter",
+        "Over-torquing can yield the bolt and reduce clamp force after relaxation",
+        "Always verify both internal and external thread capacity"
     ]
 }

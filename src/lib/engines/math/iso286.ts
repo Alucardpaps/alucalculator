@@ -7,15 +7,42 @@
  */
 
 // ============================================
+// 0. ISO 286 STANDARD DIAMETER STEPS
+// ============================================
+// ISO 286-1 does NOT evaluate the tolerance factor at the actual nominal
+// size. Instead each nominal size falls into a standard step range and all
+// values (IT grade + fundamental deviations) are computed from the GEOMETRIC
+// MEAN of that range: D = sqrt(D1 * D2). Using the raw nominal size instead
+// over-estimates IT grades by ~8% (e.g. IT7@50mm -> 27µm instead of 25µm).
+const ISO_DIAMETER_STEPS: [number, number][] = [
+    [0, 3], [3, 6], [6, 10], [10, 18], [18, 30], [30, 50],
+    [50, 80], [80, 120], [120, 180], [180, 250], [250, 315],
+    [315, 400], [400, 500]
+];
+
+// Returns the geometric-mean diameter used by ISO 286 for the step that
+// contains `nominal`. The first step (<=3mm) uses sqrt(1*3) by convention.
+export function getStepGeometricMean(nominal: number): number {
+    for (const [lo, hi] of ISO_DIAMETER_STEPS) {
+        if (nominal > lo && nominal <= hi) {
+            const loEff = lo === 0 ? 1 : lo;
+            return Math.sqrt(loEff * hi);
+        }
+    }
+    // Above 500mm the standard continues with further steps; fall back to the
+    // nominal size (the engine is primarily intended for the 1-500mm range).
+    return nominal;
+}
+
+// ============================================
 // 1. STANDARD TOLERANCE FACTOR (i)
 // ============================================
-// i = 0.45 * D^(1/3) + 0.001 * D (microns)
-// D in mm.
+// i = 0.45 * D^(1/3) + 0.001 * D (microns), with D = step geometric mean.
 function getStandardToleranceFactor(d: number): number {
     if (d <= 500) {
         return 0.45 * Math.pow(d, 1 / 3) + 0.001 * d;
     }
-    // Formula changes slightly above 500mm but this is sufficient for 99% of cases
+    // I (for D > 500mm): I = 0.004 * D + 2.1
     return 0.004 * d + 2.1;
 }
 
@@ -38,19 +65,23 @@ const IT_MULTIPLIERS: Record<number, number> = {
 export function getTolerance(grade: number, diameter: number): number {
     const k = IT_MULTIPLIERS[grade];
     if (!k) return 0;
-    const i = getStandardToleranceFactor(diameter);
-    // Round to nearest micron usually, simplified here
-    return Math.round(k * i) / 1000; // Return in MM
+    // ISO 286: evaluate i at the geometric mean of the standard step range.
+    const D = getStepGeometricMean(diameter);
+    const i = getStandardToleranceFactor(D);
+    // Round to nearest micron, return in mm.
+    return Math.round(k * i) / 1000;
 }
 
 // ============================================
 // 3. FUNDAMENTAL DEVIATIONS (Upper/Lower)
 // ============================================
-// Formulas for Upper Deviation (es) or Lower Deviation (ei) in MICRONS based on D (Geometric Mean of range)
-// We simplify by using D = nominal for continuous calculation
+// Formulas for Upper Deviation (es) or Lower Deviation (ei) in MICRONS based on
+// D = geometric mean of the standard ISO 286 step range.
 
 export function getFundamentalDeviation(letter: string, diameter: number): number {
-    const D = diameter;
+    // ISO 286 fundamental deviations are also functions of the step geometric
+    // mean, not the raw nominal size.
+    const D = getStepGeometricMean(diameter);
     let dev = 0; // microns
 
     // Shaft Deviations (es or ei)

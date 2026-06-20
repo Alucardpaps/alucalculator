@@ -118,7 +118,36 @@ export class DimensionSystem {
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(textStr, textCenter.x, textCenter.y);
+
+        // Check for tolerance values
+        const hasTolerance = dim.tolUpper !== undefined || dim.tolLower !== undefined;
+
+        if (hasTolerance) {
+            const tolU = dim.tolUpper ?? 0;
+            const tolL = dim.tolLower ?? 0;
+
+            // Draw nominal value slightly left
+            ctx.font = '12px sans-serif';
+            const nominalText = textStr;
+            const nominalWidth = ctx.measureText(nominalText).width;
+            const nomX = textCenter.x - 8;
+            ctx.fillText(nominalText, nomX, textCenter.y);
+
+            // Draw tolerance stack (superscript/subscript) to the right
+            ctx.font = '8px sans-serif';
+            ctx.textAlign = 'left';
+            const tolX = nomX + nominalWidth / 2 + 3;
+
+            // Upper tolerance (superscript)
+            const upperText = tolU >= 0 ? `+${tolU.toFixed(3)}` : tolU.toFixed(3);
+            ctx.fillText(upperText, tolX, textCenter.y - 6);
+
+            // Lower tolerance (subscript)
+            const lowerText = tolL >= 0 ? `+${tolL.toFixed(3)}` : tolL.toFixed(3);
+            ctx.fillText(lowerText, tolX, textCenter.y + 6);
+        } else {
+            ctx.fillText(textStr, textCenter.x, textCenter.y);
+        }
 
         ctx.restore();
     }

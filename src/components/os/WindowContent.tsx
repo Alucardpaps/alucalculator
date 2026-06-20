@@ -1,9 +1,12 @@
 'use client';
 
+import { Suspense } from 'react';
 import { ModuleType } from '@/config/modules';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Monitor } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { getWorkstationPage } from '@/locales/workstationPageTranslations';
 
 // Lazy load modules - Mechanical
 const ProfileWeightModule = dynamic(() => import('@/components/modules/mechanical/ProfileWeightModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -31,6 +34,8 @@ const FatigueAnalysisModule = dynamic(() => import('@/components/modules/mechani
 
 // Advanced Engineering V2 Modules
 const MaterialAIModule = dynamic(() => import('@/components/modules/ai/MaterialAIModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PlanetaryCalculator = dynamic(() => import('@/components/calculators/PlanetaryCalculator').then(mod => mod.PlanetaryCalculator as any), { loading: () => <ModuleLoading /> });
+
 
 import type { UniversalCalcRendererProps } from '@/components/calculators/UniversalCalcRenderer';
 const UniversalCalcRenderer = dynamic<UniversalCalcRendererProps>(() => 
@@ -42,6 +47,8 @@ const UniversalCalcRenderer = dynamic<UniversalCalcRendererProps>(() =>
 const motorSelectionSchema = require('@/calculators/schemas-v2/motor-selection').default;
 const failureAnalysisSchema = require('@/calculators/schemas-v2/failure-analysis').default;
 const fatigueLifeSnSchema = require('@/calculators/schemas-v2/fatigue-life-sn').default;
+const chainDriveSchema = require('@/calculators/schemas-v2/chain-drive').default;
+const beltDriveSchema = require('@/calculators/schemas-v2/belt-drive').default;
 
 // Engineering Workstation Expansions
 const MaterialsExplorer = dynamic(() => import('@/components/modules/MaterialsExplorer').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -91,11 +98,26 @@ const SimulationFEAModule = dynamic(() => import('@/components/modules/mechanica
 // Creative
 const SettingsModule = dynamic(() => import('@/components/modules/os/SettingsModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ExcalidrawModule = dynamic(() => import('@/components/modules/sketch/ExcalidrawModule').then(mod => mod.default), { loading: () => <ModuleLoading /> });
+const EngineeringNotesModule = dynamic(() => import('@/modules/system/EngineeringNotes').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+
+// Dynamically imported OS workstation components to resolve hydration mismatch and allow standalone routing
+const FileExplorerModule = dynamic(() => import('@/components/modules/os/FileExplorerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ProjectManagerModule = dynamic(() => import('@/components/modules/os/ProjectManagerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ProjectVault = dynamic(() => import('@/components/modules/ProjectVault').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const BrowserModule = dynamic(() => import('@/components/modules/software/BrowserModule').then(mod => mod.BrowserModule as any), { loading: () => <ModuleLoading /> });
+const TerminalModule = dynamic(() => import('@/components/modules/os/TerminalModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const RealTimeCostModule = dynamic(() => import('@/modules/finance/RealTimeCost').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const AiCoPilotModule = dynamic(() => import('@/modules/software/AiCoPilot').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const HolographicViewer = dynamic(() => import('@/components/modules/presentation/HolographicViewer').then(mod => mod.HolographicViewer as any), { loading: () => <ModuleLoading /> });
+const MatrixScreensaverModule = dynamic(() => import('@/components/modules/presentation/MatrixScreensaverModule').then(mod => mod.MatrixScreensaverModule as any), { loading: () => <ModuleLoading /> });
+const ParametricCadModule = dynamic(() => import('@/components/modules/parametric/ParametricCadModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 function ModuleLoading() {
+    const { language } = useI18nStore();
+    const t = getWorkstationPage(language).layout;
     return (
         <div className="flex items-center justify-center h-full" style={{ color: 'var(--color-os-text-secondary)' }}>
-            <div className="animate-pulse">Loading...</div>
+            <div className="animate-pulse">{t.moduleLoading}</div>
         </div>
     );
 }
@@ -150,9 +172,17 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'welding': return <WeldingModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'manufacturing': return <ManufacturingModule />;
         case 'manufacturing-sandbox': return <ManufacturingSandbox />;
-        case 'fasteners': return <BoltTorqueModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
-        case 'bolt-torque': return <BoltTorqueModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
-        case 'bearings': return <BearingAnalysisModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'fasteners': return (
+            <Suspense fallback={<ModuleLoading />}>
+                <FastenersModule {...({ lang: currentLanguage, dict: dictionary } as any)} />
+            </Suspense>
+        );
+        case 'bolt-torque': return (
+            <Suspense fallback={<ModuleLoading />}>
+                <BoltTorqueModule {...({ lang: currentLanguage, dict: dictionary } as any)} />
+            </Suspense>
+        );
+        case 'bearings': return <BearingsModuleComponent {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'fits-tolerances': return <FitsTolerancesModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'strength-analysis': return <MohrStressModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'cutting-optimizer': return <CuttingOptimizerModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
@@ -165,6 +195,8 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'machining-details': return <MachiningDetailsModule />;
         case 'fatigue-analysis': return <FatigueAnalysisModule />;
         case 'fatigue-advanced': return <UniversalCalcRenderer schema={fatigueLifeSnSchema} />;
+        case 'chain-drive': return <UniversalCalcRenderer schema={chainDriveSchema} />;
+        case 'belt-drive': return <UniversalCalcRenderer schema={beltDriveSchema} />;
         case 'motor-selection-std': return <MotorSelectionModule />;
         case 'failure-diagnosis': return <FailureDiagnosisModule />;
         case 'gearbox-design': return <GearboxDesignModule />;
@@ -195,7 +227,19 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'physics-solver': return <PhysicsSolver />;
         case 'concrete-reinforcement': return <ConcreteReinforcementModule />;
         case 'material-selector-ai': return <MaterialAIModule />;
+        case 'planetary-gearbox': return <PlanetaryCalculator />;
         case 'settings': return <SettingsModule />;
+        case 'engineering-notes': return <EngineeringNotesModule />;
+        case 'file-explorer': return <FileExplorerModule />;
+        case 'project-manager': return <ProjectManagerModule />;
+        case 'project-vault': return <ProjectVault />;
+        case 'browser': return <BrowserModule />;
+        case 'terminal': return <TerminalModule />;
+        case 'cost-estimator': return <RealTimeCostModule />;
+        case 'ai-copilot': return <AiCoPilotModule />;
+        case 'holographic-viewer': return <HolographicViewer />;
+        case 'matrix-screensaver': return <MatrixScreensaverModule />;
+        case 'parametric-cad': return <ParametricCadModule />;
         default:
             const isHeadless = (calculatorsDB as any[]).find(c => c.slug === type);
             if (isHeadless) {

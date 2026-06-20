@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://cvh2y4b6d7x8f"]
+
+[ext_resource type="Script" path="res://scripts/entities/worker.gd" id="1_wkr2b"]
+[ext_resource type="Texture2D" uid="uid://dkcq6rfs6l20v" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Script" path="res://scripts/entities/worker_visual.gd" id="3_wkr_vis"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wkr"]
+radius = 28.0
+
+[node name="Worker" type="CharacterBody2D"]
+input_pickable = true
+script = ExtResource("1_wkr2b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_wkr")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visual"]
+visible = false
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_icon")
+
+[node name="WorkerVisual" type="Node2D" parent="Visual"]
+script = ExtResource("3_wkr_vis")
+
+[node name="NameLabel" type="Label" parent="Visual"]
+offset_left = -60.0
+offset_top = -45.0
+offset_right = 60.0
+offset_bottom = -25.0
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 11
+text = "Usta İsmi"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Visual"]
+offset_left = -15.0
+offset_top = 22.0
+offset_right = 15.0
+offset_bottom = 47.0
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+text = "⏳"
+horizontal_alignment = 1
+vertical_alignment = 1
+

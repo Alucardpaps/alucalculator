@@ -20,6 +20,9 @@ const TYPE_CONFIG: Record<ComponentType, { label: string; icon: string; color: s
   profile: { label: 'Profiles', icon: '▬', color: '#60a5fa' },
   bracket: { label: 'Brackets', icon: '⌐', color: '#a78bfa' },
   bolt: { label: 'Bolts', icon: '⏣', color: '#f472b6' },
+  gear: { label: 'Gears', icon: '⚙', color: '#fbbf24' },
+  bearing: { label: 'Bearings', icon: '◎', color: '#34d399' },
+  key: { label: 'Keys', icon: '▱', color: '#fb923c' },
 };
 
 // ════════════════════════════════════════════
@@ -31,42 +34,59 @@ const BOMRow = ({
   count,
   weight,
   cost,
+  componentsOfType,
 }: {
   type: ComponentType;
   count: number;
   weight: number;
   cost: number;
+  componentsOfType: WorkspaceComponent[];
 }) => {
   const config = TYPE_CONFIG[type];
+  const verifiedSpecs = componentsOfType.filter(c => (c.metadata as any).calculationResult);
 
   return (
-    <div
-      className="flex items-center gap-3 p-2.5 rounded-lg"
-      style={{ background: `${config.color}08`, border: `1px solid ${config.color}15` }}
-    >
-      {/* Icon */}
+    <div className="space-y-1">
       <div
-        className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
-        style={{ color: config.color, background: `${config.color}15` }}
+        className="flex items-center gap-3 p-2.5 rounded-lg"
+        style={{ background: `${config.color}08`, border: `1px solid ${config.color}15` }}
       >
-        {config.icon}
-      </div>
+        {/* Icon */}
+        <div
+          className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
+          style={{ color: config.color, background: `${config.color}15` }}
+        >
+          {config.icon}
+        </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="text-xs font-bold text-white/80">{config.label}</div>
-        <div className="text-[10px] text-white/35 font-mono mt-0.5">
-          {weight.toFixed(2)} kg • ${cost.toFixed(2)}
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="text-xs font-bold text-white/80">{config.label}</div>
+          <div className="text-[10px] text-white/35 font-mono mt-0.5">
+            {weight.toFixed(2)} kg • ${cost.toFixed(2)}
+          </div>
+        </div>
+
+        {/* Count badge */}
+        <div
+          className="text-sm font-black tabular-nums min-w-[28px] text-center"
+          style={{ color: config.color }}
+        >
+          {count}
         </div>
       </div>
 
-      {/* Count badge */}
-      <div
-        className="text-sm font-black tabular-nums min-w-[28px] text-center"
-        style={{ color: config.color }}
-      >
-        {count}
-      </div>
+      {/* Sub-components list for individual spec details */}
+      {verifiedSpecs.length > 0 && (
+        <div className="pl-6 pr-2 py-1.5 space-y-1 text-[9px] font-mono bg-white/[0.01] border-l border-[#00e5ff]/20 rounded-b-lg ml-3">
+          {verifiedSpecs.map(c => (
+            <div key={c.id} className="flex justify-between items-center py-0.5">
+              <span className="text-white/30 truncate max-w-[120px]">{c.id.split('-')[0].toUpperCase()} Spec:</span>
+              <span className="text-[#00e5ff] font-bold">{(c.metadata as any).calculationResult}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -214,6 +234,7 @@ export const BOMPanel = () => {
               count={entry.count}
               weight={entry.totalWeight}
               cost={entry.totalCost}
+              componentsOfType={Object.values(components).filter(c => c.type === entry.type)}
             />
           ))
         )}
@@ -256,7 +277,7 @@ export const BOMPanel = () => {
           {/* Production QR Button */}
           <button
             onClick={() => setIsQRModalOpen(true)}
-            className="w-full mt-4 py-3 px-4 rounded-xl border border-[#66FCF1]/20 bg-[#66FCF1]/5 text-[#66FCF1] text-[9px] font-bold uppercase tracking-[0.2em] font-mono hover:bg-[#66FCF1]/10 hover:border-[#66FCF1]/40 transition-all group flex items-center justify-center gap-2"
+            className="w-full mt-4 py-3 px-4 rounded-xl border border-[#00e5ff]/20 bg-[#00e5ff]/5 text-[#00e5ff] text-[9px] font-bold uppercase tracking-[0.2em] font-mono hover:bg-[#00e5ff]/10 hover:border-[#00e5ff]/40 transition-all group flex items-center justify-center gap-2"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />

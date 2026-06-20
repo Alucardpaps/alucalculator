@@ -1,67 +1,93 @@
 {
     "slug": "motor-power-calculation",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Intermediate",
+    "readingTime": 8,
+    "prerequisites": [],
     "meta": {
-        "title": "Motor Power Calculation (Torque, Speed, Efficiency Explained)",
-        "description": "Learn how to calculate required motor power using torque, rotational speed, and efficiency. Step-by-step sizing guide for mechanical systems."
+        "title": "Motor Power Calculation (Torque and Speed Relationship)",
+        "description": "Learn how to calculate the power required for an electric motor based on torque and angular velocity. Includes efficiency and unit conversion guide."
     },
     "hero": {
-        "h1": "Motor Power Calculation (Torque, Speed, Efficiency Explained)",
-        "intro": "Motor power calculation is essential in mechanical and electrical systems. It determines the required energy to drive loads like conveyors, pumps, and fans. Proper calculation ensures you don't oversize (wasting money) or undersize (causing motor failure)."
+        "h1": "Motor Power Calculation (Torque and Speed Relationship)",
+        "intro": "Sizing an electric motor requires understanding the dynamic relationship between rotational speed and the torque required to overcome load resistance and friction.\n\nElectric motors are sized on power, but loads present as torque at a speed. The bridge equation P = T·n/9550 (kW) appears in every drive catalog. Gearboxes, belts, and couplings add efficiency losses that must be added back to the motor nameplate.\n\nThis lesson prepares you for belt-drive and motor sizing tools in AluCalc where the same torque–speed–power triangle applies."
     },
     "formula": {
-        "equation": "P = (T × ω) / η",
+        "equation": "P = (T × n) / 9550",
         "variables": {
-            "P": "Required Motor Power (W)",
-            "T": "Torque required by the load (Nm)",
-            "ω": "Rotational speed in radians per second (rad/s)",
-            "η": "System efficiency (decimal, 0 to 1)"
+            "9550": "Conversion constant",
+            "P": "Power (kW)",
+            "T": "Torque (Nm)",
+            "n": "Rotational speed (RPM)"
         }
     },
     "stepByStep": [
-        "Measure or calculate the required load torque (T).",
-        "Determine the required rotational speed in RPM.",
-        "Convert RPM to rad/s (ω = RPM × 2π / 60).",
-        "Determine the mechanical efficiency factor of the transmission (η).",
-        "Apply the formula to calculate power in Watts."
+        "Determine the required output torque (T).",
+        "Determine the operational speed (n) in RPM.",
+        "Apply the formula to find the power in kW.",
+        "Account for transmission efficiency if necessary.",
+        "Select a motor with a power rating higher than the calculated requirement.",
+        "Identify peak vs continuous torque for duty classification.",
+        "Convert between kW and HP using 1 HP ≈ 0.746 kW when reading US catalogs."
     ],
     "example": {
         "inputs": [
             "T = 50 Nm",
-            "ω = 100 rad/s (approx 955 RPM)",
-            "η = 0.9 (90% efficiency)"
+            "n = 1450 RPM"
         ],
-        "calculation": "P = (50 × 100) / 0.9 = 5555 W (or 5.55 kW)"
+        "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
     },
     "whyThisMatters": [
-        "Crucial for proper motor sizing to prevent stalling under heavy loads.",
-        "Ensures energy savings by operating the motor close to its peak efficiency curve.",
-        "Prevents thermal overload and catastrophic motor failure."
+        "Prevents motor burnout due to undersizing.",
+        "Avoids excessive energy costs and initial investment due to oversizing."
     ],
     "commonMistakes": [
-        "Ignoring transmission efficiency (gearboxes and belts consume power).",
-        "Wrong unit conversion, particularly confusing RPM with rad/s.",
-        "Underestimating startup load or peak dynamic forces."
+        "Forgetting to include the efficiency of the gearbox or transmission.",
+        "Using HP units directly in a kW formula without conversion.",
+        "Failing to account for peak starting torque."
     ],
-    "engineeringTip": "Always apply a safety factor (usually 1.15 to 1.25) to your calculated power to account for unexpected overloads and voltage fluctuations.",
+    "engineeringTip": "Always select a motor with a 15-20% safety margin over the calculated power.",
     "calculatorCta": {
         "targetSlug": "motor-power-calc",
-        "label": "Use the Motor Power Calculator to size your system correctly"
+        "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
     },
     "faq": [
         {
-            "question": "What is the relationship between torque and power?",
-            "answer": "Power is the rate at which work is done. Torque is the rotational force. Power equals torque multiplied by the rotational speed."
+            "question": "How do I convert HP to kW?",
+            "answer": "1 HP is approximately 0.746 kW."
         },
         {
-            "question": "How do I convert kW to Horsepower (HP)?",
-            "answer": "1 kW is approximately equal to 1.34 HP. Conversely, 1 HP equals 0.746 kW."
+            "question": "What is service factor?",
+            "answer": "A multiplier accounting for shock, reversing, and daily duty — applied to calculated power before motor selection."
         },
         {
-            "question": "What causes motor efficiency to drop?",
-            "answer": "Running a motor at less than 50% of its rated load significantly reduces its efficiency. Heat, voltage imbalance, and worn bearings also degrade efficiency."
+            "question": "Why add 15–20% margin?",
+            "answer": "Covers voltage variation, bearing drag increase over life, and production tolerances."
+        },
+        {
+            "question": "How does gearbox ratio affect motor torque?",
+            "answer": "Motor torque = load torque / (ratio × efficiency) — higher ratio reduces motor torque demand."
         }
     ],
     "relatedArticles": [
-        "pressure-drop-calculation-guide"
+        "pressure-drop-calculation-guide",
+        "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Mechanical Engineering Handbook - Drives Section",
+            "filename": "Mechanical Engineering Handbook.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Convert torque and speed to shaft power using P = T·n/9550 (kW)",
+        "Account for transmission efficiency when sizing the motor nameplate",
+        "Distinguish continuous duty from peak starting torque requirements"
+    ],
+    "keyTakeaways": [
+        "Undersized motors overheat; oversized motors waste capital and efficiency",
+        "Always include gearbox losses in the motor power calculation",
+        "Add 15–20% margin for production variability and aging"
     ]
 }

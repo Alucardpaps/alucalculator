@@ -175,7 +175,9 @@ interface CadStore {
     // ─────────────────────────────────────────────────────────────
     addModifier: (entityId: string, modifier: MachiningModifier) => void;
     removeModifier: (entityId: string, modifierIndex: number) => void;
+    updateModifier: (entityId: string, index: number, updates: Partial<MachiningModifier>) => void;
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // STORE IMPLEMENTATION
@@ -410,9 +412,12 @@ export const useCadStore = create<CadStore>((set, get) => ({
                 if (geom.start && geom.end) {
                     isSelected = isLineInRect(geom.start, geom.end, p1, p2, fullyContained);
                 }
-            } else if (geom.type === 'RECTANGLE' || geom.type === 'HEXAGON') {
+            } else if (geom.type === 'RECTANGLE' || geom.type === 'HEXAGON' || geom.type === 'GEAR') {
                 isSelected = isPointInRect((geom as any).center, p1, p2);
+            } else if (geom.type === 'FASTENER') {
+                isSelected = isPointInRect((geom as any).origin, p1, p2);
             }
+
 
             if (isSelected) {
                 selected.push(entity.id);
@@ -618,6 +623,21 @@ export const useCadStore = create<CadStore>((set, get) => ({
             })
         }));
     },
+
+    updateModifier: (entityId, index, updates) => {
+        set(state => ({
+            entities: state.entities.map(e => {
+                if (e.id === entityId && e.modifiers) {
+                    const modifiers = e.modifiers.map((m, i) =>
+                        i === index ? { ...m, ...updates } : m
+                    );
+                    return { ...e, modifiers };
+                }
+                return e;
+            })
+        }));
+    },
+
 }));
 
 // ═══════════════════════════════════════════════════════════════

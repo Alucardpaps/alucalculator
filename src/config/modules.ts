@@ -63,12 +63,25 @@ export type ModuleType =
     | 'digital-logic'
     | 'filter-design'
     | 'machining-details'
+    | 'chain-drive'
+    | 'belt-drive'
     | 'ai-copilot'
     | 'holographic-viewer'
     | 'matrix-screensaver'
     | 'parametric-cad'
     | 'cost-estimator'
-    | 'settings';
+    | 'settings'
+    | 'project-manager'
+    | 'file-explorer'
+    | 'project-vault'
+    | 'browser'
+    | 'paint'
+    | 'terminal'
+    | 'project-variables'
+    | 'analytics-dashboard'
+    | 'engineering-notes'
+    | 'diagnostics'
+    | 'marine';
 
 export interface WindowSize {
     width: number;
@@ -132,7 +145,7 @@ export const BASE_REGISTRY = {
     },
     'fasteners': {
         type: 'fasteners',
-        title: 'Bölüm J: Fastener Analysis',
+        title: 'Thread Geometry & Clearances',
         category: 'mechanical',
         iconName: 'Wrench',
         defaultSize: { width: 1300, height: 850 }
@@ -321,10 +334,24 @@ export const BASE_REGISTRY = {
     },
     'bolt-torque': {
         type: 'bolt-torque',
-        title: 'Bölüm J: Fastener Suite',
+        title: 'Bolt Torque (VDI 2230)',
         category: 'mechanical',
         iconName: 'Zap',
         defaultSize: { width: 1300, height: 850 }
+    },
+    'chain-drive': {
+        type: 'chain-drive',
+        title: 'Roller Chain Drive',
+        category: 'mechanical',
+        iconName: 'Link',
+        defaultSize: { width: 1200, height: 820 }
+    },
+    'belt-drive': {
+        type: 'belt-drive',
+        title: 'Belt Drive Calculator',
+        category: 'mechanical',
+        iconName: 'Cable',
+        defaultSize: { width: 1200, height: 820 }
     },
     'physics-kinematics': {
         type: 'physics-kinematics',

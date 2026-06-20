@@ -40,7 +40,7 @@ export type CommandState = 'IDLE' | 'AWAITING_POINT' | 'AWAITING_VALUE' | 'PROCE
 // ENTITIES
 // --------------------------------------------------------
 
-export type EntityType = 'point' | 'line' | 'circle' | 'arc' | 'dimension';
+export type EntityType = 'point' | 'line' | 'circle' | 'arc' | 'dimension' | 'text' | 'gear' | 'fastener';
 
 export interface BaseEntity {
     id: EntityId;
@@ -119,6 +119,22 @@ export interface DimensionGeometry {
     value: number;
     text?: string;
     offset?: number;
+    /** Upper tolerance deviation (e.g. +0.05) */
+    tolUpper?: number;
+    /** Lower tolerance deviation (e.g. -0.01) */
+    tolLower?: number;
+}
+
+export interface TextGeometry {
+    type: 'TEXT';
+    position: Point;
+    content: string;
+    fontSize: number;
+    fontFamily: string;
+    rotation: number;
+    justification: 'left' | 'center' | 'right';
+    bold: boolean;
+    italic: boolean;
 }
 
 export interface PolylineGeometry {
@@ -148,9 +164,71 @@ export interface HexagonGeometry {
     rotation?: number;
 }
 
-export type GeometryType = LineGeometry | CircleGeometry | PolylineGeometry | ArcGeometry | DimensionGeometry | PointGeometry | RectangleGeometry | HexagonGeometry;
+export interface GearGeometry {
+    type: 'GEAR';
+    center: Point;
+    module: number;
+    teeth: number;
+    pressureAngle: number;
+    rotation?: number;
+    width?: number; // Face width
+    material?: string;
+    analyticalData?: {
+        torque?: number;
+        power?: number;
+        safetyFactor?: number;
+        bendingStress?: number;
+    };
+}
+
+export interface BeltPulleyGeometry {
+    type: 'BELT_PULLEY';
+    center1: Point;
+    radius1: number;
+    center2: Point;
+    radius2: number;
+    beltType: 'OPEN' | 'CROSSED';
+}
+
+export interface PlanetaryGearGeometry {
+    type: 'PLANETARY_GEAR';
+    center: Point;
+    module: number;
+    sunTeeth: number;
+    planetTeeth: number;
+    planetCount: number;
+    rotationSun?: number;
+    rotationCarrier?: number;
+}
+
+export interface FastenerGeometry {
+    type: 'FASTENER';
+    origin: Point;
+    fastenerType: 'BOLT' | 'NUT';
+    diameter: number;
+    length: number;
+    pitch: number;
+    rotation?: number;
+}
+
+
+export type GeometryType = 
+    | LineGeometry 
+    | CircleGeometry 
+    | PolylineGeometry 
+    | ArcGeometry 
+    | DimensionGeometry 
+    | PointGeometry 
+    | RectangleGeometry 
+    | HexagonGeometry 
+    | TextGeometry
+    | GearGeometry
+    | FastenerGeometry
+    | BeltPulleyGeometry
+    | PlanetaryGearGeometry;
 
 export interface MachiningModifier {
+    id: string; // Added ID for easier editing
     type: 'HOLE' | 'SURFACE_MILLED' | 'THREADED' | 'WELDED';
     x?: number;
     y?: number;
@@ -239,6 +317,60 @@ export function createHexagonEntity(center: Point, radius: number, layerId: stri
         modifiers: []
     };
 }
+
+export function createGearEntity(center: Point, module: number, teeth: number, layerId: string, color: string): CadEntity {
+    return {
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { type: 'GEAR', center, module, teeth, pressureAngle: 20, rotation: 0 }
+    };
+}
+
+export function createFastenerEntity(origin: Point, type: 'BOLT' | 'NUT', diameter: number, length: number, pitch: number, layerId: string, color: string): CadEntity {
+    return {
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { type: 'FASTENER', origin, fastenerType: type, diameter, length, pitch, rotation: 0 }
+    };
+}
+
+export function createBeltPulleyEntity(c1: Point, r1: number, c2: Point, r2: number, layerId: string, color: string): CadEntity {
+    return {
+        id: crypto.randomUUID(),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { type: 'BELT_PULLEY', center1: c1, radius1: r1, center2: c2, radius2: r2, beltType: 'OPEN' }
+    };
+}
+
+export function createPlanetaryGearEntity(center: Point, m: number, sunZ: number, planetZ: number, layerId: string, color: string): CadEntity {
+    return {
+        id: crypto.randomUUID(),
+        layerId,
+        color,
+        isVisible: true,
+        isSelected: false,
+        geometry: { 
+            type: 'PLANETARY_GEAR', 
+            center, 
+            module: m, 
+            sunTeeth: sunZ, 
+            planetTeeth: planetZ, 
+            planetCount: 3,
+            rotationSun: 0,
+            rotationCarrier: 0
+        }
+    };
+}
+
 
 // --------------------------------------------------------
 // SNAPPING

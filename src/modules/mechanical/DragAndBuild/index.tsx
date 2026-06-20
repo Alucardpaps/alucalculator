@@ -174,12 +174,13 @@ function RenderComponent({ comp, isTarget, onStartDrag, onRotate, onDelete }: an
         <motion.div
             layoutId={comp.id}
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1, x: comp.position.x, y: comp.position.y, rotate: comp.rotation || 0 }}
+            animate={{ scale: 1, opacity: 1, rotate: comp.rotation || 0 }}
+            transition={{ rotate: { type: 'spring', stiffness: 200, damping: 15 } }}
             className={`absolute cursor-grab active:cursor-grabbing group p-1`}
             onMouseDown={() => onStartDrag(comp.id)}
             onContextMenu={(e) => { e.preventDefault(); onRotate(comp.id, 90); }}
             onDoubleClick={(e) => { e.stopPropagation(); onDelete(comp.id); }}
-            style={{ x: comp.position.x, y: comp.position.y }}
+            style={{ left: comp.position.x, top: comp.position.y, transform: 'translate(-50%, -50%)' }}
         >
             <div className={`relative transition-all duration-300 ${isTarget ? 'ring-2 ring-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.3)]' : 'shadow-2xl'}`}>
                 {isMotor && (

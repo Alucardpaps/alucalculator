@@ -1,22 +1,288 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { 
-    Wrench, Download, RotateCcw, Box, FileImage, 
-    ShieldAlert, AlertCircle, FileText
+    Wrench, Download, RotateCcw, Box, 
+    ArrowRight, Ruler, Cpu, ShieldAlert, CheckCircle, Info, Activity, AlertTriangle, FileText
 } from 'lucide-react';
-import { EngineeringVisualization } from "@/components/ui/EngineeringVisualization";
-import { CalculatorInput } from "@/components/CalculatorInput";
 import { SaveButton } from "@/components/calculation/SaveButton";
-import { FastenerVisualizer3D } from './FastenerVisualizer3D';
-import { getFastenerGeometry, NUT_DIMENSIONS, BOLT_HEAD_DIMENSIONS, THREAD_STANDARDS } from '@/data/boltNutStandards';
+import { THREAD_STANDARDS } from '@/data/boltNutStandards';
+import {
+    computeBoltAssembly,
+    parseFastenerSearchParams,
+    buildGeometryLinkParams,
+    type TorquePageStandard,
+} from '@/lib/fastener/sharedEngine';
+import { FastenerAssemblyBlueprint } from './FastenerAssemblyBlueprint';
+import { FastenerInteractiveSchematic } from './FastenerInteractiveSchematic';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
+import { useI18nStore } from "@/store/i18nStore";
+import { 
+    ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+    PieChart, Pie, Cell
+} from 'recharts';
+
+const LOCAL_DICTS: Record<string, any> = {
+    en: {
+        title: "Fastener Node",
+        subtitle: "Multi-Standard Solver • AluCalcOS 2.0",
+        exportPdf: "Export PDF",
+        generating: "Generating...",
+        preloadForce: "Preload Force",
+        tighteningTorque: "Tightening Torque",
+        stdSize: "Standard Size",
+        length: "Length (L)",
+        yieldUtil: "Yield Utilization",
+        threadFriction: "Thread Friction μG",
+        headFriction: "Head Friction μK",
+        mfgDimensions: "Manufacturing Dimensions",
+        nomDia: "Nominal Dia (d)",
+        pitchDia: "Pitch Dia (d2)",
+        minorDia: "Minor Dia (d3)",
+        pitchLead: "Pitch / Lead",
+        stressArea: "Stress Area (As)",
+        bearingDia: "Bearing Face Dia (dw)",
+        clearanceHole: "Clearance Hole (dh)",
+        frictionRad: "Friction Radius (rb)",
+        torqueFrictionAnalysis: "Torque & Friction Analysis (VDI 2230)",
+        pitchTerm: "Pitch Term (K1)",
+        threadFrictionTerm: "Thread Friction (K2)",
+        underheadFrictionTerm: "Underhead Friction (K3)",
+        nutFactor: "Nut Factor (K)",
+        systemValidation: "System Validation",
+        nomYield: "Nominal Yield (ReL)",
+        utilizationRatio: "Utilization Ratio",
+        structuralIntegrity: "Structural Integrity",
+        passed: "Passed",
+        integrityPassDesc: "Assembly preload of {preload} kN ensures joint stability without exceeding {utilization}% of the fastener's yield capacity.",
+        tighten: "TIGHTEN",
+        threadStandard: "Thread Standard",
+        torquePreloadCurve: "Torque vs Preload Curve",
+        torqueDistribution: "Torque Distribution",
+        usefulWork: "Tensioning Work (Useful)",
+        threadLoss: "Thread Friction Loss",
+        underheadLoss: "Underhead Friction Loss",
+        grade: "Property Class (Grade)",
+        linkedGeometry: "Production dimensions shared with Thread Geometry module (ISO 965 / ISO 273)",
+        openGeometry: "Open thread geometry & drill sizes",
+        blueprintTitle: "BOLT ASSEMBLY — SECTION A-A",
+        blueprintSubtitle: "ISO 965 geometry · VDI 2230 preload model",
+        partHead: "HEAD",
+        partShank: "SHANK",
+        partThread: "THREAD",
+        partNut: "NUT",
+        partWasher: "WASHER",
+        plateA: "PLATE A",
+        plateB: "PLATE B",
+        gripZone: "GRIP",
+        preload: "Fm",
+        torque: "MA",
+        legend: "DIMENSIONS",
+        tension: "Tension zone (utilization)",
+        clearance: "ISO 273 clearance hole",
+        tabDashboard: "Dashboard",
+        tabBlueprint: "Blueprint CAD",
+        tabDimensions: "Dimensions",
+        tabVerification: "VDI 2230 Verification",
+    },
+    tr: {
+        title: "Cıvata Çözücü",
+        subtitle: "Çoklu Standart Hesaplayıcı • AluCalcOS 2.0",
+        exportPdf: "PDF Raporu",
+        generating: "Oluşturuluyor...",
+        preloadForce: "Ön Sıkma Kuvveti",
+        tighteningTorque: "Sıkma Torku",
+        stdSize: "Standart Çap",
+        length: "Boy (L)",
+        yieldUtil: "Akma Sınırı Kullanımı",
+        threadFriction: "Diş Sürtünmesi μG",
+        headFriction: "Kafa Sürtünmesi μK",
+        mfgDimensions: "İmalat Ölçüleri",
+        nomDia: "Nominal Çap (d)",
+        pitchDia: "Bölüm Çapı (d2)",
+        minorDia: "Diş Dibi Çapı (d3)",
+        pitchLead: "Diş Adımı / Hatve",
+        stressArea: "Gerilme Alanı (As)",
+        bearingDia: "Kafa Faturalı Çapı (dw)",
+        clearanceHole: "Geçiş Deliği Çapı (dh)",
+        frictionRad: "Sürtünme Yarıçapı (rb)",
+        torqueFrictionAnalysis: "Tork ve Sürtünme Analizi (VDI 2230)",
+        pitchTerm: "Diş Eğimi Terimi (K1)",
+        threadFrictionTerm: "Diş Sürtünme Terimi (K2)",
+        underheadFrictionTerm: "Kafa Altı Sürtünme Terimi (K3)",
+        nutFactor: "Tork Katsayısı (K)",
+        systemValidation: "Sistem Doğrulaması",
+        nomYield: "Nominal Akma Sınırı (ReL)",
+        utilizationRatio: "Kullanım Oranı",
+        structuralIntegrity: "Yapısal Bütünlük",
+        passed: "Uygun",
+        integrityPassDesc: "Oluşturulan {preload} kN ön sıkma kuvveti, cıvata akma mukavemetinin %{utilization}'ini aşmadan bağlantı kararlılığını sağlar.",
+        tighten: "SIKMA YÖNÜ",
+        threadStandard: "Diş Standardı",
+        torquePreloadCurve: "Tork - Ön Yük Eğrisi",
+        torqueDistribution: "Tork Kayıp Dağılımı",
+        usefulWork: "Esneme Sıkıştırma İşi (Faydalı)",
+        threadLoss: "Diş Sürtünme Kaybı",
+        underheadLoss: "Kafa Altı Sürtünme Kaybı",
+        grade: "Dayanım Sınıfı",
+        linkedGeometry: "Imalat olculeri Thread Geometry modulu ile paylasilir (ISO 965 / ISO 273)",
+        openGeometry: "Dis geometrisi ve matkap olculeri",
+        blueprintTitle: "CIVATA BAGLANTISI — KESIT A-A",
+        blueprintSubtitle: "ISO 965 geometri · VDI 2230 on yuk modeli",
+        partHead: "KAFA",
+        partShank: "GÖVDE",
+        partThread: "DIS",
+        partNut: "SOMUN",
+        partWasher: "RONDELA",
+        plateA: "PLAKA A",
+        plateB: "PLAKA B",
+        gripZone: "SIKMA",
+        preload: "Fm",
+        torque: "MA",
+        legend: "OLCULER",
+        tension: "Gerilme bolgesi (kullanim)",
+        clearance: "ISO 273 gecis deligi",
+        tabDashboard: "Kontrol Paneli",
+        tabBlueprint: "CAD Teknik Resim",
+        tabDimensions: "Boyutlar",
+        tabVerification: "VDI 2230 Doğrulama",
+    },
+    de: {
+        title: "Schraubenverbindung",
+        subtitle: "Multi-Standard Solver • AluCalcOS 2.0",
+        exportPdf: "PDF Exportieren",
+        generating: "Wird generiert...",
+        preloadForce: "Vorspannkraft",
+        tighteningTorque: "Anziehdrehmoment",
+        stdSize: "Standardgröße",
+        length: "Länge (L)",
+        yieldUtil: "Streckgrenzenausnutzung",
+        threadFriction: "Gewindereibung μG",
+        headFriction: "Kopfreibung μK",
+        mfgDimensions: "Herstellungsabmessungen",
+        nomDia: "Nenndurchmesser (d)",
+        pitchDia: "Flankendurchmesser (d2)",
+        minorDia: "Kerndurchmesser (d3)",
+        pitchLead: "Steigung",
+        stressArea: "Spannungsquerschnitt (As)",
+        bearingDia: "Auflage-Durchmesser (dw)",
+        clearanceHole: "Durchgangsloch (dh)",
+        frictionRad: "Reibradius (rb)",
+        torqueFrictionAnalysis: "Drehmoment- & Reibungsanalyse (VDI 2230)",
+        pitchTerm: "Steigungsterm (K1)",
+        threadFrictionTerm: "Gewindereibungsterm (K2)",
+        underheadFrictionTerm: "Kopfreibungsterm (K3)",
+        nutFactor: "Anziehfaktor (K)",
+        systemValidation: "Systemvalidierung",
+        nomYield: "Streckgrenze (ReL)",
+        utilizationRatio: "Auslastungsgrad",
+        structuralIntegrity: "Strukturelle Integrität",
+        passed: "Bestanden",
+        integrityPassDesc: "Die Vorspannkraft von {preload} kN sichert die Verbindung, ohne mehr als {utilization}% der Streckgrenze zu beanspruchen.",
+        tighten: "ANZIEHEN",
+        threadStandard: "Gewindestandard",
+        torquePreloadCurve: "Anzugsmoment-Vorspannkraft-Kurve",
+        torqueDistribution: "Reibungsverteilung",
+        usefulWork: "Nutzbares Anzugsmoment",
+        threadLoss: "Gewindereibungsverlust",
+        underheadLoss: "Kopfreibungsverlust",
+        grade: "Festigkeitsklasse",
+        linkedGeometry: "Fertigungsmasse werden mit Thread Geometry geteilt (ISO 965 / ISO 273)",
+        openGeometry: "Gewindegeometrie & Bohrer offnen",
+        blueprintTitle: "SCHRAUBENVERBINDUNG — SCHNITT A-A",
+        blueprintSubtitle: "ISO 965 · VDI 2230 Vorspannmodell",
+        partHead: "KOPF",
+        partShank: "Schaft",
+        partThread: "GEWINDE",
+        partNut: "MUTTER",
+        partWasher: "SCHEIBE",
+        plateA: "PLATTE A",
+        plateB: "PLATTE B",
+        gripZone: "KLEMMLÄNGE",
+        preload: "Fm",
+        torque: "MA",
+        legend: "MASSE",
+        tension: "Zugzone (Auslastung)",
+        clearance: "ISO 273 Durchgangsloch",
+        tabDashboard: "Dashboard",
+        tabBlueprint: "CAD-Zeichnung",
+        tabDimensions: "Abmessungen",
+        tabVerification: "VDI 2230 Nachweis",
+    },
+    ja: {
+        title: "ボルト締結力・締付トルク分析",
+        subtitle: "マルチ規格対応ソルバー • AluCalcOS 2.0",
+        exportPdf: "PDF出力",
+        generating: "生成中...",
+        preloadForce: "初期軸力",
+        tighteningTorque: "締付トルク",
+        stdSize: "ねじ呼び径",
+        length: "首下長さ (L)",
+        yieldUtil: "降伏強さ利用率",
+        threadFriction: "ねじ面摩擦係数 μG",
+        headFriction: "座面摩擦係数 μK",
+        mfgDimensions: "基準幾何寸法",
+        nomDia: "ねじの外径 (d)",
+        pitchDia: "ピッチ径 (d2)",
+        minorDia: "谷の径 (d3)",
+        pitchLead: "ピッチ/リード",
+        stressArea: "有効断面積 (As)",
+        bearingDia: "座面外径 (dw)",
+        clearanceHole: "ボルト通し穴径 (dh)",
+        frictionRad: "摩擦等価半径 (rb)",
+        torqueFrictionAnalysis: "トルク・摩擦分析 (VDI 2230)",
+        pitchTerm: "リード角影響項 (K1)",
+        threadFrictionTerm: "ねじ面摩擦項 (K2)",
+        underheadFrictionTerm: "座面摩擦項 (K3)",
+        nutFactor: "トルク係数 (K)",
+        systemValidation: "強度チェック",
+        nomYield: "基準降伏点 (ReL)",
+        utilizationRatio: "耐力利用率",
+        structuralIntegrity: "構造健全性検証",
+        passed: "適合",
+        integrityPassDesc: "締結軸力 {preload} kN は、ボルトの降伏点の {utilization}% を超えることなく接合部の締結信頼性を確保します。",
+        tighten: "締付方向",
+        threadStandard: "ねじ規格の種類",
+        torquePreloadCurve: "トルク・軸力関係曲線",
+        torqueDistribution: "トルク伝達摩擦損失",
+        usefulWork: "軸力変換有効仕事",
+        threadLoss: "ねじ面摩擦損失",
+        underheadLoss: "座面摩擦損失",
+        grade: "強度区分",
+        linkedGeometry: "製造寸法は Thread Geometry と共通 (ISO 965 / ISO 273)",
+        openGeometry: "ねじ幾何・下穴径を開く",
+        blueprintTitle: "ボルト締結 — 断面 A-A",
+        blueprintSubtitle: "ISO 965 · VDI 2230 軸力モデル",
+        partHead: "頭部",
+        partShank: "シャンク",
+        partThread: "ねじ部",
+        partNut: "ナット",
+        partWasher: "ワッシャ",
+        plateA: "板 A",
+        plateB: "板 B",
+        gripZone: "クランプ",
+        preload: "Fm",
+        torque: "MA",
+        legend: "寸法",
+        tension: "引張域（利用率）",
+        clearance: "ISO 273 通し穴",
+        tabDashboard: "ダッシュボード",
+        tabBlueprint: "CAD図面",
+        tabDimensions: "寸法",
+        tabVerification: "VDI 2230 検証",
+    }
+};
 
 export default function FastenerAssemblyModule() {
+    const { language } = useI18nStore();
+    const t = LOCAL_DICTS[language] || LOCAL_DICTS.en;
+    const searchParams = useSearchParams();
+
     // Technical State
-    const [threadStandard, setThreadStandard] = useState('Metric Coarse');
+    const [threadStandard, setThreadStandard] = useState<TorquePageStandard>('Metric Coarse');
     const [size, setSize] = useState('M12');
     
     // Custom properties
@@ -29,74 +295,78 @@ export default function FastenerAssemblyModule() {
     const [muHead, setMuHead] = useState(0.15);
     const [yieldUtilization, setYieldUtilization] = useState(90);
     
-    // UI State
-    const [viewMode, setViewMode] = useState<'3D' | '2D'>('3D');
+    // UI Tab State
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'blueprint' | 'dimensions' | 'verification'>('dashboard');
     const [isExporting, setIsExporting] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+    
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    useEffect(() => {
+        const { standard: qsStd, size: qsSize, grade: qsGrade } = parseFastenerSearchParams(searchParams.toString());
+        if (qsStd) setThreadStandard(qsStd as TorquePageStandard);
+        if (qsSize) setSize(qsSize);
+        if (qsGrade) setGrade(qsGrade);
+    }, [searchParams]);
     
     const printRef = useRef<HTMLDivElement>(null);
 
-    // When standard changes, update size to the first available in that standard
+    // When standard changes, keep size if still valid
     useEffect(() => {
-        if (threadStandard !== 'Custom') {
-            const first = THREAD_STANDARDS.find(t => t.type === threadStandard || (threadStandard === 'Inch' && (t.type === 'UNC' || t.type === 'UNF')));
-            if (first) {
-                setSize(first.size);
-            }
+        if (threadStandard === 'Custom') return;
+        const available = THREAD_STANDARDS.filter(t => t.type === threadStandard).map(t => t.size);
+        if (available.includes(size)) return;
+        setSize(available[0] || size);
+    }, [threadStandard, size]);
+
+    const results = useMemo(() => computeBoltAssembly({
+        threadStandard,
+        size,
+        customDia,
+        pitch,
+        grade,
+        muThread,
+        muHead,
+        yieldUtilization,
+        clearanceSeries: 'normal',
+    }), [threadStandard, size, customDia, pitch, grade, muThread, muHead, yieldUtilization]);
+
+    // Chart data for Torque vs Preload Curve
+    const chartData = useMemo(() => {
+        const points = [];
+        const maxTorque = results.MA * 1.3;
+        const step = maxTorque / 10;
+        
+        for (let i = 0; i <= 10; i++) {
+            const currentT = i * step;
+            // Preload (F_m) = T / (K * d_nom) in kN
+            const currentF = currentT > 0 ? (currentT / (results.K * (results.d_nom / 1000))) / 1000 : 0;
+            
+            points.push({
+                torque: Number(currentT.toFixed(0)),
+                preload: Number(currentF.toFixed(1)),
+                limit: Number(results.Fm_max.toFixed(1))
+            });
         }
-    }, [threadStandard]);
+        return points;
+    }, [results]);
 
-    // Calculations based on VDI 2230 and ISO dimensions
-    const results = useMemo(() => {
-        // Properties
-        const grades: any = {
-            '8.8': { yield: 640 },
-            '10.9': { yield: 940 },
-            '12.9': { yield: 1080 }
-        };
-        const Sy = grades[grade]?.yield || 640;
+    // Donut chart data for Torque distribution
+    const distributionData = useMemo(() => {
+        const totalK = results.K1 + results.K2 + results.K3;
+        if (totalK <= 0) return [];
+        const p1 = (results.K1 / totalK) * 100;
+        const p2 = (results.K2 / totalK) * 100;
+        const p3 = (results.K3 / totalK) * 100;
         
-        // Geometry
-        let d_nom = 12;
-        let pitchVal = pitch;
-        let As = 84.3;
-
-        if (threadStandard === 'Custom') {
-            d_nom = customDia;
-            pitchVal = pitch;
-            const d2 = d_nom - 0.6495 * pitchVal;
-            const d3 = d_nom - 1.2267 * pitchVal;
-            As = (Math.PI / 4) * Math.pow((d2 + d3) / 2, 2);
-        } else {
-            const std = THREAD_STANDARDS.find(t => t.size === size);
-            if (std) {
-                d_nom = std.diameter;
-                pitchVal = std.pitch || (25.4 / (std.tpi || 1));
-                As = std.area_tensile;
-            }
-        }
-        
-        const d2 = d_nom - 0.6495 * pitchVal;
-        const d3 = d_nom - 1.2267 * pitchVal;
-
-        // Lookup ISO Dimensions
-        const boltDim = getFastenerGeometry(size, d_nom);
-        const nutDim = NUT_DIMENSIONS.find(n => n.size === size) || { width: boltDim.s, height: boltDim.k * 0.8 };
-        
-        // Torque
-        const Fm_max = (yieldUtilization / 100) * As * Sy / 1000;
-        const dk = d_nom * 1.5;
-        const term1 = 0.159 * pitchVal;
-        const term2 = 0.577 * d2 * muThread;
-        const term3 = (dk / 2) * muHead;
-        const MA = Fm_max * (term1 + term2 + term3);
-        
-        return {
-            d_nom, d2, d3, As, Fm_max, MA, pitchVal,
-            stress: (Fm_max * 1000) / As,
-            safety: Sy / ((Fm_max * 1000) / As),
-            boltDim, nutDim
-        };
-    }, [threadStandard, size, customDia, pitch, grade, length, muThread, muHead, yieldUtilization]);
+        return [
+            { name: t.usefulWork, value: Number(p1.toFixed(1)), color: '#10b981' }, 
+            { name: t.threadLoss, value: Number(p2.toFixed(1)), color: '#f59e0b' }, 
+            { name: t.underheadLoss, value: Number(p3.toFixed(1)), color: '#3b82f6' }
+        ];
+    }, [results, t]);
 
     // PDF Generation
     const exportToPDF = async () => {
@@ -126,190 +396,471 @@ export default function FastenerAssemblyModule() {
         }
     };
 
+    const blueprintLabels = {
+        title: t.blueprintTitle,
+        subtitle: t.blueprintSubtitle,
+        partHead: t.partHead,
+        partShank: t.partShank,
+        partThread: t.partThread,
+        partNut: t.partNut,
+        partWasher: t.partWasher,
+        plateA: t.plateA,
+        plateB: t.plateB,
+        gripZone: t.gripZone,
+        preload: t.preload,
+        torque: t.torque,
+        legend: t.legend,
+        tension: t.tension,
+        clearance: t.clearance,
+        grade: t.grade,
+    };
+
     const standardsList = ['Metric Coarse', 'Metric Fine', 'UNC', 'UNF', 'Pipe', 'Trapezoidal', 'Custom'];
+    const engagementRatio = results.nutDim?.height ? results.nutDim.height / results.d_nom : 0;
+    const clearanceSource = results.geometry.clearanceNormal ? 'ISO 273 table' : 'computed fallback';
+    const productionChecks = [
+        { label: 'Thread geometry source', value: results.geometry.source === 'table' ? 'Catalog/Table' : 'Computed', ok: results.geometry.source === 'table' },
+        { label: 'Clearance hole source', value: clearanceSource, ok: !!results.geometry.clearanceNormal },
+        { label: 'Nut engagement', value: `${engagementRatio.toFixed(2)} x d`, ok: engagementRatio >= 0.75 },
+        { label: 'Yield utilization', value: `${yieldUtilization}%`, ok: yieldUtilization <= 90 },
+        { label: 'VDI torque factor K', value: results.K.toFixed(4), ok: results.K > 0.08 && results.K < 0.35 },
+    ];
+
+    // Yield Utilization color states
+    const utilColor = yieldUtilization > 90 ? '#ef4444' : yieldUtilization > 75 ? '#f97316' : '#10b981';
+    const utilBg = yieldUtilization > 90 ? 'bg-red-500/10 border-red-500/30 text-red-400' : yieldUtilization > 75 ? 'bg-orange-500/10 border-orange-500/30 text-orange-400' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
 
     return (
-        <div className="flex flex-col h-full bg-[#020408] text-slate-200 select-none font-sans overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
-                
-                {/* Header Side */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.3)]">
-                            <Wrench size={24} />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Fastener Node</h1>
-                            <p className="text-[10px] text-orange-500/60 font-mono tracking-widest uppercase mt-1">Multi-Standard Solver</p>
-                        </div>
+        <div className="h-full flex flex-col overflow-hidden relative text-[#c5c6c7]">
+            <div className="absolute inset-0 bg-[#020408]" />
+            
+            {/* TOP BAR / HEADER */}
+            <div className="relative z-10 flex-shrink-0 px-6 py-4 border-b border-white/5 bg-[#020408] flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
+                        <Wrench className="text-orange-400" size={20} />
                     </div>
-                    <div className="flex items-center gap-4">
-                        <SaveButton 
-                            type="bolt-torque"
-                            inputData={{ threadStandard, size, customDia, pitch, grade, length, muThread, muHead, yieldUtilization }}
-                            engineVersion="v2.5"
-                            resultJson={results}
-                        />
-                        <button 
-                            onClick={exportToPDF}
-                            disabled={isExporting}
-                            className={`px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 ${isExporting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}`}
-                        >
-                            {isExporting ? <RotateCcw size={14} className="animate-spin" /> : <Download size={14} />} 
-                            {isExporting ? 'Generating...' : 'Export PDF'}
-                        </button>
+                    <div className="min-w-0">
+                        <h1 className="text-lg sm:text-xl font-black italic tracking-tight text-white uppercase truncate">
+                            Bolt Torque & Preload <span className="text-orange-500">Workbench</span>
+                        </h1>
+                        <p className="text-[9px] font-mono tracking-[0.2em] text-white/30 uppercase truncate">{t.subtitle}</p>
                     </div>
                 </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    <button onClick={exportToPDF} disabled={isExporting}
+                        className={`px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 text-black rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-2 active:scale-95 whitespace-nowrap`}>
+                        {isExporting ? <RotateCcw size={13} className="animate-spin" /> : <Download size={13} />}
+                        {isExporting ? t.generating : t.exportPdf}
+                    </button>
+                </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Visualizer & Configuration */}
-                    <div className="space-y-8">
-                        <EngineeringVisualization status="valid" label="ASSEMBLY CHARACTERISTICS">
-                            <div className="flex flex-col w-full h-full min-h-[450px] relative bg-[#05080f] rounded-[3rem] border border-white/5 overflow-hidden">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.05)_0%,transparent_70%)] pointer-events-none" />
-                                
-                                {/* View Toggle */}
-                                <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
-                                    <button onClick={() => setViewMode('3D')} className={`px-4 py-2 text-[10px] font-black tracking-widest uppercase transition-all rounded-full border backdrop-blur-md flex items-center gap-2 ${viewMode === '3D' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.2)]' : 'bg-black/40 text-gray-500 border-white/10 hover:text-white'}`}>
-                                        <Box size={14} /> 3D Model
-                                    </button>
-                                    <button onClick={() => setViewMode('2D')} className={`px-4 py-2 text-[10px] font-black tracking-widest uppercase transition-all rounded-full border backdrop-blur-md flex items-center gap-2 ${viewMode === '2D' ? 'bg-orange-500/20 text-orange-400 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.2)]' : 'bg-black/40 text-gray-500 border-white/10 hover:text-white'}`}>
-                                        <FileImage size={14} /> 2D Blueprint
-                                    </button>
-                                </div>
+            {/* MAIN CONTAINER */}
+            <div className="relative z-10 flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 p-4 overflow-hidden">
+                
+                {/* LEFT CONTROL PANEL (INPUTS) */}
+                <div className="flex flex-col min-h-0 bg-[#06090e]/60 border border-white/5 rounded-2xl p-4 overflow-y-auto custom-scrollbar gap-5">
+                    
+                    {/* Thread Standard Selector */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block">{t.threadStandard}</label>
+                        <select 
+                            value={threadStandard} 
+                            onChange={(e) => setThreadStandard(e.target.value as TorquePageStandard)}
+                            className="w-full bg-[#0a0f18] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white font-mono font-bold outline-none focus:border-orange-500/50 cursor-pointer"
+                        >
+                            {standardsList.map((std) => (
+                                <option key={std} value={std}>{std}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                                <div className="flex-1 w-full relative z-10">
-                                    <div className="absolute inset-0 p-6 pt-20 pb-24">
-                                        {viewMode === '3D' ? (
-                                            <div className="w-full h-full">
-                                                <FastenerVisualizer3D 
-                                                    d_nom={results.d_nom} 
-                                                    pitch={results.pitchVal} 
-                                                    headWidth={results.boltDim.s} 
-                                                    headHeight={results.boltDim.k} 
-                                                    nutWidth={results.nutDim.width} 
-                                                    nutHeight={results.nutDim.height} 
-                                                    length={length}
-                                                    nutOffset={length * 0.4}
-                                                    isPipe={threadStandard === 'Pipe'}
-                                                    isTapered={size.includes('NPT') || size.includes('R ')}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <FastenerBlueprint2D results={results} length={length} isPipe={threadStandard === 'Pipe'} isTapered={size.includes('NPT') || size.includes('R ')} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                    <hr className="border-white/5" />
 
-                                <div className="absolute bottom-6 w-full px-8">
-                                    <div className="grid grid-cols-2 gap-8 w-full backdrop-blur-xl bg-[#080d14]/80 p-4 rounded-3xl border border-white/10">
-                                        <div className="text-center border-r border-white/5">
-                                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Preload Force</div>
-                                            <div className="text-3xl font-black text-white mt-1 tabular-nums">{results.Fm_max.toFixed(1)} <span className="text-xs text-slate-600">kN</span></div>
-                                        </div>
-                                        <div className="text-center">
-                                            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tightening Torque</div>
-                                            <div className="text-3xl font-black text-orange-400 mt-1 tabular-nums">{results.MA.toFixed(1)} <span className="text-xs text-slate-600">Nm</span></div>
-                                        </div>
-                                    </div>
-                                </div>
+                    {/* Geometry parameters */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-orange-400">{t.stdSize}</h3>
+                            <Box size={14} className="text-white/20" />
+                        </div>
+                        
+                        {threadStandard === 'Custom' ? (
+                            <div className="space-y-4">
+                                <ControlSlider label={t.nomDia} value={customDia} min={3} max={100} step={1} unit="mm" onChange={setCustomDia} />
+                                <ControlSlider label={t.pitchLead} value={pitch} min={0.2} max={10} step={0.05} unit="mm" onChange={setPitch} />
                             </div>
-                        </EngineeringVisualization>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/[0.02] border border-white/5 p-6 rounded-[2.5rem]">
-                            
-                            <div className="col-span-full md:col-span-2">
-                                <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Thread Standard</label>
-                                <select 
-                                    value={threadStandard} 
-                                    onChange={(e) => setThreadStandard(e.target.value)}
-                                    className="w-full bg-[#0e1622] border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono font-bold outline-none appearance-none"
-                                >
-                                    {standardsList.map(s => <option key={s} value={s}>{s}</option>)}
+                        ) : (
+                            <div className="space-y-1">
+                                <select value={size} onChange={(e) => setSize(e.target.value)}
+                                    className="w-full bg-[#0a0f18] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white font-mono font-bold outline-none focus:border-orange-500/50 cursor-pointer">
+                                    {THREAD_STANDARDS.filter(th => th.type === threadStandard).map(th => (
+                                        <option key={th.size} value={th.size}>{th.size} (Ø{th.diameter}mm)</option>
+                                    ))}
                                 </select>
                             </div>
+                        )}
 
-                            {threadStandard === 'Custom' ? (
-                                <>
-                                    <CalculatorInput label="Nominal Dia (d)" unit="mm" value={customDia} onChange={(e) => setCustomDia(Number(e.target.value))} />
-                                    <CalculatorInput label="Thread Pitch" unit="mm" value={pitch} onChange={(e) => setPitch(Number(e.target.value))} />
-                                </>
-                            ) : (
-                                <div className="col-span-full md:col-span-2 group">
-                                    <label className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block">Standard Size</label>
-                                    <select 
-                                        value={size} 
-                                        onChange={(e) => setSize(e.target.value)}
-                                        className="w-full bg-[#0e1622] border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono font-bold outline-none appearance-none"
+                        <ControlSlider label={t.length} value={length} min={10} max={300} step={5} unit="mm" onChange={setLength} />
+                    </div>
+
+                    <hr className="border-white/5" />
+
+                    {/* Preload utilization & property class */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-orange-400">Fastener Grade</h3>
+                            <Activity size={14} className="text-white/20" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[9px] uppercase tracking-widest font-mono text-white/30">{t.grade}</label>
+                            <div className="flex gap-2">
+                                {['8.8', '10.9', '12.9'].map((g) => (
+                                    <button 
+                                        key={g} 
+                                        onClick={() => setGrade(g)}
+                                        className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${
+                                            grade === g 
+                                                ? 'bg-orange-500/20 text-orange-400 border-orange-500/50 ring-1 ring-orange-500/30' 
+                                                : 'bg-[#0a0f18] text-white/30 border-white/5 hover:text-white hover:bg-white/5'
+                                        }`}
                                     >
-                                        {THREAD_STANDARDS.filter(t => t.type === threadStandard).map(t => (
-                                            <option key={t.size} value={t.size}>{t.size} (Ø{t.diameter}mm)</option>
-                                        ))}
-                                    </select>
+                                        {g}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <ControlSlider label={t.yieldUtil} value={yieldUtilization} min={10} max={100} step={5} unit="%" onChange={setYieldUtilization} />
+                    </div>
+
+                    <hr className="border-white/5" />
+
+                    {/* Friction parameters */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-orange-400">Friction Coefficients</h3>
+                        <ControlSlider label={t.threadFriction} value={muThread} min={0.05} max={0.35} step={0.01} unit="" onChange={setMuThread} />
+                        <ControlSlider label={t.headFriction} value={muHead} min={0.05} max={0.35} step={0.01} unit="" onChange={setMuHead} />
+                    </div>
+
+                    {/* Shared geometry link */}
+                    <div className="mt-auto pt-4 border-t border-white/5">
+                        <Link 
+                            href={`/fasteners?${buildGeometryLinkParams(threadStandard, size)}`}
+                            className="w-full flex items-center justify-between p-3 rounded-xl bg-orange-500/5 border border-orange-500/10 hover:border-orange-500/30 text-orange-400 text-[10px] font-bold uppercase tracking-wider transition-all group"
+                        >
+                            <span>{t.openGeometry}</span>
+                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </div>
+
+                </div>
+
+                {/* RIGHT WORKSPACE */}
+                <div className="flex flex-col min-h-0 gap-4 overflow-hidden">
+                    
+                    {/* TOP PANEL: VISUAL SCHEMATIC & SAFETY STATUS */}
+                    <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-4 flex-shrink-0">
+                        {/* Interactive Bolt Schematic Card */}
+                        <div className="h-[230px]">
+                            <FastenerInteractiveSchematic 
+                                results={results} 
+                                length={length} 
+                                yieldUtilization={yieldUtilization} 
+                                grade={grade} 
+                                size={size} 
+                                labels={blueprintLabels} 
+                                isPipe={threadStandard === 'Pipe'} 
+                                lang={language}
+                            />
+                        </div>
+                        
+                        {/* Yield Gauge & Key Metrics Card */}
+                        <div className="bg-[#06090e]/60 border border-white/5 rounded-2xl p-4 flex flex-col justify-between h-[230px]">
+                            {/* Yield warning banner inside the card */}
+                            <div className={`p-3 rounded-xl border ${utilBg} flex items-center gap-3`}>
+                                <div className="p-1.5 rounded-lg bg-black/30 shrink-0">
+                                    {yieldUtilization > 90 ? <AlertTriangle size={16} /> : <CheckCircle size={16} />}
+                                </div>
+                                <div className="min-w-0">
+                                    <h4 className="text-[10px] font-black uppercase tracking-wider text-white truncate">
+                                        {yieldUtilization > 90 ? (language === 'tr' ? 'Aşırı Gerilme Uyarısı' : 'High Preload Stress Warning') : t.structuralIntegrity}
+                                    </h4>
+                                    <p className="text-[9px] text-white/50 truncate">
+                                        {yieldUtilization > 90 ? (language === 'tr' ? 'Akma sınırı aşıldı!' : 'Yield capacity exceeded!') : (language === 'tr' ? 'Akma sınırı güvenli bölgede' : 'Safe utilization limits')}
+                                    </p>
+                                </div>
+                                <span className="ml-auto text-[9px] font-mono font-bold uppercase bg-black/20 px-2 py-0.5 rounded border border-white/5">
+                                    {yieldUtilization > 90 ? 'FAIL' : 'OK'}
+                                </span>
+                            </div>
+
+                            {/* Large KPI metrics */}
+                            <div className="grid grid-cols-2 gap-3 mt-2">
+                                <div className="bg-[#080d14]/70 border border-white/5 rounded-xl p-3 flex flex-col justify-center">
+                                    <span className="text-[8px] font-mono text-white/30 uppercase tracking-widest">{t.tighteningTorque}</span>
+                                    <div className="flex items-baseline gap-1 mt-1">
+                                        <span className="text-lg font-black font-mono text-[#fbbf24]">{results.MA.toFixed(1)}</span>
+                                        <span className="text-[8px] text-white/20 font-mono">Nm</span>
+                                    </div>
+                                </div>
+                                <div className="bg-[#080d14]/70 border border-white/5 rounded-xl p-3 flex flex-col justify-center">
+                                    <span className="text-[8px] font-mono text-white/30 uppercase tracking-widest">{t.preloadForce}</span>
+                                    <div className="flex items-baseline gap-1 mt-1">
+                                        <span className="text-lg font-black font-mono text-[#10b981]">{results.Fm_max.toFixed(1)}</span>
+                                        <span className="text-[8px] text-white/20 font-mono">kN</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Yield progress line */}
+                            <div className="mt-2 space-y-1">
+                                <div className="flex justify-between items-baseline text-[9px]">
+                                    <span className="font-mono text-white/30 uppercase">{t.yieldUtil}</span>
+                                    <span className="font-mono font-black" style={{ color: utilColor }}>{yieldUtilization}%</span>
+                                </div>
+                                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full rounded-full transition-all duration-300"
+                                        style={{ width: `${yieldUtilization}%`, backgroundColor: utilColor }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BOTTOM PANEL: TABBED DETAILED WORKSPACE */}
+                    <div className="flex-1 flex flex-col min-h-0 bg-[#06090e]/20 border border-white/5 rounded-2xl overflow-hidden">
+                        
+                        {/* TABS NAVBAR */}
+                        <div className="flex border-b border-white/5 bg-[#080d14] px-4 flex-shrink-0">
+                            {[
+                                { id: 'dashboard', label: language === 'tr' ? 'Grafikler ve Analiz' : 'Charts & Analytics', icon: Cpu },
+                                { id: 'verification', label: t.tabVerification, icon: FileText },
+                                { id: 'dimensions', label: t.tabDimensions, icon: Ruler },
+                                { id: 'blueprint', label: language === 'tr' ? 'HD Teknik Resim (PDF)' : 'HD Technical Blueprint', icon: Box },
+                            ].map((tab) => {
+                                const TabIcon = tab.icon;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id as any)}
+                                        className={`flex items-center gap-2 px-5 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 -mb-px ${
+                                            activeTab === tab.id
+                                                ? 'border-orange-500 text-orange-400 bg-orange-500/[0.02]'
+                                                : 'border-transparent text-slate-500 hover:text-slate-300'
+                                        }`}
+                                    >
+                                        <TabIcon size={12} />
+                                        <span>{tab.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* ACTIVE TAB CONTENT */}
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar min-h-0 relative">
+                            
+                            {/* TAB 1: CHARTS & ANALYTICS */}
+                            {activeTab === 'dashboard' && (
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    
+                                    {/* Torque Preload Curve */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 space-y-3">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.torquePreloadCurve}</h3>
+                                        <div className="h-[180px]">
+                                            {isMounted && (
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                                                        <defs>
+                                                            <linearGradient id="gradientPreload" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                                        <XAxis dataKey="torque" stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} axisLine={false} />
+                                                        <YAxis stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} axisLine={false} />
+                                                        <Tooltip contentStyle={{ backgroundColor: '#0a1018', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '10px' }} />
+                                                        <Area type="monotone" dataKey="preload" stroke="#f97316" strokeWidth={2} fill="url(#gradientPreload)" />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Torque loss distribution */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 space-y-3">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.torqueDistribution}</h3>
+                                        <div className="h-[180px] flex items-center justify-center gap-4">
+                                            <div className="relative w-28 h-28 shrink-0">
+                                                {isMounted && (
+                                                    <ResponsiveContainer width="100%" height="100%">
+                                                        <PieChart>
+                                                            <Pie data={distributionData} cx="50%" cy="50%" innerRadius={30} outerRadius={48} paddingAngle={3} dataKey="value">
+                                                                {distributionData.map((entry: { color: string }, index: number) => (
+                                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                                ))}
+                                                            </Pie>
+                                                        </PieChart>
+                                                    </ResponsiveContainer>
+                                                )}
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                    <span className="text-sm font-black text-emerald-400">
+                                                        {((results.K1 / (results.K1 + results.K2 + results.K3)) * 100).toFixed(0)}%
+                                                    </span>
+                                                    <span className="text-[7px] text-slate-500 font-bold uppercase tracking-wider">Useful</span>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1.5 flex-1 min-w-0">
+                                                {distributionData.map((item: any, i: number) => (
+                                                    <div key={i} className="flex items-center gap-2 text-[9px]">
+                                                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                                                        <span className="text-slate-400 truncate flex-1 font-medium">{item.name}</span>
+                                                        <span className="font-mono font-bold text-white shrink-0">{item.value}%</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             )}
 
-                            <CalculatorInput label="Length (L)" unit="mm" value={length} onChange={(e) => setLength(Number(e.target.value))} />
-                            <CalculatorInput label="Yield Utilization" unit="%" value={yieldUtilization} onChange={(e) => setYieldUtilization(Number(e.target.value))} />
-                            <CalculatorInput label="Thread Friction μG" unit="coeff" value={muThread} onChange={(e) => setMuThread(Number(e.target.value))} />
-                            <CalculatorInput label="Head Friction μK" unit="coeff" value={muHead} onChange={(e) => setMuHead(Number(e.target.value))} />
-                        </div>
-                    </div>
-
-                    {/* Technical Analysis Output */}
-                    <div className="space-y-6">
-                        <div className="bg-[#0a0c10] rounded-[3rem] p-8 border border-orange-500/20 shadow-2xl relative overflow-hidden flex flex-col h-full">
-                            <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                                <FileText size={120} />
-                            </div>
-                            
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 mb-8">Manufacturing Dimensions</h2>
-
-                            {/* Dimensions Table */}
-                            <div className="flex-1 space-y-2 mb-8 relative z-10">
-                                <DimTable 
-                                    data={[
-                                        { label: 'Nominal Dia (d)', val: results.d_nom.toFixed(2), unit: 'mm' },
-                                        { label: 'Pitch Dia (d2)', val: results.d2.toFixed(2), unit: 'mm' },
-                                        { label: 'Minor Dia (d3)', val: results.d3.toFixed(2), unit: 'mm' },
-                                        { label: 'Pitch / Lead', val: results.pitchVal.toFixed(2), unit: 'mm' },
-                                        { label: 'Stress Area (As)', val: results.As.toFixed(2), unit: 'mm²' },
-                                    ]}
-                                />
-                            </div>
-
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 mb-6 mt-4">System Validation</h2>
-
-                            <div className="space-y-4">
-                                <DetailRow label="Nominal Yield (Rel)" value={(results.stress / results.safety).toFixed(0)} unit="MPa" />
-                                <DetailRow label="Utilization Ratio" value={yieldUtilization} unit="%" color="#f97316" />
-                                
-                                <div className="mt-6 p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-3xl">
-                                    <div className="flex justify-between items-center mb-3">
-                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Structural Integrity</span>
-                                        <div className="px-3 py-1 bg-emerald-500/20 rounded-full text-[8px] font-black text-emerald-400 uppercase">Passed</div>
+                            {/* TAB 2: TECHNICAL DRAWING */}
+                            {activeTab === 'blueprint' && (
+                                <div className="flex flex-col h-full gap-4">
+                                    <div className="flex-1 min-h-[380px] rounded-2xl border border-orange-500/20 bg-[#04060a] overflow-hidden shadow-[inset_0_0_100px_rgba(0,0,0,0.6)]">
+                                        <FastenerAssemblyBlueprint 
+                                            results={results} 
+                                            length={length} 
+                                            yieldUtilization={yieldUtilization} 
+                                            grade={grade} 
+                                            size={size} 
+                                            labels={blueprintLabels} 
+                                            isPipe={threadStandard === 'Pipe'} 
+                                        />
                                     </div>
-                                    <div className="text-xs font-medium text-slate-400 leading-relaxed">
-                                        Assembly preload of <span className="text-white font-bold">{results.Fm_max.toFixed(1)} kN</span> ensures joint stability without exceeding {yieldUtilization}% of the fastener's yield capacity.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 pt-6 border-t border-white/5">
-                                <div className="grid grid-cols-3 gap-3">
-                                    {['8.8', '10.9', '12.9'].map(g => (
+                                    <div className="text-[9px] text-slate-500 font-mono flex items-center justify-between border border-white/5 bg-[#080d14]/40 p-3 rounded-xl">
+                                        <div className="flex items-center gap-2">
+                                            <Info size={12} className="text-orange-400" />
+                                            <span>Use standard controls on the left to dynamically stretch length and diameters.</span>
+                                        </div>
                                         <button 
-                                            key={g} 
-                                            onClick={() => setGrade(g)}
-                                            className={`py-2 rounded-2xl border text-[10px] font-black uppercase transition-all ${grade === g ? 'bg-orange-500 text-black border-orange-500 shadow-lg' : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300'}`}
+                                            onClick={exportToPDF} 
+                                            className="px-3 py-1.5 rounded-lg border border-white/10 hover:border-orange-500/30 hover:bg-orange-500/5 text-orange-400 font-black uppercase text-[8px] tracking-wider transition-all"
                                         >
-                                            Grade {g}
+                                            Save Blueprint PDF
                                         </button>
-                                    ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {/* TAB 3: DIMENSIONS & STANDARDS */}
+                            {activeTab === 'dimensions' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    {/* Manufacturing Dimensions Card */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 space-y-3">
+                                        <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-orange-400">{t.mfgDimensions}</h3>
+                                            <span className="text-[7px] font-mono text-emerald-400/70">{t.linkedGeometry}</span>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                            {[
+                                                { label: t.nomDia, val: results.d_nom.toFixed(2), unit: 'mm' },
+                                                { label: t.pitchDia, val: results.d2.toFixed(2), unit: 'mm' },
+                                                { label: t.minorDia, val: results.d3.toFixed(2), unit: 'mm' },
+                                                { label: t.pitchLead, val: results.pitchVal.toFixed(2), unit: 'mm' },
+                                                { label: t.stressArea, val: results.As.toFixed(2), unit: 'mm²' },
+                                                { label: t.bearingDia, val: results.dw.toFixed(2), unit: 'mm' },
+                                                { label: t.clearanceHole, val: results.dh.toFixed(2), unit: 'mm' },
+                                                { label: t.frictionRad, val: results.rb.toFixed(2), unit: 'mm' },
+                                            ].map((row, i) => (
+                                                <div key={i} className="flex justify-between items-baseline py-1.5 border-b border-white/[0.02]">
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">{row.label}</span>
+                                                    <span className="font-mono text-xs font-black text-white shrink-0">
+                                                        {row.val}<span className="text-slate-600 ml-1 text-[8px] font-bold">{row.unit}</span>
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Bolt geometry reference schema */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 flex flex-col justify-between">
+                                        <div className="space-y-3">
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-orange-400">VDI 2230 Preload Calibration</h3>
+                                            <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
+                                                The nominal dimensions shown represent standard limits. Stress area and friction radius calculations follow ISO 898-1 standards. Utilization metrics evaluate tensile safety margins relative to the nominal yield capacity of class <span className="text-white font-bold">{grade}</span>.
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="mt-4 border border-white/5 bg-black/40 rounded-xl p-3 space-y-1.5 text-[9px] font-mono text-slate-500">
+                                            <div className="flex justify-between">
+                                                <span>Nominal Size:</span>
+                                                <span className="text-white font-bold">{threadStandard === 'Custom' ? 'Custom' : size}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Thread Standard:</span>
+                                                <span className="text-white font-bold">{threadStandard}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Fastener Grade:</span>
+                                                <span className="text-white font-bold">{grade}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Thread Length:</span>
+                                                <span className="text-white font-bold">{length} mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            )}
+
+                            {/* TAB 4: VDI 2230 VERIFICATION */}
+                            {activeTab === 'verification' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    {/* Torque & friction parameters */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 space-y-3">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-orange-400">{t.torqueFrictionAnalysis}</h3>
+                                        <div className="space-y-2">
+                                            <CoeffRow label={t.pitchTerm} value={results.K1.toFixed(5)} />
+                                            <CoeffRow label={t.threadFrictionTerm} value={results.K2.toFixed(5)} />
+                                            <CoeffRow label={t.underheadFrictionTerm} value={results.K3.toFixed(5)} />
+                                            <div className="border-t border-white/10 pt-2 mt-2">
+                                                <CoeffRow label={t.nutFactor} value={results.K.toFixed(5)} highlight />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Production checklist */}
+                                    <div className="rounded-2xl border border-white/5 bg-[#080d14]/40 p-4 space-y-3">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-orange-400">Design Compliance Checklist</h3>
+                                        <div className="space-y-2">
+                                            {productionChecks.map((row) => (
+                                                <div key={row.label} className="flex items-center justify-between gap-4 border-b border-white/[0.03] pb-1.5">
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">{row.label}</span>
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        <span className={`text-[9px] font-black font-mono ${row.ok ? 'text-emerald-400' : 'text-amber-400'}`}>{row.value}</span>
+                                                        {row.ok ? (
+                                                            <CheckCircle size={11} className="text-emerald-500" />
+                                                        ) : (
+                                                            <Info size={11} className="text-amber-500" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            )}
+
                         </div>
                     </div>
                 </div>
@@ -333,7 +884,7 @@ export default function FastenerAssemblyModule() {
                     <div style={{ display: 'flex', flex: 1, gap: '20px' }}>
                         <div style={{ flex: 2, border: '1px solid #ccc', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f9f9f9' }}>
                             <div style={{ width: '80%', height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <FastenerBlueprint2D results={results} length={length} isPrint={true} isPipe={threadStandard === 'Pipe'} />
+                                <FastenerAssemblyBlueprint results={results} length={length} yieldUtilization={yieldUtilization} grade={grade} size={size} labels={blueprintLabels} isPrint isPipe={threadStandard === 'Pipe'} />
                             </div>
                         </div>
 
@@ -350,6 +901,9 @@ export default function FastenerAssemblyModule() {
                                     <tr><td style={tdStyle}>Minor Dia (d3)</td><td style={tdStyle}>{results.d3.toFixed(2)}</td></tr>
                                     <tr><td style={tdStyle}>Length (L)</td><td style={tdStyle}>{length}</td></tr>
                                     <tr><td style={tdStyle}>Pitch / Lead</td><td style={tdStyle}>{results.pitchVal.toFixed(3)}</td></tr>
+                                    <tr><td style={tdStyle}>Bearing Dia (dw)</td><td style={tdStyle}>{results.dw.toFixed(2)}</td></tr>
+                                    <tr><td style={tdStyle}>Clearance (dh)</td><td style={tdStyle}>{results.dh.toFixed(2)}</td></tr>
+                                    <tr><td style={tdStyle}>Frict. Rad. (rb)</td><td style={tdStyle}>{results.rb.toFixed(2)}</td></tr>
                                 </tbody>
                             </table>
 
@@ -364,6 +918,7 @@ export default function FastenerAssemblyModule() {
                                     <tr><td style={tdStyle}>Tightening Torque (MA)</td><td style={tdStyle}>{results.MA.toFixed(2)} Nm</td></tr>
                                     <tr><td style={tdStyle}>Yield Utilization</td><td style={tdStyle}>{yieldUtilization}%</td></tr>
                                     <tr><td style={tdStyle}>Stress Area (As)</td><td style={tdStyle}>{results.As.toFixed(2)} mm²</td></tr>
+                                    <tr><td style={tdStyle}>Nut Factor (K)</td><td style={tdStyle}>{results.K.toFixed(4)} (K1={results.K1.toFixed(3)}, K2={results.K2.toFixed(3)}, K3={results.K3.toFixed(3)})</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -374,121 +929,50 @@ export default function FastenerAssemblyModule() {
     );
 }
 
+const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any) => (
+  <div className="space-y-2">
+    <div className="flex justify-between items-baseline">
+      <label className="text-[9px] uppercase tracking-widest font-mono text-white/30">{label}</label>
+      <div className="flex items-baseline gap-1">
+        <span className="text-xs font-mono font-bold text-orange-400">{value}</span>
+        <span className="text-[9px] font-mono text-white/20">{unit}</span>
+      </div>
+    </div>
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-orange-500 hover:accent-white transition-all"
+      suppressHydrationWarning
+    />
+  </div>
+);
+
+const DataDisplay = ({ label, value, unit, icon: Icon, color = '#00e5ff', compact = false }: any) => (
+  <div className={`relative group overflow-hidden bg-[#080d14]/70 border border-white/5 transition-all hover:border-orange-500/20 ${compact ? 'px-3 py-1.5 min-w-[100px] rounded-lg' : 'p-5 min-w-[150px] rounded-2xl'}`}>
+    <div className={`flex items-center gap-2 ${compact ? 'mb-0.5' : 'mb-2'}`}>
+      <div className={`rounded-xl bg-black/40 text-white/40 group-hover:text-orange-400 transition-colors ${compact ? 'p-1' : 'p-2'}`}>
+        <Icon size={compact ? 12 : 16} />
+      </div>
+      <span className={`uppercase tracking-widest font-mono text-white/30 ${compact ? 'text-[7px]' : 'text-[9px]'}`}>{label}</span>
+    </div>
+    <div className="flex items-baseline gap-1">
+      <span className={`font-black font-mono tabular-nums tracking-tighter ${compact ? 'text-sm' : 'text-xl'}`} style={{ color }}>{value}</span>
+      <span className="text-[9px] font-mono text-white/20 uppercase">{unit}</span>
+    </div>
+  </div>
+);
+
 const tdStyle = { border: '1px solid #000', padding: '8px', fontSize: '10pt' };
 
-function DimTable({ data }: { data: { label: string, val: any, unit: string }[] }) {
+function CoeffRow({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
     return (
-        <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10">
-            {data.map((row, i) => (
-                <div key={i} className="flex justify-between items-center p-3 px-5 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{row.label}</span>
-                    <div className="font-mono text-sm">
-                        <span className="font-black text-white">{row.val}</span>
-                        <span className="text-slate-500 ml-1">{row.unit}</span>
-                    </div>
-                </div>
-            ))}
+        <div className={`flex justify-between items-center text-[10px] py-1.5 border-b border-white/[0.02] ${highlight ? 'border-t border-white/10 pt-2.5 mt-2' : ''}`}>
+            <span className={`uppercase tracking-widest truncate pr-2 ${highlight ? 'text-orange-400 font-black' : 'text-slate-400 font-bold'}`}>{label}</span>
+            <span className={`font-mono font-black shrink-0 ${highlight ? 'text-orange-400' : 'text-white'}`}>{value}</span>
         </div>
-    );
-}
-
-function DetailRow({ label, value, unit, color }: any) {
-    return (
-        <div className="flex justify-between items-center border-b border-white/[0.03] pb-3">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</span>
-            <div className="flex items-baseline gap-2">
-                <span className="text-xl font-black font-mono text-white" style={{ color }}>{value}</span>
-                <span className="text-[10px] font-bold text-slate-700 uppercase">{unit}</span>
-            </div>
-        </div>
-    );
-}
-
-function FastenerBlueprint2D({ results, length, isPrint = false, isPipe = false, isTapered = false }: any) {
-    const d = results.d_nom;
-    const l = length;
-    
-    // Scale factor
-    const totalW = isPipe ? l + 40 : results.boltDim.k + l + results.nutDim.height + 10;
-    const maxH = isPipe ? d * 2 : results.boltDim.s * 1.5;
-    
-    const strokeC = isPrint ? "#000000" : "#f97316";
-    const textC = isPrint ? "#000000" : "#94a3b8";
-    
-    if (isPipe) {
-        // Draw a Hex Nipple (Boru Nipeli / Manşon konsepti)
-        const hexW = Math.max(10, l * 0.2);
-        const threadL = (l - hexW) / 2;
-        const hexH = d * 1.5;
-        
-        // NPT/BSPT standard taper is 1°47' (1.7899 degrees)
-        const taperAngle = 1.7899 * Math.PI / 180;
-        const dTop = isTapered ? (d/2) - (threadL * Math.tan(taperAngle)) : d/2;
-
-        return (
-            <svg viewBox={`0 -${maxH/2} ${l + 40} ${maxH + 20}`} className="w-full h-full max-h-[300px]">
-                <line x1="-10" y1="0" x2={l + 30} y2="0" stroke={strokeC} strokeWidth="0.5" strokeDasharray="4,2" opacity="0.5" />
-                
-                {/* Left Thread (Tapered or straight) */}
-                <polygon points={`10,-${dTop} ${10+threadL},-${d/2} ${10+threadL},${d/2} 10,${dTop}`} fill="none" stroke={strokeC} strokeWidth="1.5" />
-                <polygon points={`10,-${dTop} ${10+threadL},-${d/2} ${10+threadL},${d/2} 10,${dTop}`} fill="none" stroke={strokeC} strokeWidth="0.5" strokeDasharray="1,1" />
-                
-                {/* Center Hex */}
-                <rect x={10+threadL} y={-hexH/2} width={hexW} height={hexH} fill="none" stroke={strokeC} strokeWidth="1.5" />
-                <line x1={10+threadL+hexW} y1={-hexH/4} x2={10+threadL} y2={-hexH/2} stroke={strokeC} strokeWidth="0.5" />
-                <line x1={10+threadL+hexW} y1={hexH/4} x2={10+threadL} y2={hexH/2} stroke={strokeC} strokeWidth="0.5" />
-
-                {/* Right Thread (Tapered or straight) */}
-                <polygon points={`${10+threadL+hexW},-${d/2} ${10+threadL*2+hexW},-${dTop} ${10+threadL*2+hexW},${dTop} ${10+threadL+hexW},${d/2}`} fill="none" stroke={strokeC} strokeWidth="1.5" />
-                <polygon points={`${10+threadL+hexW},-${d/2} ${10+threadL*2+hexW},-${dTop} ${10+threadL*2+hexW},${dTop} ${10+threadL+hexW},${d/2}`} fill="none" stroke={strokeC} strokeWidth="0.5" strokeDasharray="1,1" />
-
-                <g fontSize="4" fontFamily="monospace" fill={textC}>
-                    <line x1={10} y1={hexH/2 + 5} x2={10} y2={hexH/2 + 10} stroke={strokeC} strokeWidth="0.2" />
-                    <line x1={10+l} y1={hexH/2 + 5} x2={10+l} y2={hexH/2 + 10} stroke={strokeC} strokeWidth="0.2" />
-                    <line x1={10} y1={hexH/2 + 8} x2={10+l} y2={hexH/2 + 8} stroke={strokeC} strokeWidth="0.2" />
-                    <text x={10+l/2} y={hexH/2 + 13} textAnchor="middle">L={l}</text>
-                    <text x={10+l+5} y={1} textAnchor="start">Ø{d.toFixed(1)}</text>
-                    
-                    {isTapered && (
-                        <text x={10+l/2} y={-(hexH/2 + 8)} textAnchor="middle" fill="#ef4444" fontSize="3.5" fontWeight="bold">TAPER: 1° 47'</text>
-                    )}
-                </g>
-            </svg>
-        );
-    }
-
-    // Standard Bolt
-    const k = results.boltDim.k;
-    const s = results.boltDim.s;
-    const m = results.nutDim.height;
-    
-    return (
-        <svg viewBox={`0 -${maxH/2} ${totalW + 40} ${maxH + 20}`} className="w-full h-full max-h-[300px]">
-            <line x1="-10" y1="0" x2={totalW + 20} y2="0" stroke={strokeC} strokeWidth="0.5" strokeDasharray="4,2" opacity="0.5" />
-            
-            <rect x="10" y={-s/2} width={k} height={s} fill="none" stroke={strokeC} strokeWidth="1.5" />
-            <line x1={10+k} y1={-s/4} x2={10} y2={-s/2} stroke={strokeC} strokeWidth="0.5" />
-            <line x1={10+k} y1={s/4} x2={10} y2={s/2} stroke={strokeC} strokeWidth="0.5" />
-
-            <rect x={10+k} y={-d/2} width={l} height={d} fill="none" stroke={strokeC} strokeWidth="1.5" />
-            <rect x={10+k+l*0.4} y={-d/2} width={l*0.6} height={d} fill="none" stroke={strokeC} strokeWidth="0.5" strokeDasharray="1,1" />
-            <rect x={10+k+l*0.7} y={-s/2} width={m} height={s} fill="none" stroke={strokeC} strokeWidth="1.5" />
-            
-            <g fontSize="4" fontFamily="monospace" fill={textC}>
-                <line x1={10+k} y1={s/2 + 5} x2={10+k} y2={s/2 + 10} stroke={strokeC} strokeWidth="0.2" />
-                <line x1={10+k+l} y1={s/2 + 5} x2={10+k+l} y2={s/2 + 10} stroke={strokeC} strokeWidth="0.2" />
-                <line x1={10+k} y1={s/2 + 8} x2={10+k+l} y2={s/2 + 8} stroke={strokeC} strokeWidth="0.2" />
-                <text x={10+k+l/2} y={s/2 + 13} textAnchor="middle">L={l}</text>
-
-                <line x1={10} y1={s/2 + 5} x2={10} y2={s/2 + 10} stroke={strokeC} strokeWidth="0.2" />
-                <line x1={10} y1={s/2 + 8} x2={10+k} y2={s/2 + 8} stroke={strokeC} strokeWidth="0.2" />
-                <text x={10+k/2} y={s/2 + 13} textAnchor="middle">k</text>
-
-                <line x1={10+k+l+5} y1={-d/2} x2={10+k+l+10} y2={-d/2} stroke={strokeC} strokeWidth="0.2" />
-                <line x1={10+k+l+5} y1={d/2} x2={10+k+l+10} y2={d/2} stroke={strokeC} strokeWidth="0.2" />
-                <line x1={10+k+l+8} y1={-d/2} x2={10+k+l+8} y2={d/2} stroke={strokeC} strokeWidth="0.2" />
-                <text x={10+k+l+10} y={1} textAnchor="start">Ø{d.toFixed(1)}</text>
-            </g>
-        </svg>
     );
 }

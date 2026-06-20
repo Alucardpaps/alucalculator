@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { WeldingVisualization3D, WeldJointType3D } from "@/components/WeldingVisualization3D";
+import { WeldingVisualization2D } from "./WeldingVisualization2D";
 import {
     WELDING_METHODS, JOINT_TYPES, ELECTRODE_CATALOG, WeldingProcess, WeldJointType,
     getMinWeldSize, calculateThroatArea, calculateHeatInput, evaluateHeatInput,
@@ -59,9 +59,9 @@ export function WeldingModule() {
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden">
             {/* LEFT PANEL */}
-            <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
                 <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-orange-500/10 rounded-xl border border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.15)]">
@@ -112,7 +112,7 @@ export function WeldingModule() {
             </div>
 
             {/* RIGHT PANEL */}
-            <div className="w-[62%] h-full flex flex-col overflow-hidden">
+            <div className="flex-1 h-auto lg:h-full flex flex-col overflow-hidden min-w-0">
                 {/* Safety Factor Header */}
                 <div className="flex-none px-8 pt-8 pb-2">
                     <div className="flex items-start justify-between">
@@ -154,12 +154,11 @@ export function WeldingModule() {
                         <Flame size={14} className="text-orange-500/30" /> WELD JOINT PREVIEW
                     </div>
                     <div className="w-full h-full relative z-10">
-                        <WeldingVisualization3D
-                            jointType={jointType === 'doubleFillet' ? 'fillet' : jointType === 'vGroove' ? 'vgroove' : jointType as WeldJointType3D}
+                        <WeldingVisualization2D
+                            jointType={jointType === 'doubleFillet' ? 'fillet' : jointType === 'vGroove' ? 'vgroove' : jointType as any}
                             legSize={legSize} thickness={thickness} grooveAngle={grooveAngle} length={length}
                             material1={{ color: material1Color, name: material1Name, shape: material1Profile, dimensions: material1Dims }}
                             material2={{ color: material2Color, name: material2Name, shape: material2Profile, dimensions: material2Dims }}
-                            is2D={false}
                         />
                     </div>
                 </div>

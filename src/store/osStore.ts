@@ -57,7 +57,7 @@ interface OSState {
 }
 
 
-export type WorkspaceMode = 'cad' | 'cam' | 'desk' | 'fea' | 'mechanical' | 'manufacturing' | 'civil' | 'electrical' | 'science' | 'finance' | 'software';
+export type WorkspaceMode = 'cad' | 'cam' | 'desk' | 'fea' | 'mechanical' | 'manufacturing' | 'civil' | 'electrical' | 'science' | 'finance' | 'software' | 'flow';
 
 interface OSActions {
     openWindow: (type: ModuleType, maximized?: boolean) => void;
@@ -137,7 +137,7 @@ export const useOSStore = create<OSState & OSActions>()(
 
 
             setDictionary: (dict: any) => set({ dictionary: dict }),
-            setWorkspaceMode: (mode: 'cad' | 'cam' | 'desk' | 'fea' | 'mechanical' | 'manufacturing' | 'civil' | 'electrical' | 'science' | 'finance' | 'software') => set({ workspaceMode: mode }),
+            setWorkspaceMode: (mode: WorkspaceMode) => set({ workspaceMode: mode }),
             setUnitSystem: (sys: 'metric' | 'imperial') => set({ unitSystem: sys }),
 
             toggleStartMenu: () => set(state => ({ startMenuOpen: !state.startMenuOpen })),

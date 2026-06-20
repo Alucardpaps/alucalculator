@@ -77,7 +77,7 @@ function Nipple3D({ d_nom, length, hexWidth, hexHeight, isTapered, color = "#636
 }
 
 // Procedural Nut Geometry
-function Nut3D({ d_nom, nutWidth, nutHeight, offset, color = "#a855f7" }: any) {
+function Nut3D({ d_nom, nutWidth, nutHeight, offset, color = "#00e5ff" }: any) {
     const groupRef = useRef<THREE.Group>(null);
     const radius = d_nom / 2;
     

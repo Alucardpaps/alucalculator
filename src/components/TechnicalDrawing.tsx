@@ -1,6 +1,5 @@
 import { MetalShape } from "@/hooks/useWeightCalculator";
 import React from 'react';
-import { TechnicalDrawing3D } from "./TechnicalDrawing3D";
 
 interface TechnicalDrawingProps {
     mode?: 'shape' | 'fit' | 'gear' | 'strength' | 'bearing' | 'welding' | 'sheetMetal' | 'pump' | 'fastener';
@@ -11,34 +10,13 @@ interface TechnicalDrawingProps {
 }
 
 export const TechnicalDrawing = ({ mode = 'shape', shape = 'box', fitType, activeField, data }: TechnicalDrawingProps) => {
-    const [viewMode, setViewMode] = React.useState<'3d' | '2d'>('3d');
-
-    // === 3D MODE for SHAPES & COMPONENTS ===
+    // === 2D BLUEPRINT ONLY for SHAPES & COMPONENTS ===
     if (['gear', 'bearing', 'fastener'].includes(mode) || ['gear', 'bearing', 'fastener'].includes(shape)) {
         const shapeType = mode === 'shape' ? shape : mode;
 
         return (
-            <div className="w-full h-full relative flex flex-col bg-slate-50/50">
-                <div className="absolute top-4 left-4 z-10 flex gap-2 bg-white/90 backdrop-blur p-1 rounded-lg border border-slate-200 shadow-sm">
-                    <button
-                        onClick={() => setViewMode('3d')}
-                        className={`px-3 py-1.5 text-[10px] font-bold rounded-md uppercase tracking-wider transition-all ${viewMode === '3d' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:bg-slate-100'}`}
-                    >
-                        3D Model
-                    </button>
-                    <button
-                        onClick={() => setViewMode('2d')}
-                        className={`px-3 py-1.5 text-[10px] font-bold rounded-md uppercase tracking-wider transition-all ${viewMode === '2d' ? 'bg-slate-800 text-white shadow' : 'text-slate-500 hover:bg-slate-100'}`}
-                    >
-                        2D Blueprint
-                    </button>
-                </div>
-
-                {viewMode === '3d' ? (
-                    <TechnicalDrawing3D shape={shapeType as any} activeField={activeField} inputs={data} />
-                ) : (
-                    <BlueprintView shape={shapeType} inputs={data} />
-                )}
+            <div className="w-full h-full relative flex flex-col bg-transparent">
+                <BlueprintView shape={shapeType} inputs={data} />
             </div>
         );
     }
@@ -287,24 +265,28 @@ export const TechnicalDrawing = ({ mode = 'shape', shape = 'box', fitType, activ
 // --- BLUEPRINT 2D COMPONENTS ---
 
 const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
+    const strokeColor = "#ecfeff"; // Engineering light-gray outline
+    const dimColor = "#00e5ff"; // Engineering cyan/teal highlight
+    const textFill = "#C5C6C7"; // Readable text
+    const subtleColor = "rgba(255, 255, 255, 0.15)";
+
     // Helper for Dimension Line
     const Dim = ({ x1, y1, x2, y2, label, offset = 20, vertical = false }: any) => {
-        // Simple dimension lines
         return (
             <g>
-                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#94a3b8" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={subtleColor} strokeWidth="1" strokeDasharray="4 4" />
                 {vertical ? (
                     <>
-                        <line x1={x1 - offset} y1={y1} x2={x1 - offset} y2={y2} stroke="#0f172a" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
-                        <text x={x1 - offset - 10} y={(y1 + y2) / 2} textAnchor="middle" alignmentBaseline="middle" className="text-[10px] fill-slate-800 font-bold" transform={`rotate(-90 ${x1 - offset - 10} ${(y1 + y2) / 2})`}>{label}</text>
+                        <line x1={x1 - offset} y1={y1} x2={x1 - offset} y2={y2} stroke={dimColor} strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
+                        <text x={x1 - offset - 10} y={(y1 + y2) / 2} textAnchor="middle" alignmentBaseline="middle" className="text-[10px] font-bold font-mono uppercase tracking-wider" fill={textFill} transform={`rotate(-90 ${x1 - offset - 10} ${(y1 + y2) / 2})`}>{label}</text>
                     </>
                 ) : (
                     <>
-                        <line x1={x1} y1={y1 + offset} x2={x2} y2={y2 + offset} stroke="#0f172a" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
-                        <text x={(x1 + x2) / 2} y={y1 + offset + 15} textAnchor="middle" className="text-[10px] fill-slate-800 font-bold">{label}</text>
+                        <line x1={x1} y1={y1 + offset} x2={x2} y2={y2 + offset} stroke={dimColor} strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
+                        <text x={(x1 + x2) / 2} y={y1 + offset + 15} textAnchor="middle" className="text-[10px] font-bold font-mono uppercase tracking-wider" fill={textFill}>{label}</text>
                         {/* Extension lines */}
-                        <line x1={x1} y1={y1} x2={x1} y2={y1 + offset} stroke="#cbd5e1" strokeWidth="1" />
-                        <line x1={x2} y1={y2} x2={x2} y2={y2 + offset} stroke="#cbd5e1" strokeWidth="1" />
+                        <line x1={x1} y1={y1} x2={x1} y2={y1 + offset} stroke={subtleColor} strokeWidth="1" />
+                        <line x1={x2} y1={y2} x2={x2} y2={y2 + offset} stroke={subtleColor} strokeWidth="1" />
                     </>
                 )}
             </g>
@@ -312,13 +294,13 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
     }
 
     return (
-        <svg viewBox="-50 -50 400 400" className="w-full h-full bg-blueprint-grid">
+        <svg width="100%" height="100%" viewBox="-50 -50 400 400" className="w-full h-full bg-blueprint-grid">
             <defs>
                 <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L0,6 L9,3 z" fill="#0f172a" />
+                    <path d="M0,0 L0,6 L9,3 z" fill={dimColor} />
                 </marker>
-                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
-                    <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" stroke="#cbd5e1" strokeWidth="1" />
+                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="6" height="6">
+                    <path d="M-1,1 l2,-2 M0,6 l6,-6 M5,7 l2,-2" stroke="rgba(0, 229, 255, 0.2)" strokeWidth="0.8" />
                 </pattern>
             </defs>
 
@@ -349,14 +331,14 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                     return (
                         <g>
                             {/* Hexagon */}
-                            <polygon points={points.join(' ')} fill="none" stroke="#0f172a" strokeWidth="2" />
+                            <polygon points={points.join(' ')} fill="none" stroke={strokeColor} strokeWidth="2" />
                             {/* Inner Circle (Hole) */}
-                            <circle cx={cx} cy={cy} r={(dia / 2) * scale} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                            <circle cx={cx} cy={cy} r={(dia / 2) * scale} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                             {/* Hidden threads (Dashed) */}
-                            <circle cx={cx} cy={cy} r={(dia / 2 + (dia * 0.1)) * scale} fill="none" stroke="#0f172a" strokeWidth="1" strokeDasharray="4 4" />
+                            <circle cx={cx} cy={cy} r={(dia / 2 + (dia * 0.1)) * scale} fill="none" stroke={strokeColor} strokeWidth="1" strokeDasharray="4 4" />
 
                             <Dim x1={cx - r} y1={cy - r - 20} x2={cx + r} y2={cy - r - 20} label={`s=${S.toFixed(1)}`} offset={0} />
-                            <text x={cx} y={cy + r + 30} textAnchor="middle" className="text-xs font-bold fill-slate-500">HEX NUT TOP VIEW</text>
+                            <text x={cx} y={cy + r + 30} textAnchor="middle" className="text-[10px] font-bold font-mono tracking-wider fill-slate-400">HEX NUT TOP VIEW</text>
                         </g>
                     )
                 }
@@ -376,16 +358,16 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy - L / 2})`}>
                         {/* HEAD */}
-                        <rect x={-HW / 2} y={-HH} width={HW} height={HH} fill="none" stroke="#0f172a" strokeWidth="2" />
-                        <line x1={-HW / 2} y1={-HH} x2={HW / 2} y2={0} stroke="#0f172a" strokeWidth="1" />
-                        <line x1={HW / 2} y1={-HH} x2={-HW / 2} y2={0} stroke="#0f172a" strokeWidth="1" />
+                        <rect x={-HW / 2} y={-HH} width={HW} height={HH} fill="none" stroke={strokeColor} strokeWidth="2" />
+                        <line x1={-HW / 2} y1={-HH} x2={HW / 2} y2={0} stroke={strokeColor} strokeWidth="1" />
+                        <line x1={HW / 2} y1={-HH} x2={-HW / 2} y2={0} stroke={strokeColor} strokeWidth="1" />
 
                         {/* SHAFT */}
-                        <rect x={-D / 2} y={0} width={D} height={L} fill="none" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-D / 2} y={0} width={D} height={L} fill="none" stroke={strokeColor} strokeWidth="2" />
 
                         {/* THREADS (Schematic) */}
-                        <rect x={-D / 2 + 5} y={L * 0.3} width={D - 10} height={L * 0.7} fill="url(#diagonalHatch)" opacity="0.5" />
-                        <line x1={-D / 2} y1={L * 0.3} x2={D / 2} y2={L * 0.3} stroke="#0f172a" strokeWidth="1" />
+                        <rect x={-D / 2 + 5} y={L * 0.3} width={D - 10} height={L * 0.7} fill="url(#diagonalHatch)" opacity="0.8" />
+                        <line x1={-D / 2} y1={L * 0.3} x2={D / 2} y2={L * 0.3} stroke={strokeColor} strokeWidth="1" />
 
                         {/* Dimensions */}
                         <Dim x1={-D / 2} y1={0} x2={D / 2} y2={0} label={`⌀${dia}`} offset={-30} />
@@ -409,21 +391,21 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Outer Circle */}
-                        <circle r={OD / 2} fill="none" stroke="#0f172a" strokeWidth="2" />
+                        <circle r={OD / 2} fill="none" stroke={strokeColor} strokeWidth="2" />
                         {/* Pitch Circle */}
-                        <circle r={PD / 2} fill="none" stroke="#0f172a" strokeWidth="1" strokeDasharray="5 3" />
+                        <circle r={PD / 2} fill="none" stroke={strokeColor} strokeWidth="1" strokeDasharray="5 3" />
                         {/* Hub */}
-                        <circle r={PD / 4} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="1" />
+                        <circle r={PD / 4} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1" />
 
                         {/* Teeth schematic lines */}
                         {[...Array(12)].map((_, i) => (
-                            <line key={i} x1="0" y1={-PD / 2} x2="0" y2={-OD / 2} stroke="#0f172a" strokeWidth="1" transform={`rotate(${i * 30})`} />
+                            <line key={i} x1="0" y1={-PD / 2} x2="0" y2={-OD / 2} stroke={strokeColor} strokeWidth="1" transform={`rotate(${i * 30})`} />
                         ))}
 
                         <Dim x1={-PD / 2} y1={0} x2={PD / 2} y2={0} label={`PD=${pd}`} offset={OD / 2 + 20} />
                         <Dim x1={-OD / 2} y1={0} x2={OD / 2} y2={0} label={`OD=${od}`} offset={OD / 2 + 40} />
 
-                        <text x="0" y="5" textAnchor="middle" className="text-xs font-bold fill-slate-800">z={z1} m={mod}</text>
+                        <text x="0" y="5" textAnchor="middle" className="text-xs font-bold font-mono fill-slate-400">z={z1} m={mod}</text>
                     </g>
                 )
             })()}
@@ -432,28 +414,155 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 const od = parseFloat(inputs?.od || inputs?.outerDiameter || 80);
                 const id = parseFloat(inputs?.id || inputs?.innerDiameter || 40);
                 const w = parseFloat(inputs?.width || 20);
+                const type = inputs?.type || 'ball'; // 'ball' | 'roller' | 'needle' | 'tapered'
 
                 const scale = 200 / (od || 100);
                 const OD = od * scale;
                 const ID = id * scale;
-                const W = w * scale; // Width in section view?
+                const W = w * scale;
 
-                // Draw Section View (Side cut)
                 const cx = 150, cy = 150;
+                const H = (OD - ID) / 2; // Total radial height of ring space
+                const ringTh = H * 0.25; // 25% thickness for rings
+
+                // Center coordinates of the top and bottom rolling elements
+                const yCenterTop = -(ID/2 + OD/2) / 2;
+                const yCenterBot = (ID/2 + OD/2) / 2;
+                const spaceY = H - 2 * ringTh;
+
+                // Let's draw outer ring, inner ring and rolling elements based on type
+                if (type === 'tapered') {
+                    // Slanted tapered bearing
+                    // Top rings
+                    const topOuterRing = `-${W/2},-${OD/2} ${W/2},-${OD/2} ${W/2},-${OD/2 + ringTh * 1.3} -${W/2},-${OD/2 + ringTh * 0.7}`;
+                    const topInnerRing = `-${W/2},-${ID/2} -${W/2},-${ID/2 - ringTh * 0.7} ${W/2},-${ID/2 - ringTh * 1.3} ${W/2},-${ID/2}`;
+                    // Bot rings (mirror y)
+                    const botOuterRing = `-${W/2},${OD/2} ${W/2},${OD/2} ${W/2},${OD/2 - ringTh * 1.3} -${W/2},${OD/2 - ringTh * 0.7}`;
+                    const botInnerRing = `-${W/2},${ID/2} -${W/2},${ID/2 + ringTh * 0.7} ${W/2},${ID/2 + ringTh * 1.3} ${W/2},${ID/2}`;
+
+                    // Tapered Rollers: Trapezoids centered at x=0
+                    // Top roller points
+                    const rx1 = -W * 0.35, rx2 = W * 0.35;
+                    const rTopY1 = -OD/2 + ringTh * 0.7 + 2;
+                    const rTopY2 = -OD/2 + ringTh * 1.3 + 2;
+                    const rBotY1 = -ID/2 - ringTh * 0.7 - 2;
+                    const rBotY2 = -ID/2 - ringTh * 1.3 - 2;
+                    const topRoller = `${rx1},${rTopY1} ${rx2},${rTopY2} ${rx2},${rBotY2} ${rx1},${rBotY1}`;
+
+                    // Bottom roller points (mirror y)
+                    const botRoller = `${rx1},${-rTopY1} ${rx2},${-rTopY2} ${rx2},${-rBotY2} ${rx1},${-rBotY1}`;
+
+                    return (
+                        <g transform={`translate(${cx}, ${cy})`}>
+                            {/* Rings */}
+                            <polygon points={topOuterRing} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                            <polygon points={topInnerRing} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                            <polygon points={botOuterRing} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                            <polygon points={botInnerRing} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+
+                            {/* Rollers */}
+                            <polygon points={topRoller} fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                            <line x1={rx1} y1={(rTopY1 + rBotY1)/2} x2={rx2} y2={(rTopY2 + rBotY2)/2} stroke={strokeColor} strokeWidth="1" strokeDasharray="2 2" />
+                            
+                            <polygon points={botRoller} fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                            <line x1={rx1} y1={-(rTopY1 + rBotY1)/2} x2={rx2} y2={-(rTopY2 + rBotY2)/2} stroke={strokeColor} strokeWidth="1" strokeDasharray="2 2" />
+
+                            {/* Center Line */}
+                            <line x1={-W} y1={0} x2={W} y2={0} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
+
+                            <Dim x1={W / 2} y1={-OD / 2} x2={W / 2} y2={OD / 2} label={`OD=${od}`} offset={20} vertical />
+                            <Dim x1={-W / 2} y1={-ID / 2} x2={-W / 2} y2={ID / 2} label={`ID=${id}`} offset={20} vertical />
+                            <Dim x1={-W / 2} y1={-OD / 2 - 10} x2={W / 2} y2={-OD / 2 - 10} label={`B=${w}`} offset={0} />
+                        </g>
+                    );
+                }
+
+                // Precise CAD cross-sections for rings
+                const W_half = W / 2;
+                
+                // Let's define the paths for top/bottom inner/outer rings based on type
+                let topOuterPath = "";
+                let botOuterPath = "";
+                let topInnerPath = "";
+                let botInnerPath = "";
+
+                if (type === 'ball') {
+                    // Ball bearing rings with curved raceway grooves
+                    const y_out_top = -OD/2;
+                    const y_face_top = yCenterTop - spaceY * 0.42;
+                    const y_groove_top = yCenterTop - spaceY * 0.56;
+                    topOuterPath = `M ${-W_half},${y_out_top} L ${W_half},${y_out_top} L ${W_half},${y_face_top} L ${W_half * 0.4},${y_face_top} Q 0,${y_groove_top} ${-W_half * 0.4},${y_face_top} L ${-W_half},${y_face_top} Z`;
+
+                    const y_out_bot = OD/2;
+                    const y_face_bot = yCenterBot + spaceY * 0.42;
+                    const y_groove_bot = yCenterBot + spaceY * 0.56;
+                    botOuterPath = `M ${-W_half},${y_out_bot} L ${W_half},${y_out_bot} L ${W_half},${y_face_bot} L ${W_half * 0.4},${y_face_bot} Q 0,${y_groove_bot} ${-W_half * 0.4},${y_face_bot} L ${-W_half},${y_face_bot} Z`;
+
+                    const y_in_inner_top = -ID/2;
+                    const y_face_inner_top = yCenterTop + spaceY * 0.42;
+                    const y_groove_inner_top = yCenterTop + spaceY * 0.56;
+                    topInnerPath = `M ${-W_half},${y_in_inner_top} L ${W_half},${y_in_inner_top} L ${W_half},${y_face_inner_top} L ${W_half * 0.4},${y_face_inner_top} Q 0,${y_groove_inner_top} ${-W_half * 0.4},${y_face_inner_top} L ${-W_half},${y_face_inner_top} Z`;
+
+                    const y_in_inner_bot = ID/2;
+                    const y_face_inner_bot = yCenterBot - spaceY * 0.42;
+                    const y_groove_inner_bot = yCenterBot - spaceY * 0.56;
+                    botInnerPath = `M ${-W_half},${y_in_inner_bot} L ${W_half},${y_in_inner_bot} L ${W_half},${y_face_inner_bot} L ${W_half * 0.4},${y_face_inner_bot} Q 0,${y_groove_inner_bot} ${-W_half * 0.4},${y_face_inner_bot} L ${-W_half},${y_face_inner_bot} Z`;
+                } else if (type === 'roller') {
+                    // Cylindrical roller rings: Outer ring has guiding shoulders, inner ring is flat (NU type)
+                    const y_out_top = -OD/2;
+                    const y_flange_top = yCenterTop - spaceY * 0.25;
+                    const y_face_top = yCenterTop - spaceY * 0.52;
+                    const w_flange = W * 0.16;
+                    topOuterPath = `M ${-W_half},${y_out_top} L ${W_half},${y_out_top} L ${W_half},${y_flange_top} L ${W_half - w_flange},${y_flange_top} L ${W_half - w_flange},${y_face_top} L ${-W_half + w_flange},${y_face_top} L ${-W_half + w_flange},${y_flange_top} L ${-W_half},${y_flange_top} Z`;
+
+                    const y_out_bot = OD/2;
+                    const y_flange_bot = yCenterBot + spaceY * 0.25;
+                    const y_face_bot = yCenterBot + spaceY * 0.52;
+                    botOuterPath = `M ${-W_half},${y_out_bot} L ${W_half},${y_out_bot} L ${W_half},${y_flange_bot} L ${W_half - w_flange},${y_flange_bot} L ${W_half - w_flange},${y_face_bot} L ${-W_half + w_flange},${y_face_bot} L ${-W_half + w_flange},${y_flange_bot} L ${-W_half},${y_flange_bot} Z`;
+
+                    // Flat inner rings
+                    topInnerPath = `M ${-W_half},${-ID/2} L ${W_half},${-ID/2} L ${W_half},${-ID/2 - ringTh} L ${-W_half},${-ID/2 - ringTh} Z`;
+                    botInnerPath = `M ${-W_half},${ID/2} L ${W_half},${ID/2} L ${W_half},${ID/2 + ringTh} L ${-W_half},${ID/2 + ringTh} Z`;
+                } else {
+                    // Default thin rings for needle or other types
+                    topOuterPath = `M ${-W_half},${-OD/2} L ${W_half},${-OD/2} L ${W_half},${-OD/2 + ringTh} L ${-W_half},${-OD/2 + ringTh} Z`;
+                    botOuterPath = `M ${-W_half},${OD/2} L ${W_half},${OD/2} L ${W_half},${OD/2 - ringTh} L ${-W_half},${OD/2 - ringTh} Z`;
+                    topInnerPath = `M ${-W_half},${-ID/2} L ${W_half},${-ID/2} L ${W_half},${-ID/2 - ringTh} L ${-W_half},${-ID/2 - ringTh} Z`;
+                    botInnerPath = `M ${-W_half},${ID/2} L ${W_half},${ID/2} L ${W_half},${ID/2 + ringTh} L ${-W_half},${ID/2 + ringTh} Z`;
+                }
 
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
-                        {/* Top Section */}
-                        <rect x={-W / 2} y={-OD / 2} width={W} height={(OD - ID) / 2} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
-                        {/* Bot Section */}
-                        <rect x={-W / 2} y={ID / 2} width={W} height={(OD - ID) / 2} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        {/* Rings */}
+                        <path d={topOuterPath} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                        <path d={topInnerPath} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                        <path d={botOuterPath} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+                        <path d={botInnerPath} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="1.5" />
+
+                        {/* Rolling Elements */}
+                        {type === 'ball' && (
+                            <>
+                                <circle cx="0" cy={yCenterTop} r={spaceY * 0.48} fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                                <circle cx="0" cy={yCenterBot} r={spaceY * 0.48} fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                            </>
+                        )}
+
+                        {type === 'roller' && (
+                            <>
+                                <rect x={-W*0.35} y={yCenterTop - spaceY*0.48} width={W*0.7} height={spaceY*0.96} rx="1" fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                                <rect x={-W*0.35} y={yCenterBot - spaceY*0.48} width={W*0.7} height={spaceY*0.96} rx="1" fill="#0a1018" stroke={strokeColor} strokeWidth="2" />
+                            </>
+                        )}
+
+                        {type === 'needle' && (
+                            <>
+                                <rect x={-W*0.15} y={yCenterTop - spaceY*0.48} width={W*0.3} height={spaceY*0.96} rx="0.5" fill="#0a1018" stroke={strokeColor} strokeWidth="1.5" />
+                                <rect x={-W*0.15} y={yCenterBot - spaceY*0.48} width={W*0.3} height={spaceY*0.96} rx="0.5" fill="#0a1018" stroke={strokeColor} strokeWidth="1.5" />
+                            </>
+                        )}
 
                         {/* Center Line */}
-                        <line x1={-W} y1={0} x2={W} y2={0} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
-
-                        {/* Circle Balls placeholder */}
-                        <circle cx="0" cy={-(ID + (OD - ID) / 2) / 2} r={(OD - ID) / 6} fill="white" stroke="#0f172a" />
-                        <circle cx="0" cy={(ID + (OD - ID) / 2) / 2} r={(OD - ID) / 6} fill="white" stroke="#0f172a" />
+                        <line x1={-W} y1={0} x2={W} y2={0} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
 
                         <Dim x1={W / 2} y1={-OD / 2} x2={W / 2} y2={OD / 2} label={`OD=${od}`} offset={20} vertical />
                         <Dim x1={-W / 2} y1={-ID / 2} x2={-W / 2} y2={ID / 2} label={`ID=${id}`} offset={20} vertical />
@@ -480,9 +589,9 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Outer Rectangle */}
-                        <rect x={-W / 2} y={-H / 2} width={W} height={H} fill="none" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-W / 2} y={-H / 2} width={W} height={H} fill="none" stroke={strokeColor} strokeWidth="2" />
                         {/* Inner Rectangle (hollow) */}
-                        <rect x={-W / 2 + T} y={-H / 2 + T} width={W - 2 * T} height={H - 2 * T} fill="white" stroke="#0f172a" strokeWidth="1.5" />
+                        <rect x={-W / 2 + T} y={-H / 2 + T} width={W - 2 * T} height={H - 2 * T} fill="#0A0C10" stroke={strokeColor} strokeWidth="1.5" />
                         {/* Hatching for material */}
                         <rect x={-W / 2} y={-H / 2} width={T} height={H} fill="url(#diagonalHatch)" opacity="0.5" />
                         <rect x={W / 2 - T} y={-H / 2} width={T} height={H} fill="url(#diagonalHatch)" opacity="0.5" />
@@ -493,8 +602,8 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                         <Dim x1={-W / 2} y1={H / 2} x2={W / 2} y2={H / 2} label={`B=${w}`} offset={25} />
                         <Dim x1={W / 2} y1={-H / 2} x2={W / 2} y2={H / 2} label={`H=${h}`} offset={25} vertical />
                         {/* Wall thickness indicator */}
-                        <line x1={-W / 2} y1={-H / 2 - 10} x2={-W / 2 + T} y2={-H / 2 - 10} stroke="#0f172a" strokeWidth="1" />
-                        <text x={-W / 2 + T / 2} y={-H / 2 - 15} textAnchor="middle" className="text-[8px] fill-slate-600 font-bold">t={t}</text>
+                        <line x1={-W / 2} y1={-H / 2 - 10} x2={-W / 2 + T} y2={-H / 2 - 10} stroke={strokeColor} strokeWidth="1" />
+                        <text x={-W / 2 + T / 2} y={-H / 2 - 15} textAnchor="middle" className="text-[8px] font-bold font-mono" fill={textFill}>t={t}</text>
                     </g>
                 )
             })()}
@@ -513,16 +622,16 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Outer Circle */}
-                        <circle r={OD / 2} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <circle r={OD / 2} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Inner Circle (hollow) */}
-                        <circle r={ID / 2} fill="white" stroke="#0f172a" strokeWidth="1.5" />
+                        <circle r={ID / 2} fill="#0A0C10" stroke={strokeColor} strokeWidth="1.5" />
                         {/* Center lines */}
-                        <line x1={-OD / 2 - 15} y1={0} x2={OD / 2 + 15} y2={0} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
-                        <line x1={0} y1={-OD / 2 - 15} x2={0} y2={OD / 2 + 15} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={-OD / 2 - 15} y1={0} x2={OD / 2 + 15} y2={0} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={0} y1={-OD / 2 - 15} x2={0} y2={OD / 2 + 15} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
 
                         {/* Dimensions */}
                         <Dim x1={-OD / 2} y1={OD / 2} x2={OD / 2} y2={OD / 2} label={`⌀${od}`} offset={25} />
-                        <text x={OD / 4} y={-OD / 4} className="text-[9px] fill-slate-600 font-bold">t={t}</text>
+                        <text x={OD / 4} y={-OD / 4} className="text-[9px] font-bold font-mono" fill={textFill}>t={t}</text>
                     </g>
                 )
             })()}
@@ -538,14 +647,14 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Solid Circle with hatching */}
-                        <circle r={D / 2} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <circle r={D / 2} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Center cross */}
-                        <line x1={-D / 2 - 15} y1={0} x2={D / 2 + 15} y2={0} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
-                        <line x1={0} y1={-D / 2 - 15} x2={0} y2={D / 2 + 15} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={-D / 2 - 15} y1={0} x2={D / 2 + 15} y2={0} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={0} y1={-D / 2 - 15} x2={0} y2={D / 2 + 15} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
 
                         {/* Dimension */}
                         <Dim x1={-D / 2} y1={D / 2} x2={D / 2} y2={D / 2} label={`⌀${d}`} offset={25} />
-                        <text x={0} y={D / 2 + 50} textAnchor="middle" className="text-[10px] fill-slate-500 font-bold">SOLID BAR</text>
+                        <text x={0} y={D / 2 + 50} textAnchor="middle" className="text-[10px] font-bold font-mono" fill={textFill}>SOLID BAR</text>
                     </g>
                 )
             })()}
@@ -563,13 +672,13 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Main plate (side view) */}
-                        <rect x={-W / 2} y={-T / 2} width={W} height={T} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-W / 2} y={-T / 2} width={W} height={T} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
 
                         {/* Dimensions */}
                         <Dim x1={-W / 2} y1={T / 2} x2={W / 2} y2={T / 2} label={`B=${w}`} offset={25} />
                         <Dim x1={W / 2} y1={-T / 2} x2={W / 2} y2={T / 2} label={`t=${t}`} offset={25} vertical />
 
-                        <text x={0} y={T / 2 + 55} textAnchor="middle" className="text-[10px] fill-slate-500 font-bold">FLAT SHEET</text>
+                        <text x={0} y={T / 2 + 55} textAnchor="middle" className="text-[10px] font-bold font-mono" fill={textFill}>FLAT SHEET</text>
                     </g>
                 )
             })()}
@@ -591,17 +700,17 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Top Flange */}
-                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Bottom Flange */}
-                        <rect x={-b / 2} y={h / 2 - flange} width={b} height={flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={h / 2 - flange} width={b} height={flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Web */}
-                        <rect x={-web / 2} y={-h / 2 + flange} width={web} height={h - 2 * flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-web / 2} y={-h / 2 + flange} width={web} height={h - 2 * flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
 
                         {/* Dimensions */}
                         <Dim x1={-b / 2} y1={h / 2} x2={b / 2} y2={h / 2} label={`B=${B}`} offset={25} />
                         <Dim x1={b / 2} y1={-h / 2} x2={b / 2} y2={h / 2} label={`H=${H}`} offset={25} vertical />
-                        <text x={-b / 2 - 10} y={0} textAnchor="end" className="text-[8px] fill-slate-500">tw={tw}</text>
-                        <text x={0} y={-h / 2 - 5} textAnchor="middle" className="text-[8px] fill-slate-500">tf={tf}</text>
+                        <text x={-b / 2 - 10} y={0} textAnchor="end" className="text-[8px] font-mono" fill={textFill}>tw={tw}</text>
+                        <text x={0} y={-h / 2 - 5} textAnchor="middle" className="text-[8px] font-mono" fill={textFill}>tf={tf}</text>
                     </g>
                 )
             })()}
@@ -623,16 +732,16 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Top Flange */}
-                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Bottom Flange */}
-                        <rect x={-b / 2} y={h / 2 - flange} width={b} height={flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={h / 2 - flange} width={b} height={flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Web (left side only for C-channel) */}
-                        <rect x={-b / 2} y={-h / 2 + flange} width={web} height={h - 2 * flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={-h / 2 + flange} width={web} height={h - 2 * flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
 
                         {/* Dimensions */}
                         <Dim x1={-b / 2} y1={h / 2} x2={b / 2} y2={h / 2} label={`B=${B}`} offset={25} />
                         <Dim x1={b / 2} y1={-h / 2} x2={b / 2} y2={h / 2} label={`H=${H}`} offset={25} vertical />
-                        <text x={0} y={0} textAnchor="middle" className="text-[10px] fill-slate-500 font-bold">C-CHANNEL</text>
+                        <text x={0} y={0} textAnchor="middle" className="text-[10px] font-bold font-mono" fill={textFill}>C-CHANNEL</text>
                     </g>
                 )
             })()}
@@ -652,14 +761,14 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx - a / 4}, ${cy - b / 4})`}>
                         {/* Vertical Leg */}
-                        <rect x={0} y={0} width={thick} height={b} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={0} y={0} width={thick} height={b} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Horizontal Leg */}
-                        <rect x={thick} y={b - thick} width={a - thick} height={thick} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={thick} y={b - thick} width={a - thick} height={thick} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
 
                         {/* Dimensions */}
                         <Dim x1={0} y1={b} x2={a} y2={b} label={`A=${A}`} offset={20} />
                         <Dim x1={a} y1={0} x2={a} y2={b} label={`B=${B}`} offset={20} vertical />
-                        <text x={thick + 10} y={b - thick - 5} className="text-[8px] fill-slate-500">t={t}</text>
+                        <text x={thick + 10} y={b - thick - 5} className="text-[8px] font-mono" fill={textFill}>t={t}</text>
                     </g>
                 )
             })()}
@@ -681,15 +790,15 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Top Flange */}
-                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-b / 2} y={-h / 2} width={b} height={flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Web (stem) */}
-                        <rect x={-web / 2} y={-h / 2 + flange} width={web} height={h - flange} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <rect x={-web / 2} y={-h / 2 + flange} width={web} height={h - flange} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
 
                         {/* Dimensions */}
                         <Dim x1={-b / 2} y1={h / 2} x2={b / 2} y2={h / 2} label={`B=${B}`} offset={25} />
                         <Dim x1={b / 2} y1={-h / 2} x2={b / 2} y2={h / 2} label={`H=${H}`} offset={25} vertical />
-                        <text x={web / 2 + 10} y={0} className="text-[8px] fill-slate-500">tw={tw}</text>
-                        <text x={0} y={-h / 2 - 5} textAnchor="middle" className="text-[8px] fill-slate-500">tf={tf}</text>
+                        <text x={web / 2 + 10} y={0} className="text-[8px] font-mono" fill={textFill}>tw={tw}</text>
+                        <text x={0} y={-h / 2 - 5} textAnchor="middle" className="text-[8px] font-mono" fill={textFill}>tf={tf}</text>
                     </g>
                 )
             })()}
@@ -712,14 +821,14 @@ const BlueprintView = ({ shape, inputs }: { shape: string, inputs: any }) => {
                 return (
                     <g transform={`translate(${cx}, ${cy})`}>
                         {/* Hexagon */}
-                        <polygon points={points.join(' ')} fill="url(#diagonalHatch)" stroke="#0f172a" strokeWidth="2" />
+                        <polygon points={points.join(' ')} fill="url(#diagonalHatch)" stroke={strokeColor} strokeWidth="2" />
                         {/* Center cross */}
-                        <line x1={-r - 10} y1={0} x2={r + 10} y2={0} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
-                        <line x1={0} y1={-r - 10} x2={0} y2={r + 10} stroke="#94a3b8" strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={-r - 10} y1={0} x2={r + 10} y2={0} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
+                        <line x1={0} y1={-r - 10} x2={0} y2={r + 10} stroke={subtleColor} strokeWidth="1" strokeDasharray="10 5" />
 
                         {/* Dimension */}
                         <Dim x1={-S / 2 * scale} y1={r} x2={S / 2 * scale} y2={r} label={`S=${S}`} offset={25} />
-                        <text x={0} y={r + 55} textAnchor="middle" className="text-[10px] fill-slate-500 font-bold">HEX BAR</text>
+                        <text x={0} y={r + 55} textAnchor="middle" className="text-[10px] font-bold font-mono" fill={textFill}>HEX BAR</text>
                     </g>
                 )
             })()}

@@ -6,7 +6,7 @@ import { LineTool } from './tools/LineTool';
 import { CircleTool } from './tools/CircleTool';
 import { ArcTool } from './tools/ArcTool';
 import { RectangleTool } from './tools/RectangleTool';
-import { HexagonTool } from './tools/HexagonTool';
+import { PolygonTool } from './tools/PolygonTool';
 import { OffsetTool } from './tools/OffsetTool';
 import { TrimTool } from './tools/TrimTool';
 import { ExtendTool } from './tools/ExtendTool';
@@ -18,12 +18,129 @@ import { MirrorTool } from './tools/MirrorTool';
 import { FilletTool } from './tools/FilletTool';
 import { ChamferTool } from './tools/ChamferTool';
 import { RectArrayTool, CircArrayTool } from './tools/ArrayTools';
+import { MohrsCircleTool } from './tools/MohrsCircleTool';
+import { CrossSectionTool } from './tools/CrossSectionTool';
+import { GearTool } from './tools/GearTool';
+import { MatingGearTool } from './tools/MatingGearTool';
+import { BeltPulleyTool } from './tools/BeltPulleyTool';
+import { PlanetaryGearTool } from './tools/PlanetaryGearTool';
+import { FastenerDrawTool } from './tools/FastenerDrawTool';
+import { TextTool } from './tools/TextTool';
+import { PlotTool } from './tools/PlotTool';
 import { findEntityAtPoint } from '../geometry/GeometryUtils';
+
+// ═══════════════════════════════════════════════════════════════
+// COMMAND REGISTRY — Factory Map
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Centralized command factory registry.
+ * Maps canonical command IDs to factory functions that produce fresh tool instances.
+ */
+const COMMAND_REGISTRY: ReadonlyMap<string, () => Command> = new Map<string, () => Command>([
+    // Drawing
+    ['LINE',            () => new LineTool()],
+    ['PLINE',           () => new LineTool()],
+    ['CIRCLE',          () => new CircleTool()],
+    ['ARC',             () => new ArcTool()],
+    ['RECTANGLE',       () => new RectangleTool()],
+    ['POLYGON',         () => new PolygonTool()],
+    ['HEXAGON',         () => new PolygonTool()],
+    // Modify
+    ['OFFSET',          () => new OffsetTool()],
+    ['TRIM',            () => new TrimTool()],
+    ['EXTEND',          () => new ExtendTool()],
+    ['MOVE',            () => new MoveTool()],
+    ['COPY',            () => new CopyTool()],
+    ['ROTATE',          () => new RotateTool()],
+    ['MIRROR',          () => new MirrorTool()],
+    ['FILLET',          () => new FilletTool()],
+    ['CHAMFER',         () => new ChamferTool()],
+    // Arrays
+    ['RECTARRAY',       () => new RectArrayTool()],
+    ['CIRCARRAY',       () => new CircArrayTool()],
+    // Dimensioning
+    ['DIMENSION',       () => new DimensionTool()],
+    ['DIMENSION_LINEAR',() => new DimensionTool()],
+    // Analysis
+    ['MOHR',            () => new MohrsCircleTool()],
+    ['CROSS_SECTION',   () => new CrossSectionTool()],
+    // Mechanical Engineering
+    ['GEAR',            () => new GearTool()],
+    ['MATING_GEAR',     () => new MatingGearTool()],
+    ['BELT_PULLEY',     () => new BeltPulleyTool()],
+    ['PLANETARY_GEAR',  () => new PlanetaryGearTool()],
+    ['FASTENER',        () => new FastenerDrawTool()],
+    // Annotation
+    ['TEXT',            () => new TextTool()],
+    // Plotting
+    ['PLOT',            () => new PlotTool()],
+]);
+
+// ═══════════════════════════════════════════════════════════════
+// UNIFIED ALIAS MAP — Single Source of Truth
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Maps user-typed shortcuts and natural-language aliases to canonical command IDs.
+ * Used by both CLI (CommandLine.tsx) and this processor's handleValueInput.
+ */
+export const COMMAND_ALIASES: Readonly<Record<string, string>> = {
+    // Drawing
+    'L': 'LINE', 'LINE': 'LINE',
+    'PL': 'PLINE', 'PLINE': 'PLINE', 'POLYLINE': 'PLINE',
+    'C': 'CIRCLE', 'CIRCLE': 'CIRCLE', 'CIRC': 'CIRCLE',
+    'A': 'ARC', 'ARC': 'ARC',
+    'REC': 'RECTANGLE', 'RECT': 'RECTANGLE', 'RECTANGLE': 'RECTANGLE', 'BOX': 'RECTANGLE', 'R': 'RECTANGLE',
+    'HEX': 'POLYGON', 'HEXAGON': 'POLYGON', 'POLYGON': 'POLYGON', 'PGON': 'POLYGON',
+    // Modify
+    'O': 'OFFSET', 'OF': 'OFFSET', 'OFFSET': 'OFFSET',
+    'TR': 'TRIM', 'TRIM': 'TRIM',
+    'EX': 'EXTEND', 'EXTEND': 'EXTEND',
+    'M': 'MOVE', 'MOVE': 'MOVE',
+    'CO': 'COPY', 'COPY': 'COPY', 'CP': 'COPY',
+    'RO': 'ROTATE', 'ROTATE': 'ROTATE',
+    'MI': 'MIRROR', 'MIRROR': 'MIRROR',
+    'SC': 'SCALE', 'SCALE': 'SCALE',
+    'F': 'FILLET', 'FL': 'FILLET', 'FILLET': 'FILLET',
+    'CHA': 'CHAMFER', 'CH': 'CHAMFER', 'CHAMFER': 'CHAMFER',
+    'E': 'ERASE', 'ERASE': 'ERASE', 'DEL': 'ERASE', 'DELETE': 'ERASE',
+    // Arrays
+    'RECTARRAY': 'RECTARRAY', 'RA': 'RECTARRAY',
+    'CIRCARRAY': 'CIRCARRAY', 'CA': 'CIRCARRAY',
+    // Dimensioning
+    'D': 'DIMENSION', 'DI': 'DIMENSION', 'DIM': 'DIMENSION', 'DIMENSION': 'DIMENSION',
+    'SD': 'DIMENSION', 'SMART': 'DIMENSION',
+    'DIMLINEAR': 'DIMENSION_LINEAR', 'DIMENSION_LINEAR': 'DIMENSION_LINEAR',
+    // Analysis
+    'MOHR': 'MOHR', 'MOHRS': 'MOHR',
+    'CROSS': 'CROSS_SECTION', 'AREA': 'CROSS_SECTION', 'CROSS_SECTION': 'CROSS_SECTION',
+    // Mechanical Engineering
+    'G': 'GEAR', 'GEAR': 'GEAR', 'INVOLUTE': 'GEAR',
+    'MG': 'MATING_GEAR', 'MATING': 'MATING_GEAR', 'MATING_GEAR': 'MATING_GEAR', 'MESH': 'MATING_GEAR',
+    'BELT': 'BELT_PULLEY', 'PULLEY': 'BELT_PULLEY', 'BELT_PULLEY': 'BELT_PULLEY', 'BP': 'BELT_PULLEY',
+    'PG': 'PLANETARY_GEAR', 'PLANET': 'PLANETARY_GEAR', 'PLANETARY': 'PLANETARY_GEAR', 'PLANETARY_GEAR': 'PLANETARY_GEAR',
+    'BOLT': 'FASTENER', 'NUT': 'FASTENER', 'FASTENER': 'FASTENER', 'SCREW': 'FASTENER',
+    // Annotation
+    'T': 'TEXT', 'TEXT': 'TEXT', 'MTEXT': 'TEXT',
+    // Plotting
+    'PLOT': 'PLOT', 'PRINT': 'PLOT',
+    // Viewport
+    'Z': 'ZOOM', 'ZOOM': 'ZOOM',
+    'P': 'PAN', 'PAN': 'PAN',
+    'U': 'UNDO', 'UNDO': 'UNDO',
+    'REDO': 'REDO',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// COMMAND PROCESSOR
+// ═══════════════════════════════════════════════════════════════
 
 /**
  * Command Processor
  * 
  * Central controller for managing active CAD commands.
+ * Uses a Map-based factory registry for O(1) command instantiation.
  * Handles input routing (mouse, keyboard, CLI) to the active command.
  */
 export class CommandProcessor {
@@ -33,49 +150,20 @@ export class CommandProcessor {
         // Initialize
     }
 
+    /**
+     * Start a command by its canonical ID.
+     * Looks up the factory in COMMAND_REGISTRY and instantiates a new tool.
+     */
     public startCommand(commandId: string) {
-        let command: Command | null = null;
+        const factory = COMMAND_REGISTRY.get(commandId);
 
-        if (commandId === 'LINE' || commandId === 'PLINE') {
-            command = new LineTool();
-        } else if (commandId === 'CIRCLE') {
-            command = new CircleTool();
-        } else if (commandId === 'ARC') {
-            command = new ArcTool();
-        } else if (commandId === 'RECTANGLE') {
-            command = new RectangleTool();
-        } else if (commandId === 'HEXAGON') {
-            command = new HexagonTool();
-        } else if (commandId === 'OFFSET') {
-            command = new OffsetTool();
-        } else if (commandId === 'TRIM') {
-            command = new TrimTool();
-        } else if (commandId === 'EXTEND') {
-            command = new ExtendTool();
-        } else if (commandId === 'DIMENSION' || commandId === 'DIMENSION_LINEAR') {
-            command = new DimensionTool();
-        } else if (commandId === 'MOVE') {
-            command = new MoveTool();
-        } else if (commandId === 'COPY') {
-            command = new CopyTool();
-        } else if (commandId === 'ROTATE') {
-            command = new RotateTool();
-        } else if (commandId === 'MIRROR') {
-            command = new MirrorTool();
-        } else if (commandId === 'FILLET') {
-            command = new FilletTool();
-        } else if (commandId === 'CHAMFER') {
-            command = new ChamferTool();
-        } else if (commandId === 'RECTARRAY') {
-            command = new RectArrayTool();
-        } else if (commandId === 'CIRCARRAY') {
-            command = new CircArrayTool();
-        } else {
+        if (!factory) {
             console.warn(`Unknown command: ${commandId}`);
-            // Don't clear current command if unknown
+            useCadStore.setState({ commandPrompt: `Unknown command: ${commandId}` });
             return;
         }
 
+        const command = factory();
         this.setActiveCommand(command);
     }
 
@@ -113,21 +201,19 @@ export class CommandProcessor {
         }
     }
 
-    public handleMouseDown(point: Point) {
-        if (!this.activeCommand) {
-            const { entities, viewport, selectEntity } = useCadStore.getState();
-            const entity = findEntityAtPoint(point, entities, viewport.zoom);
-            if (entity) {
-                selectEntity(entity.id);
-                this.startCommand('MOVE');
-            }
-        }
+    /**
+     * FIX: Removed auto-MOVE on entity click in select mode.
+     * Previously, clicking any entity without an active command would
+     * auto-start MOVE, hijacking all subsequent point inputs.
+     * Now it only selects the entity — MOVE must be explicitly invoked.
+     */
+    public handleMouseDown(_point: Point) {
+        // Selection is handled by CadCanvas.handleMouseDown directly.
+        // No implicit command activation here.
     }
 
     public handleMouseUp() {
-        if (this.activeCommand?.id === 'MOVE') {
-            this.handleCancel();
-        }
+        // No-op — MOVE auto-cancel removed along with auto-start
     }
 
     public handlePointInput(point: Point) {
@@ -171,30 +257,10 @@ export class CommandProcessor {
         if (this.activeCommand) {
             this.activeCommand.onValueInput(resolvedValue);
         } else {
-            // CLI command parsing — try alias match first
+            // CLI command parsing — use the unified alias map
             const cmd = resolvedValue.trim().toUpperCase();
+            const resolved = COMMAND_ALIASES[cmd];
 
-            const ALIASES: Record<string, string> = {
-                'L': 'LINE', 'LINE': 'LINE',
-                'PL': 'PLINE', 'PLINE': 'PLINE',
-                'C': 'CIRCLE', 'CIRCLE': 'CIRCLE',
-                'A': 'ARC', 'ARC': 'ARC',
-                'REC': 'RECTANGLE', 'RECTANGLE': 'RECTANGLE',
-                'TR': 'TRIM', 'TRIM': 'TRIM',
-                'EX': 'EXTEND', 'EXTEND': 'EXTEND',
-                'O': 'OFFSET', 'OFFSET': 'OFFSET',
-                'M': 'MOVE', 'MOVE': 'MOVE',
-                'CO': 'COPY', 'COPY': 'COPY',
-                'RO': 'ROTATE', 'ROTATE': 'ROTATE',
-                'MI': 'MIRROR', 'MIRROR': 'MIRROR',
-                'F': 'FILLET', 'FILLET': 'FILLET',
-                'CHA': 'CHAMFER', 'CHAMFER': 'CHAMFER',
-                'D': 'DIMENSION', 'DIM': 'DIMENSION', 'DIMENSION': 'DIMENSION',
-                'RECTARRAY': 'RECTARRAY', 'CIRCARRAY': 'CIRCARRAY',
-                'HEX': 'HEXAGON', 'HEXAGON': 'HEXAGON',
-            };
-
-            const resolved = ALIASES[cmd];
             if (resolved) {
                 this.startCommand(resolved);
             } else {

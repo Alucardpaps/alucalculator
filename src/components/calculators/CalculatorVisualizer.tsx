@@ -5,6 +5,10 @@ import { generateBoltSVG } from '@/lib/visualizers/bolt-visualizer';
 import { generateBeamSVG } from '@/lib/visualizers/beam-visualizer';
 import { generatePipeSVG } from '@/lib/visualizers/pipe-visualizer';
 import { generateGearSVG } from '@/lib/visualizers/gear-visualizer';
+import { generateChainSVG } from '@/lib/visualizers/chain-visualizer';
+import { generateBeltSVG } from '@/lib/visualizers/belt-visualizer';
+import { ChainDriveBlueprint } from '@/components/visualizers/ChainDriveBlueprint';
+import { BeltDriveBlueprint } from '@/components/visualizers/BeltDriveBlueprint';
 import type { CalculatorSchema } from '@/types/calculator-schema';
 import { isSchemaV2 } from '@/types/calculator-schema-v2';
 
@@ -41,17 +45,38 @@ export const CalculatorVisualizer: React.FC<CalculatorVisualizerProps> = ({
             };
 
             return (
-                <div className="bg-[#0f1419] border border-[#1e2833] rounded-lg flex flex-col items-center justify-center overflow-hidden w-full h-full relative group">
-                    <div className="absolute top-2 left-3 z-10 text-[10px] text-[#00e5ff]/50 uppercase tracking-widest font-bold">
-                        VISUALIZATION
-                    </div>
-
-                    <div className="w-full h-full p-4 flex items-center justify-center">
-                        {schema.visualization.render(
-                            mockResult,
-                            inputs as any
-                        )}
-                    </div>
+                <div className="w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
+                    {schema.id === 'chain-drive' ? (
+                        <ChainDriveBlueprint
+                            z1={Number((inputs as any).z1 ?? 19)}
+                            z2={Number((inputs as any).z2 ?? 57)}
+                            pitch={Number((inputs as any).pitch ?? 15.875)}
+                            centerDist={Number((inputs as any).centerDist ?? 500)}
+                            rpm1={Number((inputs as any).rpm1 ?? 1450)}
+                            ratio={outputs.ratio as number}
+                            rpm2={outputs.rpm2 as number}
+                            chainVelocity={outputs.chainVelocity as number}
+                            chainLength={outputs.chainLength as number}
+                            chainTension={outputs.chainTension as number}
+                            d1={outputs.d1 as number}
+                        />
+                    ) : schema.id === 'belt-drive' ? (
+                        <BeltDriveBlueprint
+                            d1={Number((inputs as any).d1 ?? 100)}
+                            d2={Number((inputs as any).d2 ?? 250)}
+                            centerDist={Number((inputs as any).centerDist ?? 500)}
+                            beltType={String((inputs as any).beltType ?? 'v-belt')}
+                            rpm1={Number((inputs as any).rpm1 ?? 1450)}
+                            rpm2={outputs.rpm2 as number}
+                            beltVelocity={outputs.beltVelocity as number}
+                            beltLength={outputs.beltLength as number}
+                            arcOfContact={outputs.arcOfContact as number}
+                            T1={outputs.T1 as number}
+                            T2={outputs.T2 as number}
+                        />
+                    ) : (
+                        schema.visualization.render(mockResult, inputs as any)
+                    )}
                 </div>
             );
         } catch (e) {
@@ -72,6 +97,8 @@ export const CalculatorVisualizer: React.FC<CalculatorVisualizerProps> = ({
             generateBeamSVG,
             generatePipeSVG,
             generateGearSVG,
+            generateChainSVG,
+            generateBeltSVG,
         };
 
         try {
@@ -92,6 +119,22 @@ export const CalculatorVisualizer: React.FC<CalculatorVisualizerProps> = ({
             // 2. V2 Schema explicit routing
             if (id === 'gear-spur') {
                 return generateGearSVG(inputs as any);
+            }
+            if (id === 'chain-drive') {
+                return generateChainSVG({
+                    z1: Number((inputs as any).z1 ?? 19),
+                    z2: Number((inputs as any).z2 ?? 57),
+                    pitch: Number((inputs as any).pitch ?? 15.875),
+                    centerDist: Number((inputs as any).centerDist ?? 500),
+                });
+            }
+            if (id === 'belt-drive') {
+                return generateBeltSVG({
+                    d1: Number((inputs as any).d1 ?? 100),
+                    d2: Number((inputs as any).d2 ?? 250),
+                    centerDist: Number((inputs as any).centerDist ?? 500),
+                    beltType: String((inputs as any).beltType ?? 'v-belt'),
+                });
             }
             if (id === 'bolt-stress' || id === 'fasteners') {
                 return generateBoltSVG(inputs as any);

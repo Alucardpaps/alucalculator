@@ -1,0 +1,119 @@
+﻿scratch/assembly_proof_mock.ts(78,44): error TS2531: Object is possibly 'null'.
+scratch/assembly_proof_mock.ts(78,70): error TS2339: Property 'events' does not exist on type 'TimelineEvent[] | { status: string; totalDurationMs: number; steps: number; }'.
+  Property 'events' does not exist on type 'TimelineEvent[]'.
+scratch/assembly_test.ts(84,55): error TS2339: Property 'events' does not exist on type '{ mode: TelemetryMode; timeline: any; }'.
+scratch/assembly_test.ts(110,57): error TS2339: Property 'events' does not exist on type '{ mode: TelemetryMode; timeline: any; }'.
+scripts/generate-seo-pages.ts(15,18): error TS7006: Parameter 'text' implicitly has an 'any' type.
+scripts/generate-seo-pages.ts(19,23): error TS7006: Parameter 'slug' implicitly has an 'any' type.
+scripts/generate-seo-pages.ts(19,29): error TS7006: Parameter 'knowledge' implicitly has an 'any' type.
+src/app/academy/sandbox/page.tsx(24,54): error TS2322: Type '{ args: [number, number, number, number]; rotation: [number, number, number]; }' is not assignable to type 'Mutable<Overwrite<Partial<Overwrite<CylinderGeometry, MathProps<CylinderGeometry> & ReactProps<CylinderGeometry>>>, Omit<...>>>'.
+  Property 'rotation' does not exist on type 'Mutable<Overwrite<Partial<Overwrite<CylinderGeometry, MathProps<CylinderGeometry> & ReactProps<CylinderGeometry>>>, Omit<...>>>'.
+src/app/academy/sandbox/page.tsx(35,47): error TS2322: Type '{ args: [number, number, number]; rotation: [number, number, number]; }' is not assignable to type 'Mutable<Overwrite<Partial<Overwrite<ConeGeometry, MathProps<ConeGeometry> & ReactProps<ConeGeometry>>>, Omit<...>>>'.
+  Property 'rotation' does not exist on type 'Mutable<Overwrite<Partial<Overwrite<ConeGeometry, MathProps<ConeGeometry> & ReactProps<ConeGeometry>>>, Omit<...>>>'.
+src/app/api/calculations/save-seo/route.ts(18,53): error TS18048: 'session.user' is possibly 'undefined'.
+src/app/api/calculations/save-seo/route.ts(18,66): error TS2339: Property 'id' does not exist on type '{ name?: string | null | undefined; email?: string | null | undefined; image?: string | null | undefined; }'.
+src/app/api/calculations/save-seo/route.ts(22,57): error TS18048: 'session.user' is possibly 'undefined'.
+src/app/api/calculations/save-seo/route.ts(22,70): error TS2339: Property 'id' does not exist on type '{ name?: string | null | undefined; email?: string | null | undefined; image?: string | null | undefined; }'.
+src/app/calculators/page.tsx(98,57): error TS2304: Cannot find name 'Calculator'.
+src/components/calculators/CalculationReport.tsx(14,25): error TS2345: Argument of type '() => Promise<typeof import("react-mathjax2")>' is not assignable to parameter of type 'DynamicOptions<{}> | Loader<{}>'.
+  Type '() => Promise<typeof import("react-mathjax2")>' is not assignable to type '() => LoaderComponent<{}>'.
+    Type 'Promise<typeof import("react-mathjax2")>' is not assignable to type 'LoaderComponent<{}>'.
+      Type 'typeof import("react-mathjax2")' is not assignable to type 'ComponentType<{}> | ComponentModule<{}>'.
+src/components/calculators/CalculationReport.tsx(149,58): error TS2339: Property 'Node' does not exist on type 'ComponentType<{}>'.
+  Property 'Node' does not exist on type 'ComponentClass<{}, any>'.
+src/components/calculators/UniversalCalcRenderer.tsx(392,74): error TS2322: Type 'string | number | boolean' is not assignable to type 'number | null'.
+  Type 'string' is not assignable to type 'number'.
+src/components/calculators/UniversalCalcRenderer.tsx(424,48): error TS2339: Property 'version' does not exist on type '{ title: string; description: string; category: CalculatorCategory; version: string; author: string; lastUpdated: string; tags?: string[] | undefined; verifiedStandards: string[]; } | { ...; }'.
+  Property 'version' does not exist on type '{ title: string; description: string; author?: string | undefined; lastUpdated?: string | undefined; tags?: string[] | undefined; }'.
+src/components/canvas/InfiniteBoard.tsx(14,25): error TS2307: Cannot find module '../nodes/mech/ProfileNode' or its corresponding type declarations.
+src/components/canvas/InfiniteBoard.tsx(15,22): error TS2307: Cannot find module '../nodes/finance/CostNode' or its corresponding type declarations.
+src/components/canvas/InfiniteBoard.tsx(16,25): error TS2307: Cannot find module '../nodes/ai/CoPilotNode' or its corresponding type declarations.
+src/components/GearsPageClient.tsx(77,80): error TS18004: No value exists in scope for the shorthand property 'teethCount'. Either declare one or provide an initializer.
+src/components/modules/mechanical/BearingsModule.tsx(78,17): error TS2345: Argument of type '{ name: string; category: string; material: string; weightPerUnit: number; costPerUnit: number; quantity: number; }' is not assignable to parameter of type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+  Property 'type' is missing in type '{ name: string; category: string; material: string; weightPerUnit: number; costPerUnit: number; quantity: number; }' but required in type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+src/components/modules/mechanical/FastenersModule.tsx(50,17): error TS2345: Argument of type '{ name: string; category: string; material: string; weightPerUnit: number; costPerUnit: number; quantity: number; }' is not assignable to parameter of type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+  Property 'type' is missing in type '{ name: string; category: string; material: string; weightPerUnit: number; costPerUnit: number; quantity: number; }' but required in type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+src/components/modules/mechanical/ProfileWeightModule.tsx(114,17): error TS2345: Argument of type '{ name: string; category: string; material: string; quantity: number; weightPerUnit: number; costPerUnit: number; }' is not assignable to parameter of type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+  Property 'type' is missing in type '{ name: string; category: string; material: string; quantity: number; weightPerUnit: number; costPerUnit: number; }' but required in type 'Omit<ProjectItem, "id" | "timestamp" | "totalWeight" | "totalCost">'.
+src/components/modules/mechanical/SimulationFEAModule.tsx(215,110): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/components/modules/mechanical/SimulationFEAModule.tsx(217,116): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/components/modules/os/FileExplorerModule.tsx(68,42): error TS2345: Argument of type '"image-viewer"' is not assignable to parameter of type 'ModuleType'.
+src/components/modules/os/FileExplorerModule.tsx(70,42): error TS2345: Argument of type '"media-player"' is not assignable to parameter of type 'ModuleType'.
+src/components/modules/os/FileExplorerModule.tsx(71,40): error TS2345: Argument of type '"pdf-viewer"' is not assignable to parameter of type 'ModuleType'.
+src/components/modules/os/FileExplorerModule.tsx(72,48): error TS2345: Argument of type '"spreadsheet-viewer"' is not assignable to parameter of type 'ModuleType'.
+src/components/modules/os/ProjectManagerModule.tsx(24,10): error TS2305: Module '"@/calculators/CalculatorLoader"' has no exported member 'getModuleSchema'.
+src/components/modules/os/ProjectManagerModule.tsx(28,32): error TS2339: Property 'updateQuantity' does not exist on type 'ProjectState'.
+src/components/modules/os/ProjectManagerModule.tsx(95,13): error TS2322: Type '(string | undefined)[][]' is not assignable to type 'RowInput[]'.
+  Type '(string | undefined)[]' is not assignable to type 'RowInput'.
+    Type '(string | undefined)[]' is not assignable to type 'CellInput[]'.
+      Type 'string | undefined' is not assignable to type 'CellInput'.
+        Type 'undefined' is not assignable to type 'CellInput'.
+src/components/modules/os/ProjectManagerModule.tsx(127,13): error TS2322: Type '(string | undefined)[][]' is not assignable to type 'RowInput[]'.
+  Type '(string | undefined)[]' is not assignable to type 'RowInput'.
+    Type '(string | undefined)[]' is not assignable to type 'CellInput[]'.
+      Type 'string | undefined' is not assignable to type 'CellInput'.
+        Type 'undefined' is not assignable to type 'CellInput'.
+src/components/os/OSFrame.tsx(15,24): error TS2307: Cannot find module '@/components/flow/FlowCanvas' or its corresponding type declarations.
+src/components/os/StartMenu.tsx(107,26): error TS2367: This comparison appears to be unintentional because the types 'ModuleCategory' and '"utilities"' have no overlap.
+src/components/scene/AssemblyScene.tsx(72,11): error TS2322: Type 'RefObject<Group<Object3DEventMap> | null>' is not assignable to type 'Object3D<Object3DEventMap> | RefObject<Object3D<Object3DEventMap>> | undefined'.
+  Type 'RefObject<Group<Object3DEventMap> | null>' is not assignable to type 'RefObject<Object3D<Object3DEventMap>>'.
+    Type 'Group<Object3DEventMap> | null' is not assignable to type 'Object3D<Object3DEventMap>'.
+      Type 'null' is not assignable to type 'Object3D<Object3DEventMap>'.
+src/components/scene/AssemblyScene.tsx(79,17): error TS2345: Argument of type 'EulerTuple' is not assignable to parameter of type '[number, number, number]'.
+  Target allows only 3 element(s) but source may have more.
+src/components/scene/HeroScene.tsx(35,3): error TS2300: Duplicate identifier 'radius'.
+src/components/scene/HeroScene.tsx(36,3): error TS2300: Duplicate identifier 'radius'.
+src/components/scene/HeroScene.tsx(100,30): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(100,71): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(101,36): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(102,35): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(148,30): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(148,71): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(149,36): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(150,35): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(209,30): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(209,71): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(210,36): error TS2304: Cannot find name 'href'.
+src/components/scene/HeroScene.tsx(211,35): error TS2304: Cannot find name 'href'.
+src/components/seo/ClusterNav.tsx(23,20): error TS2352: Conversion of type '({ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides...' to type 'SEOCalculatorData[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides?...' is not comparable to type 'SEOCalculatorData'.
+    Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { k: string; ... 57 more ...; omega?: undefined; }; ... 6 more ...; faq: { ...; }[]; }; cta: { ...; }; relatedCalc...' is not comparable to type 'SEOCalculatorData'.
+      The types of 'seo.variables' are incompatible between these types.
+        Type '{ k: string; G: string; d: string; D: string; N: string; L?: undefined; C?: undefined; Q?: undefined; P?: undefined; eta?: undefined; Mu?: undefined; As?: undefined; fy?: undefined; GM?: undefined; KB?: undefined; BM?: undefined; ... 42 more ...; omega?: undefined; }' is not comparable to type 'Record<string, string>'.
+          Property '"L"' is incompatible with index signature.
+            Type 'undefined' is not comparable to type 'string'.
+src/components/seo/ClusterNav.tsx(51,36): error TS2339: Property 'intent' does not exist on type '{ h1: string; intro: string; formula: string; variables: Record<string, string>; practical: string; example?: string | undefined; step_by_step?: string | undefined; technical_data?: { ...; }[] | undefined; checklist?: string[] | undefined; pitfalls?: string[] | undefined; faq?: { ...; }[] | undefined; }'.
+src/lib/engine/registry.ts(87,77): error TS2322: Type '"diagnostics"' is not assignable to type '"mechanical" | "electrical" | "thermal" | "civil"'.
+src/lib/engine/registry.ts(96,76): error TS2322: Type '"marine"' is not assignable to type '"mechanical" | "electrical" | "thermal" | "civil"'.
+src/lib/engineering/governancePolicyEngine.ts(1,35): error TS2307: Cannot find module './rewardSystemController' or its corresponding type declarations.
+src/lib/engineering/governancePolicyEngine.ts(13,42): error TS2339: Property 'rewards' does not exist on type 'GovernedRewardState'.
+src/lib/engineering/governancePolicyEngine.ts(26,11): error TS2339: Property 'rewards' does not exist on type 'GovernedRewardState'.
+src/lib/engineering/governancePolicyEngine.ts(33,5): error TS2353: Object literal may only specify known properties, and 'rewards' does not exist in type 'GovernedRewardState'.
+src/lib/engineering/rewardDriftAnalyzer.ts(1,31): error TS2307: Cannot find module './adaptiveRewardSchema' or its corresponding type declarations.
+src/lib/engineering/rewardDriftAnalyzer.ts(5,59): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/lib/engineering/rewardStabilizer.ts(1,31): error TS2307: Cannot find module './adaptiveRewardSchema' or its corresponding type declarations.
+src/lib/engineering/rewardStabilizer.ts(11,38): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/lib/seo/clusterMap.ts(5,28): error TS2352: Conversion of type '({ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides...' to type 'SEOCalculatorData[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides?...' is not comparable to type 'SEOCalculatorData'.
+    Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { k: string; ... 57 more ...; omega?: undefined; }; ... 6 more ...; faq: { ...; }[]; }; cta: { ...; }; relatedCalc...' is not comparable to type 'SEOCalculatorData'.
+      The types of 'seo.variables' are incompatible between these types.
+        Type '{ k: string; G: string; d: string; D: string; N: string; L?: undefined; C?: undefined; Q?: undefined; P?: undefined; eta?: undefined; Mu?: undefined; As?: undefined; fy?: undefined; GM?: undefined; KB?: undefined; BM?: undefined; ... 42 more ...; omega?: undefined; }' is not comparable to type 'Record<string, string>'.
+          Property '"L"' is incompatible with index signature.
+            Type 'undefined' is not comparable to type 'string'.
+src/lib/seo/clusterMap.ts(33,25): error TS2339: Property 'intent' does not exist on type '{ h1: string; intro: string; formula: string; variables: Record<string, string>; practical: string; example?: string | undefined; step_by_step?: string | undefined; technical_data?: { ...; }[] | undefined; checklist?: string[] | undefined; pitfalls?: string[] | undefined; faq?: { ...; }[] | undefined; }'.
+src/lib/seo/graphBuilder.ts(22,16): error TS2352: Conversion of type '({ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides...' to type 'SEOCalculatorData[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { ...; }; ... 6 more ...; faq?: undefined; }; cta: { ...; }; relatedCalculators?: undefined; relatedAcademyGuides?...' is not comparable to type 'SEOCalculatorData'.
+    Type '{ id: string; title: string; slug: string; keyword: string; category: string; intent: string; meta: { title: string; description: string; }; seo: { h1: string; intro: string; formula: string; variables: { k: string; ... 57 more ...; omega?: undefined; }; ... 6 more ...; faq: { ...; }[]; }; cta: { ...; }; relatedCalc...' is not comparable to type 'SEOCalculatorData'.
+      The types of 'seo.variables' are incompatible between these types.
+        Type '{ k: string; G: string; d: string; D: string; N: string; L?: undefined; C?: undefined; Q?: undefined; P?: undefined; eta?: undefined; Mu?: undefined; As?: undefined; fy?: undefined; GM?: undefined; KB?: undefined; BM?: undefined; ... 42 more ...; omega?: undefined; }' is not comparable to type 'Record<string, string>'.
+          Property '"L"' is incompatible with index signature.
+            Type 'undefined' is not comparable to type 'string'.
+src/lib/seo/semanticScore.ts(27,39): error TS2339: Property 'intent' does not exist on type '{ h1: string; intro: string; formula: string; variables: Record<string, string>; practical: string; example?: string | undefined; step_by_step?: string | undefined; technical_data?: { ...; }[] | undefined; checklist?: string[] | undefined; pitfalls?: string[] | undefined; faq?: { ...; }[] | undefined; }'.
+src/lib/seo/semanticScore.ts(28,43): error TS2339: Property 'intent' does not exist on type '{ h1: string; intro: string; formula: string; variables: Record<string, string>; practical: string; example?: string | undefined; step_by_step?: string | undefined; technical_data?: { ...; }[] | undefined; checklist?: string[] | undefined; pitfalls?: string[] | undefined; faq?: { ...; }[] | undefined; }'.
+src/lib/seo/semanticScore.ts(32,13): error TS7006: Parameter 'word' implicitly has an 'any' type.
+src/lib/services/logicProofV2.ts(1,10): error TS2305: Module '"./calculationService"' has no exported member 'calculate'.
+src/lib/store/assemblyStore.ts(58,35): error TS2304: Cannot find name 'MachiningType'.
+src/lib/store/assemblyStore.ts(60,61): error TS2304: Cannot find name 'MachiningModifier'.
+src/lib/store/assemblyStore.ts(212,25): error TS2304: Cannot find name 'MachiningModifier'.
+src/modules/civil/ConcreteReinforcement/index.tsx(213,26): error TS2304: Cannot find name 'ShieldAlert'.
+src/modules/science/BiologyGenetics/index.tsx(223,104): error TS7006: Parameter 'val' implicitly has an 'any' type.

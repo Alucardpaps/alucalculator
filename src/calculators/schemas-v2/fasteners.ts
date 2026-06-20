@@ -160,12 +160,10 @@ const fastenerSelectionSchema: CalculatorSchemaV2 = {
         const Fp_N = v * Sy * As;
         const Fp_kN = Fp_N / 1000;
 
-        // Torque (Simplified K-factor method: T = K * d * F)
-        // K approx 0.2 for standard black/zinc
-        // K varies with mu. K ≈ 0.16*P/d + 0.58*mu + mu*(Dkm/2d) ??? 
-        // Let's use simplified Kellerman & Klein formula approx: T = F * (0.16P + 0.58*d2*mu + Dkm/2*mu)
-        // Assuming Hex head Dkm approx 1.3*d
-        const Dkm = 1.3 * d;
+        // Torque (VDI 2230 simplified — Dkm from ISO 4017 head width)
+        const sizeStr = `M${Math.round(d)}`;
+        const head = BOLT_HEAD_DIMENSIONS.find(b => b.size === sizeStr);
+        const Dkm = head ? 0.92 * head.headWidth : 1.3 * d;
         // F in N, dims in mm -> Torque in Nmm -> /1000 for Nm
         const Ma_Nmm = Fp_N * (0.16 * P + 0.58 * d2 * mu + (Dkm / 2) * mu);
         const Ma_Nm = Ma_Nmm / 1000;

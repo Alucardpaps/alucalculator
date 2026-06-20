@@ -2,45 +2,6 @@ import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue } from '@/types/engineering';
 import { calculateIsoFit } from '@/lib/engines/math/iso286';
 
-// ISO 286-1 Tolerance Calculation Logic (Simplified subset for common fits)
-// Full tables would be very large, using algorithmic approximation for standard grades
-
-const TOLERANCE_GRADES: Record<number, (d: number) => number> = {
-    // IT grades (values in microns)
-    // Formula: i = 0.45 * D^(1/3) + 0.001 * D (D in mm)
-    // Tolerance = k * i
-    // Simplified constants for ranges 
-    6: (d) => 10 * Math.pow(d, 1 / 3), // Very rough approx for IT6
-    7: (d) => 16 * Math.pow(d, 1 / 3),
-    8: (d) => 25 * Math.pow(d, 1 / 3),
-    9: (d) => 40 * Math.pow(d, 1 / 3),
-    11: (d) => 100 * Math.pow(d, 1 / 3),
-};
-
-// Fundamental Deviations (microns)
-// H = 0
-// f = -5.5 * D^0.41
-// g = -2.5 * D^0.34
-// p = IT7 + 0... complicated
-// This needs a proper library or lookup table. 
-// For this implementation, we'll use a small lookup table for common fits.
-
-const COMMON_FITS_DATA: Record<string, Record<string, [number, number]>> = {
-    // [upper, lower] deviation in microns for 30-50mm range (example)
-    'H7': { '30-50': [25, 0] },
-    'g6': { '30-50': [-9, -25] },
-    'f7': { '30-50': [-25, -50] },
-    'p6': { '30-50': [42, 26] },
-};
-
-// Start with a basic schema that calculates clearance/interference
-// We'll trust the user to input deviations if not using standard lookup, 
-// OR we implement a robust lookup later. 
-// Let's implement logic that takes Deviation inputs for now, 
-// and a "Standard Fit" dropdown that pre-fills them?
-// V2 supports dynamic defaults? No, but we can do it in the engine or UI.
-// Better: Input specific upper/lower bounds.
-
 const fitsTolerancesSchema: CalculatorSchemaV2 = {
     id: 'fits-tolerances',
     metadata: {
@@ -99,24 +60,7 @@ const fitsTolerancesSchema: CalculatorSchemaV2 = {
         const holeClass = inputs.holeClass.value as string; // e.g. "H7"
         const shaftClass = inputs.shaftClass.value as string; // e.g. "g6"
 
-        // Import engine dynamically or assume it's available?
-        // Since this file is lazy loaded, we need to import the engine. 
-        // Note: For now, I will modify the file import at top, but here is logic.
-        // Actually, this file needs the import. I will add it in next tool or manually.
-        // Wait, I can only replace contiguous blocks.
-        // I will trust that I will add the import at the top later.
-
-        // FIXME: Use the actual implementation logic here directly to be safe?
-        // No, I created src/lib/engines/math/iso286.ts.
-        // I need to import { calculateIsoFit } from '@/lib/engines/math/iso286';
-
-        // TEMPORARY MOCK UNTIL IMPORT IS ADDED:
-        // const res = calculateIsoFit(nom, holeClass, shaftClass);
-
-        // Actually, I can just use the tool to add import to top first.
-        // But for this block:
-
-        // Engine is now imported at top level
+        // ISO 286 fit engine (algorithmic IT grades + fundamental deviations).
         const res = calculateIsoFit(nom, holeClass, shaftClass);
 
         return {
@@ -142,7 +86,7 @@ const fitsTolerancesSchema: CalculatorSchemaV2 = {
         render: (result, inputs) => {
             if (!inputs) return null;
 
-            const nom = Number(inputs.nominalSize) || 50;
+            const nom = Number(inputs.nominalSize?.value ?? inputs.nominalSize) || 50;
 
             // Get deviation values from OUTPUTS
             const getVal = (key: string) => {

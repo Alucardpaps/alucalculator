@@ -5,12 +5,19 @@
  *
  * Aluminum extrusion profile rendered as box geometry.
  * PURE RENDERING — receives all data via props, zero logic inside.
+ *
+ * Supports FEA stress contour overlay driven by global feaActive state.
  */
 
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAssemblyStore } from '@/lib/store/assemblyStore';
+import { stressToColor, idToStress } from '@/lib/fea/stressUtils';
+
+// ════════════════════════════════════════════
+// Component
+// ════════════════════════════════════════════
 
 interface ProfileMeshProps {
   id: string;
@@ -38,7 +45,11 @@ export const ProfileMesh = ({
   onPointerOut,
 }: ProfileMeshProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
+  const feaMaterialRef = useRef<THREE.MeshStandardMaterial>(null);
   const [hovered, setHovered] = useState(false);
+
+  // Global FEA state
+  const feaActive = useAssemblyStore((s) => s.feaActive);
 
   // Get modifiers from state (selective subscription would be better, but we have the id)
   const modifiers = useAssemblyStore((s) => s.components[id]?.modifiers || []);
@@ -48,12 +59,22 @@ export const ProfileMesh = ({
   const profileWidth = 0.08;
   const profileHeight = 0.08;
 
+  // FEA stress — deterministic per component ID
+  const stressValue = useMemo(() => idToStress(id), [id]);
+  const stressColor = useMemo(() => stressToColor(stressValue), [stressValue]);
+
   // Glow intensity animation
   const glowRef = useRef(0);
   useFrame((_, delta) => {
     if (!meshRef.current) return;
     const targetGlow = isSelected ? 1.0 : hovered ? 0.6 : isSnappable ? 0.4 : 0;
     glowRef.current = THREE.MathUtils.lerp(glowRef.current, targetGlow, delta * 8);
+
+    // Animate FEA emissive pulse
+    if (feaActive && !isGhost && feaMaterialRef.current) {
+      const pulse = (Math.sin(Date.now() * 0.003) + 1) * 0.5;
+      feaMaterialRef.current.emissiveIntensity = 0.2 + pulse * 0.4;
+    }
   });
 
   const color = useMemo(() => {
@@ -65,11 +86,77 @@ export const ProfileMesh = ({
 
   const opacity = isGhost ? 0.35 : 1;
 
+  // Resolve material props based on FEA mode
+  const showFea = feaActive && !isGhost;
+
+  // Memoize geometry with subtractive cuts to prevent GC thrashing during render loops
+  const { geometry, edges } = useMemo(() => {
+    const shape = new THREE.Shape();
+    // Main profile cross section outline (projected on XZ plane)
+    shape.moveTo(-worldLength / 2, -profileWidth / 2);
+    shape.lineTo(worldLength / 2, -profileWidth / 2);
+    shape.lineTo(worldLength / 2, profileWidth / 2);
+    shape.lineTo(-worldLength / 2, profileWidth / 2);
+    shape.closePath();
+
+    // Subtract cuts/holes from the profile shape
+    modifiers.forEach((mod) => {
+      // Map local mm coordinates to 3D units relative to the center
+      const localX = (mod.x / 200) * 1.0 - worldLength / 2;
+      const localY = (mod.y / 200) * 1.0;
+
+      if (mod.type === 'HOLE' || mod.type === 'THREADED') {
+        const r = (mod.diameter || 8) / 400; // radius
+        const holePath = new THREE.Path();
+        holePath.absarc(localX, localY, r, 0, Math.PI * 2, true);
+        shape.holes.push(holePath);
+      } else if (mod.type === 'RECT_CUT') {
+        const w_cut = (mod.width || 20) / 200;
+        const h_cut = (mod.height || 20) / 200;
+        const cutPath = new THREE.Path();
+        // Clockwise path for clean subtraction
+        cutPath.moveTo(localX - w_cut / 2, localY - h_cut / 2);
+        cutPath.lineTo(localX - w_cut / 2, localY + h_cut / 2);
+        cutPath.lineTo(localX + w_cut / 2, localY + h_cut / 2);
+        cutPath.lineTo(localX + w_cut / 2, localY - h_cut / 2);
+        cutPath.closePath();
+        shape.holes.push(cutPath);
+      }
+    });
+
+    const extrudeSettings = {
+      depth: profileHeight,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      steps: 1,
+      bevelSize: 0.001,
+      bevelThickness: 0.001,
+      curveSegments: 24,
+    };
+
+    const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    // Rotate geometry so Z-extrusion matches Y-axis height
+    geom.rotateX(-Math.PI / 2);
+    geom.center(); // Center geometry
+
+    const edgeGeom = new THREE.EdgesGeometry(geom);
+    return { geometry: geom, edges: edgeGeom };
+  }, [worldLength, profileHeight, profileWidth, modifiers]);
+
+  // Clean up GPU memory when geometry changes or component unmounts
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      edges.dispose();
+    };
+  }, [geometry, edges]);
+
   return (
     <group position={position} rotation={rotation}>
       {/* Main profile body */}
       <mesh
         ref={meshRef}
+        geometry={geometry}
         castShadow
         receiveShadow
         onPointerDown={(e) => {
@@ -87,45 +174,54 @@ export const ProfileMesh = ({
         }}
         userData={{ componentId: id, type: 'profile' }}
       >
-        <boxGeometry args={[worldLength, profileHeight, profileWidth]} />
-        <meshStandardMaterial
-          color={color}
-          metalness={0.85}
-          roughness={0.15}
-          transparent={isGhost}
-          opacity={opacity}
-          emissive={color}
-          emissiveIntensity={glowRef.current * 0.3}
-        />
+        {showFea ? (
+          <meshStandardMaterial
+            ref={feaMaterialRef}
+            color={stressColor}
+            metalness={0.3}
+            roughness={0.5}
+            transparent
+            opacity={0.92}
+            emissive={stressColor}
+            emissiveIntensity={0.3}
+          />
+        ) : (
+          <meshStandardMaterial
+            color={color}
+            metalness={0.85}
+            roughness={0.15}
+            transparent={isGhost}
+            opacity={opacity}
+            emissive={color}
+            emissiveIntensity={glowRef.current * 0.3}
+          />
+        )}
       </mesh>
 
-      {/* Machining Modifiers Visualization */}
+      {/* FEA Wireframe Overlay */}
+      {showFea && (
+        <mesh geometry={geometry}>
+          <meshBasicMaterial wireframe wireframeLinewidth={1} color="#ffffff" transparent opacity={0.15} />
+        </mesh>
+      )}
+
+      {/* Machining Modifiers Visualization (e.g. thread rings) */}
       {!isGhost && modifiers.map((mod) => {
-        // Convert local machining coordinates to 3D positions
-        // x is along the profile length
-        // y is across the profile width
         const localX = (mod.x / 200) * 1.0 - worldLength / 2;
-        const localY = (mod.y / 200) * 1.0; 
+        const localY = (mod.y / 200) * 1.0;
+        const holeDiam = (mod.diameter || 8) / 200;
         
-        if (mod.type === 'HOLE' || mod.type === 'THREADED') {
-          const holeDiam = (mod.diameter || 8) / 200;
+        if (mod.type === 'THREADED') {
           return (
-            <group key={mod.id} position={[localX, profileHeight / 2, localY]}>
-              {/* Hole visual (subtractive look) */}
-              <mesh rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[holeDiam / 2, holeDiam / 2, 0.02, 16]} />
-                <meshBasicMaterial color="#000000" />
+            <group key={mod.id} position={[localX, profileHeight / 2 + 0.001, localY]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1.15, 1, 1.15]}>
+                <ringGeometry args={[holeDiam / 2, holeDiam / 2 + 0.003, 16]} />
+                <meshBasicMaterial color="#60a5fa" transparent opacity={0.8} />
               </mesh>
-              {/* Highlight for threads */}
-              {mod.type === 'THREADED' && (
-                <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1.2, 1, 1.2]}>
-                  <ringGeometry args={[holeDiam / 2, holeDiam / 2 + 0.005, 16]} />
-                  <meshBasicMaterial color="#60a5fa" transparent opacity={0.6} />
-                </mesh>
-              )}
             </group>
           );
         }
+        return null;
         
         if (mod.type === 'SURFACE_MILLED') {
           return (
@@ -153,8 +249,7 @@ export const ProfileMesh = ({
 
       {/* Selection outline */}
       {(isSelected || hovered) && !isGhost && (
-        <lineSegments>
-          <edgesGeometry args={[new THREE.BoxGeometry(worldLength + 0.01, profileHeight + 0.01, profileWidth + 0.01)]} />
+        <lineSegments geometry={edges}>
           <lineBasicMaterial color="#00e5ff" linewidth={2} transparent opacity={0.7} />
         </lineSegments>
       )}

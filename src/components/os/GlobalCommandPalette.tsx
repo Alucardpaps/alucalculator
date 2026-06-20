@@ -7,6 +7,7 @@ import { MODULE_REGISTRY } from '@/config/modules';
 import { ENGINEERING_CONSTANTS, EngineeringConstant } from '@/data/engineering-constants';
 import { Search, Monitor, Terminal, Bot, Settings, Zap, X, Eye, Focus, Volume2, VolumeX, AlertTriangle, Code, Clock, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AegisIcon } from '@/components/copilot/AegisIcon';
 
 export function GlobalCommandPalette() {
     const [open, setOpen] = useState(false);
@@ -208,8 +209,8 @@ export function GlobalCommandPalette() {
                                         }}
                                         className="flex items-center px-3 py-2.5 mt-1 rounded-lg cursor-pointer hover:bg-cyan-900/30 aria-selected:bg-cyan-900/40 transition-colors"
                                     >
-                                        <Bot className="w-4 h-4 mr-3 text-indigo-400" />
-                                        <span className="font-medium text-sm text-indigo-100">Launch AI Copilot</span>
+                                        <AegisIcon size={16} mode="idle" />
+                                        <span className="font-medium text-sm text-indigo-100 ml-3">Launch AeGiS</span>
                                     </Command.Item>
                                     <Command.Item
                                         onSelect={() => {

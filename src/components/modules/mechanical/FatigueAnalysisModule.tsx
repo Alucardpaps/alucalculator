@@ -55,17 +55,17 @@ export default function FatigueAnalysisModule() {
     const scaleY = (val: number) => 500 - padding - (val / MAX_Y) * boxH;
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden p-2">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden p-2 gap-4">
             {/* LEFT PANEL - Control Center (35%) */}
-            <div className="w-[35%] h-full flex flex-col bg-[#080d14]/80 rounded-2xl border border-white/5 backdrop-blur-2xl px-6 py-6 overflow-y-auto custom-scrollbar">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 rounded-2xl border border-white/5 backdrop-blur-2xl px-6 py-6 overflow-y-auto custom-scrollbar">
                 
                 <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                    <div className="p-2.5 bg-fuchsia-500/10 rounded-xl border border-fuchsia-500/20 text-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.15)]">
+                    <div className="p-2.5 bg-cyan-500/10 rounded-xl border border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.15)]">
                         <Activity size={20} strokeWidth={2} />
                     </div>
                     <div>
                         <h2 className="text-xl font-bold tracking-tight text-gray-100">Fatigue Life</h2>
-                        <p className="text-[10px] text-fuchsia-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Endurance Limit Analysis</p>
+                        <p className="text-[10px] text-cyan-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Endurance Limit Analysis</p>
                     </div>
                 </div>
 
@@ -75,7 +75,7 @@ export default function FatigueAnalysisModule() {
                 </div>
 
                 <div className="space-y-6 flex-1">
-                    <PremiumNumBox label="Ultimate Tensile (S_ut)" unit="MPa" value={inputs.S_ut} min={100} max={3000} step={10} onChange={(v: number) => setInputs({ ...inputs, S_ut: v })} color="#a855f7" />
+                    <PremiumNumBox label="Ultimate Tensile (S_ut)" unit="MPa" value={inputs.S_ut} min={100} max={3000} step={10} onChange={(v: number) => setInputs({ ...inputs, S_ut: v })} color="#00e5ff" />
                     <PremiumNumBox label="Yield Strength (S_y)" unit="MPa" value={inputs.S_y} min={100} max={2500} step={10} onChange={(v: number) => setInputs({ ...inputs, S_y: v })} color="#3b82f6" />
                     
                     <div className="my-8 border-t border-white/5 pt-6"></div>
@@ -95,7 +95,7 @@ export default function FatigueAnalysisModule() {
             </div>
 
             {/* RIGHT PANEL - Live Visualization & Output (65%) */}
-            <div className="w-[65%] h-full flex flex-col px-6">
+            <div className="flex-1 h-auto lg:h-full flex flex-col px-6 min-w-0">
                 
                 {/* Math Results Header */}
                 <div className="flex-none pt-8 pb-4">
@@ -122,7 +122,7 @@ export default function FatigueAnalysisModule() {
                         
                         <div className="flex flex-col items-end gap-1 pt-6 text-right">
                             <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Endurance Limit (Se)</span>
-                            <span className="text-3xl font-mono font-black text-fuchsia-400">{results.S_e.toFixed(1)} <span className="text-xl text-gray-500">MPa</span></span>
+                            <span className="text-3xl font-mono font-black text-cyan-400">{results.S_e.toFixed(1)} <span className="text-xl text-gray-500">MPa</span></span>
                         </div>
                     </div>
                 </div>
@@ -168,14 +168,14 @@ export default function FatigueAnalysisModule() {
                             <line 
                                 x1={scaleX(0)} y1={scaleY(results.S_e)} 
                                 x2={scaleX(inputs.S_ut)} y2={scaleY(0)} 
-                                stroke="#a855f7" strokeWidth="3" strokeDasharray="6,6" opacity={0.8}
+                                stroke="#00e5ff" strokeWidth="3" strokeDasharray="6,6" opacity={0.8}
                             />
                             
                             {/* Goodman Labels */}
-                            <text x={scaleX(inputs.S_ut)} y={scaleY(0)+25} fill="#a855f7" fontSize="13" fontWeight="bold" textAnchor="middle">S_ut ({inputs.S_ut})</text>
-                            <text x={scaleX(0)-15} y={scaleY(results.S_e)} fill="#a855f7" fontSize="13" fontWeight="bold" textAnchor="end" dominantBaseline="middle">S_e ({results.S_e.toFixed(0)})</text>
-                            <circle cx={scaleX(inputs.S_ut)} cy={scaleY(0)} r="4" fill="#a855f7" />
-                            <circle cx={scaleX(0)} cy={scaleY(results.S_e)} r="4" fill="#a855f7" />
+                            <text x={scaleX(inputs.S_ut)} y={scaleY(0)+25} fill="#00e5ff" fontSize="13" fontWeight="bold" textAnchor="middle">S_ut ({inputs.S_ut})</text>
+                            <text x={scaleX(0)-15} y={scaleY(results.S_e)} fill="#00e5ff" fontSize="13" fontWeight="bold" textAnchor="end" dominantBaseline="middle">S_e ({results.S_e.toFixed(0)})</text>
+                            <circle cx={scaleX(inputs.S_ut)} cy={scaleY(0)} r="4" fill="#00e5ff" />
+                            <circle cx={scaleX(0)} cy={scaleY(results.S_e)} r="4" fill="#00e5ff" />
 
                             {/* Langer Yield Line (S_y on Y to S_y on X) */}
                             <line 

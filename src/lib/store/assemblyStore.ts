@@ -15,6 +15,8 @@ import type {
   SnapConfig,
   SnapResult,
   ConnectionRule,
+  MachiningType,
+  MachiningModifier,
 } from '@/lib/types/v5-types';
 
 // Re-import as values (not just types)
@@ -41,6 +43,8 @@ interface AssemblyState {
   selectedId: string | null;
   /** Workspace tool mode */
   toolMode: 'select' | 'translate' | 'rotate';
+  /** Whether FEA stress rendering is active */
+  feaActive: boolean;
 }
 
 // ════════════════════════════════════════════
@@ -55,7 +59,7 @@ interface AssemblyActions {
   updateMetadata: (id: string, metadata: Partial<WorkspaceComponent['metadata']>) => void;
 
   // ── Machining Modifiers ──
-  addModifier: (id: string, type: MachiningType) => void;
+  addModifier: (id: string, type: MachiningType, face?: 'top' | 'front' | 'side', x?: number, y?: number) => void;
   removeModifier: (id: string, modId: string) => void;
   updateModifier: (id: string, modId: string, data: Partial<MachiningModifier>) => void;
 
@@ -74,6 +78,9 @@ interface AssemblyActions {
 
   // ── Tools ──
   setToolMode: (mode: 'select' | 'translate' | 'rotate') => void;
+
+  // ── FEA Visualization ──
+  setFeaActive: (active: boolean) => void;
 
   // ── Snap Config ──
   setSnapEnabled: (enabled: boolean) => void;
@@ -119,6 +126,7 @@ export const useAssemblyStore = create<AssemblyState & AssemblyActions>()(
       connectionRules: [...RULES],
       selectedId: null,
       toolMode: 'select',
+      feaActive: false,
 
       // ════════════════════════════════════════
       // Component CRUD
@@ -192,19 +200,46 @@ export const useAssemblyStore = create<AssemblyState & AssemblyActions>()(
           const component = state.components[id];
           if (!component) return state;
 
+          const newMeta = { ...component.metadata, ...metadata };
+          let newWeight = component.metadata.weight;
+          let newCost = component.metadata.unitCost;
+
+          if (component.type === 'profile' && metadata.length !== undefined) {
+            newWeight = parseFloat((newMeta.length! * 0.0027).toFixed(3));
+            newCost = parseFloat((newMeta.length! * 0.0625).toFixed(2));
+          } else if (component.type === 'gear' && (metadata.teeth !== undefined || metadata.module !== undefined || metadata.width !== undefined)) {
+            const Rp = ((newMeta.module ?? 2) * (newMeta.teeth ?? 24)) / 2;
+            const volume = Math.PI * Rp * Rp * (newMeta.width ?? 20);
+            const steelDensity = 7.85e-6; // kg/mm^3
+            newWeight = parseFloat((volume * steelDensity).toFixed(3));
+            newCost = parseFloat((newWeight * 15 + 5).toFixed(2));
+          } else if (component.type === 'bearing' && (metadata.innerDia !== undefined || metadata.outerDia !== undefined || metadata.width !== undefined)) {
+            const rOuter = (newMeta.outerDia ?? 47) / 2;
+            const rInner = (newMeta.innerDia ?? 20) / 2;
+            const volume = Math.PI * (rOuter * rOuter - rInner * rInner) * (newMeta.width ?? 14);
+            const steelDensity = 7.85e-6; // kg/mm^3
+            newWeight = parseFloat((volume * steelDensity * 0.65).toFixed(3)); // 65% fill factor
+            newCost = parseFloat((newWeight * 30 + 8).toFixed(2));
+          } else if (component.type === 'key' && (metadata.length !== undefined || metadata.width !== undefined || metadata.height !== undefined)) {
+            const volume = (newMeta.length ?? 20) * (newMeta.width ?? 6) * (newMeta.height ?? 6);
+            const steelDensity = 7.85e-6; // kg/mm^3
+            newWeight = parseFloat((volume * steelDensity).toFixed(3));
+            newCost = parseFloat((newWeight * 20 + 0.5).toFixed(2));
+          }
+
           return {
             components: {
               ...state.components,
               [id]: {
                 ...component,
-                metadata: { ...component.metadata, ...metadata },
+                metadata: { ...newMeta, weight: newWeight, unitCost: newCost },
               },
             },
           };
         });
       },
 
-      addModifier: (id, type) => {
+      addModifier: (id, type, face = 'top', x = 0, y = 0) => {
         set((state) => {
           const component = state.components[id];
           if (!component) return state;
@@ -212,9 +247,12 @@ export const useAssemblyStore = create<AssemblyState & AssemblyActions>()(
           const newMod: MachiningModifier = {
             id: crypto.randomUUID(),
             type,
-            x: 0,
-            y: 0,
+            face,
+            x,
+            y,
             diameter: type === 'HOLE' || type === 'THREADED' ? 8 : undefined,
+            width: type === 'RECT_CUT' ? 20 : undefined,
+            height: type === 'RECT_CUT' ? 20 : undefined,
             depth: 10,
           };
 
@@ -411,6 +449,10 @@ export const useAssemblyStore = create<AssemblyState & AssemblyActions>()(
         set({ toolMode: mode });
       },
 
+      setFeaActive: (active) => {
+        set({ feaActive: active });
+      },
+
       // ════════════════════════════════════════
       // Snap Config
       // ════════════════════════════════════════
@@ -526,3 +568,6 @@ export const selectIsSelected = (id: string) => (state: AssemblyState) =>
 /** Get count of all components */
 export const selectComponentCount = (state: AssemblyState) =>
   Object.keys(state.components).length;
+
+/** Whether FEA stress visualization is active */
+export const selectFeaActive = (state: AssemblyState) => state.feaActive;

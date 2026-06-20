@@ -76,7 +76,9 @@ export default function ProfileWeightModule() {
             case 'angle': netVolume = (width * thickness + (height - thickness) * thickness) * length; break;
             case 'channel': netVolume = (width * thickness * 2 + (height - 2 * thickness) * thickness) * length; break;
             case 'i-beam': netVolume = (2 * flangeW * flangeT + (webH - 2 * flangeT) * webT) * length; break;
-            case 'hex': netVolume = (3 * Math.sqrt(3) / 2) * Math.pow(diameter / 2, 2) * length; break;
+            // Hex bar is specified by its across-flats (wrench) size S.
+            // Cross-section area of a regular hexagon = (√3/2)·S² ≈ 0.866·S².
+            case 'hex': netVolume = (Math.sqrt(3) / 2) * Math.pow(diameter, 2) * length; break;
         }
 
         const kerfSpec = CUTTING_METHODS.find(c => c.method === cuttingMethod);
@@ -112,6 +114,7 @@ export default function ProfileWeightModule() {
 
     const addToProject = () => {
         addItem({
+            type: 'part',
             name: `${SHAPES.find(s => s.id === shape)?.label} ${width || diameter}x${height || thickness} L${length}`,
             category, material, quantity,
             weightPerUnit: result.totalWeightKg,
@@ -158,9 +161,9 @@ export default function ProfileWeightModule() {
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden">
             {/* ═══ LEFT PANEL — Controls (38%) ═══ */}
-            <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
                 {/* Header */}
                 <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
                     <div className="flex items-center gap-3">
@@ -218,7 +221,8 @@ export default function ProfileWeightModule() {
                                     <PanelInput label="Thickness" unit="mm" value={thickness} onChange={setThickness} color="#06b6d4" />
                                 </div>
                             </>}
-                            {(shape === 'round' || shape === 'hex') && <PanelInput label="Diameter" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />}
+                            {shape === 'round' && <PanelInput label="Diameter" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />}
+                            {shape === 'hex' && <PanelInput label="Across-Flats (S)" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />}
                             {shape === 'tube' && <div className="grid grid-cols-2 gap-3">
                                 <PanelInput label="Outer Ø" unit="mm" value={diameter} onChange={setDiameter} color="#06b6d4" />
                                 <PanelInput label="Wall" unit="mm" value={wallThickness} onChange={setWallThickness} color="#06b6d4" />
@@ -263,7 +267,7 @@ export default function ProfileWeightModule() {
             </div>
 
             {/* ═══ RIGHT PANEL — Visualization & Results (62%) ═══ */}
-            <div className="w-[62%] h-full flex flex-col overflow-hidden">
+            <div className="flex-1 h-auto lg:h-full flex flex-col overflow-hidden min-w-0">
                 {/* Giant KPI Header */}
                 <div className="flex-none px-8 pt-8 pb-4">
                     <div className="flex items-start justify-between">

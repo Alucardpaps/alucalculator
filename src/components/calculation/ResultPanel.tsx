@@ -1,6 +1,10 @@
+'use client';
+
 import React, { useState, memo } from 'react';
 import { CheckCircle, AlertTriangle, Cpu, Zap, Activity, Info, ChevronDown, ChevronUp, Terminal } from 'lucide-react';
 import { ExecutionResult } from '@/lib/utils/contract';
+import { useI18nStore } from '@/store/i18nStore';
+import { getWorkstationPage } from '@/locales/workstationPageTranslations';
 
 /**
  * Compressed ResultPanel Component
@@ -13,6 +17,8 @@ interface ResultPanelProps {
 }
 
 export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) => {
+    const { language } = useI18nStore();
+    const t = getWorkstationPage(language).resultPanel;
     const [showTelemetry, setShowTelemetry] = useState(false);
 
     if (isComputing) {
@@ -22,7 +28,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                     <div className="w-16 h-16 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
                     <Cpu className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
-                <p className="text-[10px] font-bold tracking-[0.3em] text-blue-500 uppercase">Processing Engine Request</p>
+                <p className="text-[10px] font-bold tracking-[0.3em] text-blue-500 uppercase">{t.processing}</p>
             </div>
         );
     }
@@ -31,7 +37,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
         return (
             <div className="bg-[#0f172a]/30 text-slate-600 rounded-2xl p-8 border border-slate-900 border-dashed flex flex-col items-center justify-center gap-4 min-h-[350px]">
                 <Info className="w-6 h-6 opacity-20" />
-                <p className="text-[10px] uppercase font-bold tracking-widest">Awaiting Parameters</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest">{t.awaiting}</p>
             </div>
         );
     }
@@ -53,7 +59,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                 </p>
                 <div className="flex items-center justify-between pt-6 border-t border-white/5">
                     <span className="text-[10px] font-mono opacity-40">TRACE: {traceId.split('-')[0]}</span>
-                    <button className="text-[10px] font-bold uppercase underline">Report Issue</button>
+                    <button type="button" className="text-[10px] font-bold uppercase underline">{t.reportIssue}</button>
                 </div>
             </div>
         );
@@ -66,14 +72,15 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
             <div className="p-6 border-b border-slate-800/50 flex justify-between items-center bg-slate-900/30">
                 <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-bold uppercase tracking-[0.2em]">
                     <Zap size={12} className="fill-emerald-500" />
-                    Engine Verified
+                    {t.engineVerified}
                 </div>
                 <button 
+                    type="button"
                     onClick={() => setShowTelemetry(!showTelemetry)}
                     className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-slate-300 transition-colors uppercase font-bold"
                 >
                     <Terminal size={12} />
-                    {showTelemetry ? "Hide Logs" : "Inspect"}
+                    {showTelemetry ? t.hideLogs : t.inspect}
                     {showTelemetry ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                 </button>
             </div>
@@ -83,7 +90,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                 <div className="space-y-1 mb-8">
                     {data.stress !== undefined ? (
                         <>
-                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Calculated Stress Output</p>
+                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{t.calculatedStress}</p>
                             <div className="flex items-baseline gap-3">
                                 <span className="text-7xl font-mono font-black tracking-tighter text-white">
                                     {Number(data.stress).toFixed(4)}
@@ -93,7 +100,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                         </>
                     ) : data.displacement !== undefined ? (
                         <>
-                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Displacement / Tonnes</p>
+                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{t.displacementTonnes}</p>
                             <div className="flex items-baseline gap-3">
                                 <span className="text-7xl font-mono font-black tracking-tighter text-white">
                                     {Number(data.displacement).toLocaleString()}
@@ -122,11 +129,11 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                 <div className="flex items-center gap-6 pt-6 border-t border-slate-800/50">
                     <div className="flex items-center gap-2">
                         <Activity size={12} className={performance.status === 'healthy' ? 'text-emerald-500' : 'text-orange-500'} />
-                        <span className="text-[10px] font-mono text-slate-400">{performance.totalMs}ms Execution</span>
+                        <span className="text-[10px] font-mono text-slate-400">{performance.totalMs}ms {t.executionMs}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <CheckCircle size={12} className="text-emerald-500" />
-                        <span className="text-[10px] font-mono text-slate-400">Determinism v1.0</span>
+                        <span className="text-[10px] font-mono text-slate-400">{t.determinism}</span>
                     </div>
                 </div>
             </div>
@@ -134,7 +141,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
             {/* Inspectable Depth (Telemetry) */}
             {showTelemetry && (
                 <div className="p-6 bg-black/40 border-t border-slate-800/50 animate-in slide-in-from-bottom-2 duration-300">
-                    <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Execution Timeline</h5>
+                    <h5 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">{t.executionTimeline}</h5>
                     <div className="space-y-3">
                         {telemetry.mode === 'full' ? (
                             telemetry.timeline.map((step: any, i: number) => (
@@ -145,8 +152,8 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                             ))
                         ) : (
                             <div className="flex justify-between items-center text-[10px] font-mono">
-                                <span className="text-slate-400">Total Logic Stages</span>
-                                <span className="text-slate-600">{telemetry.timeline.steps} steps</span>
+                                <span className="text-slate-400">{t.totalLogicStages}</span>
+                                <span className="text-slate-600">{telemetry.timeline.steps} {t.steps}</span>
                             </div>
                         )}
                         <div className="pt-2 mt-2 border-t border-white/5 flex justify-between text-[9px] font-mono text-slate-700">

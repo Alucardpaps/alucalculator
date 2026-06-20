@@ -45,6 +45,27 @@ const PALETTE_ITEMS: PaletteItem[] = [
     icon: '⏣',
     color: '#f472b6',
   },
+  {
+    type: 'gear',
+    label: 'Spur Gear',
+    description: 'Customizable gear teeth',
+    icon: '⚙',
+    color: '#fbbf24',
+  },
+  {
+    type: 'bearing',
+    label: 'Ball Bearing',
+    description: 'High-speed rotary support',
+    icon: '◎',
+    color: '#34d399',
+  },
+  {
+    type: 'key',
+    label: 'Shaft Key',
+    description: 'Torque keyway insert',
+    icon: '▱',
+    color: '#fb923c',
+  },
 ];
 
 // ════════════════════════════════════════════

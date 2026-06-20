@@ -81,7 +81,7 @@ export default function GearboxDesignModule() {
     };
 
     return (
-        <div className="flex flex-col w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-purple-500/30">
+        <div className="flex flex-col w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-cyan-500/30">
             {/* Visual Grid Layer */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(168,85,247,0.1),transparent_50%)] pointer-events-none" />
 
@@ -90,18 +90,18 @@ export default function GearboxDesignModule() {
                 {/* Header */}
                 <header className="flex items-center justify-between shrink-0 mb-2 border-b border-white/5 pb-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+                        <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,229,255,0.2)]">
                             <Settings className="animate-[spin_4s_linear_infinite]" size={24} />
                         </div>
                         <div>
                             <h1 className="text-xl font-black tracking-tighter text-white uppercase italic">Gearbox Ratio Engine</h1>
-                            <p className="text-[10px] text-purple-500/60 font-mono tracking-widest uppercase">Multi-Stage Transmission Synthesis</p>
+                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase">Multi-Stage Transmission Synthesis</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4 px-6 py-3 bg-[#0a101f] border border-white/5 rounded-xl shadow-inner">
                         <div className="flex flex-col items-end">
                             <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Total Global Ratio</span>
-                            <span className="text-xl font-black font-mono text-purple-400">1 : {formatNum(results.totalRatio, 2)}</span>
+                            <span className="text-xl font-black font-mono text-cyan-400">1 : {formatNum(results.totalRatio, 2)}</span>
                         </div>
                     </div>
                 </header>
@@ -142,10 +142,10 @@ export default function GearboxDesignModule() {
                         </div>
 
                         {/* FINAL OUTPUT DATA */}
-                        <div className="bg-purple-900/10 backdrop-blur-xl border border-purple-500/20 rounded-[2rem] p-6 relative overflow-hidden flex-1">
+                        <div className="bg-cyan-900/10 backdrop-blur-xl border border-cyan-500/20 rounded-[2rem] p-6 relative overflow-hidden flex-1">
                             <div className="flex items-center gap-3 mb-6">
-                                <Gauge className="text-purple-400" size={18} />
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500">Output Shaft Metrics</h2>
+                                <Gauge className="text-cyan-400" size={18} />
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">Output Shaft Metrics</h2>
                             </div>
                             
                             <div className="flex flex-col gap-4">
@@ -157,7 +157,7 @@ export default function GearboxDesignModule() {
                                     <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Final Torque</span>
                                     <div className="text-5xl font-black font-mono text-white">{formatNum(results.finalTorque, 0)} <span className="text-xl text-slate-600 font-sans">Nm</span></div>
                                 </div>
-                                <div className="w-full h-px bg-purple-500/20 my-2" />
+                                <div className="w-full h-px bg-cyan-500/20 my-2" />
                                 <div className="flex items-center justify-between">
                                     <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Global Efficiency</span>
                                     <span className="font-black text-emerald-400">{(results.totalEfficiency * 100).toFixed(1)}%</span>
@@ -206,7 +206,7 @@ export default function GearboxDesignModule() {
                                                     <input 
                                                         type="number" value={stage.z1} 
                                                         onChange={e => updateStage(idx, 'z1', Number(e.target.value))}
-                                                        className="w-full bg-[#0a101f] border border-white/10 rounded-lg p-2 font-mono text-white outline-none focus:border-purple-500/50 transition-colors"
+                                                        className="w-full bg-[#0a101f] border border-white/10 rounded-lg p-2 font-mono text-white outline-none focus:border-cyan-500/50 transition-colors"
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
@@ -214,7 +214,7 @@ export default function GearboxDesignModule() {
                                                     <input 
                                                         type="number" value={stage.z2} 
                                                         onChange={e => updateStage(idx, 'z2', Number(e.target.value))}
-                                                        className="w-full bg-[#0a101f] border border-white/10 rounded-lg p-2 font-mono text-white outline-none focus:border-purple-500/50 transition-colors"
+                                                        className="w-full bg-[#0a101f] border border-white/10 rounded-lg p-2 font-mono text-white outline-none focus:border-cyan-500/50 transition-colors"
                                                     />
                                                 </div>
                                                 <div className="space-y-1 col-span-2">
@@ -231,10 +231,10 @@ export default function GearboxDesignModule() {
                                                 <ArrowRight size={24} />
                                             </div>
 
-                                            <div className="w-full md:w-48 bg-purple-900/10 border border-purple-500/20 rounded-xl p-4 flex flex-col gap-2">
+                                            <div className="w-full md:w-48 bg-cyan-900/10 border border-cyan-500/20 rounded-xl p-4 flex flex-col gap-2">
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-[9px] font-bold uppercase text-slate-500">Ratio</span>
-                                                    <span className="font-mono text-sm text-purple-400">1:{formatNum(stgRes.ratio)}</span>
+                                                    <span className="font-mono text-sm text-cyan-400">1:{formatNum(stgRes.ratio)}</span>
                                                 </div>
                                                 <div className="w-full h-px bg-white/5" />
                                                 <div className="flex justify-between items-center">

@@ -65,11 +65,11 @@ export default function FileExplorerModule() {
             handleNavigate(file.id);
         } else {
             switch (file.type) {
-                case 'image': openWindow('image-viewer'); break;
+                case 'image': openWindow('image-viewer' as any); break;
                 case 'video':
-                case 'audio': openWindow('media-player'); break;
-                case 'pdf': openWindow('pdf-viewer'); break;
-                case 'spreadsheet': openWindow('spreadsheet-viewer'); break;
+                case 'audio': openWindow('media-player' as any); break;
+                case 'pdf': openWindow('pdf-viewer' as any); break;
+                case 'spreadsheet': openWindow('spreadsheet-viewer' as any); break;
                 default: console.log('Opening file:', file.name);
             }
         }

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { IEC_MOTORS, Motor } from '@/data/motorData';
 import { GEAR_MATERIALS, GearMaterial, APPLICATION_FACTORS, ApplicationFactor, GEAR_MODULES_ISO } from '@/data/gearsData';
 import {
@@ -51,7 +51,7 @@ export const useDriveTrainCalculator = () => {
     const [pinDia2, setPinDia2] = useState<number>(Number((1.7 * 3).toFixed(2)));
 
     // Update default pin when module changes
-    useMemo(() => {
+    useEffect(() => {
         const def = Number((1.7 * gearModule).toFixed(2));
         setPinDia1(def);
         setPinDia2(def);
@@ -80,15 +80,21 @@ export const useDriveTrainCalculator = () => {
         const requiredFs = baseFs * startFactor;
 
         // Geometry
-        const betaRad = (gearType === 'helical' ? helixAngle : 0) * (Math.PI / 180);
-        const alphaRad = pressureAngle * (Math.PI / 180);
-        const mt = gearModule / Math.cos(betaRad);
+        // NOTE: Helix angle (β) always drives the geometry. A gear is "helical"
+        // whenever β > 0; there is no separate spur/helical toggle that can
+        // accidentally null out the angle. With β > 0 the transverse module
+        // grows (mt = mn / cos β), which in turn increases the reference
+        // diameters and therefore the center distance — exactly as expected.
+        const betaRad = (helixAngle || 0) * (Math.PI / 180);
+        const alphaRad = pressureAngle * (Math.PI / 180); // normal pressure angle (αn)
+        const mt = gearModule / Math.cos(betaRad);         // transverse module (mt)
+        // Transverse pressure angle (αt) — depends on both αn and β.
         const alpha_t_rad = Math.atan(Math.tan(alphaRad) / Math.cos(betaRad));
 
-        // Pitch Diameters
+        // Reference (pitch) Diameters — transverse plane: d = z · mt
         const d1 = z1 * mt;
         const d2 = z2 * mt;
-        const a_standard = (d1 + d2) / 2; // Standard Center Distance
+        const a_standard = (d1 + d2) / 2; // Standard Center Distance (a = mn·(z1+z2) / (2·cosβ))
 
         // --- PROFILE SHIFT LOGIC ---
         // Involute Function: inv(x) = tan(x) - x
@@ -195,8 +201,13 @@ export const useDriveTrainCalculator = () => {
             outputSpeed,
             outputTorque,
             ratio: i,
-            d1: d1 + (2 * x1 * gearModule),
-            d2: d2 + (2 * x2 * gearModule),
+            // True reference (pitch) diameters in the transverse plane.
+            // Profile shift (x) changes tooth thickness, NOT the reference diameter.
+            d1,
+            d2,
+            mt,
+            betaDeg: helixAngle,
+            alpha_t_deg: alpha_t_rad * (180 / Math.PI),
             da1,
             da2,
             df1,

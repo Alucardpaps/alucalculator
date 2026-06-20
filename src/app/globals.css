@@ -1,6 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap');
 @import "tailwindcss";
 
 @theme {
+  /* Fonts */
+  --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+
   /* Core Brand Colors */
   --color-brand-blue: #0A2342;
   --color-brand-orange: #FF5722;
@@ -19,22 +24,36 @@
   --color-surface-900: #0F172A;
   --color-surface-950: #020617;
 
-  /* AluCalc OS Theme (Cyber-Industrial) */
+  /* ════════════════════════════════════════════════════════════
+     AluCalc OS — CANONICAL THEME ("Cyber-Industrial Blueprint")
+     Single source of truth for ALL pages/modules. Components must
+     pull accents from these tokens instead of hardcoding hexes so
+     every screen shares one visual identity.
+     • Primary accent  : electric cyan  #00e5ff
+     • Secondary accent: violet         #8b5cf6  (secondary data series)
+     • Tertiary accent : amber          #f59e0b  (highlights / torque)
+     • Semantic        : success/warn/danger
+     ════════════════════════════════════════════════════════════ */
   --color-os-canvas: #020408;
   --color-os-panel: rgba(5, 9, 14, 0.85);
   --color-os-header: rgba(0, 0, 0, 0.4);
   --color-os-border: rgba(0, 229, 255, 0.15);
   --color-os-accent: #00e5ff;
   --color-os-accent-dim: rgba(0, 229, 255, 0.3);
+  /* Secondary / tertiary accents (use for 2nd & 3rd data series) */
+  --color-os-accent-2: #8b5cf6;
+  --color-os-accent-2-dim: rgba(139, 92, 246, 0.3);
+  --color-os-accent-3: #f59e0b;
+  --color-os-accent-3-dim: rgba(245, 158, 11, 0.3);
   --color-os-text-primary: #ecfeff;
   /* cyan-50 */
   --color-os-text-secondary: rgba(236, 254, 255, 0.5);
   /* cyan-50/50 */
-  --color-os-success: #00e5ff;
+  --color-os-success: #10b981;
   --color-os-warning: #f59e0b;
   --color-os-danger: #ef4444;
 
-  /* Fonts */
+  /* Fonts mapping */
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
 
@@ -73,6 +92,53 @@
 
 @utility field-label {
   @apply block text-[9px] font-bold text-cyan-900/60 uppercase tracking-widest mb-2 font-mono;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CANONICAL HUD PRIMITIVES — shared across every module so all
+   pages render with one consistent visual language. Prefer these
+   over per-component bespoke styling.
+   ════════════════════════════════════════════════════════════ */
+
+/* Glass panel/card used for every grouped section */
+@utility hud-card {
+  @apply rounded-2xl border p-5 relative overflow-hidden;
+  background: var(--color-os-panel);
+  border-color: var(--color-os-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.04);
+}
+
+/* Section / panel heading — small mono caps with accent */
+@utility hud-section-title {
+  @apply text-[10px] font-bold uppercase tracking-[0.25em] font-mono flex items-center gap-2;
+  color: var(--color-os-accent);
+}
+
+/* Small dim label above an input or stat */
+@utility hud-label {
+  @apply block text-[9px] font-bold uppercase tracking-widest mb-1.5 font-mono;
+  color: var(--color-os-text-secondary);
+}
+
+/* Large primary readout number */
+@utility hud-stat-value {
+  @apply font-mono font-black tabular-nums tracking-tighter leading-none;
+  color: var(--color-os-accent);
+}
+
+/* Hairline divider tinted with the accent */
+@utility hud-divider {
+  @apply w-full h-px my-3;
+  background: linear-gradient(90deg, transparent, var(--color-os-border), transparent);
+}
+
+/* Pill/chip toggle in its active state */
+@utility hud-chip-active {
+  background: color-mix(in srgb, var(--color-os-accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-os-accent) 50%, transparent);
+  color: var(--color-os-accent);
 }
 
 @utility calc-btn {
@@ -232,4 +298,103 @@ body {
 
 .animate-meteor {
   animation: meteor 5s linear infinite;
+}
+
+/* ═══ CUSTOM SCROLLBAR ═══ */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 8px 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ═══ PREMIUM ENGINEERING APP UTILITIES ═══ */
+.glass-hud-panel {
+  background: rgba(5, 10, 18, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 2px 0 rgba(255, 255, 255, 0.05);
+}
+
+.fea-mesh-overlay {
+  background-image: 
+    linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+
+.fea-stress-gradient {
+  background: linear-gradient(90deg, 
+    rgba(37, 99, 235, 0.2) 0%, 
+    rgba(16, 185, 129, 0.2) 30%, 
+    rgba(245, 158, 11, 0.3) 70%, 
+    rgba(239, 68, 68, 0.4) 100%);
+}
+
+/* --- WEBVIEW/APK SAFE AREA UTILITIES --- */
+@utility safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@keyframes float-hexagon-1 {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.02; }
+  50% { transform: translateY(-40px) rotate(180deg); opacity: 0.06; }
+  100% { transform: translateY(0px) rotate(360deg); opacity: 0.02; }
+}
+
+@keyframes float-hexagon-2 {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.03; }
+  50% { transform: translateY(-70px) rotate(-180deg); opacity: 0.08; }
+  100% { transform: translateY(0px) rotate(-360deg); opacity: 0.03; }
+}
+
+@keyframes float-hexagon-3 {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.02; }
+  50% { transform: translateY(-100px) rotate(90deg); opacity: 0.07; }
+  100% { transform: translateY(0px) rotate(360deg); opacity: 0.02; }
+}
+
+.animate-float-hex-1 {
+  animation: float-hexagon-1 25s ease-in-out infinite;
+}
+
+.animate-float-hex-2 {
+  animation: float-hexagon-2 35s ease-in-out infinite;
+}
+
+.animate-float-hex-3 {
+  animation: float-hexagon-3 45s ease-in-out infinite;
+}
+
+/* workstation-container-bg-cleanse clears root backgrounds of loaded modules */
+.workstation-container-bg-cleanse > * {
+  background-color: transparent !important;
+  background-image: none !important;
 }

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FactoryLayoutResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/factory_layout_resource.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+length = 80.0
+width = 20.0
+height = 10.0
+z_offset = -8.0
+wall_material_type = "concrete"
+ceiling_lights = [Vector3(20, 9.8, -4), Vector3(20, 9.8, 4), Vector3(20, 9.8, 10), Vector3(40, 9.8, -4), Vector3(40, 9.8, 4), Vector3(40, 9.8, 10), Vector3(60, 9.8, -4), Vector3(60, 9.8, 4), Vector3(60, 9.8, 10)]
+partition_boundaries = [5, 10, 15, 20, 25, 30]
+partition_corridor_gap = 2.0
+partition_material_type = "wall"
+custom_decorations = [{
+"mat_type": "lead_wall",
+"pos": Vector3(26.0, 2.0, -4.0),
+"size": Vector3(4.0, 4.0, 4.0)
+}, {
+"mat_type": "thick_concrete",
+"pos": Vector3(72.0, 3.0, -4.0),
+"size": Vector3(14.0, 6.0, 6.0)
+}]

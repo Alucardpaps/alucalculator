@@ -15,7 +15,7 @@ import { STANDARD_PROFILES } from '@/data/standardProfiles';
 import { useUrlState } from '@/hooks/useUrlState';
 import { useCallback } from "react";
 
-import { TechnicalDrawing3D } from "@/components/TechnicalDrawing3D";
+
 import { HistorySidebar } from "@/components/HistorySidebar";
 import { ComparisonBar } from "@/components/ComparisonBar";
 import { EngineeringWarnings } from "@/components/EngineeringWarnings";
@@ -97,7 +97,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
     const [liveData, setLiveData] = useState<{ price: number, currency: string }>({ price: 0, currency: '$' });
     const [showAdvancedCalc, setShowAdvancedCalc] = useState(false);
     const [activeField, setActiveField] = useState<string | null>(null);
-    const [viewMode, setViewMode] = useState<'2D' | '3D'>('2D');
+
 
     // Comparison State
     const [comparisonBaseline, setComparisonBaseline] = useState<{ weight: number, cost: number, description: string } | null>(null);
@@ -701,30 +701,8 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                     {/* Technical Drawing */}
                     <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-1 flex flex-col items-center justify-center min-h-[350px] relative group overflow-hidden">
 
-                        {/* View Toggle */}
-                        <div className="absolute top-4 left-4 z-20 flex bg-slate-100 rounded-lg p-1 shadow-sm">
-                            <button
-                                onClick={() => setViewMode('2D')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${viewMode === '2D' ? 'bg-white text-slate-900 shadow' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                2D BLUEPRINT
-                            </button>
-                            <button
-                                onClick={() => setViewMode('3D')}
-                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${viewMode === '3D' ? 'bg-white text-ind-orange shadow' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                3D MODEL
-                            </button>
-                        </div>
-
                         <div className="w-full h-full flex items-center justify-center p-4">
-                            {viewMode === '2D' ? (
-                                <TechnicalDrawing shape={shape} activeField={activeField} data={inputs} />
-                            ) : (
-                                <div className="w-full h-[300px]">
-                                    <TechnicalDrawing3D shape={shape} activeField={activeField} inputs={inputs} />
-                                </div>
-                            )}
+                            <TechnicalDrawing shape={shape} activeField={activeField} data={inputs} />
                         </div>
 
                         <button

@@ -24,17 +24,20 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { 
     AlertTriangle, Info, BookOpen, ExternalLink, 
-    ChevronDown, ChevronUp, Settings2, Zap, Ruler 
+    ChevronDown, ChevronUp, Settings2, Zap, Ruler,
+    ShieldCheck 
 } from 'lucide-react';
 import type { CalculatorSchema, InputField, OutputField, ValidationWarning } from '@/types/calculator-schema';
 import { evaluateFormula, extractVariables } from '@/lib/formula-parser';
 import { CalculatorVisualizer } from '@/components/calculators/CalculatorVisualizer';
+import { CalculationReport } from '@/components/calculators/CalculationReport';
 import { isSchemaV2, type CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue, type ValidatedEngineeringValue } from '@/types/engineering';
 import { METRIC_BOLTS } from '@/data/mechanical/fasteners';
 import { SIGMA_PROFILES } from '@/data/mechanical/profiles';
 import { useProjectStore } from '@/store/projectStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { Save } from 'lucide-react';
 
 // ============================================
 // Props Interface
@@ -54,6 +57,7 @@ export interface UniversalCalcRendererProps {
 
 import BeamCanvas from '../modules/fea/BeamCanvas';
 import BeamCanvas3D from '../modules/fea/BeamCanvas3D';
+import { DriveCalcWorkbench } from './DriveCalcWorkbench';
 
 // ============================================
 // Styles (PREMIUM WORKSTATION UPGRADE)
@@ -65,13 +69,13 @@ const styles = {
         bg-[#03060a] text-white overflow-hidden
     `,
     mainWrapper: `
-        flex flex-1 overflow-hidden p-4 gap-4
+        flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden p-4 gap-4
     `,
     leftPane: `
-        w-[38%] h-full flex flex-col bg-[#0b121d]/80 rounded-[28px] border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl
+        w-full lg:w-[380px] shrink-0 h-auto lg:h-full flex flex-col bg-[#0b121d]/80 rounded-[28px] border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl
     `,
     rightPane: `
-        w-[62%] h-full flex flex-col bg-gradient-to-b from-[#0a1018] to-black rounded-[32px] border border-white/5 relative overflow-hidden shadow-2xl
+        flex-1 h-auto lg:h-full flex flex-col bg-gradient-to-b from-[#0a1018] to-black rounded-[32px] border border-white/5 relative overflow-hidden shadow-2xl min-w-0
     `,
     gridOverlay: `
         absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none
@@ -325,6 +329,11 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
     const [inputErrors, setInputErrors] = useState<Record<string, string>>({});
     const [assumptionsOpen, setAssumptionsOpen] = useState(false);
     const [is3DMode, setIs3DMode] = useState(false);
+    const [reportOpen, setReportOpen] = useState(false);
+    const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+    const [saveName, setSaveName] = useState('');
+
+    const { addCalculation } = useProjectStore();
 
     const { t } = useI18nStore();
     const translatedTitle = t.modules[schema.id]?.title || schema.metadata.title;
@@ -381,7 +390,7 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
                 });
                 const result = schema.calculationEngine(validatedInputs);
                 if (result) {
-                    Object.entries(result.outputs).forEach(([k, v]) => { outputs[k] = v.value; });
+                    Object.entries(result.outputs).forEach(([k, v]) => { outputs[k] = v.value as number; });
                     result.warnings?.forEach(w => { warnings[w.field] = { field: w.field, message: w.message, value: 0, threshold: 'min' }; });
                 }
             } catch (e) { console.error(e); }
@@ -404,8 +413,33 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
         onOutputsChange?.(valid);
     }, [computedOutputs.outputs]);
 
+    const handleSaveToProject = () => {
+        if (!saveName.trim()) return;
+        
+        const status = Object.keys(computedOutputs.warnings).length > 0 ? 'warning' : 'success';
+        
+        addCalculation(
+            saveName,
+            {
+                schemaId: schema.id,
+                schemaVersion: (schema.metadata as any).version || "1.0",
+                inputs: inputValues,
+                outputs: computedOutputs.outputs,
+                title: translatedTitle
+            },
+            status
+        );
+        
+        setSaveDialogOpen(false);
+        setSaveName('');
+    };
+
     const hasVisualizer = isSchemaV2(schema) ? schema.visualization.type !== 'none' : !!(schema as any).visualizer;
     const assumptions = isSchemaV2(schema) ? (schema.documentation?.assumptions || []) : (schema as any).assumptions || [];
+
+    if (isSchemaV2(schema) && (schema.id === 'chain-drive' || schema.id === 'belt-drive')) {
+        return <DriveCalcWorkbench schema={schema} />;
+    }
 
     if (schema.id === 'beam-frame-fea') {
         return (
@@ -477,9 +511,62 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
                                 <KPIResult key={field.key} field={field} value={computedOutputs.outputs[field.key] as any} warning={computedOutputs.warnings[field.key]} />
                             ))}
                         </div>
+                        {isSchemaV2(schema) && (
+                            <div className="px-6 pb-6 pt-2 flex justify-center gap-3">
+                                {saveDialogOpen ? (
+                                    <div className="flex items-center gap-2 bg-[#0b121d] border border-blue-500/30 rounded-xl px-2 py-1 shadow-xl animate-in fade-in slide-in-from-bottom-2">
+                                        <input 
+                                            autoFocus
+                                            placeholder="Item Name (e.g. Motor Bolt)"
+                                            className="bg-transparent text-[10px] font-bold text-white px-3 py-1.5 outline-none w-48"
+                                            value={saveName}
+                                            onChange={(e) => setSaveName(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSaveToProject()}
+                                        />
+                                        <button 
+                                            onClick={handleSaveToProject}
+                                            className="px-3 py-1.5 bg-blue-600 text-white text-[9px] font-black rounded-lg uppercase"
+                                        >
+                                            Confirm
+                                        </button>
+                                        <button 
+                                            onClick={() => setSaveDialogOpen(false)}
+                                            className="px-3 py-1.5 text-slate-500 text-[9px] font-black rounded-lg uppercase hover:text-white"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button 
+                                        onClick={() => {
+                                            setSaveName(translatedTitle);
+                                            setSaveDialogOpen(true);
+                                        }}
+                                        className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 shadow-lg shadow-emerald-500/5 active:scale-95"
+                                    >
+                                        <Save size={14} /> Add to Project BOM
+                                    </button>
+                                )}
+                                <button 
+                                    onClick={() => setReportOpen(true)}
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 shadow-lg shadow-blue-500/5 active:scale-95"
+                                >
+                                    <ShieldCheck size={14} /> Generate Detailed Audit Report
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {reportOpen && isSchemaV2(schema) && (
+                <CalculationReport 
+                    schema={schema as CalculatorSchemaV2}
+                    inputs={inputValues}
+                    outputs={computedOutputs.outputs as Record<string, number>}
+                    onClose={() => setReportOpen(false)}
+                />
+            )}
         </div>
     );
 };

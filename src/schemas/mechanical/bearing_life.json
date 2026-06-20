@@ -13,7 +13,7 @@
       "id": "L10_millions",
       "formula": "(C / P)^lifeFactor",
       "description": "Calculate basic rating life (millions of revolutions)",
-      "latex": "L_{10} = \\left( \\frac{C}{P} \\right)^3"
+      "latex": "L_{10} = \\left( \\frac{C}{P} \\right)^{lifeFactor}"
     },
     {
       "id": "L10h",

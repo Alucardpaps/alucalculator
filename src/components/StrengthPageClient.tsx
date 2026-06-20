@@ -28,7 +28,7 @@ import {
     ShapeDimensions
 } from "@/utils/sectionProperties";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
-import { TechnicalDrawing3D } from "@/components/TechnicalDrawing3D";
+
 import {
     AlertTriangle, CheckCircle, Circle, BarChart3,
     Cylinder, ArrowUpDown, Rotate3d, Target, Zap, Box, Eye
@@ -68,7 +68,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
     }, [selectedShape, shapeDims]);
 
     // 3D View Mode
-    const [viewMode3D, setViewMode3D] = useState<'2d' | '3d'>('2d');
+
 
     // ===== PRINCIPAL/VON MISES STATE =====
     const [sigmaX, setSigmaX] = useState(100);   // MPa
@@ -336,30 +336,18 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {useShapeCalc && (
                         <div className="mt-4">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-white flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Eye size={14} className="text-cyan-400" />
                                     {lang === 'tr' ? 'Profil Görünümü' : 'Profile View'}
                                 </span>
-                                <div className="flex bg-slate-700 rounded p-1">
-                                    <button onClick={() => setViewMode3D('2d')} className={`px-3 py-1 text-[10px] font-bold rounded ${viewMode3D === '2d' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'}`}>2D</button>
-                                    <button onClick={() => setViewMode3D('3d')} className={`px-3 py-1 text-[10px] font-bold rounded ${viewMode3D === '3d' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'}`}>3D</button>
-                                </div>
                             </div>
                             <div className="h-[200px] bg-slate-800 rounded-lg overflow-hidden">
-                                {viewMode3D === '2d' ? (
-                                    <TechnicalDrawing
-                                        mode="shape"
-                                        shape={selectedShape === 'ibeam' ? 'beam' : selectedShape === 'rectangle' ? 'sheet' : selectedShape as any}
-                                        activeField={null}
-                                        data={shapeDims}
-                                    />
-                                ) : (
-                                    <TechnicalDrawing3D
-                                        shape={selectedShape === 'ibeam' ? 'beam' : selectedShape === 'rectangle' ? 'sheet' : selectedShape as any}
-                                        activeField={null}
-                                        inputs={{ ...shapeDims, length: 200 }}
-                                    />
-                                )}
+                                <TechnicalDrawing
+                                    mode="shape"
+                                    shape={selectedShape === 'ibeam' ? 'beam' : selectedShape === 'rectangle' ? 'sheet' : selectedShape as any}
+                                    activeField={null}
+                                    data={shapeDims}
+                                />
                             </div>
                         </div>
                     )}

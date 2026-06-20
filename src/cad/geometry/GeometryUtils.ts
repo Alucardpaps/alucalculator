@@ -112,8 +112,20 @@ export function distanceToEntity(point: Point, entity: CadEntity): number {
             }
             return dMin;
         }
+        case 'GEAR': {
+            const g = geom as any;
+            const rPitch = (g.module * g.teeth) / 2;
+            return Math.abs(distance(point, g.center) - rPitch);
+        }
+        case 'FASTENER': {
+            const g = geom as any;
+            const dHead = distanceToLine(point, g.origin, { x: g.origin.x, y: g.origin.y + 10 }); // Head ref
+            const dCenter = distance(point, g.origin);
+            return Math.min(dHead, dCenter);
+        }
         default:
             return Infinity;
+
     }
 }
 

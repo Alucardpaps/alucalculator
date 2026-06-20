@@ -1,0 +1,11 @@
+res://scripts/visuals/factory_3d.gd
+res://autoload/game_manager.gd
+res://scenes/game.gd
+res://scenes/ui/end_of_day_modal.gd
+res://scenes/ui/order_panel.gd
+res://scripts/states/idle_state.gd
+res://scripts/visuals/industrial/sliding_glass_door_3d.gd
+res://autoload/event_bus.gd
+res://scripts/entities/vehicle_3d.gd
+res://scripts/states/player/driving_state.gd
+res://scripts/visuals/manager_3d_controller.gd

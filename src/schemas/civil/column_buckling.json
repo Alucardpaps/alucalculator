@@ -1,0 +1,60 @@
+{
+  "id": "column_buckling",
+  "name": "Column Buckling (Euler & J.B. Johnson)",
+  "category": "civil",
+  "inputs": [
+    { "key": "E", "type": "number", "unit": "MPa" },
+    { "key": "Sy", "type": "number", "unit": "MPa" },
+    { "key": "L", "type": "number", "unit": "mm" },
+    { "key": "I", "type": "number", "unit": "mm^4" },
+    { "key": "A", "type": "number", "unit": "mm^2" },
+    { "key": "C", "type": "number", "unit": "" },
+    { "key": "FS", "type": "number", "unit": "" }
+  ],
+  "steps": [
+    {
+      "id": "r",
+      "formula": "sqrt(I / A)",
+      "description": "Calculate radius of gyration (r)",
+      "latex": "r = \\sqrt{\\frac{I}{A}}"
+    },
+    {
+      "id": "lambda",
+      "formula": "L / r",
+      "description": "Calculate slenderness ratio (λ)",
+      "latex": "\\lambda = \\frac{L}{r}"
+    },
+    {
+      "id": "lambda_c",
+      "formula": "sqrt((2 * pi^2 * C * E) / Sy)",
+      "description": "Calculate critical transition slenderness (λ_c)",
+      "latex": "\\lambda_c = \\sqrt{\\frac{2 \\pi^2 C E}{S_y}}"
+    },
+    {
+      "id": "sigma_cr",
+      "formula": "lambda > lambda_c ? (C * pi^2 * E) / (lambda^2) : Sy - ((Sy^2 * lambda^2) / (4 * C * pi^2 * E))",
+      "description": "Calculate critical stress using Euler or Johnson formula",
+      "latex": "\\sigma_{cr} = \\begin{cases} \\frac{C \\pi^2 E}{\\lambda^2} & \\lambda > \\lambda_c \\\\ S_y - \\frac{S_y^2 \\lambda^2}{4 C \\pi^2 E} & \\lambda \\le \\lambda_c \\end{cases}"
+    },
+    {
+      "id": "P_cr",
+      "formula": "(sigma_cr * A) / 1000",
+      "description": "Calculate critical buckling load in kN",
+      "latex": "P_{cr} = \\frac{\\sigma_{cr} \\cdot A}{1000}"
+    },
+    {
+      "id": "P_safe",
+      "formula": "P_cr / FS",
+      "description": "Calculate safe working load based on Factor of Safety",
+      "latex": "P_{safe} = \\frac{P_{cr}}{FS}"
+    }
+  ],
+  "outputs": [
+    "r",
+    "lambda",
+    "lambda_c",
+    "sigma_cr",
+    "P_cr",
+    "P_safe"
+  ]
+}

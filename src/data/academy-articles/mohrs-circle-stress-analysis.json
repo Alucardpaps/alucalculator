@@ -1,0 +1,96 @@
+{
+    "slug": "mohrs-circle-stress-analysis",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Advanced",
+    "readingTime": 15,
+    "prerequisites": [
+        "mechanics-of-materials-fundamentals"
+    ],
+    "meta": {
+        "title": "Mohr's Circle Stress Analysis (Principal Stresses)",
+        "description": "Learn how to use Mohr's Circle to determine principal stresses and maximum shear stress in a material. Essential for advanced structural engineering and failure analysis."
+    },
+    "hero": {
+        "h1": "Mohr's Circle Stress Analysis (Principal Stresses)",
+        "intro": "In multi-axial loading, the stress at a point depends on the orientation of the plane you are looking at. Mohr's Circle is a powerful graphical method (and mathematical model) to find the maximum and minimum stresses a material will ever see.\n\nReal components rarely see pure axial stress. Bending, torsion, and press fits combine into plane-stress states (σx, σy, τxy). Mohr's circle transforms these components to principal stresses and maximum shear — the values used in ductile failure criteria.\n\nThe Principal Stress Simulator in this lesson mirrors the analytical kernel in AluCalc Mohr Circle Lab."
+    },
+    "formula": {
+        "equation": "σ1,2 = (σx + σy)/2 ± √[((σx - σy)/2)² + τxy²]",
+        "variables": {
+            "σ1,2": "Principal Stresses (MPa)",
+            "σx, σy": "Normal stresses in X and Y (MPa)",
+            "τxy": "Shear stress (MPa)"
+        }
+    },
+    "stepByStep": [
+        "Determine the initial stress state (σx, σy, τxy).",
+        "Plot the points (σx, τxy) and (σy, -τxy) on the stress axes.",
+        "Draw the circle passing through these two points.",
+        "Locate the center and calculate the radius (R).",
+        "Identify σ1 (max) and σ2 (min) as the intersections with the horizontal axis.",
+        "Plot σx, σy, τxy on Mohr circle to read σ1, σ2, and τ_max.",
+        "Compare τ_max to yield/2 for ductile materials per Tresca criterion."
+    ],
+    "example": {
+        "inputs": [
+            "σx = 100 MPa",
+            "σy = 40 MPa",
+            "τxy = 40 MPa"
+        ],
+        "calculation": "Center = 70. Radius = √[(30)² + 40²] = 50. → σ1 = 120 MPa, σ2 = 20 MPa."
+    },
+    "whyThisMatters": [
+        "Ductile materials typically fail due to maximum shear stress (τmax).",
+        "Brittle materials fail due to maximum principal stress (σ1).",
+        "Mohr's Circle allows designers to predict the angle of failure."
+    ],
+    "commonMistakes": [
+        "Confusing the 2θ angle in Mohr's Circle with the θ angle in the physical world.",
+        "Incorrectly plotting the sign of the shear stress.",
+        "Forgetting to check the 3D stress state (Triaxial stress)."
+    ],
+    "engineeringTip": "The center of the circle always represents the average normal stress at that point.",
+    "calculatorCta": {
+        "targetSlug": "beam-deflection-calc",
+        "label": "Open the Analysis Lab to visualize complex stress states"
+    },
+    "faq": [
+        {
+            "question": "What is a principal stress?",
+            "answer": "It is a normal stress that acts on a plane where the shear stress is exactly zero."
+        },
+        {
+            "question": "Are principal stresses unique?",
+            "answer": "Yes — σ1 and σ2 are invariants; only the orientation of principal planes changes with loading."
+        },
+        {
+            "question": "What is plane stress?",
+            "answer": "One principal stress is zero (thin plates, free surfaces) — simplifies 3D problems to 2D."
+        },
+        {
+            "question": "When is Mohr circle insufficient?",
+            "answer": "Triaxial stress states require 3D failure criteria (von Mises in full tensor form)."
+        }
+    ],
+    "relatedArticles": [
+        "mechanics-of-materials-fundamentals",
+        "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Mohr Dairesi Analizi Sunumu",
+            "filename": "10-_mohr_dairesi_(rev).ppt"
+        }
+    ],
+    "learningObjectives": [
+        "Transform plane-stress components to find principal stresses σ1, σ2",
+        "Compute maximum shear τ_max from Mohr circle geometry",
+        "Explain why principal values are invariant while σ(θ) and τ(θ) rotate"
+    ],
+    "keyTakeaways": [
+        "Principal planes have zero shear — design checks often use σ1",
+        "τ_max = Mohr circle radius — drives yielding in ductile materials",
+        "Combined loading requires plane-stress analysis before failure criteria"
+    ]
+}

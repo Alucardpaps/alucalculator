@@ -64,6 +64,21 @@ export class LineTool extends BaseCommand {
     onValueInput(value: string): void {
         const trimmed = value.trim();
 
+        // Polar relative: @distance<angle (degrees) — MUST be checked first
+        if (trimmed.startsWith('@') && trimmed.includes('<') && this.startPoint) {
+            const parts = trimmed.substring(1).split('<');
+            const dist = parseFloat(parts[0].trim());
+            const angleDeg = parseFloat(parts[1].trim());
+            if (!isNaN(dist) && !isNaN(angleDeg)) {
+                const angleRad = angleDeg * Math.PI / 180;
+                this.onPointInput({
+                    x: this.startPoint.x + dist * Math.cos(angleRad),
+                    y: this.startPoint.y - dist * Math.sin(angleRad) // Screen Y inverted
+                });
+                return;
+            }
+        }
+
         // Relative coordinates: @dx,dy
         if (trimmed.startsWith('@') && this.startPoint) {
             const parts = trimmed.substring(1).split(',');
@@ -77,21 +92,6 @@ export class LineTool extends BaseCommand {
                     });
                     return;
                 }
-            }
-        }
-
-        // Polar relative: @distance<angle (degrees)
-        if (trimmed.startsWith('@') && trimmed.includes('<') && this.startPoint) {
-            const parts = trimmed.substring(1).split('<');
-            const dist = parseFloat(parts[0].trim());
-            const angleDeg = parseFloat(parts[1].trim());
-            if (!isNaN(dist) && !isNaN(angleDeg)) {
-                const angleRad = angleDeg * Math.PI / 180;
-                this.onPointInput({
-                    x: this.startPoint.x + dist * Math.cos(angleRad),
-                    y: this.startPoint.y - dist * Math.sin(angleRad) // Screen Y inverted
-                });
-                return;
             }
         }
 

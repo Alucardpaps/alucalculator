@@ -269,6 +269,68 @@ export function computeEntityBBox(entity: CadEntity): BBox | null {
                 maxY: g.center.y + g.radius,
             };
 
+        case 'GEAR': {
+            const gAny = g as any;
+            if (!gAny.center) return null;
+            const mod = gAny.module || 2;
+            const teeth = gAny.teeth || 20;
+            const rOuter = (mod * (teeth + 2)) / 2;
+            return {
+                minX: gAny.center.x - rOuter,
+                minY: gAny.center.y - rOuter,
+                maxX: gAny.center.x + rOuter,
+                maxY: gAny.center.y + rOuter,
+            };
+        }
+
+        case 'FASTENER': {
+            const gFast = g as any;
+            const halfW = gFast.diameter * 2;
+            const halfH = (gFast.length || gFast.diameter) / 2 + gFast.diameter;
+            return {
+                minX: gFast.origin.x - halfW,
+                minY: gFast.origin.y - halfH,
+                maxX: gFast.origin.x + halfW,
+                maxY: gFast.origin.y + halfH,
+            };
+        }
+
+        case 'BELT_PULLEY': {
+            const gBelt = g as any;
+            const allX = [gBelt.center1.x - gBelt.radius1, gBelt.center1.x + gBelt.radius1, gBelt.center2.x - gBelt.radius2, gBelt.center2.x + gBelt.radius2];
+            const allY = [gBelt.center1.y - gBelt.radius1, gBelt.center1.y + gBelt.radius1, gBelt.center2.y - gBelt.radius2, gBelt.center2.y + gBelt.radius2];
+            return {
+                minX: Math.min(...allX),
+                minY: Math.min(...allY),
+                maxX: Math.max(...allX),
+                maxY: Math.max(...allY),
+            };
+        }
+
+        case 'PLANETARY_GEAR': {
+            const gPlan = g as any;
+            const ringTeeth = gPlan.sunTeeth + 2 * gPlan.planetTeeth;
+            const rRing = (gPlan.module * (ringTeeth + 2)) / 2;
+            return {
+                minX: gPlan.center.x - rRing,
+                minY: gPlan.center.y - rRing,
+                maxX: gPlan.center.x + rRing,
+                maxY: gPlan.center.y + rRing,
+            };
+        }
+
+        case 'TEXT': {
+            const gText = g as any;
+            const fontSize = gText.fontSize || 12;
+            const textWidth = (gText.content?.length || 5) * fontSize * 0.6;
+            return {
+                minX: gText.position.x - 5,
+                minY: gText.position.y - fontSize - 5,
+                maxX: gText.position.x + textWidth + 5,
+                maxY: gText.position.y + 5,
+            };
+        }
+
         default:
             return null;
     }

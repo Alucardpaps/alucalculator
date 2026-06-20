@@ -9,6 +9,8 @@ import { useWorkspace } from '@/store/useWorkspace';
 import { Settings, RefreshCw, Layers, ShieldCheck, Zap, Box, Link as LinkIcon } from 'lucide-react';
 import { ExecutionResult } from '@/lib/utils/contract';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { useI18nStore } from '@/store/i18nStore';
+import { getWorkstationPage } from '@/locales/workstationPageTranslations';
 
 /**
  * Premium Shafts Workstation (Wave 3.1)
@@ -16,6 +18,8 @@ import { UserMenu } from '@/components/auth/UserMenu';
  */
 
 export default function ShaftsPage() {
+    const { language } = useI18nStore();
+    const ws = getWorkstationPage(language).shafts;
     const { currentProjectId, setUnsavedChanges } = useWorkspace();
     
     // Shaft Form State
@@ -79,15 +83,15 @@ export default function ShaftsPage() {
                                 <Box className="w-5 h-5 text-blue-500" />
                             </div>
                             <div className="flex items-center gap-2 text-blue-500 font-bold text-[10px] uppercase tracking-[0.4em]">
-                                Workstation <span className="text-slate-700">/</span> Assembly
+                                {ws.breadcrumb} <span className="text-slate-700">/</span> {ws.assembly}
                             </div>
                         </div>
                         <div className="space-y-1">
                             <h1 className="text-4xl font-black tracking-tight text-white flex items-baseline gap-3">
-                                Shaft Analysis
+                                {ws.title}
                                 <span className="text-sm font-mono text-slate-600 font-medium bg-slate-900/50 px-2 py-0.5 rounded border border-slate-800">L1-03</span>
                             </h1>
-                            <p className="text-slate-500 text-sm font-medium">Beam statics and reaction force resolution for bearings.</p>
+                            <p className="text-slate-500 text-sm font-medium">{ws.subtitle}</p>
                         </div>
                     </div>
                     
@@ -112,16 +116,16 @@ export default function ShaftsPage() {
                     
                     {/* Control Panel (Left) */}
                     <div className="lg:col-span-5 space-y-8">
-                        <InputPanel title="Shaft Statics & Loading">
+                        <InputPanel title={ws.inputTitle}>
                             <div className="space-y-8">
                                 <CalculatorInput 
-                                    label="Total Length (L)" 
+                                    label={ws.totalLength} 
                                     unit="mm" 
                                     value={length} 
                                     onChange={(e) => setLength(Number(e.target.value))} 
                                 />
                                 <CalculatorInput 
-                                    label="Force Position (a)" 
+                                    label={ws.forcePosition} 
                                     unit="mm from A" 
                                     value={forcePos} 
                                     onChange={(e) => setForcePos(Number(e.target.value))} 
@@ -132,7 +136,7 @@ export default function ShaftsPage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
                                             <LinkIcon size={12} />
-                                            Assembly Connector
+                                            {ws.assemblyConnector}
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" className="sr-only peer" checked={isRefEnabled} onChange={() => setIsRefEnabled(!isRefEnabled)} />
@@ -142,10 +146,10 @@ export default function ShaftsPage() {
 
                                     {isRefEnabled ? (
                                         <div className="space-y-2">
-                                            <p className="text-[10px] text-slate-500">Provide $ref to Gear Stress Output:</p>
+                                            <p className="text-[10px] text-slate-500">{ws.refHint}</p>
                                             <input 
                                                 type="text" 
-                                                placeholder="e.g. {calc_id}.stress"
+                                                placeholder={ws.refPlaceholder}
                                                 className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-blue-400 placeholder:text-slate-700 focus:outline-none focus:border-blue-500/50"
                                                 value={refString}
                                                 onChange={(e) => setRefString(e.target.value)}
@@ -153,7 +157,7 @@ export default function ShaftsPage() {
                                         </div>
                                     ) : (
                                         <CalculatorInput 
-                                            label="Applied Force (F)" 
+                                            label={ws.appliedForce} 
                                             unit="Newtons" 
                                             value={force} 
                                             onChange={(e) => setForce(Number(e.target.value))} 
@@ -174,16 +178,16 @@ export default function ShaftsPage() {
                         <div className="grid grid-cols-2 gap-6">
                             <div className="p-6 bg-slate-900/40 rounded-2xl border border-slate-800/50 space-y-3">
                                 <Layers size={20} className="text-blue-500" />
-                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reaction Matrix</h6>
+                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{ws.reactionMatrix}</h6>
                                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                                    Forces resolved at Support A and Support B for direct bearing load injection.
+                                    {ws.reactionDesc}
                                 </p>
                             </div>
                             <div className="p-6 bg-slate-900/40 rounded-2xl border border-slate-800/50 space-y-3">
                                 <RefreshCw size={20} className="text-emerald-500" />
-                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data-Bus Sync</h6>
+                                <h6 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{ws.dataBusSync}</h6>
                                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                                    Resolved values are tracked in the execution timeline for project-wide consistency.
+                                    {ws.dataBusDesc}
                                 </p>
                             </div>
                         </div>

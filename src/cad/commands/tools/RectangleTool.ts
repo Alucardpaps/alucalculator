@@ -1,6 +1,6 @@
 
 import { BaseCommand } from '../BaseCommand';
-import { Point, CadEntity, createPolylineEntity } from '../../kernel/types';
+import { Point, createRectangleEntity } from '../../kernel/types';
 import { useCadStore } from '../../store/cadStore';
 
 export class RectangleTool extends BaseCommand {
@@ -21,17 +21,17 @@ export class RectangleTool extends BaseCommand {
         this.currentPoint = point;
 
         if (this.startPoint) {
-            // Update preview
-            const vertices = [
-                this.startPoint,
-                { x: point.x, y: this.startPoint.y },
-                point,
-                { x: this.startPoint.x, y: point.y }
-            ];
+            const width = Math.abs(point.x - this.startPoint.x);
+            const height = Math.abs(point.y - this.startPoint.y);
+            const center = {
+                x: (this.startPoint.x + point.x) / 2,
+                y: (this.startPoint.y + point.y) / 2
+            };
 
-            const previewRect = createPolylineEntity(
-                vertices,
-                true, // closed
+            const previewRect = createRectangleEntity(
+                center,
+                width,
+                height,
                 useCadStore.getState().activeLayerId,
                 '#cccccc'
             );
@@ -41,20 +41,18 @@ export class RectangleTool extends BaseCommand {
 
     onPointInput(point: Point): void {
         if (!this.startPoint) {
-            // First corner
             this.startPoint = point;
             this.setPrompt('Specify other corner point:');
         } else {
-            // Second corner - Create Rectangle
-            const vertices = [
-                this.startPoint,
-                { x: point.x, y: this.startPoint.y },
-                point,
-                { x: this.startPoint.x, y: point.y }
-            ];
+            const width = Math.abs(point.x - this.startPoint.x);
+            const height = Math.abs(point.y - this.startPoint.y);
+            const center = {
+                x: (this.startPoint.x + point.x) / 2,
+                y: (this.startPoint.y + point.y) / 2
+            };
 
             const layerId = useCadStore.getState().activeLayerId;
-            const rect = createPolylineEntity(vertices, true, layerId, '#ffffff');
+            const rect = createRectangleEntity(center, width, height, layerId, '#ffffff');
 
             useCadStore.getState().addEntity(rect);
 

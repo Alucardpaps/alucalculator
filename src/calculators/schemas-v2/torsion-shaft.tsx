@@ -155,3 +155,6 @@ export const torsionShaftSchema: CalculatorSchemaV2 = {
         formulaLatex: '\\tau_{max} = \\frac{16 T}{\\pi d^3}, \\quad \\phi = \\frac{T L}{J G}'
     }
 };
+
+export default torsionShaftSchema;
+

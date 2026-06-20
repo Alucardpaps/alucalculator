@@ -12,7 +12,7 @@
  * - All heavy math (snap calc) runs outside React render
  */
 
-import { useCallback, useRef, useMemo } from 'react';
+import { useCallback, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useThree, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, GizmoHelper, GizmoViewport, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -25,6 +25,10 @@ import type { Vec3, WorkspaceComponent } from '@/lib/types/v5-types';
 import { ProfileMesh } from './ProfileMesh';
 import { BracketMesh } from './BracketMesh';
 import { BoltMesh } from './BoltMesh';
+import { GearMesh } from './GearMesh';
+import { BearingMesh } from './BearingMesh';
+import { KeyMesh } from './KeyMesh';
+import { FinanceHUD } from './FinanceHUD';
 
 // ════════════════════════════════════════════
 // Component Renderer (maps type → mesh)
@@ -41,7 +45,19 @@ const ComponentRenderer = ({ component, isSelected, isSnappable, isGhost }: Comp
   const selectComponent = useAssemblyStore((s) => s.selectComponent);
   const toolMode = useAssemblyStore((s) => s.toolMode);
   const updateTransform = useAssemblyStore((s) => s.updateTransform);
+  const { controls } = useThree();
   const meshRef = useRef<THREE.Group>(null);
+  const tcRef = useRef<any>(null);
+
+  useEffect(() => {
+    const tc = tcRef.current;
+    if (!tc) return;
+    const onDragging = (e: any) => {
+      if (controls) (controls as any).enabled = !e.value;
+    };
+    tc.addEventListener('dragging-changed', onDragging);
+    return () => tc.removeEventListener('dragging-changed', onDragging);
+  }, [controls]);
 
   const handlePointerDown = useCallback(
     (e: ThreeEvent<PointerEvent>) => {
@@ -65,18 +81,22 @@ const ComponentRenderer = ({ component, isSelected, isSnappable, isGhost }: Comp
         {component.type === 'profile' && <ProfileMesh {...meshProps} length={component.metadata.length} position={[0,0,0]} rotation={[0,0,0]} />}
         {component.type === 'bracket' && <BracketMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
         {component.type === 'bolt' && <BoltMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'gear' && <GearMesh {...meshProps} teeth={component.metadata.teeth} module={component.metadata.module} width={component.metadata.width} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'bearing' && <BearingMesh {...meshProps} innerDia={component.metadata.innerDia} outerDia={component.metadata.outerDia} width={component.metadata.width} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'key' && <KeyMesh {...meshProps} length={component.metadata.length} width={component.metadata.width} height={component.metadata.height} position={[0,0,0]} rotation={[0,0,0]} />}
       </group>
 
       {isSelected && toolMode !== 'select' && !isGhost && (
         <TransformControls
-          object={meshRef}
+          ref={tcRef}
+          object={meshRef as any}
           mode={toolMode as any}
           onObjectChange={() => {
             if (meshRef.current) {
               updateTransform(
                 component.id,
-                meshRef.current.position.toArray(),
-                meshRef.current.rotation.toArray()
+                meshRef.current.position.toArray() as [number, number, number],
+                meshRef.current.rotation.toArray() as [number, number, number]
               );
             }
           }}
@@ -138,6 +158,9 @@ const SceneContent = () => {
           />
         );
       })}
+
+      {/* Finance HUD Overlay */}
+      <FinanceHUD />
 
       {/* Click on void → deselect */}
       <mesh

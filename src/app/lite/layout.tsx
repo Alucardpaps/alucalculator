@@ -1,16 +1,22 @@
 import { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'AluCalc | Standard Mode',
-    description: 'Simplified engineering calculators for fast, mobile-friendly access.',
+    title: 'AluCalc Lite | Mobile-Friendly Engineering Calculators',
+    description: 'Simplified, mobile-optimized engineering calculators for quick access to bolt torque, bearing life, beam deflection, and 40+ more precision tools — no desktop required.',
+    alternates: {
+        canonical: 'https://www.alucalculator.com/lite',
+    },
+    openGraph: {
+        title: 'AluCalc Lite | Mobile Engineering Calculators',
+        description: 'Quick-access engineering calculators optimized for mobile devices. Fast, clean, and browser-based.',
+        type: 'website',
+        url: 'https://www.alucalculator.com/lite',
+    },
 };
 
 export default function LiteLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className={`min-h-screen bg-slate-50 dark:bg-[#0a0e14] text-slate-900 dark:text-slate-100 ${inter.className}`}>
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0a0e14] text-slate-900 dark:text-slate-100 font-sans">
             <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-[#12161e]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">

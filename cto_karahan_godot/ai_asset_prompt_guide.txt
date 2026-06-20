@@ -1,0 +1,89 @@
+# ALU-CALCULATOR: YAPAY ZEKA GÖRSEL ASSET PROMPT REHBERİ (AI PROMPT GUIDE)
+==========================================================================
+
+Bu dosya, Alucardpaps/alucalculator oyununda kullanılacak olan tüm karakterler, 3D nesneler ve 3D triplanar zemin/duvar dokuları için en son nesil görsel üretim yapay zekaları (örneğin Midjourney v6, DALL-E 3, Stable Diffusion XL veya FLUX) ile uyumlu profesyonel prompt komutlarını içerir.
+
+--------------------------------------------------------------------------
+## RESMİ DOSYA YERLEŞİM PLANI (ASSET DIRECTORY PLAN)
+--------------------------------------------------------------------------
+Oluşturduğunuz görselleri Godot projesinde tam olarak aşağıdaki klasör yollarına, belirtilen format ve isimlerle kaydetmeniz gerekmektedir:
+
+1. **Usta Karakter Görselleri (Skeletal Joint Textures):**
+   * Dosya Biçimi: `.png` (Kaydetmeden önce arka planı tamamen silip şeffaf yapın!)
+   * Klasör Yolu: `res://assets/textures/characters/skins/`
+   * Dosya İsimleri (Usta Orhan için örnek):
+     - `orhan_torso.png`       (Gövde / ceket cildi)
+     - `orhan_head.png`        (Kafeterya / kask altı kafa)
+     - `orhan_left_leg.png`    (Sol bacak)
+     - `orhan_right_leg.png`   (Sağ bacak)
+     - `orhan_left_boot.png`   (Sol çizme / bot)
+     - `orhan_right_boot.png`  (Sağ çizme / bot)
+
+2. **Arayüz Nesneleri & Logolar (UI Elements & Logos):**
+   * Dosya Biçimi: `.png` (Şeffaf arka plan)
+   * Klasör Yolu: `res://assets/ui/`
+   * Dosya İsimleri:
+     - `tablet_background.png`  (Tablet masaüstü duvar kağıdı)
+     - `factory_logo.png`       (HUD panellerinde görünecek şirket logosu)
+
+3. **3D Dünya Dokuları (Procedural Triplanar Materials):**
+   * Dosya Biçimi: `.jpg` veya `.png` (Seamless / Tileable - Dikişsiz döşenebilir olmalıdır!)
+   * Klasör Yolu: `res://assets/textures/world/`
+   * Dosya İsimleri:
+     - `epoxy_floor_albedo.png`  (Fabrika zemin rengi)
+     - `epoxy_floor_normal.png`  (Fabrika zemin pürüz haritası)
+     - `brut_concrete_albedo.png`(Beton duvar rengi)
+     - `brut_concrete_normal.png`(Beton duvar pürüz haritası)
+     - `asphalt_road_albedo.png`  (Yol asfaltı rengi)
+     - `asphalt_road_normal.png`  (Yol asfaltı pürüz haritası)
+
+--------------------------------------------------------------------------
+## 1. KARAKTERLER (CHARACTERS & JOINT SKINS)
+--------------------------------------------------------------------------
+Karakterlerin eklem yerlerine tam oturması için "isometric, flat 2D sprite sheet, isolated white background" teknik terimlerini kullanın. Çıktıyı aldıktan sonra arka planı kesin.
+
+### A. Usta Selim (Montaj & Kaynak Grubu - Kıdemli Usta)
+* **Prompt:**
+  > Flat 2D vector character sprite sheet, torso front view and limbs, senior Turkish factory mechanic master named Selim, wearing blue work overalls, safety harness, grey hair, warm friendly eyes. Clean white background, isolated, game character parts, high resolution, 8k, PNG format.
+
+### B. Usta Orhan (Astar & Boya Grubu - Genç İşçi)
+* **Prompt:**
+  > 2D game concept sprite parts sheet, young assembly line paint worker named Orhan, wearing safety goggles, dirty yellow jumpsuit with paint splatters, brown hair, energetic face. Flat vector, clean white background, isolated joint components, flat illustration.
+
+### C. Usta Rıza (Kaynak Grubu - Sinirli/Titiz Usta)
+* **Prompt:**
+  > Game sprite design sheet, tough middle-aged welding master named Riza, wearing high-density welding protective jacket, protective welding cap, serious focus face expression, grey mustache. Flat 2D vector graphic, isolated white background, separate limbs and body parts.
+
+--------------------------------------------------------------------------
+## 2. 3D NESNELER (3D PROPS & VEHICLES)
+--------------------------------------------------------------------------
+Oyun içi 3D modelleme referansı veya sprite olarak kullanılabilecek, ortografik açılı nesne promptları.
+
+### A. Kırmızı Sedan Araba (Red Sedan Vehicle)
+* **Prompt:**
+  > Orthographic 3D render of a modern electric red sedan car, clean glossy paint finish, metallic rims, premium dark glass windshield. Isolated on solid studio background, studio lighting, unreal engine 5 render look, side-front angle view.
+
+### B. Mavi Sedan Araba (Blue Sedan Vehicle)
+* **Prompt:**
+  > Orthographic view of a sleek blue luxury city car, realistic car design, dark alloy wheels, LED headlights illuminated. Solid isolated background, cinematic automotive presentation style.
+
+### C. Turuncu Kargo Kamyonu (Orange Cargo Truck)
+* **Prompt:**
+  > Professional isometric 3D render of an industrial heavy-duty orange logistics cargo delivery truck, white metallic cargo storage container on the back, rugged offroad wheels. High fidelity, detailed cabin interior visibility, studio lighting, game ready asset.
+
+--------------------------------------------------------------------------
+## 3. DOKULAR (SEAMLESS TEXTURES)
+--------------------------------------------------------------------------
+Dikişsiz döşeme (tileable/seamless) yapılabilmesi için promptların sonuna "seamless, tileable, top-down texture" terimlerini ekleyin.
+
+### A. Premium Epoksi Fabrika Zemini (Epoxy Factory Floor)
+* **Prompt:**
+  > Seamless tileable floor texture, premium dark industrial blue epoxied concrete flooring with micro scratches, glossy protective coating reflection, top-down view, game texture map, photorealistic, 4k resolution.
+
+### B. Brüt Beton Fabrika Duvarı (Brut Concrete Wall)
+* **Prompt:**
+  > Seamless concrete wall texture, high-detail raw grey architectural concrete panels, vertical concrete seams, formwork tie-rod holes, rough surface, bump map detail, top-down texture, tileable.
+
+### C. Koyu Yol Asfaltı (Asphalt Road)
+* **Prompt:**
+  > Seamless coarse dark asphalt texture, detailed black bitumen gravel surface, micro-cracks, photorealistic road texture, top-down view, game dev material, 4k.

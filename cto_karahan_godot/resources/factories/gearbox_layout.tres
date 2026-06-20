@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="FactoryLayoutResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/factory_layout_resource.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+length = 80.0
+width = 20.0
+height = 8.0
+z_offset = -8.0
+wall_material_type = "concrete"
+ceiling_lights = [Vector3(45, 7.8, -6), Vector3(10, 7.8, -4), Vector3(10, 7.8, 4), Vector3(10, 7.8, 10), Vector3(25, 7.8, -4), Vector3(25, 7.8, 4), Vector3(25, 7.8, 10), Vector3(40, 7.8, -4), Vector3(40, 7.8, 4), Vector3(40, 7.8, 10), Vector3(60, 7.8, -4), Vector3(60, 7.8, 4), Vector3(60, 7.8, 10)]
+partition_boundaries = [5, 10, 15, 20, 25, 30]
+partition_corridor_gap = 2.0
+partition_material_type = "gearbox_mix"
+custom_decorations = [{
+"mat_type": "metal",
+"pos": Vector3(10.0, 0.45, 1.0),
+"size": Vector3(3.0, 0.9, 0.8)
+}, {
+"mat_type": "metal",
+"pos": Vector3(8.5, 0.45, -1.0),
+"size": Vector3(0.8, 0.9, 3.0)
+}, {
+"mat_type": "metal",
+"pos": Vector3(11.5, 0.45, -1.0),
+"size": Vector3(0.8, 0.9, 3.0)
+}]

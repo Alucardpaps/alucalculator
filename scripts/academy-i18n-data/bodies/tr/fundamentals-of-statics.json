@@ -1,0 +1,55 @@
+{
+  "formula": {
+    "variables": {
+      "ΣF": "Tüm kuvvetlerin toplamı (N)",
+      "ΣM": "Tüm momentlerin toplamı (Nm)"
+    }
+  },
+  "stepByStep": [
+    "Cisme etki eden tüm dış kuvvetleri belirleyin.",
+    "Serbest cisim diyagramı (FBD) çizin.",
+    "Kuvvetleri X, Y ve Z bileşenlerine ayırın.",
+    "Denge denklemlerini uygulayın: ΣFx=0, ΣFy=0.",
+    "Bilinmeyenleri bulmak için bir nokta etrafında moment alın: ΣM=0.",
+    "Bilinmeyen sayısının bağımsız denge denklemlerine eşit olduğunu kontrol edin.",
+    "Tepkileri ikinci bir moment merkezine koyarak doğrulayın."
+  ],
+  "whyThisMatters": [
+    "Yapıların ve makinelerin hareket etmeden yük taşımasını garanti eder.",
+    "Mesnet tepkilerinin hesaplanmasını sağlar."
+  ],
+  "commonMistakes": [
+    "FBD'de tüm kuvvetleri dahil etmemek.",
+    "Kuvvet/moment yönünü (işaret) yanlış seçmek.",
+    "Cisim ağırlığını önemsiz sanmak."
+  ],
+  "engineeringTip": "Moment toplamında en çok bilinmeyenin olduğu noktayı seçin.",
+  "faq": [
+    {
+      "question": "Moment nedir?",
+      "answer": "Bir kuvvetin cismi belirli bir nokta etrafında döndürme eğiliminin ölçüsüdür."
+    },
+    {
+      "question": "Serbest cisim diyagramı nedir?",
+      "answer": "Tüm dış kuvvet ve momentlerin gösterildiği izole cisim çizimidir."
+    },
+    {
+      "question": "ΣF=0 iken ΣM≠0 olabilir mi?",
+      "answer": "Evet. Her iki koşul da gerekli; aksi halde cisim döner."
+    },
+    {
+      "question": "Cisim ağırlığı ne zaman dahil edilir?",
+      "answer": "Uygulanan yüklerle kıyaslanabilir olduğunda."
+    }
+  ],
+  "learningObjectives": [
+    "Doğru yönlü tam serbest cisim diyagramı çizmek",
+    "ΣF = 0 ve ΣM = 0 ile bilinmeyen tepkileri çözmek",
+    "Eğik kuvvetleri bileşenlerine ayırmak"
+  ],
+  "keyTakeaways": [
+    "FBD'de eksik kuvvet tüm sonuçları geçersiz kılar",
+    "En çok bilinmeyenin olduğu moment merkezini seçin",
+    "Statik, tüm yapısal tasarımın ön koşuludur"
+  ]
+}

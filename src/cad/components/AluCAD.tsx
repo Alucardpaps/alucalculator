@@ -20,14 +20,16 @@ import { FeatureTree } from './FeatureTree';
 import { CadMcpPanel } from './CadMcpPanel';
 import { StatusBar } from './StatusBar';
 import { ReferenceSidebar } from './ReferenceSidebar';
+import { ToolPropertyPanel } from './ToolPropertyPanel';
 import { useCadStore } from '../store/cadStore';
 import { commandProcessor } from '../commands/CommandProcessor';
 import {
     Layers, Settings, MousePointer2, Minus, Pencil, Square, Circle,
     Scissors, Maximize, CornerUpRight, Ruler, Copy, RotateCw, Move,
     FlipHorizontal, Scan, ChevronLeft, ChevronRight, Spline,
-    Blend, Pentagon, Grid2X2, RotateCcw, Download, FileText,
-    History, Info, Bot, Activity, Hammer as HammerIcon, Hexagon, CircleDot, Wrench
+    Blend, Pentagon,     Grid2X2, RotateCcw, Download, FileText,
+    History, Info, Bot, Activity, Hammer as HammerIcon, Hexagon, CircleDot, Wrench,
+    PieChart, Target, Cog, Type, Nut, Link, LifeBuoy, Printer, Magnet, Keyboard
 } from 'lucide-react';
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,6 +85,24 @@ const DIM_TOOLS = [
     { id: 'DIMENSION_LINEAR', label: 'Linear Dimension', Icon: Ruler },
 ] as const;
 
+const ANALYSIS_TOOLS = [
+    { id: 'MOHR', label: "Mohr's Circle (Math)", Icon: PieChart },
+    { id: 'CROSS_SECTION', label: 'Area/Inertia (Civil)', Icon: Target },
+] as const;
+
+const MECHANICAL_TOOLS = [
+    { id: 'GEAR', label: 'Involute Gear (G)', Icon: Cog },
+    { id: 'MATING_GEAR', label: 'Mating Gear (MG)', Icon: Cog },
+    { id: 'BELT_PULLEY', label: 'Belt & Pulley', Icon: Link },
+    { id: 'PLANETARY_GEAR', label: 'Planetary Gearbox (PG)', Icon: LifeBuoy },
+    { id: 'FASTENER', label: 'Bolt/Nut (BOLT)', Icon: Nut },
+] as const;
+
+const ANNOTATION_TOOLS = [
+    { id: 'TEXT', label: 'Text (T)', Icon: Type },
+    { id: 'PLOT', label: 'Plot / Print', Icon: Printer },
+] as const;
+
 const AI_TOOLS = [
     { id: 'AI_ANALYZE', label: 'AI Stress Analysis', Icon: Activity },
     { id: 'AI_GCODE', label: 'Auto CAM (G-Code)', Icon: HammerIcon },
@@ -100,7 +120,8 @@ export function AluCAD({ className }: AluCADProps) {
     const [activePanel, setActivePanel] = useState<'layers' | 'props' | null>(null);
     const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
     const [featureTreeCollapsed, setFeatureTreeCollapsed] = useState(false);
-    const { activeCommand, selectedIds, setActiveMcpTool, activeMcpTool } = useCadStore();
+    const [showShortcuts, setShowShortcuts] = useState(false);
+    const { activeCommand, selectedIds, setActiveMcpTool, activeMcpTool, entities, snapEnabled, toggleSnap } = useCadStore();
 
     // Auto-open Properties panel when entities selected
     React.useEffect(() => {
@@ -151,21 +172,61 @@ export function AluCAD({ className }: AluCADProps) {
         URL.revokeObjectURL(url);
     };
 
-    const handleExportPDF = async () => {
+    const handleQuickPDF = async () => {
         const { entities, layers } = useCadStore.getState();
         const canvas = document.getElementById('cad-canvas') as HTMLCanvasElement;
-        const pdfBytes = await generatePDF(entities, layers, canvas);
+        const pdfBytes = await generatePDF(entities, layers, canvas, { scale: 'FIT' });
         const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'AluCAD_Export.pdf';
+        a.download = 'AluCAD_QuickExport.pdf';
         a.click();
         URL.revokeObjectURL(url);
     };
 
+    const handlePlot = () => {
+        commandProcessor.startCommand('PLOT');
+    };
+
     return (
         <div className={`flex flex-col w-full h-full bg-[#020408] text-slate-300 font-sans selection:bg-cyan-500/30 ${className}`}>
+            {/* ─── TOP HUD ─── */}
+            <div className="flex-none h-11 border-b border-cyan-900/30 bg-[#05090e]/90 backdrop-blur-xl flex items-center justify-between px-4 z-40">
+                <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                        <Pencil size={14} />
+                    </div>
+                    <div>
+                        <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white">AluCAD Studio</span>
+                        <span className="hidden sm:inline text-[9px] text-slate-500 font-mono ml-3">{entities.length} entities</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button type="button" onClick={toggleSnap}
+                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all flex items-center gap-1.5 ${snapEnabled ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40' : 'bg-white/5 text-slate-500 border-white/10'}`}>
+                        <Magnet size={12} /> Snap {snapEnabled ? 'ON' : 'OFF'}
+                    </button>
+                    <button type="button" onClick={() => setShowShortcuts(s => !s)}
+                        className="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-white/10 bg-white/5 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all flex items-center gap-1.5">
+                        <Keyboard size={12} /> Shortcuts
+                    </button>
+                    <button type="button" onClick={handleExportDXF}
+                        className="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-all flex items-center gap-1.5">
+                        <Download size={12} /> DXF
+                    </button>
+                </div>
+            </div>
+
+            {showShortcuts && (
+                <div className="absolute top-14 right-4 z-50 w-72 bg-[#0a0e14]/95 border border-cyan-500/20 rounded-xl p-4 shadow-2xl backdrop-blur-xl text-[10px] font-mono space-y-1">
+                    <div className="text-cyan-400 font-black uppercase tracking-widest mb-2">Keyboard Shortcuts</div>
+                    {[['L', 'Line'], ['C', 'Circle'], ['REC', 'Rectangle'], ['M', 'Move'], ['CO', 'Copy'], ['TR', 'Trim'], ['F', 'Fillet'], ['Esc', 'Select']].map(([k, v]) => (
+                        <div key={k} className="flex justify-between text-slate-400"><span>{v}</span><span className="text-cyan-400">{k}</span></div>
+                    ))}
+                </div>
+            )}
+
             {/* ─── MAIN WORKSPACE ─── */}
             <div className="flex flex-1 min-h-0 relative">
 
@@ -199,9 +260,9 @@ export function AluCAD({ className }: AluCADProps) {
                                 <motion.div
                                     initial={{ x: -20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
-                                    className="absolute left-6 top-6 z-20"
+                                    className="absolute left-6 top-6 bottom-6 z-20 flex flex-col pointer-events-none"
                                 >
-                                    <div className="bg-[#0a0e14]/60 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col w-12 p-1 gap-1 relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/[0.05] before:to-transparent before:pointer-events-none pb-2">
+                                    <div className="bg-[#0a0e14]/60 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-y-auto overflow-x-hidden pointer-events-auto flex flex-col w-12 p-1.5 gap-0.5 relative before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/[0.05] before:to-transparent before:pointer-events-none before:rounded-2xl py-2 custom-scrollbar">
                                         {DRAW_TOOLS.map(t => (
                                             <ToolbarButton
                                                 key={t.id}
@@ -241,6 +302,36 @@ export function AluCAD({ className }: AluCADProps) {
                                                 onClick={() => handleToolClick(t.id)}
                                             />
                                         ))}
+                                        <div className="h-px w-6 mx-auto bg-gradient-to-r from-transparent via-amber-500/50 to-transparent my-1.5" />
+                                        {ANALYSIS_TOOLS.map(t => (
+                                            <ToolbarButton
+                                                key={t.id}
+                                                Icon={t.Icon}
+                                                label={t.label}
+                                                isActive={activeCommand === t.id}
+                                                onClick={() => handleToolClick(t.id)}
+                                            />
+                                        ))}
+                                        <div className="h-px w-6 mx-auto bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent my-1.5" />
+                                        {MECHANICAL_TOOLS.map(t => (
+                                            <ToolbarButton
+                                                key={t.id}
+                                                Icon={t.Icon}
+                                                label={t.label}
+                                                isActive={activeCommand === t.id}
+                                                onClick={() => handleToolClick(t.id)}
+                                            />
+                                        ))}
+                                        <div className="h-px w-6 mx-auto bg-gradient-to-r from-transparent via-violet-500/50 to-transparent my-1.5" />
+                                        {ANNOTATION_TOOLS.map(t => (
+                                            <ToolbarButton
+                                                key={t.id}
+                                                Icon={t.Icon}
+                                                label={t.label}
+                                                isActive={activeCommand === t.id}
+                                                onClick={() => handleToolClick(t.id)}
+                                            />
+                                        ))}
                                         <div className="h-px w-6 mx-auto bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent my-1.5" />
                                         {AI_TOOLS.map(t => (
                                             <ToolbarButton
@@ -256,24 +347,12 @@ export function AluCAD({ className }: AluCADProps) {
                                 </motion.div>
                             </AnimatePresence>
 
-                            {/* Viewport Info Overlay (Avant-Garde) */}
-                            <div className="absolute right-6 top-6 flex flex-col gap-3 pointer-events-none z-30">
-                                <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full flex items-center gap-4 shadow-xl">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#00e5ff]" />
-                                        <span className="text-[10px] font-mono tracking-widest text-slate-300 uppercase drop-shadow">WCS Active</span>
-                                    </div>
-                                    <div className="w-[1px] h-3 bg-white/10" />
-                                    <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold">Drafting 2D</span>
-                                </div>
+                            {/* SolidWorks-Style Property Panel */}
+                            <AnimatePresence>
+                                {activeCommand && <ToolPropertyPanel />}
+                            </AnimatePresence>
 
-                                <div className="bg-[#0a0e14]/80 backdrop-blur-md border border-white/5 px-4 py-1.5 rounded-lg flex flex-col shadow-lg items-end self-end">
-                                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-[0.2em] mb-0.5">Engine</span>
-                                    <span className="text-[10px] font-mono text-cyan-50/80 uppercase tracking-widest flex items-center gap-2">
-                                        <span className="w-1 h-1 bg-green-400 rounded-full" /> Hardware Accel
-                                    </span>
-                                </div>
-                            </div>
+                            {/* Viewport HUD removed as per user request */}
                             
                             {/* AI MCP Overlay Panel */}
                             <CadMcpPanel />
@@ -346,16 +425,17 @@ export function AluCAD({ className }: AluCADProps) {
                             </div>
 
                             {/* Quick Export Strip */}
-                            <div className="p-4 border-t border-white/10 flex items-center justify-between gap-3 bg-black/40 backdrop-blur-md">
-                                <button onClick={handleExportPDF} className="group relative flex-1 py-3 rounded-xl bg-gradient-to-b from-white/10 to-transparent hover:from-white/20 border border-white/10 text-[10px] font-mono uppercase tracking-widest transition-all text-slate-300 hover:text-white flex items-center justify-center gap-2 overflow-hidden">
-                                    <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 transition-colors" />
-                                    <FileText size={14} className="group-hover:text-red-400 transition-colors" /> PDF
-                                </button>
-                                <button onClick={handleExportDXF} className="group relative flex-1 py-3 rounded-xl bg-gradient-to-b from-cyan-900/30 to-transparent hover:from-cyan-900/50 border border-cyan-500/20 text-[10px] font-mono uppercase tracking-widest transition-all text-cyan-500 hover:text-cyan-300 flex items-center justify-center gap-2 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,229,255,0.2)]">
-                                    <div className="absolute inset-0 bg-cyan-500/0 group-hover:bg-cyan-500/10 transition-colors" />
-                                    <Download size={14} className="drop-shadow-[0_0_5px_rgba(0,229,255,0.5)]" /> DXF
-                                </button>
-                            </div>
+                             <div className="p-4 border-t border-white/10 flex items-center justify-between gap-2 bg-black/40 backdrop-blur-md">
+                                 <button onClick={handlePlot} className="group relative flex-1 py-3 rounded-xl bg-gradient-to-b from-amber-500/20 to-transparent hover:from-amber-500/30 border border-amber-500/20 text-[10px] font-mono uppercase tracking-widest transition-all text-amber-500 hover:text-amber-300 flex items-center justify-center gap-2 overflow-hidden shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+                                     <Printer size={14} /> PLOT
+                                 </button>
+                                 <button onClick={handleQuickPDF} className="group relative flex-[0.7] py-3 rounded-xl bg-gradient-to-b from-white/10 to-transparent hover:from-white/20 border border-white/10 text-[10px] font-mono uppercase tracking-widest transition-all text-slate-300 hover:text-white flex items-center justify-center gap-2 overflow-hidden">
+                                     <FileText size={14} /> PDF
+                                 </button>
+                                 <button onClick={handleExportDXF} className="group relative flex-[0.7] py-3 rounded-xl bg-gradient-to-b from-cyan-900/30 to-transparent hover:from-cyan-900/50 border border-cyan-500/20 text-[10px] font-mono uppercase tracking-widest transition-all text-cyan-500 hover:text-cyan-300 flex items-center justify-center gap-2 overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.1)]">
+                                     <Download size={14} /> DXF
+                                 </button>
+                             </div>
                         </div>
                     </Panel>
                 </PanelGroup>

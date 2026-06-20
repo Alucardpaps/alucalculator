@@ -4,15 +4,25 @@
 import React, { useCallback } from 'react';
 import { useCadStore } from '../store/cadStore';
 import { distance } from '../kernel/GeometryKernel';
-import { CadEntity, Point } from '../kernel/types';
+import { 
+    CadEntity, 
+    Point, 
+    GeometryType, 
+    GearGeometry, 
+    BeltPulleyGeometry, 
+    PlanetaryGearGeometry 
+} from '../kernel/types';
 import { Info } from 'lucide-react';
+
+const toDeg = (rad: number) => rad * (180 / Math.PI);
+const toRad = (deg: number) => deg * (Math.PI / 180);
 
 // ═══════════════════════════════════════════════════════════════
 // PROPERTIES PANEL — Full Entity Parameter Editor
 // ═══════════════════════════════════════════════════════════════
 
 export function PropertiesPanel() {
-    const { entities, updateEntity, layers, removeEntity, constraints, addModifier, removeModifier } = useCadStore();
+    const { entities, updateEntity, layers, removeEntity, constraints, addModifier, removeModifier, updateModifier } = useCadStore();
     const selectedEntities = entities.filter(e => e.isSelected);
 
     if (selectedEntities.length === 0) {
@@ -135,7 +145,12 @@ export function PropertiesPanel() {
                 {/* === MACHINING MODIFIERS === */}
                 {!isMulti && (
                     <Section title="Machining Modifiers">
-                        <ModifiersEditor entity={first} addModifier={addModifier} removeModifier={removeModifier} />
+                        <ModifiersEditor 
+                            entity={first} 
+                            addModifier={addModifier} 
+                            removeModifier={removeModifier} 
+                            updateModifier={updateModifier} 
+                        />
                     </Section>
                 )}
 
@@ -165,6 +180,76 @@ function Section({ title, children }: { title: string; children: React.ReactNode
                 <div className="text-[9px] font-mono text-slate-500 uppercase tracking-[0.2em]">{title}</div>
             </div>
             <div className="space-y-4 px-3">{children}</div>
+        </div>
+    );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENGINEERING CALCULATORS
+// ═══════════════════════════════════════════════════════════════
+
+function GearCalculator({ geom }: { geom: GearGeometry }) {
+    const m = (geom as any).module;
+    const z = (geom as any).teeth;
+    const phi = 20 * (Math.PI / 180); // Default 20deg
+    
+    const d = m * z;
+    const da = d + 2 * m;
+    const df = d - 2.5 * m;
+    const db = d * Math.cos(phi);
+
+    return (
+        <div className="p-2 rounded bg-amber-500/5 border border-amber-500/10 space-y-1">
+            <div className="text-[10px] font-bold text-amber-400 mb-1 border-b border-amber-500/10 pb-0.5 uppercase tracking-wider">Gear Analysis</div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Pitch Diam (d):</span>
+                <span className="text-amber-200">{d.toFixed(2)}mm</span>
+            </div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Addendum (da):</span>
+                <span className="text-amber-200">{da.toFixed(2)}mm</span>
+            </div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Dedendum (df):</span>
+                <span className="text-amber-200">{df.toFixed(2)}mm</span>
+            </div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Base Circle (db):</span>
+                <span className="text-amber-200">{db.toFixed(2)}mm</span>
+            </div>
+        </div>
+    );
+}
+
+function BeltCalculator({ geom }: { geom: BeltPulleyGeometry }) {
+    const { center1: c1, center2: c2, radius1: r1, radius2: r2, beltType } = geom;
+    const dx = c2.x - c1.x;
+    const dy = c2.y - c1.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    
+    let beltLength = 0;
+    if (beltType === 'OPEN') {
+        const theta = Math.acos((r1 - r2) / d);
+        beltLength = 2 * d * Math.sin(theta) + 
+                     Math.PI * (r1 + r2) + 
+                     2 * (r1 - r2) * Math.asin((r1 - r2) / d);
+    } else {
+        const crossAngle = Math.asin((r1 + r2) / d);
+        beltLength = 2 * d * Math.cos(crossAngle) + 
+                     (r1 + r2) * (Math.PI + 2 * crossAngle);
+    }
+
+    return (
+        <div className="p-2 rounded bg-green-500/5 border border-green-500/10 space-y-1">
+            <div className="text-[10px] font-bold text-green-400 mb-1 border-b border-green-500/10 pb-0.5 uppercase tracking-wider">Belt Analysis</div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Center Dist:</span>
+                <span className="text-green-200">{d.toFixed(2)}mm</span>
+            </div>
+            <div className="flex justify-between text-[9px] font-mono text-gray-400">
+                <span>Belt Length:</span>
+                <span className="text-green-200">{beltLength.toFixed(2)}mm</span>
+            </div>
         </div>
     );
 }
@@ -293,6 +378,80 @@ function GeometryEditor({ entity, updateEntity }: { entity: CadEntity; updateEnt
                 </div>
             );
 
+        case 'GEAR':
+            return (
+                <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="Module" value={(geom as any).module} onChange={v => update({ module: v })} />
+                        <PropInput label="Teeth" value={(geom as any).teeth} onChange={v => update({ teeth: Math.round(v) })} />
+                        <PropInput label="Rotation°" value={toDeg((geom as any).rotation || 0)} onChange={v => update({ rotation: toRad(v) })} />
+                        <PropInput label="Center X" value={(geom as any).center.x} onChange={v => update({ center: { ...(geom as any).center, x: v } })} />
+                        <PropInput label="Center Y" value={(geom as any).center.y} onChange={v => update({ center: { ...(geom as any).center, y: v } })} />
+                    </div>
+                    <GearCalculator geom={geom as any} />
+                </div>
+            );
+
+        case 'FASTENER':
+            return (
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                    <PropInput label="X" value={(geom as any).origin.x} onChange={v => update({ origin: { ...(geom as any).origin, x: v } })} />
+                    <PropInput label="Y" value={(geom as any).origin.y} onChange={v => update({ origin: { ...(geom as any).origin, y: v } })} />
+                    <PropInput label="Diameter" value={(geom as any).diameter} onChange={v => update({ diameter: v })} />
+                    <PropInput label="Pitch" value={(geom as any).pitch} onChange={v => update({ pitch: v })} />
+                    {(geom as any).fastenerType === 'BOLT' && (
+                        <div className="col-span-2">
+                            <PropInput label="Length" value={(geom as any).length} onChange={v => update({ length: v })} />
+                        </div>
+                    )}
+                </div>
+            );
+
+        case 'BELT_PULLEY':
+            return (
+                <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="R1" value={(geom as any).radius1} onChange={v => update({ radius1: v })} />
+                        <PropInput label="R2" value={(geom as any).radius2} onChange={v => update({ radius2: v })} />
+                        <div className="col-span-2">
+                            <select 
+                                value={(geom as any).beltType} 
+                                onChange={e => update({ beltType: e.target.value })}
+                                className="w-full text-[10px] bg-gray-900 border border-gray-700 rounded px-1 py-1"
+                            >
+                                <option value="OPEN">Open Belt</option>
+                                <option value="CROSSED">Crossed Belt</option>
+                            </select>
+                        </div>
+                    </div>
+                    <BeltCalculator geom={geom as any} />
+                </div>
+            );
+
+        case 'PLANETARY_GEAR':
+            return (
+                <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="Module" value={(geom as any).module} onChange={v => update({ module: v })} />
+                        <PropInput label="Sun Z" value={(geom as any).sunTeeth} onChange={v => update({ sunTeeth: Math.round(v) })} />
+                        <PropInput label="Planet Z" value={(geom as any).planetTeeth} onChange={v => update({ planetTeeth: Math.round(v) })} />
+                        <PropInput label="Count" value={(geom as any).planetCount} onChange={v => update({ planetCount: Math.round(v) })} />
+                    </div>
+                    <div className="p-2 rounded bg-blue-500/10 border border-blue-500/20">
+                        <div className="flex justify-between text-[9px] font-mono text-blue-300">
+                            <span>Ring Teeth (Z):</span>
+                            <span>{(geom as any).sunTeeth + 2 * (geom as any).planetTeeth}</span>
+                        </div>
+                        <div className="flex justify-between text-[9px] font-mono text-blue-300 mt-1">
+                            <span>Ratio (1:N):</span>
+                            <span>{(1 + (geom as any).sunTeeth / (geom as any).sunTeeth + 2 * (geom as any).planetTeeth).toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+
+
+
         default:
             return <div className="text-[10px] text-gray-500 italic">No editable properties</div>;
     }
@@ -418,24 +577,24 @@ function PropInput({ label, value, onChange }: { label: string; value: number; o
 // HELPERS
 // ═══════════════════════════════════════════════════════════════
 
-function toDeg(rad: number): number { return rad * 180 / Math.PI; }
-function toRad(deg: number): number { return deg * Math.PI / 180; }
+// (Utilities defined at top of file)
 
 // ═══════════════════════════════════════════════════════════════
 // MODIFIERS EDITOR — Add/Remove Holes, Welds, Milling
 // ═══════════════════════════════════════════════════════════════
 
-function ModifiersEditor({ entity, addModifier, removeModifier }: {
+function ModifiersEditor({ entity, addModifier, removeModifier, updateModifier }: {
     entity: CadEntity;
     addModifier: (entityId: string, modifier: any) => void;
     removeModifier: (entityId: string, index: number) => void;
+    updateModifier: (entityId: string, index: number, updates: any) => void;
 }) {
     const modifiers = entity.modifiers || [];
 
     const handleAddHole = () => {
         const geom = entity.geometry as any;
-        const cx = geom.center?.x ?? geom.start?.x ?? 0;
-        const cy = geom.center?.y ?? geom.start?.y ?? 0;
+        const cx = geom.center?.x ?? geom.origin?.x ?? geom.start?.x ?? 0;
+        const cy = geom.center?.y ?? geom.origin?.y ?? geom.start?.y ?? 0;
         addModifier(entity.id, {
             type: 'HOLE',
             x: cx,
@@ -448,8 +607,8 @@ function ModifiersEditor({ entity, addModifier, removeModifier }: {
 
     const handleAddThread = () => {
         const geom = entity.geometry as any;
-        const cx = geom.center?.x ?? geom.start?.x ?? 0;
-        const cy = geom.center?.y ?? geom.start?.y ?? 0;
+        const cx = geom.center?.x ?? geom.origin?.x ?? geom.start?.x ?? 0;
+        const cy = geom.center?.y ?? geom.origin?.y ?? geom.start?.y ?? 0;
         addModifier(entity.id, {
             type: 'THREADED',
             x: cx,
@@ -462,8 +621,8 @@ function ModifiersEditor({ entity, addModifier, removeModifier }: {
 
     const handleAddWeld = () => {
         const geom = entity.geometry as any;
-        const cx = geom.center?.x ?? geom.start?.x ?? 0;
-        const cy = geom.center?.y ?? geom.start?.y ?? 0;
+        const cx = geom.center?.x ?? geom.origin?.x ?? geom.start?.x ?? 0;
+        const cy = geom.center?.y ?? geom.origin?.y ?? geom.start?.y ?? 0;
         addModifier(entity.id, {
             type: 'WELDED',
             x: cx,
@@ -475,8 +634,8 @@ function ModifiersEditor({ entity, addModifier, removeModifier }: {
 
     const handleAddMilling = () => {
         const geom = entity.geometry as any;
-        const cx = geom.center?.x ?? geom.start?.x ?? 0;
-        const cy = geom.center?.y ?? geom.start?.y ?? 0;
+        const cx = geom.center?.x ?? geom.origin?.x ?? geom.start?.x ?? 0;
+        const cy = geom.center?.y ?? geom.origin?.y ?? geom.start?.y ?? 0;
         addModifier(entity.id, {
             type: 'SURFACE_MILLED',
             x: cx,
@@ -495,27 +654,41 @@ function ModifiersEditor({ entity, addModifier, removeModifier }: {
     return (
         <div className="space-y-3">
             {/* Existing Modifiers List */}
-            {modifiers.length > 0 ? (
-                <div className="space-y-1.5">
+            {modifiers.length > 0 && (
+                <div className="space-y-2">
                     {modifiers.map((mod, idx) => (
-                        <div key={idx} className={`flex items-center justify-between px-2 py-1.5 rounded border ${modTypeColors[mod.type] || 'text-gray-400 bg-gray-500/10 border-gray-500/20'}`}>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-mono font-bold uppercase">{mod.type.replace('_', ' ')}</span>
-                                {mod.description && <span className="text-[9px] opacity-60">{mod.description}</span>}
-                                {mod.diameter && <span className="text-[9px] opacity-60">⌀{mod.diameter}mm</span>}
+                        <div key={idx} className={`p-2 rounded border transition-all ${modTypeColors[mod.type] || 'text-gray-400 bg-gray-500/10 border-gray-500/20'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">{mod.type.replace('_', ' ')}</span>
+                                <button
+                                    onClick={() => removeModifier(entity.id, idx)}
+                                    className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                                >
+                                    REMOVE
+                                </button>
                             </div>
-                            <button
-                                onClick={() => removeModifier(entity.id, idx)}
-                                className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20"
-                            >
-                                ✕
-                            </button>
+                            
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                                <PropInput label="X" value={mod.x ?? 0} onChange={v => updateModifier(entity.id, idx, { x: v })} />
+                                <PropInput label="Y" value={mod.y ?? 0} onChange={v => updateModifier(entity.id, idx, { y: v })} />
+                                {mod.diameter !== undefined && (
+                                    <PropInput label="Diam." value={mod.diameter} onChange={v => updateModifier(entity.id, idx, { diameter: v })} />
+                                )}
+                                {mod.depth !== undefined && (
+                                    <PropInput label="Depth" value={mod.depth} onChange={v => updateModifier(entity.id, idx, { depth: v })} />
+                                )}
+                                {mod.weldSize !== undefined && (
+                                    <PropInput label="Weld Size" value={mod.weldSize} onChange={v => updateModifier(entity.id, idx, { weldSize: v })} />
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
-            ) : (
+            )}
+            {modifiers.length === 0 && (
                 <div className="text-[10px] text-gray-500 italic">No modifiers applied.</div>
             )}
+
 
             {/* Add Modifier Buttons */}
             <div className="grid grid-cols-2 gap-1.5">

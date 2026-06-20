@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+import { useAssemblyStore } from '@/lib/store/assemblyStore';
+
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
 interface PartRow { id: string; label: string; length: number; qty: number; }
@@ -29,7 +31,8 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
     const [kerf, setKerf] = useState(4);
     const [trimStart, setTrimStart] = useState(0);
     const [trimEnd, setTrimEnd] = useState(0);
-    const [algorithm] = useState<'bfd'>('bfd');
+    const [algorithm, setAlgorithm] = useState<'bfd' | 'ffd'>('bfd');
+    const [costPerBar, setCostPerBar] = useState(45);
     const [feedRate, setFeedRate] = useState(800);
     const [plungeRate, setPlungeRate] = useState(300);
     const [safeZ, setSafeZ] = useState(10);
@@ -46,6 +49,37 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
     const updateRow = useCallback((id: string, field: keyof PartRow, value: string | number) => setParts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p)), []);
     const duplicateRow = useCallback((id: string) => { setParts(prev => { const o = prev.find(p => p.id === id); return o ? [...prev, { ...o, id: generateId(), label: o.label + ' (Copy)' }] : prev; }); }, []);
     const resetAll = useCallback(() => { setParts([{ id: generateId(), label: '', length: 0, qty: 1 }]); setResult(null); setGcode(''); setViewMode('input'); }, []);
+
+    const importFromAssembly = useCallback(() => {
+        const componentsObj = useAssemblyStore.getState().components;
+        const profiles = Object.values(componentsObj).filter(c => c.type === 'profile');
+        if (profiles.length === 0) {
+            alert('No profiles found in 3D Assembly. Please add profiles in the 3D Assembly tab first.');
+            return;
+        }
+
+        // Group by length
+        const groups: Record<number, number> = {};
+        profiles.forEach(p => {
+            const len = p.metadata?.length || 500;
+            groups[len] = (groups[len] || 0) + 1;
+        });
+
+        const newRows: PartRow[] = Object.entries(groups).map(([lenStr, qty]) => {
+            const len = Number(lenStr);
+            return {
+                id: `assembly-profile-${len}-${generateId()}`,
+                label: `Profile ${len}mm`,
+                length: len,
+                qty: qty
+            };
+        });
+
+        setParts(newRows);
+        setResult(null);
+        setGcode('');
+        setViewMode('input');
+    }, []);
 
     const calculate = useCallback(() => {
         const valid: CutItem[] = parts.filter(p => p.length > 0 && p.qty > 0).map(p => ({ id: p.id, label: p.label || `Part ${p.id.slice(0, 4)}`, length: p.length, qty: p.qty }));
@@ -119,18 +153,18 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden">
             {/* LEFT PANEL */}
-            <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
                 <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                            <div className="p-2.5 bg-cyan-500/10 rounded-xl border border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.15)]">
                                 <Scissors size={20} strokeWidth={2} />
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold tracking-tight text-gray-100">Cut Optimizer</h2>
-                                <p className="text-[10px] text-emerald-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Nesting & CAM</p>
+                                <p className="text-[10px] text-cyan-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">1D Nesting & CAM</p>
                             </div>
                         </div>
                         <div className="flex gap-2">
@@ -151,6 +185,17 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
                                     </button>
                                 ))}
                             </div>
+                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                                <button type="button" onClick={() => setAlgorithm('bfd')}
+                                    className={`py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${algorithm === 'bfd' ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40' : 'bg-white/[0.02] text-gray-600 border-white/5'}`}>
+                                    BFD (Min Waste)
+                                </button>
+                                <button type="button" onClick={() => setAlgorithm('ffd')}
+                                    className={`py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${algorithm === 'ffd' ? 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40' : 'bg-white/[0.02] text-gray-600 border-white/5'}`}>
+                                    FFD (Fast)
+                                </button>
+                            </div>
+                            <PanelInput label="Cost / Bar" unit="€" value={costPerBar} onChange={setCostPerBar} color="#00e5ff" />
                             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
                                 <PanelInput label="Stock Length" unit="mm" value={stockLength} onChange={setStockLength} color="#10b981" />
                                 <PanelInput label="Blade Kerf" unit="mm" value={kerf} onChange={setKerf} color="#10b981" />
@@ -180,7 +225,16 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
                     <div className="rounded-xl border border-white/5 bg-[#0a1018]/60 overflow-hidden">
                         <div className="flex items-center justify-between px-4 py-3">
                             <div className="flex items-center gap-2.5 text-emerald-400"><Layers size={14} /><span className="text-[10px] font-black uppercase tracking-[0.2em]">Parts</span></div>
-                            <button onClick={addRow} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all border border-emerald-500/20"><Plus size={14} /></button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={importFromAssembly}
+                                    title="Import Extrusions from 3D Assembly"
+                                    className="px-2 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-[9px] font-black uppercase tracking-wider transition-all border border-cyan-500/20 flex items-center gap-1 cursor-pointer"
+                                >
+                                    📥 Import 3D
+                                </button>
+                                <button onClick={addRow} className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all border border-emerald-500/20 cursor-pointer"><Plus size={14} /></button>
+                            </div>
                         </div>
                         <div className="px-4 pb-4 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
                             <AnimatePresence>
@@ -213,7 +267,7 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
             </div>
 
             {/* RIGHT PANEL */}
-            <div className="w-[62%] h-full flex flex-col overflow-hidden">
+            <div className="flex-1 h-auto lg:h-full flex flex-col overflow-hidden min-w-0">
                 <AnimatePresence mode="wait">
                     {(!result || viewMode === 'input') ? (
                         <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -253,6 +307,8 @@ export function CuttingOptimizerModule({ lang, dict }: { lang: string, dict: any
                                             </button>
                                         </div>
                                         <div className="space-y-2">
+                                            <SideStat label="Est. Material Cost" value={`€${(result.totalStockUsed * costPerBar).toFixed(0)}`} color="#00e5ff" />
+                                            <SideStat label="Rating" value={result.stats.efficiencyRating.toUpperCase()} color="#8b5cf6" />
                                             <SideStat label="Bars Used" value={String(result.totalStockUsed)} color="#10b981" />
                                             <SideStat label="Total Waste" value={`${result.totalWaste.toFixed(0)} mm`} color="#f59e0b" />
                                             <SideStat label="Total Cuts" value={String(result.stats.totalCuts)} color="#8b5cf6" />

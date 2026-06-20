@@ -83,9 +83,9 @@ export default function BearingAnalysisModule() {
     }, [activeBearing, radialLoad, axialLoad, rpm, reliability, viscosity]);
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden p-2">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden p-2 gap-4">
             {/* CONFIGURATION SIDEBAR (38%) */}
-            <div className="w-[38%] h-full flex flex-col bg-[#0b121d]/80 rounded-2xl border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#0b121d]/80 rounded-2xl border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl">
                 
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
                     <div className="flex items-center gap-3">
@@ -97,12 +97,6 @@ export default function BearingAnalysisModule() {
                             <p className="text-[10px] text-indigo-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Bearing Analytics & Life Prediction</p>
                         </div>
                     </div>
-                    <SaveButton 
-                        type="bearings"
-                        inputData={{ searchQuery, radialLoad, axialLoad, rpm, reliability, viscosity }}
-                        engineVersion="v2.5"
-                        resultJson={results}
-                    />
                 </div>
 
                 <div className="space-y-8">
@@ -188,7 +182,7 @@ export default function BearingAnalysisModule() {
             </div>
 
             {/* MAIN CONTENT (62%) */}
-            <div className="w-[62%] h-full flex flex-col pl-4 gap-4 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 h-auto lg:h-full flex flex-col gap-4 overflow-y-auto custom-scrollbar min-w-0">
                 
                 {/* PREVIEW HEADER */}
                 <div className="bg-[#0b121d]/50 p-6 rounded-[28px] border border-white/5 relative overflow-hidden flex items-center justify-between shadow-lg">

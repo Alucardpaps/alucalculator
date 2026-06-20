@@ -15,11 +15,11 @@ export async function POST(req: Request) {
         const { calculatorId, inputs, result, resultVar, resultJson } = await req.json();
 
         // 1. Get or Create default "Personal Workspace" project for the user
-        let projects = await projectRepo.listByUser(session.user.id);
+        let projects = await projectRepo.listByUser((session.user as any).id);
         let targetProjectId = projects[0]?.id;
 
         if (!targetProjectId) {
-            const newProject = await projectRepo.create(session.user.id, "Personal Workspace");
+            const newProject = await projectRepo.create((session.user as any).id, "Personal Workspace");
             targetProjectId = newProject.id;
         }
 

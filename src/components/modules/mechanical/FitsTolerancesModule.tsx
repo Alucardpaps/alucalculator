@@ -66,9 +66,9 @@ export default function FitsTolerancesModule() {
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden">
             {/* LEFT PANEL — Controls */}
-            <div className="w-[38%] h-full flex flex-col bg-[#080d14]/80 border-r border-white/5 overflow-hidden">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
                 <div className="flex-none px-6 pt-6 pb-4 border-b border-white/5">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
@@ -161,7 +161,7 @@ export default function FitsTolerancesModule() {
             </div>
 
             {/* RIGHT PANEL — Visualization & Results */}
-            <div className="w-[62%] h-full flex flex-col overflow-hidden">
+            <div className="flex-1 h-auto lg:h-full flex flex-col overflow-hidden min-w-0">
                 {/* KPI Header */}
                 <div className="flex-none px-8 pt-8 pb-4">
                     <div className="flex items-start justify-between">

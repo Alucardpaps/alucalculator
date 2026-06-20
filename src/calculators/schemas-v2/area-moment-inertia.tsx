@@ -139,7 +139,7 @@ export const areaMomentInertiaSchema: CalculatorSchemaV2 = {
                         {/* Mini Data HUD */}
                         <g transform="translate(10, 20)">
                             <rect x="0" y="0" width="100" height="50" fill="rgba(15, 23, 42, 0.8)" rx="4" />
-                            <text x="10" y="20" fontSize="10" fill="#a855f7" fontWeight="bold">Ix: {Ix.toExponential(2)}</text>
+                            <text x="10" y="20" fontSize="10" fill="#00e5ff" fontWeight="bold">Ix: {Ix.toExponential(2)}</text>
                             <text x="10" y="40" fontSize="10" fill="#3b82f6" fontWeight="bold">Iy: {Iy.toExponential(2)}</text>
                         </g>
 

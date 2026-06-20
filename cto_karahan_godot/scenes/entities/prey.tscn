@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://cs87q6o4hpd4z"]
+
+[ext_resource type="Script" path="res://scripts/entities/prey.gd" id="1_prey1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_prey"]
+radius = 18.0
+
+[node name="Prey" type="CharacterBody2D"]
+input_pickable = true
+script = ExtResource("1_prey1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_prey")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="IconLabel" type="Label" parent="Visual"]
+offset_left = -30.0
+offset_top = -30.0
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "💀"
+horizontal_alignment = 1
+vertical_alignment = 1

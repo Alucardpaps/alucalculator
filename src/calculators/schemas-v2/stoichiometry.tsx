@@ -26,7 +26,7 @@ export const stoichiometrySchema: CalculatorSchemaV2 = {
     inputs: [
         { key: 'm_solute', label: 'Mass of Solute', unit: 'g', defaultValue: 58.44, description: 'Grams of solute (e.g. NaCl)', validation: { required: true, min: 0 } },
         { key: 'mw_solute', label: 'Molar Mass', unit: 'g/mol' as any, defaultValue: 58.44, description: 'Molecular weight', validation: { required: true, min: 0.1 } },
-        { key: 'v_solution', label: 'Volume (Solution)', unit: 'mm3' as any, defaultValue: 1, description: 'Total volume in Liters', validation: { required: true, min: 0.0001 } },
+        { key: 'v_solution', label: 'Volume (Solution)', unit: 'L' as any, defaultValue: 1, description: 'Total volume in liters', validation: { required: true, min: 0.0001 } },
         { key: 'm_solvent', label: 'Mass (Solvent)', unit: 'kg', defaultValue: 1, description: 'Mass of solvent in kg', validation: { required: true, min: 0.0001 } }
     ],
     outputs: [

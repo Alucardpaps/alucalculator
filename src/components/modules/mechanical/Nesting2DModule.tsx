@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 const Nesting2D = dynamic(() => import('@/components/Nesting2D').then(mod => mod.Nesting2D), {
     loading: () => (
         <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
             <span className="text-sm font-medium">Loading Nesting Engine...</span>
         </div>
     ),
@@ -29,7 +29,7 @@ export default function Nesting2DModule({ lang = 'en', dict = {} }: Nesting2DMod
     const props = useMemo(() => ({ lang, dict }), [lang, dict]);
 
     return (
-        <div className="h-full w-full overflow-hidden bg-white dark:bg-slate-950">
+        <div className="h-full w-full overflow-hidden bg-[#020408]">
             <Nesting2D {...props} />
         </div>
     );

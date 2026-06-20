@@ -10,55 +10,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useCadStore } from '../store/cadStore';
 import { useOSStore } from '../../store/osStore';
 import { CAD_COLORS } from '../kernel/constants';
-import { commandProcessor } from '../commands/CommandProcessor';
+import { commandProcessor, COMMAND_ALIASES } from '../commands/CommandProcessor';
 
-// ═══════════════════════════════════════════════════════════════
-// COMMAND ALIASES (AutoCAD Style)
-// ═══════════════════════════════════════════════════════════════
-
-const COMMAND_ALIASES: Record<string, string> = {
-    'L': 'LINE',
-    'LINE': 'LINE',
-    'PL': 'PLINE',
-    'PLINE': 'PLINE',
-    'C': 'CIRCLE',
-    'CIRCLE': 'CIRCLE',
-    'A': 'ARC',
-    'ARC': 'ARC',
-    'REC': 'RECTANGLE',
-    'RECTANGLE': 'RECTANGLE',
-    'E': 'ERASE',
-    'ERASE': 'ERASE',
-    'TR': 'TRIM',
-    'TRIM': 'TRIM',
-    'EX': 'EXTEND',
-    'EXTEND': 'EXTEND',
-    'O': 'OFFSET',
-    'OFFSET': 'OFFSET',
-    'M': 'MOVE',
-    'MOVE': 'MOVE',
-    'CO': 'COPY',
-    'COPY': 'COPY',
-    'RO': 'ROTATE',
-    'ROTATE': 'ROTATE',
-    'MI': 'MIRROR',
-    'MIRROR': 'MIRROR',
-    'SC': 'SCALE',
-    'SCALE': 'SCALE',
-    'F': 'FILLET',
-    'FILLET': 'FILLET',
-    'CHA': 'CHAMFER',
-    'CHAMFER': 'CHAMFER',
-    'DIM': 'DIMENSION',
-    'DIMENSION': 'DIMENSION',
-    'Z': 'ZOOM',
-    'ZOOM': 'ZOOM',
-    'P': 'PAN',
-    'PAN': 'PAN',
-    'U': 'UNDO',
-    'UNDO': 'UNDO',
-    'REDO': 'REDO'
-};
 
 // ═══════════════════════════════════════════════════════════════
 // COMMAND LINE COMPONENT
@@ -251,7 +204,7 @@ export function CommandLine({ className }: CommandLineProps) {
 
             {/* Quick Help */}
             <div className="px-4 pb-2 text-[10px] text-gray-500">
-                L=Line | C=Circle | REC=Rect | TR=Trim | O=Offset | E=Erase | ESC=Cancel | Enter=Finish
+                L=Line | C=Circle | REC=Rect | G=Gear | BOLT=Fastener | PG=Planetary | DIM=Dimension | E=Erase | ESC=Cancel
             </div>
         </div>
     );

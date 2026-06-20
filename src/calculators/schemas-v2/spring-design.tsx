@@ -37,7 +37,8 @@ export const springDesignSchema: CalculatorSchemaV2 = {
         { key: 'Kw', label: 'Wahl Factor (Kw)', unit: '-', description: 'Stress correction factor for curvature', precision: 3, formulaLatex: 'K_W = \\frac{4C-1}{4C-4} + \\frac{0.615}{C}' },
         { key: 'tau', label: 'Shear Stress (τ)', unit: 'MPa', description: 'Maximum shear stress at the inner fiber', precision: 1, formulaLatex: '\\tau = K_W \\frac{8 F D}{\\pi d^3}' },
         { key: 'delta', label: 'Deflection (δ)', unit: 'mm', description: 'Axial deflection of the spring', precision: 2, formulaLatex: '\\delta = \\frac{8 F D^3 N_a}{G d^4}' },
-        { key: 'k', label: 'Spring Rate (k)', unit: 'N/mm' as any, description: 'Stiffness of the spring (F/δ)', precision: 2, formulaLatex: 'k = \\frac{G d^4}{8 D^3 N_a}' }
+        { key: 'k', label: 'Spring Rate (k)', unit: 'N/mm' as any, description: 'Stiffness of the spring (F/δ)', precision: 2, formulaLatex: 'k = \\frac{G d^4}{8 D^3 N_a}' },
+        { key: 'SF', label: 'Safety Factor (SF)', unit: '-', description: 'Ratio of yield strength to max shear stress (Ssy/τ)', precision: 2, formulaLatex: 'SF = S_{sy} / \\tau' }
     ],
     calculationEngine: (inputs: Record<string, any>) => {
         const F = Number(inputs.F.value);
@@ -70,6 +71,8 @@ export const springDesignSchema: CalculatorSchemaV2 = {
         // 5. Spring Rate (Stiffness)
         const k = (G_MPa * Math.pow(d, 4)) / (8 * Math.pow(D, 3) * Na);
 
+        const SF = tau > 0 ? Ssy / tau : 0;
+
         const warnings: { field: string; message: string; severity: "info" | "warning" | "critical" }[] = [];
 
         if (C < 4 || C > 12) {
@@ -86,7 +89,8 @@ export const springDesignSchema: CalculatorSchemaV2 = {
                 Kw: createValidatedValue(Kw, '-', 'derived'),
                 tau: createValidatedValue(tau, 'MPa', 'derived'),
                 delta: createValidatedValue(delta, 'mm', 'derived'),
-                k: createValidatedValue(k, 'N/mm' as any, 'derived')
+                k: createValidatedValue(k, 'N/mm' as any, 'derived'),
+                SF: createValidatedValue(SF, '-', 'derived')
             },
             verified: true,
             warnings,

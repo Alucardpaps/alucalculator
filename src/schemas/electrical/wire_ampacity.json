@@ -1,0 +1,38 @@
+{
+  "id": "wire_ampacity",
+  "name": "Wire Ampacity & Voltage Drop (3-Phase)",
+  "category": "electrical",
+  "inputs": [
+    { "key": "P", "type": "number", "unit": "W" },
+    { "key": "V", "type": "number", "unit": "V" },
+    { "key": "cos_phi", "type": "number", "unit": "" },
+    { "key": "L", "type": "number", "unit": "m" },
+    { "key": "kappa", "type": "number", "unit": "m/Ohm.mm^2" },
+    { "key": "S", "type": "number", "unit": "mm^2" }
+  ],
+  "steps": [
+    {
+      "id": "I",
+      "formula": "P / (1.732 * V * cos_phi)",
+      "description": "Calculate Nominal Design Current (3-Phase)",
+      "latex": "I = \\frac{P}{\\sqrt{3} \\cdot V \\cdot \\cos\\phi}"
+    },
+    {
+      "id": "VD_percent",
+      "formula": "(100 * P * L) / (kappa * S * V^2)",
+      "description": "Calculate Voltage Drop Percentage",
+      "latex": "\\%e = \\frac{100 \\cdot P \\cdot L}{\\kappa \\cdot S \\cdot V^2}"
+    },
+    {
+      "id": "VD_volts",
+      "formula": "(VD_percent / 100) * V",
+      "description": "Calculate Voltage Drop in Volts",
+      "latex": "\\Delta V = \\frac{\\%e}{100} \\cdot V"
+    }
+  ],
+  "outputs": [
+    "I",
+    "VD_percent",
+    "VD_volts"
+  ]
+}

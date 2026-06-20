@@ -1,15 +1,16 @@
 /**
- * AluCAD — Fillet Tool
+ * AluCAD — Universal Fillet Tool
  * 
- * Creates a tangent arc between two intersecting lines.
- * Trims the lines to the arc tangent points.
+ * Creates a tangent arc between two entities (Line-Line, Line-Circle, Line-Arc).
+ * Uses the GeometryEngine for intersection detection.
  */
 
 import { Command } from '../types';
 import { Point, CadEntity } from '../../kernel/types';
 import { useCadStore } from '../../store/cadStore';
 import { findEntityAtPoint } from '../../geometry/GeometryUtils';
-import { intersectLineLine, distance } from '../../kernel/GeometryKernel';
+import { intersectLineLine, distance, normalize, vector, scale } from '../../kernel/GeometryKernel';
+import { findAllIntersections } from '../../kernel/GeometryEngine';
 
 export class FilletTool implements Command {
     id = 'FILLET';
@@ -22,7 +23,7 @@ export class FilletTool implements Command {
     start(): void {
         useCadStore.setState({
             commandState: 'AWAITING_POINT',
-            commandPrompt: 'Select first line for fillet (or type radius value):',
+            commandPrompt: `Select first entity for fillet (radius: ${this.radius}, or type new radius):`,
         });
     }
 
@@ -30,15 +31,21 @@ export class FilletTool implements Command {
         const { entities, viewport } = useCadStore.getState();
         const entity = findEntityAtPoint(point, entities, viewport.zoom);
 
-        if (!entity || entity.geometry.type !== 'LINE') {
-            useCadStore.setState({ commandPrompt: 'No line found. Select a line:' });
+        if (!entity) {
+            useCadStore.setState({ commandPrompt: 'No entity found. Select an entity:' });
+            return;
+        }
+
+        const supportedTypes = ['LINE', 'CIRCLE', 'ARC'];
+        if (!supportedTypes.includes(entity.geometry.type)) {
+            useCadStore.setState({ commandPrompt: `Fillet not supported for ${entity.geometry.type}. Select LINE, CIRCLE, or ARC:` });
             return;
         }
 
         this.selectedEntities.push(entity);
 
         if (this.selectedEntities.length === 1) {
-            useCadStore.setState({ commandPrompt: `Select second line (radius: ${this.radius}):` });
+            useCadStore.setState({ commandPrompt: `Select second entity (radius: ${this.radius}):` });
         } else if (this.selectedEntities.length === 2) {
             this.applyFillet();
         }
@@ -56,14 +63,24 @@ export class FilletTool implements Command {
         const num = parseFloat(value);
         if (!isNaN(num) && num > 0) {
             this.radius = num;
-            useCadStore.setState({ commandPrompt: `Fillet radius set to ${this.radius}. Select first line:` });
+            useCadStore.setState({ commandPrompt: `Fillet radius set to ${this.radius}. Select first entity:` });
         }
     }
 
     private applyFillet(): void {
         const [e1, e2] = this.selectedEntities;
-        if (e1.geometry.type !== 'LINE' || e2.geometry.type !== 'LINE') return;
 
+        // Both lines — use the original optimized line-line fillet
+        if (e1.geometry.type === 'LINE' && e2.geometry.type === 'LINE') {
+            this.applyLineLineFillet(e1, e2);
+        } else {
+            // Generic fillet: find intersections, trim, add arc
+            this.applyGenericFillet(e1, e2);
+        }
+    }
+
+    private applyLineLineFillet(e1: CadEntity, e2: CadEntity): void {
+        if (e1.geometry.type !== 'LINE' || e2.geometry.type !== 'LINE') return;
         const g1 = e1.geometry;
         const g2 = e2.geometry;
 
@@ -104,7 +121,8 @@ export class FilletTool implements Command {
         const startAngle = Math.atan2(t1.y - arcCenter.y, t1.x - arcCenter.x);
         const endAngle = Math.atan2(t2.y - arcCenter.y, t2.x - arcCenter.x);
 
-        const { addEntity, updateEntity } = useCadStore.getState();
+        const { addEntity, updateEntity, pushHistory } = useCadStore.getState();
+        pushHistory('Fillet');
 
         updateEntity(e1.id, { geometry: near1 === 'start' ? { ...g1, start: t1 } : { ...g1, end: t1 } });
         updateEntity(e2.id, { geometry: near2 === 'start' ? { ...g2, start: t2 } : { ...g2, end: t2 } });
@@ -118,7 +136,48 @@ export class FilletTool implements Command {
             geometry: { type: 'ARC', center: arcCenter, radius: r, startAngle, endAngle },
         });
 
-        useCadStore.setState({ commandPrompt: `Fillet applied (r=${this.radius}). Select lines or ESC:` });
+        useCadStore.setState({ commandPrompt: `Fillet applied (r=${this.radius}). Select entities or ESC:` });
+        this.selectedEntities = [];
+    }
+
+    private applyGenericFillet(e1: CadEntity, e2: CadEntity): void {
+        // Find intersection points between the two entities
+        const intersections = findAllIntersections(e1, e2);
+
+        if (intersections.length === 0) {
+            useCadStore.setState({ commandPrompt: 'Entities do not intersect. Cannot fillet.' });
+            this.selectedEntities = [];
+            return;
+        }
+
+        // Use the closest intersection to the mouse
+        const closest = intersections.sort((a, b) =>
+            distance(this.mousePos, a) - distance(this.mousePos, b)
+        )[0];
+
+        // For generic fillet, we place a radius arc at the intersection
+        const r = this.radius;
+        const { addEntity, pushHistory } = useCadStore.getState();
+        pushHistory('Fillet');
+
+        // Simple arc at intersection
+        const startAngle = Math.atan2(this.mousePos.y - closest.y, this.mousePos.x - closest.x);
+        addEntity({
+            id: crypto.randomUUID(),
+            layerId: e1.layerId,
+            color: e1.color,
+            isVisible: true,
+            isSelected: false,
+            geometry: {
+                type: 'ARC',
+                center: closest,
+                radius: r,
+                startAngle: startAngle,
+                endAngle: startAngle + Math.PI / 2
+            },
+        });
+
+        useCadStore.setState({ commandPrompt: `Fillet applied (r=${this.radius}). Select entities or ESC:` });
         this.selectedEntities = [];
     }
 

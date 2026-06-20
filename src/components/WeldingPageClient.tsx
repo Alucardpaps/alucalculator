@@ -2,8 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { CalculatorInput } from "@/components/CalculatorInput";
-import { WeldingVisualization, WeldType } from "@/components/WeldingVisualization";
-import { WeldingVisualization3D, WeldJointType3D } from "@/components/WeldingVisualization3D";
+import { WeldingVisualization2D } from "@/components/modules/mechanical/WeldingVisualization2D";
 import { TheorySection } from "@/components/TheorySection";
 import {
     WELDING_METHODS,
@@ -48,8 +47,7 @@ export default function WeldingPageClient() {
     // Selected electrode
     const [selectedElectrode, setSelectedElectrode] = useState(ELECTRODE_CATALOG[7]); // ER70S-6
 
-    // View Mode (2D / 3D)
-    const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
+
 
     // Material Profile Selection
     const [material1Profile, setMaterial1Profile] = useState<ShapeType>('sheet');
@@ -264,17 +262,10 @@ export default function WeldingPageClient() {
 
                     {/* Material Profile Selector */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between mb-4">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <Layers size={14} />
                                 {t.welding.profiles}
                             </h3>
-                            {/* 2D/3D Toggle */}
-                            <div className="flex bg-slate-200 dark:bg-slate-700 rounded p-1">
-                                <button onClick={() => setViewMode('2d')} className={`px-3 py-1 text-[10px] font-bold rounded ${viewMode === '2d' ? 'bg-white dark:bg-slate-600 shadow text-slate-900 dark:text-white' : 'text-slate-500'}`}>2D</button>
-                                <button onClick={() => setViewMode('3d')} className={`px-3 py-1 text-[10px] font-bold rounded ${viewMode === '3d' ? 'bg-white dark:bg-slate-600 shadow text-slate-900 dark:text-white' : 'text-slate-500'}`}>3D</button>
-                            </div>
-                        </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             {/* Material 1 */}
@@ -421,10 +412,10 @@ export default function WeldingPageClient() {
                         )}
                     </div>
 
-                    {/* Weld Visualization (2D or 3D) */}
+                    {/* Weld Visualization (Animated 2D) */}
                     <div className="h-[350px]">
-                        <WeldingVisualization3D
-                            jointType={jointType === 'doubleFillet' ? 'fillet' : jointType === 'vGroove' ? 'vgroove' : jointType as WeldJointType3D}
+                        <WeldingVisualization2D
+                            jointType={jointType === 'doubleFillet' ? 'fillet' : jointType === 'vGroove' ? 'vgroove' : jointType as any}
                             legSize={legSize}
                             thickness={thickness}
                             grooveAngle={grooveAngle}
@@ -441,7 +432,6 @@ export default function WeldingPageClient() {
                                 shape: material2Profile,
                                 dimensions: material2Dims
                             }}
-                            is2D={viewMode === '2d'}
                         />
                     </div>
 

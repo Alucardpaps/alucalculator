@@ -26,14 +26,36 @@ export const HeadlessCalculatorWindow: React.FC<HeadlessWindowProps> = ({ calcul
 
         try {
             // Forward the query + the theoretical context to the Gemini RAG endpoint
-            const res = await fetch('/api/ai/copilot', {
+            let res = await fetch('/api/ai/copilot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     query: inputQuery,
                     context: `Calculate using this tool: ${calculatorConfig.title}. Formula: ${calculatorConfig.seo.formula}. Variables context: ${JSON.stringify(calculatorConfig.seo.variables)}. User input: ${inputQuery}`
                 })
+            }).catch(async (err) => {
+                console.warn("[Headless Window] Primary API route failed, trying PHP fallback:", err);
+                return await fetch('/api/ai/copilot/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: inputQuery,
+                        context: `Calculate using this tool: ${calculatorConfig.title}. Formula: ${calculatorConfig.seo.formula}. Variables context: ${JSON.stringify(calculatorConfig.seo.variables)}. User input: ${inputQuery}`
+                    })
+                });
             });
+
+            if (res.status === 404) {
+                console.warn("[Headless Window] Primary API route returned 404, trying PHP fallback.");
+                res = await fetch('/api/ai/copilot/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: inputQuery,
+                        context: `Calculate using this tool: ${calculatorConfig.title}. Formula: ${calculatorConfig.seo.formula}. Variables context: ${JSON.stringify(calculatorConfig.seo.variables)}. User input: ${inputQuery}`
+                    })
+                });
+            }
 
             const data = await res.json();
             setResult(data.answer || "Calculation failed. The Oracle is confused.");

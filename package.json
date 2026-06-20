@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/copy_calculators.js",
     "dev": "next dev",
     "build": "next build && next-sitemap",
     "start": "next start",
@@ -16,7 +17,7 @@
     "@formatjs/intl-localematcher": "^0.8.0",
     "@google/generative-ai": "^0.24.1",
     "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
+    "@react-three/fiber": "^9.6.1",
     "@salusoft89/planegcs": "^1.1.7",
     "ai": "^6.0.75",
     "basic-ftp": "^5.1.0",
@@ -57,7 +58,7 @@
     "three": "^0.182.0",
     "uuid": "^13.0.0",
     "ytsr": "^3.8.4",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@magicuidesign/mcp": "^1.0.6",

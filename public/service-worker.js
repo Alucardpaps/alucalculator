@@ -68,14 +68,37 @@ self.addEventListener('activate', (event) => {
  * Fetch Event - Network-first for API, Cache-first for static
  */
 self.addEventListener('fetch', (event) => {
-    const { request } = event;
-    const url = new URL(request.url);
+    let { request } = event;
+    let url = new URL(request.url);
 
     // Skip non-GET requests
     if (request.method !== 'GET') return;
 
     // Skip external requests
     if (url.origin !== location.origin) return;
+
+    // Rewrite Next.js client dynamic route RSC payload fetch calls.
+    // Next.js static export generates nested directory payloads like:
+    // .../__next.calculators/$d$slug/
+    // but the client-side router requests dot-separated files like:
+    // .../__next.calculators.$d$slug.txt or .../__next.calculators.$d$slug.__PAGE__.txt
+    // We rewrite the dot separator back to a slash.
+    if (url.pathname.includes('__next.')) {
+        let rewrittenPathname = url.pathname;
+        if (rewrittenPathname.includes('.$d$slug')) {
+            rewrittenPathname = rewrittenPathname.replace(/__next\.([a-zA-Z0-9_-]+)\.\$d\$slug/g, '__next.$1/$d$slug');
+        }
+        if (rewrittenPathname.includes('.__PAGE__')) {
+            rewrittenPathname = rewrittenPathname.replace(/__next\.([a-zA-Z0-9_-]+)\.__PAGE__/g, '__next.$1/__PAGE__');
+        }
+        if (rewrittenPathname !== url.pathname) {
+            console.log(`[SW] Rewriting RSC path: ${url.pathname} -> ${rewrittenPathname}`);
+            const rewrittenUrl = new URL(url.href);
+            rewrittenUrl.pathname = rewrittenPathname;
+            request = new Request(rewrittenUrl.toString(), request);
+            url = rewrittenUrl;
+        }
+    }
 
     // Handle API routes - Network first, cache fallback
     if (url.pathname.startsWith('/api/')) {

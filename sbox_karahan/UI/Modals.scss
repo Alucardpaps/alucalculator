@@ -1,0 +1,375 @@
+/* ═══════════════════════════════════════════════════════════
+   CTO KARAHAN — ChatModal & PurchaseModal Styles
+   ═══════════════════════════════════════════════════════════ */
+
+$bg-overlay: rgba(0, 0, 0, 0.65);
+$bg-modal: rgba(15, 23, 42, 0.96);
+$border-glow: rgba(59, 130, 246, 0.3);
+$accent-blue: #3b82f6;
+$accent-green: #22c55e;
+$accent-orange: #f59e0b;
+$accent-red: #ef4444;
+$accent-pink: #ec4899;
+$text-primary: #e2e8f0;
+$text-muted: #94a3b8;
+
+/* ═══════ CHAT MODAL ═══════ */
+ChatModal {
+    .chat-overlay {
+        position: absolute;
+        left: 0; top: 0; right: 0; bottom: 0;
+        background: $bg-overlay;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .chat-modal {
+        background: $bg-modal;
+        border: 1px solid $border-glow;
+        border-radius: 12px;
+        width: 420px;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        animation: modal-in 0.25s ease;
+    }
+
+    @keyframes modal-in {
+        from { transform: scale(0.92); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+
+        .chat-avatar {
+            font-size: 32px;
+            background: rgba(59, 130, 246, 0.1);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .chat-info {
+            flex: 1;
+
+            .chat-name {
+                font-size: 16px;
+                font-weight: 700;
+                color: $text-primary;
+            }
+
+            .chat-subtitle {
+                font-size: 11px;
+                color: $text-muted;
+            }
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-muted;
+            font-size: 18px;
+            cursor: pointer;
+
+            &:hover { color: $accent-red; }
+        }
+    }
+
+    .chat-stats {
+        display: flex;
+        gap: 12px;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+
+        .mini-stat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            .label {
+                font-size: 9px;
+                color: $text-muted;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .mini-bar {
+                height: 4px;
+                background: rgba(255,255,255,0.08);
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            .mini-fill {
+                height: 100%;
+                border-radius: 2px;
+                transition: width 0.3s;
+
+                &.morale { background: linear-gradient(90deg, $accent-orange, $accent-green); }
+                &.trust { background: linear-gradient(90deg, $accent-pink, $accent-blue); }
+            }
+
+            .val {
+                font-size: 13px;
+                font-weight: 700;
+                color: $text-primary;
+
+                &.warn { color: $accent-orange; }
+            }
+        }
+    }
+
+    .chat-bio {
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+
+        .bio-trait {
+            display: inline-block;
+            background: rgba(236, 72, 153, 0.15);
+            color: $accent-pink;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 12px;
+            color: $text-muted;
+            margin: 4px 0 0;
+        }
+    }
+
+    .question-bubble {
+        margin: 12px 16px;
+        background: rgba(59, 130, 246, 0.08);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 8px;
+        padding: 12px;
+
+        .question-text {
+            font-size: 13px;
+            color: $text-primary;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .question-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .action-btn {
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            color: $accent-blue;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+
+            &:hover {
+                background: rgba(59, 130, 246, 0.2);
+                border-color: $accent-blue;
+                transform: translateX(3px);
+            }
+        }
+    }
+
+    .no-question {
+        padding: 20px 16px;
+        font-size: 12px;
+        color: $text-muted;
+        text-align: center;
+    }
+
+    .chat-footer {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+
+        .footer-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+
+            &.positive {
+                background: rgba(34, 197, 94, 0.12);
+                color: $accent-green;
+                border-color: rgba(34, 197, 94, 0.25);
+
+                &:hover {
+                    background: rgba(34, 197, 94, 0.2);
+                }
+            }
+
+            &.negative {
+                background: rgba(239, 68, 68, 0.12);
+                color: $accent-red;
+                border-color: rgba(239, 68, 68, 0.25);
+
+                &:hover {
+                    background: rgba(239, 68, 68, 0.2);
+                }
+            }
+        }
+    }
+}
+
+/* ═══════ PURCHASE MODAL ═══════ */
+PurchaseModal {
+    .purchase-overlay {
+        position: absolute;
+        left: 0; top: 0; right: 0; bottom: 0;
+        background: $bg-overlay;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .purchase-modal {
+        background: $bg-modal;
+        border: 1px solid $border-glow;
+        border-radius: 12px;
+        width: 480px;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        animation: modal-in 0.25s ease;
+    }
+
+    .purchase-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+
+        .title {
+            font-size: 16px;
+            font-weight: 700;
+            color: $text-primary;
+            flex: 1;
+        }
+
+        .balance {
+            font-size: 13px;
+            color: $accent-green;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: $text-muted;
+            font-size: 18px;
+            cursor: pointer;
+
+            &:hover { color: $accent-red; }
+        }
+    }
+
+    .material-grid {
+        padding: 8px 16px;
+    }
+
+    .material-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+
+        .mat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .mat-name {
+                font-size: 12px;
+                font-weight: 600;
+                color: $text-primary;
+            }
+
+            .mat-stock {
+                font-size: 10px;
+                color: $text-muted;
+            }
+        }
+
+        .mat-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .mat-cost {
+                font-size: 11px;
+                color: $accent-orange;
+                font-weight: 600;
+            }
+
+            .buy-btn {
+                background: rgba(59, 130, 246, 0.12);
+                border: 1px solid rgba(59, 130, 246, 0.2);
+                color: $accent-blue;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 4px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.15s;
+
+                &:hover {
+                    background: rgba(59, 130, 246, 0.25);
+                }
+
+                &:disabled {
+                    opacity: 0.3;
+                    cursor: not-allowed;
+                }
+
+                &.bulk {
+                    background: rgba(34, 197, 94, 0.12);
+                    border-color: rgba(34, 197, 94, 0.2);
+                    color: $accent-green;
+
+                    &:hover { background: rgba(34, 197, 94, 0.25); }
+                }
+            }
+        }
+    }
+
+    .purchase-footer {
+        padding: 10px 16px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+
+        .tip {
+            font-size: 10px;
+            color: $text-muted;
+            font-style: italic;
+        }
+    }
+}

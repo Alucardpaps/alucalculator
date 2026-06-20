@@ -223,6 +223,16 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
         },
     },
 
+    'chain-drive': {
+        loader: () => import('./schemas-v2/chain-drive'),
+        metadata: {
+            title: 'Roller Chain Drive',
+            description: 'Sprocket ratio, chain length, velocity, and tension (ISO 606)',
+            category: 'mechanical',
+            icon: 'Link',
+        },
+    },
+
     'brakes-clutches': {
         loader: () => import('./schemas-v2/brakes-clutches'),
         metadata: {
@@ -290,6 +300,56 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             description: 'Determine shaft torque from motor power and speed.',
             category: 'mechanical',
             icon: 'Zap',
+        },
+    },
+
+    'failure-analysis': {
+        loader: () => import('./schemas-v2/failure-analysis'),
+        metadata: {
+            title: 'Failure Analysis & Safety',
+            description: 'Yield, fatigue, and overload failure mode analysis (ASME B15.1)',
+            category: 'mechanical',
+            icon: 'AlertTriangle',
+        },
+    },
+
+    'fatigue-life-sn': {
+        loader: () => import('./schemas-v2/fatigue-life-sn'),
+        metadata: {
+            title: 'Fatigue Life S-N (Basquin)',
+            description: 'Cycle life prediction under fluctuating loads (ASTM E606)',
+            category: 'mechanical',
+            icon: 'TrendingDown',
+        },
+    },
+
+    'motor-selection': {
+        loader: () => import('./schemas-v2/motor-selection'),
+        metadata: {
+            title: 'Motor Selection Engine',
+            description: 'Required power & nearest IEC standard motor sizing (IEC 60034-1)',
+            category: 'mechanical',
+            icon: 'Cpu',
+        },
+    },
+
+    'torsion-shaft': {
+        loader: () => import('./schemas-v2/torsion-shaft'),
+        metadata: {
+            title: 'Torsion of Shafts',
+            description: 'Shear stress and angle of twist for circular shafts',
+            category: 'mechanical',
+            icon: 'RotateCcw',
+        },
+    },
+
+    'bearings-advanced': {
+        loader: () => import('./schemas-v2/bearings' as any),
+        metadata: {
+            title: 'Advanced Bearing Analysis',
+            description: 'Extended bearing life with visualizations and advanced parameters',
+            category: 'mechanical',
+            icon: 'Target',
         },
     },
 

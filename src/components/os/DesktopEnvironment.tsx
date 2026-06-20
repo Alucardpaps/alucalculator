@@ -40,7 +40,7 @@ export default function DesktopEnvironment() {
     const [kernelReady, setKernelReady] = useState(false);
     const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'fea' | 'cam'>('desk');
     const [isOvenOpen, setIsOvenOpen] = useState(false);
-    const { setLanguage, openWindow } = useOSStore();
+    const { openWindow } = useOSStore();
 
     // Ctrl+Shift+P → Open Terminal
     useEffect(() => {
@@ -70,12 +70,11 @@ export default function DesktopEnvironment() {
                 throw new Error("Kernel Integrity Violation: Boot failed.");
             }
 
-            setLanguage('en');
             setKernelReady(true);
         } catch (e) {
             console.error("OS CRASH:", e);
         }
-    }, [setLanguage]);
+    }, []);
 
     if (!kernelReady) return null;
 

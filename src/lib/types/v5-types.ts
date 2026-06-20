@@ -9,16 +9,19 @@
 // Component Types
 // ════════════════════════════════════════════
 
-export type ComponentType = 'profile' | 'bracket' | 'bolt';
+export type ComponentType = 'profile' | 'bracket' | 'bolt' | 'gear' | 'bearing' | 'key';
 
-export type MachiningType = 'HOLE' | 'SURFACE_MILLED' | 'THREADED' | 'WELDED';
+export type MachiningType = 'HOLE' | 'SURFACE_MILLED' | 'THREADED' | 'WELDED' | 'RECT_CUT';
 
 export interface MachiningModifier {
   id: string;
   type: MachiningType;
-  x: number; // Position along the relevant axis/surface
-  y: number; // Position across the relevant axis/surface
-  diameter?: number;
+  face?: 'top' | 'front' | 'side'; // selected sketch plane
+  x: number; // Position along the relevant axis/surface (mm)
+  y: number; // Position across the relevant axis/surface (mm)
+  diameter?: number; // for circular holes/threads
+  width?: number; // for rectangular cuts
+  height?: number; // for rectangular cuts
   depth?: number;
   description?: string;
   weldSize?: number;
@@ -27,7 +30,7 @@ export interface MachiningModifier {
 export type Vec3 = [number, number, number];
 
 export interface ComponentMetadata {
-  /** Length in mm (profiles) */
+  /** Length in mm (profiles / keys) */
   length?: number;
   /** Material designation */
   material?: string;
@@ -35,6 +38,15 @@ export interface ComponentMetadata {
   weight?: number;
   /** Unit cost in currency */
   unitCost?: number;
+  // Gear params
+  teeth?: number;
+  module?: number;
+  width?: number; // face width (mm)
+  // Bearing params
+  innerDia?: number;
+  outerDia?: number;
+  // Key params
+  height?: number;
 }
 
 export interface WorkspaceComponent {
@@ -145,12 +157,18 @@ export const DEFAULT_METADATA: Record<ComponentType, ComponentMetadata> = {
   profile: { length: 200, material: 'AL-6063-T5', weight: 0.54, unitCost: 12.5 },
   bracket: { material: 'AL-6063-T5', weight: 0.08, unitCost: 3.2 },
   bolt: { material: 'Steel 8.8', weight: 0.015, unitCost: 0.45 },
+  gear: { teeth: 24, module: 2, width: 20, material: 'Steel C45', weight: 0.85, unitCost: 18.5 },
+  bearing: { innerDia: 20, outerDia: 47, width: 14, material: 'Chrome Steel', weight: 0.12, unitCost: 6.5 },
+  key: { length: 20, width: 6, height: 6, material: 'Steel C45', weight: 0.02, unitCost: 1.2 },
 };
 
 export const CONNECTION_RULES: ConnectionRule[] = [
-  { source: 'profile', targets: ['profile', 'bracket'], snapAxis: 'x' },
+  { source: 'profile', targets: ['profile', 'bracket', 'gear', 'bearing', 'key'], snapAxis: 'x' },
   { source: 'bracket', targets: ['profile'], snapAxis: 'any' },
   { source: 'bolt', targets: ['profile', 'bracket'], snapAxis: 'z' },
+  { source: 'gear', targets: ['profile', 'bearing'], snapAxis: 'any' },
+  { source: 'bearing', targets: ['profile', 'gear'], snapAxis: 'any' },
+  { source: 'key', targets: ['profile'], snapAxis: 'any' },
 ];
 
 export const DEFAULT_SNAP_CONFIG: SnapConfig = {

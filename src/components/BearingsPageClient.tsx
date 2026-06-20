@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import {
     BEARING_CATALOG,
@@ -46,13 +46,35 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
             list = list.filter(b => b.type === typeFilter);
         }
 
-        if (searchCode.trim()) {
-            const search = searchCode.toUpperCase().replace(/\s/g, '');
-            list = list.filter(b => b.code.toUpperCase().includes(search));
+        const trimmed = searchCode.trim();
+        if (trimmed) {
+            const search = trimmed.toUpperCase().replace(/\s|-/g, '');
+            let filtered = list.filter(b => b.code.toUpperCase().replace(/\s|-/g, '').includes(search));
+            
+            // Try to find a dynamic parsed bearing matching the search code
+            const parsed = findBearing(trimmed);
+            if (parsed) {
+                const alreadyExists = filtered.some(b => b.code.toUpperCase().replace(/\s|-/g, '') === parsed.code.toUpperCase().replace(/\s|-/g, ''));
+                if (!alreadyExists) {
+                    filtered = [parsed, ...filtered];
+                }
+            }
+            return filtered;
         }
 
         return list;
     }, [typeFilter, searchCode]);
+
+    // Auto-select bearing if it matches exactly or is parsed dynamically
+    useEffect(() => {
+        const trimmed = searchCode.trim();
+        if (trimmed.length >= 3) {
+            const match = findBearing(trimmed);
+            if (match) {
+                setSelectedBearing(match);
+            }
+        }
+    }, [searchCode]);
 
     // Auto-detect type from search input
     const detectedType = useMemo(() => {
@@ -95,12 +117,6 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
 
                 {/* Type Badge & Save */}
                 <div className="flex items-center gap-4">
-                    <SaveButton 
-                        type="bearings"
-                        inputData={{ code: selectedBearing.code, fr, fa, rpm, reliability }}
-                        engineVersion="v2.0"
-                        resultJson={results}
-                    />
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
                         style={{ backgroundColor: `${typeInfo.color}20`, color: typeInfo.color }}>
                         <span>{typeInfo.icon}</span>

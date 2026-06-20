@@ -9,16 +9,36 @@ export const generateStructuredJSON = async <T>(
 ): Promise<T | null> => {
     try {
         // Send request to our Secure Server Proxy
-        const response = await fetch('/api/ai/gemini', {
+        let response = await fetch('/api/ai/gemini', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ prompt, schemaDescription })
+        }).catch(async (err) => {
+            console.warn("[Platform Kernel] /api/ai/gemini fetch error, trying PHP fallback:", err);
+            return await fetch('/api/ai/gemini/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt, schemaDescription })
+            });
         });
 
+        if (response.status === 404) {
+            console.warn("[Platform Kernel] /api/ai/gemini returned 404. Trying PHP fallback.");
+            response = await fetch('/api/ai/gemini/index.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt, schemaDescription })
+            });
+        }
+
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             if (errorData.code === 'NO_API_KEY') {
                 console.warn("[Platform Kernel] API Key missing on server. Falling back to deterministic simulation algorithm.");
                 return null; // Triggers graceful fallback in the stores automatically

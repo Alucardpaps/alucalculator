@@ -117,6 +117,37 @@ function createDefaultWorkspace(name: string = 'Default'): WorkspaceLayout {
 }
 
 // ============================================
+// Debounced Storage Adapter
+// ============================================
+
+function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {
+    let timeoutId: any;
+    return (...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+}
+
+const debouncedLocalStorage = {
+    getItem: (name: string) => {
+        if (typeof window === 'undefined') return null;
+        return localStorage.getItem(name);
+    },
+    setItem: debounce((name: string, value: string) => {
+        if (typeof window === 'undefined') return;
+        try {
+            localStorage.setItem(name, value);
+        } catch (e) {
+            console.error('LocalStorage write failed:', e);
+        }
+    }, 400),
+    removeItem: (name: string) => {
+        if (typeof window === 'undefined') return;
+        localStorage.removeItem(name);
+    }
+};
+
+// ============================================
 // Store Implementation
 // ============================================
 
@@ -441,7 +472,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
         }),
         {
             name: 'alucalc-workspace',
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => debouncedLocalStorage),
             partialize: (state) => ({
                 projects: state.projects,
                 recentProjects: state.recentProjects,

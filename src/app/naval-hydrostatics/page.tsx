@@ -6,6 +6,8 @@ import { CalculatorInput } from '@/components/CalculatorInput';
 import { ResultPanel } from '@/components/calculation/ResultPanel';
 import { useComputation } from '@/hooks/useComputation';
 import { Anchor, Compass, Activity, Shield, Waves, Ship, AlertTriangle } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { getWorkstationPage } from '@/locales/workstationPageTranslations';
 
 /**
  * Naval Hydrostatics Workstation
@@ -13,6 +15,8 @@ import { Anchor, Compass, Activity, Shield, Waves, Ship, AlertTriangle } from 'l
  */
 
 export default function NavalHydrostaticsPage() {
+    const { language } = useI18nStore();
+    const ws = getWorkstationPage(language).naval;
     const [params, setParams] = useState({
         length: 120,
         beam: 20,
@@ -32,7 +36,7 @@ export default function NavalHydrostaticsPage() {
 
     return (
         <WorkstationLayout 
-            title="Naval Hydrostatics" 
+            title={ws.title} 
             id="SHIP_STAB_01"
             status={results ? 'stable' : 'idle'}
             onCalculate={() => execute(params)}
@@ -42,24 +46,24 @@ export default function NavalHydrostaticsPage() {
                 <div className="p-6 bg-slate-900/50 rounded-3xl border border-slate-800 space-y-6">
                     <h3 className="text-[10px] font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2">
                         <Ship size={12} />
-                        Hull Dimensions
+                        {ws.hullDimensions}
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <CalculatorInput label="Length (Lpp)" unit="m" value={params.length} onChange={(e) => updateParam('length', Number(e.target.value))} />
-                        <CalculatorInput label="Beam (B)" unit="m" value={params.beam} onChange={(e) => updateParam('beam', Number(e.target.value))} />
-                        <CalculatorInput label="Draft (T)" unit="m" value={params.draft} onChange={(e) => updateParam('draft', Number(e.target.value))} />
-                        <CalculatorInput label="Block Coeff (Cb)" unit="index" value={params.blockCoefficient} onChange={(e) => updateParam('blockCoefficient', Number(e.target.value))} />
+                        <CalculatorInput label={ws.length} unit="m" value={params.length} onChange={(e) => updateParam('length', Number(e.target.value))} />
+                        <CalculatorInput label={ws.beam} unit="m" value={params.beam} onChange={(e) => updateParam('beam', Number(e.target.value))} />
+                        <CalculatorInput label={ws.draft} unit="m" value={params.draft} onChange={(e) => updateParam('draft', Number(e.target.value))} />
+                        <CalculatorInput label={ws.blockCoeff} unit="index" value={params.blockCoefficient} onChange={(e) => updateParam('blockCoefficient', Number(e.target.value))} />
                     </div>
                 </div>
 
                 <div className="p-6 bg-slate-900/50 rounded-3xl border border-slate-800 space-y-6">
                     <h3 className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
                         <Anchor size={12} />
-                        Loading & Stability
+                        {ws.loadingStability}
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <CalculatorInput label="Center of Gravity (KG)" unit="m" value={params.centerOfGravity} onChange={(e) => updateParam('centerOfGravity', Number(e.target.value))} />
-                        <CalculatorInput label="Water Density" unit="kg/m³" value={params.waterDensity} onChange={(e) => updateParam('waterDensity', Number(e.target.value))} />
+                        <CalculatorInput label={ws.centerOfGravity} unit="m" value={params.centerOfGravity} onChange={(e) => updateParam('centerOfGravity', Number(e.target.value))} />
+                        <CalculatorInput label={ws.waterDensity} unit="kg/m³" value={params.waterDensity} onChange={(e) => updateParam('waterDensity', Number(e.target.value))} />
                     </div>
                 </div>
             </div>
@@ -69,7 +73,7 @@ export default function NavalHydrostaticsPage() {
                 {error ? (
                     <div className="h-full flex flex-col items-center justify-center p-12 bg-red-950/10 border border-dashed border-red-500/30 rounded-[2.5rem] animate-in shake duration-500">
                         <AlertTriangle size={48} className="mb-4 text-red-500" />
-                        <h4 className="text-sm font-black text-red-500 uppercase tracking-widest mb-2">Simulation Failed</h4>
+                        <h4 className="text-sm font-black text-red-500 uppercase tracking-widest mb-2">{ws.simulationFailed}</h4>
                         <p className="text-[10px] font-mono text-red-400/60 uppercase tracking-widest text-center max-w-xs">{error}</p>
                     </div>
                 ) : results ? (
@@ -83,37 +87,35 @@ export default function NavalHydrostaticsPage() {
                             <div className="relative z-10">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500/70">Marine Stability Assessment</h3>
+                                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500/70">{ws.marineAssessment}</h3>
                                 </div>
 
                                 <div className="mb-12">
                                     <h2 className={`text-7xl font-black italic tracking-tighter leading-none ${results.metacentricHeight > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                        {results.metacentricHeight > 0 ? 'STABLE' : 'UNSTABLE'}
+                                        {results.metacentricHeight > 0 ? ws.stable : ws.unstable}
                                     </h2>
                                     <p className="text-[11px] font-bold text-white/30 uppercase tracking-[0.2em] mt-4 max-w-sm leading-relaxed">
-                                        {results.metacentricHeight > 0 
-                                            ? "The vessel possesses a positive metacentric height, ensuring a self-righting moment during heeling." 
-                                            : "WARNING: Negative GM detected. The vessel lacks initial stability and may capsize under external moments."}
+                                        {results.metacentricHeight > 0 ? ws.stableDesc : ws.unstableDesc}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-10">
                                     <div className="space-y-2">
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">Metacentric Height (GM)</span>
+                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">{ws.metacentricHeight}</span>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-3xl font-mono font-black text-white">{results.metacentricHeight.toFixed(3)}</span>
                                             <span className="text-[10px] font-bold text-blue-400">m</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">Displacement</span>
+                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">{ws.displacement}</span>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-3xl font-mono font-black text-white">{(results.displacement / 1000).toFixed(1)}k</span>
                                             <span className="text-[10px] font-bold text-blue-400">t</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">Buoyancy Force</span>
+                                        <span className="text-[9px] font-black text-white/20 uppercase tracking-widest block">{ws.buoyancyForce}</span>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-3xl font-mono font-black text-white">{(results.buoyancyForce / 1e6).toFixed(1)}M</span>
                                             <span className="text-[10px] font-bold text-blue-400">kN</span>
@@ -132,14 +134,14 @@ export default function NavalHydrostaticsPage() {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                             <div className="absolute bottom-8 left-8">
-                                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em]">Technical Schematic // Static Stability Curve</span>
+                                <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em]">{ws.schematicCaption}</span>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center p-12 bg-blue-950/10 border border-dashed border-blue-900/30 rounded-[2.5rem] opacity-40">
                         <Ship size={48} className="mb-4 text-blue-900" />
-                        <p className="text-xs font-mono uppercase tracking-[0.2em] text-blue-800">Initiating hydrostatic simulation...</p>
+                        <p className="text-xs font-mono uppercase tracking-[0.2em] text-blue-800">{ws.initiating}</p>
                     </div>
                 )}
             </div>

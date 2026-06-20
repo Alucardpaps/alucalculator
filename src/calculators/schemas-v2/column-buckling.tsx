@@ -49,6 +49,14 @@ export const columnBucklingSchema: CalculatorSchemaV2 = {
             validation: { required: true, min: 1, step: 100 }
         },
         {
+            key: 'area',
+            label: 'Cross-Section Area (A)',
+            description: 'Required for slenderness ratio and critical stress',
+            unit: 'mm2',
+            defaultValue: 500,
+            validation: { required: true, min: 0.1, step: 10 }
+        },
+        {
             key: 'kFactor',
             label: 'Effective Length Factor (K)',
             unit: '-', // unitless
@@ -71,12 +79,20 @@ export const columnBucklingSchema: CalculatorSchemaV2 = {
             unit: '-',
             description: 'KL / r (Radius of Gyration)',
             formulaLatex: '\\lambda = \\frac{K L}{r}'
+        },
+        {
+            key: 'criticalStress',
+            label: 'Critical Stress (σcr)',
+            unit: 'MPa',
+            description: 'Euler buckling stress = Pcr / A',
+            formulaLatex: '\\sigma_{cr} = \\frac{P_{cr}}{A} = \\frac{\\pi^2 E}{\\lambda^2}'
         }
     ],
     calculationEngine: (inputs) => {
         const L = inputs.length.value as number;
         const E_GPa = inputs.modulus.value as number;
         const I = inputs.inertia.value as number;
+        const A = inputs.area.value as number;
         const K = inputs.kFactor.value as number;
 
         const E = E_GPa * 1000; // MPa -> N/mm2
@@ -89,13 +105,34 @@ export const columnBucklingSchema: CalculatorSchemaV2 = {
         const Pcr_N = (Math.PI ** 2 * E * I) / (Le ** 2);
         const Pcr_kN = Pcr_N / 1000;
 
+        // Radius of gyration r = sqrt(I/A), slenderness ratio λ = KL / r
+        const r = A > 0 ? Math.sqrt(I / A) : 0;
+        const slenderness = r > 0 ? Le / r : 0;
+
+        // Critical (Euler) stress σcr = Pcr / A  (= π²E / λ²)
+        const criticalStress = A > 0 ? Pcr_N / A : 0;
+
+        const warnings: CalculationResult['warnings'] = [];
+
+        // Euler theory is only valid for slender columns. Below the transition
+        // slenderness (where σcr would exceed the material yield), the column
+        // fails by inelastic/short-column crushing, not elastic buckling.
+        if (slenderness > 0 && slenderness < 50) {
+            warnings.push({
+                field: 'slenderness',
+                message: `Slenderness ratio λ=${slenderness.toFixed(0)} is low. This is an intermediate/short column — Euler buckling over-predicts capacity; check Johnson/yield criteria.`,
+                severity: 'warning'
+            });
+        }
+
         return {
             outputs: {
                 criticalLoad: createValidatedValue(Pcr_kN, 'kN', 'derived'),
-                slenderness: createValidatedValue(0, '-', 'derived') // Placeholder
+                slenderness: createValidatedValue(slenderness, '-', 'derived'),
+                criticalStress: createValidatedValue(criticalStress, 'MPa', 'derived')
             },
             verified: true,
-            warnings: [],
+            warnings,
             timestamp: Date.now()
         };
     },

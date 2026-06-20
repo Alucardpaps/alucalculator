@@ -1,0 +1,912 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using Karahan;
+@using Karahan.Worker;
+@using Karahan.Factory;
+@using Karahan.UI;
+@inherits PanelComponent
+
+<root class="hud-root">
+
+    @* ═══════ TOP BAR ═══════ *@
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="clock-icon">⏱️</span>
+            <span class="clock-text">Gün @VM.Day — @VM.TimeFormatted</span>
+        </div>
+        <div class="topbar-center">
+            <span class="badge" style="background: @VM.FactoryBadgeColor">
+                @VM.FactoryBadge
+            </span>
+            <span class="factory-name">@VM.FactoryName</span>
+        </div>
+        <div class="topbar-right">
+            <div class="stat">
+                <span class="stat-label">💰 Kasa</span>
+                <span class="stat-value money">@($"{VM.Money:N0}") ₺</span>
+            </div>
+            @if (VM.CurrentZone == "home")
+            {
+                <div class="stat">
+                    <span class="stat-label">🏠 Kişisel</span>
+                    <span class="stat-value money">@($"{VM.PersonalBalance:N0}") ₺</span>
+                </div>
+            }
+            <div class="stat">
+                <span class="stat-label">⭐ Ün</span>
+                <span class="stat-value">@VM.Rating / @(VM.HomeUpgrades.GetValueOrDefault("pc", false) ? 110 : 100)</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">👔 Patron</span>
+                <span class="stat-value @VM.BossTrustClass">@VM.BossTrust</span>
+            </div>
+            
+            <button class="zone-toggle-btn @(VM.CurrentZone == "home" ? "home" : "factory")" onclick=@ToggleZone>
+                @(VM.CurrentZone == "home" ? "🏭 Fabrikaya Git" : "🏠 Eve Git")
+            </button>
+        </div>
+    </div>
+
+    @* ═══════ CRUNCH TIME OVERLAY ═══════ *@
+    @if (VM.CrunchTime)
+    {
+        <div class="crunch-banner">
+            🚨 YOĞUN ÇALIŞMA (CRUNCH) — Kalan: @(VM.CrunchTimer / 3) tick — Hata: @VM.CrunchFails
+        </div>
+    }
+
+    @* ═══════ TABLET CONTAINER ═══════ *@
+    <div class="tablet-container">
+        
+        @* ═══════ TABLET TABS NAVIGATION ═══════ *@
+        <div class="tablet-tabs">
+            <button class="tab-btn @ActiveTabClass("workers")" onclick=@(() => SwitchTab("workers"))>👷 Ustalar</button>
+            <button class="tab-btn @ActiveTabClass("orders")" onclick=@(() => SwitchTab("orders"))>📋 Siparişler</button>
+            <button class="tab-btn @ActiveTabClass("warehouse")" onclick=@(() => SwitchTab("warehouse"))>📦 Depo / Tedarik</button>
+            <button class="tab-btn @ActiveTabClass("upgrades")" onclick=@(() => SwitchTab("upgrades"))>🚀 Geliştirmeler</button>
+            <button class="tab-btn @ActiveTabClass("handbook")" onclick=@(() => SwitchTab("handbook"))>📖 El Kitabı</button>
+            <button class="tab-btn @ActiveTabClass("flappy")" onclick=@(() => SwitchTab("flappy"))>🐦 Flappy Bird</button>
+        </div>
+
+        @* ═══════ TABLET SCREEN / CONTENT ═══════ *@
+        <div class="tablet-screen">
+
+            @* ──────── TAB 1: WORKERS LIST ──────── *@
+            @if (CurrentTab == "workers")
+            {
+                <div class="tab-content workers-tab">
+                    <div class="workers-grid-wide">
+                        @foreach (var m in VM.Masters)
+                        {
+                            <div class="worker-card-wide @StatusClass(m)" onclick=@(() => SelectWorker(m))>
+                                <div class="worker-avatar">
+                                    @AvatarEmoji(m.Skill)
+                                </div>
+                                <div class="worker-details-col">
+                                    <div class="worker-row1">
+                                        <span class="worker-name">@m.MasterName</span>
+                                        <span class="worker-skill">@m.Skill</span>
+                                    </div>
+                                    <div class="worker-row2">
+                                        <span class="worker-meta">Memleket: @m.Hometown • Özellik: @m.Trait</span>
+                                        <span class="worker-level-badge">Seviye @VM.WorkerLevels.GetValueOrDefault(m.MasterName, 1)</span>
+                                    </div>
+                                    @if (m.EventDaysRemaining > 0)
+                                    {
+                                        <div class="worker-event-status">
+                                            ℹ️ @m.EventDescription
+                                        </div>
+                                    }
+                                </div>
+                                <div class="worker-bars-col">
+                                    <div class="bar-row">
+                                        <span class="bar-label">Moral</span>
+                                        <div class="bar-track"><div class="bar-fill morale" style="width: @(m.Morale)%"></div></div>
+                                        <span class="bar-value">@m.Morale</span>
+                                    </div>
+                                    <div class="bar-row">
+                                        <span class="bar-label">Güven</span>
+                                        <div class="bar-track"><div class="bar-fill trust" style="width: @(m.Trust)%"></div></div>
+                                        <span class="bar-value">@m.Trust</span>
+                                    </div>
+                                </div>
+                                <div class="worker-action-col">
+                                    <span class="status-badge">@StatusIcon(m) @m.Status.ToUpper()</span>
+                                    @if (m.Warnings > 0)
+                                    {
+                                        <span class="warnings-indicator">⚠️ @m.Warnings / 3</span>
+                                    }
+                                </div>
+                                @if (m.ActiveQuestion != null)
+                                {
+                                    <div class="question-badge">❓</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ──────── TAB 2: ORDERS SPLIT-VIEW ──────── *@
+            @if (CurrentTab == "orders")
+            {
+                <div class="tab-content orders-tab-split">
+                    @* Left detail pane *@
+                    <div class="order-details-pane">
+                        @if (SelectedOrder == null)
+                        {
+                            <div class="empty-detail-state">
+                                <h3>Detayları görmek için sağdaki listeden bir sipariş seçin.</h3>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="order-detail-header">
+                                <div class="title-row">
+                                    <span class="order-id">📋 @SelectedOrder.Id</span>
+                                    <span class="order-reward">💰 +@($"{SelectedOrder.Reward:N0}") ₺</span>
+                                </div>
+                                <p class="order-desc">@SelectedOrder.Desc</p>
+                                <div class="time-status-pill @(SelectedOrder.Due <= 1 && SelectedOrder.Designed ? "urgent" : "")">
+                                    @(SelectedOrder.Designed ? $"⏱️ Kalan Süre: {SelectedOrder.Due} Gün" : $"📐 Ar-Ge Kalan Süre: {SelectedOrder.RndDays} Gün")
+                                </div>
+                            </div>
+
+                            @if (!SelectedOrder.Designed)
+                            {
+                                <div class="rd-explanation-card">
+                                    <h4>📐 AR-GE AŞAMASINDA</h4>
+                                    <p>Tasarım ve planlama ekibimiz sipariş detayları üzerinde çalışıyor. Tasarım tamamlandığında üretim bileşenleri aktifleşecektir.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="blueprints-container">
+                                    @foreach (var bp in SelectedOrder.Blueprints)
+                                    {
+                                        var reqSkill = bp.StageIndex < bp.Stages.Count ? bp.Stages[bp.StageIndex] : "Tamamlandı";
+                                        var isReady = IsBlueprintReady(SelectedOrder, bp, out string missingDep);
+
+                                        <div class="blueprint-card @(bp.Done ? "done" : bp.Faulty ? "faulty" : "")">
+                                            <div class="bp-card-header">
+                                                <span class="bp-card-name">@bp.Name</span>
+                                                <span class="bp-card-status">
+                                                    @(bp.Done ? "✅ TAMAMLANDI" : bp.Faulty ? "⚠️ HATALI PARÇA" : "🔧 ÜRETİMDE")
+                                                </span>
+                                            </div>
+                                            
+                                            @if (bp.Done)
+                                            {
+                                                <p class="bp-done-text">Bu bileşenin üretimi başarıyla tamamlandı.</p>
+                                            }
+                                            else if (!isReady)
+                                            {
+                                                <p class="bp-blocked-text">⏳ Ön koşul bekleniyor: @missingDep</p>
+                                            }
+                                            else
+                                            {
+                                                <div class="bp-stage-info">
+                                                    <span class="stage-label">Aşama: <b>@reqSkill</b> (@GetStageDots(bp))</span>
+                                                    <div class="bp-progress-row">
+                                                        <div class="bp-progress-track">
+                                                            <div class="bp-progress-fill" style="width: @(bp.Progress)%"></div>
+                                                        </div>
+                                                        <span class="bp-progress-value">@((int)bp.Progress)%</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="bp-workers-row">
+                                                    @if (bp.AssignedWorkers.Count > 0)
+                                                    {
+                                                        <span class="assigned-names">Çalışanlar: <b>@string.Join(", ", bp.AssignedWorkers)</b> (@bp.AssignedWorkers.Count/@bp.Need)</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="no-workers-warning">Çalışan usta yok! (@bp.Need usta gerekiyor)</span>
+                                                    }
+                                                </div>
+
+                                                @if (bp.AssignedWorkers.Count < bp.Need)
+                                                {
+                                                    <button class="assign-trigger-btn" onclick=@(() => OpenAssignSelector(bp))>
+                                                        👤 Usta Ata (@bp.AssignedWorkers.Count/@bp.Need)
+                                                    </button>
+                                                }
+
+                                                @if (ActiveAssignBlueprint == bp)
+                                                {
+                                                    <div class="assign-selector-overlay">
+                                                        <div class="selector-header">
+                                                            <span>Usta Seçin (@reqSkill)</span>
+                                                            <button class="close-selector-btn" onclick=@CloseAssignSelector>✕</button>
+                                                        </div>
+                                                        <div class="selector-list">
+                                                            @{
+                                                                var idleWorkers = VM.Masters.Where(w => w.Status == "idle").ToList();
+                                                                if (idleWorkers.Count == 0)
+                                                                {
+                                                                    <div class="no-idle-text">Boşta usta yok!</div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    foreach (var w in idleWorkers)
+                                                                    {
+                                                                        var isMatch = w.Skill == reqSkill;
+                                                                        <button class="selector-item-btn @(isMatch ? "match" : "mismatch")" onclick=@(() => AssignWorker(SelectedOrder.Id, bp.Name, w.MasterName))>
+                                                                            👷 @w.MasterName (@w.Skill) - @(isMatch ? "Uzman" : "Uyumsuz! (Hata Riski)")
+                                                                        </button>
+                                                                    }
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    @* Right orders list pane *@
+                    <div class="orders-list-pane">
+                        <div class="pane-header">
+                            <h3>Aktif Sipariş Havuzu</h3>
+                            <span class="limit-badge">Kapasite: @VM.Orders.Count / @VM.MaxOrdersLimit</span>
+                        </div>
+                        <div class="orders-scroll-list">
+                            @foreach (var o in VM.Orders)
+                            {
+                                <div class="order-list-card @(o == SelectedOrder ? "active" : "") @(o.Designed ? "" : "rnd")" onclick=@(() => SelectOrderCard(o))>
+                                    <div class="list-card-row1">
+                                        <span class="order-id">@o.Id</span>
+                                        <span class="order-price">+@($"{o.Reward:N0}") ₺</span>
+                                    </div>
+                                    <div class="list-card-row2">
+                                        <span class="order-limit">
+                                            @(o.Designed ? $"⏱️ {o.Due} gün kaldı" : "📐 Ar-Ge Aşamasında")
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* ──────── TAB 3: WAREHOUSE / PURCHASING ──────── *@
+            @if (CurrentTab == "warehouse")
+            {
+                <div class="tab-content warehouse-tab">
+                    <div class="warehouse-header">
+                        <h3>📦 Malzeme Tedarik ve Ambar Durumu</h3>
+                        <span class="budget-label">Kasa Bakiyesi: <b>@($"{VM.Money:N0}") ₺</b></span>
+                    </div>
+                    <div class="material-grid-wide">
+                        @if (VM.SelectedFactory != null)
+                        {
+                            @foreach (var mat in VM.SelectedFactory.Materials)
+                            {
+                                var cost = VM.SelectedFactory.MatCosts.GetValueOrDefault(mat, 1000);
+                                var stock = VM.Inventory.GetValueOrDefault(mat, 0);
+
+                                <div class="material-card-wide">
+                                    <div class="mat-info-col">
+                                        <span class="mat-name">@mat</span>
+                                        <span class="mat-stock">Depodaki Stok: <b>@stock</b></span>
+                                    </div>
+                                    <div class="mat-actions-col">
+                                        <span class="mat-cost">Birim Fiyat: <b>@($"{cost:N0}") ₺</b></span>
+                                        <div class="buy-buttons-row">
+                                            <button class="buy-action-btn" disabled=@(VM.Money < cost) onclick=@(() => BuyMaterial(mat, cost, 1))>
+                                                1x Satın Al
+                                            </button>
+                                            <button class="buy-action-btn bulk" disabled=@(VM.Money < cost * 5) onclick=@(() => BuyMaterial(mat, cost * 5, 5))>
+                                                5x Toplu Al
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ──────── TAB 4: UPGRADES / ZONE DEPENDENT ──────── *@
+            @if (CurrentTab == "upgrades")
+            {
+                <div class="tab-content upgrades-tab">
+                    @if (VM.CurrentZone == "factory")
+                    {
+                        <div class="upgrades-grid-split">
+                            @* Workstations upgrades column *@
+                            <div class="upgrades-column">
+                                <h3 class="column-title">🛠️ Üretim Tezgahları</h3>
+                                <div class="upgrades-list">
+                                    @if (VM.SelectedFactory != null)
+                                    {
+                                        @foreach (var wsId in VM.SelectedFactory.Workstations.Keys)
+                                        {
+                                            if (!VM.WorkstationUpgrades.ContainsKey(wsId)) continue;
+                                            var wsData = VM.SelectedFactory.Workstations[wsId];
+                                            var lvl = VM.WorkstationUpgrades[wsId];
+                                            var cost = (lvl + 1) * 8000;
+                                            var bonus = lvl * 20;
+
+                                            <div class="upgrade-card-inline">
+                                                <div class="upgrade-info">
+                                                    <span class="name">@wsData.Icon @wsData.Name</span>
+                                                    <span class="stats">Seviye: <b>@lvl</b> • Hız Bonusu: <b>+@bonus%</b></span>
+                                                </div>
+                                                <button class="upgrade-action-btn" disabled=@(VM.Money < cost) onclick=@(() => BuyWorkstationUpgrade(wsId, cost))>
+                                                    Yükselt<br>@($"{cost:N0}") ₺
+                                                </button>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                            @* Workers levels and boosts column *@
+                            <div class="upgrades-column">
+                                <h3 class="column-title">🎓 Usta Eğitimleri & Güçlendirmeler</h3>
+                                <div class="upgrades-list">
+                                    @* Workers list *@
+                                    @foreach (var w in VM.Masters)
+                                    {
+                                        var lvl = VM.WorkerLevels.GetValueOrDefault(w.MasterName, 1);
+                                        var cost = lvl * 5000;
+                                        var bonus = (lvl - 1) * 15;
+
+                                        <div class="upgrade-card-inline">
+                                            <div class="upgrade-info">
+                                                <span class="name">👷 @w.MasterName (@w.Skill)</span>
+                                                <span class="stats">Seviye: <b>@lvl</b> • Verim Bonusu: <b>+@bonus%</b></span>
+                                            </div>
+                                            <button class="upgrade-action-btn" disabled=@(VM.Money < cost) onclick=@(() => TrainWorker(w, cost))>
+                                                Eğit<br>@($"{cost:N0}") ₺
+                                            </button>
+                                        </div>
+                                    }
+
+                                    @* Factory boosts *@
+                                    <h4 class="sub-column-title">🏢 Fabrika Eklentileri</h4>
+                                    
+                                    @* Coffee Machine *@
+                                    <div class="upgrade-card-inline boost @(VM.CoffeeMachineOwned ? "owned" : "")">
+                                        <div class="upgrade-info">
+                                            <span class="name">☕ Sanayi Kahve Makinesi</span>
+                                            <span class="stats">Maksimum usta morali limitini 110 yapar. Dinlenme hızı artar.</span>
+                                        </div>
+                                        <button class="upgrade-action-btn" disabled=@(VM.CoffeeMachineOwned || VM.Money < 12000) onclick=@(() => BuyFactoryBoost("coffee", 12000))>
+                                            @(VM.CoffeeMachineOwned ? "Alındı" : "Satın Al\n12.000 ₺")
+                                        </button>
+                                    </div>
+
+                                    @* ERP Software *@
+                                    <div class="upgrade-card-inline boost @(VM.OrderSoftwareOwned ? "owned" : "")">
+                                        <div class="upgrade-info">
+                                            <span class="name">💻 Sipariş & ERP Yazılımı</span>
+                                            <span class="stats">Maksimum aktif sipariş limitini 8 yapar. Kazançları kalıcı +%10 artırır.</span>
+                                        </div>
+                                        <button class="upgrade-action-btn" disabled=@(VM.OrderSoftwareOwned || VM.Money < 15000) onclick=@(() => BuyFactoryBoost("software", 15000))>
+                                            @(VM.OrderSoftwareOwned ? "Alındı" : "Satın Al\n15.000 ₺")
+                                        </button>
+                                    </div>
+
+                                    @* Auto Loader *@
+                                    <div class="upgrade-card-inline boost @(VM.AutoLoaderOwned ? "owned" : "")">
+                                        <div class="upgrade-info">
+                                            <span class="name">🚚 Otomatik Yükleme Rampası</span>
+                                            <span class="stats">Sipariş tırlarının yükleme bekleme süresini 5sn'den 2sn'ye düşürür.</span>
+                                        </div>
+                                        <button class="upgrade-action-btn" disabled=@(VM.AutoLoaderOwned || VM.Money < 10000) onclick=@(() => BuyFactoryBoost("loader", 10000))>
+                                            @(VM.AutoLoaderOwned ? "Alındı" : "Satın Al\n10.000 ₺")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else @* CurrentZone == "home" *@
+                    {
+                        <div class="upgrades-grid-split home-zone">
+                            @* Home upgrades column *@
+                            <div class="upgrades-column">
+                                <h3 class="column-title">🏠 Ev Eşyaları (Kişisel Bakiye)</h3>
+                                <div class="upgrades-list">
+                                    @{
+                                        var homeList = new[]
+                                        {
+                                            new { Key = "bed", Name = "🛏️ Rahat Yatak", Cost = 1000, Desc = "Her sabah ustalara kalıcı +5 Güven bonusu verir." },
+                                            new { Key = "tv", Name = "📺 Akıllı TV", Cost = 2000, Desc = "Her sabah ustalara kalıcı +5 Moral bonusu verir." },
+                                            new { Key = "coffee", Name = "☕ Espresso Makinesi", Cost = 3000, Desc = "Her sabah başlangıç itibarını +5 artırır." },
+                                            new { Key = "kitchen", Name = "🍳 Modern Mutfak", Cost = 5000, Desc = "Her sabah başlangıçta patron güvenini +1 artırır." },
+                                            new { Key = "pc", Name = "🎮 Hobi Bilgisayarı (RTX)", Cost = 8000, Desc = "Maksimum ün/itibar limitini kalıcı olarak +10 artırır." }
+                                        };
+                                        foreach (var item in homeList)
+                                        {
+                                            var owned = VM.HomeUpgrades.GetValueOrDefault(item.Key, false);
+                                            <div class="upgrade-card-inline home @(owned ? "owned" : "")">
+                                                <div class="upgrade-info">
+                                                    <span class="name">@item.Name</span>
+                                                    <span class="stats">@item.Desc</span>
+                                                </div>
+                                                <button class="upgrade-action-btn" disabled=@(owned || VM.PersonalBalance < item.Cost) onclick=@(() => BuyHomeUpgrade(item.Key, item.Cost))>
+                                                    @(owned ? "Alındı" : $"Satın Al\n{item.Cost:N0} ₺")
+                                                </button>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+
+                            @* Vehicles dealership column *@
+                            <div class="upgrades-column">
+                                <h3 class="column-title">🚗 Galeri & Garaj (Kişisel Bakiye)</h3>
+                                <div class="upgrades-list">
+                                    @{
+                                        var carList = new[]
+                                        {
+                                            new { Key = "red_hatchback", Name = "🚗 Hızlı Hatchback (Kırmızı)", Cost = 4000, Desc = "Kompakt araç. Azami sürüş hızı: 16 m/s." },
+                                            new { Key = "yellow_suv", Name = "🚙 Heybetli SUV (Sarı)", Cost = 8000, Desc = "Geniş ve yüksek şasi. Azami sürüş hızı: 24 m/s." },
+                                            new { Key = "black_sport", Name = "🏎️ Spor Araba (Siyah)", Cost = 15000, Desc = "Yere yakın yarış arabası. Azami hız: 32 m/s!" }
+                                        };
+                                        foreach (var item in carList)
+                                        {
+                                            var owned = VM.PersonalVehicles.GetValueOrDefault(item.Key, false);
+                                            <div class="upgrade-card-inline car @(owned ? "owned" : "")">
+                                                <div class="upgrade-info">
+                                                    <span class="name">@item.Name</span>
+                                                    <span class="stats">@item.Desc</span>
+                                                </div>
+                                                <button class="upgrade-action-btn" disabled=@(owned || VM.PersonalBalance < item.Cost) onclick=@(() => BuyPersonalVehicle(item.Key, item.Cost))>
+                                                    @(owned ? "Alındı" : $"Satın Al\n{item.Cost:N0} ₺")
+                                                </button>
+                                            </div>
+                                        }
+                                    }
+                                    
+                                    @* Bed Sleep mechanic *@
+                                    <div class="sleep-block">
+                                        <h3>🛌 Günlük Dinlenme</h3>
+                                        <p>Günü bitirip uyuduğunuzda ev eşyalarınızın sağladığı tüm bonuslar işçilerinize ve fabrikaya uygulanacaktır.</p>
+                                        <button class="sleep-action-btn" onclick=@SleepAndStartNewDay>
+                                            🛌 Uyu & Yeni Güne Başla
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            @* ──────── TAB 5: HANDBOOK VINTAGE SLATE ──────── *@
+            @if (CurrentTab == "handbook")
+            {
+                <div class="tab-content handbook-tab">
+                    <div class="handbook-container">
+                        <div class="handbook-page">
+                            <h2>📖 FABRİKA YÖNETMELİĞİ VE EL KİTABI</h2>
+                            <hr>
+                            <div class="handbook-content-scroll">
+                                @if (VM.SelectedFactory != null && !string.IsNullOrEmpty(VM.SelectedFactory.Handbook))
+                                {
+                                    @((MarkupString)VM.SelectedFactory.Handbook.Replace("\n", "<br>"))
+                                }
+                                else
+                                {
+                                    <p><b>🔄 ORTAK FABRİKA AKIŞ VE TEZGAH ŞEMASI</b><br>
+                                    Sipariş detaylarındaki bileşen üretim sırasını takip edin. Hammadde lazer kesim / testereden başlayarak büküm, fırınlama, lehimleme ve montaj hatlarından geçer.<br><br>
+                                    <b>💡 PRATİK BİLGİLER VE KURAL TABLOSU</b><br>
+                                    • Her usta kendi uzmanlık alanında (Sac Kesim, Büküm, Fırınlama vb.) %100 hızla çalışır. Uzmanlık dışı bir işe atanırsa hız düşer ve parça hatalı çıkabilir.<br>
+                                    • Ustaların morali düştüğünde dinlenmeye kaçarlar (Slacking). Onlara çay ocağında mola verdirin ya da prim vererek morallerini yüksek tutun.<br>
+                                    • Ölü fare/kuş leşleri hijyen problemi yaratır. Üzerine tıklayarak temizlemezseniz tüm ustaların morali hızla azalacaktır.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* ──────── TAB 6: RETRO FLAPPY BIRD ──────── *@
+            @if (CurrentTab == "flappy")
+            {
+                <div class="tab-content flappy-tab">
+                    <div class="flappy-game-frame" onclick=@FlappyJump>
+                        <div class="flappy-sky">
+                            @* Scoreboard *@
+                            <div class="flappy-score">Skor: @FlappyScore  |  En Yüksek: @FlappyHighScore</div>
+
+                            @* Bird element *@
+                            <div class="flappy-bird" style="top: @(FlappyBirdY)px; transform: rotate(@(FlappyBirdVel * 0.15f)deg)">
+                                🐤
+                            </div>
+
+                            @* Upper Pipe *@
+                            <div class="flappy-pipe upper" style="left: @(FlappyPipeX)px; height: @(FlappyPipeGapY)px;"></div>
+
+                            @* Lower Pipe *@
+                            <div class="flappy-pipe lower" style="left: @(FlappyPipeX)px; top: @(FlappyPipeGapY + FlappyPipeGapHeight)px; height: @(400 - (FlappyPipeGapY + FlappyPipeGapHeight))px;"></div>
+
+                            @* Instructions Overlay *@
+                            @if (!FlappyIsRunning)
+                            {
+                                <div class="flappy-instructions">
+                                    <h2>🐦 FLAPPY BIRD MINIGAME</h2>
+                                    <p>Zıplamak için TIKLA veya [SPACE]'e bas!</p>
+                                    <button class="start-btn" onclick=@StartFlappyGame>Oyunu Başlat</button>
+                                </div>
+                            }
+                        </div>
+                        <div class="flappy-dirt"></div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    @* ═══════ PERSISTENT LOG FEED ═══════ *@
+    <div class="log-panel">
+        <h3 class="panel-title">📜 Fabrika Günlüğü</h3>
+        <div class="log-feed">
+            @foreach (var log in VM.Logs.Take(20))
+            {
+                <div class="log-entry">@log</div>
+            }
+        </div>
+    </div>
+
+    @* ═══════ END OF DAY EVALUATION MODAL OVERLAY ═══════ *@
+    @if (!VM.DayEndedAndSlept)
+    {
+        <div class="eod-overlay">
+            <div class="eod-modal">
+                <div class="eod-header">
+                    <h2>🌙 GÜNÜN SONU DEĞERLENDİRMESİ</h2>
+                    <span class="day-label">Gün @VM.Day Tamamlandı</span>
+                </div>
+                <div class="eod-content">
+                    <div class="report-card">
+                        <div class="report-row">
+                            <span>Completing Orders (Bugün):</span>
+                            <b>+@VM.OrdersCompletedToday adet</b>
+                        </div>
+                        <div class="report-row">
+                            <span>Ortalama Usta Morali:</span>
+                            <b>%@GetAverageMorale()</b>
+                        </div>
+                        <div class="report-row">
+                            <span>Ortalama Usta Güveni:</span>
+                            <b>%@GetAverageTrust()</b>
+                        </div>
+                        <div class="report-row">
+                            <span>Patron Güven Skoru:</span>
+                            <b class="@VM.BossTrustClass">@VM.BossTrust / 10</b>
+                        </div>
+                        <hr>
+                        <div class="report-row total">
+                            <span>Kazanılan Kişisel Bakiye:</span>
+                            <b class="reward-glow">@($"+{CalculatePersonalReward():N0}") ₺</b>
+                        </div>
+                    </div>
+                    
+                    <p class="summary-tip">💡 Evinize gidip kazandığınız kişisel bakiyeyle yeni eşyalar veya spor arabalar satın alabilirsiniz!</p>
+                </div>
+                <div class="eod-footer">
+                    <button class="rest-btn" onclick=@EodGoToHome>
+                        🛌 Eve Git ve Dinlen
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+</root>
+
+@code {
+    public string CurrentTab { get; set; } = "workers";
+    private ActiveOrder SelectedOrder { get; set; }
+    private ActiveBlueprint ActiveAssignBlueprint { get; set; }
+
+    private KarahanViewModel VM => KarahanViewModel.Instance;
+
+    // Flappy Bird physics state
+    private bool FlappyIsRunning { get; set; } = false;
+    private float FlappyBirdY { get; set; } = 200f;
+    private float FlappyBirdVel { get; set; } = 0f;
+    private float FlappyPipeX { get; set; } = 900f;
+    private float FlappyPipeGapY { get; set; } = 120f;
+    private float FlappyPipeGapHeight { get; set; } = 110f;
+    private int FlappyScore { get; set; } = 0;
+    private int FlappyHighScore { get; set; } = 0;
+
+    protected override void OnStart()
+    {
+        if (VM.Orders.Count > 0)
+        {
+            SelectedOrder = VM.Orders[0];
+        }
+    }
+
+    protected override void OnUpdate()
+    {
+        // Handle input for Flappy Bird
+        if (CurrentTab == "flappy" && FlappyIsRunning)
+        {
+            if (Input.Pressed("jump") || Input.Pressed("attack") || Input.Pressed("use"))
+            {
+                FlappyJump();
+            }
+            TickFlappyBird(Time.Delta);
+        }
+    }
+
+    private void SwitchTab(string tab)
+    {
+        CurrentTab = tab;
+        ActiveAssignBlueprint = null;
+        if (tab != "flappy")
+        {
+            FlappyIsRunning = false;
+        }
+    }
+
+    private string ActiveTabClass(string tab)
+    {
+        return CurrentTab == tab ? "active" : "";
+    }
+
+    private string StatusClass(WorkerComponent m) => m.Status switch
+    {
+        "working" => "status-working",
+        "slacking" => "status-slacking",
+        "feud" => "status-feud",
+        "leave" => "status-leave",
+        "sick" => "status-sick",
+        "injured" => "status-sick",
+        "offsite" => "status-offsite",
+        _ => "status-idle"
+    };
+
+    private string StatusIcon(WorkerComponent m) => m.Status switch
+    {
+        "working" => "🔧",
+        "slacking" => "☕",
+        "feud" => "⚔️",
+        "leave" => "👶",
+        "sick" => "🏥",
+        "injured" => "🩹",
+        "offsite" => "🚚",
+        _ => "💤"
+    };
+
+    private string AvatarEmoji(string skill) => skill switch
+    {
+        "Sac Kesim" or "Testere Kesim" or "Plazma Kesim" => "✂️",
+        "Büküm" or "Tornalama" or "Ağır Büküm" => "🌀",
+        "Ar-Ge" or "Tasarım" => "✏️",
+        "Petek Dokuma" or "Azdırma" or "Ağır Kaynak" => "🎡",
+        "Fırınlama" or "Isıl İşlem" => "🔥",
+        "Sert Lehim" or "Taşlama" or "Tahribatsız Muayene" => "💎",
+        "Sızdırmazlık" or "Test" or "Kabul Testi" => "🧪",
+        "Boya" or "Astar & Boya" => "🎨",
+        "Montaj" or "Entegrasyon" => "🔧",
+        "Shipment" => "📦",
+        _ => "👷"
+    };
+
+    private void SelectWorker(WorkerComponent worker)
+    {
+        VM.SelectWorker(worker, Scene);
+    }
+
+    private void SelectOrderCard(ActiveOrder o)
+    {
+        SelectedOrder = o;
+        ActiveAssignBlueprint = null;
+    }
+
+    private void OpenAssignSelector(ActiveBlueprint bp)
+    {
+        ActiveAssignBlueprint = bp;
+    }
+
+    private void CloseAssignSelector()
+    {
+        ActiveAssignBlueprint = null;
+    }
+
+    private void AssignWorker(string orderId, string bpName, string workerName)
+    {
+        VM.AssignWorker(orderId, bpName, workerName);
+        ActiveAssignBlueprint = null;
+    }
+
+    private bool IsBlueprintReady(ActiveOrder o, ActiveBlueprint bp, out string missingDep)
+    {
+        missingDep = "";
+        foreach (var dep in bp.Dependencies)
+        {
+            var depBp = o.Blueprints.FirstOrDefault(b => b.Name == dep);
+            if (depBp == null || !depBp.Done)
+            {
+                missingDep = dep;
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private string GetStageDots(ActiveBlueprint bp)
+    {
+        var dots = "";
+        for (int i = 0; i < bp.Stages.Count; i++)
+        {
+            dots += i == bp.StageIndex ? "●" : "○";
+        }
+        return dots;
+    }
+
+    private void BuyMaterial(string material, int cost, int qty)
+    {
+        VM.BuyMaterial(material, cost, qty);
+    }
+
+    private void BuyWorkstationUpgrade(string wsId, int cost)
+    {
+        VM.BuyWorkstationUpgrade(wsId, cost);
+    }
+
+    private void TrainWorker(WorkerComponent w, int cost)
+    {
+        VM.TrainWorker(w, cost);
+    }
+
+    private void BuyFactoryBoost(string boostId, int cost)
+    {
+        VM.BuyFactoryBoost(boostId, cost);
+    }
+
+    private void BuyHomeUpgrade(string key, int cost)
+    {
+        VM.BuyHomeUpgrade(key, cost);
+    }
+
+    private void BuyPersonalVehicle(string key, int cost)
+    {
+        VM.BuyPersonalVehicle(key, cost);
+    }
+
+    private void ToggleZone()
+    {
+        if (VM.CurrentZone == "factory")
+        {
+            VM.SetZone("home");
+        }
+        else
+        {
+            VM.SetZone("factory");
+        }
+    }
+
+    private int GetAverageMorale()
+    {
+        if (VM.Masters.Count == 0) return 0;
+        return (int)Math.Round(VM.Masters.Average(m => m.Morale));
+    }
+
+    private int GetAverageTrust()
+    {
+        if (VM.Masters.Count == 0) return 0;
+        return (int)Math.Round(VM.Masters.Average(m => m.Trust));
+    }
+
+    private int CalculatePersonalReward()
+    {
+        int baseScore = 100;
+        int completedTodayPoints = VM.OrdersCompletedToday * 50;
+        int avgMorale = GetAverageMorale();
+        int avgTrust = GetAverageTrust();
+        int warningPenalty = VM.Masters.Sum(m => m.Warnings) * 15;
+        // Assume 0 overdue count for this visual preview since Eod calculates accurately on backend
+        int score = baseScore + completedTodayPoints + avgMorale + avgTrust - warningPenalty;
+        score = Math.Clamp(score, 10, 500);
+        return score * 10;
+    }
+
+    private void EodGoToHome()
+    {
+        VM.SetZone("home");
+        if (KarahanGame.Current != null)
+        {
+            KarahanGame.Current.DayEndedAndSlept = true;
+        }
+    }
+
+    private void SleepAndStartNewDay()
+    {
+        VM.SleepAndStartNewDay();
+        if (VM.Orders.Count > 0)
+        {
+            SelectedOrder = VM.Orders[0];
+        }
+        SwitchTab("workers");
+    }
+
+    // ─── FLAPPY BIRD LOGIC ───
+    private void StartFlappyGame()
+    {
+        FlappyIsRunning = true;
+        FlappyBirdY = 180f;
+        FlappyBirdVel = 0f;
+        FlappyPipeX = 800f;
+        FlappyScore = 0;
+        RandomizePipe();
+    }
+
+    private void FlappyJump()
+    {
+        if (!FlappyIsRunning)
+        {
+            StartFlappyGame();
+        }
+        else
+        {
+            FlappyBirdVel = -220f; // Jump upward impulse
+        }
+    }
+
+    private void RandomizePipe()
+    {
+        FlappyPipeGapY = Random.Shared.Next(60, 220);
+    }
+
+    private void TickFlappyBird(float delta)
+    {
+        // Apply gravity
+        FlappyBirdVel += 600f * delta;
+        FlappyBirdY += FlappyBirdVel * delta;
+
+        // Move pipes left
+        FlappyPipeX -= 150f * delta;
+        if (FlappyPipeX < -50f)
+        {
+            FlappyPipeX = 640f;
+            RandomizePipe();
+            FlappyScore++;
+            if (FlappyScore > FlappyHighScore)
+            {
+                FlappyHighScore = FlappyScore;
+            }
+        }
+
+        // Collisions
+        if (FlappyBirdY < 0 || FlappyBirdY > 375f)
+        {
+            GameOverFlappy();
+        }
+
+        // Pipe collisions check
+        if (FlappyPipeX > 50f && FlappyPipeX < 120f)
+        {
+            // Bird is inside the horizontal boundaries of the pipe
+            if (FlappyBirdY < FlappyPipeGapY || FlappyBirdY > FlappyPipeGapY + FlappyPipeGapHeight - 20)
+            {
+                GameOverFlappy();
+            }
+        }
+    }
+
+    private void GameOverFlappy()
+    {
+        FlappyIsRunning = false;
+    }
+}

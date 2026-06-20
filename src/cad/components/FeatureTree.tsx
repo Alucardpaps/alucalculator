@@ -35,7 +35,7 @@ function TreeNode({ label, icon, children, isActive, badge, onClick, actions, de
     const hasChildren = React.Children.count(children) > 0;
 
     return (
-        <div className="select-none">
+        <div className="select-none group">
             <div
                 className={`flex items-center gap-1.5 px-2 py-1 text-xs cursor-pointer rounded
           transition-all duration-150

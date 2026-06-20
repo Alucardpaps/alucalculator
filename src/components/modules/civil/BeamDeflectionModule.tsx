@@ -40,9 +40,9 @@ export default function BeamDeflectionModule() {
     const activeColor = results.isSafe ? '#10b981' : '#ef4444'; // Emerald for safe, Red for unsafe
 
     return (
-        <div className="flex h-full bg-[#03060a] text-white overflow-hidden p-2">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden p-2 gap-4">
             {/* LEFT PANEL - Control Center (35%) */}
-            <div className="w-[35%] h-full flex flex-col bg-[#080d14]/80 rounded-2xl border border-white/5 backdrop-blur-2xl px-6 py-6 overflow-y-auto custom-scrollbar">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 rounded-2xl border border-white/5 backdrop-blur-2xl px-6 py-6 overflow-y-auto custom-scrollbar">
                 <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
                     <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
                         <Layers size={20} strokeWidth={2} />
@@ -100,7 +100,7 @@ export default function BeamDeflectionModule() {
             </div>
 
             {/* RIGHT PANEL - Live Visualization & Output (65%) */}
-            <div className="w-[65%] h-full flex flex-col px-6">
+            <div className="flex-1 h-auto lg:h-full flex flex-col px-6 min-w-0">
                 {/* Math Results Header */}
                 <div className="flex-none pt-8 pb-4">
                     <div className="flex items-start justify-between">

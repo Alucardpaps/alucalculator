@@ -197,7 +197,7 @@ export const GearboxSchematic = ({ stages, activeStageIndex }: GearboxSchematicP
               <circle r={rs * 0.4} fill="#0f172a" stroke="#78350f" strokeWidth="2" />
             </g>
 
-            <path d="M -10 0 L 10 0 M 0 -10 L 0 10" stroke="#66FCF1" strokeWidth="1" opacity="0.5" />
+            <path d="M -10 0 L 10 0 M 0 -10 L 0 10" stroke="#00e5ff" strokeWidth="1" opacity="0.5" />
           </g>
           
           <text x="20" y="30" className="text-xs font-black fill-cyan-500 uppercase tracking-[0.3em]" filter="url(#glowCyan)">FRONT VIEW (DYNAMIC)</text>
@@ -232,8 +232,8 @@ export const GearboxSchematic = ({ stages, activeStageIndex }: GearboxSchematicP
 
               return (
                 <g key={idx} transform={`translate(0, ${y.toFixed(3)})`}>
-                  <rect x={(-srr - 20).toFixed(3)} y={0} width={((srr + 20) * 2).toFixed(3)} height={h.toFixed(3)} fill={active ? 'rgba(102, 252, 241, 0.03)' : 'none'} stroke={active ? 'rgba(102, 252, 241, 0.2)' : 'rgba(255,255,255,0.05)'} strokeWidth="2" />
-                  <line x1={0} y1={-10} x2={0} y2={(h + 10).toFixed(3)} stroke="#66FCF1" strokeDasharray="10 5 2 5" strokeWidth="1" opacity="0.5" />
+                  <rect x={(-srr - 20).toFixed(3)} y={0} width={((srr + 20) * 2).toFixed(3)} height={h.toFixed(3)} fill={active ? 'rgba(0, 229, 255, 0.03)' : 'none'} stroke={active ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255,255,255,0.05)'} strokeWidth="2" />
+                  <line x1={0} y1={-10} x2={0} y2={(h + 10).toFixed(3)} stroke="#00e5ff" strokeDasharray="10 5 2 5" strokeWidth="1" opacity="0.5" />
 
                   <rect x={(-srs*0.4).toFixed(3)} y={0} width={(srs*0.8).toFixed(3)} height={h.toFixed(3)} fill="#1e293b" stroke="#0f172a" />
                   

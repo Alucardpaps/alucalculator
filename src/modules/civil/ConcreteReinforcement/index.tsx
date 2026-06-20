@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Construction, Ruler, Layers, Activity, 
     Zap, Info, Target, Maximize2, Shield, 
-    HardHat, Hammer, FileText, Settings
+    HardHat, Hammer, FileText, Settings, ShieldAlert
 } from 'lucide-react';
 
 export default function ConcreteReinforcement() {

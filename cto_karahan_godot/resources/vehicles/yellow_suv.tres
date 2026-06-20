@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="VehicleData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/vehicle_data.gd" id="1_abcde"]
+
+[resource]
+script = ExtResource("1_abcde")
+vehicle_name = "Heybetli SUV (Sarı)"
+vehicle_type = "suv"
+top_speed = 24.0
+color = Color(0.9, 0.75, 0.15, 1)

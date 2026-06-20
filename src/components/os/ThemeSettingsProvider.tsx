@@ -6,7 +6,15 @@ import { useI18nStore } from '@/store/i18nStore';
 
 export function ThemeSettingsProvider() {
     const { theme, fontSize, fontFamily } = useOSStore();
-    const { language } = useI18nStore();
+    const { language, setLanguage } = useI18nStore();
+
+    // Sync store translations reactively on client-side mount
+    useEffect(() => {
+        if (typeof window !== 'undefined' && language) {
+            // Force sync and refresh store translations to trigger reactive updates on hydrated load
+            setLanguage(language);
+        }
+    }, [language, setLanguage]);
 
     useEffect(() => {
         const doc = document.documentElement;

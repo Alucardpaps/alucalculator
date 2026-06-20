@@ -93,11 +93,11 @@ export const FASTENERS_DB: Fastener[] = [
     { standard: 'BSPP (G)', size: 'G 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 19.0, stressArea: 290.0 },
     { standard: 'BSPP (G)', size: 'G 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 24.5, stressArea: 479.1 },
     { standard: 'BSPP (G)', size: 'G 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 30.75, stressArea: 756.2 },
-    { standard: 'BSPP (G)', size: 'G 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 39.5, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 45.0, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 2', pitch: 11, majorDia: 59.614, minorDia: 56.656, pitchDia: 58.135, tapDrill: 57.0, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 2-1/2', pitch: 11, majorDia: 75.184, minorDia: 72.226, pitchDia: 73.705, tapDrill: 72.5, stressArea: 0 },
-    { standard: 'BSPP (G)', size: 'G 3', pitch: 11, majorDia: 87.884, minorDia: 84.926, pitchDia: 86.405, tapDrill: 85.0, stressArea: 0 },
+    { standard: 'BSPP (G)', size: 'G 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 39.5, stressArea: 1237.3 },
+    { standard: 'BSPP (G)', size: 'G 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 45.0, stressArea: 1632.0 },
+    { standard: 'BSPP (G)', size: 'G 2', pitch: 11, majorDia: 59.614, minorDia: 56.656, pitchDia: 58.135, tapDrill: 57.0, stressArea: 2587.3 },
+    { standard: 'BSPP (G)', size: 'G 2-1/2', pitch: 11, majorDia: 75.184, minorDia: 72.226, pitchDia: 73.705, tapDrill: 72.5, stressArea: 4181.4 },
+    { standard: 'BSPP (G)', size: 'G 3', pitch: 11, majorDia: 87.884, minorDia: 84.926, pitchDia: 86.405, tapDrill: 85.0, stressArea: 5763.7 },
 
     // --- BSPT (R) Tapered Pipe (ISO 7) ---
     // Pitch is TPI. Angle 55. Major Dia is Gauge Plane Diameter.
@@ -107,36 +107,36 @@ export const FASTENERS_DB: Fastener[] = [
     { standard: 'BSPT (R)', size: 'R 3/8', pitch: 19, majorDia: 16.662, minorDia: 14.950, pitchDia: 15.806, tapDrill: 14.5, stressArea: 185.8 },
     { standard: 'BSPT (R)', size: 'R 1/2', pitch: 14, majorDia: 20.955, minorDia: 18.631, pitchDia: 19.793, tapDrill: 18.0, stressArea: 290.0 },
     { standard: 'BSPT (R)', size: 'R 3/4', pitch: 14, majorDia: 26.441, minorDia: 24.117, pitchDia: 25.279, tapDrill: 23.5, stressArea: 479.1 },
-    { standard: 'BSPT (R)', size: 'R 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 29.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 38.0, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 44.0, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 2', pitch: 11, majorDia: 59.614, minorDia: 56.656, pitchDia: 58.135, tapDrill: 55.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 2-1/2', pitch: 11, majorDia: 75.184, minorDia: 72.226, pitchDia: 73.705, tapDrill: 71.0, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 3', pitch: 11, majorDia: 87.884, minorDia: 84.926, pitchDia: 86.405, tapDrill: 84.0, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 4', pitch: 11, majorDia: 113.030, minorDia: 110.072, pitchDia: 111.551, tapDrill: 109.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 5', pitch: 11, majorDia: 138.430, minorDia: 135.472, pitchDia: 136.951, tapDrill: 134.5, stressArea: 0 },
-    { standard: 'BSPT (R)', size: 'R 6', pitch: 11, majorDia: 163.830, minorDia: 160.872, pitchDia: 162.351, tapDrill: 160.0, stressArea: 0 },
+    { standard: 'BSPT (R)', size: 'R 1', pitch: 11, majorDia: 33.249, minorDia: 30.291, pitchDia: 31.770, tapDrill: 29.5, stressArea: 756.2 },
+    { standard: 'BSPT (R)', size: 'R 1-1/4', pitch: 11, majorDia: 41.910, minorDia: 38.952, pitchDia: 40.431, tapDrill: 38.0, stressArea: 1237.3 },
+    { standard: 'BSPT (R)', size: 'R 1-1/2', pitch: 11, majorDia: 47.803, minorDia: 44.845, pitchDia: 46.324, tapDrill: 44.0, stressArea: 1632.0 },
+    { standard: 'BSPT (R)', size: 'R 2', pitch: 11, majorDia: 59.614, minorDia: 56.656, pitchDia: 58.135, tapDrill: 55.5, stressArea: 2587.3 },
+    { standard: 'BSPT (R)', size: 'R 2-1/2', pitch: 11, majorDia: 75.184, minorDia: 72.226, pitchDia: 73.705, tapDrill: 71.0, stressArea: 4181.4 },
+    { standard: 'BSPT (R)', size: 'R 3', pitch: 11, majorDia: 87.884, minorDia: 84.926, pitchDia: 86.405, tapDrill: 84.0, stressArea: 5763.7 },
+    { standard: 'BSPT (R)', size: 'R 4', pitch: 11, majorDia: 113.030, minorDia: 110.072, pitchDia: 111.551, tapDrill: 109.5, stressArea: 9644.0 },
+    { standard: 'BSPT (R)', size: 'R 5', pitch: 11, majorDia: 138.430, minorDia: 135.472, pitchDia: 136.951, tapDrill: 134.5, stressArea: 14572.0 },
+    { standard: 'BSPT (R)', size: 'R 6', pitch: 11, majorDia: 163.830, minorDia: 160.872, pitchDia: 162.351, tapDrill: 160.0, stressArea: 20513.0 },
 
     // --- NPT Tapered Pipe (ANSI B1.20.1) ---
     // Angle 60. Taper 1:16. Major Dia is Pipe OD (approx).
     // Tap Drill is for Tapered Reamer or Commercial use.
     // Stored in Metric equiv for DB consistency, converted to Inch for display.
-    { standard: 'NPT', size: '1/16 NPT', pitch: 27, majorDia: 7.950, minorDia: 6.388, pitchDia: 7.142, tapDrill: 6.15, stressArea: 0 }, // Tap Drill D
-    { standard: 'NPT', size: '1/8 NPT', pitch: 27, majorDia: 10.287, minorDia: 8.730, pitchDia: 9.489, tapDrill: 8.43, stressArea: 0 }, // Tap Drill Q
-    { standard: 'NPT', size: '1/4 NPT', pitch: 18, majorDia: 13.716, minorDia: 11.359, pitchDia: 12.487, tapDrill: 11.13, stressArea: 0 }, // 7/16
-    { standard: 'NPT', size: '3/8 NPT', pitch: 18, majorDia: 17.145, minorDia: 14.796, pitchDia: 15.926, tapDrill: 14.27, stressArea: 0 }, // 9/16
-    { standard: 'NPT', size: '1/2 NPT', pitch: 14, majorDia: 21.336, minorDia: 18.321, pitchDia: 19.772, tapDrill: 17.86, stressArea: 0 }, // 45/64
-    { standard: 'NPT', size: '3/4 NPT', pitch: 14, majorDia: 26.670, minorDia: 23.665, pitchDia: 25.117, tapDrill: 23.01, stressArea: 0 }, // 29/32
-    { standard: 'NPT', size: '1 NPT', pitch: 11.5, majorDia: 33.401, minorDia: 29.726, pitchDia: 31.461, tapDrill: 28.98, stressArea: 0 }, // 1-9/64
-    { standard: 'NPT', size: '1-1/4 NPT', pitch: 11.5, majorDia: 42.164, minorDia: 38.451, pitchDia: 40.218, tapDrill: 37.69, stressArea: 0 },
-    { standard: 'NPT', size: '1-1/2 NPT', pitch: 11.5, majorDia: 48.260, minorDia: 44.524, pitchDia: 46.287, tapDrill: 43.66, stressArea: 0 },
-    { standard: 'NPT', size: '2 NPT', pitch: 11.5, majorDia: 60.325, minorDia: 56.558, pitchDia: 58.325, tapDrill: 55.58, stressArea: 0 },
-    { standard: 'NPT', size: '2-1/2 NPT', pitch: 8, majorDia: 73.025, minorDia: 67.628, pitchDia: 69.952, tapDrill: 66.68, stressArea: 0 },
-    { standard: 'NPT', size: '3 NPT', pitch: 8, majorDia: 88.900, minorDia: 83.503, pitchDia: 85.801, tapDrill: 82.55, stressArea: 0 },
-    { standard: 'NPT', size: '3-1/2 NPT', pitch: 8, majorDia: 101.600, minorDia: 96.203, pitchDia: 98.501, tapDrill: 95.25, stressArea: 0 },
-    { standard: 'NPT', size: '4 NPT', pitch: 8, majorDia: 114.300, minorDia: 108.903, pitchDia: 111.201, tapDrill: 107.95, stressArea: 0 },
-    { standard: 'NPT', size: '5 NPT', pitch: 8, majorDia: 141.300, minorDia: 135.903, pitchDia: 138.125, tapDrill: 134.94, stressArea: 0 },
-    { standard: 'NPT', size: '6 NPT', pitch: 8, majorDia: 168.275, minorDia: 162.878, pitchDia: 165.100, tapDrill: 161.93, stressArea: 0 },
+    { standard: 'NPT', size: '1/16 NPT', pitch: 27, majorDia: 7.950, minorDia: 6.388, pitchDia: 7.142, tapDrill: 6.15, stressArea: 35.9 },
+    { standard: 'NPT', size: '1/8 NPT', pitch: 27, majorDia: 10.287, minorDia: 8.730, pitchDia: 9.489, tapDrill: 8.43, stressArea: 65.2 },
+    { standard: 'NPT', size: '1/4 NPT', pitch: 18, majorDia: 13.716, minorDia: 11.359, pitchDia: 12.487, tapDrill: 11.13, stressArea: 111.6 },
+    { standard: 'NPT', size: '3/8 NPT', pitch: 18, majorDia: 17.145, minorDia: 14.796, pitchDia: 15.926, tapDrill: 14.27, stressArea: 185.3 },
+    { standard: 'NPT', size: '1/2 NPT', pitch: 14, majorDia: 21.336, minorDia: 18.321, pitchDia: 19.772, tapDrill: 17.86, stressArea: 284.9 },
+    { standard: 'NPT', size: '3/4 NPT', pitch: 14, majorDia: 26.670, minorDia: 23.665, pitchDia: 25.117, tapDrill: 23.01, stressArea: 467.2 },
+    { standard: 'NPT', size: '1 NPT', pitch: 11.5, majorDia: 33.401, minorDia: 29.726, pitchDia: 31.461, tapDrill: 28.98, stressArea: 735.1 },
+    { standard: 'NPT', size: '1-1/4 NPT', pitch: 11.5, majorDia: 42.164, minorDia: 38.451, pitchDia: 40.218, tapDrill: 37.69, stressArea: 1215.2 },
+    { standard: 'NPT', size: '1-1/2 NPT', pitch: 11.5, majorDia: 48.260, minorDia: 44.524, pitchDia: 46.287, tapDrill: 43.66, stressArea: 1619.2 },
+    { standard: 'NPT', size: '2 NPT', pitch: 11.5, majorDia: 60.325, minorDia: 56.558, pitchDia: 58.325, tapDrill: 55.58, stressArea: 2591.4 },
+    { standard: 'NPT', size: '2-1/2 NPT', pitch: 8, majorDia: 73.025, minorDia: 67.628, pitchDia: 69.952, tapDrill: 66.68, stressArea: 3716.5 },
+    { standard: 'NPT', size: '3 NPT', pitch: 8, majorDia: 88.900, minorDia: 83.503, pitchDia: 85.801, tapDrill: 82.55, stressArea: 5628.1 },
+    { standard: 'NPT', size: '3-1/2 NPT', pitch: 8, majorDia: 101.600, minorDia: 96.203, pitchDia: 98.501, tapDrill: 95.25, stressArea: 7443.5 },
+    { standard: 'NPT', size: '4 NPT', pitch: 8, majorDia: 114.300, minorDia: 108.903, pitchDia: 111.201, tapDrill: 107.95, stressArea: 9512.3 },
+    { standard: 'NPT', size: '5 NPT', pitch: 8, majorDia: 141.300, minorDia: 135.903, pitchDia: 138.125, tapDrill: 134.94, stressArea: 14744.2 },
+    { standard: 'NPT', size: '6 NPT', pitch: 8, majorDia: 168.275, minorDia: 162.878, pitchDia: 165.100, tapDrill: 161.93, stressArea: 21121.3 },
 
     // --- Trapezoidal (Tr) ---
     // DIN 103

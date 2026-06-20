@@ -29,10 +29,10 @@ const Gear = ({
   teeth = 18,
   thickness = 0.1,
   speed = 0.3,
+  href,
 }: {
   position: [number, number, number];
   color: string;
-  radius?: number;
   radius?: number;
   teeth?: number;
   thickness?: number;
@@ -125,6 +125,7 @@ const HexNut = ({
   color,
   size = 0.15,
   speed = 0.5,
+  href,
 }: {
   position: [number, number, number];
   color: string;
@@ -187,6 +188,7 @@ const HeroBolt = ({
   position,
   color,
   speed = 0.35,
+  href,
 }: {
   position: [number, number, number];
   color: string;

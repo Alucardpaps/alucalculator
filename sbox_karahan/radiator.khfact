@@ -1,0 +1,88 @@
+{
+  "FactoryName": "Alüminyum Radyatör Fabrikası (Resource)",
+  "Badge": "Hassas Lehimleme (Res)",
+  "BadgeColor": "#3b82f6",
+  "Materials": [
+    "Alüminyum Rulo Sac",
+    "Alüminyum Döküm Kazan",
+    "Sert Lehim Dekapajı",
+    "Petek Kalıp Şeridi",
+    "Fan & Braket Kiti",
+    "Silikon Hortum Seti"
+  ],
+  "MaterialCosts": [
+    { "Material": "Alüminyum Rulo Sac", "Cost": 4000 },
+    { "Material": "Alüminyum Döküm Kazan", "Cost": 3000 },
+    { "Material": "Sert Lehim Dekapajı", "Cost": 500 },
+    { "Material": "Petek Kalıp Şeridi", "Cost": 1500 },
+    { "Material": "Fan & Braket Kiti", "Cost": 2500 },
+    { "Material": "Silikon Hortum Seti", "Cost": 1000 }
+  ],
+  "StartInventory": [
+    { "Material": "Alüminyum Rulo Sac", "Amount": 10 },
+    { "Material": "Alüminyum Döküm Kazan", "Amount": 8 },
+    { "Material": "Sert Lehim Dekapajı", "Amount": 15 },
+    { "Material": "Petek Kalıp Şeridi", "Amount": 12 },
+    { "Material": "Fan & Braket Kiti", "Amount": 6 },
+    { "Material": "Silikon Hortum Seti", "Amount": 8 }
+  ],
+  "Workstations": [
+    { "Id": "ws-lazer", "Name": "Lazer Kesim & Sac", "Icon": "✂️", "RequiredSkill": "Sac Kesim" },
+    { "Id": "ws-abkant", "Name": "Abkant Büküm İstasyonu", "Icon": "📐", "RequiredSkill": "Büküm" },
+    { "Id": "ws-arge", "Name": "Ar-Ge Tasarım Ofisi", "Icon": "✏️", "RequiredSkill": "Ar-Ge" },
+    { "Id": "ws-dokuma", "Name": "Petek Kalıplama & Dokuma", "Icon": "🕸️", "RequiredSkill": "Petek Dokuma" },
+    { "Id": "ws-firin", "Name": "CAB Lehimleme Fırını", "Icon": "♨️", "RequiredSkill": "Fırınlama" },
+    { "Id": "ws-ik", "Name": "İnsan Kaynakları Ofisi", "Icon": "💼", "RequiredSkill": "İdari" },
+    { "Id": "ws-lehim", "Name": "Kazan Sert Lehimleme", "Icon": "🔥", "RequiredSkill": "Sert Lehim" },
+    { "Id": "ws-test", "Name": "Sızdırmazlık Test İstasyonu", "Icon": "🧪", "RequiredSkill": "Sızdırmazlık" },
+    { "Id": "ws-boya", "Name": "Toz Boya Kabini", "Icon": "🎨", "RequiredSkill": "Boya" },
+    { "Id": "ws-montaj", "Name": "Montaj & Son Kontrol", "Icon": "🔧", "RequiredSkill": "Montaj" },
+    { "Id": "ws-depo", "Name": "Depo / Ambar", "Icon": "📦", "RequiredSkill": "Shipment" },
+    { "Id": "ws-cay", "Name": "Çay Ocağı / Dinlenme", "Icon": "☕", "RequiredSkill": "Break" },
+    { "Id": "ws-wc", "Name": "Genel WC / Lavabolar", "Icon": "🚾", "RequiredSkill": "Break" },
+    { "Id": "ws-revir", "Name": "Sağlık Odası (Revir)", "Icon": "🏥", "RequiredSkill": "Medical" }
+  ],
+  "Masters": [
+    { "Name": "Usta Ahmet (Res)", "Hometown": "Trabzon", "Skill": "Sac Kesim", "Trait": "İnatçı", "Bg": "30 yıllık giyotin sac makasçısı.", "Feuds": [ "Usta Kadir (Res)" ] },
+    { "Name": "Usta Kadir (Res)", "Hometown": "Adana", "Skill": "Büküm", "Trait": "Girişken", "Bg": "CNC Abkant operatörü.", "Feuds": [ "Usta Ahmet (Res)" ] },
+    { "Name": "Usta Gizem (Res)", "Hometown": "İzmir", "Skill": "Ar-Ge", "Trait": "Yardımcıev", "Bg": "Genç makine ressamı.", "Feuds": [] },
+    { "Name": "Usta Hasan (Res)", "Hometown": "Konya", "Skill": "Petek Dokuma", "Trait": "Asosyal", "Bg": "Eski kalıp ustası.", "Feuds": [] },
+    { "Name": "Usta Selim (Res)", "Hometown": "Sivas", "Skill": "Fırınlama", "Trait": "İnatçı", "Bg": "CAB lehim fırını uzmanı.", "Feuds": [ "Usta Rıza (Res)" ] },
+    { "Name": "Usta Rıza (Res)", "Hometown": "Amasya", "Skill": "Sert Lehim", "Trait": "Yardımcıev", "Bg": "Oksi-asetilen şalomasıyla pirinç.", "Feuds": [ "Usta Selim (Res)" ] },
+    { "Name": "Usta Can (Res)", "Hometown": "Ankara", "Skill": "Sızdırmazlık", "Trait": "Girişken", "Bg": "Su altı kabarcık dedektörü şefi.", "Feuds": [] },
+    { "Name": "Usta Orhan (Res)", "Hometown": "Bursa", "Skill": "Boya", "Trait": "Asosyal", "Bg": "Kromat kaplama ve boyacı.", "Feuds": [] },
+    { "Name": "Usta Murat (Res)", "Hometown": "Kayseri", "Skill": "Montaj", "Trait": "Girişken", "Bg": "Radyatör toplama ve braket vidalama.", "Feuds": [] },
+    { "Name": "Sevkiyatçı Selo (Res)", "Hometown": "Kırşehir", "Skill": "Shipment", "Trait": "Yardımcıev", "Bg": "Malzeme taşıyıcısı ve dedikodu şefi.", "Feuds": [] }
+  ],
+  "QuestionPool": [
+    {
+      "Body": "CAB lehim fırını flux kaplama yükünü metrekare başına kaç gram ayarlayalım?",
+      "Actions": [
+        { "Label": "3 - 5 g/m² (İdeal Oksit Çözme)", "Correct": true },
+        { "Label": "10 - 15 g/m²", "Correct": false }
+      ]
+    },
+    {
+      "Body": "CAB lehimleme fırınındaki oksijen limitini kaç ppm altında tutalım?",
+      "Actions": [
+        { "Label": "Oksijen seviyesi < 10 ppm olmalı", "Correct": true },
+        { "Label": "Oksijen seviyesi < 100 ppm", "Correct": false }
+      ]
+    }
+  ],
+  "OrderTemplates": [
+    {
+      "Desc": "Ağır Hizmet Kamyon Radyatörü (Resource)",
+      "Due": 5,
+      "Reward": 95000,
+      "Penalty": 25000,
+      "RndDays": 1,
+      "Blueprints": [
+        { "Name": "Petek Core Üretimi", "Stages": [ "Petek Dokuma", "Fırınlama" ], "Need": 2, "Dependencies": [] },
+        { "Name": "Kazan Sac Gövdesi", "Stages": [ "Sac Kesim", "Büküm" ], "Need": 1, "Dependencies": [] },
+        { "Name": "Radyatör Montaj & Bitiş", "Stages": [ "Sert Lehim", "Sızdırmazlık", "Boya", "Montaj" ], "Need": 2, "Dependencies": [ "Petek Core Üretimi", "Kazan Sac Gövdesi" ] }
+      ]
+    }
+  ],
+  "Handbook": "<b>🔄 ORTAK FABRİKA AKIŞ VE TEZGAH ŞEMASI (RESOURCE)</b><br>Bu fabrika verileri .khfact dosyasından dinamik olarak yüklenmiştir."
+}

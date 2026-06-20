@@ -7,7 +7,7 @@ import { MATERIALS_DB } from "@/data/materialsData";
 import { EngineeringVisualization } from '@/components/ui/EngineeringVisualization';
 import { AssumptionPanel, CalculationMetadata } from '@/components/ui/AssumptionPanel';
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
-import { TechnicalDrawing3D } from "@/components/TechnicalDrawing3D";
+
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { Box, Layers, Circle, Cylinder, Zap, Settings, Triangle, Columns, Magnet, Type, Hexagon } from 'lucide-react';
 
@@ -22,7 +22,7 @@ export function AluminumModule({ lang, dict }: { lang: string, dict: any }) {
         materialName, setMaterialName
     } = useWeightCalculator();
 
-    const [viewMode, setViewMode] = useState<'2D' | '3D'>('2D');
+
     const [activeTab, setActiveTab] = useState<'inputs' | 'details'>('inputs');
 
     // Shapes Config
@@ -80,18 +80,7 @@ export function AluminumModule({ lang, dict }: { lang: string, dict: any }) {
                     <Settings size={14} /> Design
                 </button>
                 <div className="h-4 w-px bg-slate-700 mx-1" />
-                <button
-                    onClick={() => setViewMode('2D')}
-                    className={`px-2 py-1 text-xs font-mono rounded ${viewMode === '2D' ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                    2D
-                </button>
-                <button
-                    onClick={() => setViewMode('3D')}
-                    className={`px-2 py-1 text-xs font-mono rounded ${viewMode === '3D' ? 'bg-slate-700 text-ind-orange' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                    3D
-                </button>
+
             </div>
 
             {/* Content */}
@@ -100,11 +89,7 @@ export function AluminumModule({ lang, dict }: { lang: string, dict: any }) {
                 {/* 1. Vis - Flexible Height */}
                 <div className="flex-[2] min-h-[200px] w-full bg-black/20 rounded-lg overflow-hidden border border-white/5 relative">
                     <EngineeringVisualization status={status} label={`${shape.toUpperCase()} PROFILE`}>
-                        {viewMode === '2D' ? (
-                            <TechnicalDrawing shape={shape} activeField={null} data={inputs} />
-                        ) : (
-                            <TechnicalDrawing3D shape={shape} activeField={null} inputs={inputs} />
-                        )}
+                        <TechnicalDrawing shape={shape} activeField={null} data={inputs} />
                     </EngineeringVisualization>
                 </div>
 

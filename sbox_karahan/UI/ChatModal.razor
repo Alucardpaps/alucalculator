@@ -1,0 +1,141 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using Karahan;
+@using Karahan.Worker;
+@using Karahan.Factory;
+@using Karahan.UI;
+@inherits PanelComponent
+
+@if (IsVisible && SelectedWorker != null)
+{
+    <root class="chat-overlay" onclick=@Close>
+        <div class="chat-modal" onclick:stopPropagation>
+
+            @* ═══════ HEADER ═══════ *@
+            <div class="chat-header">
+                <div class="chat-avatar">@AvatarEmoji</div>
+                <div class="chat-info">
+                    <div class="chat-name">@SelectedWorker.MasterName</div>
+                    <div class="chat-subtitle">@SelectedWorker.Skill • @SelectedWorker.Hometown</div>
+                </div>
+                <button class="close-btn" onclick=@Close>✕</button>
+            </div>
+
+            @* ═══════ WORKER STATS ═══════ *@
+            <div class="chat-stats">
+                <div class="mini-stat">
+                    <span class="label">Moral</span>
+                    <div class="mini-bar">
+                        <div class="mini-fill morale" style="width: @(SelectedWorker.Morale)%"></div>
+                    </div>
+                    <span class="val">@SelectedWorker.Morale</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="label">Güven</span>
+                    <div class="mini-bar">
+                        <div class="mini-fill trust" style="width: @(SelectedWorker.Trust)%"></div>
+                    </div>
+                    <span class="val">@SelectedWorker.Trust</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="label">Uyarı</span>
+                    <span class="val warn">@SelectedWorker.Warnings / 3</span>
+                </div>
+            </div>
+
+            @* ═══════ BIO ═══════ *@
+            <div class="chat-bio">
+                <span class="bio-trait">@SelectedWorker.Trait</span>
+                <p>@SelectedWorker.Bg</p>
+            </div>
+
+            @* ═══════ ACTIVE QUESTION ═══════ *@
+            @if (SelectedWorker.ActiveQuestion != null)
+            {
+                <div class="question-bubble">
+                    <div class="question-text">
+                        💬 "@SelectedWorker.ActiveQuestion.Body"
+                    </div>
+                    <div class="question-actions">
+                        @foreach (var action in SelectedWorker.ActiveQuestion.Actions)
+                        {
+                            <button class="action-btn" onclick=@(() => AnswerQuestion(action))>
+                                @action.Label
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="no-question">
+                    Bu ustanın şu an aktif bir sorusu yok.
+                </div>
+            }
+
+            @* ═══════ ACTION BUTTONS ═══════ *@
+            <div class="chat-footer">
+                <button class="footer-btn positive" disabled=@(VM.Money < 500) onclick=@GiveBonus>
+                    💰 Prim Ver (+500₺)
+                </button>
+                <button class="footer-btn negative" onclick=@GiveWarning>
+                    ⚠️ Uyarı Ver
+                </button>
+            </div>
+        </div>
+    </root>
+}
+
+@code {
+    public bool IsVisible { get; set; }
+    public WorkerComponent SelectedWorker { get; set; }
+
+    private KarahanViewModel VM => KarahanViewModel.Instance;
+
+    private string AvatarEmoji => SelectedWorker?.Skill switch
+    {
+        "Sac Kesim" or "Testere Kesim" => "✂️",
+        "Büküm" or "Tornalama" => "🌀",
+        "Ar-Ge" => "✏️",
+        "Petek Dokuma" or "Azdırma" => "🎡",
+        "Fırınlama" or "Isıl İşlem" => "🔥",
+        "Sert Lehim" or "Taşlama" => "💎",
+        "Sızdırmazlık" or "Test" => "🧪",
+        "Boya" => "🎨",
+        "Montaj" => "🔧",
+        "Shipment" => "📦",
+        _ => "👷"
+    };
+
+    public void Show(WorkerComponent worker)
+    {
+        SelectedWorker = worker;
+        IsVisible = true;
+    }
+
+    private void Close()
+    {
+        IsVisible = false;
+        SelectedWorker = null;
+    }
+
+    private void AnswerQuestion(ActionTemplate action)
+    {
+        if (SelectedWorker == null) return;
+        VM.AnswerQuestion(SelectedWorker, action);
+    }
+
+    private void GiveBonus()
+    {
+        if (SelectedWorker == null) return;
+        VM.GiveBonus(SelectedWorker);
+    }
+
+    private void GiveWarning()
+    {
+        if (SelectedWorker == null) return;
+        VM.GiveWarning(SelectedWorker, Scene);
+    }
+}

@@ -119,7 +119,10 @@ export function calculateFit(nominal: number, holeClass: string, holeGrade: numb
     let holeEI = 0;
     let holeES = 0;
     
-    if (holeClass.toUpperCase() === 'H') {
+    if (holeClass.toUpperCase() === 'JS') {
+        holeEI = -hIT / 2;
+        holeES = hIT / 2;
+    } else if (holeClass.toUpperCase() === 'H') {
         holeEI = 0;
         holeES = hIT;
     } else {
@@ -138,7 +141,10 @@ export function calculateFit(nominal: number, holeClass: string, holeGrade: numb
     let shaft_ei = 0;
     let shaft_es = 0;
 
-    if (shaftClass.toLowerCase() === 'h') {
+    if (shaftClass.toLowerCase() === 'js') {
+        shaft_ei = -sIT / 2;
+        shaft_es = sIT / 2;
+    } else if (shaftClass.toLowerCase() === 'h') {
         shaft_es = 0;
         shaft_ei = -sIT;
     } else {

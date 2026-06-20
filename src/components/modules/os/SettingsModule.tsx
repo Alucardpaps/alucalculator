@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useI18nStore } from '@/store/i18nStore';
+import { LANGUAGE_OPTIONS } from '@/locales/siteNav';
+import { FlagIcon } from '@/components/ui/FlagIcon';
 import { useOSStore } from '@/store/osStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -33,20 +35,7 @@ export default function SettingsModule() {
     } = useOSStore();
 
 
-    const languages = [
-        { id: 'en', label: t.languageEn, flag: '🇺🇸', native: 'English' },
-        { id: 'tr', label: t.languageTr, flag: '🇹🇷', native: 'Türkçe' },
-        { id: 'de', label: t.languageDe, flag: '🇩🇪', native: 'Deutsch' },
-        { id: 'es', label: t.languageEs, flag: '🇪🇸', native: 'Español' },
-        { id: 'fr', label: t.languageFr ?? 'Français', flag: '🇫🇷', native: 'Français' },
-        { id: 'it', label: t.languageIt ?? 'Italiano', flag: '🇮🇹', native: 'Italiano' },
-        { id: 'pt', label: t.languagePt ?? 'Português', flag: '🇵🇹', native: 'Português' },
-        { id: 'ru', label: t.languageRu ?? 'Русский', flag: '🇷🇺', native: 'Русский' },
-        { id: 'zh', label: t.languageZh, flag: '🇨🇳', native: '中文' },
-        { id: 'ja', label: t.languageJa, flag: '🇯🇵', native: '日本語' },
-        { id: 'ko', label: t.languageKo, flag: '🇰🇷', native: '한국어' },
-        { id: 'ar', label: t.languageAr, flag: '🇦🇪', native: 'العربية' },
-    ];
+    const languages = LANGUAGE_OPTIONS;
 
     const themes = [
         { id: 'dark', label: t.themeDark, icon: Moon, color: 'bg-[#0a0e14]', desc: t.themeDarkDesc },
@@ -145,21 +134,22 @@ export default function SettingsModule() {
                                 </header>
 
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                     {languages.map((lang) => (
                                         <button
                                             key={lang.id}
-                                            onClick={() => setLanguage(lang.id as any)}
-                                            className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-300 group ${language === lang.id ? 'bg-cyan-500/10 border-cyan-500/50 ring-1 ring-cyan-500/30' : 'bg-white/5 border-white/5 hover:bg-white/[0.1] hover:border-white/10'}`}
+                                            type="button"
+                                            title={lang.native}
+                                            aria-label={lang.native}
+                                            onClick={() => setLanguage(lang.id)}
+                                            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-300 ${
+                                                language === lang.id
+                                                    ? 'bg-cyan-500/10 border-cyan-500/50 ring-1 ring-cyan-500/30 scale-105'
+                                                    : 'bg-white/5 border-white/5 hover:bg-white/[0.1] hover:border-white/10'
+                                            }`}
                                         >
-                                            <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-black/20 rounded-lg text-2xl">
-                                                {lang.flag}
-                                            </div>
-                                            <div className="flex-1 min-w-0 text-left">
-                                                <p className={`text-sm font-bold truncate ${language === lang.id ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>{lang.native}</p>
-                                                <p className="text-[9px] text-slate-500 uppercase tracking-wider truncate">{lang.label}</p>
-                                            </div>
-                                            {language === lang.id && <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />}
+                                            <FlagIcon lang={lang.id} className="w-8 h-5.5 object-cover rounded-md" />
+                                            {language === lang.id && <Check className="w-4 h-4 text-cyan-400" />}
                                         </button>
                                     ))}
                                 </div>

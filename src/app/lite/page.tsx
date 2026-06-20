@@ -5,22 +5,15 @@ import { MODULE_REGISTRY, ModuleType, getModuleIcon } from '@/config/modules';
 import { WindowContent } from '@/components/os/WindowContent';
 import { X, LayoutGrid } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useI18nStore } from '@/store/i18nStore';
+import { getLitePage, type LiteCategoryKey } from '@/locales/liteTranslations';
 
 // Order of categories for display
-const CATEGORY_ORDER = ['mechanical', 'manufacturing', 'civil', 'electrical', 'finance', 'science', 'software', 'other'];
-
-const CATEGORY_LABELS: Record<string, string> = {
-    'mechanical': 'Mechanical Engineering',
-    'manufacturing': 'Manufacturing & Production',
-    'civil': 'Civil Engineering',
-    'electrical': 'Electrical',
-    'finance': 'Finance & Costing',
-    'science': 'Science & Math',
-    'software': 'Software Utilities',
-    'other': 'Other Tools'
-};
+const CATEGORY_ORDER: LiteCategoryKey[] = ['mechanical', 'manufacturing', 'civil', 'electrical', 'finance', 'science', 'software', 'other'];
 
 export default function LiteDashboard() {
+    const { language } = useI18nStore();
+    const t = getLitePage(language);
     const [activeModule, setActiveModule] = useState<ModuleType | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -45,13 +38,13 @@ export default function LiteDashboard() {
             {/* Header / Search */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Calculators</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Select a tool below to begin your calculations.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{t.title}</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t.subtitle}</p>
                 </div>
                 <div className="relative w-full sm:w-72">
                     <input 
                         type="text" 
-                        placeholder="Search calculators..." 
+                        placeholder={t.searchPlaceholder} 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-white dark:bg-[#1a212d] border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan-500 transition-all text-slate-900 dark:text-white"
@@ -64,14 +57,14 @@ export default function LiteDashboard() {
                 {grouped.length === 0 ? (
                     <div className="text-center py-20 text-slate-500">
                         <LayoutGrid className="mx-auto h-12 w-12 opacity-20 mb-4" />
-                        <p>No calculators found matching your search.</p>
+                        <p>{t.emptyState}</p>
                     </div>
                 ) : (
                     grouped.map(group => (
                         <div key={group.category} className="flex flex-col gap-4">
                             <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
-                                {CATEGORY_LABELS[group.category] || group.category}
+                                {t.categories[group.category as LiteCategoryKey] || group.category}
                             </h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                                 {group.items.map(mod => {

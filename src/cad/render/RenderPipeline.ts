@@ -299,22 +299,79 @@ class GeometryLayer extends RenderLayer {
                 }
 
                 case 'HEXAGON': {
-                    const gHex = g as any;
-                    const c = worldToScreen(gHex.center);
-                    const r = gHex.radius * zoom;
-                    ctx.save();
-                    ctx.translate(c.x, c.y);
-                    if (gHex.rotation) ctx.rotate(gHex.rotation);
+                    const gPoly = g as any;
+                    const c = worldToScreen(gPoly.center);
+                    const r = gPoly.radius * viewport.zoom;
+                    const sides = gPoly.sides || 6;
+                    const rotation = gPoly.rotation || 0;
                     ctx.beginPath();
-                    for (let i = 0; i < 6; i++) {
-                        const angle = (Math.PI / 3) * i;
-                        const px = r * Math.cos(angle);
-                        const py = r * Math.sin(angle);
+                    for (let i = 0; i < sides; i++) {
+                        const angle = rotation + (Math.PI * 2 / sides) * i;
+                        const px = c.x + r * Math.cos(angle);
+                        const py = c.y + r * Math.sin(angle);
                         if (i === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
                     }
                     ctx.closePath();
                     ctx.stroke();
+                    break;
+                }
+
+                case 'GEAR': {
+                    const gGear = g as any;
+                    const c = worldToScreen(gGear.center);
+                    const vertices = RenderPipeline.computeGearVertices(gGear);
+                    RenderPipeline.strokeVertices(ctx, vertices, worldToScreen);
+
+                    // Pitch circle (reference)
+                    const rPitch = (gGear.module * gGear.teeth) / 2 * zoom;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(74, 222, 128, 0.4)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, rPitch, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                }
+
+                case 'FASTENER': {
+                    const gFast = g as any;
+                    RenderPipeline.drawFastener(ctx, gFast, worldToScreen, zoom);
+                    break;
+                }
+
+                case 'BELT_PULLEY': {
+                    const gBelt = g as any;
+                    RenderPipeline.drawBeltPulley(ctx, gBelt, worldToScreen, zoom);
+                    break;
+                }
+
+                case 'PLANETARY_GEAR': {
+                    const gPlan = g as any;
+                    RenderPipeline.drawPlanetaryGear(ctx, gPlan, worldToScreen, zoom);
+                    break;
+                }
+
+                case 'TEXT': {
+                    const gText = g as any;
+                    const pos = worldToScreen(gText.position);
+                    const fontSize = Math.max(8, gText.fontSize * zoom);
+                    const fontWeight = gText.bold ? 'bold' : 'normal';
+                    const fontStyle = gText.italic ? 'italic' : 'normal';
+                    ctx.save();
+                    ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${gText.fontFamily || 'Arial'}`;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = gText.justification || 'left';
+                    ctx.textBaseline = 'top';
+
+                    if (gText.rotation) {
+                        ctx.translate(pos.x, pos.y);
+                        ctx.rotate(-gText.rotation);
+                        ctx.fillText(gText.content, 0, 0);
+                    } else {
+                        ctx.fillText(gText.content, pos.x, pos.y);
+                    }
                     ctx.restore();
                     break;
                 }
@@ -323,6 +380,7 @@ class GeometryLayer extends RenderLayer {
                 default:
                     break;
             }
+
 
             // Render Modifiers (Holes, Welds, Milling)
             if (entity.modifiers && entity.modifiers.length > 0) {
@@ -370,15 +428,65 @@ class GeometryLayer extends RenderLayer {
                          ctx.fillStyle = 'rgba(139, 92, 246, 0.2)';
                          const mw = 30 * zoom; 
                          ctx.fillRect(cx - mw/2, cy - mw/2, mw, mw);
-                         ctx.strokeRect(cx - mw/2, cy - mw/2, mw, mw);
-                         ctx.beginPath(); ctx.moveTo(cx - mw/2, cy - mw/2); ctx.lineTo(cx + mw/2, cy + mw/2); ctx.stroke();
-                         ctx.beginPath(); ctx.moveTo(cx + mw/2, cy - mw/2); ctx.lineTo(cx - mw/2, cy + mw/2); ctx.stroke();
-                    }
+                    ctx.strokeRect(cx - mw/2, cy - mw/2, mw, mw);
+                    ctx.beginPath(); ctx.moveTo(cx - mw/2, cy - mw/2); ctx.lineTo(cx + mw/2, cy + mw/2); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(cx + mw/2, cy - mw/2); ctx.lineTo(cx - mw/2, cy + mw/2); ctx.stroke();
                 }
             }
         }
+
+        // --- DRAW GRIPS FOR SELECTED ENTITIES ---
+        if (isSelected) {
+            this.drawGrips(ctx, entity, worldToScreen, zoom);
+        }
+        }
     }
+
+    private drawGrips(ctx: CanvasRenderingContext2D, entity: CadEntity, worldToScreen: (p: Point) => Point, zoom: number) {
+        const g = entity.geometry;
+        const gripSize = 3; // Screen pixels half-size
+        const gripColor = '#3b82f6'; // Professional Blue
+        
+        let points: Point[] = [];
+
+        switch (g.type) {
+            case 'LINE':
+                points = [g.start, g.end];
+                break;
+            case 'CIRCLE':
+            case 'ARC':
+            case 'RECTANGLE':
+            case 'HEXAGON':
+            case 'GEAR':
+                points = [(g as any).center];
+                break;
+            case 'POINT':
+                points = [{ x: g.x, y: g.y }];
+                break;
+            case 'POLYLINE':
+                points = g.vertices;
+                break;
+            case 'FASTENER':
+                points = [(g as any).origin];
+                break;
+        }
+
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = gripColor;
+        ctx.lineWidth = 1;
+
+        points.forEach(p => {
+            const sp = worldToScreen(p);
+            ctx.fillRect(sp.x - gripSize, sp.y - gripSize, gripSize * 2, gripSize * 2);
+            ctx.strokeRect(sp.x - gripSize, sp.y - gripSize, gripSize * 2, gripSize * 2);
+        });
+        ctx.restore();
+    }
+
+
 }
+
 
 // ============================================
 // OVERLAY LAYER
@@ -435,6 +543,41 @@ class OverlayLayer extends RenderLayer {
                     const c = worldToScreen((g as any).center);
                     const r = (g as any).radius * viewport.zoom;
                     ctx.beginPath(); ctx.arc(c.x, c.y, r, (g as any).startAngle, (g as any).endAngle); ctx.stroke();
+                    break;
+                }
+                case 'HEXAGON': {
+                    const gPoly = g as any;
+                    const c = worldToScreen(gPoly.center);
+                    const r = gPoly.radius * viewport.zoom;
+                    const sides = gPoly.sides || 6;
+                    const rotation = gPoly.rotation || 0;
+                    ctx.beginPath();
+                    for (let i = 0; i < sides; i++) {
+                        const a = rotation + (Math.PI * 2 / sides) * i;
+                        const px = c.x + r * Math.cos(a);
+                        const py = c.y + r * Math.sin(a);
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                    break;
+                }
+                case 'GEAR': {
+                    const verts = RenderPipeline.computeGearVertices(g);
+                    RenderPipeline.strokeVertices(ctx, verts, worldToScreen);
+                    break;
+                }
+                case 'FASTENER': {
+                    RenderPipeline.drawFastener(ctx, g, worldToScreen, viewport.zoom);
+                    break;
+                }
+                case 'BELT_PULLEY': {
+                    RenderPipeline.drawBeltPulley(ctx, g, worldToScreen, viewport.zoom);
+                    break;
+                }
+                case 'PLANETARY_GEAR': {
+                    RenderPipeline.drawPlanetaryGear(ctx, g, worldToScreen, viewport.zoom);
                     break;
                 }
             }
@@ -509,13 +652,52 @@ class OverlayLayer extends RenderLayer {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            // Text Background
-            const textWidth = ctx.measureText(text).width;
-            ctx.fillStyle = '#080c12';
-            ctx.fillRect((p1Ext.x + p2Ext.x) / 2 - textWidth / 2 - 2, (p1Ext.y + p2Ext.y) / 2 - 7, textWidth + 4, 14);
+            const textCenterX = (p1Ext.x + p2Ext.x) / 2;
+            const textCenterY = (p1Ext.y + p2Ext.y) / 2;
 
-            ctx.fillStyle = dimColor;
-            ctx.fillText(text, (p1Ext.x + p2Ext.x) / 2, (p1Ext.y + p2Ext.y) / 2);
+            // Check for tolerance
+            const hasTol = g.tolUpper !== undefined || g.tolLower !== undefined;
+
+            if (hasTol) {
+                const tolU = g.tolUpper ?? 0;
+                const tolL = g.tolLower ?? 0;
+
+                // Text background (wider for tolerance)
+                const nomWidth = ctx.measureText(text).width;
+                const tolText = `+${Math.abs(tolU).toFixed(3)}`;
+                ctx.font = '8px monospace';
+                const tolWidth = ctx.measureText(tolText).width;
+                const totalWidth = nomWidth + tolWidth + 8;
+
+                ctx.font = '11px monospace';
+                ctx.fillStyle = '#080c12';
+                ctx.fillRect(textCenterX - totalWidth / 2 - 2, textCenterY - 10, totalWidth + 4, 20);
+
+                // Nominal value
+                const nomX = textCenterX - tolWidth / 2 - 2;
+                ctx.fillStyle = dimColor;
+                ctx.textAlign = 'center';
+                ctx.fillText(text, nomX, textCenterY);
+
+                // Upper tolerance (superscript)
+                ctx.font = '8px monospace';
+                ctx.textAlign = 'left';
+                const tolX = nomX + nomWidth / 2 + 3;
+                const upperText = tolU >= 0 ? `+${tolU.toFixed(3)}` : tolU.toFixed(3);
+                ctx.fillText(upperText, tolX, textCenterY - 5);
+
+                // Lower tolerance (subscript)
+                const lowerText = tolL >= 0 ? `+${tolL.toFixed(3)}` : tolL.toFixed(3);
+                ctx.fillText(lowerText, tolX, textCenterY + 5);
+            } else {
+                // Text Background
+                const textWidth = ctx.measureText(text).width;
+                ctx.fillStyle = '#080c12';
+                ctx.fillRect(textCenterX - textWidth / 2 - 2, textCenterY - 7, textWidth + 4, 14);
+
+                ctx.fillStyle = dimColor;
+                ctx.fillText(text, textCenterX, textCenterY);
+            }
         }
 
         // --- Snap indicator ---
@@ -728,6 +910,221 @@ class UIInteractionLayer extends RenderLayer {
 // ============================================
 
 export class RenderPipeline {
+    public static computeGearVertices(g: any): Point[] {
+        const { module: m, teeth: z, pressureAngle, center } = g;
+        const phi = (pressureAngle || 20) * (Math.PI / 180);
+
+        const rPitch = (m * z) / 2;
+        const rBase = rPitch * Math.cos(phi);
+        const rAddendum = rPitch + m;
+        const rDedendum = rPitch - 1.25 * m;
+        const rRoot = Math.max(rDedendum, rBase * 0.9);
+
+        const toothThickAngle = Math.PI / (2 * z);
+        const invPhi = Math.tan(phi) - phi;
+        const halfToothAngle = toothThickAngle + invPhi;
+
+        const vertices: Point[] = [];
+        const rightProfile: { angle: number; radius: number }[] = [];
+        const steps = 10;
+        for (let i = 0; i <= steps; i++) {
+            const r = rBase + (rAddendum - rBase) * (i / steps);
+            if (r < rBase) continue;
+            const alpha = Math.acos(rBase / r);
+            const invAlpha = Math.tan(alpha) - alpha;
+            rightProfile.push({ angle: invAlpha, radius: r });
+        }
+
+        for (let tooth = 0; tooth < z; tooth++) {
+            const toothCenterAngle = (2 * Math.PI / z) * tooth + (g.rotation || 0);
+
+            // Right flank
+            for (let i = 0; i < rightProfile.length; i++) {
+                const { angle: invAngle, radius: r } = rightProfile[i];
+                const a = toothCenterAngle + halfToothAngle - invAngle;
+                vertices.push({ x: center.x + r * Math.cos(a), y: center.y + r * Math.sin(a) });
+            }
+
+            // Tip
+            const tipRight = toothCenterAngle + halfToothAngle - rightProfile[rightProfile.length - 1].angle;
+            const tipLeft = toothCenterAngle - halfToothAngle + rightProfile[rightProfile.length - 1].angle;
+            for (let i = 1; i <= 2; i++) {
+                const a = tipRight + (tipLeft - tipRight) * (i / 3);
+                vertices.push({ x: center.x + rAddendum * Math.cos(a), y: center.y + rAddendum * Math.sin(a) });
+            }
+
+            // Left flank
+            for (let i = rightProfile.length - 1; i >= 0; i--) {
+                const { angle: invAngle, radius: r } = rightProfile[i];
+                const a = toothCenterAngle - halfToothAngle + invAngle;
+                vertices.push({ x: center.x + r * Math.cos(a), y: center.y + r * Math.sin(a) });
+            }
+
+            // Root
+            const nextToothAngle = (2 * Math.PI / z) * (tooth + 1) + (g.rotation || 0);
+            const rootStart = toothCenterAngle - halfToothAngle + rightProfile[0].angle;
+            const rootEnd = nextToothAngle + halfToothAngle - rightProfile[0].angle;
+            for (let i = 1; i <= 2; i++) {
+                const a = rootStart + (rootEnd - rootStart) * (i / 3);
+                vertices.push({ x: center.x + rRoot * Math.cos(a), y: center.y + rRoot * Math.sin(a) });
+            }
+        }
+        return vertices;
+    }
+
+    public static drawFastener(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
+        const { origin, fastenerType, diameter: d, length: len, pitch: p } = g;
+        
+        const METRIC_TABLE: Record<number, { headH: number; headW: number }> = {
+            3: { headH: 2, headW: 5.5 }, 4: { headH: 2.8, headW: 7 }, 5: { headH: 3.5, headW: 8 },
+            6: { headH: 4, headW: 10 }, 8: { headH: 5.3, headW: 13 }, 10: { headH: 6.4, headW: 16 },
+            12: { headH: 7.5, headW: 18 }, 16: { headH: 10, headW: 24 }, 20: { headH: 12.5, headW: 30 },
+            24: { headH: 15, headW: 36 }
+        };
+        const meta = METRIC_TABLE[d] || { headH: d * 0.7, headW: d * 1.6 };
+
+        if (fastenerType === 'BOLT') {
+            const hH = meta.headH; const hW = meta.headW; const r = d / 2;
+            const headPts = [
+                { x: origin.x - hW / 2, y: origin.y }, { x: origin.x + hW / 2, y: origin.y },
+                { x: origin.x + hW / 2, y: origin.y + hH }, { x: origin.x - hW / 2, y: origin.y + hH }
+            ].map(worldToScreen);
+            
+            ctx.beginPath(); ctx.moveTo(headPts[0].x, headPts[0].y);
+            headPts.forEach(p => ctx.lineTo(p.x, p.y)); ctx.closePath(); ctx.stroke();
+
+            const shaftTop = origin.y + hH; const shaftBottom = origin.y + hH + len;
+            const sL = worldToScreen({ x: origin.x - r, y: shaftTop });
+            const sLE = worldToScreen({ x: origin.x - r, y: shaftBottom });
+            const sR = worldToScreen({ x: origin.x + r, y: shaftTop });
+            const sRE = worldToScreen({ x: origin.x + r, y: shaftBottom });
+
+            ctx.beginPath(); ctx.moveTo(sL.x, sL.y); ctx.lineTo(sLE.x, sLE.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sR.x, sR.y); ctx.lineTo(sRE.x, sRE.y); ctx.stroke();
+            
+            // Threads
+            const threadH = 0.866 * p; const threadLen = len * 0.7; const threadStart = shaftBottom - threadLen;
+            ctx.beginPath();
+            let y = threadStart;
+            const startP = worldToScreen({ x: origin.x - r, y });
+            ctx.moveTo(startP.x, startP.y);
+            while (y < shaftBottom - p) {
+                const p1 = worldToScreen({ x: origin.x - r - threadH * 0.5, y: y + p / 4 });
+                const p2 = worldToScreen({ x: origin.x - r, y: y + p / 2 });
+                ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                y += p / 2;
+            }
+            ctx.stroke();
+        } else {
+            // Nut
+            const r = meta.headW / 2;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const a = (Math.PI / 3) * i;
+                const p = worldToScreen({ x: origin.x + r * Math.cos(a), y: origin.y + r * Math.sin(a) });
+                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+            }
+            ctx.closePath(); ctx.stroke();
+            const c = worldToScreen(origin); ctx.beginPath(); ctx.arc(c.x, c.y, (d/2)*zoom, 0, Math.PI*2); ctx.stroke();
+        }
+    }
+
+    public static drawBeltPulley(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
+        const { center1: c1, radius1: r1, center2: c2, radius2: r2, beltType } = g;
+        const p1 = worldToScreen(c1);
+        const p2 = worldToScreen(c2);
+        const sr1 = r1 * zoom;
+        const sr2 = r2 * zoom;
+
+        // Draw Pulleys
+        ctx.beginPath(); ctx.arc(p1.x, p1.y, sr1, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(p2.x, p2.y, sr2, 0, Math.PI * 2); ctx.stroke();
+
+        // Calculate Tangents
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < Math.abs(sr1 - sr2)) return; // One inside another
+
+        const angleBase = Math.atan2(dy, dx);
+        
+        ctx.save();
+        ctx.setLineDash([5, 3]);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        
+        if (beltType === 'OPEN') {
+            const angleOffset = Math.acos((sr1 - sr2) / d);
+            const t1_1 = { x: p1.x + sr1 * Math.cos(angleBase + angleOffset), y: p1.y + sr1 * Math.sin(angleBase + angleOffset) };
+            const t2_1 = { x: p2.x + sr2 * Math.cos(angleBase + angleOffset), y: p2.y + sr2 * Math.sin(angleBase + angleOffset) };
+            const t1_2 = { x: p1.x + sr1 * Math.cos(angleBase - angleOffset), y: p1.y + sr1 * Math.sin(angleBase - angleOffset) };
+            const t2_2 = { x: p2.x + sr2 * Math.cos(angleBase - angleOffset), y: p2.y + sr2 * Math.sin(angleBase - angleOffset) };
+
+            ctx.beginPath(); ctx.moveTo(t1_1.x, t1_1.y); ctx.lineTo(t2_1.x, t2_1.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(t1_2.x, t1_2.y); ctx.lineTo(t2_2.x, t2_2.y); ctx.stroke();
+        } else {
+            const angleOffset = Math.acos((sr1 + sr2) / d);
+            const t1_1 = { x: p1.x + sr1 * Math.cos(angleBase + angleOffset), y: p1.y + sr1 * Math.sin(angleBase + angleOffset) };
+            const t2_1 = { x: p2.x + sr2 * Math.cos(angleBase + angleOffset + Math.PI), y: p2.y + sr2 * Math.sin(angleBase + angleOffset + Math.PI) };
+            const t1_2 = { x: p1.x + sr1 * Math.cos(angleBase - angleOffset), y: p1.y + sr1 * Math.sin(angleBase - angleOffset) };
+            const t2_2 = { x: p2.x + sr2 * Math.cos(angleBase - angleOffset + Math.PI), y: p2.y + sr2 * Math.sin(angleBase - angleOffset + Math.PI) };
+
+            ctx.beginPath(); ctx.moveTo(t1_1.x, t1_1.y); ctx.lineTo(t2_1.x, t2_1.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(t1_2.x, t1_2.y); ctx.lineTo(t2_2.x, t2_2.y); ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    public static drawPlanetaryGear(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
+        const { center, module: m, sunTeeth, planetTeeth, planetCount } = g;
+        const ringTeeth = sunTeeth + 2 * planetTeeth;
+        const orbitRadius = m * (sunTeeth + planetTeeth) / 2;
+
+        // 1. Draw Sun Gear
+        const sunGeom = { center, module: m, teeth: sunTeeth, rotation: g.rotationSun || 0 };
+        const sunVerts = this.computeGearVertices(sunGeom);
+        this.strokeVertices(ctx, sunVerts, worldToScreen);
+
+        // 2. Draw Planets
+        for (let i = 0; i < planetCount; i++) {
+            const angle = (2 * Math.PI / planetCount) * i + (g.rotationCarrier || 0);
+            const pCenter = {
+                x: center.x + orbitRadius * Math.cos(angle),
+                y: center.y + orbitRadius * Math.sin(angle)
+            };
+            // Planet rotation: linked to sun rotation for visual sync
+            // Ratio = sun / planet
+            const pRotation = (g.rotationSun || 0) * (-sunTeeth / planetTeeth) - angle * (1 + sunTeeth/planetTeeth);
+            
+            const pGeom = { center: pCenter, module: m, teeth: planetTeeth, rotation: pRotation };
+            const pVerts = this.computeGearVertices(pGeom);
+            this.strokeVertices(ctx, pVerts, worldToScreen);
+        }
+
+        // 3. Draw Ring Gear (Internal)
+        // For internal gear, we draw a circle for now, or reversed involute
+        const ringRadius = (m * ringTeeth / 2) * zoom;
+        const c = worldToScreen(center);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath(); ctx.arc(c.x, c.y, ringRadius, 0, Math.PI * 2); ctx.stroke();
+        // Outer housing
+        ctx.beginPath(); ctx.arc(c.x, c.y, ringRadius + 10 * zoom, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+    }
+
+    public static strokeVertices(ctx: CanvasRenderingContext2D, vertices: Point[], worldToScreen: (p: Point) => Point) {
+        if (vertices.length === 0) return;
+        ctx.beginPath();
+        const first = worldToScreen(vertices[0]);
+        ctx.moveTo(first.x, first.y);
+        for (let i = 1; i < vertices.length; i++) {
+            const p = worldToScreen(vertices[i]);
+            ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+
     private layers: RenderLayer[];
     private gridLayer: GridLayer;
     private geometryLayer: GeometryLayer;

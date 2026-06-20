@@ -1,0 +1,112 @@
+{
+    "slug": "thread-geometry-standards",
+    "academicYear": 1,
+    "department": "Manufacturing",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [
+        "introduction-to-machine-elements"
+    ],
+    "meta": {
+        "title": "Thread Geometry & Standards (Metrik, UN, W, Tr Profiles)",
+        "description": "A comprehensive guide to thread profiles, angles, and tolerances used in modern manufacturing. Covers ISO Metric, Unified National, Whitworth, and Trapezoidal standards."
+    },
+    "hero": {
+        "h1": "Thread Geometry & Standards: The DNA of Mechanical Joints",
+        "intro": "Every bolt is a complex mathematical helix. To the untrained eye, they look similar, but the difference between a 60° Metric thread and a 55° Whitworth thread is the difference between a secure joint and a catastrophic failure. This module decodes the geometric standards used in modern CNC machining.\n\nThread standards encode helix geometry in a compact designation — M16×1.5-6g tells a machinist the nominal diameter, pitch, and tolerance band. CNC threading cycles, tap drill charts, and fastener strength calculations all depend on reading these symbols correctly.\n\nThis module aligns shop-floor vocabulary with the Thread Geometry engine in AluCalc, covering metric, UN, Whitworth, and trapezoidal families."
+    },
+    "formula": {
+        "equation": "Profile Angle (θ) / Pitch (P) / Diameter (D)",
+        "variables": {
+            "Metrik (M)": "60° Profile Angle",
+            "Unified (UN)": "60° Profile Angle",
+            "Whitworth (W)": "55° Profile Angle",
+            "Trapezoidal (Tr)": "30° Profile Angle"
+        }
+    },
+    "stepByStep": [
+        "Identify the primary thread system (Metrik vs. Inch).",
+        "Verify the profile angle (e.g., 60° for ISO Metrik).",
+        "Select the appropriate tolerance class (4h for tight, 6g for standard).",
+        "Calculate the major and minor diameters based on the pitch.",
+        "Choose the correct machining tool based on the profile.",
+        "Calculate stress area As from pitch and pitch diameter for strength checks.",
+        "Verify tap drill size against minor diameter before production run."
+    ],
+    "example": {
+        "inputs": [
+            "Thread: M16 x 1.5",
+            "Standard: ISO 262",
+            "Angle: 60°"
+        ],
+        "calculation": "Major Diameter = 16 mm, Pitch = 1.5 mm, Minor Diameter ≈ 14.16 mm"
+    },
+    "whyThisMatters": [
+        "Profile mismatch (e.g., trying to fit a UN into an M hole) destroys threads immediately.",
+        "Tolerance grades (6g vs 4h) determine the 'fit' and assembly ease in mass production."
+    ],
+    "commonMistakes": [
+        "Mixing up 60° (Metric) and 55° (Whitworth) threads, which look nearly identical.",
+        "Ignoring thread tolerances (6g/6H) in critical structural applications.",
+        "Using partial profile tools for full-profile requirements."
+    ],
+    "textbookInsights": [
+        {
+            "page": "J2",
+            "insight": "Kısmi profil (partial profile) kesici uçlar, aynı uçla farklı hatveleri işleyebilir ancak diş tepesinde keskin kenar bırakır.",
+            "source": "Kyocera Bolum-J"
+        },
+        {
+            "page": "J3",
+            "insight": "Diş hassasiyeti (6g, 4h vb.) imalat kalitesini ve montaj sıkılığını belirleyen en kritik parametredir.",
+            "source": "Kyocera Bolum-J"
+        },
+        {
+            "page": "J54",
+            "init": "Trapez dişler (Tr) 30° tepe açısına sahiptir ve genellikle güç iletimi için kullanılır.",
+            "source": "Kyocera Bolum-J"
+        }
+    ],
+    "calculatorCta": {
+        "targetSlug": "bolt-torque-calc",
+        "label": "Design custom thread profiles in the Fastener Lab"
+    },
+    "faq": [
+        {
+            "question": "What is the difference between 6g and 4h tolerances?",
+            "answer": "6g is the standard commercial fit, while 4h is a tighter, precision fit used in high-vibration environments."
+        },
+        {
+            "question": "What does 6g/6H mean?",
+            "answer": "6g is external thread tolerance (bolt); 6H is internal (nut). Lower numbers mean tighter fits."
+        },
+        {
+            "question": "Why are Whitworth threads 55°?",
+            "answer": "Historical British standard — incompatible with 60° metric/UN profiles despite similar appearance."
+        },
+        {
+            "question": "When are trapezoidal (Tr) threads used?",
+            "answer": "Power screws and lead screws where efficiency and load transmission matter more than fast assembly."
+        }
+    ],
+    "relatedArticles": [
+        "introduction-to-machine-elements",
+        "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Kyocera Threading Manual (Turkish)",
+            "filename": "bolum-j.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Distinguish 60° metric/UN threads from 55° Whitworth and 30° trapezoidal profiles",
+        "Read tolerance designations (6g/6H, 4h) and their assembly implications",
+        "Estimate stress area from pitch and major diameter for fastener sizing"
+    ],
+    "keyTakeaways": [
+        "Profile angle mismatch destroys threads on first assembly",
+        "Tolerance class controls fit — 4h is tighter than 6g for critical joints",
+        "Partial-profile tools trade flexibility for crest sharpness"
+    ]
+}

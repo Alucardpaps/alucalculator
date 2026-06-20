@@ -2,6 +2,7 @@
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue } from '@/types/engineering';
 import { BEARING_DATABASE, getBearing } from '@/data/bearingStandards';
+import { findBearing } from '@/data/skfBearings';
 
 const bearingLifeSchema: CalculatorSchemaV2 = {
     id: 'bearings', // Keep ID to match file name/registry expectations if possible, or rename file
@@ -112,6 +113,22 @@ const bearingLifeSchema: CalculatorSchemaV2 = {
             precision: 3
         },
         {
+            key: 'e_factor',
+            label: 'Limit e',
+            unit: '-',
+            formulaLatex: 'e',
+            description: 'Fa/Fr ratio limit for factor selection.',
+            precision: 3
+        },
+        {
+            key: 'Y_factor',
+            label: 'Factor Y',
+            unit: '-',
+            formulaLatex: 'Y',
+            description: 'Axial load factor when Fa/Fr > e.',
+            precision: 2
+        },
+        {
             key: 'L10',
             label: 'Basic Life (L10)',
             unit: 'Mrev',
@@ -136,6 +153,7 @@ const bearingLifeSchema: CalculatorSchemaV2 = {
     calculationEngine: (inputs) => {
         const code = inputs.model.value.toString();
         const bearing = getBearing(code);
+        const skfBearing = findBearing(code);
 
         if (!bearing) {
             throw new Error(`Bearing ${code} not found`);
@@ -148,26 +166,25 @@ const bearingLifeSchema: CalculatorSchemaV2 = {
         const n = inputs.rpm.value as number;
         const a1 = inputs.reliability.value as number;
 
-        // Equivalent Load P calculation (Simplified ISO 281 for Deep Groove Ball Bearings)
-        // Ratio Fa/C0 determines e
-        const fa_c0 = Fa / C0;
-        let e = 0.19; // Default low
-        let X = 0.56;
-        let Y = 1.0;  // Placeholder
+        let e = skfBearing?.e ?? 0.25;
+        let Y = skfBearing?.Y ?? 1.6;
 
-        // Interpolation table for e and Y (simplified)
-        if (fa_c0 <= 0.014) { e = 0.19; Y = 2.30; }
-        else if (fa_c0 <= 0.028) { e = 0.22; Y = 1.99; }
-        else if (fa_c0 <= 0.056) { e = 0.26; Y = 1.71; }
-        else if (fa_c0 <= 0.084) { e = 0.28; Y = 1.55; }
-        else if (fa_c0 <= 0.11) { e = 0.30; Y = 1.45; }
-        else if (fa_c0 <= 0.17) { e = 0.34; Y = 1.31; }
-        else if (fa_c0 <= 0.28) { e = 0.38; Y = 1.15; }
-        else if (fa_c0 <= 0.42) { e = 0.42; Y = 1.04; }
-        else { e = 0.44; Y = 1.00; }
+        // Series fallback when SKF catalog entry lacks e/Y
+        if (!skfBearing?.e) {
+            const fa_c0 = Fa / C0;
+            if (fa_c0 <= 0.014) { e = 0.19; Y = 2.30; }
+            else if (fa_c0 <= 0.028) { e = 0.22; Y = 1.99; }
+            else if (fa_c0 <= 0.056) { e = 0.26; Y = 1.71; }
+            else if (fa_c0 <= 0.084) { e = 0.28; Y = 1.55; }
+            else if (fa_c0 <= 0.11) { e = 0.30; Y = 1.45; }
+            else if (fa_c0 <= 0.17) { e = 0.34; Y = 1.31; }
+            else if (fa_c0 <= 0.28) { e = 0.38; Y = 1.15; }
+            else if (fa_c0 <= 0.42) { e = 0.42; Y = 1.04; }
+            else { e = 0.44; Y = 1.00; }
+        }
 
         let P = Fr;
-        const ratio = Fa / Fr;
+        const ratio = Fr > 0 ? Fa / Fr : Infinity;
 
         if (ratio > e) {
             P = 0.56 * Fr + Y * Fa;
@@ -183,6 +200,8 @@ const bearingLifeSchema: CalculatorSchemaV2 = {
                 C_dynamic: createValidatedValue(C, 'kN', 'derived'),
                 C0_static: createValidatedValue(C0, 'kN', 'derived'),
                 P_equiv: createValidatedValue(P, 'kN', 'derived'),
+                e_factor: createValidatedValue(e, '-', 'derived'),
+                Y_factor: createValidatedValue(Y, '-', 'derived'),
                 L10: createValidatedValue(L10_adjusted, 'Mrev', 'derived'),
                 L10h: createValidatedValue(L10h, 'hours', 'derived')
             },

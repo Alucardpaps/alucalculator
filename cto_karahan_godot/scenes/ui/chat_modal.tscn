@@ -1,0 +1,126 @@
+[gd_scene load_steps=3 format=3 uid="uid://df1tq6o4hpd4r"]
+
+[ext_resource type="Script" path="res://scenes/ui/chat_modal.gd" id="1_chtmd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+bg_color = Color(0.101961, 0.117647, 0.156863, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.243137, 0.282353, 0.352941, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 12
+
+[node name="ChatModal" type="Panel"]
+custom_minimum_size = Vector2(540, 480)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.0
+offset_top = -240.0
+offset_right = 270.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+script = ExtResource("1_chtmd")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.94, 0.96, 1)
+theme_override_font_sizes/font_size = 18
+text = "Usta Profili"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BioContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="BgLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/BioContainer"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.7, 0.73, 0.8, 1)
+theme_override_font_sizes/normal_font_size = 11
+text = "Özgeçmiş bilgisi burada görüntülenecektir."
+
+[node name="StatsContainer" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+text = "Branş: - | Moral: - | Güven: - | Uyarı: -"
+autowrap_mode = 2
+
+[node name="QuestionContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="QuestionBody" type="Label" parent="MarginContainer/VBoxContainer/QuestionContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.77, 0.25, 1)
+theme_override_font_sizes/font_size = 13
+text = "Soru içeriği buraya gelecek."
+autowrap_mode = 2
+
+[node name="OptionsList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/QuestionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ActionButtonsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PrimButton" type="Button" parent="MarginContainer/VBoxContainer/ActionButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "💰 Prim Ver (750₺)"
+
+[node name="WarnButton" type="Button" parent="MarginContainer/VBoxContainer/ActionButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "⚠️ Uyar / Fırçala"
+
+[node name="FireButton" type="Button" parent="MarginContainer/VBoxContainer/ActionButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "🚨 İşten Çıkar"
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Kapat"

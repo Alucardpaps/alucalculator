@@ -1,0 +1,88 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using Karahan;
+@using Karahan.Factory;
+@using Karahan.UI;
+@inherits PanelComponent
+
+@if (IsVisible)
+{
+    <root class="purchase-overlay" onclick=@Close>
+        <div class="purchase-modal" onclick:stopPropagation>
+
+            @* ═══════ HEADER ═══════ *@
+            <div class="purchase-header">
+                <span class="title">📦 Malzeme Satın Alma</span>
+                <span class="balance">Kasa: <b>@($"{VM.Money:N0}") ₺</b></span>
+                <button class="close-btn" onclick=@Close>✕</button>
+            </div>
+
+            @* ═══════ MATERIAL LIST ═══════ *@
+            <div class="material-grid">
+                @if (VM.SelectedFactory != null)
+                {
+                    @foreach (var mat in VM.SelectedFactory.Materials)
+                    {
+                        var cost = VM.SelectedFactory.MatCosts.GetValueOrDefault(mat, 0);
+                        var stock = GetStock(mat);
+
+                        <div class="material-row">
+                            <div class="mat-info">
+                                <span class="mat-name">@mat</span>
+                                <span class="mat-stock">Stok: <b>@stock</b></span>
+                            </div>
+                            <div class="mat-actions">
+                                <span class="mat-cost">@($"{cost:N0}") ₺</span>
+                                <button class="buy-btn" disabled=@(VM.Money < cost) onclick=@(() => BuyMaterial(mat, cost))>
+                                    Satın Al
+                                </button>
+                                <button class="buy-btn bulk" disabled=@(VM.Money < cost * 5) onclick=@(() => BuyBulk(mat, cost))>
+                                    5x Al
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            @* ═══════ FOOTER ═══════ *@
+            <div class="purchase-footer">
+                <span class="tip">💡 Stok sıfırlanırsa üretim durur. Malzeme tedarikinde gecikmeler siparişlerinizi tehlikeye atar.</span>
+            </div>
+        </div>
+    </root>
+}
+
+@code {
+    public bool IsVisible { get; set; }
+
+    private KarahanViewModel VM => KarahanViewModel.Instance;
+
+    private int GetStock(string material)
+    {
+        return VM.Inventory.GetValueOrDefault(material, 0);
+    }
+
+    public void Show()
+    {
+        IsVisible = true;
+    }
+
+    private void Close()
+    {
+        IsVisible = false;
+    }
+
+    private void BuyMaterial(string material, int cost)
+    {
+        VM.BuyMaterial(material, cost, 1);
+    }
+
+    private void BuyBulk(string material, int cost)
+    {
+        VM.BuyMaterial(material, cost * 5, 5);
+    }
+}
