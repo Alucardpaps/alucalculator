@@ -49,8 +49,9 @@ build.gradle
 settings.gradle
 gradle.properties
 jdk17/
-/app/
-/*.apk
-/*.aab
-/*.idsig
-manifest-checksum.txt
+/android/app/
+/android/*.apk
+/android/*.aab
+/android/*.idsig
+/android/manifest-checksum.txt
+/alucalc-deploy.zip

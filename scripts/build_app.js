@@ -5,8 +5,8 @@ const child_process = require('child_process');
 
 const rootDir = path.join(__dirname, '..');
 const keytoolPath = 'C:\\Program Files\\Android\\Android Studio\\jbr\\bin\\keytool.exe';
-const keystorePath = path.join(rootDir, 'alucalc-release.keystore');
-const twaManifestPath = path.join(rootDir, 'twa-manifest.json');
+const keystorePath = path.join(rootDir, 'android', 'alucalc-release.keystore');
+const twaManifestPath = path.join(rootDir, 'android', 'twa-manifest.json');
 const storepass = 'alucalc123';
 const PORT = 8585;
 
@@ -21,7 +21,7 @@ function runCmd(cmd, options = {}) {
   return new Promise((resolve, reject) => {
     const child = child_process.spawn(cmd, {
       shell: true,
-      cwd: rootDir,
+      cwd: options.cwd || rootDir,
       env: env
     });
 
@@ -214,11 +214,11 @@ async function buildApp() {
 
     // Initialize/Update Android project
     console.log('Updating Android project files...');
-    await runCmd('npx bubblewrap update --skipVersionUpgrade');
-
+    await runCmd('npx bubblewrap update --skipVersionUpgrade', { cwd: path.join(rootDir, 'android') });
+ 
     // Compile App
     console.log('Compiling signed APK and AAB binaries...');
-    await runCmd('npx bubblewrap build --skipPwaValidation');
+    await runCmd('npx bubblewrap build --skipPwaValidation', { cwd: path.join(rootDir, 'android') });
 
     // 7. Copy output binaries to public/app/ and out/app/
     console.log('Copying built app files to web output folders...');
@@ -228,24 +228,25 @@ async function buildApp() {
     if (!fs.existsSync(publicAppDir)) fs.mkdirSync(publicAppDir, { recursive: true });
     if (!fs.existsSync(outAppDir)) fs.mkdirSync(outAppDir, { recursive: true });
 
-    const filesInRoot = fs.readdirSync(rootDir);
-    const apkFile = filesInRoot.find(f => f.endsWith('-signed.apk'));
-    const aabFile = filesInRoot.find(f => f.endsWith('.aab'));
-
+    const androidDir = path.join(rootDir, 'android');
+    const filesInAndroid = fs.readdirSync(androidDir);
+    const apkFile = filesInAndroid.find(f => f.endsWith('-signed.apk'));
+    const aabFile = filesInAndroid.find(f => f.endsWith('.aab'));
+ 
     if (apkFile) {
-      fs.copyFileSync(path.join(rootDir, apkFile), path.join(publicAppDir, 'alucalc-release.apk'));
-      fs.copyFileSync(path.join(rootDir, apkFile), path.join(outAppDir, 'alucalc-release.apk'));
+      fs.copyFileSync(path.join(androidDir, apkFile), path.join(publicAppDir, 'alucalc-release.apk'));
+      fs.copyFileSync(path.join(androidDir, apkFile), path.join(outAppDir, 'alucalc-release.apk'));
       console.log(`Copied APK: ${apkFile} -> alucalc-release.apk`);
     } else {
-      console.warn('Warning: Signed APK file not found in root directory!');
+      console.warn('Warning: Signed APK file not found in android directory!');
     }
-
+ 
     if (aabFile) {
-      fs.copyFileSync(path.join(rootDir, aabFile), path.join(publicAppDir, 'alucalc-release.aab'));
-      fs.copyFileSync(path.join(rootDir, aabFile), path.join(outAppDir, 'alucalc-release.aab'));
+      fs.copyFileSync(path.join(androidDir, aabFile), path.join(publicAppDir, 'alucalc-release.aab'));
+      fs.copyFileSync(path.join(androidDir, aabFile), path.join(outAppDir, 'alucalc-release.aab'));
       console.log(`Copied AAB: ${aabFile} -> alucalc-release.aab`);
     } else {
-      console.warn('Warning: AAB file not found in root directory!');
+      console.warn('Warning: AAB file not found in android directory!');
     }
 
     console.log('===================================================');
