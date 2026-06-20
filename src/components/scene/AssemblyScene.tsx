@@ -182,6 +182,12 @@ const SceneContent = () => {
         maxPolarAngle={Math.PI / 2.1}
         minDistance={1}
         maxDistance={20}
+        touches={{
+          ONE: THREE.TOUCH.ROTATE,
+          TWO: THREE.TOUCH.DOLLY_PAN
+        }}
+        enableZoom={true}
+        enablePan={true}
       />
 
       {/* Viewport gizmo */}

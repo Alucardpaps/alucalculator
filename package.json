@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "node scripts/copy_calculators.js",
     "dev": "next dev",
-    "build": "next build && next-sitemap",
+    "build": "next build && next-sitemap && node scripts/build_app.js",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "node scripts/patch_planegcs.js",
@@ -61,6 +61,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@bubblewrap/cli": "^1.24.1",
     "@magicuidesign/mcp": "^1.0.6",
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^30.0.0",
@@ -77,6 +78,7 @@
     "eslint-config-next": "16.1.6",
     "next-devtools-mcp": "^0.3.10",
     "next-sitemap": "^4.2.3",
+    "sharp": "^0.35.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"

@@ -614,6 +614,12 @@ export function SimulationFEAModule() {
                                         r={selection?.id === n.id ? 7 : 5} 
                                         fill={n.fixedX || n.fixedY ? '#10b981' : (selection?.id === n.id ? '#fff' : '#94a3b8')} 
                                     />
+                                    {/* Invisible touch target overlay for mobile viewports */}
+                                    <motion.circle
+                                        animate={{ cx: n.x + dx, cy: n.y + dy }}
+                                        r={18}
+                                        fill="transparent"
+                                    />
                                     {n.fixedX && <rect x={n.x + dx - 10} y={n.y + dy + 8} width="20" height="2" fill="#10b981" opacity="0.5" />}
                                     {n.fy !== 0 && <line x1={n.x+dx} y1={n.y+dy-40} x2={n.x+dx} y2={n.y+dy-8} stroke="#f87171" strokeWidth="2" markerEnd="url(#arrow)" />}
                                 </g>

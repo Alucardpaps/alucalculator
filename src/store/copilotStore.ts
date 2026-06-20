@@ -7,6 +7,8 @@ interface CopilotStoreState {
   setGreetingText: (text: string | null) => void;
   mousePos: { x: number; y: number };
   setMousePos: (pos: { x: number; y: number }) => void;
+  isThinking: boolean;
+  setIsThinking: (isThinking: boolean) => void;
 }
 
 export const useCopilotStore = create<CopilotStoreState>((set) => ({
@@ -16,4 +18,6 @@ export const useCopilotStore = create<CopilotStoreState>((set) => ({
   setGreetingText: (greetingText) => set({ greetingText }),
   mousePos: { x: 0, y: 0 },
   setMousePos: (mousePos) => set({ mousePos }),
+  isThinking: false,
+  setIsThinking: (isThinking) => set({ isThinking }),
 }));

@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Android / Gradle / JDK
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+build.gradle
+settings.gradle
+gradle.properties
+jdk17/
+/app/
+/*.apk
+/*.aab
+/*.idsig
+manifest-checksum.txt

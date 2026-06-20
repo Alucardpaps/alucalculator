@@ -6,7 +6,7 @@ import { EngineeringCopilot, CopilotIntent } from '@/engine/copilot/copilot';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCopilotStore } from '@/store/copilotStore';
-import { usePathname } from 'next/navigation';
+
 import { getCopilotStrings, getCopilotEngineLocale, getCopilotResponseLanguage } from '@/locales/copilotTranslations';
 import { getCopilotGameStrings, getTriviaQuestions } from '@/locales/copilotGameTranslations';
 import { AegisIcon } from './AegisIcon';
@@ -51,15 +51,20 @@ const hexagonsData = [
 export const AICopilotOverlay: React.FC = () => {
   const { language } = useI18nStore();
   const strings = getCopilotStrings(language);
-  const { isOpen, setIsOpen, greetingText, setGreetingText, mousePos } = useCopilotStore();
-  const pathname = usePathname();
-  const isWorkspace = pathname?.startsWith('/workspace');
+  const { isOpen, setIsOpen, greetingText, setGreetingText } = useCopilotStore();
+
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [thinkingSteps, setThinkingSteps] = useState<string[]>([]);
+
+  // Synchronize local isTyping with global copilot store isThinking
+  const setIsThinking = useCopilotStore((s) => s.setIsThinking);
+  useEffect(() => {
+    setIsThinking(isTyping);
+  }, [isTyping, setIsThinking]);
 
   const [gameState, setGameState] = useState<{
     type: 'none' | 'trivia' | 'rps';
@@ -508,18 +513,7 @@ export const AICopilotOverlay: React.FC = () => {
 
   return (
     <>
-      {/* Floating Toggle Button */}
-      {!isOpen && !isWorkspace && (
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-14 right-4 z-[9990] w-12 h-12 rounded-full bg-gradient-to-br from-slate-950 to-[#0a1628] hover:from-[#051020] hover:to-[#0a1a30] flex items-center justify-center shadow-[0_0_24px_rgba(0,229,255,0.35)] hover:shadow-[0_0_32px_rgba(0,229,255,0.55)] hover:scale-110 active:scale-95 transition-all cursor-pointer border border-[#00e5ff]/20"
-          title="Open AeGiS (Alt+C)"
-        >
-          <AegisIcon size={30} mode="idle" />
-        </motion.button>
-      )}
+      {/* Floating Toggle Button replaced by the global animated assistant pet */}
 
       {/* ═══ CLICK-OUTSIDE BACKDROP TO DISPERSE ═══ */}
       {isOpen && (
@@ -530,33 +524,37 @@ export const AICopilotOverlay: React.FC = () => {
         />
       )}
 
-      {/* ═══ IDLE GREETING / JOKE BUBBLE NEAR CURSOR ═══ */}
+      {/* ═══ IDLE GREETING / JOKE BUBBLE NEAR AEGIS MASCOT ═══ */}
       <AnimatePresence>
         {!isOpen && greetingText && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed z-[10000] bg-slate-950/95 border border-[#00e5ff]/40 text-[#00e5ff] px-4 py-3 rounded-2xl shadow-[0_0_25px_rgba(0,229,255,0.4)] text-[12px] font-mono select-none max-w-xs whitespace-pre-wrap leading-relaxed pointer-events-none"
+            onClick={() => setIsOpen(true)}
+            className="fixed z-[9990] bg-slate-950/95 border border-[#00e5ff]/40 text-[#00e5ff] px-4 py-3 rounded-2xl shadow-[0_0_25px_rgba(0,229,255,0.4)] text-[12px] font-mono select-none max-w-xs whitespace-pre-wrap leading-relaxed cursor-pointer pointer-events-auto hover:border-[#00e5ff]/80 transition-all"
             style={{
-              left: Math.max(20, Math.min(window.innerWidth - 300, mousePos.x + 20)),
-              top: Math.max(20, Math.min(window.innerHeight - 150, mousePos.y - 60)),
+              right: '24px',
+              bottom: '145px',
             }}
+            title="Click to chat with AeGiS"
           >
-            {/* Small speech bubble arrow tail */}
-            <div className="absolute right-full top-6 w-0 h-0 border-t-[6px] border-t-transparent border-r-[8px] border-r-slate-950 border-b-[6px] border-b-transparent" />
+            {/* Speech bubble arrow tail pointing down to the mascot */}
+            <div className="absolute bottom-[-8px] right-[86px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-slate-950" />
+            {/* Speech bubble border tail (for glow/color matching) */}
+            <div className="absolute bottom-[-10px] right-[84px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/40 -z-10" />
             {greetingText}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ═══ CHAT SPEECH BUBBLE PANEL (LEFT SIDE) ═══ */}
+      {/* ═══ CHAT SPEECH BUBBLE PANEL (BOTTOM RIGHT) ═══ */}
       <div
         onPointerDown={(e) => e.stopPropagation()}
-        className={`fixed left-24 top-1/2 -translate-y-1/2 w-[380px] max-w-[90vw] h-[550px] z-[9991] glass-hud-panel border border-[#00e5ff]/30 shadow-2xl flex flex-col rounded-2xl transition-all duration-400 ease-out transform ${isOpen ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-10 opacity-0 scale-95 pointer-events-none'}`}
+        className={`fixed right-6 bottom-[140px] w-[380px] max-w-[90vw] h-[520px] z-[9991] glass-hud-panel border border-[#00e5ff]/30 shadow-2xl flex flex-col rounded-2xl transition-all duration-400 ease-out transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`}
       >
-        {/* Speech Bubble Arrow Tail */}
-        <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-r-[10px] border-r-[#00e5ff]/30 border-b-[8px] border-b-transparent filter drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]" />
+        {/* Speech Bubble Arrow Tail pointing down to the pet */}
+        <div className="absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
 
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/40 rounded-t-2xl">
           <div className="flex items-center gap-2.5">

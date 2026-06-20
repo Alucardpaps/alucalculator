@@ -1,0 +1,30 @@
+{
+  "packageId": "com.alucard.alucalcos",
+  "host": "www.alucalculator.com",
+  "name": "AluCalc OS",
+  "launcherName": "AluCalc",
+  "themeColor": "#020408",
+  "navigationColor": "#020408",
+  "backgroundColor": "#020408",
+  "startUrl": "/",
+  "iconUrl": "http://localhost:8585/icons/icon-512.png",
+  "maskableIconUrl": "http://localhost:8585/icons/icon-512.png",
+  "display": "standalone",
+  "orientation": "any",
+  "appVersionName": "5.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./alucalc-release.keystore",
+    "alias": "alucalc"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+  "fingerprints": [
+    {
+      "type": "sha256",
+      "value": "E1:D2:9E:5C:3C:7F:52:E1:E6:F7:1D:42:EE:8A:72:45:1A:53:33:1C:AE:52:4E:FF:11:46:92:D1:EB:F4:C2:B1"
+    }
+  ],
+  "isChromeOSOnly": false,
+  "isMetaQuest": false
+}

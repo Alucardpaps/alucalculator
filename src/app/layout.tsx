@@ -33,6 +33,16 @@ export const metadata: Metadata = {
     ],
     category: "Engineering / CAD",
     manifest: '/manifest.json',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black',
+        title: 'AluCalc OS',
+    },
+    other: {
+        'mobile-web-app-capable': 'yes',
+        'apple-mobile-web-app-capable': 'yes',
+        'apple-mobile-web-app-status-bar-style': 'black',
+    },
     openGraph: {
         type: 'website',
         locale: 'en_US',
