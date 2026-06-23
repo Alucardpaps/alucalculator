@@ -21,6 +21,11 @@ import { Activity, Zap, Cpu, GraduationCap, ChevronRight, X, ShieldAlert, Wrench
 import { useCalculatorBridge } from '@/hooks/engineering/useCalculatorBridge';
 import { InteractiveFormula } from '@/components/os/InteractiveFormula';
 
+const MobileEnvironment = dynamic(
+  () => import('@/components/os/MobileEnvironment').then((m) => m.MobileEnvironment),
+  { ssr: false }
+);
+
 // Loading Placeholder for dynamic imports
 function ModuleLoading({ label }: { label: string }) {
   return (
@@ -94,6 +99,17 @@ const CuttingOptimizerModule = dynamic<any>(
 );
 
 export default function WorkspacePage() {
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [activePanelTab, setActivePanelTab] = useState<'props' | 'bom'>('props');
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
@@ -118,6 +134,18 @@ export default function WorkspacePage() {
   React.useEffect(() => {
     if (selectedId) setActivePanelTab('props');
   }, [selectedId]);
+
+  if (isMobile === null) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-[#020408]">
+        <div className="w-8 h-8 border-2 border-t-[#00e5ff] border-white/10 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (isMobile === true) {
+    return <MobileEnvironment />;
+  }
 
   return (
     <div className="flex flex-col w-screen h-screen overflow-hidden bg-transparent">

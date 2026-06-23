@@ -6,6 +6,8 @@ import {
   ArrowRight, Calculator, Settings, CircleDot, Ruler, FlaskConical,
   CheckCircle2, BookOpen, GraduationCap, Globe,
 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useI18nStore } from '@/store/i18nStore';
 import { UI_TRANSLATIONS } from '@/locales/uiTranslations';
 
@@ -94,7 +96,20 @@ interface HomePageContentProps {
 }
 
 export function HomePageContent({ recentCalculators }: HomePageContentProps) {
+  const router = useRouter();
   const { language } = useI18nStore();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.location.search.includes('mode=app') || 
+                           window.location.search.includes('utm_source=app');
+      if (isStandalone) {
+        router.push('/workspace');
+      }
+    }
+  }, [router]);
+
   const ui = UI_TRANSLATIONS[language] || UI_TRANSLATIONS.en;
 
   const popularTitle = (key: string) => ui[`${key}Title`] as string;

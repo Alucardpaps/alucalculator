@@ -6,7 +6,7 @@
   "themeColor": "#020408",
   "navigationColor": "#020408",
   "backgroundColor": "#020408",
-  "startUrl": "/",
+  "startUrl": "/workspace",
   "iconUrl": "http://localhost:8585/icons/icon-512.png",
   "maskableIconUrl": "http://localhost:8585/icons/icon-512.png",
   "display": "standalone",
