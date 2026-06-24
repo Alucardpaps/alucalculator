@@ -495,7 +495,7 @@ export const BASE_REGISTRY = {
     },
     'ai-copilot': {
         type: 'ai-copilot',
-        title: 'AI Copilot',
+        title: 'Aegis AI',
         category: 'other',
         iconName: 'Bot',
         defaultSize: { width: 800, height: 700 }

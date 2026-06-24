@@ -75,8 +75,14 @@ export const AICopilotOverlay: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const copilotEngine = useRef(new EngineeringCopilot());
 
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -509,7 +515,7 @@ export const AICopilotOverlay: React.FC = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, setIsOpen]);
 
-  if (!mounted) return null;
+  if (!mounted || isMobile) return null;
 
   return (
     <>

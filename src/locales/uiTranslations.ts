@@ -15,6 +15,9 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     heroTitle: "Engineering Calculators",
     heroTitleHighlight: "Built on Real Formulas",
     heroSubTitle: "(ISO, ASME, ANSI, DIN)",
+    downloadTitle: "Download Mobile App",
+    downloadApk: "Download APK Directly",
+    googlePlay: "Get it on Google Play",
     
     // Value Propositions
     prop1Title: "88+ Verified Solvers",
@@ -102,6 +105,9 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     heroTitle: "Mühendislik Hesaplayıcıları",
     heroTitleHighlight: "Gerçek Formüllerle Oluşturuldu",
     heroSubTitle: "(ISO, ASME, ANSI, DIN)",
+    downloadTitle: "Mobil Uygulamayı İndir",
+    downloadApk: "Doğrudan APK İndir",
+    googlePlay: "Google Play'den İndirin",
     
     // Value Propositions
     prop1Title: "88+ Doğrulanmış Çözücü",

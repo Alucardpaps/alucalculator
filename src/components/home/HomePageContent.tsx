@@ -4,8 +4,7 @@ import Link from 'next/link';
 import {
   Zap, Layers, ShieldCheck, ChevronRight, Cpu, Wrench, Droplets,
   ArrowRight, Calculator, Settings, CircleDot, Ruler, FlaskConical,
-  CheckCircle2, BookOpen, GraduationCap, Globe,
-} from 'lucide-react';
+  CheckCircle2, BookOpen, GraduationCap, Globe, Download, Play,} from 'lucide-react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18nStore } from '@/store/i18nStore';
@@ -152,7 +151,7 @@ export function HomePageContent({ recentCalculators }: HomePageContentProps) {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-8">
           <Link
             href="/workspace"
             className="px-10 py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.3em] hover:bg-blue-500 hover:scale-105 active:scale-95 transition-all shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] flex items-center gap-3"
@@ -162,6 +161,32 @@ export function HomePageContent({ recentCalculators }: HomePageContentProps) {
           <Link href="/academy" className="px-10 py-5 bg-white/[0.03] border border-white/10 rounded-2xl text-slate-300 font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10 hover:text-white transition-all backdrop-blur-md flex items-center gap-3">
             <GraduationCap size={16} /> {ui.exploreAcademy}
           </Link>
+        </div>
+
+        {/* Mobile Download Section */}
+        <div className="mt-8 mb-16 flex flex-col items-center justify-center gap-4">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none">
+            {ui.downloadTitle}
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.alucard.alucalcos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-6 py-4 bg-white/[0.02] hover:bg-[#00e5ff]/5 border border-white/10 hover:border-[#00e5ff]/40 rounded-2xl text-slate-300 hover:text-white font-black text-xs uppercase tracking-widest transition-all backdrop-blur-md active:scale-95 shadow-lg hover:shadow-[0_0_25px_rgba(0,229,255,0.15)] group"
+            >
+              <Play size={14} className="text-[#00e5ff] fill-[#00e5ff] group-hover:scale-110 transition-transform" />
+              <span>{ui.googlePlay}</span>
+            </a>
+            <a
+              href="/app/alucalc-release.apk"
+              download
+              className="inline-flex items-center gap-2.5 px-6 py-4 bg-white/[0.02] hover:bg-indigo-500/10 border border-white/10 hover:border-indigo-400/40 rounded-2xl text-slate-300 hover:text-white font-black text-xs uppercase tracking-widest transition-all backdrop-blur-md active:scale-95 shadow-lg hover:shadow-[0_0_25px_rgba(99,102,241,0.15)] group"
+            >
+              <Download size={14} className="text-indigo-400 group-hover:translate-y-0.5 transition-transform" />
+              <span>{ui.downloadApk}</span>
+            </a>
+          </div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-3">

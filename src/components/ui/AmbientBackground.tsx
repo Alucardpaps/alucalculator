@@ -26,10 +26,20 @@ export function AmbientBackground() {
   const mouseRef = useRef({ x: 0, y: 0, active: false, lastMove: 0 });
 
   const [petMode, setPetMode] = useState<'idle' | 'active' | 'thinking' | 'tracking'>('idle');
+  const [isMobile, setIsMobile] = useState(false);
 
   const isOpen = useCopilotStore((s) => s.isOpen);
   const isThinking = useCopilotStore((s) => s.isThinking);
   const mode = isThinking ? 'thinking' : isOpen ? 'active' : petMode;
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -503,7 +513,7 @@ export function AmbientBackground() {
       window.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#020408]">
@@ -515,28 +525,30 @@ export function AmbientBackground() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.003)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.003)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
       {/* ── INTERACTIVE SWARM CANVAS ── */}
-      <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
+      {!isMobile && <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />}
 
       {/* ── FLOATING LEADER AEGIS ASSISTANT PET ── */}
-      <div
-        ref={leaderDOMRef}
-        className="absolute pointer-events-auto cursor-pointer select-none transition-shadow hover:scale-105 active:scale-95 duration-200"
-        style={{
-          width: '70px',
-          height: '70px',
-          left: 0,
-          top: 0,
-          transform: 'translate3d(50vw, 50vh, 0)',
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          useCopilotStore.getState().setIsOpen(!isOpen);
-        }}
-        title="Open AeGiS Assistant"
-      >
-        {/* Render with full character mode (pure={false}) to display waving arms, legs, and mini-hexagons */}
-        <AegisIcon size={70} mode={mode} pure={false} />
-      </div>
+      {!isMobile && (
+        <div
+          ref={leaderDOMRef}
+          className="absolute pointer-events-auto cursor-pointer select-none transition-shadow hover:scale-105 active:scale-95 duration-200"
+          style={{
+            width: '70px',
+            height: '70px',
+            left: 0,
+            top: 0,
+            transform: 'translate3d(50vw, 50vh, 0)',
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            useCopilotStore.getState().setIsOpen(!isOpen);
+          }}
+          title="Open AeGiS Assistant"
+        >
+          {/* Render with full character mode (pure={false}) to display waving arms, legs, and mini-hexagons */}
+          <AegisIcon size={70} mode={mode} pure={false} />
+        </div>
+      )}
     </div>
   );
 }
