@@ -14,33 +14,45 @@ import zh from '../locales/zh';
 import ja from '../locales/ja';
 import ko from '../locales/ko';
 import ar from '../locales/ar';
+import { getModuleHints } from '../locales/moduleHintsTranslations';
 
 export type Language = 'en' | 'tr' | 'de' | 'es' | 'fr' | 'it' | 'pt' | 'ru' | 'zh' | 'ja' | 'ko' | 'ar';
 
 type Translations = typeof en;
 
-function mergeLocaleWithFallback(locale: any): typeof en {
+function mergeLocaleWithFallback(locale: any, lang: Language): typeof en {
     return {
         ...en,
         ...locale,
         modules: { ...en.modules, ...(locale?.modules ?? {}) },
-        moduleHints: { ...en.moduleHints, ...(locale?.moduleHints ?? {}) },
+        moduleHints: { ...getModuleHints(lang), ...(locale?.moduleHints ?? {}) },
+        categories: { ...en.categories, ...(locale?.categories ?? {}) },
+        ribbon: { ...en.ribbon, ...(locale?.ribbon ?? {}) },
+        handbook: locale?.handbook ? { ...en.handbook, ...locale.handbook, shortcuts: { ...en.handbook?.shortcuts, ...(locale.handbook?.shortcuts ?? {}) } } : en.handbook,
+        variables: { ...en.variables, ...(locale?.variables ?? {}) },
+        palette: locale?.palette
+            ? {
+                ...en.palette,
+                ...locale.palette,
+                categories: { ...en.palette?.categories, ...(locale.palette?.categories ?? {}) },
+            }
+            : en.palette,
     };
 }
 
 const translations: Record<Language, any> = {
     en,
-    tr: mergeLocaleWithFallback(tr),
-    de: mergeLocaleWithFallback(de),
-    es: mergeLocaleWithFallback(es),
-    fr: mergeLocaleWithFallback(fr),
-    it: mergeLocaleWithFallback(it),
-    pt: mergeLocaleWithFallback(pt),
-    ru: mergeLocaleWithFallback(ru),
-    zh: mergeLocaleWithFallback(zh),
-    ja: mergeLocaleWithFallback(ja),
-    ko: mergeLocaleWithFallback(ko),
-    ar: mergeLocaleWithFallback(ar),
+    tr: mergeLocaleWithFallback(tr, 'tr'),
+    de: mergeLocaleWithFallback(de, 'de'),
+    es: mergeLocaleWithFallback(es, 'es'),
+    fr: mergeLocaleWithFallback(fr, 'fr'),
+    it: mergeLocaleWithFallback(it, 'it'),
+    pt: mergeLocaleWithFallback(pt, 'pt'),
+    ru: mergeLocaleWithFallback(ru, 'ru'),
+    zh: mergeLocaleWithFallback(zh, 'zh'),
+    ja: mergeLocaleWithFallback(ja, 'ja'),
+    ko: mergeLocaleWithFallback(ko, 'ko'),
+    ar: mergeLocaleWithFallback(ar, 'ar'),
 };
 
 interface I18nState {

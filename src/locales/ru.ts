@@ -185,7 +185,7 @@ export default {
     modules: {
         'calculator': { title: "Научный калькулятор" },
         'unit-converter': { title: "Конвертер единиц" },
-        'ai-copilot': { title: "AI‑копилот" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "Файловый менеджер" },
         'settings': { title: "Настройки" },
         'handbook': { title: "Инженерный справочник" },
@@ -230,6 +230,8 @@ export default {
         'welding-fillet': { title: "Прочность углового шва" },
         'welding-heat': { title: "Тепловложение сварки" },
         'nesting': { title: "Нестинг" },
+        'analytics-dashboard': { title: "Аналитика" },
+        'engineering-notes': { title: "Инженерные заметки" },
     } as Record<string, { title: string }>,
 
     // Node Palette Categories
@@ -249,7 +251,7 @@ export default {
     moduleHints: {
         'calculator': 'Продвинутые математические расчёты',
         'unit-converter': 'Инженерные единицы',
-        'ai-copilot': 'AI‑помощь в проектировании',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': 'Системные файлы',
         'settings': 'Системные настройки',
         'handbook': 'Формулы и справочные данные',
@@ -351,6 +353,7 @@ export default {
         labelFullReport: "Полный отчёт",
         labelExportNc: "Экспорт NC",
         labelSolverReady: "Решатель готов",
+        labelWorkstation: "ИНЖЕНЕРНАЯ СТАНЦИЯ",
         labelMatrixSparse: "Матрица: разреженная",
         labelStrokeColor: "Цвет линии",
         defaultNote: "📌 Новая заметка",

@@ -165,11 +165,11 @@ export function enrichCourse(course: AcademyCourse, locale: Language = 'en'): En
   const article = rawArticle ? localizeAcademyArticle(rawArticle, locale) : undefined;
   const enTitle = article?.meta.title ?? course.title;
   const title = localizeCourseTitle(course.slug, enTitle, locale);
-  const intro = article?.hero.intro ?? course.title;
+  const summarySource = article?.meta.description ?? article?.hero.intro ?? course.title;
   return {
     ...course,
     title,
-    summary: intro.slice(0, 160).trim() + (intro.length > 160 ? '…' : '') || title,
+    summary: summarySource.slice(0, 160).trim() + (summarySource.length > 160 ? '…' : '') || title,
     difficulty: article?.difficulty ?? 'Intermediate',
     readingTime: article?.readingTime ?? 8,
     prerequisites: article?.prerequisites ?? [],

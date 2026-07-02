@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Ruler, Info } from 'lucide-react';
+import { getFastenerSchematicStrings } from '@/locales/fastenerSchematicTranslations';
 
 type SchematicLabels = {
     partHead: string;
@@ -37,6 +38,7 @@ export function FastenerInteractiveSchematic({
     lang = 'en',
 }: FastenerInteractiveSchematicProps) {
     const [hoveredPart, setHoveredPart] = useState<string | null>(null);
+    const fs = getFastenerSchematicStrings(lang);
 
     const d = results.d_nom;
     const l = length;
@@ -50,71 +52,70 @@ export function FastenerInteractiveSchematic({
 
     // Tooltip data content based on hovered part
     const partDetails = useMemo(() => {
-        const isTr = lang === 'tr';
         if (hoveredPart === 'head') {
             return {
                 title: labels.partHead,
-                desc: isTr ? `Kafa anahtar ağzı ve kalınlığı` : `Head width and thickness`,
+                desc: fs.headDesc,
                 metrics: [
-                    { label: isTr ? 'Anahtar Ağzı (s)' : 'Hex Size (s)', val: `${s.toFixed(1)} mm` },
-                    { label: isTr ? 'Kafa Yüksekliği (k)' : 'Head Height (k)', val: `${k.toFixed(1)} mm` },
-                    { label: isTr ? 'Kafa Fatura Çapı (dw)' : 'Bearing Dia (dw)', val: `${dw.toFixed(1)} mm` },
+                    { label: fs.hexSize, val: `${s.toFixed(1)} mm` },
+                    { label: fs.headHeight, val: `${k.toFixed(1)} mm` },
+                    { label: fs.bearingDia, val: `${dw.toFixed(1)} mm` },
                 ]
             };
         }
         if (hoveredPart === 'shank') {
             return {
                 title: labels.partShank,
-                desc: isTr ? 'Cıvatanın pürüzsüz dişsiz gövdesi' : 'Smooth unthreaded body section',
+                desc: fs.shankDesc,
                 metrics: [
-                    { label: isTr ? 'Nominal Çap (d)' : 'Nominal Dia (d)', val: `${d.toFixed(1)} mm` },
-                    { label: isTr ? 'Gövde Boyu' : 'Shank Length', val: `${Math.max(0, l - (results.pitchVal * 8)).toFixed(0)} mm` },
+                    { label: fs.nominalDia, val: `${d.toFixed(1)} mm` },
+                    { label: fs.shankLength, val: `${Math.max(0, l - (results.pitchVal * 8)).toFixed(0)} mm` },
                 ]
             };
         }
         if (hoveredPart === 'thread') {
             return {
                 title: labels.partThread,
-                desc: isTr ? 'Gerilmeye maruz kalan dişli bölge' : 'Threaded zone subject to tensile load',
+                desc: fs.threadDesc,
                 metrics: [
-                    { label: isTr ? 'Diş Dibi Çapı (d3)' : 'Minor Dia (d3)', val: `${results.d3.toFixed(2)} mm` },
-                    { label: isTr ? 'Bölüm Çapı (d2)' : 'Pitch Dia (d2)', val: `${results.d2.toFixed(2)} mm` },
-                    { label: isTr ? 'Adım (P)' : 'Pitch (P)', val: `${results.pitchVal.toFixed(2)} mm` },
-                    { label: isTr ? 'Gerilme Alanı (As)' : 'Stress Area (As)', val: `${results.As.toFixed(1)} mm²` },
+                    { label: fs.minorDia, val: `${results.d3.toFixed(2)} mm` },
+                    { label: fs.pitchDia, val: `${results.d2.toFixed(2)} mm` },
+                    { label: fs.pitch, val: `${results.pitchVal.toFixed(2)} mm` },
+                    { label: fs.stressArea, val: `${results.As.toFixed(1)} mm²` },
                 ]
             };
         }
         if (hoveredPart === 'plates') {
             return {
-                title: isTr ? 'Sıkıştırılan Plakalar' : 'Clamped Joint Plates',
-                desc: isTr ? 'Birleştirilen parça kalınlıkları' : 'Total thickness of clamped materials',
+                title: fs.platesTitle,
+                desc: fs.platesDesc,
                 metrics: [
-                    { label: isTr ? 'Sıkma Boyu (Grip)' : 'Grip Length (LG)', val: `${(l - m - 4).toFixed(1)} mm` },
-                    { label: isTr ? 'Geçiş Deliği (dh)' : 'Clearance Hole (dh)', val: `${dh.toFixed(1)} mm` },
+                    { label: fs.gripLength, val: `${(l - m - 4).toFixed(1)} mm` },
+                    { label: fs.clearanceHole, val: `${dh.toFixed(1)} mm` },
                 ]
             };
         }
         if (hoveredPart === 'nut') {
             return {
                 title: labels.partNut,
-                desc: isTr ? 'İç dişli somun elemanı' : 'Threaded female locking element',
+                desc: fs.nutDesc,
                 metrics: [
-                    { label: isTr ? 'Somun Yüksekliği (m)' : 'Nut Height (m)', val: `${m.toFixed(1)} mm` },
-                    { label: isTr ? 'Diş Standardı' : 'Thread Class', val: size },
+                    { label: fs.nutHeight, val: `${m.toFixed(1)} mm` },
+                    { label: fs.threadClass, val: size },
                 ]
             };
         }
         if (hoveredPart === 'washer') {
             return {
                 title: labels.partWasher,
-                desc: isTr ? 'Basınç dağıtıcı rondelalar' : 'Load distributing washers',
+                desc: fs.washerDesc,
                 metrics: [
-                    { label: isTr ? 'Rondela Çapı (dw)' : 'Washer Dia (dw)', val: `${dw.toFixed(1)} mm` },
+                    { label: fs.washerDia, val: `${dw.toFixed(1)} mm` },
                 ]
             };
         }
         return null;
-    }, [hoveredPart, s, k, dw, d, l, results, m, dh, size, labels, lang]);
+    }, [hoveredPart, s, k, dw, d, l, results, m, dh, size, labels, fs]);
 
     const geom = useMemo(() => {
         const drawFieldW = 460;
@@ -173,10 +174,10 @@ export function FastenerInteractiveSchematic({
             <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[#04060a]/90 rounded-2xl border border-white/5 min-h-[220px]">
                 <Info className="text-orange-400 mb-2" size={24} />
                 <span className="text-xs font-mono font-bold text-slate-400 text-center">
-                    {lang === 'tr' ? 'Boru dişi görseli desteklenmemektedir.' : 'Pipe thread model illustration not supported.'}
+                    {fs.pipeNotSupported}
                 </span>
                 <span className="text-[10px] text-slate-500 mt-1 text-center">
-                    {lang === 'tr' ? 'Lütfen metrik veya UNC cıvata boyutlarını seçin.' : 'Please select metric or UNC bolt sizes for interactive diagram.'}
+                    {fs.selectMetricUnc}
                 </span>
             </div>
         );
@@ -317,7 +318,7 @@ export function FastenerInteractiveSchematic({
                 {!hoveredPart && (
                     <div className="absolute bottom-2 left-2 right-2 text-center pointer-events-none z-10">
                         <span className="text-[8px] font-mono text-slate-600 uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded border border-white/[0.02]">
-                            {lang === 'tr' ? 'ÖLÇÜLER İÇİN CIVATA ÜZERİNE GELİN' : 'HOVER PARTS TO DEEP-DIVE DIMENSIONS'}
+                            {fs.hoverHint}
                         </span>
                     </div>
                 )}

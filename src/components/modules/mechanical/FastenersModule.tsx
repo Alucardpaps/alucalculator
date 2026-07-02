@@ -1,4 +1,6 @@
 "use client";
+
+import { getFastenersModuleUiStrings } from '@/locales/fastenersModuleUiTranslations';
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useFastenerCalculator } from "@/hooks/useFastenerCalculator";
@@ -12,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useProjectStore } from "@/store/projectStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { getFastenerMetadataStrings } from '@/locales/fastenerMetadataTranslations';
 import { PDFReportEngine, ReportMetadata } from "@/lib/pdfReportEngine";
 import { ReportSettingsModal } from "@/components/ui/ReportSettingsModal";
 import { SaveButton } from "@/components/calculation/SaveButton";
@@ -164,136 +167,13 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
   </div>
 );
 
-const LOCAL_DICTS: Record<string, any> = {
-    en: {
-        title: "Thread Fasteners",
-        subtitle: "Section J: Thread Geometry & Clearances • AluCalcOS 2.0",
-        addToBom: "ADD TO BOM",
-        pdfSpec: "PDF SPEC",
-        specification: "Specification",
-        sizing: "Sizing",
-        stdFamily: "Standard Family",
-        nomSize: "Nominal Size",
-        length: "Length",
-        lengthAdj: "Length adjustment",
-        bolt: "Bolt",
-        nut: "Nut",
-        tapDrill: "Tap Drill Size (D1)",
-        tensileArea: "Tensile Stress Area",
-        clearanceHole: "Clearance Hole (dh)",
-        detailedThreadMetrics: "Detailed Thread Profile Metrics",
-        validGeometry: "VALID GEOMETRY",
-        outOfBounds: "OUT OF BOUNDS",
-        majorDia: "Major Diameter (D)",
-        pitchDia: "Pitch Diameter (D2)",
-        minorDia: "Minor Diameter (D1)",
-        nomPitch: "Nominal Thread Pitch",
-        pitch: "Pitch",
-        engagementDynamics: "ENGAGEMENT DYNAMICS",
-        clearanceSeries: "ISO 273 Clearance Series",
-        headWidth: "Head Across Flats (s)",
-        headHeight: "Head Height (k)",
-        openTorque: "Calculate tightening torque"
-    },
-    tr: {
-        title: "Dişli Bağlantılar",
-        subtitle: "Bölüm J: Diş Geometrisi ve Toleranslar • AluCalcOS 2.0",
-        addToBom: "PROJEYE EKLE",
-        pdfSpec: "PDF SPEC",
-        specification: "Özellikler",
-        sizing: "Boyutlandırma",
-        stdFamily: "Standart Grubu",
-        nomSize: "Nominal Boyut",
-        length: "Boy",
-        lengthAdj: "Boy ayarı",
-        bolt: "Cıvata",
-        nut: "Somun",
-        tapDrill: "Matkap Çapı (D1)",
-        tensileArea: "Gerilme Alanı (As)",
-        clearanceHole: "Geçiş Deliği (dh)",
-        detailedThreadMetrics: "Detaylı Diş Profili Metrikleri",
-        validGeometry: "UYGUN GEOMETRİ",
-        outOfBounds: "LİMİT DIŞI",
-        majorDia: "Anma Çapı (D)",
-        pitchDia: "Bölüm Dairesi Çapı (D2)",
-        minorDia: "Diş Dibi Çapı (D1)",
-        nomPitch: "Nominal Diş Adımı",
-        pitch: "Diş Adımı",
-        engagementDynamics: "VİDA DİŞ GEÇME ANALİZİ",
-        clearanceSeries: "ISO 273 Gecis Deligi Serisi",
-        headWidth: "Bas Genisligi (s)",
-        headHeight: "Bas Yuksekligi (k)",
-        openTorque: "Sikma torku hesapla"
-    },
-    de: {
-        title: "Gewindebolzen",
-        subtitle: "Sektion J: Gewindegeometrie & Spielräume • AluCalcOS 2.0",
-        addToBom: "ZUR STÜCKLISTE",
-        pdfSpec: "PDF-SPEZIFIKATION",
-        specification: "Spezifikation",
-        sizing: "Dimensionierung",
-        stdFamily: "Standardfamilie",
-        nomSize: "Nennmaß",
-        length: "Länge",
-        lengthAdj: "Längenanpassung",
-        bolt: "Schraube",
-        nut: "Mutter",
-        tapDrill: "Kernlochdurchmesser (D1)",
-        tensileArea: "Spannungsquerschnitt",
-        clearanceHole: "Durchgangsloch (dh)",
-        detailedThreadMetrics: "Detaillierte Gewindeprofil-Metriken",
-        validGeometry: "GÜLTIGE GEOMETRIE",
-        outOfBounds: "AUSSERHALB DER GRENZEN",
-        majorDia: "Außendurchmesser (D)",
-        pitchDia: "Flankendurchmesser (D2)",
-        minorDia: "Kerndurchmesser (D1)",
-        nomPitch: "Nennsteigung",
-        pitch: "Steigung",
-        engagementDynamics: "GEWINDE-EINGRIFF",
-        clearanceSeries: "ISO 273 Durchgangsloch-Serie",
-        headWidth: "Schlüsselweite (s)",
-        headHeight: "Kopfhöhe (k)",
-        openTorque: "Anzugsmoment berechnen"
-    },
-    ja: {
-        title: "ねじ締結要素",
-        subtitle: "セクションJ: ねじの幾学とクリアランス • AluCalcOS 2.0",
-        addToBom: "部品表に追加",
-        pdfSpec: "PDFスペック",
-        specification: "ねじ規格",
-        sizing: "寸法設定",
-        stdFamily: "規格ファミリー",
-        nomSize: "呼び径",
-        length: "長さ",
-        lengthAdj: "長さスライド調整",
-        bolt: "ボルト",
-        nut: "ナット",
-        tapDrill: "下穴径 (D1)",
-        tensileArea: "有効断面積 (As)",
-        clearanceHole: "ボルト通し穴 (dh)",
-        detailedThreadMetrics: "ねじ断面プロファイル詳細",
-        validGeometry: "有効な幾何形状",
-        outOfBounds: "限界値超過",
-        majorDia: "ねじの外径 (D)",
-        pitchDia: "ピッチ径 (D2)",
-        minorDia: "谷の径 (D1)",
-        nomPitch: "基準山ピッチ",
-        pitch: "ピッチ",
-        engagementDynamics: "かみ合い特性ビジュアル",
-        clearanceSeries: "ISO 273 ボルト通し穴系列",
-        headWidth: "頭部二面幅 (s)",
-        headHeight: "頭部高さ (k)",
-        openTorque: "締付トルクを計算"
-    }
-};
-
 // ════════════════════════════════════════════
 // MAIN COMPONENT
 // ════════════════════════════════════════════
 
 export function FastenersModule({ lang, dict }: { lang: string, dict: any }) {
     const { language } = useI18nStore();
-    const t = LOCAL_DICTS[language] || LOCAL_DICTS.en;
+    const t = getFastenersModuleUiStrings(language);
 
     const {
         standard, setStandard,
@@ -321,38 +201,9 @@ export function FastenersModule({ lang, dict }: { lang: string, dict: any }) {
     const metadata: CalculationMetadata = useMemo(() => {
         const isISO = standard.includes('ISO');
         const standardId = isISO ? "ISO 965-1" : "ASME B1.1";
-        let standardTitle = "";
-        let assumptions = [];
-
-        if (language === 'tr') {
-            standardTitle = isISO ? "Genel amaçlı metrik cıvata dişleri" : "Unifiye İnç Vida Dişleri (UN/UNR)";
-            assumptions = [
-                "Tolerans Sınıfı: 6g (Cıvata) / 6H (Somun)",
-                "Yalnızca Standart Kaba/İnce Adımlar",
-                "Gerilme alanı hesabı nominal çapa dayanmaktadır"
-            ];
-        } else if (language === 'de') {
-            standardTitle = isISO ? "Metrisches ISO-Gewinde allgemeiner Anwendung" : "Einheitliches Zoll-Gewinde (UN/UNR)";
-            assumptions = [
-                "Toleranzklasse: 6g (Schraube) / 6H (Mutter)",
-                "Nur Standard-Regel-/Feingewinde",
-                "Spannungsquerschnitts-Berechnung basiert auf Nenndurchmesser"
-            ];
-        } else if (language === 'ja') {
-            standardTitle = isISO ? "一般用メートルねじ規格" : "ユニファイねじ規格 (UN/UNR)";
-            assumptions = [
-                "公差等級: 6g (ボルト) / 6H (ナット)",
-                "標準の並目・細目ピッチのみ",
-                "有効断面積は基準寸法(呼び径)に基づいて算出"
-            ];
-        } else {
-            standardTitle = isISO ? "General purpose metric screw threads" : "Unified Inch Screw Threads (UN/UNR)";
-            assumptions = [
-                "Tolerance Class: 6g (Bolt) / 6H (Nut)",
-                "Standard Coarse/Fine Pitches only",
-                "Tensile Area calculation based on nominal diameter"
-            ];
-        }
+        const fm = getFastenerMetadataStrings(language);
+        const standardTitle = isISO ? fm.isoStandardTitle : fm.uncStandardTitle;
+        const assumptions = [fm.assumption1, fm.assumption2, fm.assumption3];
 
         return { standardId, standardTitle, version: "2013", assumptions };
     }, [standard, language]);

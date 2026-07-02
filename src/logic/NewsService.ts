@@ -1,4 +1,6 @@
 
+import { getLocaleBcp47 } from '@/locales/localeFormat';
+
 export interface NewsItem {
     id: string;
     title: string;
@@ -53,7 +55,7 @@ function getMockNews(lang: string): NewsItem[] {
     // Helper for date formatting
     const formatDate = (daysAgo: number) => {
         const d = new Date(baseDate.getTime() - daysAgo * 86400000);
-        return d.toLocaleDateString(lang === 'tr' ? 'tr-TR' : lang === 'de' ? 'de-DE' : 'en-US');
+        return d.toLocaleDateString(getLocaleBcp47(lang), { month: 'short', day: 'numeric' });
     };
 
     // Translation Dictionaries
@@ -129,6 +131,30 @@ function getMockNews(lang: string): NewsItem[] {
             robotics: { title: "机器人效率", summary: "新型伺服电机技术将工业机器人的能耗降低了 25%。" },
             digital: { title: "数字孪生兴起", summary: "实时工厂模拟正在将生产误差降至接近零的水平。" },
             logistics: { title: "自主物流", summary: "AGV 车队正在改变仓库管理和供应链透明度。" }
+        },
+        ko: {
+            industry: { title: "인더스트리 5.0 혁명", summary: "AI 기반 자율 공장이 인간 중심 기술로 생산 효율을 40% 향상시킵니다." },
+            materials: { title: "차세대 복합재", summary: "항공우주용 초경량 탄소-알루미늄 합금이 자동차 시장에 진입하고 있습니다." },
+            energy: { title: "그린 에너지 제조", summary: "재생 가능한 풍력 및 태양 에너지로 완전히 구동되는 지속 가능한 생산 시설." },
+            robotics: { title: "로봇 효율", summary: "새로운 서보 모터 기술이 산업용 로봇의 에너지 소비를 25% 줄입니다." },
+            digital: { title: "디지털 트윈 부상", summary: "실시간 공장 시뮬레이션이 생산 오류를 거의 0으로 줄입니다." },
+            logistics: { title: "자율 물류", summary: "AGV 함대가 창고 관리와 공급망 투명성을 변화시키고 있습니다." }
+        },
+        ar: {
+            industry: { title: "ثورة الصناعة 5.0", summary: "المصانع المستقلة المدعومة بالذكاء الاصطناعي ترفع كفاءة الإنتاج بنسبة 40%." },
+            materials: { title: "مواد مركبة الجيل التالي", summary: "سبائك الكربون والألومنيوم فائقة الخفة تدخل سوق السيارات." },
+            energy: { title: "تصنيع الطاقة الخضراء", summary: "منشآت إنتاج مستدامة تعمل بالكامل على طاقة الرياح والشمس المتجددة." },
+            robotics: { title: "كفاءة الروبوتات", summary: "تقنيات محرك سيرفو جديدة تقلل استهلاك الطاقة للروبوتات الصناعية بنسبة 25%." },
+            digital: { title: "صعود التوأم الرقمي", summary: "محاكاة المصانع في الوقت الفعلي تقلل أخطاء الإنتاج إلى ما يقرب من الصفر." },
+            logistics: { title: "اللوجستيات المستقلة", summary: "أساطيل AGV تحول إدارة المستودعات وشفافية سلسلة التوريد." }
+        },
+        it: {
+            industry: { title: "Rivoluzione Industria 5.0", summary: "Le fabbriche autonome guidate dall'IA aumentano l'efficienza produttiva del 40%." },
+            materials: { title: "Compositi di Nuova Generazione", summary: "Leghe carbonio-alluminio ultraleggere entrano nel mercato automobilistico." },
+            energy: { title: "Produzione Energia Verde", summary: "Impianti sostenibili alimentati interamente da energia rinnovabile." },
+            robotics: { title: "Efficienza Robotica", summary: "Nuove tecnologie servo riducono il consumo energetico dei robot del 25%." },
+            digital: { title: "Ascesa del Gemello Digitale", summary: "Le simulazioni in tempo reale riducono gli errori di produzione quasi a zero." },
+            logistics: { title: "Logistica Autonoma", summary: "Le flotte AGV stanno trasformando la gestione dei magazzini." }
         }
     };
 

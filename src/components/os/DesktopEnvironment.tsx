@@ -28,7 +28,13 @@ import { ChaosToggle } from '@/components/ui/ChaosToggle';
 import { AnimatePresence } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useWorkspaceStore } from '@/store/workspaceStore';
 import dynamic from 'next/dynamic';
+
+const KernelDevPanel = dynamic(
+    () => import('@/components/os/KernelDevPanel').then((m) => m.KernelDevPanel),
+    { ssr: false },
+);
 
 const AluCAD = dynamic(() => import('@/cad/components/AluCAD').then(mod => mod.AluCAD), { ssr: false });
 import { ActionTerminal } from '@/components/os/ActionTerminal';
@@ -41,6 +47,7 @@ export default function DesktopEnvironment() {
     const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'fea' | 'cam'>('desk');
     const [isOvenOpen, setIsOvenOpen] = useState(false);
     const { openWindow } = useOSStore();
+    const debugMode = useWorkspaceStore((s) => s.debugMode);
 
     // Ctrl+Shift+P → Open Terminal
     useEffect(() => {
@@ -95,7 +102,7 @@ export default function DesktopEnvironment() {
                 <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border-b border-cyan-900/30 backdrop-blur-md">
                     <div className="flex items-center gap-4">
                         <span className="text-[10px] font-bold text-cyan-900/80 uppercase tracking-[0.2em] font-mono">AluCalc OS v5.0</span>
-                        <ChaosToggle />
+                        {debugMode && <ChaosToggle />}
                     </div>
                     {/* View Switcher */}
                     <div className="flex bg-[#0a0f16]/60 rounded p-0.5 border border-cyan-900/30 backdrop-blur">
@@ -153,30 +160,35 @@ export default function DesktopEnvironment() {
             <WelcomeModal />
 
             {/* 5. Engineering Workstation Tools (Floating) */}
-            <div className="absolute bottom-16 left-4 z-40 flex flex-col gap-4 pointer-events-none">
-                <AnimatePresence>
-                    {isOvenOpen && (
-                        <div className="pointer-events-auto">
-                            <EngineeringOven onClose={() => setIsOvenOpen(false)} />
-                        </div>
-                    )}
-                </AnimatePresence>
-                <div className="pointer-events-auto">
-                    <ActionTerminal className="w-[380px] h-[220px]" />
+            {debugMode && (
+                <div className="absolute bottom-16 left-4 z-40 flex flex-col gap-4 pointer-events-none">
+                    <AnimatePresence>
+                        {isOvenOpen && (
+                            <div className="pointer-events-auto">
+                                <EngineeringOven onClose={() => setIsOvenOpen(false)} />
+                            </div>
+                        )}
+                    </AnimatePresence>
+                    <div className="pointer-events-auto">
+                        <ActionTerminal className="w-[380px] h-[220px]" />
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* 6. Workstation Quick Access */}
+            {debugMode && (
             <button 
                 onClick={() => setIsOvenOpen(!isOvenOpen)}
                 className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-2 bg-orange-600/20 border border-orange-500/30 rounded-full text-orange-400 hover:bg-orange-500 hover:text-white transition-all shadow-[0_0_20px_rgba(255,87,34,0.2)] group"
-                title="Sistem Fırınını Aç"
+                title="Engineering Oven"
             >
                 <div className="relative">
                     <Flame size={20} className={cn(isOvenOpen && "animate-pulse")} />
                     <div className="absolute -right-1 -top-1 w-2 h-2 bg-orange-500 rounded-full animate-ping opacity-75"></div>
                 </div>
             </button>
+            )}
+
+            {debugMode && <KernelDevPanel />}
         </div>
     );
 }

@@ -64,7 +64,15 @@ export function getLocalizedHandbookData(lang: string): HandbookChapter[] {
         case 'ja': dict = JA_DICT; break;
         case 'ko': dict = KO_DICT; break;
         case 'ar': dict = AR_DICT; break;
-        default: dict = {}; break;
+        case 'fr':
+        case 'it':
+        case 'pt':
+        case 'ru':
+            dict = EN_DICT;
+            break;
+        default:
+            dict = EN_DICT;
+            break;
     }
 
     // Deep clone and translate with English as fallback for missing items

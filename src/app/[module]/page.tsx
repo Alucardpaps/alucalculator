@@ -9,6 +9,164 @@ import { getModuleSeo } from '@/config/seo';
 
 
 /**
+ * Data-driven slug → ModuleType lookup map.
+ * Aliases (short slugs) point to their canonical ModuleType value.
+ * Slugs that are already identical to their ModuleType are included
+ * for O(1) deterministic resolution without a fallback cast.
+ */
+const SLUG_TO_MODULE: Record<string, ModuleType> = {
+  // — Profile / Aluminum —
+  'aluminum':               'profile-weight',
+  'profile-weight':         'profile-weight',
+  // — Bearings —
+  'bearings':               'bearings',
+  // — Unit Converter —
+  'converter':              'unit-converter',
+  'unit-converter':         'unit-converter',
+  // — Fasteners —
+  'fasteners':              'fasteners',
+  // — Gears & Bearings —
+  'gears':                  'gears-bearings',
+  'gears-bearings':         'gears-bearings',
+  // — Handbook —
+  'handbook':               'handbook',
+  // — Pumps —
+  'pumps':                  'pumps',
+  // — Sheet Metal —
+  'sheet-metal':            'sheet-metal',
+  // — Strength Analysis —
+  'strength':               'strength-analysis',
+  'strength-analysis':      'strength-analysis',
+  // — Welding —
+  'welding':                'welding',
+  // — 2D Nesting —
+  'nesting':                'nesting-2d',
+  'nesting-2d':             'nesting-2d',
+  // — Fits & Tolerances —
+  'fits':                   'fits-tolerances',
+  'fits-tolerances':        'fits-tolerances',
+  // — Beam Deflection —
+  'beam-deflection':        'beam-deflection',
+  // — Fatigue Analysis —
+  'fatigue':                'fatigue-analysis',
+  'fatigue-analysis':       'fatigue-analysis',
+  // — Thermal Expansion —
+  'thermal':                'thermal-expansion',
+  'thermal-expansion':      'thermal-expansion',
+  // — Fluid Dynamics —
+  'fluids':                 'fluid-dynamics',
+  'fluid-dynamics':         'fluid-dynamics',
+  // — Aerospace Dynamics —
+  'aerospace':              'aerospace-dynamics',
+  'aerospace-dynamics':     'aerospace-dynamics',
+  // — Physics / Kinematics —
+  'kinematics':             'physics-kinematics',
+  'physics-kinematics':     'physics-kinematics',
+  // — Sketch Pad —
+  'sketch-pad':             'sketch-pad',
+  // — CAD Editor —
+  'cad-editor':             'cad-editor',
+  // — Engineering Selection —
+  'engineering-selection':  'engineering-selection',
+  // — Manufacturing Readiness —
+  'mfg-readiness':          'manufacturing-readiness',
+  'manufacturing-readiness':'manufacturing-readiness',
+  // — Manufacturing Sandbox —
+  'mfg-sandbox':            'manufacturing-sandbox',
+  'manufacturing-sandbox':  'manufacturing-sandbox',
+  // — Cutting Optimizer —
+  'cutting-optimizer':      'cutting-optimizer',
+  // — Materials DB —
+  'materials-db':           'materials-db',
+  // — Machine Assembly —
+  'machine-assembly':       'machine-assembly',
+  // — Fatigue Advanced —
+  'fatigue-advanced':       'fatigue-advanced',
+  // — Motor Selection —
+  'motor-selection':        'motor-selection-std',
+  'motor-selection-std':    'motor-selection-std',
+  // — Gearbox Design —
+  'gearbox-design':         'gearbox-design',
+  // — Materials Explorer —
+  'materials-explorer':     'materials-explorer',
+  // — Failure Prediction —
+  'failure-prediction':     'failure-prediction',
+  // — Failure Diagnosis —
+  'failure-diagnosis':      'failure-diagnosis',
+  // — Simulation FEA —
+  'simulation-fea':         'simulation-fea',
+  // — Topology Optimization —
+  'topology-optimization':  'topology-optimization',
+  // — Calculator —
+  'calculator':             'calculator',
+  // — Reducer Lubrication —
+  'reducer-lubrication':    'reducer-lubrication',
+  // — Concrete Reinforcement —
+  'concrete-reinforcement': 'concrete-reinforcement',
+  // — Ohm's Law —
+  'ohms-law':               'ohms-law',
+  // — Voltage Drop —
+  'voltage-drop':           'voltage-drop',
+  // — Periodic Table —
+  'periodic-table':         'periodic-table',
+  // — Chemistry Reactions —
+  'chemistry-reactions':    'chemistry-reactions',
+  // — Biology Genetics —
+  'biology-genetics':       'biology-genetics',
+  // — CS Algorithms —
+  'cs-algorithms':          'cs-algorithms',
+  // — Naval Hydrostatics —
+  'naval-hydrostatics':     'naval-hydrostatics',
+  // — Physics Solver —
+  'physics-solver':         'physics-solver',
+  // — Bolt Torque —
+  'bolt-torque':            'bolt-torque',
+  // — Chain Drive —
+  'chain-drive':            'chain-drive',
+  // — Belt Drive —
+  'belt-drive':             'belt-drive',
+  // — Material Selector AI —
+  'material-selector-ai':   'material-selector-ai',
+  // — Three-Phase Power —
+  'three-phase-power':      'three-phase-power',
+  // — Digital Logic —
+  'digital-logic':          'digital-logic',
+  // — Filter Design —
+  'filter-design':          'filter-design',
+  // — Planetary Gearbox —
+  'planetary-gearbox':      'planetary-gearbox',
+  // — Machining Details —
+  'machining-details':      'machining-details',
+  // — Manufacturing —
+  'manufacturing':          'manufacturing',
+  // — Cost Estimator —
+  'cost-estimator':         'cost-estimator',
+  // — AI Copilot —
+  'ai-copilot':             'ai-copilot',
+  // — Engineering Notes —
+  'engineering-notes':      'engineering-notes',
+  // — Settings —
+  'settings':               'settings',
+  // — File Explorer —
+  'file-explorer':          'file-explorer',
+  // — Project Manager —
+  'project-manager':        'project-manager',
+  // — Project Vault —
+  'project-vault':          'project-vault',
+  // — Browser —
+  'browser':                'browser',
+  // — Terminal —
+  'terminal':               'terminal',
+  // — Holographic Viewer —
+  'holographic-viewer':     'holographic-viewer',
+  // — Matrix Screensaver —
+  'matrix-screensaver':     'matrix-screensaver',
+  // — Parametric CAD —
+  'parametric-cad':         'parametric-cad',
+};
+
+
+/**
  * Generate unique metadata for each module page.
  * Uses the Centralized SEO Registry (Master Parameter Table).
  */
@@ -145,95 +303,7 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
   if (moduleSlug === 'tolerance-stackup') {
     redirect('/fits');
   }
-  
-  let type: ModuleType | null = null;
-  
-  switch(moduleSlug) {
-    case 'aluminum':
-    case 'profile-weight': type = 'profile-weight'; break;
-    case 'bearings': type = 'bearings'; break;
-    case 'converter':
-    case 'unit-converter': type = 'unit-converter'; break;
-    case 'fasteners': type = 'fasteners'; break;
-    case 'gears':
-    case 'gears-bearings': type = 'gears-bearings'; break;
-    case 'handbook': type = 'handbook'; break;
-    case 'pumps': type = 'pumps'; break;
-    case 'sheet-metal': type = 'sheet-metal'; break;
-    case 'strength':
-    case 'strength-analysis': type = 'strength-analysis'; break;
-    case 'welding': type = 'welding'; break;
-    case 'nesting':
-    case 'nesting-2d': type = 'nesting-2d'; break;
-    case 'fits':
-    case 'fits-tolerances': type = 'fits-tolerances'; break;
-    case 'beam-deflection': type = 'beam-deflection'; break;
-    case 'fatigue':
-    case 'fatigue-analysis': type = 'fatigue-analysis'; break;
-    case 'thermal':
-    case 'thermal-expansion': type = 'thermal-expansion'; break;
-    case 'fluids':
-    case 'fluid-dynamics': type = 'fluid-dynamics'; break;
-    case 'aerospace':
-    case 'aerospace-dynamics': type = 'aerospace-dynamics'; break;
-    case 'kinematics':
-    case 'physics-kinematics': type = 'physics-kinematics'; break;
-    case 'sketch-pad': type = 'sketch-pad'; break;
-    case 'cad-editor': type = 'cad-editor'; break;
-    case 'engineering-selection': type = 'engineering-selection'; break;
-    case 'mfg-readiness':
-    case 'manufacturing-readiness': type = 'manufacturing-readiness'; break;
-    case 'mfg-sandbox':
-    case 'manufacturing-sandbox': type = 'manufacturing-sandbox'; break;
-    case 'cutting-optimizer': type = 'cutting-optimizer'; break;
-    case 'materials-db': type = 'materials-db'; break;
-    case 'machine-assembly': type = 'machine-assembly'; break;
-    case 'fatigue-advanced': type = 'fatigue-advanced'; break;
-    case 'motor-selection': type = 'motor-selection-std'; break;
-    case 'gearbox-design': type = 'gearbox-design'; break;
-    case 'materials-explorer': type = 'materials-explorer'; break;
-    case 'failure-prediction': type = 'failure-prediction'; break;
-    case 'failure-diagnosis': type = 'failure-diagnosis'; break;
-    case 'simulation-fea': type = 'simulation-fea'; break;
-    case 'topology-optimization': type = 'topology-optimization'; break;
-    case 'calculator': type = 'calculator'; break;
-    case 'reducer-lubrication': type = 'reducer-lubrication'; break;
-    case 'concrete-reinforcement': type = 'concrete-reinforcement'; break;
-    case 'ohms-law': type = 'ohms-law'; break;
-    case 'voltage-drop': type = 'voltage-drop'; break;
-    case 'periodic-table': type = 'periodic-table'; break;
-    case 'chemistry-reactions': type = 'chemistry-reactions'; break;
-    case 'biology-genetics': type = 'biology-genetics'; break;
-    case 'cs-algorithms': type = 'cs-algorithms'; break;
-    case 'naval-hydrostatics': type = 'naval-hydrostatics'; break;
-    case 'physics-solver': type = 'physics-solver'; break;
-    case 'bolt-torque': type = 'bolt-torque'; break;
-    case 'chain-drive': type = 'chain-drive'; break;
-    case 'belt-drive': type = 'belt-drive'; break;
-    case 'motor-selection-std': type = 'motor-selection-std'; break;
-    case 'material-selector-ai': type = 'material-selector-ai'; break;
-    case 'three-phase-power': type = 'three-phase-power'; break;
-    case 'digital-logic': type = 'digital-logic'; break;
-    case 'filter-design': type = 'filter-design'; break;
-    case 'planetary-gearbox': type = 'planetary-gearbox'; break;
-    case 'machining-details': type = 'machining-details'; break;
-    case 'manufacturing': type = 'manufacturing'; break;
-    case 'cost-estimator': type = 'cost-estimator'; break;
-    case 'ai-copilot': type = 'ai-copilot'; break;
-    case 'engineering-notes': type = 'engineering-notes'; break;
-    case 'settings': type = 'settings'; break;
-    case 'file-explorer': type = 'file-explorer'; break;
-    case 'project-manager': type = 'project-manager'; break;
-    case 'project-vault': type = 'project-vault'; break;
-    case 'browser': type = 'browser'; break;
-    case 'terminal': type = 'terminal'; break;
-    case 'holographic-viewer': type = 'holographic-viewer'; break;
-    case 'matrix-screensaver': type = 'matrix-screensaver'; break;
-    case 'parametric-cad': type = 'parametric-cad'; break;
-    default:
-        type = moduleSlug as ModuleType; 
-        break;
-  }
+  const type: ModuleType | null = SLUG_TO_MODULE[moduleSlug] ?? (moduleSlug as ModuleType);
 
   if (!type) return notFound();
 

@@ -153,6 +153,7 @@ const de = {
     architecture: "Architektur",
     archName: "B-Model Cloud Hybrid",
     engineStatus: "Engine-Status",
+    toggleDevMode: "Entwicklermodus umschalten",
     statusOptimized: "OPTIMIERT",
     localeLatency: "Locale-Latenz",
     latencyValue: "2.4ms (Cache Hit)",
@@ -180,7 +181,7 @@ const de = {
     modules: {
         'calculator': { title: "Wissenschaftlicher Rechner" },
         'unit-converter': { title: "Einheitenumrechner" },
-        'ai-copilot': { title: "KI-Assistent" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "Dateimanager" },
         'settings': { title: "Einstellungen" },
         'handbook': { title: "Technisches Handbuch" },
@@ -213,13 +214,15 @@ const de = {
         'voltage-drop': { title: "Spannungsabfall" },
         'welding-fillet': { title: "Kehlnahtfestigkeit" },
         'welding-heat': { title: "Schweißwärmeeinbringung" },
+        'analytics-dashboard': { title: "Analytik" },
+        'engineering-notes': { title: "Ingenieurnotizen" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': 'Erweiterte Berechnungen',
         'unit-converter': 'Einheiten umrechnen',
-        'ai-copilot': 'KI-Assistenz',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': 'Systemdateien',
         'settings': 'Systemeinstellungen',
         'handbook': 'Formeln & Daten',
@@ -294,6 +297,7 @@ const de = {
         groupExport: "Export",
         groupPaint: "Malen",
         groupContent: "Inhalt",
+        labelWorkstation: "INGENIEURARBEITSPLATZ",
     },
 
     // Node Palette Categories

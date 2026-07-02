@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { ModuleType } from '@/config/modules';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
@@ -31,6 +31,12 @@ const FluidDynamicsModule = dynamic(() => import('@/modules/mechanical/FluidDyna
 const BoltTorqueModule = dynamic(() => import('@/components/modules/mechanical/FastenerAssemblyModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const BearingAnalysisModule = dynamic(() => import('@/components/modules/mechanical/BearingAnalysisModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const FatigueAnalysisModule = dynamic(() => import('@/components/modules/mechanical/FatigueAnalysisModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const SoundMeterModule = dynamic(() => import('@/components/modules/mechanical/SoundMeterModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ClinometerModule = dynamic(() => import('@/components/modules/mechanical/ClinometerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const GPSSurveyorModule = dynamic(() => import('@/components/modules/mechanical/GPSSurveyorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const HardnessConverterModule = dynamic(() => import('@/components/modules/mechanical/HardnessConverterModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+
+
 
 // Advanced Engineering V2 Modules
 const MaterialAIModule = dynamic(() => import('@/components/modules/ai/MaterialAIModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -61,6 +67,15 @@ const BiologyGeneticsModule = dynamic(() => import('@/modules/science/BiologyGen
 const CSAlgorithmsModule = dynamic(() => import('@/modules/software/CSAlgorithms').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const AerospaceDynamicsModule = dynamic(() => import('@/modules/mechanical/AerospaceDynamics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const NavalHydrostaticsModule = dynamic(() => import('@/modules/mechanical/NavalHydrostatics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const WindTunnelModule = dynamic(() => import('@/components/modules/mechanical/AerodynamicsModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const HeatSinkModule = dynamic(() => import('@/components/modules/mechanical/HeatSinkModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PressureVesselModule = dynamic(() => import('@/components/modules/mechanical/PressureVesselModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PipeFrictionModule = dynamic(() => import('@/components/modules/mechanical/PipeFrictionModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ColumnBucklingModule = dynamic(() => import('@/components/modules/mechanical/ColumnBucklingModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const AdvancedSpringModule = dynamic(() => import('@/components/modules/mechanical/AdvancedSpringModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const VibrationModule = dynamic(() => import('@/components/modules/mechanical/VibrationModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ToleranceStackupModule = dynamic(() => import('@/components/modules/mechanical/ToleranceStackupModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const HvacLoadModule = dynamic(() => import('@/components/modules/mechanical/HvacLoadModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 // Electrical
 const OhmsLawModule = dynamic(() => import('@/components/modules/electrical/OhmsLawModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -155,7 +170,16 @@ import { HeadlessCalculatorWindow } from './HeadlessCalculatorWindow';
 const FastenersModuleComponent = dynamic(() => import('@/components/modules/mechanical/FastenersModule').then(mod => mod.FastenersModule as any), { loading: () => <ModuleLoading /> });
 
 export function WindowContent({ type }: WindowContentProps) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const { currentLanguage, dictionary } = useOSStore();
+
+    if (!mounted) {
+        return <ModuleLoading />;
+    }
 
     // 1. Check if this is a dynamically registered UDA Module
     const DynamicComponent = ModuleRegistry.getComponentByType(type);
@@ -194,6 +218,10 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'fluid-dynamics': return <FluidDynamicsModule />;
         case 'machining-details': return <MachiningDetailsModule />;
         case 'fatigue-analysis': return <FatigueAnalysisModule />;
+        case 'sound-meter': return <SoundMeterModule />;
+        case 'clinometer': return <ClinometerModule />;
+        case 'gps-surveyor': return <GPSSurveyorModule />;
+        case 'hardness-converter': return <HardnessConverterModule />;
         case 'fatigue-advanced': return <UniversalCalcRenderer schema={fatigueLifeSnSchema} />;
         case 'chain-drive': return <UniversalCalcRenderer schema={chainDriveSchema} />;
         case 'belt-drive': return <UniversalCalcRenderer schema={beltDriveSchema} />;
@@ -206,6 +234,15 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'cs-algorithms': return <CSAlgorithmsModule />;
         case 'aerospace-dynamics': return <AerospaceDynamicsModule />;
         case 'naval-hydrostatics': return <NavalHydrostaticsModule />;
+        case 'wind-tunnel': return <WindTunnelModule />;
+        case 'heat-sink': return <HeatSinkModule />;
+        case 'pressure-vessel': return <PressureVesselModule />;
+        case 'pipe-friction': return <PipeFrictionModule />;
+        case 'column-buckling': return <ColumnBucklingModule />;
+        case 'advanced-spring': return <AdvancedSpringModule />;
+        case 'vibration': return <VibrationModule />;
+        case 'tolerance-stackup': return <ToleranceStackupModule />;
+        case 'hvac-load': return <HvacLoadModule />;
         case 'ohms-law': return <OhmsLawModule />;
         case 'voltage-drop': return <VoltageDropModule />;
         case 'three-phase-power': return <ThreePhasePowerModule />;

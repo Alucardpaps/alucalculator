@@ -6,9 +6,13 @@ import {
     Ruler, AlertTriangle, ArrowDown, Layers, Subtitles, Settings2, Target
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { getDedicatedCalcPage } from '@/locales/dedicatedCalcTranslations';
+import { getBeamDeflectionModuleStrings, formatBeamCriticalWarning } from '@/locales/beamDeflectionModuleTranslations';
 
 export default function BeamDeflectionModule() {
-    const { t } = useI18nStore();
+    const { language, t } = useI18nStore();
+    const d = getDedicatedCalcPage(language).beamDeflection;
+    const b = getBeamDeflectionModuleStrings(language);
 
     const [inputs, setInputs] = useState({
         length: 3000, // mm
@@ -55,7 +59,9 @@ export default function BeamDeflectionModule() {
 
                 <div className="flex items-center gap-2 mb-4 text-cyan-400">
                     <Settings2 size={16} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Kinematic Setup</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                        {b.kinematicSetup}
+                    </span>
                 </div>
 
                 {/* Beam Type Toggle */}
@@ -66,32 +72,35 @@ export default function BeamDeflectionModule() {
                             onClick={() => setInputs({ ...inputs, type })}
                             className={`flex-1 py-2.5 rounded-[10px] text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-300 ${inputs.type === type ? 'bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-[0_4px_15px_rgba(59,130,246,0.4)] border border-blue-400/50' : 'text-gray-500 hover:text-gray-300'}`}
                         >
-                            {type === 'simple' ? 'Simply Supported' : 'Cantilevered'}
+                            {type === 'simple' 
+                                ? b.simplySupported 
+                                : b.cantilever
+                            }
                         </button>
                     ))}
                 </div>
 
                 <div className="space-y-6 flex-1">
                     <PremiumNumBox
-                        label="Beam Length (L)" unit="mm"
+                        label={d.spanLength || "Beam Length (L)"} unit="mm"
                         value={inputs.length} min={500} max={20000} step={100}
                         onChange={(v: number) => setInputs({ ...inputs, length: v })}
                         color="#3b82f6"
                     />
                     <PremiumNumBox
-                        label="Applied Load (F)" unit="kN"
+                        label={b.appliedLoad} unit="kN"
                         value={inputs.load} min={0.1} max={500} step={0.5}
                         onChange={(v: number) => setInputs({ ...inputs, load: v })}
                         color="#f59e0b"
                     />
                     <PremiumNumBox
-                        label="Elastic Modulus (E)" unit="GPa"
+                        label={d.modulusOfElasticity || "Elastic Modulus (E)"} unit="GPa"
                         value={inputs.modulus} min={10} max={300} step={1}
                         onChange={(v: number) => setInputs({ ...inputs, modulus: v })}
                         color="#10b981"
                     />
                     <PremiumNumBox
-                        label="Area Moment (Ix)" unit="10⁶ mm⁴"
+                        label={d.inertiaMoment || "Area Moment (Ix)"} unit="10⁶ mm⁴"
                         value={inputs.inertia} min={0.1} max={5000} step={0.1}
                         onChange={(v: number) => setInputs({ ...inputs, inertia: v })}
                         color="#8b5cf6"
@@ -114,7 +123,10 @@ export default function BeamDeflectionModule() {
                                     className="w-2.5 h-2.5 rounded-full" 
                                     animate={{ backgroundColor: activeColor, boxShadow: `0 0 15px ${activeColor}` }} 
                                 />
-                                {results.isSafe ? 'INTEGRITY: NORMAL' : 'WARNING: LIMIT EXCEEDED'}
+                                {results.isSafe 
+                                    ? b.integrityNormal 
+                                    : b.limitExceeded
+                                }
                             </motion.div>
                             <div className="flex items-baseline gap-4">
                                 <motion.div 
@@ -129,12 +141,12 @@ export default function BeamDeflectionModule() {
                                 </motion.div>
                                 <span className="text-4xl font-bold text-gray-500 mb-4">mm</span>
                             </div>
-                            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">Maximum Deflection (ΔMax)</p>
+                            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">{d.maxDeflection || "Maximum Deflection (ΔMax)"}</p>
                         </div>
                         
                         <div className="flex flex-col items-end gap-1 pt-6 text-right">
                             <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2">
-                                <Target size={12} /> Allowable Limit (L/300)
+                                <Target size={12} /> {b.allowableLimit}
                             </span>
                             <span className="text-3xl font-mono font-black text-gray-300">{results.limit.toFixed(2)} <span className="text-xl text-gray-500">mm</span></span>
                         </div>
@@ -147,7 +159,7 @@ export default function BeamDeflectionModule() {
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
                     <div className="absolute top-6 left-6 flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                        <Ruler size={14} /> LIVE DEFORMATION KINEMATICS
+                        <Ruler size={14} /> {b.liveDeformation}
                     </div>
 
                     {/* Beam Animation Container */}
@@ -238,8 +250,12 @@ export default function BeamDeflectionModule() {
                         >
                             <AlertTriangle className="shrink-0 animate-pulse" size={32} />
                             <div>
-                                <p className="text-xs font-black uppercase tracking-[0.2em]">Critical Structural Warning</p>
-                                <p className="text-[11px] opacity-80 mt-1">Deflection exceeds the structural limit. Consider increasing beam inertia ({inputs.inertia} → {Math.ceil(inputs.inertia * 1.5)}) or utilizing a higher modulus material.</p>
+                                <p className="text-xs font-black uppercase tracking-[0.2em]">
+                                    {b.criticalWarning}
+                                </p>
+                                <p className="text-[11px] opacity-80 mt-1">
+                                    {formatBeamCriticalWarning(b, inputs.inertia, Math.ceil(inputs.inertia * 1.5))}
+                                </p>
                             </div>
                         </motion.div>
                     )}

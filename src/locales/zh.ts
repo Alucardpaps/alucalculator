@@ -149,6 +149,7 @@ export default {
     architecture: "架构",
     archName: "B-Model 云混合架构",
     engineStatus: "引擎状态",
+    toggleDevMode: "切换开发者模式",
     statusOptimized: "已优化",
     localeLatency: "区域延迟",
     latencyValue: "2.4ms (缓存命中)",
@@ -176,7 +177,7 @@ export default {
     modules: {
         'calculator': { title: "科学计算器" },
         'unit-converter': { title: "单位换算器" },
-        'ai-copilot': { title: "AI 助手" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "文件管理器" },
         'settings': { title: "设置" },
         'handbook': { title: "工程手册" },
@@ -208,13 +209,15 @@ export default {
         'voltage-drop': { title: "电压降" },
         'welding-fillet': { title: "角焊缝强度" },
         'welding-heat': { title: "焊接热输入" },
+        'analytics-dashboard': { title: "分析" },
+        'engineering-notes': { title: "工程笔记" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': '高级数学计算',
         'unit-converter': '工程单位换算',
-        'ai-copilot': 'AI 设计辅助',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': '系统文件管理',
         'settings': '系统偏好设置',
         'handbook': '参考公式与数据',
@@ -285,6 +288,7 @@ export default {
         groupExport: "导出",
         groupPaint: "绘制",
         groupContent: "内容",
+        labelWorkstation: "工程工作站",
     },
 
     // Node Palette Categories

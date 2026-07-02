@@ -47,7 +47,10 @@ const ANALYSIS_MODES: { id: AnalysisMode; label: string; labelTr: string; icon: 
     { id: 'combined', label: 'Combined', labelTr: 'Kombine', icon: Zap, color: 'bg-amber-600' },
 ];
 
+import { getStrengthPageStrings, getStrengthModeLabel, getStrengthShapeLabel } from '@/locales/strengthPageTranslations';
+
 export default function StrengthPageClient({ lang, dict }: { lang: string, dict: any }) {
+    const s = getStrengthPageStrings(lang);
     const [mode, setMode] = useState<AnalysisMode>('principal');
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
     const [selectedMaterial, setSelectedMaterial] = useState<MaterialStrength>(STRENGTH_MATERIALS[0]);
@@ -190,7 +193,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             {dict.strength?.title || 'Stress Analysis'}
                         </h1>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                            {lang === 'tr' ? currentModeInfo.labelTr : currentModeInfo.label} • {selectedMaterial.name}
+                            {getStrengthModeLabel(s, mode)} • {selectedMaterial.name}
                         </p>
                     </div>
                 </div>
@@ -224,7 +227,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 }`}
                         >
                             <Icon size={14} />
-                            {lang === 'tr' ? m.labelTr : m.label}
+                            {getStrengthModeLabel(s, m.id)}
                         </button>
                     );
                 })}
@@ -236,10 +239,10 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                             <Box size={18} className="text-cyan-400" />
-                            <h3 className="text-sm font-bold text-white">{lang === 'tr' ? 'Şekil Seçimi' : 'Shape Selection'}</h3>
+                            <h3 className="text-sm font-bold text-white">{s.shapeSelection}</h3>
                         </div>
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <span className="text-xs text-slate-400">{lang === 'tr' ? 'Manuel' : 'Manual'}</span>
+                            <span className="text-xs text-slate-400">{s.manual}</span>
                             <input
                                 type="checkbox"
                                 checked={useShapeCalc}
@@ -247,7 +250,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 className="w-10 h-5 rounded-full appearance-none bg-slate-600 transition-all duration-300 checked:bg-cyan-500 relative cursor-pointer
                                     before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 before:transition-all before:duration-300 checked:before:translate-x-5"
                             />
-                            <span className="text-xs text-cyan-400 font-bold">{lang === 'tr' ? 'Şekilden' : 'From Shape'}</span>
+                            <span className="text-xs text-cyan-400 font-bold">{s.fromShape}</span>
                         </label>
                     </div>
 
@@ -265,7 +268,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                             }`}
                                     >
                                         <span className="text-base">{SHAPE_INFO[shape].icon}</span>
-                                        {lang === 'tr' ? SHAPE_INFO[shape].nameTr : SHAPE_INFO[shape].name}
+                                        {getStrengthShapeLabel(s, shape)}
                                     </button>
                                 ))}
                             </div>
@@ -274,38 +277,38 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                                 {(selectedShape === 'box') && (
                                     <>
-                                        <CalculatorInput label={lang === 'tr' ? 'Genişlik (B)' : 'Width (B)'} unit="mm" value={shapeDims.width || 0} onChange={(e) => setShapeDims({ ...shapeDims, width: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Yükseklik (H)' : 'Height (H)'} unit="mm" value={shapeDims.height || 0} onChange={(e) => setShapeDims({ ...shapeDims, height: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Et Kalınlığı (t)' : 'Wall (t)'} unit="mm" value={shapeDims.wallThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, wallThickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.widthB} unit="mm" value={shapeDims.width || 0} onChange={(e) => setShapeDims({ ...shapeDims, width: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.heightH} unit="mm" value={shapeDims.height || 0} onChange={(e) => setShapeDims({ ...shapeDims, height: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.wallT} unit="mm" value={shapeDims.wallThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, wallThickness: Number(e.target.value) })} />
                                     </>
                                 )}
                                 {(selectedShape === 'pipe') && (
                                     <>
-                                        <CalculatorInput label={lang === 'tr' ? 'Dış Çap (D)' : 'Outer Dia (D)'} unit="mm" value={shapeDims.diameter || 0} onChange={(e) => setShapeDims({ ...shapeDims, diameter: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Et Kalınlığı (t)' : 'Wall (t)'} unit="mm" value={shapeDims.wallThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, wallThickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.outerDia} unit="mm" value={shapeDims.diameter || 0} onChange={(e) => setShapeDims({ ...shapeDims, diameter: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.wallT} unit="mm" value={shapeDims.wallThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, wallThickness: Number(e.target.value) })} />
                                     </>
                                 )}
                                 {(selectedShape === 'bar') && (
-                                    <CalculatorInput label={lang === 'tr' ? 'Çap (D)' : 'Diameter (D)'} unit="mm" value={shapeDims.diameter || 0} onChange={(e) => setShapeDims({ ...shapeDims, diameter: Number(e.target.value) })} />
+                                    <CalculatorInput label={s.diameterD} unit="mm" value={shapeDims.diameter || 0} onChange={(e) => setShapeDims({ ...shapeDims, diameter: Number(e.target.value) })} />
                                 )}
                                 {(selectedShape === 'sheet' || selectedShape === 'rectangle') && (
                                     <>
-                                        <CalculatorInput label={lang === 'tr' ? 'Genişlik (B)' : 'Width (B)'} unit="mm" value={shapeDims.width || 0} onChange={(e) => setShapeDims({ ...shapeDims, width: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Kalınlık (t)' : 'Thickness (t)'} unit="mm" value={shapeDims.thickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, thickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.widthB} unit="mm" value={shapeDims.width || 0} onChange={(e) => setShapeDims({ ...shapeDims, width: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.thicknessT} unit="mm" value={shapeDims.thickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, thickness: Number(e.target.value) })} />
                                     </>
                                 )}
                                 {(selectedShape === 'ibeam' || selectedShape === 'channel' || selectedShape === 'tee') && (
                                     <>
-                                        <CalculatorInput label={lang === 'tr' ? 'Yükseklik (H)' : 'Height (H)'} unit="mm" value={shapeDims.height || 0} onChange={(e) => setShapeDims({ ...shapeDims, height: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Flanş Genişliği' : 'Flange Width'} unit="mm" value={shapeDims.flangeWidth || 0} onChange={(e) => setShapeDims({ ...shapeDims, flangeWidth: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Flanş Kalınlığı' : 'Flange Thick.'} unit="mm" value={shapeDims.flangeThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, flangeThickness: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Gövde Kalınlığı' : 'Web Thick.'} unit="mm" value={shapeDims.webThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, webThickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.heightH} unit="mm" value={shapeDims.height || 0} onChange={(e) => setShapeDims({ ...shapeDims, height: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.flangeWidth} unit="mm" value={shapeDims.flangeWidth || 0} onChange={(e) => setShapeDims({ ...shapeDims, flangeWidth: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.flangeThick} unit="mm" value={shapeDims.flangeThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, flangeThickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.webThick} unit="mm" value={shapeDims.webThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, webThickness: Number(e.target.value) })} />
                                     </>
                                 )}
                                 {(selectedShape === 'angle') && (
                                     <>
-                                        <CalculatorInput label={lang === 'tr' ? 'Bacak Uzunluğu' : 'Leg Length'} unit="mm" value={shapeDims.legWidth || 0} onChange={(e) => setShapeDims({ ...shapeDims, legWidth: Number(e.target.value) })} />
-                                        <CalculatorInput label={lang === 'tr' ? 'Kalınlık (t)' : 'Thickness (t)'} unit="mm" value={shapeDims.legThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, legThickness: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.legLength} unit="mm" value={shapeDims.legWidth || 0} onChange={(e) => setShapeDims({ ...shapeDims, legWidth: Number(e.target.value) })} />
+                                        <CalculatorInput label={s.thicknessT} unit="mm" value={shapeDims.legThickness || 0} onChange={(e) => setShapeDims({ ...shapeDims, legThickness: Number(e.target.value) })} />
                                     </>
                                 )}
                             </div>
@@ -338,7 +341,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                     <Eye size={14} className="text-cyan-400" />
-                                    {lang === 'tr' ? 'Profil Görünümü' : 'Profile View'}
+                                    {s.profileView}
                                 </span>
                             </div>
                             <div className="h-[200px] bg-slate-800 rounded-lg overflow-hidden">
@@ -363,7 +366,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {(mode === 'principal' || mode === 'vonMises') && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? '2B Gerilme Durumu' : '2D Stress State'}
+                                {s.stress2D}
                             </h3>
                             <div className="grid grid-cols-3 gap-3">
                                 <CalculatorInput label="σx" unit="MPa" value={sigmaX} onChange={(e) => setSigmaX(Number(e.target.value))} />
@@ -377,11 +380,11 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'fatigue' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Yorulma Yükleri' : 'Fatigue Loading'}
+                                {s.fatigueLoading}
                             </h3>
                             <div className="grid grid-cols-2 gap-3">
-                                <CalculatorInput label={lang === 'tr' ? 'Değişken (σa)' : 'Alternating (σa)'} unit="MPa" value={sigmaA} onChange={(e) => setSigmaA(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Ortalama (σm)' : 'Mean (σm)'} unit="MPa" value={sigmaM} onChange={(e) => setSigmaM(Number(e.target.value))} />
+                                <CalculatorInput label={s.altSigma} unit="MPa" value={sigmaA} onChange={(e) => setSigmaA(Number(e.target.value))} />
+                                <CalculatorInput label={s.meanSigma} unit="MPa" value={sigmaM} onChange={(e) => setSigmaM(Number(e.target.value))} />
                             </div>
                             <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                 <div className="text-[10px] text-slate-500">Material: {selectedMaterial.name}</div>
@@ -394,18 +397,18 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'buckling' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Kolon Parametreleri' : 'Column Parameters'}
+                                {s.columnParams}
                             </h3>
                             <div className="grid grid-cols-2 gap-3 mb-3">
-                                <CalculatorInput label={lang === 'tr' ? 'Uzunluk (L)' : 'Length (L)'} unit="mm" value={columnLength} onChange={(e) => setColumnLength(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Uygulanan Yük' : 'Applied Load'} unit="N" value={appliedLoad} onChange={(e) => setAppliedLoad(Number(e.target.value))} />
+                                <CalculatorInput label={s.lengthL} unit="mm" value={columnLength} onChange={(e) => setColumnLength(Number(e.target.value))} />
+                                <CalculatorInput label={s.appliedLoad} unit="N" value={appliedLoad} onChange={(e) => setAppliedLoad(Number(e.target.value))} />
                             </div>
                             <div className="grid grid-cols-2 gap-3 mb-3">
                                 <CalculatorInput label="I (Inertia)" unit="mm⁴" value={inertia} onChange={(e) => setInertiaManual(Number(e.target.value))} />
                                 <CalculatorInput label="A (Area)" unit="mm²" value={area} onChange={(e) => setAreaManual(Number(e.target.value))} />
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-400 uppercase mb-1 block">{lang === 'tr' ? 'Mesnet Koşulu' : 'End Condition'}</label>
+                                <label className="text-[10px] text-slate-400 uppercase mb-1 block">{s.endCondition}</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {(['pinned-pinned', 'fixed-pinned', 'fixed-fixed', 'fixed-free'] as const).map(ec => (
                                         <button
@@ -428,7 +431,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'beam' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Kiriş Parametreleri' : 'Beam Parameters'}
+                                {s.beamParams}
                             </h3>
                             <div className="grid grid-cols-2 gap-2 mb-3">
                                 {(['cantilever', 'simply_supported', 'fixed_both'] as BeamType[]).map(bt => (
@@ -467,15 +470,15 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'torsion' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Mil Parametreleri' : 'Shaft Parameters'}
+                                {s.shaftParams}
                             </h3>
                             <div className="grid grid-cols-2 gap-3">
                                 <CalculatorInput label="Torque (T)" unit="N·mm" value={torque} onChange={(e) => setTorque(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Uzunluk' : 'Length'} unit="mm" value={shaftLength} onChange={(e) => setShaftLength(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Dış Çap (D)' : 'Outer Dia (D)'} unit="mm" value={shaftDiameter} onChange={(e) => setShaftDiameter(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'İç Çap (d)' : 'Inner Dia (d)'} unit="mm" value={shaftInnerDia} onChange={(e) => setShaftInnerDia(Number(e.target.value))} />
+                                <CalculatorInput label={s.length} unit="mm" value={shaftLength} onChange={(e) => setShaftLength(Number(e.target.value))} />
+                                <CalculatorInput label={s.outerDia} unit="mm" value={shaftDiameter} onChange={(e) => setShaftDiameter(Number(e.target.value))} />
+                                <CalculatorInput label={s.innerDia} unit="mm" value={shaftInnerDia} onChange={(e) => setShaftInnerDia(Number(e.target.value))} />
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-2">İç çap 0 = masif mil</p>
+                            <p className="text-[10px] text-slate-400 mt-2">{s.solidShaftHint}</p>
                         </div>
                     )}
 
@@ -483,12 +486,12 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'pressure' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Basınçlı Kap' : 'Pressure Vessel'}
+                                {s.pressureVessel}
                             </h3>
                             <div className="grid grid-cols-1 gap-3">
-                                <CalculatorInput label={lang === 'tr' ? 'İç Basınç (p)' : 'Internal Pressure (p)'} unit="MPa" value={innerPressure} onChange={(e) => setInnerPressure(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'İç Yarıçap (ri)' : 'Inner Radius (ri)'} unit="mm" value={innerRadius} onChange={(e) => setInnerRadius(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Et Kalınlığı (t)' : 'Wall Thickness (t)'} unit="mm" value={wallThickness} onChange={(e) => setWallThickness(Number(e.target.value))} />
+                                <CalculatorInput label={s.internalPressure} unit="MPa" value={innerPressure} onChange={(e) => setInnerPressure(Number(e.target.value))} />
+                                <CalculatorInput label={s.innerRadius} unit="mm" value={innerRadius} onChange={(e) => setInnerRadius(Number(e.target.value))} />
+                                <CalculatorInput label={s.wallThickness} unit="mm" value={wallThickness} onChange={(e) => setWallThickness(Number(e.target.value))} />
                             </div>
                         </div>
                     )}
@@ -497,11 +500,11 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                     {mode === 'combined' && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                {lang === 'tr' ? 'Kombine Yükleme' : 'Combined Loading'}
+                                {s.combinedLoading}
                             </h3>
                             <div className="grid grid-cols-2 gap-3 mb-3">
-                                <CalculatorInput label={lang === 'tr' ? 'Eksenel (F)' : 'Axial (F)'} unit="N" value={axialLoad} onChange={(e) => setAxialLoad(Number(e.target.value))} />
-                                <CalculatorInput label={lang === 'tr' ? 'Moment (M)' : 'Bending (M)'} unit="N·mm" value={bendingMoment} onChange={(e) => setBendingMoment(Number(e.target.value))} />
+                                <CalculatorInput label={s.axialF} unit="N" value={axialLoad} onChange={(e) => setAxialLoad(Number(e.target.value))} />
+                                <CalculatorInput label={s.bendingM} unit="N·mm" value={bendingMoment} onChange={(e) => setBendingMoment(Number(e.target.value))} />
                                 <CalculatorInput label="Torque (T)" unit="N·mm" value={combinedTorque} onChange={(e) => setCombinedTorque(Number(e.target.value))} />
                                 <CalculatorInput label="A" unit="mm²" value={combinedArea} onChange={(e) => setCombinedAreaManual(Number(e.target.value))} />
                                 <CalculatorInput label="I" unit="mm⁴" value={combinedI} onChange={(e) => setCombinedIManual(Number(e.target.value))} />
@@ -530,7 +533,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Güvenlik K.' : 'Safety Factor'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold flex items-center gap-2 ${safetyFactor.status === 'failure' ? 'text-red-400' : safetyFactor.status === 'marginal' ? 'text-yellow-400' : 'text-green-400'}`}>
                                         {safetyFactor.fos.toFixed(2)}
                                         {safetyFactor.status === 'safe' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
@@ -589,13 +592,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                         <div className="bg-slate-900 text-white rounded-xl p-6 shadow-xl">
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Kritik Yük (Pcr)' : 'Critical Load (Pcr)'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.criticalLoad}</div>
                                     <div className="text-4xl font-mono font-bold text-red-400">
                                         {(bucklingResults.Pcr / 1000).toFixed(1)} <span className="text-lg">kN</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Güvenlik K.' : 'Safety Factor'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold ${bucklingResults.safe ? 'text-green-400' : 'text-red-400'}`}>
                                         {(bucklingResults.Pcr / appliedLoad).toFixed(2)}
                                     </div>
@@ -623,13 +626,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                         <div className="bg-slate-900 text-white rounded-xl p-6 shadow-xl">
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Maks Sehim' : 'Max Deflection'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxDeflection}</div>
                                     <div className="text-4xl font-mono font-bold text-green-400">
                                         {beamResults.maxDeflection.toFixed(3)} <span className="text-lg">mm</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Maks Gerilme' : 'Max Stress'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxStress}</div>
                                     <div className="text-4xl font-mono font-bold text-purple-400">
                                         {beamResults.maxStress.toFixed(1)} <span className="text-lg">MPa</span>
                                     </div>
@@ -657,13 +660,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                         <div className="bg-slate-900 text-white rounded-xl p-6 shadow-xl">
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Maks Kayma Ger.' : 'Max Shear Stress'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxShearStress}</div>
                                     <div className="text-4xl font-mono font-bold text-cyan-400">
                                         {torsionResults.maxShearStress.toFixed(1)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Burulma Açısı' : 'Angle of Twist'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.angleOfTwist}</div>
                                     <div className="text-4xl font-mono font-bold text-cyan-400">
                                         {torsionResults.angleOfTwistDeg.toFixed(3)} <span className="text-lg">°</span>
                                     </div>
@@ -678,13 +681,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             <div className="mb-2 text-xs text-slate-400">Method: {pressureResults.method}</div>
                             <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Çevresel (σh)' : 'Hoop (σh)'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.hoopStress}</div>
                                     <div className="text-3xl font-mono font-bold text-pink-400">
                                         {pressureResults.hoopStress.toFixed(1)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Eksenel (σa)' : 'Axial (σa)'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.axialStress}</div>
                                     <div className="text-3xl font-mono font-bold text-pink-400">
                                         {pressureResults.axialStress.toFixed(1)} <span className="text-lg">MPa</span>
                                     </div>
@@ -708,7 +711,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{lang === 'tr' ? 'Güvenlik K.' : 'Safety Factor'}</div>
+                                    <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold ${combinedResults.safetyFactor >= 2 ? 'text-green-400' : combinedResults.safetyFactor >= 1 ? 'text-yellow-400' : 'text-red-400'}`}>
                                         {combinedResults.safetyFactor.toFixed(2)}
                                     </div>
@@ -729,7 +732,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                 </div>
             </div>
 
-            <TheorySection title={lang === 'tr' ? 'Teori' : 'Theory'}>
+            <TheorySection title={s.theory}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
                     <div>
                         <h4 className="font-bold text-slate-800 dark:text-white mb-2">Von Mises Criterion</h4>

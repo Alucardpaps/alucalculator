@@ -4,8 +4,18 @@ import { AssumptionPanel, CalculationMetadata } from "@/components/ui/Assumption
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { CheckCircle, AlertTriangle, Droplets, Activity, Zap, TrendingUp } from 'lucide-react';
 import { motion } from "framer-motion";
+import { useI18nStore } from "@/store/i18nStore";
+import { useOSStore } from "@/store/osStore";
 
-export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
+import { getPumpsModuleStrings } from '@/locales/pumpsModuleTranslations';
+
+export function PumpsModule({ lang: propLang, dict: propDict }: { lang?: string, dict?: any }) {
+    const { language: storeLang } = useI18nStore();
+    const { dictionary: storeDict } = useOSStore();
+    const lang = propLang || storeLang;
+    const dict = propDict || storeDict;
+    const s = getPumpsModuleStrings(lang);
+
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
     // Inputs (Metric Internal)
@@ -66,12 +76,14 @@ export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
                         </div>
                         <div>
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">HydraNode v2</h1>
-                            <p className="text-[10px] text-blue-500/60 font-mono tracking-widest uppercase mt-1">Industrial Hydraulic Solver</p>
+                            <p className="text-[10px] text-blue-500/60 font-mono tracking-widest uppercase mt-1">
+                                {s.subtitle}
+                            </p>
                         </div>
                     </div>
                     <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
-                        <button onClick={() => setUnit('metric')} className={`px-4 py-1.5 text-[10px] font-black uppercase transition-all rounded-lg ${unit === 'metric' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Metric</button>
-                        <button onClick={() => setUnit('imperial')} className={`px-4 py-1.5 text-[10px] font-black uppercase transition-all rounded-lg ${unit === 'imperial' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Imperial</button>
+                        <button onClick={() => setUnit('metric')} className={`px-4 py-1.5 text-[10px] font-black uppercase transition-all rounded-lg ${unit === 'metric' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>{s.metric}</button>
+                        <button onClick={() => setUnit('imperial')} className={`px-4 py-1.5 text-[10px] font-black uppercase transition-all rounded-lg ${unit === 'imperial' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>{s.imperial}</button>
                     </div>
                 </div>
 
@@ -80,7 +92,7 @@ export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
                     
                     {/* Visualizer & Controls */}
                     <div className="space-y-8">
-                        <EngineeringVisualization status={status} label="GEOMETRIC CHARACTERISTIC">
+                        <EngineeringVisualization status={status} label={s.geometricCharacteristic}>
                             <div className="flex flex-col items-center justify-center p-8 w-full h-full min-h-[300px] relative bg-[#05080f] rounded-[2.5rem] border border-white/5 overflow-hidden">
                                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
                                 
@@ -100,8 +112,15 @@ export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
 
                                 <div className="mt-8 flex gap-6">
                                     <div className="text-center">
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Type</div>
-                                        <div className="text-sm font-black text-white italic mt-1">{results.ns < 30 ? 'Centrifugal' : results.ns < 100 ? 'Mixed Flow' : 'Axial Flow'}</div>
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.type}</div>
+                                        <div className="text-sm font-black text-white italic mt-1">
+                                            {results.ns < 30 
+                                                ? s.centrifugal
+                                                : results.ns < 100 
+                                                ? s.mixedFlow
+                                                : s.axialFlow
+                                            }
+                                        </div>
                                     </div>
                                     <div className="w-px h-8 bg-white/10" />
                                     <div className="text-center">
@@ -114,19 +133,29 @@ export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
 
                         <div className="grid grid-cols-2 gap-6 bg-white/[0.02] border border-white/5 p-8 rounded-[2.5rem]">
                             <CalculatorInput
-                                label={`Flow rate (Q)`}
+                                label={s.flowRate}
                                 unit={unit === 'metric' ? 'm³/h' : 'GPM'}
                                 value={unit === 'metric' ? flow : parseFloat(toGPM(flow).toFixed(1))}
-                                onChange={(e) => unit === 'metric' ? setFlow(Number(e.target.value)) : setFlow(toM3H(Number(e.target.value)))}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => unit === 'metric' ? setFlow(Number(e.target.value)) : setFlow(toM3H(Number(e.target.value)))}
                             />
                             <CalculatorInput
-                                label={`Total Head (H)`}
+                                label={s.totalHead}
                                 unit={unit === 'metric' ? 'm' : 'ft'}
                                 value={unit === 'metric' ? head : parseFloat(toFT(head).toFixed(1))}
-                                onChange={(e) => unit === 'metric' ? setHead(Number(e.target.value)) : setHead(toM(Number(e.target.value)))}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => unit === 'metric' ? setHead(Number(e.target.value)) : setHead(toM(Number(e.target.value)))}
                             />
-                            <CalculatorInput label="Rotational Speed" unit="RPM" value={rpm} onChange={(e) => setRpm(Number(e.target.value))} />
-                            <CalculatorInput label="Int. Efficiency" unit="η (0-1)" value={efficiency} onChange={(e) => setEfficiency(Number(e.target.value))} />
+                            <CalculatorInput 
+                                label={s.rotationalSpeed} 
+                                unit="RPM" 
+                                value={rpm} 
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRpm(Number(e.target.value))} 
+                            />
+                            <CalculatorInput 
+                                label={s.intEfficiency} 
+                                unit="η (0-1)" 
+                                value={efficiency} 
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEfficiency(Number(e.target.value))} 
+                            />
                         </div>
                     </div>
 
@@ -137,25 +166,27 @@ export function PumpsModule({ lang, dict }: { lang: string, dict: any }) {
                                 <TrendingUp size={120} />
                             </div>
                             
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-12">Performance Summary</h2>
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-12">
+                                {s.performanceSummary}
+                            </h2>
 
                             <div className="grid grid-cols-1 gap-6">
                                 <ResultCard 
-                                    label="Hydraulic Output" 
+                                    label={s.hydraulicOutput} 
                                     value={unit === 'metric' ? results.hydPower.toFixed(2) : toHP(results.hydPower).toFixed(2)} 
                                     unit={unit === 'metric' ? 'kW' : 'HP'} 
                                     color="#22d3ee"
                                     icon={<Activity size={18}/>}
                                 />
                                 <ResultCard 
-                                    label="Shaft Input (BHP)" 
+                                    label={s.shaftInput} 
                                     value={unit === 'metric' ? results.shaftPower.toFixed(2) : toHP(results.shaftPower).toFixed(2)} 
                                     unit={unit === 'metric' ? 'kW' : 'HP'} 
                                     color="#fff"
                                     icon={<Zap size={18}/>}
                                 />
                                 <ResultCard 
-                                    label="Shaft Torque" 
+                                    label={s.shaftTorque} 
                                     value={results.torque.toFixed(1)} 
                                     unit="N·m" 
                                     color="#60a5fa"

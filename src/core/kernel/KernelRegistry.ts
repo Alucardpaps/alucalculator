@@ -47,7 +47,7 @@ class KernelRegistry {
     private status: KernelStatus = {
         bootedAt: null,
         moduleCount: 0,
-        buildId: process.env.NEXT_PUBLIC_BUILD_ID || `dev-${Date.now()}`,
+        buildId: process.env.NEXT_PUBLIC_BUILD_ID || process.env.BUILD_ID || 'dev-local',
         errors: [],
     };
     private bootPromise: Promise<void> | null = null;

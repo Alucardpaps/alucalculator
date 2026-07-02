@@ -1,4 +1,5 @@
 import type { Language } from '@/store/i18nStore';
+import { ACADEMY_PAGE_UI_CHROME } from './academyPageUiChrome';
 
 export type AcademyPageStrings = {
   badge: string;
@@ -116,6 +117,7 @@ export type AcademyPageStrings = {
   quizOptionNone: string;
   quizOptionDepends: string;
   quizOptionNA: string;
+  visitedLabel: string;
 };
 
 export type AcademyCourse = {
@@ -254,6 +256,7 @@ const EN: AcademyPageStrings = {
   quizOptionNone: 'None of the above',
   quizOptionDepends: 'It depends on application details',
   quizOptionNA: 'Not applicable',
+  visitedLabel: 'Visited',
 };
 
 const TR: AcademyPageStrings = {
@@ -375,6 +378,7 @@ const TR: AcademyPageStrings = {
   quizOptionNone: 'Hiçbiri',
   quizOptionDepends: 'Uygulama detaylarına bağlıdır',
   quizOptionNA: 'Geçersiz / Uygulanamaz',
+  visitedLabel: 'Ziyaret edildi',
 };
 
 const EN_DEPARTMENTS: AcademyDepartment[] = [
@@ -719,9 +723,11 @@ const ACADEMY_PAGE: Record<Language, AcademyPageStrings> = {
 };
 
 export function getAcademyPage(locale: string): AcademyPageStrings {
-  const loc = ACADEMY_PAGE[locale as Language];
-  if (!loc) return EN;
-  return { ...EN, ...loc };
+  const lang = locale as Language;
+  const loc = ACADEMY_PAGE[lang];
+  const chrome = ACADEMY_PAGE_UI_CHROME[lang] ?? {};
+  if (!loc) return { ...EN, ...chrome };
+  return { ...EN, ...loc, ...chrome };
 }
 
 export function formatAcademyYear(template: string, year: number): string {
@@ -805,17 +811,41 @@ const DEPT_TRANSLATIONS: Record<Language, Record<string, { title: string; head: 
 
 export function getAcademyDepartments(locale: string): AcademyDepartment[] {
   const baseDepts = locale === 'tr' ? TR_DEPARTMENTS : EN_DEPARTMENTS;
-  if (locale === 'tr' || locale === 'en') return baseDepts;
 
   return baseDepts.map((dept) => {
-    const translation = DEPT_TRANSLATIONS[locale as Language]?.[dept.id];
-    if (!translation) return dept;
+    const translation =
+      locale === 'tr' || locale === 'en'
+        ? undefined
+        : DEPT_TRANSLATIONS[locale as Language]?.[dept.id];
     return {
       ...dept,
-      title: translation.title,
-      head: translation.head,
+      title: translation?.title ?? dept.title,
+      head: translation?.head ?? dept.head,
     };
   });
+}
+
+const ACADEMY_CATEGORY_LABELS: Record<string, Partial<Record<Language, string>>> = {
+  mechanical: { en: 'Mechanical', tr: 'Mekanik', de: 'Maschinenbau', es: 'Mecánica', fr: 'Mécanique', it: 'Meccanica', pt: 'Mecânica', ru: 'Механика', ja: '機械', zh: '机械', ko: '기계', ar: 'ميكانيكي' },
+  structural: { en: 'Structural', tr: 'Yapısal', de: 'Konstruktion', es: 'Estructural', fr: 'Structure', it: 'Strutturale', pt: 'Estrutural', ru: 'Конструкции', ja: '構造', zh: '结构', ko: '구조', ar: 'إنشائي' },
+  structures: { en: 'Structures', tr: 'Yapılar', de: 'Tragwerke', es: 'Estructuras', fr: 'Structures', it: 'Strutture', pt: 'Estruturas', ru: 'Конструкции', ja: '構造物', zh: '结构', ko: '구조물', ar: 'هياكل' },
+  civil: { en: 'Civil', tr: 'İnşaat', de: 'Bauwesen', es: 'Civil', fr: 'Génie civil', it: 'Civile', pt: 'Civil', ru: 'Строительство', ja: '土木', zh: '土木', ko: '토목', ar: 'مدني' },
+  aerospace: { en: 'Aerospace', tr: 'Havacılık', de: 'Luft- und Raumfahrt', es: 'Aeroespacial', fr: 'Aérospatial', it: 'Aerospaziale', pt: 'Aeroespacial', ru: 'Авиакосмос', ja: '航空宇宙', zh: '航空航天', ko: '항공우주', ar: 'فضاء جوي' },
+  fluid: { en: 'Fluid', tr: 'Akışkan', de: 'Strömung', es: 'Fluidos', fr: 'Fluides', it: 'Fluidi', pt: 'Fluidos', ru: 'Гидравлика', ja: '流体', zh: '流体', ko: '유체', ar: 'سوائل' },
+  fluids: { en: 'Fluids', tr: 'Akışkanlar', de: 'Strömungslehre', es: 'Fluidos', fr: 'Fluides', it: 'Fluidi', pt: 'Fluidos', ru: 'Гидравлика', ja: '流体', zh: '流体', ko: '유체', ar: 'سوائل' },
+  manufacturing: { en: 'Manufacturing', tr: 'İmalat', de: 'Fertigung', es: 'Fabricación', fr: 'Fabrication', it: 'Produzione', pt: 'Manufatura', ru: 'Производство', ja: '製造', zh: '制造', ko: '제조', ar: 'تصنيع' },
+  electrical: { en: 'Electrical', tr: 'Elektrik', de: 'Elektrotechnik', es: 'Eléctrica', fr: 'Électrique', it: 'Elettrica', pt: 'Elétrica', ru: 'Электротехника', ja: '電気', zh: '电气', ko: '전기', ar: 'كهربائي' },
+  science: { en: 'Science', tr: 'Bilim', de: 'Naturwissenschaft', es: 'Ciencia', fr: 'Sciences', it: 'Scienza', pt: 'Ciência', ru: 'Наука', ja: '科学', zh: '科学', ko: '과학', ar: 'علوم' },
+  thermal: { en: 'Thermal', tr: 'Termal', de: 'Thermik', es: 'Térmica', fr: 'Thermique', it: 'Termica', pt: 'Térmica', ru: 'Теплотехника', ja: '熱', zh: '热工', ko: '열', ar: 'حراري' },
+  fasteners: { en: 'Fasteners', tr: 'Bağlantı Elemanları', de: 'Verbindungselemente', es: 'Fijaciones', fr: 'Fixations', it: 'Fissaggi', pt: 'Fixadores', ru: 'Крепёж', ja: '締結', zh: '紧固件', ko: '체결', ar: 'مثبتات' },
+};
+
+export function getAcademyCategoryLabel(category: string | undefined, locale: string): string | undefined {
+  if (!category) return undefined;
+  const key = category.toLowerCase();
+  const labels = ACADEMY_CATEGORY_LABELS[key];
+  if (!labels) return category;
+  return labels[locale as Language] ?? labels.en ?? category;
 }
 
 const DEPT_OUTCOMES_EN: Record<string, string[]> = {

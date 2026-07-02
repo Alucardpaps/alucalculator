@@ -185,7 +185,7 @@ export default {
     modules: {
         'calculator': { title: "Calculatrice scientifique" },
         'unit-converter': { title: "Convertisseur d’unités" },
-        'ai-copilot': { title: "Copilote IA" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "Explorateur de fichiers" },
         'settings': { title: "Paramètres" },
         'handbook': { title: "Manuel d’ingénierie" },
@@ -230,6 +230,8 @@ export default {
         'welding-fillet': { title: "Résistance cordon d’angle" },
         'welding-heat': { title: "Apport thermique soudage" },
         'nesting': { title: "Nesting" },
+        'analytics-dashboard': { title: "Analytique" },
+        'engineering-notes': { title: "Notes d'ingénierie" },
     } as Record<string, { title: string }>,
 
     // Node Palette Categories
@@ -249,7 +251,7 @@ export default {
     moduleHints: {
         'calculator': 'Calculs mathématiques avancés',
         'unit-converter': 'Unités d’ingénierie',
-        'ai-copilot': 'Assistance IA de conception',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': 'Fichiers système',
         'settings': 'Préférences système',
         'handbook': 'Formules & données de référence',
@@ -351,6 +353,7 @@ export default {
         labelFullReport: "Rapport complet",
         labelExportNc: "Exporter NC",
         labelSolverReady: "Solveur prêt",
+        labelWorkstation: "POSTE D'INGÉNIERIE",
         labelMatrixSparse: "Matrice : creuse",
         labelStrokeColor: "Couleur du trait",
         defaultNote: "📌 Nouvelle note",

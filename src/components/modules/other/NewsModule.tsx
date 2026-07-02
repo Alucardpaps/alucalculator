@@ -1,64 +1,71 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useI18nStore } from '@/store/i18nStore';
+import { dictionary } from '@/locales/dictionary';
+import { extractLocale, type SupportedLocale } from '@/locales/types';
+import { getNewsFeedCatalog } from '@/locales/newsFeedCatalog';
 
-// News Module - Engineering & Industry News
+type NewsCategory = 'Standards' | 'Materials' | 'Manufacturing' | 'Automotive' | 'Sustainability' | 'Regulations' | 'Software';
+
 interface NewsItem {
     id: number;
     title: string;
     source: string;
     date: string;
-    category: string;
+    category: NewsCategory;
     url?: string;
 }
 
-// Simulated engineering news feed
-const MOCK_NEWS: NewsItem[] = [
-    { id: 1, title: 'New ISO Standards for Aluminum Alloy Specifications Released', source: 'ISO Updates', date: '2026-02-05', category: 'Standards' },
-    { id: 2, title: 'Breakthrough in Lightweight Composite Materials for Aerospace', source: 'Materials Today', date: '2026-02-04', category: 'Materials' },
-    { id: 3, title: 'CNC Machining Accuracy Reaches New Precision Levels', source: 'Manufacturing Weekly', date: '2026-02-03', category: 'Manufacturing' },
-    { id: 4, title: 'Electric Vehicle Battery Technology Advances', source: 'Tech News', date: '2026-02-02', category: 'Automotive' },
-    { id: 5, title: 'Sustainable Steel Production Methods Gain Traction', source: 'Green Engineering', date: '2026-02-01', category: 'Sustainability' },
-    { id: 6, title: '3D Metal Printing Cost Reduced by 40%', source: 'Additive Manufacturing', date: '2026-01-30', category: 'Manufacturing' },
-    { id: 7, title: 'EU Releases New Machinery Directive Guidelines', source: 'EU Commission', date: '2026-01-28', category: 'Regulations' },
-    { id: 8, title: 'AI Integration in CAD/CAM Software Accelerates', source: 'Design World', date: '2026-01-25', category: 'Software' },
-];
-
-const CATEGORIES = ['All', 'Standards', 'Materials', 'Manufacturing', 'Automotive', 'Sustainability', 'Regulations', 'Software'];
+const FILTER_CATEGORIES: Array<NewsCategory | 'All'> = ['All', 'Standards', 'Materials', 'Manufacturing', 'Automotive', 'Sustainability'];
 
 export default function NewsModule() {
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const { language } = useI18nStore();
+    const newsT = useMemo(
+        () => extractLocale(dictionary, language as SupportedLocale).news,
+        [language],
+    );
+
+    const categoryLabels: Record<string, string> = useMemo(() => ({
+        All: newsT.catAll,
+        Standards: newsT.catStandards,
+        Materials: newsT.catMaterials,
+        Manufacturing: newsT.catManufacturing,
+        Automotive: newsT.catAutomotive,
+        Sustainability: newsT.catSustainability,
+    }), [newsT]);
+
+    const [selectedCategory, setSelectedCategory] = useState<NewsCategory | 'All'>('All');
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const localizedNews = useMemo(() => getNewsFeedCatalog(language), [language]);
+
     useEffect(() => {
-        // Simulate API fetch
         setLoading(true);
         const timer = setTimeout(() => {
             const filtered = selectedCategory === 'All'
-                ? MOCK_NEWS
-                : MOCK_NEWS.filter(n => n.category === selectedCategory);
+                ? localizedNews
+                : localizedNews.filter(n => n.category === selectedCategory);
             setNews(filtered);
             setLoading(false);
         }, 300);
         return () => clearTimeout(timer);
-    }, [selectedCategory]);
+    }, [selectedCategory, localizedNews]);
 
     return (
         <div className="flex flex-col gap-3 h-full">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase" style={{ color: 'var(--color-os-text-secondary)' }}>
-                    📰 Industry News
+                    📰 {newsT.title}
                 </span>
                 <span className="text-[9px]" style={{ color: 'var(--color-os-text-secondary)' }}>
-                    {new Date().toLocaleDateString()}
+                    {new Date().toLocaleDateString(language)}
                 </span>
             </div>
 
-            {/* Category Filter */}
             <div className="flex gap-1 flex-wrap">
-                {CATEGORIES.slice(0, 6).map(cat => (
+                {FILTER_CATEGORIES.map(cat => (
                     <button
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
@@ -68,20 +75,19 @@ export default function NewsModule() {
                             color: selectedCategory === cat ? 'var(--color-os-canvas)' : 'var(--color-os-text-secondary)',
                         }}
                     >
-                        {cat}
+                        {categoryLabels[cat]}
                     </button>
                 ))}
             </div>
 
-            {/* News List */}
             <div className="flex-1 overflow-auto space-y-2">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
-                        <div className="animate-pulse" style={{ color: 'var(--color-os-text-secondary)' }}>Loading...</div>
+                        <div className="animate-pulse" style={{ color: 'var(--color-os-text-secondary)' }}>{newsT.loading}</div>
                     </div>
                 ) : news.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-sm" style={{ color: 'var(--color-os-text-secondary)' }}>
-                        No news in this category
+                        {newsT.emptyCategory}
                     </div>
                 ) : (
                     news.map(item => (
@@ -108,9 +114,8 @@ export default function NewsModule() {
                 )}
             </div>
 
-            {/* Footer */}
             <div className="p-2 rounded-lg text-[9px] text-center" style={{ backgroundColor: 'var(--color-os-panel)', color: 'var(--color-os-text-secondary)' }}>
-                💡 News updates are simulated. Connect to a real API for live data.
+                💡 {newsT.simulatedNote}
             </div>
         </div>
     );

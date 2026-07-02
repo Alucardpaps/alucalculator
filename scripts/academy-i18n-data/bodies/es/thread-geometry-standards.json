@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "Distinga las roscas métricas/UN de 60° de los perfiles Whitworth de 55° y trapezoidales de 30°",
+    "Lea las designaciones de tolerancia (6 g/6 H, 4 h) y sus implicaciones de montaje.",
+    "Calcule el área de tensión a partir del paso y el diámetro mayor para dimensionar los sujetadores."
+  ],
+  "keyTakeaways": [
+    "La falta de coincidencia del ángulo del perfil destruye las roscas en el primer ensamblaje",
+    "Se ajustan los controles de clase de tolerancia: 4h es más estricto que 6g para juntas críticas",
+    "Las herramientas de perfil parcial intercambian flexibilidad por la nitidez de la cresta"
+  ],
+  "supplementalParagraph": "La geometría de la rosca es el ADN de cada unión atornillada. ",
+  "formula": {
+    "variables": {
+      "Metrik (M)": "Metrik (M): Ángulo de perfil de 60°",
+      "Unified (UN)": "Unificado (UN): Ángulo de perfil de 60°",
+      "Whitworth (W)": "Whitworth (W): Ángulo de perfil de 55°",
+      "Trapezoidal (Tr)": "Trapezoidal (Tr): Ángulo de perfil de 30°"
+    }
+  },
+  "stepByStep": [
+    "Identifique el sistema de hilo principal (Metrik vs. Pulgada).",
+    "Verifique el ángulo del perfil (por ejemplo, 60° para ISO Metrik).",
+    "Seleccione la clase de tolerancia adecuada (4h para apretado, 6g para estándar).",
+    "Calcule los diámetros mayor y menor según el paso.",
+    "Elija la herramienta de mecanizado correcta según el perfil.",
+    "Calcule el área de tensión a partir del paso y el diámetro de paso para realizar comprobaciones de resistencia.",
+    "Verifique el tamaño del taladro de macho con respecto al diámetro menor antes del inicio de la producción."
+  ],
+  "example": {
+    "inputs": [
+      "Thread: M16 x 1.5",
+      "Standard: ISO 262",
+      "Angle: 60°"
+    ],
+    "calculation": "Major Diameter = 16 mm, Pitch = 1.5 mm, Minor Diameter ≈ 14.16 mm"
+  },
+  "whyThisMatters": [
+    "La falta de coincidencia del perfil (por ejemplo, intentar encajar una ONU en un orificio M) destruye las roscas inmediatamente.",
+    "Los grados de tolerancia (6g frente a 4h) determinan el \"ajuste\" y la facilidad de montaje en la producción en masa."
+  ],
+  "commonMistakes": [
+    "Mezclando hilos de 60° (métrico) y 55° (Whitworth), que parecen casi idénticos.",
+    "Ignorar las tolerancias de rosca (6g/6H) en aplicaciones estructurales críticas.",
+    "Uso de herramientas de perfil parcial para requisitos de perfil completo."
+  ],
+  "calculatorCta": {
+    "label": "Design custom thread profiles in the Fastener Lab"
+  },
+  "faq": [
+    {
+      "question": "¿Cuál es la diferencia entre las tolerancias de 6 gy 4 h?",
+      "answer": "6g es el ajuste comercial estándar, mientras que 4h es un ajuste más ajustado y de precisión que se utiliza en entornos de alta vibración."
+    },
+    {
+      "question": "¿Qué significa 6g/6H?",
+      "answer": "6 g es la tolerancia de rosca externa (perno); "
+    },
+    {
+      "question": "¿Por qué las roscas Whitworth tienen un ángulo de 55°?",
+      "answer": "Estándar británico histórico: incompatible con perfiles métricos/UN de 60° a pesar de su apariencia similar."
+    },
+    {
+      "question": "¿Cuándo se utilizan roscas trapezoidales (Tr)?",
+      "answer": "Tornillos de potencia y tornillos de avance donde la eficiencia y la transmisión de carga importan más que el montaje rápido."
+    }
+  ]
+}

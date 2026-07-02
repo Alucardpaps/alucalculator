@@ -99,7 +99,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Spring Design',
             description: 'Helical compression spring analysis (Wahl factor, stiffness)',
             category: 'mechanical',
-            icon: 'Navigation', // Placeholder icon
+            icon: 'Heater',
         },
     },
 
@@ -109,7 +109,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: '3D Mohr\'s Circle',
             description: 'Principal stresses from 3D tensor',
             category: 'mechanical',
-            icon: 'Activity', // Placeholder icon
+            icon: 'CircleDot',
         },
     },
 
@@ -119,7 +119,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: '3D Hooke\'s Law',
             description: 'Triaxial stress-strain relationships, volumetric analysis.',
             category: 'mechanical',
-            icon: 'Activity',
+            icon: 'Maximize2',
         },
     },
 
@@ -149,7 +149,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Periodic Element',
             description: 'Interactive lookup for periodic element properties',
             category: 'mechanical',
-            icon: 'Activity',
+            icon: 'Atom',
         },
     },
 
@@ -159,7 +159,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Ideal & Real Gas Laws',
             description: 'Van der Waals gas properties calculator',
             category: 'mechanical',
-            icon: 'Activity', // Placeholder
+            icon: 'CloudRain',
         },
     },
 
@@ -179,7 +179,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Solution Concentration',
             description: 'Molarity, Molality, Mass Percent',
             category: 'mechanical',
-            icon: 'Activity', // Placeholder
+            icon: 'FlaskConical',
         },
     },
 
@@ -189,7 +189,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Area Moment of Inertia',
             description: 'I-Beams & Rectangles Properties',
             category: 'mechanical',
-            icon: 'Activity',
+            icon: 'Square',
         },
     },
 
@@ -199,7 +199,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Castigliano\'s Energy',
             description: 'Strain energy & deflection using Castigliano\'s theorem',
             category: 'mechanical',
-            icon: 'Activity', // Placeholder
+            icon: 'Zap',
         },
     },
 
@@ -219,7 +219,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Belt Drive',
             description: 'Speed ratio, belt length, and tension analysis',
             category: 'mechanical',
-            icon: 'Activity',
+            icon: 'RotateCw',
         },
     },
 
@@ -458,7 +458,7 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             title: 'Pump Sizing Calculator',
             description: 'Head, power, and NPSH calculations',
             category: 'fluid',
-            icon: 'Activity',
+            icon: 'Droplets',
         },
     },
 
@@ -505,6 +505,108 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
             description: 'Conduction and convection heat flow metrics',
             category: 'thermal',
             icon: 'Thermometer',
+        },
+    },
+    // ==========================================
+    // NEW POWER PACK CALCULATORS (V5.1)
+    // ==========================================
+    'worm-gear': {
+        loader: () => import('./schemas-v2/worm-gear' as any),
+        metadata: {
+            title: 'Worm Gear Calculator',
+            description: 'Geometry, efficiency, sliding velocity, output torque, and thermal heat generation of worm gear sets',
+            category: 'mechanical',
+            icon: 'Cog',
+        },
+    },
+
+    'planetary-gear': {
+        loader: () => import('./schemas-v2/planetary-gear' as any),
+        metadata: {
+            title: 'Planetary Gear Train',
+            description: 'Speed, torque, efficiency, and assembly spacing analysis for planetary gear sets',
+            category: 'mechanical',
+            icon: 'Settings',
+        },
+    },
+
+    'cam-follower': {
+        loader: () => import('./schemas-v2/cam-follower' as any),
+        metadata: {
+            title: 'Cam & Follower Design',
+            description: 'Kinematics and curvature check for disk cams with roller followers',
+            category: 'mechanical',
+            icon: 'Activity',
+        },
+    },
+
+    'flywheel-design': {
+        loader: () => import('./schemas-v2/flywheel-design' as any),
+        metadata: {
+            title: 'Flywheel Design & Energy',
+            description: 'Sizing, mass, mass moment of inertia, energy capacity, and hoop stress limits for solid or rimmed flywheels',
+            category: 'mechanical',
+            icon: 'Circle',
+        },
+    },
+
+    'concrete-beam-design': {
+        loader: () => import('./schemas-v2/concrete-beam-design' as any),
+        metadata: {
+            title: 'Concrete Beam Design (ACI 318)',
+            description: 'Bending capacity, reinforcement ratios, compression block, and limit checks for reinforced concrete rectangular beams',
+            category: 'civil',
+            icon: 'Layers',
+        },
+    },
+
+    'foundation-bearing': {
+        loader: () => import('./schemas-v2/foundation-bearing' as any),
+        metadata: {
+            title: 'Foundation Bearing Capacity',
+            description: 'Meyerhof & Terzaghi geotechnical formulas for ultimate and allowable bearing capacity of shallow foundations',
+            category: 'civil',
+            icon: 'Building',
+        },
+    },
+
+    'transformer-design': {
+        loader: () => import('./schemas-v2/transformer-design' as any),
+        metadata: {
+            title: 'Transformer Design',
+            description: 'Turns count, core area, currents, and winding specification for single-phase transformers',
+            category: 'electrical',
+            icon: 'Zap',
+        },
+    },
+
+    'motor-efficiency': {
+        loader: () => import('./schemas-v2/motor-efficiency' as any),
+        metadata: {
+            title: 'Motor Efficiency & Load',
+            description: 'Electrical input power, operating efficiency, load factor, and annual energy/CO2 metrics for induction motors',
+            category: 'electrical',
+            icon: 'Zap',
+        },
+    },
+
+    'heat-exchanger': {
+        loader: () => import('./schemas-v2/heat-exchanger' as any),
+        metadata: {
+            title: 'Heat Exchanger Sizing (LMTD)',
+            description: 'Heat transfer rate, LMTD, and required heat transfer area for shell & tube or plate heat exchangers',
+            category: 'thermal',
+            icon: 'Thermometer',
+        },
+    },
+
+    'hydraulic-cylinder': {
+        loader: () => import('./schemas-v2/hydraulic-cylinder' as any),
+        metadata: {
+            title: 'Hydraulic Cylinder Sizing',
+            description: 'Bore and rod diameter sizing, operating fluid volume, flow rate, and Euler buckling check for hydraulic cylinders',
+            category: 'fluid',
+            icon: 'Droplets',
         },
     },
 

@@ -149,6 +149,7 @@ export default {
     architecture: "アーキテクチャ",
     archName: "B-Model クラウドハイブリッド",
     engineStatus: "エンジンステータス",
+    toggleDevMode: "開発者モードを切り替え",
     statusOptimized: "最適化済み",
     localeLatency: "ロケール・レイテンシ",
     latencyValue: "2.4ms (キャッシュヒット)",
@@ -176,7 +177,7 @@ export default {
     modules: {
         'calculator': { title: "科学計算機" },
         'unit-converter': { title: "単位変換器" },
-        'ai-copilot': { title: "AI コパイロット" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "ファイルエクスプローラー" },
         'settings': { title: "設定" },
         'handbook': { title: "エンジニアリングハンドブック" },
@@ -208,13 +209,15 @@ export default {
         'voltage-drop': { title: "電圧降下" },
         'welding-fillet': { title: "すみ肉溶接強度" },
         'welding-heat': { title: "溶接入熱" },
+        'analytics-dashboard': { title: "分析" },
+        'engineering-notes': { title: "エンジニアリングノート" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': '高度な数学計算',
         'unit-converter': 'エンジニアリング単位換算',
-        'ai-copilot': 'AI 設計支援',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': 'システムファイル管理',
         'settings': 'システム設定',
         'handbook': '参考公式とデータ',
@@ -285,6 +288,7 @@ export default {
         groupExport: "エクスポート",
         groupPaint: "ペイント",
         groupContent: "コンテンツ",
+        labelWorkstation: "エンジニアリングワークステーション",
     },
 
     // Node Palette Categories

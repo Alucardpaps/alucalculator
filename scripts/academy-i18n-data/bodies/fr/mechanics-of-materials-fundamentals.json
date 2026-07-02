@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Calculer la contrainte normale σ = F/A et interpréter la tension par rapport à la compression",
+    "Appliquer la loi de Hooke pour relier la contrainte, la déformation et le module élastique",
+    "Identifiez les concentrations de contraintes au niveau des trous, des congés et des changements soudains de section."
+  ],
+  "keyTakeaways": [
+    "Le stress est une résistance interne ; ",
+    "Restez en dessous du rendement avec un facteur de sécurité approprié (1,5–3,0)",
+    "La zone de cisaillement se situe dans le plan de la force de cisaillement et non dans la zone normale"
+  ],
+  "supplementalParagraph": "La statique provoque des réactions externes ; ",
+  "formula": {
+    "variables": {
+      "σ": "σ : Contrainte normale (Pa ou MPa)",
+      "F": "F : Force axiale (N)",
+      "A": "A : Superficie transversale (m²)"
+    }
+  },
+  "stepByStep": [
+    "Calculez la force interne au point d’intérêt.",
+    "Déterminez la surface de la section transversale de l'élément.",
+    "Appliquez la formule de contrainte : σ = F / A.",
+    "Calculez la déformation en utilisant la loi de Hooke : ε = σ / E.",
+    "Vérifiez que la contrainte est inférieure à la limite d'élasticité du matériau.",
+    "Appliquez le facteur de concentration de contraintes Kt lorsque la géométrie présente des discontinuités.",
+    "Comparez la contrainte calculée au rendement avec un facteur de sécurité approprié."
+  ],
+  "example": {
+    "inputs": [
+      "Force: 50,000 N",
+      "Area: 100 mm² (0.0001 m²)"
+    ],
+    "calculation": "σ = 50000 / 0.0001 = 500,000,000 Pa = 500 MPa"
+  },
+  "whyThisMatters": [
+    "Empêche les défaillances structurelles en garantissant que les limites de matériaux ne sont jamais dépassées.",
+    "Permet la sélection de matériaux appropriés en fonction des conditions de chargement."
+  ],
+  "commonMistakes": [
+    "Négliger le signe de la contrainte (Tension vs Compression).",
+    "Utiliser la mauvaise zone pour la contrainte de cisaillement (c'est la zone parallèle à la force).",
+    "Ne pas tenir compte des concentrations de contraintes au niveau des trous ou des congés."
+  ],
+  "engineeringTip": "Dans la conception technique, nous visons généralement un facteur de sécurité (FoS) compris entre 1,5 et 3,0.",
+  "calculatorCta": {
+    "label": "Analyze fastener stress with our real-time integrity engine"
+  },
+  "faq": [
+    {
+      "question": "Quelle est la différence entre le stress et la pression ?",
+      "answer": "La pression est une force externe répartie sur une surface externe, tandis que la contrainte est une résistance interne répartie sur une section interne."
+    },
+    {
+      "question": "Qu'est-ce que le facteur de sécurité ?",
+      "answer": "Rapport entre la contrainte admissible et la contrainte calculée : généralement 1,5 à 3,0 en fonction des conséquences de la rupture et de l'incertitude de la charge."
+    },
+    {
+      "question": "En quoi la contrainte de cisaillement est-elle différente ?",
+      "answer": "Le cisaillement agit parallèlement à la zone ; "
+    },
+    {
+      "question": "Quand la loi de Hooke échoue-t-elle ?",
+      "answer": "Au-delà de la limite proportionnelle/rendement, la déformation plastique nécessite différents modèles constitutifs."
+    }
+  ]
+}

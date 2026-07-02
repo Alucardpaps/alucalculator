@@ -59,6 +59,8 @@ const AppGridItem = ({ id, title, hint, icon: Icon, accentColor, onSelect }: {
 export function StartMenu({ isOpen, onClose }: StartMenuProps) {
     const { openWindow } = useOSStore();
     const { t } = useI18nStore();
+    const debugMode = useWorkspaceStore((s) => s.debugMode);
+    const toggleDebugMode = useWorkspaceStore((s) => s.toggleDebugMode);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -102,6 +104,10 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
         'gearbox-design': '#7c3aed', 'motor-selection-std': '#f97316',
         'chain-drive': '#00e5ff',
         'belt-drive': '#f59e0b',
+        'sound-meter': '#00e5ff',
+        'clinometer': '#8b5cf6',
+        'gps-surveyor': '#06b6d4',
+        'hardness-converter': '#14b8a6',
     };
 
     const categories = useMemo(() => {
@@ -173,7 +179,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 </button>
 
                                 <div className="h-px w-full bg-white/5 my-2" />
-                                <div className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-2 px-3 mt-4">Disciplines</div>
+                                <div className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] mb-2 px-3 mt-4">{t.disciplinesLabel ?? 'Disciplines'}</div>
 
                                 {categories.map(cat => (
                                     <button
@@ -198,7 +204,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                     onClick={() => window.location.reload()}
                                     className="w-full text-left px-3 py-2 rounded-md text-[11px] font-semibold tracking-wide text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2 group"
                                 >
-                                    <Power size={14} className="group-hover:animate-pulse" /> Shut Down
+                                    <Power size={14} className="group-hover:animate-pulse" /> {t.shutDown ?? 'Shut Down'}
                                 </button>
                             </div>
                         </div>
@@ -226,8 +232,8 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                     )}
                                 </div>
                                 <button
-                                    onClick={() => useWorkspaceStore.getState().toggleDebugMode()}
-                                    className={`w-11 h-11 shrink-0 rounded-xl transition-all border flex items-center justify-center ${useWorkspaceStore.getState().debugMode
+                                    onClick={toggleDebugMode}
+                                    className={`w-11 h-11 shrink-0 rounded-xl transition-all border flex items-center justify-center ${debugMode
                                         ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                                         : 'bg-black/40 hover:bg-white/10 text-slate-500 border-white/5'
                                         }`}
@@ -241,8 +247,8 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 {displayedModules.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center pt-20 pb-10 text-center opacity-60">
                                         <Search size={48} className="text-slate-600 mb-4" />
-                                        <h3 className="text-lg font-bold text-slate-400 mb-1">No modules found</h3>
-                                        <p className="text-sm text-slate-500">Try adjusting your search query.</p>
+                                        <h3 className="text-lg font-bold text-slate-400 mb-1">{t.noModulesFound ?? 'No modules found'}</h3>
+                                        <p className="text-sm text-slate-500">{t.noModulesHint ?? 'Try adjusting your search query.'}</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-2 gap-y-6">

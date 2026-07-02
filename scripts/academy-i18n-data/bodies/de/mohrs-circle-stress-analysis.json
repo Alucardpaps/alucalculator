@@ -1,0 +1,69 @@
+{
+  "learningObjectives": [
+    "Ebenspannungskomponenten zu Hauptspannungen σ1, σ2 transformieren",
+    "Maximale Schubspannung τ_max aus Mohr-Kreis-Geometrie berechnen",
+    "Erklären, warum Hauptwerte invariant sind, während σ(θ) und τ(θ) rotieren"
+  ],
+  "keyTakeaways": [
+    "Hauptebenen haben null Schub — Designprüfungen nutzen oft σ1",
+    "τ_max = Mohr-Kreisradius — bestimmt Fließen bei duktilen Werkstoffen",
+    "Kombinierte Belastung erfordert Ebenspannungsanalyse vor Versagskriterien"
+  ],
+  "supplementalParagraph": "Uniaxiales σ = F/A reicht nicht bei Biegung und Torsion. Das Mohr-Kreis-Lab visualisiert dieselbe Transformation wie der OS-Kern.",
+  "formula": {
+    "variables": {
+      "σ1,2": "σ1,2: Hauptspannungen (MPa)",
+      "σx, σy": "σx, σy: Normalspannungen in X und Y (MPa)",
+      "τxy": "τxy: Schubspannung (MPa)"
+    }
+  },
+  "stepByStep": [
+    "Anfangsspannungszustand bestimmen (σx, σy, τxy).",
+    "Punkte (σx, τxy) und (σy, −τxy) auf den Spannungsachsen eintragen.",
+    "Kreis durch diese beiden Punkte zeichnen.",
+    "Mittelpunkt bestimmen und Radius (R) berechnen.",
+    "σ1 (max) und σ2 (min) als Schnittpunkte mit der Horizontalen identifizieren.",
+    "σx, σy, τxy im Mohr-Kreis eintragen, um σ1, σ2 und τ_max abzulesen.",
+    "τ_max mit Streckgrenze/2 für duktile Werkstoffe nach Tresca vergleichen."
+  ],
+  "example": {
+    "inputs": [
+      "σx = 100 MPa",
+      "σy = 40 MPa",
+      "τxy = 40 MPa"
+    ],
+    "calculation": "Center = 70. Radius = √[(30)² + 40²] = 50. → σ1 = 120 MPa, σ2 = 20 MPa."
+  },
+  "whyThisMatters": [
+    "Duktile Werkstoffe versagen typischerweise durch maximale Schubspannung (τmax).",
+    "Spröde Werkstoffe versagen durch maximale Hauptspannung (σ1).",
+    "Mohr-Kreis ermöglicht Vorhersage des Versagenswinkels."
+  ],
+  "commonMistakes": [
+    "2θ-Winkel im Mohr-Kreis mit θ-Winkel in der realen Welt verwechseln.",
+    "Vorzeichen der Schubspannung falsch eintragen.",
+    "3D-Spannungszustand (triaxiale Spannung) nicht prüfen."
+  ],
+  "engineeringTip": "Der Kreismittelpunkt repräsentiert immer die mittlere Normalspannung an diesem Punkt.",
+  "calculatorCta": {
+    "label": "Open the Analysis Lab to visualize complex stress states"
+  },
+  "faq": [
+    {
+      "question": "Was ist eine Hauptspannung?",
+      "answer": "Normalspannung auf einer Ebene, auf der die Schubspannung exakt null ist."
+    },
+    {
+      "question": "Sind Hauptspannungen eindeutig?",
+      "answer": "Ja — σ1 und σ2 sind Invarianten; nur die Orientierung der Hauptebenen ändert sich mit der Belastung."
+    },
+    {
+      "question": "Was ist Ebenspannung?",
+      "answer": "Eine Hauptspannung ist null (dünne Platten, freie Oberflächen) — vereinfacht 3D auf 2D."
+    },
+    {
+      "question": "Wann reicht der Mohr-Kreis nicht?",
+      "answer": "Triaxiale Spannungszustände erfordern 3D-Versagskriterien (von Mises im vollen Tensor)."
+    }
+  ]
+}

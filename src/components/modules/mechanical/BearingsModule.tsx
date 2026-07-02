@@ -22,6 +22,8 @@ import { PDFReportEngine, ReportMetadata } from "@/lib/pdfReportEngine";
 import { ReportSettingsModal } from "@/components/ui/ReportSettingsModal";
 import { SaveButton } from "@/components/calculation/SaveButton";
 import { useI18nStore } from '@/store/i18nStore';
+import { getBearingsModuleUiStrings } from '@/locales/bearingsModuleUiTranslations';
+import { getBearingsOsModuleStrings, getBearingOsFilterLabel } from '@/locales/bearingsOsModuleTranslations';
 
 // ════════════════════════════════════════════
 // CONSTANTS & THEME
@@ -100,207 +102,25 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
   </div>
 );
 
-const LOCAL_DICTS: Record<string, any> = {
-    en: {
-        title: "Bearing Life & Fits",
-        subtitle: "Dynamic Load Ratings, Rating Life & Machining Fits • ISO 281 / ISO 286",
-        addToProject: "ADD TO PROJECT",
-        report: "REPORT",
-        searchPlaceholder: "Search SKF Code (e.g. 6204)...",
-        allBearings: "All Bearings",
-        catalogDb: "Catalog Database",
-        appliedConditions: "Applied Conditions",
-        radialLoad: "Radial Load (Fr)",
-        axialLoad: "Axial Load (Fa)",
-        speed: "Speed",
-        reliability: "Reliability",
-        fineTuneFr: "Fine-tune Fr",
-        fineTuneFa: "Fine-tune Fa",
-        operatingSpeed: "Operating Speed",
-        l10hLife: "L10h Rated Life",
-        equivLoadP: "Equivalent Load P",
-        equivStaticP0: "Equivalent Static P0",
-        staticSafetyS0: "Static Safety S0",
-        refCapacity: "Bearing Reference & Dynamic Capacity",
-        safetyMet: "SAFETY COEFFICIENT MET",
-        belowDesign: "BELOW DESIGN LIFE (5000h)",
-        dynRating: "Dynamic Rating (C)",
-        staticRating: "Static Rating (C0)",
-        boreDia: "Bore Diameter (d)",
-        outerDia: "Outer Diameter (D)",
-        width: "Width (B)",
-        machiningRec: "Machining & Tolerance Recommendations (ISO 286 / ISO 1132)",
-        shaftSeat: "Shaft Seat Fit",
-        housingSeat: "Housing Seat Fit",
-        nominalDia: "Nominal Diameter",
-        upperDev: "Upper Deviation",
-        lowerDev: "Lower Deviation",
-        limits: "Machining Limits",
-        normalRotation: "Normal Rotation (H7)",
-        easyAssembly: "Easy Assembly (JS7)",
-        limitDia: "Diameter Limits",
-        shaftLogic: "Shaft Fit Logic",
-        shaftLogicDesc: "Since the bearing inner ring rotates with the shaft, an interference or transition fit (e.g. {fit}) is selected to prevent creep/slipping on the shaft seat.",
-        housingLogic: "Housing Fit Logic",
-        housingLogicDesc: "Since the bearing outer ring is usually stationary, a clearance or light transition fit (e.g. H7 or JS7) is selected to allow thermal expansion and ease of assembly.",
-        hours: "hours",
-        noBearings: "No bearings found"
-    },
-    tr: {
-        title: "Rulman Ömrü ve Toleranslar",
-        subtitle: "Dinamik Yük Değerleri, Ömür ve İşleme Toleransları • ISO 281 / ISO 286",
-        addToProject: "PROJEYE EKLE",
-        report: "TEKLİF / RAPOR",
-        searchPlaceholder: "Rulman Kodunu Arayın (örn. 6204)...",
-        allBearings: "Tüm Rulmanlar",
-        catalogDb: "Katalog Veritabanı",
-        appliedConditions: "Uygulanan Şartlar",
-        radialLoad: "Radyal Yük (Fr)",
-        axialLoad: "Eksenel Yük (Fa)",
-        speed: "Hız",
-        reliability: "Güvenilirlik",
-        fineTuneFr: "Radyal Yük Fr Ayarı",
-        fineTuneFa: "Eksenel Yük Fa Ayarı",
-        operatingSpeed: "Çalışma Devri",
-        l10hLife: "L10h Nominal Ömür",
-        equivLoadP: "Dinamik Eşdeğer Yük P",
-        equivStaticP0: "Statik Eşdeğer Yük P0",
-        staticSafetyS0: "Statik Emniyet Katsayısı S0",
-        refCapacity: "Rulman Kapasite Değerleri",
-        safetyMet: "GÜVENLİK KATSAYISI KARŞILANDI",
-        belowDesign: "TASARIM ÖMRÜNÜN ALTINDA (5000h)",
-        dynRating: "Dinamik Yük Değeri (C)",
-        staticRating: "Statik Yük Değeri (C0)",
-        boreDia: "İç Çap (d)",
-        outerDia: "Dış Çap (D)",
-        width: "Genişlik (B)",
-        machiningRec: "İşleme Tolerans Önerileri (ISO 286 / ISO 1132)",
-        shaftSeat: "Mil Yuvası Toleransı",
-        housingSeat: "Gövde Yuvası Toleransı",
-        nominalDia: "Nominal Çap",
-        upperDev: "Üst Sapma",
-        lowerDev: "Alt Sapma",
-        limits: "İşleme Tolerans Sınırları",
-        normalRotation: "Normal Dönüş (H7)",
-        easyAssembly: "Kolay Montaj (JS7)",
-        limitDia: "Çap Limitleri",
-        shaftLogic: "Mil Tolerans Mantığı",
-        shaftLogicDesc: "Rulman iç bileziği mil ile birlikte döndüğü için mil yuvasında kayma (creep) oluşmaması istenir. Bu sebeple nominal mil çapına göre sıkı veya geçişli mil toleransları (örn. {fit}) seçilir.",
-        housingLogic: "Gövde Tolerans Mantığı",
-        housingLogicDesc: "Rulman dış bileziği gövde içerisinde genellikle sabittir. Millerin ısı altında uzayabilmesi ve montaj kolaylığı için boşluklu veya hafif geçişli gövde yuvası toleransları (örn. H7 veya JS7) tercih edilir.",
-        hours: "saat",
-        noBearings: "Rulman bulunamadı"
-    },
-    de: {
-        title: "Lagerlebensdauer & Passungen",
-        subtitle: "Dynamische Tragzahlen, Lebensdauer & Fertigungspassungen • ISO 281 / ISO 286",
-        addToProject: "ZUM PROJEKT HINZUFÜGEN",
-        report: "BERICHT",
-        searchPlaceholder: "SKF-Code suchen (z. B. 6204)...",
-        allBearings: "Alle Lager",
-        catalogDb: "Katalog-Datenbank",
-        appliedConditions: "Betriebsbedingungen",
-        radialLoad: "Radialkraft (Fr)",
-        axialLoad: "Axialkraft (Fa)",
-        speed: "Drehzahl",
-        reliability: "Zuverlässigkeit",
-        fineTuneFr: "Feineinstellung Fr",
-        fineTuneFa: "Feineinstellung Fa",
-        operatingSpeed: "Betriebsdrehzahl",
-        l10hLife: "Nennlebensdauer L10h",
-        equivLoadP: "Äquivalente Belastung P",
-        equivStaticP0: "Statische Äquivalentlast P0",
-        staticSafetyS0: "Statische Kennzahl S0",
-        refCapacity: "Tragzahlen & Abmessungen",
-        safetyMet: "SICHERHEITSKOEFFIZIENT ERFÜLLT",
-        belowDesign: "UNTER DESIGNLEBENSDAUER (5000h)",
-        dynRating: "Dynamische Tragzahl (C)",
-        staticRating: "Statische Tragzahl (C0)",
-        boreDia: "Bohrungsdurchmesser (d)",
-        outerDia: "Außendurchmesser (D)",
-        width: "Breite (B)",
-        machiningRec: "Fertigungs- & Toleranzempfehlungen (ISO 286 / ISO 1132)",
-        shaftSeat: "Wellensitz-Passung",
-        housingSeat: "Gehäusesitz-Passung",
-        nominalDia: "Nennmaß",
-        upperDev: "Obere Abweichung",
-        lowerDev: "Untere Abweichung",
-        limits: "Grenzmaße",
-        normalRotation: "Normale Drehung (H7)",
-        easyAssembly: "Leichte Montage (JS7)",
-        limitDia: "Durchmessergrenzen",
-        shaftLogic: "Wellenpassungs-Logik",
-        shaftLogicDesc: "Da der Innenring mit der Welle rotiert, ist eine feste oder Übergangspassung (z. B. {fit}) erforderlich, um ein Rutschen (Kriechen) auf der Welle zu verhindern.",
-        housingLogic: "Gehäusepassungs-Logik",
-        housingLogicDesc: "Da der Außenring meist stillsteht, wird eine Spiel- oder leichte Übergangspassung (z. B. H7 oder JS7) gewählt, um thermische Dehnungen zu erlauben und die Montage zu erleichtern.",
-        hours: "Stunden",
-        noBearings: "Keine Lager gefunden"
-    },
-    ja: {
-        title: "軸受寿命とはめあい公差",
-        subtitle: "動定格荷重、定格寿命および加工公差算出 • ISO 281 / ISO 286",
-        addToProject: "プロジェクトに追加",
-        report: "レポート出力",
-        searchPlaceholder: "型番検索 (例: 6204)...",
-        allBearings: "すべての軸受",
-        catalogDb: "カタログデータベース",
-        appliedConditions: "負荷・運転条件",
-        radialLoad: "ラジアル荷重 (Fr)",
-        axialLoad: "アキシアル荷重 (Fa)",
-        speed: "回転速度",
-        reliability: "信頼度",
-        fineTuneFr: "ラジアル荷重微調整",
-        fineTuneFa: "アキシアル荷重微調整",
-        operatingSpeed: "運転回転速度",
-        l10hLife: "基本定格寿命 L10h",
-        equivLoadP: "動等価荷重 P",
-        equivStaticP0: "静等価荷重 P0",
-        staticSafetyS0: "静安全係数 S0",
-        refCapacity: "基本定格荷重・許容仕様",
-        safetyMet: "設計寿命に適合",
-        belowDesign: "目標寿命以下 (5000時間未満)",
-        dynRating: "動定格荷重 (C)",
-        staticRating: "静定格荷重 (C0)",
-        boreDia: "内径 (d)",
-        outerDia: "外径 (D)",
-        width: "幅 (B)",
-        machiningRec: "推奨加工公差・はめあい規格 (ISO 286 / ISO 1132)",
-        shaftSeat: "軸のはめあい公差",
-        housingSeat: "ハウジングのはめあい公差",
-        nominalDia: "基準寸法",
-        upperDev: "上の寸法許容差",
-        lowerDev: "下の寸法許容差",
-        limits: "許容寸法範囲",
-        normalRotation: "通常回転支持 (H7)",
-        easyAssembly: "容易組み立て用 (JS7)",
-        limitDia: "限界寸法値",
-        shaftLogic: "軸公差の選定基準",
-        shaftLogicDesc: "内輪は軸と共に回転するため、軸との間での「クリープ」（共回り）を防止すべく、基準内径に対し移行またはしまりはめあい（例: {fit}）を選定します。",
-        housingLogic: "ハウジング公差の選定基準",
-        housingLogicDesc: "外輪は通常静止するため、軸の熱膨張の吸収や組立性向上のため、すきままたは軽い移行はめあい（例: H7またはJS7）を選定します。",
-        hours: "時間",
-        noBearings: "見つかりません"
-    }
-};
-
 // ════════════════════════════════════════════
 // MAIN COMPONENT
 // ════════════════════════════════════════════
 
 export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
     const { language } = useI18nStore();
-    const t = LOCAL_DICTS[language] || LOCAL_DICTS.en;
+    const bos = getBearingsOsModuleStrings(language);
+    const t = getBearingsModuleUiStrings(language);
     const { addItem } = useProjectStore();
 
     const bearingTypeFilters = useMemo(() => [
-        { id: 'all' as BearingType | 'all', label: t.allBearings },
-        { id: 'deep-groove-ball' as BearingType | 'all', label: language === 'tr' ? 'Sabit Bilyalı (DGB)' : language === 'de' ? 'Rillenkugellager (DGB)' : language === 'ja' ? '深溝玉軸受 (DGB)' : 'Deep Groove Ball (DGB)' },
-        { id: 'angular-contact-ball' as BearingType | 'all', label: language === 'tr' ? 'Eğik Bilyalı (ACB)' : language === 'de' ? 'Schrägkugellager (ACB)' : language === 'ja' ? 'アンギュラ玉軸受 (ACB)' : 'Angular Contact (ACB)' },
-        { id: 'tapered-roller' as BearingType | 'all', label: language === 'tr' ? 'Konik Makaralı (TRB)' : language === 'de' ? 'Kegelrollenlager (TRB)' : language === 'ja' ? '円すいころ軸受 (TRB)' : 'Tapered Roller (TRB)' },
-        { id: 'cylindrical-roller' as BearingType | 'all', label: language === 'tr' ? 'Silindirik Makaralı (CRB)' : language === 'de' ? 'Zylinderrollenlager (CRB)' : language === 'ja' ? '円筒ころ軸受 (CRB)' : 'Cylindrical Roller (CRB)' },
-        { id: 'needle-roller' as BearingType | 'all', label: language === 'tr' ? 'İğneli Makaralı (NRB)' : language === 'de' ? 'Nadelkranz (NRB)' : language === 'ja' ? '針状ころ軸受 (NRB)' : 'Needle Roller (NRB)' },
-        { id: 'thrust-ball' as BearingType | 'all', label: language === 'tr' ? 'Aksiyal Bilyalı (Thrust)' : language === 'de' ? 'Axial-Kugellager (Thrust)' : language === 'ja' ? 'スラスト玉軸受 (Thrust)' : 'Thrust Ball (Thrust)' },
-    ], [language, t]);
+        { id: 'all' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'all') },
+        { id: 'deep-groove-ball' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'deep-groove-ball') },
+        { id: 'angular-contact-ball' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'angular-contact-ball') },
+        { id: 'tapered-roller' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'tapered-roller') },
+        { id: 'cylindrical-roller' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'cylindrical-roller') },
+        { id: 'needle-roller' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'needle-roller') },
+        { id: 'thrust-ball' as BearingType | 'all', label: getBearingOsFilterLabel(bos, 'thrust-ball') },
+    ], [bos]);
 
     // Search & Filter State
     const [searchCode, setSearchCode] = useState('');
@@ -508,7 +328,7 @@ export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
                                     }}
                                 >
                                     <option value="all" className="bg-[#020408] text-[#C5C6C7]">
-                                        {language === 'tr' ? 'İç Çap: Tümü' : 'Bore: All'}
+                                        {bos.boreAll}
                                     </option>
                                     {uniqueBores.map(bore => (
                                         <option key={bore} value={bore} className="bg-[#020408] text-[#C5C6C7]">
@@ -887,7 +707,7 @@ export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
                                     <div className="text-white font-bold">{selectedBearing.B} mm</div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-slate-400 text-[9px] uppercase tracking-wider">{language === 'tr' ? 'Kütle' : 'Mass'}</div>
+                                    <div className="text-slate-400 text-[9px] uppercase tracking-wider">{bos.mass}</div>
                                     <div className="text-white font-bold">{selectedBearing.mass ? `${selectedBearing.mass.toFixed(3)} kg` : 'N/A'}</div>
                                 </div>
                             </div>
@@ -996,7 +816,7 @@ export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
                                     return (
                                         <div className="space-y-3 p-4 rounded-xl bg-black/30 border border-white/5 flex flex-col justify-between min-h-[140px]">
                                             <div className="flex justify-between items-center border-b border-white/5 pb-1">
-                                                <span className="text-[#00e5ff] font-bold">{language === 'tr' ? 'Sapma Bölgeleri (µm)' : 'Deviation Zones (µm)'}</span>
+                                                <span className="text-[#00e5ff] font-bold">{bos.deviationZones}</span>
                                                 <span className="text-[9px] text-white/40 font-mono">ISO 286</span>
                                             </div>
                                             
@@ -1035,8 +855,8 @@ export function BearingsModule({ lang, dict }: { lang: string, dict: any }) {
                                             </div>
 
                                             <div className="flex justify-around text-[8px] text-white/40 uppercase font-mono tracking-wider">
-                                                <span>{language === 'tr' ? 'Bilezik' : 'Bore'}</span>
-                                                <span>{language === 'tr' ? 'Mil' : 'Shaft'}</span>
+                                                <span>{bos.bore}</span>
+                                                <span>{bos.shaft}</span>
                                             </div>
                                         </div>
                                     );

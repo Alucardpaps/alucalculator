@@ -153,6 +153,7 @@ const es = {
     architecture: "Arquitectura",
     archName: "B-Model Cloud Hybrid",
     engineStatus: "Estado del Motor",
+    toggleDevMode: "Alternar modo desarrollador",
     statusOptimized: "OPTIMIZADO",
     localeLatency: "Latencia de Localización",
     latencyValue: "2.4ms (Cache Hit)",
@@ -180,7 +181,7 @@ const es = {
     modules: {
         'calculator': { title: "Calculadora Científica" },
         'unit-converter': { title: "Convertidor de Unidades" },
-        'ai-copilot': { title: "Copiloto AI" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "Explorador de Archivos" },
         'settings': { title: "Configuración" },
         'handbook': { title: "Manual de Ingeniería" },
@@ -213,13 +214,15 @@ const es = {
         'voltage-drop': { title: "Caída de Tensión" },
         'welding-fillet': { title: "Resistencia de Soldadura de Filete" },
         'welding-heat': { title: "Entrada de Calor de Soldadura" },
+        'analytics-dashboard': { title: "Analítica" },
+        'engineering-notes': { title: "Notas de ingeniería" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': 'Cálculos matemáticos',
         'unit-converter': 'Unidades de ingeniería',
-        'ai-copilot': 'Asistencia de IA',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': 'Archivos de sistema',
         'settings': 'Preferencias del SO',
         'handbook': 'Fórmulas y datos',
@@ -294,6 +297,7 @@ const es = {
         groupExport: "Exportar",
         groupPaint: "Pintar",
         groupContent: "Contenido",
+        labelWorkstation: "ESTACIÓN DE INGENIERÍA",
     },
 
     // Node Palette Categories

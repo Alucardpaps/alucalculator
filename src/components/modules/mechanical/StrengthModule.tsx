@@ -1,4 +1,6 @@
 import { useState, useMemo } from "react";
+import { useI18nStore } from '@/store/i18nStore';
+import { useOSStore } from '@/store/osStore';
 import { EngineeringVisualization } from "@/components/ui/EngineeringVisualization";
 import { AssumptionPanel, CalculationMetadata } from "@/components/ui/AssumptionPanel";
 import { CalculatorInput } from "@/components/CalculatorInput";
@@ -37,7 +39,11 @@ import { PDFGenerator } from "../shared/PDFGenerator";
 
 type AnalysisMode = 'principal' | 'vonMises' | 'fatigue' | 'buckling' | 'beam' | 'torsion' | 'pressure' | 'combined';
 
-export function StrengthModule({ lang, dict }: { lang: string, dict: any }) {
+export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: string, dict?: any }) {
+    const { language: storeLang } = useI18nStore();
+    const { dictionary: storeDict } = useOSStore();
+    const lang = propLang || storeLang;
+    const dict = propDict || storeDict;
 
     // Derived Configuration using Dictionary
     const ANALYSIS_MODES: { id: AnalysisMode; label: string; icon: any; color: string }[] = [

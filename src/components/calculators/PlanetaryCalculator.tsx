@@ -8,6 +8,8 @@ import {
 } from 'recharts';
 import { Settings, Zap, RotateCcw, Activity, Shield, Info, Plus, Trash2 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { getPlanetaryCalculatorStrings } from '@/locales/planetaryCalculatorTranslations';
+import { getPlanetaryTitleStrings } from '@/locales/planetaryTitleTranslations';
 
 // ════════════════════════════════════════════
 // CONSTANTS & STYLES
@@ -21,109 +23,6 @@ const COLORS = {
   accentDim: 'rgba(0, 229, 255, 0.2)',
   glow: 'rgba(0, 229, 255, 0.4)',
   danger: '#ef4444',
-};
-
-const LOCAL_DICTS: Record<string, any> = {
-  tr: {
-    title: "Planer Çok Kademeli",
-    subtitle: "Mühendislik Zekası • Ekli Kademe Sayısı: {stagesLength}",
-    systemRatio: "Sistem Oranı",
-    outputRpm: "Çıkış Devri",
-    totalTorque: "Toplam Tork",
-    systemAdvantage: "Sistem Avantajı",
-    lastStageRpm: "Son Kademe Devri",
-    module: "Modül (m)",
-    sunTeeth: "Güneş Diş Sayısı (zs)",
-    ringTeeth: "Çember Diş Sayısı (zr)",
-    planetCount: "Planet Sayısı",
-    inputRpm: "Sistem Giriş Devri",
-    inputPower: "Sistem Giriş Gücü",
-    stageParams: "Kademe {stage} Parametreleri",
-    fixedComponent: "Sabit Eleman",
-    ring: "ÇEMBER",
-    sun: "GÜNEŞ",
-    carrier: "TAŞIYICI",
-    characteristic: "Toplam Sistem Karakteristiği",
-    infoText: "Çok kademeli hesaplamalar doğrudan kaplini (kayma olmadan) varsayar. Modül (m) mutlak geometrik çapı belirler D=m*Z.",
-    totalRatio: "Toplam Oran",
-    outputSpeed: "ÇIKIŞ HIZI",
-    stage: "Kademe",
-  },
-  en: {
-    title: "Planetary Multi-Stage",
-    subtitle: "Engineering Intelligence • Stages Attached: {stagesLength}",
-    systemRatio: "System Ratio",
-    outputRpm: "Output RPM",
-    totalTorque: "Total Torque",
-    systemAdvantage: "System Advantage",
-    lastStageRpm: "Last Stage RPM",
-    module: "Module (m)",
-    sunTeeth: "Sun Teeth (zs)",
-    ringTeeth: "Ring Teeth (zr)",
-    planetCount: "Planet Count",
-    inputRpm: "System Input RPM",
-    inputPower: "System Input Power",
-    stageParams: "Stage {stage} Params",
-    fixedComponent: "Fixed Component",
-    ring: "RING",
-    sun: "SUN",
-    carrier: "CARRIER",
-    characteristic: "Total System Characteristic",
-    infoText: "Multi-stage calculations assume direct coupling (no intermediate slip). Module (m) determines absolute geometric diameter D=m*Z.",
-    totalRatio: "Total Ratio",
-    outputSpeed: "OUTPUT SPEED",
-    stage: "Stage",
-  },
-  de: {
-    title: "Planetengetriebe Mehrstufig",
-    subtitle: "Engineering-Intelligenz • Angeschlossene Stufen: {stagesLength}",
-    systemRatio: "Systemübersetzung",
-    outputRpm: "Ausgangsdrehzahl",
-    totalTorque: "Gesamtdrehmoment",
-    systemAdvantage: "Systemvorteil",
-    lastStageRpm: "Drehzahl Letzte Stufe",
-    module: "Modul (m)",
-    sunTeeth: "Sonnenzähne (zs)",
-    ringTeeth: "Hohlradzähne (zr)",
-    planetCount: "Planetenanzahl",
-    inputRpm: "System-Eingangsdrehzahl",
-    inputPower: "System-Eingangsleistung",
-    stageParams: "Parameter Stufe {stage}",
-    fixedComponent: "Festes Bauteil",
-    ring: "HOHLRAD",
-    sun: "SONNE",
-    carrier: "TRÄGER",
-    characteristic: "Gesamtsystem-Charakteristik",
-    infoText: "Mehrstufige Berechnungen setzen eine direkte Kopplung (kein Schlupf) voraus. Modul (m) bestimmt den absoluten geometrischen Durchmesser D=m*Z.",
-    totalRatio: "Gesamtübersetzung",
-    outputSpeed: "AUSGANGSDREHZAHL",
-    stage: "Stufe",
-  },
-  ja: {
-    title: "遊星マルチステージ",
-    subtitle: "エンジニアリングインテリジェンス • 接続されたステージ: {stagesLength}",
-    systemRatio: "システム比",
-    outputRpm: "出力回転数",
-    totalTorque: "総トルク",
-    systemAdvantage: "システムアドバンテージ",
-    lastStageRpm: "最終ステージ回転数",
-    module: "モジュール (m)",
-    sunTeeth: "太陽歯車歯数 (zs)",
-    ringTeeth: "内歯車歯数 (zr)",
-    planetCount: "遊星ギヤ数",
-    inputRpm: "システム入力回転数",
-    inputPower: "システム入力電力",
-    stageParams: "ステージ {stage} パラメータ",
-    fixedComponent: "固定要素",
-    ring: "リング",
-    sun: "サン",
-    carrier: "キャリア",
-    characteristic: "トータルシステム特性",
-    infoText: "多段計算は直接結合（中間スリップなし）を前提としています。モジュール（m）は絶対幾何直径D=m*Zを決定します。",
-    totalRatio: "総比",
-    outputSpeed: "出力速度",
-    stage: "ステージ",
-  }
 };
 
 // ════════════════════════════════════════════
@@ -176,7 +75,8 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
 
 export const PlanetaryCalculator = () => {
   const { language } = useI18nStore();
-  const t = LOCAL_DICTS[language] || LOCAL_DICTS.en;
+  const pt = getPlanetaryTitleStrings(language);
+  const t = getPlanetaryCalculatorStrings(language);
 
   // Multistage State
   const [stages, setStages] = useState<StageConfig[]>([
@@ -244,7 +144,7 @@ export const PlanetaryCalculator = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
             <h1 className="text-4xl font-black italic tracking-tighter text-white uppercase">
-              Planetary <span className="text-[#00e5ff]">Multi-Stage</span>
+              <>{pt.titleBefore} <span className="text-[#00e5ff]">{pt.titleHighlight}</span></>
             </h1>
             <p className="text-[10px] font-mono tracking-[0.3em] text-white/30 uppercase">
               {t.subtitle.replace('{stagesLength}', stages.length.toString())}

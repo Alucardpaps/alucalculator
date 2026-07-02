@@ -14,7 +14,7 @@ import {
     LucideIcon, Monitor
 } from 'lucide-react';
 import { useOSStore } from '@/store/osStore';
-import { getAllCalculators, DOMAIN_INFO } from '@/calculators/registry';
+import { CALCULATOR_REGISTRY_V2, CATEGORY_INFO } from '@/calculators/registry-v2';
 
 // ── Stat Card ──
 function StatCard({ label, value, icon: Icon, color, trend }: {
@@ -58,19 +58,19 @@ function DomainBar({ name, count, total, color }: { name: string; count: number;
 
 export default function AnalyticsDashboardModule() {
     const { windows } = useOSStore();
-    const allCalcs = useMemo(() => getAllCalculators(), []);
+    const allCalcs = useMemo(() => Object.values(CALCULATOR_REGISTRY_V2), []);
 
     // Domain distribution
     const domainCounts = useMemo(() => {
         const counts: Record<string, number> = {};
         allCalcs.forEach(c => {
-            const d = c.domain || 'other';
+            const d = c.metadata.category || 'other';
             counts[d] = (counts[d] || 0) + 1;
         });
         return counts;
     }, [allCalcs]);
 
-    const domainMeta = Object.entries(DOMAIN_INFO);
+    const domainMeta = Object.entries(CATEGORY_INFO);
 
     const activeCalculators = windows.filter(w => 
         ['mechanical', 'civil', 'electrical', 'science', 'finance', 'software'].includes(

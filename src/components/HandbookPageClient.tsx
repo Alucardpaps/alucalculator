@@ -19,8 +19,11 @@ const G_CODES = [
     { code: 'M08', desc: 'Coolant ON' },
 ];
 
+import { getHandbookPageClientStrings } from '@/locales/handbookPageClientTranslations';
+
 export default function HandbookPageClient() {
     const { t, language: lang } = useI18nStore();
+    const h = getHandbookPageClientStrings(lang);
     const [section, setSection] = useState<Section>('bearings');
     const [search, setSearch] = useState('');
     const [typeFilter, setTypeFilter] = useState('All');
@@ -69,7 +72,7 @@ export default function HandbookPageClient() {
                         onClick={() => setSection('gcodes')}
                         className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'gcodes' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
-                        G & M Codes
+                        {h.gCodesTitle}
                     </button>
                 </div>
 
@@ -82,7 +85,7 @@ export default function HandbookPageClient() {
                             <Search size={20} className="text-slate-400" />
                             <input
                                 type="text"
-                                placeholder={lang === 'tr' ? 'Ara...' : 'Filter...'}
+                                placeholder={h.filterPlaceholder}
                                 className="w-full outline-none text-slate-700 dark:text-slate-200 bg-transparent"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -96,10 +99,10 @@ export default function HandbookPageClient() {
                                     <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                                         <tr>
                                             <th className="p-4">{t.variables.name}</th>
-                                            <th className="p-4">{lang === 'tr' ? 'Tip' : 'Type'}</th>
+                                            <th className="p-4">{h.type}</th>
                                             <th className="p-4">ID (d)</th>
                                             <th className="p-4">OD (D)</th>
-                                            <th className="p-4">{lang === 'tr' ? 'Genişlik' : 'Width'} (B)</th>
+                                            <th className="p-4">{h.width} (B)</th>
                                             <th className="p-4">Dyn (C)</th>
                                             <th className="p-4">Stat (Co)</th>
                                         </tr>
@@ -127,9 +130,9 @@ export default function HandbookPageClient() {
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                                         <tr>
-                                            <th className="p-4">{lang === 'tr' ? 'Tolerans' : 'Fit / Grade'}</th>
-                                            <th className="p-4">{lang === 'tr' ? 'Tip' : 'Type'}</th>
-                                            <th className="p-4">{lang === 'tr' ? 'Uygulama' : 'Application'}</th>
+                                            <th className="p-4">{h.fitGrade}</th>
+                                            <th className="p-4">{h.type}</th>
+                                            <th className="p-4">{h.application}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -151,12 +154,12 @@ export default function HandbookPageClient() {
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                                         <tr>
-                                            <th className="p-4">Material</th>
-                                            <th className="p-4">Category</th>
-                                            <th className="p-4">Density (g/cm³)</th>
-                                            <th className="p-4">Yield (MPa)</th>
-                                            <th className="p-4">Tensile (MPa)</th>
-                                            <th className="p-4">Hardness</th>
+                                            <th className="p-4">{h.material}</th>
+                                            <th className="p-4">{h.category}</th>
+                                            <th className="p-4">{h.density}</th>
+                                            <th className="p-4">{h.yield}</th>
+                                            <th className="p-4">{h.tensile}</th>
+                                            <th className="p-4">{h.hardness}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -178,7 +181,7 @@ export default function HandbookPageClient() {
                         {/* G-Codes (Construction) */}
                         {section === 'gcodes' && (
                             <div className="p-12 text-center text-slate-400 dark:text-slate-500">
-                                {lang === 'tr' ? 'Bu tablo hazırlanıyor...' : 'Table construction in progress...'}
+                                {h.tableInProgress}
                             </div>
                         )}
 

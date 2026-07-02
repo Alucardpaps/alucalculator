@@ -15,6 +15,15 @@ export function ServiceWorkerRegistration() {
             return;
         }
 
+        // Service workers cache assets and call skipWaiting(); in dev that fights
+        // Turbopack HMR and can cause reload / rebuild storms.
+        if (process.env.NODE_ENV === 'development') {
+            void navigator.serviceWorker.getRegistrations().then((regs) => {
+                regs.forEach((reg) => void reg.unregister());
+            });
+            return;
+        }
+
         const registerSW = async () => {
             try {
                 const registration = await navigator.serviceWorker.register('/service-worker.js', {

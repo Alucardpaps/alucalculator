@@ -21,11 +21,11 @@
  * ─────────────────────────────────────────────────────────────────────
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { 
     AlertTriangle, Info, BookOpen, ExternalLink, 
     ChevronDown, ChevronUp, Settings2, Zap, Ruler,
-    ShieldCheck 
+    ShieldCheck, Undo2, Redo2, Layers
 } from 'lucide-react';
 import type { CalculatorSchema, InputField, OutputField, ValidationWarning } from '@/types/calculator-schema';
 import { evaluateFormula, extractVariables } from '@/lib/formula-parser';
@@ -38,6 +38,7 @@ import { SIGMA_PROFILES } from '@/data/mechanical/profiles';
 import { useProjectStore } from '@/store/projectStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { Save } from 'lucide-react';
+import { getUnitCategory, convertUnit, UNIT_CATEGORIES } from '@/engine/unit-conversion';
 
 // ============================================
 // Props Interface
@@ -146,13 +147,15 @@ const styles = {
 interface CalcInputProps {
     field: InputField;
     value: number | string;
+    unit: string;
+    onUnitChange?: (newUnit: string) => void;
     formula?: string;
     onChange: (key: string, value: number | string) => void;
     onFormulaChange?: (key: string, formula: string | null) => void;
     error?: string;
 }
 
-const CalcInput: React.FC<CalcInputProps> = ({ field, value, formula, onChange, onFormulaChange, error }) => {
+const CalcInput: React.FC<CalcInputProps> = ({ field, value, unit, onUnitChange, formula, onChange, onFormulaChange, error }) => {
     const { getVariableValue } = useProjectStore();
     const { t } = useI18nStore();
     const [isFormula, setIsFormula] = useState(!!formula);
@@ -258,7 +261,23 @@ const CalcInput: React.FC<CalcInputProps> = ({ field, value, formula, onChange, 
                     className={`${styles.input} ${error ? styles.inputError : ''} pr-12`}
                     title={resolvedDesc}
                 />
-                <span className={styles.inputUnit}>{field.unit}</span>
+                {(() => {
+                    const cat = getUnitCategory(field.unit as any);
+                    if (cat && onUnitChange) {
+                        return (
+                            <select
+                                value={unit}
+                                onChange={(e) => onUnitChange(e.target.value)}
+                                className="absolute right-2 bg-slate-900 border border-white/10 rounded px-1.5 py-0.5 text-[10px] font-black text-gray-400 focus:outline-none cursor-pointer"
+                            >
+                                {Object.keys(UNIT_CATEGORIES[cat].units).map(u => (
+                                    <option key={u} value={u}>{u}</option>
+                                ))}
+                            </select>
+                        );
+                    }
+                    return <span className={styles.inputUnit}>{unit}</span>;
+                })()}
             </div>
             {error && <div className="text-red-400 text-[10px] uppercase font-bold mt-1 pl-1">{error}</div>}
         </div>
@@ -327,13 +346,92 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
 
     const [inputValues, setInputValues] = useState<Record<string, number | string>>(defaultValues as any);
     const [inputErrors, setInputErrors] = useState<Record<string, string>>({});
+    const [unitOverrides, setUnitOverrides] = useState<Record<string, string>>({});
     const [assumptionsOpen, setAssumptionsOpen] = useState(false);
     const [is3DMode, setIs3DMode] = useState(false);
     const [reportOpen, setReportOpen] = useState(false);
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [saveName, setSaveName] = useState('');
 
+    // History state
+    const [history, setHistory] = useState<Record<string, number | string>[]>([defaultValues as any]);
+    const [historyIndex, setHistoryIndex] = useState<number>(0);
+    const historyTimerRef = useRef<NodeJS.Timeout | null>(null);
+
     const { addCalculation } = useProjectStore();
+
+    const scheduleHistoryPush = useCallback((nextState: Record<string, number | string>) => {
+        if (historyTimerRef.current) clearTimeout(historyTimerRef.current);
+        historyTimerRef.current = setTimeout(() => {
+            setHistory(prev => {
+                const next = prev.slice(0, historyIndex + 1);
+                const lastState = next[next.length - 1];
+                if (JSON.stringify(lastState) === JSON.stringify(nextState)) return prev;
+                next.push(nextState);
+                if (next.length > 50) next.shift();
+                return next;
+            });
+            setHistoryIndex(prev => {
+                const len = Math.min(historyIndex + 2, 50);
+                return len - 1;
+            });
+        }, 600);
+    }, [historyIndex]);
+
+    const handleUndo = () => {
+        if (historyIndex > 0) {
+            const idx = historyIndex - 1;
+            setHistoryIndex(idx);
+            setInputValues(history[idx]);
+        }
+    };
+
+    const handleRedo = () => {
+        if (historyIndex < history.length - 1) {
+            const idx = historyIndex + 1;
+            setHistoryIndex(idx);
+            setInputValues(history[idx]);
+        }
+    };
+
+    const handleUnitChange = useCallback((key: string, newUnit: string) => {
+        const field = schema.inputs.find(i => i.key === key);
+        if (!field) return;
+
+        const currentVal = Number(inputValues[key]);
+        const prevUnit = unitOverrides[key] || field.unit;
+
+        if (!isNaN(currentVal)) {
+            const converted = convertUnit(currentVal, prevUnit as any, newUnit as any);
+            const nextValues = { ...inputValues, [key]: parseFloat(converted.toFixed(6)) };
+            setInputValues(nextValues);
+            setUnitOverrides(prev => ({ ...prev, [key]: newUnit }));
+            scheduleHistoryPush(nextValues);
+        } else {
+            setUnitOverrides(prev => ({ ...prev, [key]: newUnit }));
+        }
+    }, [schema, inputValues, unitOverrides, scheduleHistoryPush]);
+
+    const [rightTab, setRightTab] = useState<'visualizer' | 'comparison'>('visualizer');
+    const [scenarios, setScenarios] = useState<Array<{ id: string; name: string; inputs: Record<string, number | string>; outputs: Record<string, number | null> }>>([]);
+    const [saveScenarioOpen, setSaveScenarioOpen] = useState(false);
+    const [scenarioName, setScenarioName] = useState('');
+
+    const handleSaveScenario = () => {
+        if (!scenarioName.trim()) return;
+        setScenarios(prev => [
+            ...prev,
+            {
+                id: Date.now().toString(),
+                name: scenarioName.trim(),
+                inputs: { ...inputValues },
+                outputs: { ...computedOutputs.outputs }
+            }
+        ]);
+        setScenarioName('');
+        setSaveScenarioOpen(false);
+        setRightTab('comparison');
+    };
 
     const { t } = useI18nStore();
     const translatedTitle = t.modules[schema.id]?.title || schema.metadata.title;
@@ -375,7 +473,8 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
             return rest;
         });
         onValuesChange?.(nextValues as any);
-    }, [schema, inputValues, validateInput, onValuesChange]);
+        scheduleHistoryPush(nextValues);
+    }, [schema, inputValues, validateInput, onValuesChange, scheduleHistoryPush]);
 
     const computedOutputs = useMemo(() => {
         const outputs: Record<string, number | null> = {};
@@ -386,6 +485,13 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
                 const validatedInputs: Record<string, ValidatedEngineeringValue> = {};
                 schema.inputs.forEach(input => {
                     let raw = inputValues[input.key] ?? (input as any).defaultValue;
+                    
+                    // Convert user overridden unit back to default unit for calculation
+                    const currentUnit = unitOverrides[input.key];
+                    if (currentUnit && currentUnit !== input.unit && typeof raw === 'number') {
+                        raw = convertUnit(raw, currentUnit as any, input.unit as any);
+                    }
+
                     validatedInputs[input.key] = createValidatedValue(raw as any, input.unit, 'user');
                 });
                 const result = schema.calculationEngine(validatedInputs);
@@ -405,7 +511,7 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
             });
         }
         return { outputs, warnings };
-    }, [schema, inputValues]);
+    }, [schema, inputValues, unitOverrides]);
 
     useEffect(() => {
         const valid: Record<string, number> = {};
@@ -469,10 +575,74 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
                     </div>
 
                     <div className={styles.section}>
-                        <div className={styles.sectionTitle}><Settings2 size={14} className="text-blue-500" /><span>{t.parametersTitle || "ENGINEERING PARAMETERS"}</span></div>
+                        <div className={styles.sectionTitle}>
+                            <Settings2 size={14} className="text-blue-500" />
+                            <span>{t.parametersTitle || "ENGINEERING PARAMETERS"}</span>
+                            <div className="flex items-center gap-1.5 ml-auto">
+                                <button
+                                    onClick={handleUndo}
+                                    disabled={historyIndex <= 0}
+                                    className="p-1 rounded text-slate-500 hover:text-white disabled:opacity-30 disabled:hover:text-slate-500 transition-colors"
+                                    title="Undo"
+                                >
+                                    <Undo2 size={12} />
+                                </button>
+                                <button
+                                    onClick={handleRedo}
+                                    disabled={historyIndex >= history.length - 1}
+                                    className="p-1 rounded text-slate-500 hover:text-white disabled:opacity-30 disabled:hover:text-slate-500 transition-colors"
+                                    title="Redo"
+                                >
+                                    <Redo2 size={12} />
+                                </button>
+                                <button
+                                    onClick={() => setSaveScenarioOpen(true)}
+                                    className="flex items-center gap-1 px-2 py-0.5 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/20 rounded text-[9px] font-black uppercase transition-all duration-200"
+                                    title="Save Scenario"
+                                >
+                                    <Save size={10} />
+                                    <span>Compare</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {saveScenarioOpen && (
+                            <div className="p-3 mb-4 bg-slate-900 border border-emerald-500/30 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                                <input
+                                    autoFocus
+                                    placeholder="Scenario Name (e.g. Design A)"
+                                    className="bg-transparent text-[10px] font-bold text-white px-2 py-1 outline-none w-36 border-b border-white/10"
+                                    value={scenarioName}
+                                    onChange={(e) => setScenarioName(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSaveScenario()}
+                                />
+                                <button
+                                    onClick={handleSaveScenario}
+                                    className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-black rounded uppercase"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    onClick={() => setSaveScenarioOpen(false)}
+                                    className="text-slate-500 hover:text-white text-[9px] font-black uppercase"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        )}
                         <div className={styles.inputGrid}>
                             {schema.inputs.map((field: any) => (
-                                <CalcInput key={field.key} field={field} value={inputValues[field.key] ?? ''} formula={formulas?.[field.key]} onChange={handleInputChange} onFormulaChange={onFormulaChange} error={inputErrors[field.key]} />
+                                <CalcInput 
+                                    key={field.key} 
+                                    field={field} 
+                                    value={inputValues[field.key] ?? ''} 
+                                    unit={unitOverrides[field.key] || field.unit}
+                                    onUnitChange={(newUnit) => handleUnitChange(field.key, newUnit)}
+                                    formula={formulas?.[field.key]} 
+                                    onChange={handleInputChange} 
+                                    onFormulaChange={onFormulaChange} 
+                                    error={inputErrors[field.key]} 
+                                />
                             ))}
                         </div>
                     </div>
@@ -491,13 +661,112 @@ export const UniversalCalcRenderer: React.FC<UniversalCalcRendererProps> = ({
                 <div className={styles.rightPane}>
                     <div className={styles.gridOverlay} />
                     <div className="flex-1 relative flex flex-col">
-                        <div className="absolute top-6 left-6 z-10 flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.3em]"><Zap size={14} className="text-blue-500" />Technical Visualizer</div>
-                        {hasVisualizer ? (
-                            <div className="w-full h-full flex items-center justify-center p-8">
-                                <CalculatorVisualizer schema={schema as any} inputs={inputValues as any} outputs={computedOutputs.outputs as Record<string, number>} />
+                        <div className="absolute top-6 left-6 right-6 z-10 flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">
+                                <Zap size={14} className="text-blue-500" />
+                                {rightTab === 'visualizer' ? 'Technical Visualizer' : 'Scenario Comparison Matrix'}
                             </div>
+                            <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 select-none print:hidden">
+                                <button
+                                    onClick={() => setRightTab('visualizer')}
+                                    className={`px-3 py-1 text-[10px] font-black uppercase rounded-md transition-colors ${rightTab === 'visualizer' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    Visualizer
+                                </button>
+                                <button
+                                    onClick={() => setRightTab('comparison')}
+                                    className={`px-3 py-1 text-[10px] font-black uppercase rounded-md transition-colors ${rightTab === 'comparison' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    Comparison ({scenarios.length})
+                                </button>
+                            </div>
+                        </div>
+
+                        {rightTab === 'visualizer' ? (
+                            hasVisualizer ? (
+                                <div className="w-full h-full flex items-center justify-center p-8">
+                                    <CalculatorVisualizer schema={schema as any} inputs={inputValues as any} outputs={computedOutputs.outputs as Record<string, number>} />
+                                </div>
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center opacity-10"><BookOpen size={120} className="text-blue-500" /></div>
+                            )
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center opacity-10"><BookOpen size={120} className="text-blue-500" /></div>
+                            <div className="w-full h-full flex flex-col p-8 pt-20 overflow-auto custom-scrollbar">
+                                {scenarios.length === 0 ? (
+                                    <div className="flex-1 flex flex-col items-center justify-center text-slate-500 gap-3">
+                                        <Layers size={40} className="opacity-30 animate-pulse" />
+                                        <div className="text-[10px] font-bold uppercase tracking-widest text-center">
+                                            No Scenarios Saved
+                                        </div>
+                                        <div className="text-[9px] max-w-[240px] text-center leading-normal opacity-60">
+                                            Capture current input configurations to compare different design alternatives side-by-side.
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="border border-white/5 rounded-2xl overflow-hidden bg-[#070b10]/60 backdrop-blur-xl">
+                                        <table className="w-full text-left border-collapse text-[10px] font-mono">
+                                            <thead>
+                                                <tr className="border-b border-white/10 bg-white/5">
+                                                    <th className="p-3 text-slate-500 font-bold uppercase tracking-wider w-36">Metric</th>
+                                                    <th className="p-3 text-blue-400 font-bold uppercase tracking-wider">Current</th>
+                                                    {scenarios.map((sc) => (
+                                                        <th key={sc.id} className="p-3 text-emerald-400 font-bold uppercase tracking-wider relative group">
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <span className="truncate max-w-[80px]" title={sc.name}>{sc.name}</span>
+                                                                <div className="flex gap-1">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setInputValues(sc.inputs);
+                                                                            scheduleHistoryPush(sc.inputs);
+                                                                        }}
+                                                                        className="px-1 py-0.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-[8px] font-black"
+                                                                        title="Load Scenario"
+                                                                    >
+                                                                        LOAD
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setScenarios(prev => prev.filter(p => p.id !== sc.id))}
+                                                                        className="px-1 py-0.5 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded text-[8px] font-black"
+                                                                        title="Delete Scenario"
+                                                                    >
+                                                                        DEL
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr className="bg-white/[0.02] border-b border-white/5">
+                                                    <td colSpan={2 + scenarios.length} className="p-2 text-slate-600 font-black uppercase text-[8px] tracking-wider pl-3">Design Parameters (Inputs)</td>
+                                                </tr>
+                                                {schema.inputs.map((field) => (
+                                                    <tr key={field.key} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                                        <td className="p-3 text-slate-400 font-medium pl-4">{(field as any).label || (field as any).name}</td>
+                                                        <td className="p-3 text-white font-black">{inputValues[field.key] ?? '—'} <span className="text-slate-600 font-normal">{unitOverrides[field.key] || field.unit}</span></td>
+                                                        {scenarios.map((sc) => (
+                                                            <td key={sc.id} className="p-3 text-slate-300">{sc.inputs[field.key] ?? '—'} <span className="text-slate-600">{field.unit}</span></td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                                <tr className="bg-white/[0.02] border-b border-white/5">
+                                                    <td colSpan={2 + scenarios.length} className="p-2 text-slate-600 font-black uppercase text-[8px] tracking-wider pl-3">Calculated Outputs</td>
+                                                </tr>
+                                                {schema.outputs.map((field) => (
+                                                    <tr key={field.key} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                                                        <td className="p-3 text-slate-400 font-medium pl-4">{(field as any).label || (field as any).name}</td>
+                                                        <td className="p-3 text-blue-400 font-black font-mono">{(computedOutputs.outputs[field.key] as number)?.toFixed(field.precision ?? 2)} <span className="text-slate-600 font-normal">{field.unit}</span></td>
+                                                        {scenarios.map((sc) => (
+                                                            <td key={sc.id} className="p-3 text-slate-300 font-mono">{(sc.outputs[field.key] as number)?.toFixed(field.precision ?? 2)} <span className="text-slate-600">{field.unit}</span></td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
 

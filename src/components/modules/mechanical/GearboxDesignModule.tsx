@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Zap, ArrowRight, Gauge, Activity, PlusCircle, MinusCircle, RefreshCcw } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { getGearboxModuleStrings, formatGearboxStage } from '@/locales/gearboxModuleTranslations';
 
 interface GearStage {
     z1: number;
@@ -11,6 +13,9 @@ interface GearStage {
 }
 
 export default function GearboxDesignModule() {
+    const { language } = useI18nStore();
+    const g = getGearboxModuleStrings(language);
+
     const [stages, setStages] = useState<GearStage[]>([
         { z1: 20, z2: 60, efficiency: 0.98 },
         { z1: 15, z2: 45, efficiency: 0.98 }
@@ -94,13 +99,19 @@ export default function GearboxDesignModule() {
                             <Settings className="animate-[spin_4s_linear_infinite]" size={24} />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black tracking-tighter text-white uppercase italic">Gearbox Ratio Engine</h1>
-                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase">Multi-Stage Transmission Synthesis</p>
+                            <h1 className="text-xl font-black tracking-tighter text-white uppercase italic">
+                                {g.ratioEngine}
+                            </h1>
+                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase">
+                                {g.multiStage}
+                            </p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4 px-6 py-3 bg-[#0a101f] border border-white/5 rounded-xl shadow-inner">
                         <div className="flex flex-col items-end">
-                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Total Global Ratio</span>
+                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                {g.totalRatio}
+                            </span>
                             <span className="text-xl font-black font-mono text-cyan-400">1 : {formatNum(results.totalRatio, 2)}</span>
                         </div>
                     </div>
@@ -114,28 +125,32 @@ export default function GearboxDesignModule() {
                         <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 relative overflow-hidden">
                             <div className="flex items-center gap-3 mb-6">
                                 <Zap className="text-yellow-500" size={18} />
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Motor Parameters</h2>
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                    {g.motorParams}
+                                </h2>
                             </div>
                             
                             <div className="space-y-5">
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500">
-                                        <span>Motor Power (P)</span>
+                                        <span>{g.motorPower}</span>
                                         <span className="text-yellow-400 font-mono text-sm">{inputPower} kW</span>
                                     </div>
-                                    <input type="range" min="0.1" max="1000" step="0.1" value={inputPower} onChange={e => setInputPower(e.target.valueAsNumber)} className="w-full accent-yellow-500" />
+                                    <input type="range" min="0.1" max="1000" step="0.1" value={inputPower} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputPower(e.target.valueAsNumber)} className="w-full accent-yellow-500" />
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500">
-                                        <span>Motor Speed (n1)</span>
+                                        <span>{g.motorSpeed}</span>
                                         <span className="text-cyan-400 font-mono text-sm">{inputRPM} RPM</span>
                                     </div>
-                                    <input type="range" min="10" max="3600" step="10" value={inputRPM} onChange={e => setInputRPM(e.target.valueAsNumber)} className="w-full accent-cyan-500" />
+                                    <input type="range" min="10" max="3600" step="10" value={inputRPM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputRPM(e.target.valueAsNumber)} className="w-full accent-cyan-500" />
                                 </div>
 
                                 <div className="p-4 bg-black/40 rounded-xl border border-white/5 flex items-center justify-between">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Initial Torque</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                                        {g.initialTorque}
+                                    </span>
                                     <span className="font-mono font-black text-white">{formatNum(inputTorque)} <span className="text-slate-500 text-xs">Nm</span></span>
                                 </div>
                             </div>
@@ -145,21 +160,29 @@ export default function GearboxDesignModule() {
                         <div className="bg-cyan-900/10 backdrop-blur-xl border border-cyan-500/20 rounded-[2rem] p-6 relative overflow-hidden flex-1">
                             <div className="flex items-center gap-3 mb-6">
                                 <Gauge className="text-cyan-400" size={18} />
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">Output Shaft Metrics</h2>
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">
+                                    {g.outputMetrics}
+                                </h2>
                             </div>
                             
                             <div className="flex flex-col gap-4">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Final RPM</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                                        {g.finalRpm}
+                                    </span>
                                     <div className="text-4xl font-black font-mono text-cyan-400">{formatNum(results.finalRPM, 1)}</div>
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Final Torque</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                                        {g.finalTorque}
+                                    </span>
                                     <div className="text-5xl font-black font-mono text-white">{formatNum(results.finalTorque, 0)} <span className="text-xl text-slate-600 font-sans">Nm</span></div>
                                 </div>
                                 <div className="w-full h-px bg-cyan-500/20 my-2" />
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Global Efficiency</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                                        {g.globalEfficiency}
+                                    </span>
                                     <span className="font-black text-emerald-400">{(results.totalEfficiency * 100).toFixed(1)}%</span>
                                 </div>
                             </div>
@@ -171,7 +194,9 @@ export default function GearboxDesignModule() {
                         <div className="flex items-center justify-between mb-8">
                            <div className="flex items-center gap-3">
                                <RefreshCcw className="text-blue-400" size={18} />
-                               <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Transmission Cascade</h2>
+                               <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                   {g.transmissionCascade}
+                               </h2>
                            </div>
                            <div className="flex items-center gap-2">
                                <button onClick={removeStage} disabled={stages.length <= 1} className="p-2 border border-white/10 rounded-lg hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-colors disabled:opacity-30">
@@ -197,12 +222,16 @@ export default function GearboxDesignModule() {
                                         >
                                             {/* Stage ID */}
                                             <div className="absolute top-0 left-0 bottom-0 w-8 bg-white/5 flex items-center justify-center border-r border-white/5">
-                                                <span className="-rotate-90 text-[10px] font-black uppercase tracking-widest text-slate-600">Stage {idx + 1}</span>
+                                                <span className="-rotate-90 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                                    {formatGearboxStage(g, idx + 1)}
+                                                </span>
                                             </div>
 
                                             <div className="ml-8 flex-1 grid grid-cols-2 gap-4">
                                                 <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Pinion (Z1)</span>
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                        {g.pinion}
+                                                    </span>
                                                     <input 
                                                         type="number" value={stage.z1} 
                                                         onChange={e => updateStage(idx, 'z1', Number(e.target.value))}
@@ -210,7 +239,9 @@ export default function GearboxDesignModule() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Gear (Z2)</span>
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                        {g.gear}
+                                                    </span>
                                                     <input 
                                                         type="number" value={stage.z2} 
                                                         onChange={e => updateStage(idx, 'z2', Number(e.target.value))}
@@ -218,7 +249,9 @@ export default function GearboxDesignModule() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1 col-span-2">
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Efficiency (0.1 - 1.0)</span>
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                        {g.efficiency}
+                                                    </span>
                                                     <input 
                                                         type="number" step="0.01" value={stage.efficiency} 
                                                         onChange={e => updateStage(idx, 'efficiency', Number(e.target.value))}
@@ -233,17 +266,23 @@ export default function GearboxDesignModule() {
 
                                             <div className="w-full md:w-48 bg-cyan-900/10 border border-cyan-500/20 rounded-xl p-4 flex flex-col gap-2">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-[9px] font-bold uppercase text-slate-500">Ratio</span>
+                                                    <span className="text-[9px] font-bold uppercase text-slate-500">
+                                                        {g.ratio}
+                                                    </span>
                                                     <span className="font-mono text-sm text-cyan-400">1:{formatNum(stgRes.ratio)}</span>
                                                 </div>
                                                 <div className="w-full h-px bg-white/5" />
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-[9px] font-bold uppercase text-slate-500">Out RPM</span>
+                                                    <span className="text-[9px] font-bold uppercase text-slate-500">
+                                                        {g.outRpm}
+                                                    </span>
                                                     <span className="font-mono text-sm text-cyan-400">{formatNum(stgRes.outRPM, 0)}</span>
                                                 </div>
                                                 <div className="w-full h-px bg-white/5" />
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-[9px] font-bold uppercase text-slate-500">Out Nm</span>
+                                                    <span className="text-[9px] font-bold uppercase text-slate-500">
+                                                        {g.outNm}
+                                                    </span>
                                                     <span className="font-mono text-sm text-white font-bold">{formatNum(stgRes.outTorque, 0)}</span>
                                                 </div>
                                             </div>

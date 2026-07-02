@@ -74,7 +74,7 @@ export const getDictionary = async (locale: string) => {
         const mergedLegacy = locale === 'en' ? enDict : deepMerge(enDict, localeDict);
 
         if (safeLocale === 'ko' || safeLocale === 'ar') {
-            return mergedLegacy;
+            return deepMerge(mergedLegacy, colocatedDict);
         }
 
         // Colocated dictionary takes precedence over legacy

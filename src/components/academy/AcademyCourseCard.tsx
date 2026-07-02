@@ -18,9 +18,10 @@ type Props = {
   difficultyLabel: (d: string) => string;
   prereqTitle?: (slug: string) => string;
   visited?: boolean;
+  categoryLabel?: string;
 };
 
-export function AcademyCourseCard({ course, t, difficultyLabel, prereqTitle, visited }: Props) {
+export function AcademyCourseCard({ course, t, difficultyLabel, prereqTitle, visited, categoryLabel }: Props) {
   const diffClass = DIFFICULTY_STYLE[course.difficulty] ?? DIFFICULTY_STYLE.Intermediate;
   const cardHref = `/academy/${course.slug}`;
 
@@ -34,7 +35,7 @@ export function AcademyCourseCard({ course, t, difficultyLabel, prereqTitle, vis
             </div>
             <div className="min-w-0">
               <h3 className="text-sm font-black text-slate-100 group-hover:text-white leading-snug">
-                {visited && <span className="text-emerald-500 mr-1.5" title="Visited">✓</span>}
+                {visited && <span className="text-emerald-500 mr-1.5" title={t.visitedLabel}>✓</span>}
                 {course.title}
               </h3>
               <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{course.summary}</p>
@@ -53,8 +54,8 @@ export function AcademyCourseCard({ course, t, difficultyLabel, prereqTitle, vis
           {course.isSeoGuide && (
             <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">
               {t.engineeringGuide}
-              {course.category && (
-                <span className="text-cyan-500/70 normal-case tracking-normal font-bold">· {course.category}</span>
+              {course.category && categoryLabel && (
+                <span className="text-cyan-500/70 normal-case tracking-normal font-bold">· {categoryLabel}</span>
               )}
             </span>
           )}

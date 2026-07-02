@@ -4,6 +4,10 @@ import { useEffect } from "react";
 
 export function useChunkErrorFix() {
     useEffect(() => {
+        if (process.env.NODE_ENV === "development") {
+            return;
+        }
+
         const originalError = console.error;
         console.error = (...args) => {
             if (

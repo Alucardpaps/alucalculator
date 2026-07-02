@@ -6,7 +6,8 @@ import {
     Folder, File, Image, Video, Music, FileText, Palette, Globe, GitGraph,
     Bot, Scan, DollarSign, Droplet, BarChart3, Box, Factory, PenTool, Variable,
     Terminal, Sparkles, Thermometer, Activity,
-    Rocket, FlaskConical, Dna, Code, Plane, Anchor, Cpu, ShieldCheck
+    Rocket, FlaskConical, Dna, Code, Plane, Anchor, Cpu, ShieldCheck,
+    Volume2, Compass
 } from 'lucide-react';
 
 export type ModuleType =
@@ -81,6 +82,19 @@ export type ModuleType =
     | 'analytics-dashboard'
     | 'engineering-notes'
     | 'diagnostics'
+    | 'sound-meter'
+    | 'clinometer'
+    | 'gps-surveyor'
+    | 'hardness-converter'
+    | 'wind-tunnel'
+    | 'heat-sink'
+    | 'pressure-vessel'
+    | 'pipe-friction'
+    | 'column-buckling'
+    | 'advanced-spring'
+    | 'vibration'
+    | 'tolerance-stackup'
+    | 'hvac-load'
     | 'marine';
 
 export interface WindowSize {
@@ -527,6 +541,97 @@ export const BASE_REGISTRY = {
         category: 'finance',
         iconName: 'DollarSign',
         defaultSize: { width: 1000, height: 750 }
+    },
+    'sound-meter': {
+        type: 'sound-meter',
+        title: 'Noise & Decibel Analyzer',
+        category: 'mechanical',
+        iconName: 'Volume2',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'clinometer': {
+        type: 'clinometer',
+        title: 'Clinometer / Height Finder',
+        category: 'mechanical',
+        iconName: 'Compass',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'gps-surveyor': {
+        type: 'gps-surveyor',
+        title: 'GPS Surveyor & Compass',
+        category: 'mechanical',
+        iconName: 'Compass',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'hardness-converter': {
+        type: 'hardness-converter',
+        title: 'Hardness & Tensile Converter',
+        category: 'mechanical',
+        iconName: 'Layers',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'wind-tunnel': {
+        type: 'wind-tunnel',
+        title: '3D Wind Tunnel',
+        category: 'mechanical',
+        iconName: 'Wind',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'heat-sink': {
+        type: 'heat-sink',
+        title: 'Heat Sink / Thermal',
+        category: 'mechanical',
+        iconName: 'Flame',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'pressure-vessel': {
+        type: 'pressure-vessel',
+        title: 'Pressure Vessel',
+        category: 'mechanical',
+        iconName: 'Droplets',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'pipe-friction': {
+        type: 'pipe-friction',
+        title: 'Pipe Friction',
+        category: 'mechanical',
+        iconName: 'MoveRight',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'column-buckling': {
+        type: 'column-buckling',
+        title: 'Column Buckling',
+        category: 'mechanical',
+        iconName: 'AlignVerticalSpaceAround',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'advanced-spring': {
+        type: 'advanced-spring',
+        title: 'Advanced Spring',
+        category: 'mechanical',
+        iconName: 'ArrowUpDown',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'vibration': {
+        type: 'vibration',
+        title: 'Vibration & Isolation',
+        category: 'mechanical',
+        iconName: 'Waves',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'tolerance-stackup': {
+        type: 'tolerance-stackup',
+        title: 'Tolerance Stackup',
+        category: 'mechanical',
+        iconName: 'Layers',
+        defaultSize: { width: 1000, height: 750 }
+    },
+    'hvac-load': {
+        type: 'hvac-load',
+        title: 'HVAC Load',
+        category: 'mechanical',
+        iconName: 'Wind',
+        defaultSize: { width: 1000, height: 750 }
     }
 } as Record<string, ModuleDefinition>;
 
@@ -601,6 +706,8 @@ export const getModuleIcon = (name: string) => {
         case 'Anchor': return Anchor;
         case 'Cpu': return Cpu;
         case 'ShieldCheck': return ShieldCheck;
+        case 'Volume2': return Volume2;
+        case 'Compass': return Compass;
         default: return Circle;
     }
 };

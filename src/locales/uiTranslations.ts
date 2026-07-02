@@ -18,6 +18,7 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     downloadTitle: "Download Mobile App",
     downloadApk: "Download APK Directly",
     googlePlay: "Get it on Google Play",
+    downloadWearApk: "Download Wear OS APK",
     
     // Value Propositions
     prop1Title: "88+ Verified Solvers",
@@ -108,6 +109,7 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     downloadTitle: "Mobil Uygulamayı İndir",
     downloadApk: "Doğrudan APK İndir",
     googlePlay: "Google Play'den İndirin",
+    downloadWearApk: "Wear OS APK İndir",
     
     // Value Propositions
     prop1Title: "88+ Doğrulanmış Çözücü",

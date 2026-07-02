@@ -6,8 +6,13 @@ import {
     Activity, ShieldAlert, Zap, Layers, Info
 } from 'lucide-react';
 import { HeadlessEngine } from '@/headless-engine/engine';
+import { useI18nStore } from '@/store/i18nStore';
+import { getFatigueModuleStrings } from '@/locales/fatigueModuleTranslations';
 
 export default function FatigueAnalysisModule() {
+    const { language } = useI18nStore();
+    const f = getFatigueModuleStrings(language);
+
     const [inputs, setInputs] = useState({
         S_ut: 800,     // MPa (Ultimate Strength)
         S_y: 650,      // MPa (Yield Strength)
@@ -64,32 +69,40 @@ export default function FatigueAnalysisModule() {
                         <Activity size={20} strokeWidth={2} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold tracking-tight text-gray-100">Fatigue Life</h2>
-                        <p className="text-[10px] text-cyan-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">Endurance Limit Analysis</p>
+                        <h2 className="text-xl font-bold tracking-tight text-gray-100">
+                            {f.fatigueLife}
+                        </h2>
+                        <p className="text-[10px] text-cyan-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">
+                            {f.enduranceAnalysis}
+                        </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 mb-4 text-cyan-400">
                     <Layers size={16} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Material & Load Setup</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                        {f.materialLoad}
+                    </span>
                 </div>
 
                 <div className="space-y-6 flex-1">
-                    <PremiumNumBox label="Ultimate Tensile (S_ut)" unit="MPa" value={inputs.S_ut} min={100} max={3000} step={10} onChange={(v: number) => setInputs({ ...inputs, S_ut: v })} color="#00e5ff" />
-                    <PremiumNumBox label="Yield Strength (S_y)" unit="MPa" value={inputs.S_y} min={100} max={2500} step={10} onChange={(v: number) => setInputs({ ...inputs, S_y: v })} color="#3b82f6" />
+                    <PremiumNumBox label={f.ultimateTensile} unit="MPa" value={inputs.S_ut} min={100} max={3000} step={10} onChange={(v: number) => setInputs({ ...inputs, S_ut: v })} color="#00e5ff" />
+                    <PremiumNumBox label={f.yieldStrength} unit="MPa" value={inputs.S_y} min={100} max={2500} step={10} onChange={(v: number) => setInputs({ ...inputs, S_y: v })} color="#3b82f6" />
                     
                     <div className="my-8 border-t border-white/5 pt-6"></div>
 
-                    <PremiumNumBox label="Alternating Stress (σ_a)" unit="MPa" value={inputs.sigma_a} min={0} max={1000} step={5} onChange={(v: number) => setInputs({ ...inputs, sigma_a: v })} color="#f59e0b" />
-                    <PremiumNumBox label="Mean Stress (σ_m)" unit="MPa" value={inputs.sigma_m} min={0} max={1000} step={5} onChange={(v: number) => setInputs({ ...inputs, sigma_m: v })} color="#ef4444" />
+                    <PremiumNumBox label={f.altStress} unit="MPa" value={inputs.sigma_a} min={0} max={1000} step={5} onChange={(v: number) => setInputs({ ...inputs, sigma_a: v })} color="#f59e0b" />
+                    <PremiumNumBox label={f.meanStress} unit="MPa" value={inputs.sigma_m} min={0} max={1000} step={5} onChange={(v: number) => setInputs({ ...inputs, sigma_m: v })} color="#ef4444" />
                     
                     <div className="my-8 border-t border-white/5 pt-6"></div>
                     
                     <div className="bg-[#0e1622] rounded-xl border border-white/5 p-4 space-y-4">
-                        <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Marin Factors (k_a, k_b, k_c)</p>
-                        <PremiumNumBox label="Surface (k_a)" unit="" value={inputs.k_a} min={0.1} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_a: v })} color="#10b981" />
-                        <PremiumNumBox label="Size (k_b)" unit="" value={inputs.k_b} min={0.5} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_b: v })} color="#10b981" />
-                        <PremiumNumBox label="Load (k_c)" unit="" value={inputs.k_c} min={0.5} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_c: v })} color="#10b981" />
+                        <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+                            {f.marinFactors}
+                        </p>
+                        <PremiumNumBox label={f.surfaceKa} unit="" value={inputs.k_a} min={0.1} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_a: v })} color="#10b981" />
+                        <PremiumNumBox label={f.sizeKb} unit="" value={inputs.k_b} min={0.5} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_b: v })} color="#10b981" />
+                        <PremiumNumBox label={f.loadKc} unit="" value={inputs.k_c} min={0.5} max={1.0} step={0.05} onChange={(v: number) => setInputs({ ...inputs, k_c: v })} color="#10b981" />
                     </div>
                 </div>
             </div>
@@ -106,7 +119,10 @@ export default function FatigueAnalysisModule() {
                                 animate={{ color: activeColor }}
                             >
                                 <motion.div className="w-2.5 h-2.5 rounded-full" animate={{ backgroundColor: activeColor, boxShadow: `0 0 15px ${activeColor}` }} />
-                                {results.isSafe ? 'INFINITE LIFE CONFIRMED' : 'WARNING: FATIGUE FAILURE PREDICTED'}
+                                {results.isSafe 
+                                    ? f.infiniteLife 
+                                    : f.fatigueWarning
+                                }
                             </motion.div>
                             <div className="flex items-baseline gap-4">
                                 <motion.div 
@@ -117,11 +133,15 @@ export default function FatigueAnalysisModule() {
                                 </motion.div>
                                 <span className="text-3xl font-bold text-gray-500 mb-4">FS</span>
                             </div>
-                            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">Overall Factor of Safety (min)</p>
+                            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] mt-2">
+                                {f.overallFos}
+                            </p>
                         </div>
                         
                         <div className="flex flex-col items-end gap-1 pt-6 text-right">
-                            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Endurance Limit (Se)</span>
+                            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+                                {f.enduranceLimit}
+                            </span>
                             <span className="text-3xl font-mono font-black text-cyan-400">{results.S_e.toFixed(1)} <span className="text-xl text-gray-500">MPa</span></span>
                         </div>
                     </div>
@@ -132,7 +152,7 @@ export default function FatigueAnalysisModule() {
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
                     
                     <div className="absolute top-6 left-6 flex items-center gap-2 text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
-                        <Zap size={14} /> LIVE MODIFIED GOODMAN DIAGRAM
+                        <Zap size={14} /> {f.goodmanDiagram}
                     </div>
 
                     <div className="w-full h-full relative z-10 flex items-center justify-center p-8">
@@ -199,7 +219,7 @@ export default function FatigueAnalysisModule() {
                                 {/* Load Line from origin to operating point */}
                                 <line x1={scaleX(0) - scaleX(inputs.sigma_m)} y1={scaleY(0) - scaleY(inputs.sigma_a)} x2="0" y2="0" stroke={activeColor} strokeWidth="2" strokeDasharray="3,3" opacity="0.6"/>
                                 <text x="15" y="-15" fill={activeColor} fontSize="14" fontWeight="bold" opacity="0.9">
-                                    Load ({inputs.sigma_m}, {inputs.sigma_a})
+                                    {`${f.loadPoint} (${inputs.sigma_m}, ${inputs.sigma_a})`}
                                 </text>
                             </motion.g>
 
@@ -216,8 +236,12 @@ export default function FatigueAnalysisModule() {
                         >
                             <ShieldAlert className="shrink-0 animate-pulse" size={32} />
                             <div>
-                                <p className="text-xs font-black uppercase tracking-[0.2em]">Fatigue Envelope Exceeded</p>
-                                <p className="text-[11px] opacity-80 mt-1">Operating stress combination lies outside the Goodman/Langer safe zone. Infinite life cannot be guaranteed.</p>
+                                <p className="text-xs font-black uppercase tracking-[0.2em]">
+                                    {f.envelopeExceeded}
+                                </p>
+                                <p className="text-[11px] opacity-80 mt-1">
+                                    {f.envelopeExceededDesc}
+                                </p>
                             </div>
                         </motion.div>
                     )}
@@ -235,7 +259,7 @@ function PremiumNumBox({ label, unit, value, min, max, step, onChange, color }: 
             </div>
             <div className="relative flex items-center bg-[#0e1622] border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group-focus-within:border-white/30 group-focus-within:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                 <input
-                    type="number" value={value} onChange={(e) => onChange(Number(e.target.value))}
+                    type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))}
                     min={min} max={max} step={step}
                     className="w-full bg-transparent text-lg font-black font-mono px-4 py-3 text-white outline-none appearance-none"
                     style={{ textShadow: `0 0 10px ${color}40` }}
@@ -248,7 +272,7 @@ function PremiumNumBox({ label, unit, value, min, max, step, onChange, color }: 
             </div>
             <div className="mt-3 px-1">
                 <input
-                    type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))}
+                    type="range" min={min} max={max} step={step} value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))}
                     className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer hover:h-1.5 transition-all outline-none"
                     style={{ accentColor: color }}
                 />

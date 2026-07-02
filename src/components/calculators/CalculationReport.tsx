@@ -9,6 +9,7 @@ import {
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
+import { PDFReportEngine } from '@/lib/pdfReportEngine';
 
 // Lazy load MathJax for performance
 const MathJaxNode: React.ComponentType<any> = dynamic(() => import('react-mathjax2').then(mod => (mod as any).default.Node || (mod as any).Node), { 
@@ -37,6 +38,63 @@ export const CalculationReport: React.FC<CalculationReportProps> = ({
 }) => {
     const handlePrint = () => {
         window.print();
+    };
+
+    const handleDownloadPDF = async () => {
+        const meta = {
+            title: schema.metadata.title,
+            preparedBy: "AluCalc OS Engineer",
+            projectName: "Calculation Report",
+            referenceNo: `AC-${schema.id.toUpperCase()}-${Date.now().toString().slice(-4)}`
+        };
+
+        const engine = new PDFReportEngine(meta);
+        
+        let currentY = engine.addMetadataSection(50);
+        
+        currentY = engine.addSectionTitle("Input Parameters", currentY);
+        currentY = engine.addTable({
+            startY: currentY,
+            head: [['Parameter', 'Value', 'Unit']],
+            body: schema.inputs.map(input => [
+                (input as any).label || (input as any).name || input.key,
+                String(inputs[input.key] !== undefined && inputs[input.key] !== null ? inputs[input.key] : ''),
+                input.unit || '-'
+            ])
+        });
+        
+        currentY = engine.addSectionTitle("Calculated Results", currentY);
+        currentY = engine.addTable({
+            startY: currentY,
+            head: [['Output Metric', 'Calculated Value', 'Unit']],
+            body: schema.outputs.map(output => [
+                (output as any).label || (output as any).name || output.key,
+                String(outputs[output.key] !== null && outputs[output.key] !== undefined ? (outputs[output.key] as number).toFixed(output.precision ?? 4) : '—'),
+                output.unit || '-'
+            ])
+        });
+
+        const standards = schema.documentation?.standards || [];
+        if (standards.length > 0) {
+            currentY = engine.addSectionTitle("Applied Standards & References", currentY);
+            currentY = engine.addTable({
+                startY: currentY,
+                head: [['Standard Code', 'Title']],
+                body: standards.map(std => [std.code, std.title])
+            });
+        }
+
+        const assumptions = schema.documentation?.assumptions || [];
+        if (assumptions.length > 0) {
+            currentY = engine.addSectionTitle("Engineering Assumptions", currentY);
+            currentY = engine.addTable({
+                startY: currentY,
+                head: [['Assumption', 'Impact Level']],
+                body: assumptions.map(asp => [asp.text, asp.impact.toUpperCase()])
+            });
+        }
+
+        engine.save(`AluCalc_${schema.id}_Report.pdf`);
     };
 
     const standards = schema.documentation?.standards || [];
@@ -76,6 +134,13 @@ export const CalculationReport: React.FC<CalculationReportProps> = ({
                             title="Print Report"
                         >
                             <Printer size={20} />
+                        </button>
+                        <button 
+                            onClick={handleDownloadPDF}
+                            className="p-2.5 hover:bg-slate-200 rounded-xl transition-colors text-slate-600 ml-2"
+                            title="Download PDF"
+                        >
+                            <Download size={20} />
                         </button>
                         <button 
                             onClick={onClose}

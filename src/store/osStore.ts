@@ -399,6 +399,8 @@ export const useOSStore = create<OSState & OSActions>()(
                 nextZIndex: state.nextZIndex,
                 currentLanguage: state.currentLanguage,
                 theme: state.theme,
+                fontSize: state.fontSize,
+                unitSystem: state.unitSystem,
                 hasSeenWelcome: state.hasSeenWelcome,
                 workspaceMode: state.workspaceMode,
                 isChaosMode: state.isChaosMode,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Trash2, Maximize2, Minimize2 } from 'lucide-react';
+import { MathEngine } from '@/engine/math-core';
 
 interface SavedVar {
     id: string;
@@ -122,46 +123,115 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
         return `${d}°${m}'${s}"`;
     };
 
+    /** Finds the balanced closing paren for a function call starting at openIndex. */
+    const findClosingParen = (str: string, openIndex: number): number => {
+        let depth = 1;
+        for (let i = openIndex + 1; i < str.length; i++) {
+            if (str[i] === '(') depth++;
+            if (str[i] === ')') depth--;
+            if (depth === 0) return i;
+        }
+        return -1;
+    };
+
+    /**
+     * Wraps trig function arguments with an angle-conversion factor.
+     * e.g. sin(45) → sin((45) * (pi / 180)) when angleMode is DEG.
+     */
+    const wrapTrigForAngleMode = (expr: string, mode: AngleMode): string => {
+        if (mode === 'RAD') return expr;
+
+        const conversionFactor = mode === 'DEG' ? '(pi / 180)' : '(pi / 200)';
+        const inverseFactor = mode === 'DEG' ? '(180 / pi)' : '(200 / pi)';
+
+        // Forward trig: sin(X) → sin((X) * factor)
+        const forwardFns = ['sin', 'cos', 'tan'];
+        for (const fn of forwardFns) {
+            let cursor = 0;
+            while (cursor < expr.length) {
+                const idx = expr.indexOf(fn + '(', cursor);
+                if (idx === -1) break;
+                // Ensure it's not part of a longer identifier (asin, sinh, etc.)
+                if (idx > 0 && /[a-zA-Z]/.test(expr[idx - 1])) {
+                    cursor = idx + fn.length;
+                    continue;
+                }
+                const parenOpen = idx + fn.length; // index of '('
+                const parenClose = findClosingParen(expr, parenOpen);
+                if (parenClose === -1) break;
+
+                const inner = expr.slice(parenOpen + 1, parenClose);
+                const wrapped = `${fn}((${inner}) * ${conversionFactor})`;
+                expr = expr.slice(0, idx) + wrapped + expr.slice(parenClose + 1);
+                cursor = idx + wrapped.length;
+            }
+        }
+
+        // Inverse trig: asin(X) → (asin(X) * inverseFactor)
+        const inverseFns = ['asin', 'acos', 'atan'];
+        for (const fn of inverseFns) {
+            let cursor = 0;
+            while (cursor < expr.length) {
+                const idx = expr.indexOf(fn + '(', cursor);
+                if (idx === -1) break;
+                // Ensure it's not part of a longer identifier (e.g., asinh)
+                if (idx > 0 && /[a-zA-Z]/.test(expr[idx - 1])) {
+                    cursor = idx + fn.length;
+                    continue;
+                }
+                // Also skip if followed by 'h' (asinh, acosh, atanh)
+                const afterFn = idx + fn.length;
+                if (afterFn < expr.length && expr[afterFn] === 'h') {
+                    cursor = afterFn;
+                    continue;
+                }
+                const parenOpen = idx + fn.length;
+                const parenClose = findClosingParen(expr, parenOpen);
+                if (parenClose === -1) break;
+
+                const fullCall = expr.slice(idx, parenClose + 1);
+                const wrapped = `(${fullCall} * ${inverseFactor})`;
+                expr = expr.slice(0, idx) + wrapped + expr.slice(parenClose + 1);
+                cursor = idx + wrapped.length;
+            }
+        }
+
+        return expr;
+    };
+
     const handleCalculate = useCallback(() => {
         if (!display) return;
         try {
             let expr = display;
-            expr = expr.replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E');
 
-            const toRad = (deg: number) => angleMode === 'DEG' ? deg * Math.PI / 180 : (angleMode === 'GRAD' ? deg * Math.PI / 200 : deg);
-            const fromRad = (rad: number) => angleMode === 'DEG' ? rad * 180 / Math.PI : (angleMode === 'GRAD' ? rad * 200 / Math.PI : rad);
+            // Map display symbols → mathjs-compatible tokens
+            expr = expr.replace(/π/g, 'pi');
 
-            const context = {
-                sin: (x: number) => Math.sin(toRad(x)),
-                cos: (x: number) => Math.cos(toRad(x)),
-                tan: (x: number) => Math.tan(toRad(x)),
-                asin: (x: number) => fromRad(Math.asin(x)),
-                acos: (x: number) => fromRad(Math.acos(x)),
-                atan: (x: number) => fromRad(Math.atan(x)),
-                sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh,
-                asinh: Math.asinh, acosh: Math.acosh, atanh: Math.atanh,
-                log: Math.log10, ln: Math.log,
-                sqrt: Math.sqrt, cbrt: Math.cbrt, abs: Math.abs, pow: Math.pow,
-                fact: factorial, nPr: nPr, nCr: nCr,
-                Pol: (x: number, y: number) => Math.hypot(x, y),
-                Rec: (r: number, t: number) => r * Math.cos(toRad(t))
-            };
+            // Inline-compute factorial, nPr, nCr before evaluation
+            expr = expr.replace(/(\d+)!/g, (_, n) => factorial(parseInt(n)).toString());
+            expr = expr.replace(/(\d+)P(\d+)/g, (_, n, r) => nPr(parseInt(n), parseInt(r)).toString());
+            expr = expr.replace(/(\d+)C(\d+)/g, (_, n, r) => nCr(parseInt(n), parseInt(r)).toString());
 
-            expr = expr.replace(/([\d.]+)!/g, 'fact($1)');
-            expr = expr.replace(/([\d.]+)P([\d.]+)/g, 'nPr($1,$2)');
-            expr = expr.replace(/([\d.]+)C([\d.]+)/g, 'nCr($1,$2)');
-            expr = expr.replace(/\^/g, '**');
-            expr = expr.replace(/²/g, '**2').replace(/³/g, '**3');
+            // Superscript exponents → mathjs `^` power syntax
+            expr = expr.replace(/²/g, '^2').replace(/³/g, '^3');
             expr = expr.replace(/√\(/g, 'sqrt(');
             expr = expr.replace(/(\d+)%/g, '($1/100)');
 
-            const keys = Object.keys(context);
-            const values = Object.values(context);
-            // eslint-disable-next-line no-new-func
-            const func = new Function(...keys, `return ${expr};`);
-            const val = func(...values);
+            // Map display `log(` → mathjs `log10(`, display `ln(` → mathjs `log(`
+            expr = expr.replace(/\blog\(/g, 'log10(');
+            expr = expr.replace(/\bln\(/g, 'log(');
 
-            if (isNaN(val) || !isFinite(val)) throw new Error("Math Error");
+            // Angle-mode conversion for trig functions
+            expr = wrapTrigForAngleMode(expr, angleMode);
+
+            // Build scope from saved variables
+            const scope = savedVars.reduce<Record<string, number>>(
+                (acc, v) => ({ ...acc, [v.name]: v.value }), {}
+            );
+
+            const val = MathEngine.evaluate(expr, scope);
+
+            if (isNaN(val) || !isFinite(val)) throw new Error('Math Error');
             const cleanVal = parseFloat(val.toPrecision(12));
             setResult(cleanVal.toString());
             setHistory(prev => [`${display} = ${cleanVal}`, ...prev].slice(0, 20));
@@ -170,7 +240,7 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
         } catch (e: any) {
             setResult('Syntax ERROR');
         }
-    }, [display, angleMode]);
+    }, [display, angleMode, savedVars]);
 
     const insert = (val: string) => {
         if (result && result !== 'Syntax ERROR') {

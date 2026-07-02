@@ -2,8 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crosshair, ChevronDown, CircleDot, Settings2, List } from 'lucide-react';
+import { Crosshair, ChevronDown, CircleDot, Settings2, List, Activity } from 'lucide-react';
 import { calculateFit } from '@/lib/engine/iso286';
+import { calculateShrinkFit } from '@/lib/engine/shrinkFit';
+import { useOSStore } from '@/store/osStore';
+import { useI18nStore } from '@/store/i18nStore';
+import { getFitsModuleStrings } from '@/locales/fitsModuleTranslations';
 
 const PRESET_FITS = {
     Clearance: [
@@ -29,6 +33,11 @@ const SHAFT_CLASSES = ['a','b','c','d','e','f','g','h','j','js','k','m','n','p',
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
 export default function FitsTolerancesModule() {
+    const { language } = useI18nStore();
+    const ft = getFitsModuleStrings(language) as any;
+    const { dictionary: dict } = useOSStore();
+    const fitDict = dict?.fit || {};
+
     const [nominalDia, setNominalDia] = useState(25);
     const [mode, setMode] = useState<'preset' | 'advanced'>('preset');
     
@@ -40,6 +49,15 @@ export default function FitsTolerancesModule() {
     const [holeGrade, setHoleGrade] = useState(7);
     const [shaftClass, setShaftClass] = useState('g');
     const [shaftGrade, setShaftGrade] = useState(6);
+
+    // Shrink Fit State
+    const [hubOuterDia, setHubOuterDia] = useState(50);
+    const [length, setLength] = useState(30);
+    const [mu, setMu] = useState(0.15);
+    const [eHub, setEHub] = useState(210000);
+    const [eShaft, setEShaft] = useState(210000);
+    const [vHub, setVHub] = useState(0.3);
+    const [vShaft, setVShaft] = useState(0.3);
 
     const [expandedSection, setExpandedSection] = useState<string | null>('fit');
 
@@ -59,11 +77,54 @@ export default function FitsTolerancesModule() {
             }
         }
 
-        return calculateFit(nominalDia, hc, hg, sc, sg);
-    }, [nominalDia, mode, selectedPreset, holeClass, holeGrade, shaftClass, shaftGrade]);
+        const fitResults = calculateFit(nominalDia, hc, hg, sc, sg);
+
+        let shrinkFitMax = null;
+        let shrinkFitMin = null;
+
+        if (fitResults.fitType === 'Interference') {
+            shrinkFitMax = calculateShrinkFit({
+                nominalDia, hubOuterDia, length,
+                interference: Math.abs(fitResults.minClearance), // minClearance is max interference (most negative)
+                eHub, eShaft, vHub, vShaft, mu
+            });
+            shrinkFitMin = calculateShrinkFit({
+                nominalDia, hubOuterDia, length,
+                interference: Math.abs(fitResults.maxClearance), // maxClearance is min interference
+                eHub, eShaft, vHub, vShaft, mu
+            });
+        }
+
+        return { ...fitResults, shrinkFitMax, shrinkFitMin };
+    }, [nominalDia, mode, selectedPreset, holeClass, holeGrade, shaftClass, shaftGrade, hubOuterDia, length, mu, eHub, eShaft, vHub, vShaft]);
 
     const fitColor = results.fitType === 'Clearance' ? '#10b981' : results.fitType === 'Interference' ? '#ef4444' : '#f59e0b';
     const toggleSection = (id: string) => setExpandedSection(expandedSection === id ? null : id);
+
+    // Dynamic Preset Descriptions
+    const getPresetDesc = (id: string, def: string) => {
+        if (id === 'H7/g6') return fitDict.fitTypes?.h7g6?.desc || def;
+        if (id === 'H7/h6') return fitDict.fitTypes?.h7h6?.desc || def;
+        if (id === 'H8/f7') return fitDict.fitTypes?.h7f7?.desc || def;
+        if (id === 'H7/k6') return fitDict.fitTypes?.h7k6?.desc || def;
+        if (id === 'H7/n6') return fitDict.fitTypes?.h7n6?.desc || def;
+        if (id === 'H7/p6') return fitDict.fitTypes?.h7p6?.desc || def;
+        if (id === 'H7/s6') return fitDict.fitTypes?.h7s6?.desc || def;
+        if (id === 'H7/u6') return fitDict.fitTypes?.h7s6?.desc || def;
+        return def;
+    };
+
+    const getPresetName = (id: string, def: string) => {
+        if (id === 'H7/g6') return fitDict.fitTypes?.h7g6?.name || def;
+        if (id === 'H7/h6') return fitDict.fitTypes?.h7h6?.name || def;
+        if (id === 'H8/f7') return fitDict.fitTypes?.h7f7?.name || def;
+        if (id === 'H7/k6') return fitDict.fitTypes?.h7k6?.name || def;
+        if (id === 'H7/n6') return fitDict.fitTypes?.h7n6?.name || def;
+        if (id === 'H7/p6') return fitDict.fitTypes?.h7p6?.name || def;
+        if (id === 'H7/s6') return fitDict.fitTypes?.h7s6?.name || def;
+        if (id === 'H7/u6') return fitDict.fitTypes?.h7s6?.name || def;
+        return def;
+    };
 
     return (
         <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden">
@@ -75,24 +136,24 @@ export default function FitsTolerancesModule() {
                             <Crosshair size={20} strokeWidth={2} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold tracking-tight text-gray-100">Fits & Tolerances</h2>
-                            <p className="text-[10px] text-indigo-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">ISO 286 Dynamic Engine</p>
+                            <h2 className="text-lg font-bold tracking-tight text-gray-100">{fitDict.title || "Fits & Tolerances"}</h2>
+                            <p className="text-[10px] text-indigo-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">{fitDict.subtitle || "ISO 286 Dynamic Engine"}</p>
                         </div>
                     </div>
                     
                     <div className="flex bg-[#0e1622] rounded-lg p-1 border border-white/10">
                         <button onClick={() => setMode('preset')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-2 ${mode === 'preset' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-500 hover:text-white'}`}>
-                            <List size={14} /> Presets
+                            <List size={14} /> {fitDict.tabs?.standard || "Presets"}
                         </button>
                         <button onClick={() => setMode('advanced')} className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-2 ${mode === 'advanced' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-500 hover:text-white'}`}>
-                            <Settings2 size={14} /> Advanced
+                            <Settings2 size={14} /> {fitDict.tabs?.manual || "Advanced"}
                         </button>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-4 space-y-3">
                     {/* Nominal Diameter */}
-                    <PanelSection id="diameter" title="Nominal Diameter" icon={<CircleDot size={14} />} isOpen={expandedSection === 'diameter'} onToggle={() => toggleSection('diameter')}>
+                    <PanelSection id="diameter" title={fitDict.inputs?.nominalSize || "Nominal Diameter"} icon={<CircleDot size={14} />} isOpen={expandedSection === 'diameter'} onToggle={() => toggleSection('diameter')}>
                         <div className="group">
                             <div className="relative flex items-center bg-[#0e1622] border border-white/10 rounded-lg overflow-hidden transition-all group-focus-within:border-indigo-500/40 group-focus-within:shadow-[0_0_15px_rgba(99,102,241,0.08)]">
                                 <input type="number" value={nominalDia} onChange={e => setNominalDia(Number(e.target.value))}
@@ -107,12 +168,16 @@ export default function FitsTolerancesModule() {
                     </PanelSection>
 
                     {/* Configuration */}
-                    <PanelSection id="fit" title={mode === 'preset' ? 'Fit Class' : 'Custom Fit'} icon={<Crosshair size={14} />} isOpen={expandedSection === 'fit'} onToggle={() => toggleSection('fit')}>
+                    <PanelSection id="fit" title={mode === 'preset' ? ft.fitClass : ft.customFit} icon={<Crosshair size={14} />} isOpen={expandedSection === 'fit'} onToggle={() => toggleSection('fit')}>
                         {mode === 'preset' ? (
                             <div className="space-y-4">
                                 {Object.entries(PRESET_FITS).map(([category, fits]) => (
                                     <div key={category}>
-                                        <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 px-1">{category}</div>
+                                        <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 px-1">
+                                            {category === 'Clearance' ? ft.clearanceFits :
+                                             category === 'Transition' ? ft.transitionFits :
+                                             ft.interferenceFits}
+                                        </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             {fits.map(f => (
                                                 <button key={f.id} onClick={() => setSelectedPreset(f.id)}
@@ -123,7 +188,7 @@ export default function FitsTolerancesModule() {
                                                         }`}
                                                 >
                                                     <div className="text-sm font-mono font-black text-indigo-400">{f.id}</div>
-                                                    <div className="text-[9px] text-gray-500 mt-0.5 truncate">{f.desc}</div>
+                                                    <div className="text-[9px] text-gray-500 mt-0.5 truncate">{getPresetName(f.id, f.desc)}</div>
                                                 </button>
                                             ))}
                                         </div>
@@ -133,7 +198,7 @@ export default function FitsTolerancesModule() {
                         ) : (
                             <div className="space-y-4">
                                 <div className="bg-[#0e1622] border border-white/5 rounded-xl p-4">
-                                    <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3">HOLE (Internal)</div>
+                                    <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3">{ft.holeInternal}</div>
                                     <div className="flex gap-2">
                                         <select value={holeClass} onChange={(e) => setHoleClass(e.target.value)} className="flex-1 bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none">
                                             {HOLE_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -144,7 +209,7 @@ export default function FitsTolerancesModule() {
                                     </div>
                                 </div>
                                 <div className="bg-[#0e1622] border border-white/5 rounded-xl p-4">
-                                    <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3">SHAFT (External)</div>
+                                    <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3">{ft.shaftExternal}</div>
                                     <div className="flex gap-2">
                                         <select value={shaftClass} onChange={(e) => setShaftClass(e.target.value)} className="flex-1 bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none">
                                             {SHAFT_CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -157,6 +222,38 @@ export default function FitsTolerancesModule() {
                             </div>
                         )}
                     </PanelSection>
+
+                    {/* Shrink Fit Settings */}
+                    <AnimatePresence>
+                        {results.fitType === 'Interference' && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+                                <PanelSection id="shrink" title={ft.shrinkFit || "Shrink Fit Analysis"} icon={<Activity size={14} />} isOpen={expandedSection === 'shrink'} onToggle={() => toggleSection('shrink')}>
+                                    <div className="space-y-4">
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{ft.hubOuterDia || "Hub Outer Dia (mm)"}</label>
+                                                <input type="number" value={hubOuterDia} onChange={e => setHubOuterDia(Number(e.target.value))} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none mt-1" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{ft.length || "Length (mm)"}</label>
+                                                <input type="number" value={length} onChange={e => setLength(Number(e.target.value))} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none mt-1" />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{ft.friction || "Friction Coeff."}</label>
+                                                <input type="number" step={0.01} value={mu} onChange={e => setMu(Number(e.target.value))} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none mt-1" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{ft.material || "Material E (MPa)"}</label>
+                                                <input type="number" step={1000} value={eHub} onChange={e => { setEHub(Number(e.target.value)); setEShaft(Number(e.target.value)); }} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 outline-none mt-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </PanelSection>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
 
@@ -168,7 +265,9 @@ export default function FitsTolerancesModule() {
                         <div>
                             <motion.div className="text-[11px] font-black uppercase tracking-[0.3em] mb-3 flex items-center gap-2" animate={{ color: fitColor }}>
                                 <motion.div className="w-2.5 h-2.5 rounded-full" animate={{ backgroundColor: fitColor, boxShadow: `0 0 15px ${fitColor}` }} />
-                                {results.fitType.toUpperCase()} FIT 
+                                {results.fitType === 'Clearance' ? ft.clearanceFit : 
+                                 results.fitType === 'Interference' ? ft.interferenceFit : 
+                                 ft.transitionFit} 
                                 {mode === 'preset' ? ` — ${selectedPreset}` : ` — ${holeClass}${holeGrade}/${shaftClass}${shaftGrade}`}
                             </motion.div>
                             <div className="flex items-baseline gap-6">
@@ -177,21 +276,25 @@ export default function FitsTolerancesModule() {
                                         className="text-[4.5rem] font-black italic tracking-tighter leading-none" style={{ color: fitColor, textShadow: `0 0 40px ${fitColor}40` }}>
                                         {results.minClearance >= 0 ? '+' : ''}{(results.minClearance * 1000).toFixed(1)}
                                     </motion.div>
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Min Gap (μm)</span>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">
+                                        {results.minClearance >= 0 ? ft.minGap : ft.maxInterference}
+                                    </span>
                                 </div>
                                 <div className="text-3xl font-thin text-gray-700 self-center">~</div>
                                 <div className="flex flex-col">
                                     <motion.div className="text-[4.5rem] font-black italic tracking-tighter leading-none" style={{ color: fitColor, textShadow: `0 0 40px ${fitColor}40` }}>
                                         {results.maxClearance >= 0 ? '+' : ''}{(results.maxClearance * 1000).toFixed(1)}
                                     </motion.div>
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Max Gap (μm)</span>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">
+                                        {results.maxClearance >= 0 ? ft.maxGap : ft.minInterference}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex flex-col gap-3 text-right pt-2">
-                            <SideStat label="Hole Tol" value={`${(results.holeTol * 1000).toFixed(1)} μm`} color="#6366f1" />
-                            <SideStat label="Shaft Tol" value={`${(results.shaftTol * 1000).toFixed(1)} μm`} color="#f59e0b" />
-                            <SideStat label="Nominal" value={`Ø${nominalDia} mm`} color="#8b5cf6" />
+                            <SideStat label={ft.holeTol} value={`${(results.holeTol * 1000).toFixed(1)} μm`} color="#6366f1" />
+                            <SideStat label={ft.shaftTol} value={`${(results.shaftTol * 1000).toFixed(1)} μm`} color="#f59e0b" />
+                            <SideStat label={ft.nominal} value={`Ø${nominalDia} mm`} color="#8b5cf6" />
                         </div>
                     </div>
                 </div>
@@ -203,7 +306,7 @@ export default function FitsTolerancesModule() {
                         <PremiumFitsSVG 
                             holeMax={results.holeMax} holeMin={results.holeMin} 
                             shaftMax={results.shaftMax} shaftMin={results.shaftMin} 
-                            nominal={nominalDia} fitColor={fitColor} 
+                            nominal={nominalDia} fitColor={fitColor} ft={ft}
                         />
                     </div>
                 </div>
@@ -212,25 +315,56 @@ export default function FitsTolerancesModule() {
                 <div className="flex-none mx-6 mb-6 rounded-2xl border border-white/5 bg-[#080d14]/60 overflow-hidden">
                     <div className="grid grid-cols-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest border-b border-white/5">
                         <div className="px-5 py-2.5"></div>
-                        <div className="px-5 py-2.5 text-center">Max (mm)</div>
-                        <div className="px-5 py-2.5 text-center">Min (mm)</div>
-                        <div className="px-5 py-2.5 text-center">Tol (μm)</div>
+                        <div className="px-5 py-2.5 text-center">{ft.maxMm}</div>
+                        <div className="px-5 py-2.5 text-center">{ft.minMm}</div>
+                        <div className="px-5 py-2.5 text-center">{ft.tolUm}</div>
                     </div>
                     <div className="divide-y divide-white/[0.03]">
                         <div className="grid grid-cols-4 text-xs font-mono bg-indigo-500/5">
-                            <div className="px-5 py-3 text-indigo-400 font-bold">Hole ({mode === 'preset' ? selectedPreset.split('/')[0] : holeClass+holeGrade})</div>
+                            <div className="px-5 py-3 text-indigo-400 font-bold">{ft.holeLabel} ({mode === 'preset' ? selectedPreset.split('/')[0] : holeClass+holeGrade})</div>
                             <div className="px-5 py-3 text-center text-white font-bold">{results.holeMax.toFixed(3)}</div>
                             <div className="px-5 py-3 text-center text-gray-300">{results.holeMin.toFixed(3)}</div>
                             <div className="px-5 py-3 text-center text-indigo-400 font-bold">{(results.holeTol * 1000).toFixed(1)}</div>
                         </div>
                         <div className="grid grid-cols-4 text-xs font-mono">
-                            <div className="px-5 py-3 text-amber-400 font-bold">Shaft ({mode === 'preset' ? selectedPreset.split('/')[1] : shaftClass+shaftGrade})</div>
+                            <div className="px-5 py-3 text-amber-400 font-bold">{ft.shaftLabel} ({mode === 'preset' ? selectedPreset.split('/')[1] : shaftClass+shaftGrade})</div>
                             <div className="px-5 py-3 text-center text-white font-bold">{results.shaftMax.toFixed(3)}</div>
                             <div className="px-5 py-3 text-center text-gray-300">{results.shaftMin.toFixed(3)}</div>
                             <div className="px-5 py-3 text-center text-amber-400 font-bold">{(results.shaftTol * 1000).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
+
+                {/* Shrink Fit Results */}
+                {results.fitType === 'Interference' && results.shrinkFitMax && results.shrinkFitMin && (
+                    <div className="flex-none mx-6 mb-6 rounded-2xl border border-red-500/20 bg-[#ef4444]/5 overflow-hidden">
+                        <div className="px-5 py-3 border-b border-red-500/10 flex items-center justify-between">
+                            <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">{ft.shrinkFitAnalysis || "Shrink Fit Analysis (Min / Max)"}</span>
+                        </div>
+                        <div className="divide-y divide-white/[0.03]">
+                            <div className="grid grid-cols-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest border-b border-white/5">
+                                <div className="px-5 py-2.5">Parameter</div>
+                                <div className="px-5 py-2.5 text-center">Min Int.</div>
+                                <div className="px-5 py-2.5 text-center">Max Int.</div>
+                            </div>
+                            <div className="grid grid-cols-3 text-xs font-mono">
+                                <div className="px-5 py-3 text-gray-400 font-bold">{ft.contactPressure || "Contact Pressure (MPa)"}</div>
+                                <div className="px-5 py-3 text-center text-gray-300">{results.shrinkFitMin.contactPressure.toFixed(1)}</div>
+                                <div className="px-5 py-3 text-center text-red-400 font-bold">{results.shrinkFitMax.contactPressure.toFixed(1)}</div>
+                            </div>
+                            <div className="grid grid-cols-3 text-xs font-mono">
+                                <div className="px-5 py-3 text-gray-400 font-bold">{ft.transmissibleTorque || "Transmissible Torque (N.m)"}</div>
+                                <div className="px-5 py-3 text-center text-gray-300">{results.shrinkFitMin.transmissibleTorque.toFixed(1)}</div>
+                                <div className="px-5 py-3 text-center text-red-400 font-bold">{results.shrinkFitMax.transmissibleTorque.toFixed(1)}</div>
+                            </div>
+                            <div className="grid grid-cols-3 text-xs font-mono">
+                                <div className="px-5 py-3 text-gray-400 font-bold">{ft.hubStress || "Hub Hoop Stress (MPa)"}</div>
+                                <div className="px-5 py-3 text-center text-gray-300">{results.shrinkFitMin.hubHoopStressInner.toFixed(1)}</div>
+                                <div className="px-5 py-3 text-center text-red-400 font-bold">{results.shrinkFitMax.hubHoopStressInner.toFixed(1)}</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -263,7 +397,7 @@ function PanelSection({ id, title, icon, isOpen, onToggle, children }: { id: str
     );
 }
 
-function PremiumFitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal, fitColor }: any) {
+function PremiumFitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal, fitColor, ft }: { holeMax: number; holeMin: number; shaftMax: number; shaftMin: number; nominal: number; fitColor: string; ft: { hole: string; shaft: string } }) {
     const zeroY = 150;
     const hMaxDev = (holeMax - nominal) * 1000;
     const hMinDev = (holeMin - nominal) * 1000;
@@ -285,7 +419,9 @@ function PremiumFitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal, fitColo
                 <rect x="100" y={zeroY - hMaxDev * scaleY} width="120" height={Math.max(1, Math.abs(hMaxDev - hMinDev) * scaleY)}
                     fill="rgba(99,102,241,0.15)" stroke="#6366f1" strokeWidth="2" rx="4" />
             </g>
-            <text x="160" y={zeroY - Math.max(hMaxDev, hMinDev) * scaleY - 10} textAnchor="middle" fill="#6366f1" fontSize="12" fontWeight="bold" fontFamily="monospace">HOLE</text>
+            <text x="160" y={zeroY - Math.max(hMaxDev, hMinDev) * scaleY - 10} textAnchor="middle" fill="#6366f1" fontSize="12" fontWeight="bold" fontFamily="monospace">
+                {ft.hole}
+            </text>
             <text x="230" y={zeroY - hMaxDev * scaleY + 5} fill="#6366f1" fontSize="10" fontFamily="monospace">{hMaxDev >= 0 ? '+' : ''}{hMaxDev.toFixed(1)}μm</text>
             <text x="230" y={zeroY - hMinDev * scaleY + 5} fill="rgba(99,102,241,0.6)" fontSize="10" fontFamily="monospace">{hMinDev >= 0 ? '+' : ''}{hMinDev.toFixed(1)}μm</text>
 
@@ -294,7 +430,9 @@ function PremiumFitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal, fitColo
                 <rect x="280" y={zeroY - sMaxDev * scaleY} width="120" height={Math.max(1, Math.abs(sMaxDev - sMinDev) * scaleY)}
                     fill="rgba(245,158,11,0.15)" stroke="#f59e0b" strokeWidth="2" rx="4" />
             </g>
-            <text x="340" y={zeroY - Math.max(sMaxDev, sMinDev) * scaleY - 10} textAnchor="middle" fill="#f59e0b" fontSize="12" fontWeight="bold" fontFamily="monospace">SHAFT</text>
+            <text x="340" y={zeroY - Math.max(sMaxDev, sMinDev) * scaleY - 10} textAnchor="middle" fill="#f59e0b" fontSize="12" fontWeight="bold" fontFamily="monospace">
+                {ft.shaft}
+            </text>
             <text x="410" y={zeroY - sMaxDev * scaleY + 5} fill="#f59e0b" fontSize="10" fontFamily="monospace">{sMaxDev >= 0 ? '+' : ''}{sMaxDev.toFixed(1)}μm</text>
             <text x="410" y={zeroY - sMinDev * scaleY + 5} fill="rgba(245,158,11,0.6)" fontSize="10" fontFamily="monospace">{sMinDev >= 0 ? '+' : ''}{sMinDev.toFixed(1)}μm</text>
         </svg>

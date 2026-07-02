@@ -45,18 +45,26 @@ export class KinematicsEngine {
         const dt = 0.01; // 10ms step
         let maxHeight = y0;
         
+        // Track previous step values to interpolate safely at the end
+        let prevX = x;
+        let prevY = y;
+        let prevT = t;
+        let prevVx = vx;
+        let prevVy = vy;
+
         // Safety circuit breaker preventing infinite loops
         let iterations = 0;
         const MAX_ITERATIONS = 50000; 
 
         while (y >= 0 && iterations < MAX_ITERATIONS) {
+            prevX = x;
+            prevY = y;
+            prevT = t;
+            prevVx = vx;
+            prevVy = vy;
+
             // Calculate accelerations
-            // F_drag = -k * v * |v| for quadratic drag, but we use linear -k * v for simplicity if unit is k/m
-            // Actually, let's use quadratic drag (realistic): a = -k * v * |v|
-            // Or purely linear: a = -k * v
             const vMag = Math.sqrt(vx * vx + vy * vy);
-            
-            // Using standard linear drag for stability and easier demonstration
             const ax = -k * vx;
             const ay = -g - k * vy;
             
@@ -78,15 +86,14 @@ export class KinematicsEngine {
         }
         
         // Ensure final impact point is exactly at y=0 (linear interpolation)
-        if (y < 0 && iterations > 0 && path.length > 1) {
-            const prev = path[path.length - 1];
-            // Interpolate perfectly to y=0
-            if (prev.y !== 0) {
-                 const fraction = prev.y / (prev.y - y);
-                 const finalX = prev.x + (x - prev.x) * fraction;
-                 const finalT = prev.t + dt * fraction;
-                 const finalVx = prev.vx + (vx - prev.vx) * fraction;
-                 const finalVy = prev.vy + (vy - prev.vy) * fraction;
+        if (y < 0 && iterations > 0) {
+            const dy = prevY - y;
+            if (dy > 0) {
+                 const fraction = prevY / dy;
+                 const finalX = prevX + (x - prevX) * fraction;
+                 const finalT = prevT + dt * fraction;
+                 const finalVx = prevVx + (vx - prevVx) * fraction;
+                 const finalVy = prevVy + (vy - prevVy) * fraction;
                  path.push({ t: finalT, x: finalX, y: 0, vx: finalVx, vy: finalVy });
                  
                  x = finalX;

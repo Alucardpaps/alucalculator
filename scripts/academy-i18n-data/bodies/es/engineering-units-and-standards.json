@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Convierta entre unidades de longitud, masa y fuerza del SI e imperiales sin ambigüedad",
+    "Identificar cuándo la masa (kg) no debe sustituirse por la fuerza (N) en las ecuaciones de equilibrio",
+    "Aplicar reglas de redondeo ISO/DIN para tolerancias de fabricación expresadas en micras."
+  ],
+  "keyTakeaways": [
+    "Lleve siempre el SI internamente; ",
+    "1 pulgada = 25,4 mm exactamente; nunca sea aproximado para ajustes de precisión",
+    "Los errores de unidad se propagan silenciosamente hasta que causan fallas en el campo."
+  ],
+  "supplementalParagraph": "Cada núcleo de AluCalc asume SI internamente. ",
+  "formula": {
+    "variables": {
+      "mm": "mm: milímetros",
+      "inch": "pulgada: Pulgadas (Imperial)"
+    }
+  },
+  "stepByStep": [
+    "Identifique la unidad de origen (por ejemplo, mm).",
+    "Identifique la unidad de destino (por ejemplo, pulgadas).",
+    "Aplicar el factor de conversión.",
+    "Verificar la magnitud del resultado.",
+    "Redondee a las cifras significativas apropiadas.",
+    "Documente el sistema de unidades en el encabezado de la hoja de cálculo.",
+    "Convierta la temperatura a kelvin cuando utilice las leyes de los gases o la expansión térmica."
+  ],
+  "example": {
+    "inputs": [
+      "Value: 100 mm",
+      "Target: Inches"
+    ],
+    "calculation": "100 / 25.4 ≈ 3.937 inches"
+  },
+  "whyThisMatters": [
+    "La conversión incorrecta de unidades provocó la pérdida del Mars Climate Orbiter.",
+    "Las tolerancias de fabricación suelen especificarse en micras (μm), lo que requiere una alta precisión."
+  ],
+  "commonMistakes": [
+    "Usar puntos decimales incorrectamente en diferentes configuraciones regionales (coma versus punto).",
+    "Mezcla de unidades de masa (kg) y fuerza (N) en los cálculos.",
+    "Despreciando los cambios de unidades de temperatura (Celsius a Kelvin)."
+  ],
+  "engineeringTip": "Utilice siempre unidades SI para cálculos internos y conviértalas únicamente a imperial para la presentación final si es necesario.",
+  "calculatorCta": {
+    "label": "Use the Unit Converter for instant professional transformations"
+  },
+  "faq": [
+    {
+      "question": "¿Cuál es la unidad básica de longitud en el SI?",
+      "answer": "El metro (m)."
+    },
+    {
+      "question": "¿Por qué 25,4 mm/pulg son exactos?",
+      "answer": "La pulgada se redefinió en 1959 para que 1 pulgada = 25,4 mm exactamente; utilice este valor, no 25,0, para ajustes de precisión."
+    },
+    {
+      "question": "¿Puedo usar kg y N indistintamente?",
+      "answer": "No. kg es masa; "
+    },
+    {
+      "question": "¿Cuándo debo convertir a Imperial?",
+      "answer": "Convierta solo en los límites de la presentación: lleve el SI internamente a través de todos los pasos de cálculo."
+    }
+  ]
+}

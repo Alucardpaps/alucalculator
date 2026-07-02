@@ -56,6 +56,22 @@ function runCmd(cmd, options = {}) {
   });
 }
 
+function copyFolderSync(from, to) {
+  if (!fs.existsSync(to)) fs.mkdirSync(to, { recursive: true });
+  fs.readdirSync(from).forEach(element => {
+    const fromPath = path.join(from, element);
+    const toPath = path.join(to, element);
+    if (fs.lstatSync(fromPath).isDirectory()) {
+      if (element !== '.gradle' && element !== 'build') {
+        copyFolderSync(fromPath, toPath);
+      }
+    } else {
+      fs.copyFileSync(fromPath, toPath);
+    }
+  });
+}
+
+
 // Simple static server to serve local public/ directory during compilation
 function startLocalServer(port) {
   const server = http.createServer((req, res) => {
@@ -211,7 +227,7 @@ async function buildApp() {
     // Inject credentials into environment variables for Bubblewrap
     process.env.BUBBLEWRAP_KEYSTORE_PASSWORD = storepass;
     process.env.BUBBLEWRAP_KEY_PASSWORD = storepass;
-
+    
     // Initialize/Update Android project
     console.log('Updating Android project files...');
     await runCmd('npx bubblewrap update --skipVersionUpgrade', { cwd: path.join(rootDir, 'android') });
@@ -219,6 +235,34 @@ async function buildApp() {
     // Compile App
     console.log('Compiling signed APK and AAB binaries...');
     await runCmd('npx bubblewrap build --skipPwaValidation', { cwd: path.join(rootDir, 'android') });
+
+    // 6b. Run Bubblewrap Wear OS Build
+    console.log('Preparing Wear OS Smartwatch APK target...');
+    const androidWearDir = path.join(rootDir, 'android-wear');
+    copyFolderSync(path.join(rootDir, 'android'), androidWearDir);
+    
+    // Modify Manifest for Wear OS
+    const wearManifestPath = path.join(androidWearDir, 'app', 'src', 'main', 'AndroidManifest.xml');
+    if (fs.existsSync(wearManifestPath)) {
+      let manifestXml = fs.readFileSync(wearManifestPath, 'utf8');
+      
+      // Inject watch features if not already present
+      if (!manifestXml.includes('android.hardware.type.watch')) {
+        manifestXml = manifestXml.replace('<application', '<uses-feature android:name="android.hardware.type.watch" android:required="true" />\n    <application');
+      }
+      if (!manifestXml.includes('com.google.android.wearable')) {
+        manifestXml = manifestXml.replace('</application>', '    <uses-library android:name="com.google.android.wearable" android:required="false" />\n    </application>');
+      }
+      
+      fs.writeFileSync(wearManifestPath, manifestXml, 'utf8');
+      console.log('Wear OS feature keys injected into Manifest.');
+    }
+    
+    console.log('Updating Wear OS Android project files...');
+    await runCmd('npx bubblewrap update --skipVersionUpgrade', { cwd: androidWearDir });
+    
+    console.log('Compiling signed Wear OS APK and AAB binaries...');
+    await runCmd('npx bubblewrap build --skipPwaValidation', { cwd: androidWearDir });
 
     // 7. Copy output binaries to public/app/ and out/app/
     console.log('Copying built app files to web output folders...');
@@ -247,6 +291,23 @@ async function buildApp() {
       console.log(`Copied AAB: ${aabFile} -> alucalc-release.aab`);
     } else {
       console.warn('Warning: AAB file not found in android directory!');
+    }
+
+    const filesInWearAndroid = fs.readdirSync(androidWearDir);
+    const wearApkFile = filesInWearAndroid.find(f => f.endsWith('-signed.apk'));
+    const wearAabFile = filesInWearAndroid.find(f => f.endsWith('.aab'));
+    
+    if (wearApkFile) {
+      fs.copyFileSync(path.join(androidWearDir, wearApkFile), path.join(publicAppDir, 'alucalc-wear-release.apk'));
+      fs.copyFileSync(path.join(androidWearDir, wearApkFile), path.join(outAppDir, 'alucalc-wear-release.apk'));
+      console.log(`Copied Wear OS APK: ${wearApkFile} -> alucalc-wear-release.apk`);
+    } else {
+      console.warn('Warning: Signed Wear OS APK not found in android-wear directory!');
+    }
+    if (wearAabFile) {
+      fs.copyFileSync(path.join(androidWearDir, wearAabFile), path.join(publicAppDir, 'alucalc-wear-release.aab'));
+      fs.copyFileSync(path.join(androidWearDir, wearAabFile), path.join(outAppDir, 'alucalc-wear-release.aab'));
+      console.log(`Copied Wear OS AAB: ${wearAabFile} -> alucalc-wear-release.aab`);
     }
 
     console.log('===================================================');

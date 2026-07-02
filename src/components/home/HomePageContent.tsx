@@ -4,8 +4,8 @@ import Link from 'next/link';
 import {
   Zap, Layers, ShieldCheck, ChevronRight, Cpu, Wrench, Droplets,
   ArrowRight, Calculator, Settings, CircleDot, Ruler, FlaskConical,
-  CheckCircle2, BookOpen, GraduationCap, Globe, Download, Play,} from 'lucide-react';
-import { useEffect } from 'react';
+  CheckCircle2, BookOpen, GraduationCap, Globe, Download, Play, Watch} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18nStore } from '@/store/i18nStore';
 import { UI_TRANSLATIONS } from '@/locales/uiTranslations';
@@ -55,6 +55,16 @@ const CALCULATOR_LABEL_MAP: Record<string, Record<string, string>> = {
   'failure-diagnosis': { en: 'Failure Diagnosis', tr: 'Arıza Teşhisi' },
   'biology-genetics': { en: 'Population Genetics', tr: 'Popülasyon Genetiği' },
   'digital-logic': { en: 'Digital Logic Lab', tr: 'Dijital Mantık Laboratuvarı' },
+  'worm-gear': { en: 'Worm Gear Design', tr: 'Sonsuz Vida Dişli' },
+  'planetary-gear': { en: 'Planetary Gear Train', tr: 'Gezegen Dişli Mekanizması' },
+  'cam-follower': { en: 'Cam & Follower', tr: 'Kam ve İtici Mekanizması' },
+  'flywheel-design': { en: 'Flywheel Energy', tr: 'Volan Enerji Depolama' },
+  'concrete-beam-design': { en: 'Concrete Beam (ACI)', tr: 'Betonarme Kiriş (ACI)' },
+  'foundation-bearing': { en: 'Foundation Bearing', tr: 'Temel Taşıma Gücü' },
+  'transformer-design': { en: 'Transformer Design', tr: 'Trafo Tasarımı' },
+  'motor-efficiency': { en: 'Motor Efficiency', tr: 'Motor Verim Analizi' },
+  'heat-exchanger': { en: 'Heat Exchanger', tr: 'Isı Eşanjörü' },
+  'hydraulic-cylinder': { en: 'Hydraulic Cylinder', tr: 'Hidrolik Silindir' },
 };
 
 const POPULAR_CALCULATORS = [
@@ -67,10 +77,10 @@ const POPULAR_CALCULATORS = [
 ] as const;
 
 const CATEGORY_DEFS = [
-  { id: 'mech', color: 'cyan', icon: Settings, links: ['bolt-torque', 'bearings', 'shafts', 'gears', 'motor-selection-std', 'hooke-law'] },
-  { id: 'struct', color: 'indigo', icon: Layers, links: ['beam-deflection', 'concrete-reinforcement', 'topology-optimization', 'machine-assembly', 'simulation-fea'] },
-  { id: 'fluid', color: 'blue', icon: Droplets, links: ['fluid-dynamics', 'thermal-expansion', 'pumps', 'reducer-lubrication', 'naval-hydrostatics'] },
-  { id: 'elec', color: 'yellow', icon: Zap, links: ['three-phase-power', 'ohms-law', 'voltage-drop', 'transformer-calculation', 'filter-design'] },
+  { id: 'mech', color: 'cyan', icon: Settings, links: ['bolt-torque', 'bearings', 'shafts', 'gears', 'motor-selection-std', 'hooke-law', 'worm-gear', 'planetary-gear', 'cam-follower', 'flywheel-design', 'hydraulic-cylinder'] },
+  { id: 'struct', color: 'indigo', icon: Layers, links: ['beam-deflection', 'concrete-reinforcement', 'topology-optimization', 'machine-assembly', 'simulation-fea', 'concrete-beam-design', 'foundation-bearing'] },
+  { id: 'fluid', color: 'blue', icon: Droplets, links: ['fluid-dynamics', 'thermal-expansion', 'pumps', 'reducer-lubrication', 'naval-hydrostatics', 'heat-exchanger'] },
+  { id: 'elec', color: 'yellow', icon: Zap, links: ['three-phase-power', 'ohms-law', 'voltage-drop', 'transformer-calculation', 'filter-design', 'transformer-design', 'motor-efficiency'] },
   { id: 'science', color: 'purple', icon: FlaskConical, links: ['physics-solver', 'failure-prediction', 'failure-diagnosis', 'biology-genetics', 'digital-logic'] },
 ] as const;
 
@@ -95,6 +105,11 @@ interface HomePageContentProps {
 }
 
 export function HomePageContent({ recentCalculators }: HomePageContentProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const router = useRouter();
   const { language } = useI18nStore();
 
@@ -108,6 +123,10 @@ export function HomePageContent({ recentCalculators }: HomePageContentProps) {
       }
     }
   }, [router]);
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#020408]" />;
+  }
 
   const ui = UI_TRANSLATIONS[language] || UI_TRANSLATIONS.en;
 
@@ -185,6 +204,14 @@ export function HomePageContent({ recentCalculators }: HomePageContentProps) {
             >
               <Download size={14} className="text-indigo-400 group-hover:translate-y-0.5 transition-transform" />
               <span>{ui.downloadApk}</span>
+            </a>
+            <a
+              href="/app/alucalc-wear-release.apk"
+              download
+              className="inline-flex items-center gap-2.5 px-6 py-4 bg-white/[0.02] hover:bg-purple-500/10 border border-white/10 hover:border-purple-400/40 rounded-2xl text-slate-300 hover:text-white font-black text-xs uppercase tracking-widest transition-all backdrop-blur-md active:scale-95 shadow-lg hover:shadow-[0_0_25px_rgba(168,85,247,0.15)] group"
+            >
+              <Watch size={14} className="text-purple-400 group-hover:scale-110 transition-transform" />
+              <span>{ui.downloadWearApk}</span>
             </a>
           </div>
         </div>

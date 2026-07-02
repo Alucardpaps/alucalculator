@@ -149,6 +149,7 @@ export default {
     architecture: "아키텍처",
     archName: "B-Model 클라우드 하이브리드",
     engineStatus: "엔진 상태",
+    toggleDevMode: "개발자 모드 전환",
     statusOptimized: "최적화됨",
     localeLatency: "로케일 지연 시간",
     latencyValue: "2.4ms (캐시 히트)",
@@ -176,7 +177,7 @@ export default {
     modules: {
         'calculator': { title: "공학용 계산스" },
         'unit-converter': { title: "단위 변환기" },
-        'ai-copilot': { title: "AI 코파일럿" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "파일 탐색기" },
         'settings': { title: "설정" },
         'handbook': { title: "엔지니어링 핸드북" },
@@ -208,13 +209,15 @@ export default {
         'voltage-drop': { title: "전압 강하" },
         'welding-fillet': { title: "필렛 용접 강도" },
         'welding-heat': { title: "용접 열 입력" },
+        'analytics-dashboard': { title: "분석" },
+        'engineering-notes': { title: "엔지니어링 노트" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': '고급 수학 계산',
         'unit-converter': '엔지니어링 단위 변환',
-        'ai-copilot': 'AI 설계 지원',
+        'ai-copilot': 'Aegis AI',
         'file-explorer': '시스템 파일 관리',
         'settings': '시스템 환경 설정',
         'handbook': '참조 공식 및 데이터',
@@ -285,6 +288,7 @@ export default {
         groupExport: "내보내기",
         groupPaint: "페인트",
         groupContent: "콘텐츠",
+        labelWorkstation: "엔지니어링 워크스테이션",
     },
 
     // Node Palette Categories

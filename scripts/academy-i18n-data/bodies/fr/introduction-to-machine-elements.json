@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Classer les éléments de la machine par fonction : transmission de puissance, support et assemblage",
+    "Mapper les exigences de conception avec les composants du catalogue standard (ISO, DIN)",
+    "Reconnaître quand un élément personnalisé est justifié par rapport à une ingénierie excessive"
+  ],
+  "keyTakeaways": [
+    "Les éléments standard permettent l'interchangeabilité et réduisent le coût du cycle de vie",
+    "L'environnement (corrosion, température, vibration) détermine la sélection des éléments",
+    "Conçu pour le démontage, sauf si le joint est intentionnellement permanent"
+  ],
+  "supplementalParagraph": "La conception de machines ne consiste pas à inventer de nouvelles pièces, mais à composer des éléments éprouvés dans un système fiable. ",
+  "formula": {
+    "variables": {
+      "Elements": "Éléments : attaches, engrenages, roulements, etc.",
+      "Power": "Puissance : couple × vitesse"
+    }
+  },
+  "stepByStep": [
+    "Identifiez le mouvement requis (linéaire ou rotationnel).",
+    "Sélectionnez l'élément de transmission de puissance (engrenage, courroie, chaîne).",
+    "Choisissez l'élément de support (Roulement, Arbre).",
+    "Spécifiez la méthode d'assemblage (Bolt, Weld, Rivet).",
+    "Vérifiez le dimensionnement à l’aide des normes d’ingénierie.",
+    "Estimez le cycle de service et l’exposition environnementale avant la recherche dans le catalogue.",
+    "Vérifier l'interchangeabilité avec les dessins du fournisseur et la désignation ISO."
+  ],
+  "example": {
+    "inputs": [
+      "Requirement: Join two plates",
+      "Option: M10 Bolt"
+    ],
+    "calculation": "Selection: Threaded Fastener (M10 ISO 262)"
+  },
+  "whyThisMatters": [
+    "Les éléments standardisés permettent des pièces interchangeables et une maintenance plus facile.",
+    "Connaître le bon élément pour le travail évite une ingénierie excessive et réduit les coûts."
+  ],
+  "commonMistakes": [
+    "Choisir un élément sans tenir compte de l'environnement (Corrosion, Chaleur).",
+    "Négliger les charges dynamiques (Vibration) sur les fixations statiques.",
+    "Utiliser des tailles non standard difficiles à trouver."
+  ],
+  "engineeringTip": "Conçu toujours pour le démontage, sauf si le joint est destiné à être permanent.",
+  "calculatorCta": {
+    "label": "Start exploring machine elements with our Bolt Designer"
+  },
+  "faq": [
+    {
+      "question": "Quel est l’élément de machine le plus courant ?",
+      "answer": "Les fixations filetées (boulons et vis) sont de loin les éléments les plus utilisés en ingénierie."
+    },
+    {
+      "question": "Qu'est-ce qui distingue un élément de machine d'une pièce brute ?",
+      "answer": "Les éléments de machine sont des composants standardisés et catalogués avec des interfaces et des performances définies."
+    },
+    {
+      "question": "Quand préfère-t-on le soudage au boulonnage ?",
+      "answer": "Lorsque des joints permanents à haute rigidité sont nécessaires et que le démontage n'est pas nécessaire, mais que l'inspectabilité en souffre."
+    },
+    {
+      "question": "En quoi les roulements diffèrent-ils des bagues ?",
+      "answer": "Les roulements à éléments roulants utilisent des billes/rouleaux pour un faible frottement ; "
+    }
+  ]
+}

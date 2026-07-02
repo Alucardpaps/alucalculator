@@ -26,7 +26,10 @@ const BEARING_TYPE_FILTERS: { id: BearingType | 'all'; label: string; labelTr: s
     { id: 'thrust-ball', label: 'Thrust Ball', labelTr: 'Eksenel Bilyalı' },
 ];
 
+import { getBearingsPageStrings, getBearingFilterLabel } from '@/locales/bearingsPageTranslations';
+
 export default function BearingsPageClient({ dict, lang }: { dict: any, lang: string }) {
+    const s = getBearingsPageStrings(lang);
     // Search & Filter State
     const [searchCode, setSearchCode] = useState('');
     const [typeFilter, setTypeFilter] = useState<BearingType | 'all'>('all');
@@ -120,7 +123,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
                         style={{ backgroundColor: `${typeInfo.color}20`, color: typeInfo.color }}>
                         <span>{typeInfo.icon}</span>
-                        <span>{lang === 'tr' ? typeInfo.nameTr : typeInfo.name}</span>
+                        <span>{getBearingFilterLabel(s, selectedBearing.type)}</span>
                     </div>
                 </div>
             </header>
@@ -133,7 +136,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                     {/* SKF Code Search */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">
-                            {lang === 'tr' ? 'SKF Kod Ara' : 'Search SKF Code'}
+                            {s.searchSkf}
                         </label>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -166,7 +169,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                     }`}
                             >
-                                {lang === 'tr' ? filter.labelTr : filter.label}
+                                {getBearingFilterLabel(s, filter.id)}
                             </button>
                         ))}
                     </div>
@@ -191,7 +194,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                                             {b.d}×{b.D}×{b.B} mm
                                         </div>
                                         <div className="text-[10px] mt-1" style={{ color: info.color }}>
-                                            {info.icon} {lang === 'tr' ? info.nameTr : info.name}
+                                            {info.icon} {getBearingFilterLabel(s, b.type)}
                                         </div>
                                     </button>
                                 );
@@ -210,7 +213,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                     {/* Load Inputs */}
                     <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-                            {lang === 'tr' ? 'Yükleme Koşulları' : 'Loading Conditions'}
+                            {s.loadingConditions}
                         </h3>
                         <div className="grid grid-cols-2 gap-4 mb-4">
                             <CalculatorInput label={dict.bearing?.inputs?.radialLoad || 'Radial Load (Fr)'} unit="N" value={fr} onChange={(e) => setFr(Number(e.target.value))} />
@@ -247,7 +250,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                         <div className="flex items-center justify-between mb-3">
                             <span className="font-mono font-bold text-2xl text-slate-900 dark:text-white">{selectedBearing.code}</span>
                             <span className="px-2 py-1 rounded text-xs font-bold" style={{ backgroundColor: `${typeInfo.color}20`, color: typeInfo.color }}>
-                                {typeInfo.icon} {lang === 'tr' ? typeInfo.nameTr : typeInfo.name}
+                                {typeInfo.icon} {getBearingFilterLabel(s, selectedBearing.type)}
                             </span>
                         </div>
                         <div className="grid grid-cols-3 gap-4 text-center">

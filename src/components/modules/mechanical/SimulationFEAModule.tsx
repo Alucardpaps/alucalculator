@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
+import { getSimulationFeaStrings } from '@/locales/simulationFeaTranslations';
 import { useAssemblyStore } from '@/lib/store/assemblyStore';
 
 // --- TYPES ---
@@ -123,137 +124,6 @@ const TRUSS_PRESETS: TrussPreset[] = [
         ],
     },
 ];
-
-const LOCAL_DICTS: Record<string, any> = {
-  tr: {
-    title: "FEA Çözümleyici",
-    subtitle: "Rijitlik Çekirdeği v4.2",
-    loadPreset: "Şablon Yükle",
-    selectTemplate: "— Şablon Seç —",
-    toolSelect: "Seç",
-    toolNode: "Düğüm",
-    toolTruss: "Kiriş",
-    inspectorTitle: "Eleman Detayları",
-    selectTopology: "Topoloji seçin",
-    fixX: "Sabitle X",
-    fixY: "Sabitle Y",
-    forceVector: "Kuvvet Vektörü (N)",
-    area: "Alan",
-    modulus: "Elastisite Modülü",
-    dispScale: "Deplasman Ölçeği",
-    visualization: "Görselleştirme",
-    solved: "ÇÖZÜLDÜ",
-    unstable: "KARARSIZ",
-    visualizerLabel: "Entegre Topoloji Görselleştirici",
-    critStress: "Kritik Gerilme",
-    maxDisp: "Maks. Deplasman",
-    dof: "Serbestlik Derecesi",
-    presets: {
-      simpleBeamName: "Basit Kiriş",
-      simpleBeamDesc: "İki mesnetli, üstten tek yüklü düğüm",
-      warrenName: "Warren Kafes",
-      warrenDesc: "Alternatif çaprazlı üçgen köprü",
-      prattName: "Pratt Kafes",
-      prattDesc: "Merkeze eğimli çaprazlı dikey elemanlar",
-    }
-  },
-  en: {
-    title: "FEA Resolve",
-    subtitle: "Stiffness Kernel v4.2",
-    loadPreset: "Load Preset",
-    selectTemplate: "— Select Template —",
-    toolSelect: "Select",
-    toolNode: "Node",
-    toolTruss: "Truss",
-    inspectorTitle: "Element Inspector",
-    selectTopology: "Select topology",
-    fixX: "Fix X",
-    fixY: "Fix Y",
-    forceVector: "Force Vector (N)",
-    area: "Area",
-    modulus: "Modulus",
-    dispScale: "Disp. Scale",
-    visualization: "Visualization",
-    solved: "SOLVED",
-    unstable: "UNSTABLE",
-    visualizerLabel: "Integrated Topology Visualizer",
-    critStress: "Critical Stress",
-    maxDisp: "Max Displacement",
-    dof: "Degrees of Freedom",
-    presets: {
-      simpleBeamName: "Simple Beam",
-      simpleBeamDesc: "Two supports, one loaded top node",
-      warrenName: "Warren Truss",
-      warrenDesc: "Triangulated bridge with alternating diagonals",
-      prattName: "Pratt Truss",
-      prattDesc: "Verticals with diagonals toward center",
-    }
-  },
-  de: {
-    title: "FEA-Lösung",
-    subtitle: "Steifigkeitskern v4.2",
-    loadPreset: "Vorlage Laden",
-    selectTemplate: "— Vorlage Auswählen —",
-    toolSelect: "Auswählen",
-    toolNode: "Knoten",
-    toolTruss: "Fachwerk",
-    inspectorTitle: "Element-Inspektor",
-    selectTopology: "Topologie auswählen",
-    fixX: "Fixieren X",
-    fixY: "Fixieren Y",
-    forceVector: "Kraftvektor (N)",
-    area: "Querschnittsfläche",
-    modulus: "E-Modul",
-    dispScale: "Verschiebungsmaßstab",
-    visualization: "Visualisierung",
-    solved: "GELÖST",
-    unstable: "INSTABIL",
-    visualizerLabel: "Integrierter Topologie-Visualisierer",
-    critStress: "Kritische Spannung",
-    maxDisp: "Max. Verschiebung",
-    dof: "Freiheitsgrade",
-    presets: {
-      simpleBeamName: "Einfacher Balken",
-      simpleBeamDesc: "Zwei Auflager, ein belasteter oberer Knoten",
-      warrenName: "Warren-Fachwerk",
-      warrenDesc: "Triangulierte Brücke mit abwechselnden Diagonalen",
-      prattName: "Pratt-Fachwerk",
-      prattDesc: "Vertikalen mit Diagonalen zur Mitte",
-    }
-  },
-  ja: {
-    title: "FEA解決",
-    subtitle: "剛性カーネル v4.2",
-    loadPreset: "プリセット読み込み",
-    selectTemplate: "— テンプレートを選択 —",
-    toolSelect: "選択",
-    toolNode: "ノード",
-    toolTruss: "トラス",
-    inspectorTitle: "要素インスペクター",
-    selectTopology: "トポロジーを選択してください",
-    fixX: "X軸固定",
-    fixY: "Y軸固定",
-    forceVector: "力ベクトル (N)",
-    area: "断面積",
-    modulus: "弾性係数",
-    dispScale: "変位スケール",
-    visualization: "視覚化",
-    solved: "解決済み",
-    unstable: "不安定",
-    visualizerLabel: "統合トポロジービジュアライザ",
-    critStress: "許容応力",
-    maxDisp: "最大変位",
-    dof: "自由度",
-    presets: {
-      simpleBeamName: "単純梁",
-      simpleBeamDesc: "2つの支持部と1つの荷重付き上部ノード",
-      warrenName: "ワーレントラス",
-      warrenDesc: "交互の対角線を持つ三角形の橋梁",
-      prattName: "プラットトラス",
-      prattDesc: "中心に向かう対角線を持つ垂直材",
-    }
-  }
-};
 
 const getPresetLocalName = (name: string, t: any) => {
     if (name === 'Simple Beam') return t.presets.simpleBeamName;
@@ -377,7 +247,7 @@ const solveTruss = (nodes: Node[], members: Member[]) => {
 
 export function SimulationFEAModule() {
     const { language } = useI18nStore();
-    const t = LOCAL_DICTS[language] || LOCAL_DICTS.en;
+    const t = getSimulationFeaStrings(language);
 
     const [nodes, setNodes] = useState<Node[]>([
         { id: 'n1', x: 200, y: 450, fixedX: true, fixedY: true, fx: 0, fy: 0 },

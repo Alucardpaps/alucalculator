@@ -5,6 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { INTRO_DESC } from './seed-data-sources/intro-desc.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..', '..');
@@ -12,6 +13,7 @@ const ARTICLES = path.join(ROOT, 'src/data/academy-articles');
 const BODIES_TR = path.join(__dirname, 'bodies/tr');
 
 const titleMap = JSON.parse(fs.readFileSync(path.join(__dirname, 'title-map.json'), 'utf8'));
+const seoIntroI18n = JSON.parse(fs.readFileSync(path.join(__dirname, 'seo-intro-i18n.json'), 'utf8'));
 const calcs = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'src/data/seo-calculators/calculators.json'), 'utf8'),
 );
@@ -139,6 +141,9 @@ for (const lang of Object.keys(titleMap)) {
     if (lang === 'tr') {
       descMap.tr[slug] = TR_DESC[slug] ?? en.meta.description;
       introMap.tr[slug] = TR_INTRO[slug] ?? en.hero.intro;
+    } else if (INTRO_DESC[lang]?.[slug]) {
+      descMap[lang][slug] = INTRO_DESC[lang][slug].description;
+      introMap[lang][slug] = INTRO_DESC[lang][slug].intro;
     } else {
       descMap[lang][slug] = en.meta.description;
       introMap[lang][slug] = en.hero.intro;
@@ -147,25 +152,25 @@ for (const lang of Object.keys(titleMap)) {
 }
 
 const seoTitleMap = { tr: SEO_TR };
-const seoIntroMap = { tr: {} };
+const seoIntroMap = {};
 
-for (const c of calcs) {
-  if (c.category === 'utilities') continue;
-  const intro = c.seo?.intro ?? c.meta?.description ?? '';
-  seoIntroMap.tr[c.slug] = intro;
-  if (!SEO_TR[c.slug]) {
-    seoTitleMap.tr[c.slug] = cleanTitle(c.title ?? c.slug);
-  }
+function localizedSeoIntro(slug, lang, enIntro) {
+  return seoIntroI18n[slug]?.[lang] ?? enIntro;
 }
 
 for (const lang of Object.keys(titleMap)) {
-  if (lang === 'tr') continue;
-  seoTitleMap[lang] = {};
+  seoTitleMap[lang] = lang === 'tr' ? SEO_TR : {};
   seoIntroMap[lang] = {};
   for (const c of calcs) {
     if (c.category === 'utilities') continue;
-    seoTitleMap[lang][c.slug] = cleanTitle(c.title ?? c.slug);
-    seoIntroMap[lang][c.slug] = c.seo?.intro ?? c.meta?.description ?? '';
+    const enIntro = c.seo?.intro ?? c.meta?.description ?? '';
+    if (lang === 'tr' && !SEO_TR[c.slug]) {
+      seoTitleMap.tr[c.slug] = cleanTitle(c.title ?? c.slug);
+    }
+    if (lang !== 'tr') {
+      seoTitleMap[lang][c.slug] = cleanTitle(c.title ?? c.slug);
+    }
+    seoIntroMap[lang][c.slug] = localizedSeoIntro(c.slug, lang, enIntro);
   }
 }
 

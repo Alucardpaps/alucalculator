@@ -14,6 +14,7 @@ import { AdvancedCalculator } from '@/components/AdvancedCalculator';
 import { STANDARD_PROFILES } from '@/data/standardProfiles';
 import { useUrlState } from '@/hooks/useUrlState';
 import { useCallback } from "react";
+import { getAluminumPageStrings } from '@/locales/aluminumPageTranslations';
 
 
 import { HistorySidebar } from "@/components/HistorySidebar";
@@ -34,6 +35,7 @@ interface ProjectItem {
 }
 
 export default function AluminumPageClient({ lang, dict }: { lang: string, dict: Record<string, any> }) {
+    const alu = getAluminumPageStrings(lang);
     // URL State Management
     const { getInitialState, updateUrl } = useUrlState();
 
@@ -388,7 +390,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                     {!useLivePrice && (
                                         <div className="mt-3 p-3 bg-slate-100 rounded-lg border border-slate-200">
                                             <label className="text-[10px] text-slate-500 font-bold uppercase block mb-1">
-                                                {lang === 'tr' ? 'Manuel Fiyat' : 'Manual Price'}
+                                                {alu.manualPrice}
                                             </label>
                                             <div className="flex items-center gap-2">
                                                 <input

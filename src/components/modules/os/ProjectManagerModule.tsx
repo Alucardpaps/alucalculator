@@ -21,7 +21,7 @@ import {
     Search
 } from 'lucide-react';
 import { CalculationReport } from '@/components/calculators/CalculationReport';
-import { getCalculatorById } from '@/calculators/registry';
+import { CALCULATOR_REGISTRY_V2 } from '@/calculators/registry-v2';
 import { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 
 export default function ProjectManagerModule() {
@@ -60,12 +60,13 @@ export default function ProjectManagerModule() {
         a.click();
     };
 
-    const handleViewReport = (item: any) => {
+    const handleViewReport = async (item: any) => {
         if (!item.snapshot) return;
-        const schema = getCalculatorById(item.snapshot.schemaId);
-        if (schema) {
-            setSelectedCalc({ item, schema: schema as unknown as CalculatorSchemaV2 });
-        }
+        const entry = CALCULATOR_REGISTRY_V2[item.snapshot.schemaId];
+        if (!entry) return;
+        const module = await entry.loader();
+        const schema = (module as any).default ?? module;
+        setSelectedCalc({ item, schema: schema as CalculatorSchemaV2 });
     };
 
     const generateEnterpriseReport = async (metadata: ReportMetadata) => {

@@ -1,0 +1,73 @@
+{
+  "learningObjectives": [
+    "Calculez la durée de vie L10 en utilisant l'évaluation dynamique ISO 281 et la charge équivalente P",
+    "Appliquer l'exposant de durée de vie p = 3 pour les roulements à billes et 10/3 pour les rouleaux",
+    "Interpréter le catalogue C par rapport aux objectifs d'exploitation et de fiabilité"
+  ],
+  "keyTakeaways": [
+    "L10 signifie que 10 % des roulements échouent avant cette durée de vie avec une fiabilité de 90 %",
+    "P > C est une condition critique de survitesse/surcharge — redimensionnez immédiatement",
+    "La charge équivalente combine les composants radiaux et axiaux selon les règles ISO"
+  ],
+  "supplementalParagraph": "La sélection des roulements est un problème de fatigue et non de statique. ",
+  "formula": {
+    "variables": {
+      "L10": "L10 : Durée de vie nominale de base (millions de tours)",
+      "C": "C : charge dynamique de base (N)",
+      "P": "P : charge dynamique équivalente sur les roulements (N)",
+      "p": "p : Exposant de l'équation de la vie (3 pour la balle, 10/3 pour le rouleau)"
+    }
+  },
+  "stepByStep": [
+    "Identifiez le type de roulement et la charge dynamique de base (C).",
+    "Calculez la charge dynamique équivalente (P) en fonction des forces radiales et axiales.",
+    "Déterminez l'exposant de durée de vie (p) en fonction de la géométrie du roulement.",
+    "Appliquez la formule pour trouver la vie en millions de tours.",
+    "Convertissez les tours en heures si la vitesse de rotation est connue.",
+    "Convertissez les charges radiales et axiales combinées en P équivalent selon les règles ISO.",
+    "Convertissez L10 en millions de tours en heures en utilisant la vitesse de fonctionnement."
+  ],
+  "example": {
+    "inputs": [
+      "C = 25,000 N",
+      "P = 5,000 N",
+      "p = 3 (Ball Bearing)"
+    ],
+    "calculation": "L10 = (25000 / 5000)^3 = 5^3 = 125 million revolutions"
+  },
+  "whyThisMatters": [
+    "Empêche les temps d'arrêt inattendus des machines en prévoyant les intervalles de remplacement.",
+    "Garantit que les roulements sont correctement dimensionnés pour l’environnement d’exploitation spécifique et les conditions de charge."
+  ],
+  "commonMistakes": [
+    "Utilisation des charges nominales statiques au lieu des charges nominales dynamiques dans la formule.",
+    "Ne pas tenir compte des charges axiales lors du calcul de la charge dynamique équivalente.",
+    "En supposant une vitesse et une charge constantes lorsque les deux varient en fonctionnement réel."
+  ],
+  "engineeringTip": "Appliquez toujours des facteurs de sécurité et tenez compte des conditions environnementales telles que la température et la qualité de la lubrification.",
+  "calculatorCta": {
+    "label": "Open the Bearing Life Calculator to model your specific loading conditions"
+  },
+  "faq": [
+    {
+      "question": "Quelle est la différence entre L10 et L10h ?",
+      "answer": "L10 est la durée de vie en millions de tours, tandis que L10h est la durée de vie en heures de fonctionnement, qui dépend de la vitesse de rotation (RPM)."
+    },
+    {
+      "question": "La lubrification affecte-t-elle la durée de vie des roulements ?",
+      "answer": "Oui, une mauvaise lubrification réduit considérablement la durée de vie des roulements en augmentant la friction et la chaleur, ce qui peut entraîner une fatigue prématurée de la surface."
+    },
+    {
+      "question": "Quelle est la charge équivalente P ?",
+      "answer": "Une charge radiale unique produisant la même durée de vie que la charge radiale et axiale combinée réelle."
+    },
+    {
+      "question": "Pourquoi l'exposant p = 3 pour les balles ?",
+      "answer": "Relation contrainte-durée de vie pour le contact ponctuel — les rouleaux utilisent p = 10/3 pour le contact linéaire."
+    },
+    {
+      "question": "L10 est-il la même chose que la durée de garantie ?",
+      "answer": "Non : L10 est une note statistique ; "
+    }
+  ]
+}

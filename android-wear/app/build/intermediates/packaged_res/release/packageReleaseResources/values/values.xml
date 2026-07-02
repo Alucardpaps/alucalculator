@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="enableNotification">false</bool>
+    <bool name="enableSiteSettingsShortcut">true</bool>
+    <color name="backgroundColor">#020408</color>
+    <color name="colorPrimary">#020408</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="navigationColor">#020408</color>
+    <color name="navigationColorDark">#000000</color>
+    <color name="navigationDividerColor">#000000</color>
+    <color name="navigationDividerColorDark">#000000</color>
+    <color name="shortcut_background">#F5F5F5</color>
+    <integer name="splashScreenFadeOutDuration">300</integer>
+    <string name="appName" translatable="false">AluCalc OS</string>
+    <string name="assetStatements">
+    [{
+        \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+        \"target\": {
+            \"namespace\": \"web\",
+            \"site\": \"https://www.alucalculator.com\"
+        }
+    }]
+    
+  </string>
+    <string name="fallbackType" translatable="false">customtabs</string>
+    <string name="generatorApp" translatable="false">bubblewrap-cli</string>
+    <string name="hostName" translatable="false">www.alucalculator.com</string>
+    <string name="launchUrl" translatable="false">https://www.alucalculator.com/workspace</string>
+    <string name="launcherName" translatable="false">AluCalc</string>
+    <string name="orientation" translatable="false">any</string>
+    <string name="providerAuthority" translatable="false">com.alucard.alucalcos.fileprovider</string>
+</resources>

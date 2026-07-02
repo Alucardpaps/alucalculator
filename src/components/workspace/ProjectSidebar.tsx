@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useWorkspaceStore, Project, WorkspaceLayout } from '@/store/workspaceStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { getLocaleBcp47 } from '@/locales/localeFormat';
 
 // ============================================
 // Styles
@@ -215,7 +216,7 @@ const ProjectItem: React.FC<{
 
     const formatDate = (timestamp: number) => {
         const date = new Date(timestamp);
-        return date.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString(getLocaleBcp47(language), { month: 'short', day: 'numeric' });
     };
 
     return (

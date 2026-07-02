@@ -18,7 +18,12 @@ import { AcademyArticle } from '@/schemas/academy-article';
 import { InteractiveFastener } from '@/app/academy/components/InteractiveFastener';
 import { MohrCircleLab } from '@/app/academy/components/MohrCircleLab';
 import { useI18nStore } from '@/store/i18nStore';
-import { getAcademyPage, formatAcademyTemplate, getAcademyDepartments } from '@/locales/academyPageTranslations';
+import {
+  getAcademyPage,
+  formatAcademyTemplate,
+  getAcademyDepartments,
+  getAcademyCategoryLabel,
+} from '@/locales/academyPageTranslations';
 import { getAcademyCalculatorRoute } from '@/data/academyCalculatorRoutes';
 import { getAdjacentLessons } from '@/data/academyEngineWalkthroughs';
 import { getAcademyArticle } from '@/data/academyIndex';
@@ -42,9 +47,24 @@ type Props = {
 };
 
 export function AcademyArticleView({ slug, data: rawData }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { language } = useI18nStore();
+
+
   const data = useMemo(() => localizeAcademyArticle(rawData, language), [rawData, language]);
   const t = getAcademyPage(language);
+  const difficultyLabel = (d: string) =>
+    ({
+      Basic: t.difficultyBasic,
+      Intermediate: t.difficultyIntermediate,
+      Advanced: t.difficultyAdvanced,
+      Expert: t.difficultyExpert,
+    })[d] ?? d;
+  const departmentLabel = getAcademyCategoryLabel(data.department, language) ?? data.department;
   const walkthrough = localizeWalkthrough(slug, language);
   const calcRoute = getAcademyCalculatorRoute(slug);
   const adjacent = getAdjacentLessons(slug);
@@ -116,6 +136,10 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
 
   const bumpProgress = () => setProgressTick((n) => n + 1);
 
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#020408]" />;
+  }
+
   return (
     <div className="relative z-10 min-h-screen bg-[#020408]/80 text-slate-200 font-sans selection:bg-blue-500/30">
       <header className="border-b border-white/5 bg-[#020408]/40 backdrop-blur-xl sticky top-20 z-40">
@@ -132,7 +156,7 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
               {t.year} {data.academicYear}
             </span>
             <span>•</span>
-            <span>{data.department}</span>
+            <span>{departmentLabel}</span>
           </nav>
         </div>
       </header>
@@ -152,7 +176,7 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
               {formatAcademyTemplate(t.academicLevel, { year: data.academicYear })}
             </span>
             <span className="px-2 py-1 rounded bg-emerald-600/10 border border-emerald-500/20 text-[9px] font-black text-emerald-400 uppercase tracking-widest">
-              {data.difficulty}
+              {difficultyLabel(data.difficulty)}
             </span>
             <span className="flex items-center gap-1 text-[9px] font-mono text-slate-500 ml-auto">
               <Clock size={12} /> {formatAcademyTemplate(t.readTime, { minutes: data.readingTime })}

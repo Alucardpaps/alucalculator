@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Sélectionnez la géométrie du brise-copeaux (TF, TQ) en fonction du matériau et du fonctionnement",
+    "Comparez l'alimentation radiale à l'alimentation latérale modifiée pour la stabilité du filetage",
+    "Relier la profondeur de coupe, l'avance et la force de coupe spécifique à la charge de l'outil"
+  ],
+  "keyTakeaways": [
+    "Les puces incontrôlées provoquent une nidification d'oiseaux - le principal mode d'échec du threading",
+    "L'avance en flanc modifiée réduit la charge thermique sur un bord de plaquette",
+    "Une profondeur de coupe minimale est requise pour activer la rainure du brise-copeaux"
+  ],
+  "supplementalParagraph": "Le filetage est un problème de coupe de métal déguisé en problème de géométrie. ",
+  "formula": {
+    "variables": {
+      "ap": "ap : Profondeur de coupe (mm)",
+      "f": "f : Avance par tour (mm/tour)",
+      "Kc": "Kc : Force de coupe spécifique (N/mm²)"
+    }
+  },
+  "stepByStep": [
+    "Sélectionnez la géométrie du brise-copeaux en fonction du matériau (par exemple, TF pour général, TQ pour stabilité).",
+    "Choisissez la méthode d'alimentation : alimentation radiale ou alimentation latérale (3°–5°).",
+    "Déterminez le nombre de passes en fonction du pas de filetage (à partir des tableaux).",
+    "Surveillez la direction du flux des copeaux à l’aide de la logique de points asymétrique.",
+    "Ajustez la vitesse de coupe (Vc) en fonction des modèles d'usure des outils.",
+    "Régler la profondeur de la première passe de filetage au-dessus de l'activation minimale du brise-copeaux ap.",
+    "Appliquer du liquide de refroidissement haute pression pour les filetages internes (opérations SINR/CINR)."
+  ],
+  "example": {
+    "inputs": [
+      "Material: 15CrMo4",
+      "Tool: 16ER150 ISO-TQ",
+      "Feed: Radial"
+    ],
+    "calculation": "Using TQ geometry: Cutting force reduced by 15%, Vibration suppressed."
+  },
+  "whyThisMatters": [
+    "Un contrôle incorrect des copeaux entraîne une « nidification d'oiseaux », qui est la première cause de défaillance d'un outil.",
+    "L'avance en flanc modifiée (3°–5°) améliore considérablement la durée de vie de l'outil en distribuant la chaleur."
+  ],
+  "commonMistakes": [
+    "Utiliser une profondeur de coupe constante pour toutes les passes (la première passe doit être plus profonde).",
+    "Ne pas utiliser de liquide de refroidissement haute pression dans le filetage interne (SINR/CINR).",
+    "Négliger la profondeur de coupe minimale (ap) requise pour déclencher le brise-copeaux."
+  ],
+  "calculatorCta": {
+    "label": "Analyze tool load in the Gearbox Simulation suite"
+  },
+  "faq": [
+    {
+      "question": "Pourquoi utiliser une alimentation de flanc modifiée ?",
+      "answer": "Il garantit qu'un seul bord de l'insert effectue le travail pénible, réduisant ainsi la chaleur et empêchant les vibrations (bruit)."
+    },
+    {
+      "question": "Pénétration radiale ou latérale ?",
+      "answer": "Les charges radiales sont égales sur les deux bords ; "
+    },
+    {
+      "question": "Qu'est-ce que la force de coupe spécifique Kc ?",
+      "answer": "Force par unité de surface de puce — propriété matérielle utilisée pour estimer Fc = ap × f × Kc."
+    },
+    {
+      "question": "Pourquoi des laissez-passer supplémentaires pour l'inox ?",
+      "answer": "L'écrouissage et le retour élastique nécessitent 2 à 3 passes de plus que ce que suggèrent les tableaux en acier au carbone."
+    }
+  ]
+}

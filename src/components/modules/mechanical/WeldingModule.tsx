@@ -9,9 +9,15 @@ import { ShapeType } from "@/utils/sectionProperties";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Zap, Settings, Layers, ChevronDown, Shield } from 'lucide-react';
 import { useI18nStore } from "@/store/i18nStore";
+import { useOSStore } from "@/store/osStore";
+import { getWeldingModuleStrings } from '@/locales/weldingModuleTranslations';
 
 export function WeldingModule() {
-    const { t } = useI18nStore();
+    const { language, t } = useI18nStore();
+    const w = getWeldingModuleStrings(language);
+    const { dictionary: dict } = useOSStore();
+    const wDict = dict?.welding || {};
+
     const [process, setProcess] = useState<WeldingProcess>('mig');
     const [jointType, setJointType] = useState<WeldJointType>('fillet');
     const [current, setCurrent] = useState(180);
@@ -30,8 +36,8 @@ export function WeldingModule() {
     const [material2Profile] = useState<ShapeType>('sheet');
     const [material1Color] = useState('#94a3b8');
     const [material2Color] = useState('#64748b');
-    const [material1Name] = useState(t.welding.materialSteel);
-    const [material2Name] = useState(t.welding.materialSteel);
+    const [material1Name] = useState((t as any)?.welding?.materialSteel || 'Steel');
+    const [material2Name] = useState((t as any)?.welding?.materialSteel || 'Steel');
     const defaultDims = { width: 60, height: 80, thickness: 12, wallThickness: 4, diameter: 50, flangeWidth: 40, flangeThickness: 6, webThickness: 4, legWidth: 40, legThickness: 5 };
     const [material1Dims] = useState<any>(defaultDims);
     const [material2Dims] = useState<any>(defaultDims);
@@ -68,43 +74,45 @@ export function WeldingModule() {
                             <Flame size={20} strokeWidth={2} />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold tracking-tight text-gray-100">Weld Design</h2>
+                            <h2 className="text-lg font-bold tracking-tight text-gray-100">
+                                {wDict.title || 'Weld Design'}
+                            </h2>
                             <p className="text-[10px] text-orange-400/70 font-semibold uppercase tracking-[0.2em] mt-0.5">AWS D1.1 / EN 1090</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-4 space-y-3">
-                    <PanelSection id="process" title="Process & Joint" icon={<Settings size={14} />} isOpen={expandedSection === 'process'} onToggle={() => toggleSection('process')} accent="orange">
+                    <PanelSection id="process" title={w.processJoint} icon={<Settings size={14} />} isOpen={expandedSection === 'process'} onToggle={() => toggleSection('process')} accent="orange">
                         <div className="space-y-3">
-                            <PanelSelect label="Welding Process" value={process} onChange={(v) => setProcess(v as WeldingProcess)}
-                                options={Object.values(WELDING_METHODS).map(m => ({ value: m.id, label: (t.welding.processes as any)?.[m.id] || m.name }))} />
-                            <PanelSelect label="Joint Type" value={jointType} onChange={(v) => setJointType(v as WeldJointType)}
-                                options={(['fillet', 'doubleFillet', 'butt', 'vGroove', 'tee', 'lap'] as WeldJointType[]).map(j => ({ value: j, label: (t.welding.joints as any)?.[j] || JOINT_TYPES[j].name }))} />
-                            <PanelSelect label="Electrode" value={selectedElectrode.code} onChange={(v) => setSelectedElectrode(ELECTRODE_CATALOG.find(e => e.code === v) || ELECTRODE_CATALOG[0])}
+                            <PanelSelect label={wDict.inputs?.method || 'Welding Process'} value={process} onChange={(v) => setProcess(v as WeldingProcess)}
+                                options={Object.values(WELDING_METHODS).map(m => ({ value: m.id, label: (t as any)?.welding?.processes?.[m.id] || m.name }))} />
+                            <PanelSelect label={wDict.inputs?.type || 'Joint Type'} value={jointType} onChange={(v) => setJointType(v as WeldJointType)}
+                                options={(['fillet', 'doubleFillet', 'butt', 'vGroove', 'tee', 'lap'] as WeldJointType[]).map(j => ({ value: j, label: (t as any)?.welding?.joints?.[j] || JOINT_TYPES[j].name }))} />
+                            <PanelSelect label={w.electrode} value={selectedElectrode.code} onChange={(v) => setSelectedElectrode(ELECTRODE_CATALOG.find(e => e.code === v) || ELECTRODE_CATALOG[0])}
                                 options={ELECTRODE_CATALOG.map(e => ({ value: e.code, label: `${e.code} (${e.tensileStrength} MPa)` }))} />
                         </div>
                     </PanelSection>
 
-                    <PanelSection id="power" title="Power Parameters" icon={<Zap size={14} />} isOpen={expandedSection === 'power'} onToggle={() => toggleSection('power')} accent="orange">
+                    <PanelSection id="power" title={w.powerParams} icon={<Zap size={14} />} isOpen={expandedSection === 'power'} onToggle={() => toggleSection('power')} accent="orange">
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-3">
-                                <PanelInput label="Current" unit="A" value={current} onChange={setCurrent} color="#f59e0b" />
-                                <PanelInput label="Voltage" unit="V" value={voltage} onChange={setVoltage} color="#f59e0b" />
+                                <PanelInput label={wDict.inputs?.current || "Current"} unit="A" value={current} onChange={setCurrent} color="#f59e0b" />
+                                <PanelInput label={wDict.inputs?.voltage || "Voltage"} unit="V" value={voltage} onChange={setVoltage} color="#f59e0b" />
                             </div>
-                            <PanelInput label="Travel Speed" unit="mm/min" value={speed} onChange={setSpeed} color="#f59e0b" />
+                            <PanelInput label={wDict.inputs?.speed || "Travel Speed"} unit="mm/min" value={speed} onChange={setSpeed} color="#f59e0b" />
                         </div>
                     </PanelSection>
 
-                    <PanelSection id="geometry" title="Weld Geometry" icon={<Layers size={14} />} isOpen={expandedSection === 'geometry'} onToggle={() => toggleSection('geometry')} accent="orange">
+                    <PanelSection id="geometry" title={w.weldGeometry} icon={<Layers size={14} />} isOpen={expandedSection === 'geometry'} onToggle={() => toggleSection('geometry')} accent="orange">
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-3">
-                                <PanelInput label="Leg Size (a)" unit="mm" value={legSize} onChange={setLegSize} color="#f59e0b" />
-                                <PanelInput label="Thickness (t)" unit="mm" value={thickness} onChange={setThickness} color="#f59e0b" />
+                                <PanelInput label={wDict.inputs?.legSize || "Leg Size (a)"} unit="mm" value={legSize} onChange={setLegSize} color="#f59e0b" />
+                                <PanelInput label={wDict.inputs?.thickness || "Thickness (t)"} unit="mm" value={thickness} onChange={setThickness} color="#f59e0b" />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
-                                <PanelInput label="Weld Length" unit="mm" value={length} onChange={setLength} color="#f59e0b" />
-                                <PanelInput label="Applied Load" unit="N" value={load} onChange={setLoad} color="#ef4444" />
+                                <PanelInput label={wDict.inputs?.length || "Weld Length"} unit="mm" value={length} onChange={setLength} color="#f59e0b" />
+                                <PanelInput label={wDict.inputs?.load || "Applied Load"} unit="N" value={load} onChange={setLoad} color="#ef4444" />
                             </div>
                         </div>
                     </PanelSection>
@@ -119,7 +127,10 @@ export function WeldingModule() {
                         <div>
                             <motion.div className="text-[11px] font-black uppercase tracking-[0.3em] mb-3 flex items-center gap-2" animate={{ color: activeColor }}>
                                 <motion.div className="w-2.5 h-2.5 rounded-full" animate={{ backgroundColor: activeColor, boxShadow: `0 0 15px ${activeColor}` }} />
-                                {isSafe ? 'WELD DESIGN — SAFE' : 'WARNING: INSUFFICIENT SAFETY'}
+                                {isSafe 
+                                    ? w.weldSafe
+                                    : w.weldWarning
+                                }
                             </motion.div>
                             <div className="flex items-baseline gap-6">
                                 <div className="flex flex-col items-center">
@@ -127,22 +138,26 @@ export function WeldingModule() {
                                         animate={{ color: results.safetyFactor > 1.5 ? '#f59e0b' : '#ef4444', textShadow: `0 0 40px ${results.safetyFactor > 1.5 ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
                                         {results.safetyFactor.toFixed(2)}
                                     </motion.div>
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Safety Factor</span>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">
+                                        {w.safetyFactor}
+                                    </span>
                                 </div>
                                 <div className="text-3xl font-thin text-gray-700 self-center">/</div>
                                 <div className="flex flex-col items-center">
                                     <motion.div className="text-[5.5rem] font-black italic tracking-tighter leading-none text-white" style={{ textShadow: '0 0 40px rgba(255,255,255,0.1)' }}>
                                         {results.stress.toFixed(0)}
                                     </motion.div>
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Stress (MPa)</span>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">
+                                        {wDict.results?.stress ? `${wDict.results.stress} (MPa)` : "Stress (MPa)"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex flex-col gap-2 text-right pt-2">
-                            <SideStat label="Heat Input" value={`${results.heatInput.toFixed(2)} kJ/mm`} color={results.heatStatus.color} />
-                            <SideStat label="Min Leg" value={`${results.minWeldSize} mm`} color={results.weldSizeOk ? '#10b981' : '#ef4444'} />
-                            <SideStat label="Filler" value={`${results.filler.weight.toFixed(1)} g`} color="#8b5cf6" />
-                            <SideStat label="Preheat" value={`${results.preheat.temperature}°C`} color="#06b6d4" />
+                            <SideStat label={wDict.results?.heatInput || "Heat Input"} value={`${results.heatInput.toFixed(2)} kJ/mm`} color={results.heatStatus.color} />
+                            <SideStat label={w.minLeg} value={`${results.minWeldSize} mm`} color={results.weldSizeOk ? '#10b981' : '#ef4444'} />
+                            <SideStat label={w.filler} value={`${results.filler.weight.toFixed(1)} g`} color="#8b5cf6" />
+                            <SideStat label={w.preheat} value={`${results.preheat.temperature}°C`} color="#06b6d4" />
                         </div>
                     </div>
                 </div>
@@ -151,9 +166,10 @@ export function WeldingModule() {
                 <div className="flex-1 relative mx-6 my-4 rounded-[32px] overflow-hidden border border-white/5 bg-gradient-to-b from-[#0a1018] to-black shadow-inner">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
                     <div className="absolute top-5 left-5 z-20 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Flame size={14} className="text-orange-500/30" /> WELD JOINT PREVIEW
+                        <Flame size={14} className="text-orange-500/30" /> {w.weldPreview}
                     </div>
                     <div className="w-full h-full relative z-10">
+                        {/* We use doubleFillet or other configs safely mapped */}
                         <WeldingVisualization2D
                             jointType={jointType === 'doubleFillet' ? 'fillet' : jointType === 'vGroove' ? 'vgroove' : jointType as any}
                             legSize={legSize} thickness={thickness} grooveAngle={grooveAngle} length={length}
@@ -191,7 +207,7 @@ function PanelInput({ label, unit, value, onChange, color }: { label: string; un
         <div className="group">
             <div className="mb-1.5"><span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">{label}</span></div>
             <div className="relative flex items-center bg-[#0e1622] border border-white/10 rounded-lg overflow-hidden transition-all group-focus-within:border-orange-500/40 group-focus-within:shadow-[0_0_15px_rgba(249,115,22,0.08)]">
-                <input type="number" value={value} onChange={(e) => onChange(Number(e.target.value))} step="any" className="w-full bg-transparent text-sm font-black font-mono px-3 py-2 text-white outline-none appearance-none" />
+                <input type="number" value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(Number(e.target.value))} step="any" className="w-full bg-transparent text-sm font-black font-mono px-3 py-2 text-white outline-none appearance-none" />
                 {unit && <div className="px-3 text-[9px] font-bold text-gray-600 border-l border-white/5 bg-white/[0.02]"><span style={{ color }}>{unit}</span></div>}
             </div>
         </div>
@@ -203,7 +219,7 @@ function PanelSelect({ label, value, onChange, options }: { label: string; value
         <div className="group">
             <div className="mb-1.5"><span className="text-[9px] font-bold uppercase tracking-widest text-gray-500">{label}</span></div>
             <select className="w-full bg-[#0e1622] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white font-mono font-bold outline-none transition-all focus:border-orange-500/40 appearance-none cursor-pointer"
-                value={value} onChange={(e) => onChange(e.target.value)}
+                value={value} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}>
                 {options.map(opt => <option key={opt.value} value={opt.value} className="bg-[#0a1018]">{opt.label}</option>)}
             </select>

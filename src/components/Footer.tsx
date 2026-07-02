@@ -1,9 +1,10 @@
 "use client";
 
 import { Linkedin, Mail, AlertTriangle } from 'lucide-react';
-import Link from 'next/link';
+import { getSiteFooterStrings } from '@/locales/siteFooterTranslations';
 
 export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
+    const f = getSiteFooterStrings(lang);
     return (
         <footer className="bg-slate-900 border-t border-slate-800 py-12 text-slate-400">
             <div className="max-w-7xl mx-auto px-6">
@@ -45,12 +46,9 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="text-amber-500 flex-shrink-0 mt-1" size={24} />
                             <div>
-                                <h4 className="text-white font-bold mb-1">v4.0.0 Stable</h4>
+                                <h4 className="text-white font-bold mb-1">{f.disclaimerStable}</h4>
                                 <p className="text-sm text-slate-400 leading-relaxed">
-                                    {lang === 'tr'
-                                        ? "Bu yazılım v4.0.0 Stable sürümüdür. Hesaplama sonuçları referans amaçlıdır. Nihai üretim ve mühendislik kararları öncesinde mutlaka uzman bir profesyonel tarafından kontrol edilmelidir."
-                                        : "This software is v4.0.0 Stable. Calculation results are for reference only. Final production and engineering decisions must be verified by a qualified professional."
-                                    }
+                                    {f.disclaimerText}
                                 </p>
                             </div>
                         </div>

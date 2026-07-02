@@ -1,0 +1,78 @@
+{
+  "learningObjectives": [
+    "Relacionar el par aplicado con la precarga del perno mediante coeficientes de fricción (K o μ)",
+    "Aplicar conceptos VDI 2230: utilización del rendimiento y comprobaciones de pelado de hilos",
+    "Seleccione la estrategia de lubricación y su efecto sobre el par de apriete requerido."
+  ],
+  "keyTakeaways": [
+    "El par es una medida indirecta de la precarga: la fricción domina la dispersión",
+    "Apretar demasiado puede ceder el perno y reducir la fuerza de sujeción después de la relajación.",
+    "Siempre verifique la capacidad de la rosca interna y externa."
+  ],
+  "supplementalParagraph": "La lectura de una llave dinamométrica no es el resultado del diseño, sino la fuerza de sujeción. ",
+  "formula": {
+    "variables": {
+      "T": "T: Par (Nm)",
+      "K": "K: Coeficiente de fricción (0,18–0,25 típico)",
+      "F": "F: Fuerza de precarga (N)",
+      "d": "d: Diámetro nominal del perno (m)"
+    }
+  },
+  "stepByStep": [
+    "Determine el tamaño del perno (por ejemplo, M10).",
+    "Encuentre la precarga recomendada (de normas o tablas).",
+    "Estimar el coeficiente de fricción (lubricado versus seco).",
+    "Convertir diámetro a metros.",
+    "Aplique la fórmula: T = K × F × d.",
+    "Verifique con las tablas de torsión.",
+    "Seleccione μ_thread y μ_head de las tablas de condiciones de lubricación.",
+    "Verifique la utilización del rendimiento y el pelado de roscas tanto internas como externas."
+  ],
+  "example": {
+    "inputs": [
+      "Bolt: M10 → d = 0.01 m",
+      "Preload: 20,000 N",
+      "K = 0.2"
+    ],
+    "calculation": "T = 0.2 × 20000 × 0.01 = 40 Nm"
+  },
+  "whyThisMatters": [
+    "Un torque inadecuado provoca fatiga en los pernos, separación de las juntas y distribución desigual de la carga.",
+    "En industrias como la automovilística y la aeroespacial, la precisión del par es fundamental para la seguridad y la fiabilidad."
+  ],
+  "commonMistakes": [
+    "Ignorando los efectos de la lubricación sobre el coeficiente de fricción.",
+    "Usar tablas de torque genéricas a ciegas sin considerar el contexto de aplicación específico.",
+    "Sin tener en cuenta la variación de la fricción entre las roscas y las superficies debajo de la cabeza."
+  ],
+  "engineeringTip": "Valide siempre el par con cálculos basados ​​en precarga, no solo con tablas.",
+  "calculatorCta": {
+    "label": "Use the Bolt Torque Calculator to instantly compute torque for your application"
+  },
+  "faq": [
+    {
+      "question": "¿Qué sucede si el par es demasiado alto?",
+      "answer": "Apretar demasiado un perno hace que exceda su límite elástico, lo que provoca deformación plástica, rotura de roscas o falla repentina."
+    },
+    {
+      "question": "¿Cómo afecta la lubricación al torque de los pernos?",
+      "answer": "La lubricación reduce drásticamente el coeficiente de fricción (K). "
+    },
+    {
+      "question": "¿Por qué utilizar precarga en lugar de solo torsión?",
+      "answer": "El par es una medida indirecta. "
+    },
+    {
+      "question": "¿Cuál es un factor K típico para acero seco?",
+      "answer": "K ≈ 0,20 para acero sobre acero sin lubricar; "
+    },
+    {
+      "question": "¿El control de par garantiza la precarga?",
+      "answer": "No, es común una dispersión de ±25%. "
+    },
+    {
+      "question": "¿Cuándo se requiere VDI 2230?",
+      "answer": "Juntas críticas en automoción, recipientes a presión y aeroespacial donde es obligatoria la prueba de la fuerza de sujeción."
+    }
+  ]
+}

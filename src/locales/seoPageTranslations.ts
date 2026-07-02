@@ -255,7 +255,8 @@ const SEO_PAGE: Record<Language, SeoPageStrings> = {
 };
 
 export function getSeoPage(locale: string): SeoPageStrings {
-  return SEO_PAGE[locale as Language] ?? EN;
+  const loc = locale as Language;
+  return { ...EN, ...(SEO_PAGE[loc] ?? EN) };
 }
 
 const EXTRA_EN: Partial<SeoPageStrings> = {

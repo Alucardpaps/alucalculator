@@ -8,6 +8,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18nStore } from '@/store/i18nStore';
+import { useWorkspaceStore } from '@/store/workspaceStore';
+import { getKernelDevStrings } from '@/locales/kernelDevTranslations';
 import { KERNEL, bootKernel, type KernelModule, type KernelStatus } from '@/core/kernel';
 import { CalculatorRegistry } from '@/lib/kernel/registry';
 import { auditLog, ExecutionLogEntry } from '@/lib/traceability/audit';
@@ -35,6 +38,9 @@ interface KernelDevPanelProps {
 type Tab = 'modules' | 'schemas' | 'trace' | 'intelligence';
 
 export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
+    const { language } = useI18nStore();
+    const kd = getKernelDevStrings(language);
+    const debugMode = useWorkspaceStore((s) => s.debugMode);
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const [status, setStatus] = useState<KernelStatus | null>(null);
     const [modules, setModules] = useState<KernelModule[]>([]);
@@ -94,7 +100,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
 
     // Group modules by category
     const groupedModules = modules.reduce((acc, mod) => {
-        const cat = mod.metadata.category || 'Uncategorized';
+        const cat = mod.metadata.category || kd.uncategorized;
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(mod);
         return acc;
@@ -102,11 +108,13 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
 
     // Group schemas by category
     const groupedSchemas = schemas.reduce((acc, schema) => {
-        const cat = schema.category || 'Uncategorized';
+        const cat = schema.category || kd.uncategorized;
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(schema);
         return acc;
     }, {} as Record<string, CalculatorSchema[]>);
+
+    if (!debugMode) return null;
 
     if (!isOpen) {
         return (
@@ -115,7 +123,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                 className="fixed bottom-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg shadow-lg z-50 flex items-center gap-2 text-xs text-slate-300"
             >
                 <Terminal size={14} />
-                <span>Kernel</span>
+                <span>{kd.kernelButton}</span>
                 {status && (
                     <span className="px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded text-[10px]">
                         {status.moduleCount + schemas.length}
@@ -131,7 +139,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
             <div className="flex items-center justify-between px-3 py-2 bg-slate-800/50 border-b border-slate-700">
                 <div className="flex items-center gap-2">
                     <Cpu size={14} className="text-cyan-400" />
-                    <span className="text-sm font-bold text-white">Engineering Kernel OS</span>
+                    <span className="text-sm font-bold text-white">{kd.panelTitle}</span>
                 </div>
                 <button
                     onClick={() => setIsOpen(false)}
@@ -145,15 +153,15 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
             {status && (
                 <div className="flex divide-x divide-slate-800 border-b border-slate-800 text-[10px] text-slate-500">
                     <div className="flex-1 px-3 py-1 flex justify-between items-center">
-                        <span>BOOT:</span>
+                        <span>{kd.boot}:</span>
                         <span className="text-green-400">OK</span>
                     </div>
                     <div className="flex-1 px-3 py-1 flex justify-between items-center">
-                        <span>MODULES:</span>
+                        <span>{kd.modules}:</span>
                         <span className="text-cyan-400">{modules.length}</span>
                     </div>
                     <div className="flex-1 px-3 py-1 flex justify-between items-center">
-                        <span>SCHEMAS:</span>
+                        <span>{kd.schemas}:</span>
                         <span className="text-amber-400">{schemas.length}</span>
                     </div>
                 </div>
@@ -171,19 +179,19 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                     onClick={() => setActiveTab('schemas')}
                     className={`flex-1 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 transition-colors ${activeTab === 'schemas' ? 'text-amber-400 bg-slate-800/50 border-b-2 border-amber-400' : 'text-slate-500 hover:text-slate-300'}`}
                 >
-                    <Database size={12} /> Schemas
+                    <Database size={12} /> {kd.schemas}
                 </button>
                 <button
                     onClick={() => setActiveTab('trace')}
                     className={`flex-1 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 transition-colors ${activeTab === 'trace' ? 'text-green-400 bg-slate-800/50 border-b-2 border-green-400' : 'text-slate-500 hover:text-slate-300'}`}
                 >
-                    <Activity size={12} /> Trace ({logs.length})
+                    <Activity size={12} /> {kd.trace} ({logs.length})
                 </button>
                 <button
                     onClick={() => setActiveTab('modules')}
                     className={`flex-1 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 transition-colors ${activeTab === 'modules' ? 'text-cyan-400 bg-slate-800/50 border-b-2 border-cyan-400' : 'text-slate-500 hover:text-slate-300'}`}
                 >
-                    <Package size={12} /> Legacy
+                    <Package size={12} /> {kd.legacy}
                 </button>
             </div>
 
@@ -193,7 +201,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                 {!loading && activeTab === 'intelligence' && (
                     <div className="p-3 space-y-4">
                         <div className="flex items-center gap-2 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-4">
-                            <Zap size={10} /> Active Logic Bridges
+                            <Zap size={10} /> {kd.activeLogicBridges}
                         </div>
                         
                         {[
@@ -210,7 +218,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                                     </span>
                                 </div>
                                 <div className="p-2">
-                                    <div className="text-[9px] text-slate-500 mb-1 uppercase tracking-tighter">Exposed Tools:</div>
+                                    <div className="text-[9px] text-slate-500 mb-1 uppercase tracking-tighter">{kd.exposedTools}:</div>
                                     <div className="flex flex-wrap gap-1">
                                         {mcp.tools.map(tool => (
                                             <span key={tool} className="text-[9px] px-1.5 py-0.5 bg-black/40 border border-slate-700 rounded text-slate-400 font-mono">
@@ -223,12 +231,12 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                         ))}
                         
                         <div className="mt-4 p-2 bg-blue-500/5 border border-blue-500/20 rounded text-[10px] text-blue-300">
-                            <span className="font-bold">NOTE:</span> These bridges allow AluCalc AI to access external engineering data and files autonomously.
+                            <span className="font-bold">{kd.note}:</span> {kd.mcpNote}
                         </div>
                     </div>
                 )}
 
-                {loading && <div className="p-4 text-center text-slate-500 text-xs">Loading kernel state...</div>}
+                {loading && <div className="p-4 text-center text-slate-500 text-xs">{kd.loadingKernel}</div>}
 
                 {/* SCHEMAS TAB */}
                 {!loading && activeTab === 'schemas' && (
@@ -260,18 +268,18 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                 {!loading && activeTab === 'trace' && (
                     <div className="p-2 space-y-2">
                         {logs.length === 0 && (
-                            <div className="text-center text-slate-600 text-xs py-8">No execution logs yet.<br />Run a calculation to see trace.</div>
+                            <div className="text-center text-slate-600 text-xs py-8">{kd.noExecutionLogs}<br />{kd.runCalculationHint}</div>
                         )}
                         {[...logs].reverse().map((log, i) => (
                             <div key={i} className="bg-[#161b22] border border-slate-800 rounded p-2 text-xs">
                                 <div className="flex justify-between text-[10px] text-slate-500 mb-1">
                                     <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
-                                    <span className="text-green-400">SUCCESS</span>
+                                    <span className="text-green-400">{kd.success}</span>
                                 </div>
                                 <div className="font-bold text-green-300 mb-1">{log.calculatorId}</div>
                                 <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-800/50">
                                     <div>
-                                        <div className="text-[9px] text-slate-500 mb-1">INPUTS</div>
+                                        <div className="text-[9px] text-slate-500 mb-1">{kd.inputs}</div>
                                         {Object.entries(log.inputs).map(([k, v]) => (
                                             <div key={k} className="flex justify-between text-[10px] text-slate-300">
                                                 <span>{k}:</span>
@@ -280,7 +288,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                                         ))}
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-slate-500 mb-1">OUTPUTS</div>
+                                        <div className="text-[9px] text-slate-500 mb-1">{kd.outputs}</div>
                                         {Object.entries(log.outputs).map(([k, v]) => (
                                             <div key={k} className="flex justify-between text-[10px] text-slate-300">
                                                 <span>{k}:</span>
@@ -315,7 +323,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
             {/* Footer */}
             <div className="px-3 py-1.5 bg-slate-900/50 border-t border-slate-800 text-[10px] text-slate-600 text-center flex justify-between">
                 <span>Engineering OS v4.0</span>
-                <span>Ready</span>
+                <span>{kd.ready}</span>
             </div>
         </div>
     );

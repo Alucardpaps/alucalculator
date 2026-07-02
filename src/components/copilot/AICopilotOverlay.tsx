@@ -48,7 +48,12 @@ const hexagonsData = [
   { id: 5, size: 30, baseLeft: 16, baseTop: '64%', delay: 1.6, xRange: [0, 6, -8, 0], yRange: [0, -10, 6, 0], duration: 5 }
 ];
 
-export const AICopilotOverlay: React.FC = () => {
+export type AICopilotOverlayProps = {
+  /** Full-screen embedded panel for mobile APK tab (not floating overlay). */
+  embedded?: boolean;
+};
+
+export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = false }) => {
   const { language } = useI18nStore();
   const strings = getCopilotStrings(language);
   const { isOpen, setIsOpen, greetingText, setGreetingText } = useCopilotStore();
@@ -97,7 +102,7 @@ export const AICopilotOverlay: React.FC = () => {
   }, [language]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (embedded || isOpen) {
       setGreetingText(null);
       return;
     }
@@ -128,7 +133,7 @@ export const AICopilotOverlay: React.FC = () => {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [isOpen, language, setGreetingText]);
+  }, [embedded, isOpen, language, setGreetingText]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -501,6 +506,7 @@ export const AICopilotOverlay: React.FC = () => {
   };
 
   useEffect(() => {
+    if (embedded) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
@@ -513,9 +519,231 @@ export const AICopilotOverlay: React.FC = () => {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, setIsOpen]);
+  }, [embedded, isOpen, setIsOpen]);
 
-  if (!mounted || isMobile) return null;
+  if (!mounted) return null;
+  if (!embedded && isMobile) return null;
+
+  const panelClass = embedded
+    ? 'relative w-full h-full z-0 glass-hud-panel border-0 shadow-none flex flex-col rounded-none'
+    : `fixed right-6 bottom-[140px] w-[380px] max-w-[90vw] h-[520px] z-[9991] glass-hud-panel border border-[#00e5ff]/30 shadow-2xl flex flex-col rounded-2xl transition-all duration-400 ease-out transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`;
+
+  const chatPanel = (
+    <div
+      onPointerDown={(e) => e.stopPropagation()}
+      className={panelClass}
+    >
+      {!embedded && (
+        <div className="absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
+      )}
+
+      <div className={`flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/40 ${embedded ? '' : 'rounded-t-2xl'}`}>
+        <div className="flex items-center gap-2.5">
+          <AegisIcon size={34} mode="active" />
+          <div>
+            <h3 className="text-xs font-mono font-black text-white tracking-[0.15em] uppercase">{strings.title}</h3>
+            <p className="text-[9px] text-[#00e5ff]/60 font-mono tracking-widest">{strings.subtitle}</p>
+          </div>
+        </div>
+        {!embedded && (
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        )}
+      </div>
+
+      {/* Quick Presets Carousel with Games & Jokes */}
+      <div className="px-4 py-2.5 border-b border-white/5 bg-white/[0.01] flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+        <span className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider shrink-0">{strings.promptsLabel}</span>
+        <button
+          onClick={() => handleGameAction('game_menu')}
+          className="text-[9px] font-mono bg-cyan-950/40 hover:bg-cyan-900/60 text-[#00e5ff] px-2.5 py-1 rounded-full whitespace-nowrap border border-[#00e5ff]/20 transition-colors flex items-center gap-1 shrink-0"
+        >
+          🎮 {strings.playGame}
+        </button>
+        <button
+          onClick={handleJoke}
+          className="text-[9px] font-mono bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-purple-500/20 transition-colors shrink-0"
+        >
+          🎭 {strings.tellJoke}
+        </button>
+        <button
+          onClick={() => setMessages([
+            {
+              id: 'welcome-1',
+              sender: 'ai',
+              text: strings.welcome,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+          ])}
+          className="text-[9px] font-mono bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-rose-500/20 transition-colors shrink-0"
+        >
+          🗑️ {strings.clear}
+        </button>
+        <div className="h-4 w-[1px] bg-white/10 shrink-0" />
+        <button
+          onClick={() => handlePreset("Verify safety factor for S235 steel under 5000N load")}
+          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+        >
+          {strings.presetS235}
+        </button>
+        <button
+          onClick={() => handlePreset("Optimize dimensions for minimum deflection")}
+          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+        >
+          {strings.presetDeflection}
+        </button>
+        <button
+          onClick={() => handlePreset("What is this page and how does it work?")}
+          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+        >
+          {strings.presetGuide}
+        </button>
+      </div>
+
+      {/* Messages Container */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            {msg.sender === 'ai' && (
+              <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5">
+                <Bot size={12} />
+              </div>
+            )}
+            <div
+              className={`max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${msg.sender === 'user' ? 'bg-[#00e5ff] text-slate-950 font-medium rounded-tr-none' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none font-mono'}`}
+            >
+              <div className="whitespace-pre-wrap word-break">
+                {msg.text.split('**').map((part, index) => 
+                  index % 2 === 1 ? <strong key={index} className={msg.sender === 'user' ? 'font-black' : (msg.intent?.showSupportButton ? 'text-red-400' : 'text-[#00e5ff]')}>{part}</strong> : part
+                )}
+              </div>
+
+              {msg.intent?.actionUrl && (
+                <div className="mt-3 pt-2 border-t border-white/10">
+                  <a
+                    href={msg.intent.actionUrl}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all shadow-md ${msg.intent.showSupportButton ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-[#00e5ff] text-slate-950 hover:bg-[#00e5ff]/90'}`}
+                  >
+                    {msg.intent.showSupportButton && <AlertTriangle size={12} />}
+                    <span>{msg.intent.actionLabel || strings.openWorkspace}</span>
+                    <span className="text-[10px]">→</span>
+                  </a>
+                </div>
+              )}
+
+              {msg.intent && !msg.intent.replyOverride && (
+                <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1">
+                  {msg.intent.materialType && (
+                    <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5 uppercase">
+                      Mat: {msg.intent.materialType}
+                    </span>
+                  )}
+                  {msg.intent.forceApplied && (
+                    <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5">
+                      Load: {msg.intent.forceApplied}N
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {msg.gameOptions && (
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-2">
+                  {msg.gameOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => handleGameAction(opt.value)}
+                      className="px-2.5 py-1.5 bg-[#00e5ff]/10 hover:bg-[#00e5ff]/25 text-[#00e5ff] border border-[#00e5ff]/20 rounded-lg text-[10px] font-mono transition-all active:scale-95 flex items-center gap-1"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div suppressHydrationWarning className={`text-[8px] mt-1.5 text-right ${msg.sender === 'user' ? 'text-slate-950/60' : 'text-slate-500'}`}>
+                {msg.timestamp}
+              </div>
+            </div>
+            {msg.sender === 'user' && (
+              <div className="w-6 h-6 rounded-md bg-slate-800 border border-white/10 flex items-center justify-center text-slate-300 shrink-0 mt-0.5">
+                <User size={12} />
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isTyping && (
+          <div className="flex gap-3 justify-start items-start">
+            <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 animate-pulse">
+              <Sparkles size={12} />
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[10px] font-mono text-[#00e5ff]/70 max-w-[85%] rounded-tl-none space-y-1.5 flex flex-col shadow-lg">
+              <div className="flex items-center gap-1.5 text-xs text-white">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-ping" />
+                <span>{strings.reasoningStream}</span>
+              </div>
+              {thinkingSteps.map((step, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 opacity-80 animate-fade-in">
+                  <span className="text-[#00e5ff]">›</span>
+                  <span>{step}</span>
+                </div>
+              ))}
+              {thinkingSteps.length === 0 && (
+                <div className="flex gap-1 items-center mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.4s]" />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Area */}
+      <div className={`p-4 border-t border-white/10 bg-black/40 safe-area-pb ${embedded ? '' : 'rounded-b-2xl'}`}>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            placeholder={strings.placeholder}
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00e5ff]/50 font-mono transition-colors"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!input.trim()}
+            className="bg-[#00e5ff] hover:bg-[#00e5ff]/80 disabled:opacity-40 disabled:hover:bg-[#00e5ff] text-slate-950 rounded-xl px-3.5 flex items-center justify-center transition-all active:scale-95"
+          >
+            <Send size={14} />
+          </button>
+        </div>
+        <div className="flex items-center justify-between mt-2 px-1">
+          <span className="text-[8px] font-mono text-slate-500">{strings.pressEnter}</span>
+          <span className="text-[8px] font-mono text-[#00e5ff]/60 flex items-center gap-1">
+            <CheckCircle size={8} /> {strings.activeGovernance}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="absolute inset-0 flex flex-col bg-[#05080e] overflow-hidden">
+        {chatPanel}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -555,213 +783,7 @@ export const AICopilotOverlay: React.FC = () => {
       </AnimatePresence>
 
       {/* ═══ CHAT SPEECH BUBBLE PANEL (BOTTOM RIGHT) ═══ */}
-      <div
-        onPointerDown={(e) => e.stopPropagation()}
-        className={`fixed right-6 bottom-[140px] w-[380px] max-w-[90vw] h-[520px] z-[9991] glass-hud-panel border border-[#00e5ff]/30 shadow-2xl flex flex-col rounded-2xl transition-all duration-400 ease-out transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`}
-      >
-        {/* Speech Bubble Arrow Tail pointing down to the pet */}
-        <div className="absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
-
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/40 rounded-t-2xl">
-          <div className="flex items-center gap-2.5">
-            <AegisIcon size={34} mode="active" />
-            <div>
-              <h3 className="text-xs font-mono font-black text-white tracking-[0.15em] uppercase">{strings.title}</h3>
-              <p className="text-[9px] text-[#00e5ff]/60 font-mono tracking-widest">{strings.subtitle}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Quick Presets Carousel with Games & Jokes */}
-        <div className="px-4 py-2.5 border-b border-white/5 bg-white/[0.01] flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
-          <span className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider shrink-0">{strings.promptsLabel}</span>
-          <button
-            onClick={() => handleGameAction('game_menu')}
-            className="text-[9px] font-mono bg-cyan-950/40 hover:bg-cyan-900/60 text-[#00e5ff] px-2.5 py-1 rounded-full whitespace-nowrap border border-[#00e5ff]/20 transition-colors flex items-center gap-1 shrink-0"
-          >
-            🎮 {strings.playGame}
-          </button>
-          <button
-            onClick={handleJoke}
-            className="text-[9px] font-mono bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-purple-500/20 transition-colors shrink-0"
-          >
-            🎭 {strings.tellJoke}
-          </button>
-          <button
-            onClick={() => setMessages([
-              {
-                id: 'welcome-1',
-                sender: 'ai',
-                text: strings.welcome,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              }
-            ])}
-            className="text-[9px] font-mono bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-rose-500/20 transition-colors shrink-0"
-          >
-            🗑️ {strings.clear}
-          </button>
-          <div className="h-4 w-[1px] bg-white/10 shrink-0" />
-          <button
-            onClick={() => handlePreset("Verify safety factor for S235 steel under 5000N load")}
-            className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
-          >
-            {strings.presetS235}
-          </button>
-          <button
-            onClick={() => handlePreset("Optimize dimensions for minimum deflection")}
-            className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
-          >
-            {strings.presetDeflection}
-          </button>
-          <button
-            onClick={() => handlePreset("What is this page and how does it work?")}
-            className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
-          >
-            {strings.presetGuide}
-          </button>
-        </div>
-
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {msg.sender === 'ai' && (
-                <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5">
-                  <Bot size={12} />
-                </div>
-              )}
-              <div
-                className={`max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${msg.sender === 'user' ? 'bg-[#00e5ff] text-slate-950 font-medium rounded-tr-none' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none font-mono'}`}
-              >
-                {/* Basic pseudo markdown formatting support */}
-                <div className="whitespace-pre-wrap word-break">
-                  {msg.text.split('**').map((part, index) => 
-                    index % 2 === 1 ? <strong key={index} className={msg.sender === 'user' ? 'font-black' : (msg.intent?.showSupportButton ? 'text-red-400' : 'text-[#00e5ff]')}>{part}</strong> : part
-                  )}
-                </div>
-
-                {/* Optional Action Button / Routing Link */}
-                {msg.intent?.actionUrl && (
-                  <div className="mt-3 pt-2 border-t border-white/10">
-                    <a
-                      href={msg.intent.actionUrl}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all shadow-md ${msg.intent.showSupportButton ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-[#00e5ff] text-slate-950 hover:bg-[#00e5ff]/90'}`}
-                    >
-                      {msg.intent.showSupportButton && <AlertTriangle size={12} />}
-                      <span>{msg.intent.actionLabel || strings.openWorkspace}</span>
-                      <span className="text-[10px]">→</span>
-                    </a>
-                  </div>
-                )}
-
-                {/* Optional Intent Payload Visualizer */}
-                {msg.intent && !msg.intent.replyOverride && (
-                  <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1">
-                    {msg.intent.materialType && (
-                      <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5 uppercase">
-                        Mat: {msg.intent.materialType}
-                      </span>
-                    )}
-                    {msg.intent.forceApplied && (
-                      <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5">
-                        Load: {msg.intent.forceApplied}N
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Interactive Game Options inside message */}
-                {msg.gameOptions && (
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-2">
-                    {msg.gameOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => handleGameAction(opt.value)}
-                        className="px-2.5 py-1.5 bg-[#00e5ff]/10 hover:bg-[#00e5ff]/25 text-[#00e5ff] border border-[#00e5ff]/20 rounded-lg text-[10px] font-mono transition-all active:scale-95 flex items-center gap-1"
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div suppressHydrationWarning className={`text-[8px] mt-1.5 text-right ${msg.sender === 'user' ? 'text-slate-950/60' : 'text-slate-500'}`}>
-                  {msg.timestamp}
-                </div>
-              </div>
-              {msg.sender === 'user' && (
-                <div className="w-6 h-6 rounded-md bg-slate-800 border border-white/10 flex items-center justify-center text-slate-300 shrink-0 mt-0.5">
-                  <User size={12} />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {isTyping && (
-            <div className="flex gap-3 justify-start items-start">
-              <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 animate-pulse">
-                <Sparkles size={12} />
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[10px] font-mono text-[#00e5ff]/70 max-w-[85%] rounded-tl-none space-y-1.5 flex flex-col shadow-lg">
-                <div className="flex items-center gap-1.5 text-xs text-white">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-ping" />
-                  <span>{strings.reasoningStream}</span>
-                </div>
-                {thinkingSteps.map((step, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 opacity-80 animate-fade-in">
-                    <span className="text-[#00e5ff]">›</span>
-                    <span>{step}</span>
-                  </div>
-                ))}
-                {thinkingSteps.length === 0 && (
-                  <div className="flex gap-1 items-center mt-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.4s]" />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 border-t border-white/10 bg-black/40 rounded-b-2xl">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={strings.placeholder}
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00e5ff]/50 font-mono transition-colors"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="bg-[#00e5ff] hover:bg-[#00e5ff]/80 disabled:opacity-40 disabled:hover:bg-[#00e5ff] text-slate-950 rounded-xl px-3.5 flex items-center justify-center transition-all active:scale-95"
-            >
-              <Send size={14} />
-            </button>
-          </div>
-          <div className="flex items-center justify-between mt-2 px-1">
-            <span className="text-[8px] font-mono text-slate-500">{strings.pressEnter}</span>
-            <span className="text-[8px] font-mono text-[#00e5ff]/60 flex items-center gap-1">
-              <CheckCircle size={8} /> {strings.activeGovernance}
-            </span>
-          </div>
-        </div>
-      </div>
+      {chatPanel}
     </>
   );
 };

@@ -26,7 +26,14 @@ type Props = {
 };
 
 export function AcademySeoGuideView({ slug, lesson: rawLesson }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { language } = useI18nStore();
+
+
   const lesson = useMemo(() => localizeSeoLesson(rawLesson, language), [rawLesson, language]);
   const t = getAcademyPage(language);
   const quizQuestions = useMemo(
@@ -59,6 +66,10 @@ export function AcademySeoGuideView({ slug, lesson: rawLesson }: Props) {
   }, [slug]);
 
   const bumpProgress = () => setProgressTick((n) => n + 1);
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#020408]" />;
+  }
 
   return (
     <div className="relative z-10 min-h-screen bg-[#020408]/80 text-slate-200 font-sans selection:bg-blue-500/30">

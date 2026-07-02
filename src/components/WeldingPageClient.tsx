@@ -21,6 +21,10 @@ import { SHAPE_INFO, ShapeType } from "@/utils/sectionProperties";
 import { AlertTriangle, CheckCircle, Flame, Thermometer, Zap, Box, Layers, Eye } from 'lucide-react';
 import { useI18nStore } from "@/store/i18nStore";
 
+function localizedWeldingName(item: { name: string; nameTr: string }, lang: string): string {
+    return lang === 'tr' ? item.nameTr : item.name;
+}
+
 export default function WeldingPageClient() {
     const { t, language } = useI18nStore();
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
@@ -175,7 +179,7 @@ export default function WeldingPageClient() {
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                 >
-                                    {language === 'tr' ? method.nameTr : method.name}
+                                    {localizedWeldingName(method, language)}
                                 </button>
                             ))}
                         </div>
@@ -249,7 +253,7 @@ export default function WeldingPageClient() {
                         >
                             {compatibleElectrodes.map((el) => (
                                 <option key={el.code} value={el.code}>
-                                    {el.code} - {language === 'tr' ? el.nameTr : el.name} ({el.tensileStrength} MPa)
+                                    {el.code} - {localizedWeldingName(el, language)} ({el.tensileStrength} MPa)
                                 </option>
                             ))}
                         </select>

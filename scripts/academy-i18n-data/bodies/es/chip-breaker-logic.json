@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Seleccione la geometría del rompevirutas (TF, TQ) según el material y la operación",
+    "Compare la alimentación radial con la alimentación de flanco modificada para obtener estabilidad de roscado",
+    "Relacionar la profundidad de corte, el avance y la fuerza de corte específica con la carga de la herramienta"
+  ],
+  "keyTakeaways": [
+    "Las virutas no controladas causan anidación de pájaros, el principal modo de falla del roscado",
+    "La alimentación de flanco modificada reduce la carga de calor en un borde de la plaquita",
+    "Se requiere una profundidad de corte mínima para activar la ranura del rompevirutas."
+  ],
+  "supplementalParagraph": "El roscado es un problema de corte de metales disfrazado de problema de geometría. ",
+  "formula": {
+    "variables": {
+      "ap": "ap: Profundidad de corte (mm)",
+      "f": "f: Avance por revolución (mm/rev)",
+      "Kc": "Kc: Fuerza de corte específica (N/mm²)"
+    }
+  },
+  "stepByStep": [
+    "Seleccione la geometría del rompevirutas según el material (por ejemplo, TF para general, TQ para estabilidad).",
+    "Elija el método de alimentación: Alimentación radial frente a alimentación por flanco (3°–5°).",
+    "Determine el número de pasadas según el paso de la rosca (de las tablas).",
+    "Supervise la dirección del flujo de virutas utilizando la lógica de puntos asimétricos.",
+    "Ajuste la velocidad de corte (Vc) según los patrones de desgaste de la herramienta.",
+    "Establezca la profundidad de la primera pasada de roscado por encima de la activación mínima del rompevirutas ap.",
+    "Aplique refrigerante a alta presión para las roscas internas (operaciones SINR/CINR)."
+  ],
+  "example": {
+    "inputs": [
+      "Material: 15CrMo4",
+      "Tool: 16ER150 ISO-TQ",
+      "Feed: Radial"
+    ],
+    "calculation": "Using TQ geometry: Cutting force reduced by 15%, Vibration suppressed."
+  },
+  "whyThisMatters": [
+    "El control incorrecto de las virutas provoca el \"anidamiento de pájaros\", que es la causa número uno de fallos de las herramientas.",
+    "El avance de flanco modificado (3°–5°) mejora significativamente la vida útil de la herramienta al distribuir el calor."
+  ],
+  "commonMistakes": [
+    "Usar una profundidad de corte constante para todas las pasadas (la primera pasada debe ser más profunda).",
+    "No utilizar refrigerante de alta presión en la rosca interna (SINR/CINR).",
+    "Descuidar la profundidad mínima de corte (ap) requerida para activar el rompevirutas."
+  ],
+  "calculatorCta": {
+    "label": "Analyze tool load in the Gearbox Simulation suite"
+  },
+  "faq": [
+    {
+      "question": "¿Por qué utilizar alimentación de flanco modificada?",
+      "answer": "Garantiza que solo un borde del inserto realice el trabajo pesado, lo que reduce el calor y evita la vibración (vibración)."
+    },
+    {
+      "question": "¿Avanzada radial o de flanco?",
+      "answer": "Cargas radiales en ambos bordes por igual; "
+    },
+    {
+      "question": "¿Qué es la fuerza de corte específica Kc?",
+      "answer": "Fuerza por unidad de área de viruta: propiedad del material utilizada para estimar Fc = ap × f × Kc."
+    },
+    {
+      "question": "¿Por qué pases adicionales para acero inoxidable?",
+      "answer": "El endurecimiento por trabajo y la recuperación elástica requieren de 2 a 3 pasadas más de lo que sugieren las tablas de acero al carbono."
+    }
+  ]
+}

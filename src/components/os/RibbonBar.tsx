@@ -3,7 +3,7 @@ import { useCadStore } from '@/cad/store/cadStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useOSStore, Theme, WorkspaceMode } from '@/store/osStore';
 import { commandProcessor } from '@/cad/commands/CommandProcessor';
-import { getAllCalculators } from '@/calculators/registry'; 
+
 import { zoomViewportAt, resetViewport } from '@/cad/kernel/CoordinateSystem';
 import { Constraint } from '@/cad/kernel/types';
 import {
@@ -273,6 +273,9 @@ export function CADRibbon({ dock }: { dock?: boolean }) {
 function WorkstationRibbon({ dock }: { dock?: boolean }) {
     const { t } = useI18nStore();
     const { openWindow } = useOSStore();
+
+    const moduleLabel = (slug: string, fallback: string) =>
+        t.modules?.[slug]?.title ?? fallback;
     
     const containerClass = dock
         ? "flex items-center gap-4"
@@ -284,18 +287,18 @@ function WorkstationRibbon({ dock }: { dock?: boolean }) {
                 <>
                     <div className="flex items-center gap-2 text-cyan-500">
                         <Monitor size={20} />
-                        <span className="text-sm font-bold tracking-wider">ENGINEERING WORKSTATION</span>
+                        <span className="text-sm font-bold tracking-wider">{t.ribbon.labelWorkstation}</span>
                     </div>
                     <Divider />
                 </>
             )}
 
             <ToolGroup label={dock ? undefined : t.ribbon.groupContent}>
-                <RibbonBtn icon={Calculator} label="All Calculators" onClick={() => openWindow('calculator')} />
-                <RibbonBtn icon={BarChart3} label="Analytics" onClick={() => openWindow('analytics-dashboard')} />
-                <RibbonBtn icon={Box} label="Materials" onClick={() => openWindow('materials-explorer')} />
-                <RibbonBtn icon={Database} label="Handbook" onClick={() => openWindow('handbook')} />
-                <RibbonBtn icon={FileText} label="Notes" onClick={() => openWindow('engineering-notes')} />
+                <RibbonBtn icon={Calculator} label={moduleLabel('calculator', 'All Calculators')} onClick={() => openWindow('calculator')} />
+                <RibbonBtn icon={BarChart3} label={moduleLabel('analytics-dashboard', 'Analytics')} onClick={() => openWindow('analytics-dashboard')} />
+                <RibbonBtn icon={Box} label={moduleLabel('materials-explorer', 'Materials')} onClick={() => openWindow('materials-explorer')} />
+                <RibbonBtn icon={Database} label={moduleLabel('handbook', 'Handbook')} onClick={() => openWindow('handbook')} />
+                <RibbonBtn icon={FileText} label={moduleLabel('engineering-notes', 'Notes')} onClick={() => openWindow('engineering-notes')} />
             </ToolGroup>
 
             {!dock && <div className="flex-1" />}

@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Normalspannung σ = F/A berechnen und Zug vs. Druck interpretieren",
+    "Hookesches Gesetz für Spannung, Dehnung und Elastizitätsmodul anwenden",
+    "Spannungskonzentrationen an Bohrungen, Absätzen und Querschnittsänderungen erkennen"
+  ],
+  "keyTakeaways": [
+    "Spannung ist innerer Widerstand; Druck wirkt auf äußere Oberflächen",
+    "Unter Streckgrenze mit geeignetem Sicherheitsfaktor (1,5–3,0) bleiben",
+    "Schubfläche liegt in der Ebene der Schubkraft — nicht der Normalfläche"
+  ],
+  "supplementalParagraph": "Statik liefert äußere Reaktionen; Festigkeitslehre prüft, ob das Material innen überlebt. Jeder Spannungsrechner in AluCalc baut auf σ = F/A und ε = σ/E auf.",
+  "formula": {
+    "variables": {
+      "σ": "σ: Normalspannung (Pa oder MPa)",
+      "F": "F: Axialkraft (N)",
+      "A": "A: Querschnittsfläche (m²)"
+    }
+  },
+  "stepByStep": [
+    "Innenkraft am betrachteten Punkt berechnen.",
+    "Querschnittsfläche des Elements bestimmen.",
+    "Spannungsformel anwenden: σ = F / A.",
+    "Dehnung mit Hookeschem Gesetz berechnen: ε = σ / E.",
+    "Prüfen, dass die Spannung unter der Streckgrenze des Werkstoffs liegt.",
+    "Spannungskonzentrationsfaktor Kt bei geometrischen Kerben anwenden.",
+    "Berechnete Spannung mit geeigneter Sicherheit gegen Streckgrenze vergleichen."
+  ],
+  "example": {
+    "inputs": [
+      "Force: 50,000 N",
+      "Area: 100 mm² (0.0001 m²)"
+    ],
+    "calculation": "σ = 50000 / 0.0001 = 500,000,000 Pa = 500 MPa"
+  },
+  "whyThisMatters": [
+    "Verhindert Strukturversagen, indem Materialgrenzen nie überschritten werden.",
+    "Ermöglicht Werkstoffauswahl nach Belastungsbedingungen."
+  ],
+  "commonMistakes": [
+    "Vorzeichen der Spannung (Zug vs. Druck) vernachlässigen.",
+    "Falsche Fläche für Schubspannung verwenden (parallel zur Kraft).",
+    "Spannungskonzentrationen an Bohrungen oder Absätzen nicht berücksichtigen."
+  ],
+  "engineeringTip": "Im Konstruktionsentwurf zielen wir meist auf einen Sicherheitsfaktor (SF) zwischen 1,5 und 3,0.",
+  "calculatorCta": {
+    "label": "Analyze fastener stress with our real-time integrity engine"
+  },
+  "faq": [
+    {
+      "question": "Unterschied zwischen Spannung und Druck?",
+      "answer": "Druck ist äußere Kraft auf äußerer Fläche; Spannung ist innere Widerstandskraft auf innerem Querschnitt."
+    },
+    {
+      "question": "Was ist der Sicherheitsfaktor?",
+      "answer": "Verhältnis zulässige zu berechneter Spannung — typisch 1,5–3,0 je nach Folgen und Lastunsicherheit."
+    },
+    {
+      "question": "Wie unterscheidet sich Schubspannung?",
+      "answer": "Schub wirkt parallel zur Fläche; Fläche liegt in der Schubebene, nicht senkrecht zur Kraft."
+    },
+    {
+      "question": "Wann versagt Hookesches Gesetz?",
+      "answer": "Jenseits proportionaler Grenze / Streckgrenze — plastische Verformung erfordert andere Modelle."
+    }
+  ]
+}

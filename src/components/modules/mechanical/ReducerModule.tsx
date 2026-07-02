@@ -10,7 +10,11 @@ import {
 import { EngineeringVisualization } from "@/components/ui/EngineeringVisualization";
 import { CalculatorInput } from "@/components/CalculatorInput";
 
+import { getReducerModuleStrings, formatReducerMaintenance } from '@/locales/reducerModuleTranslations';
+
 export default function ReducerModule({ lang, dict }: { lang: string, dict: any }) {
+    const s = getReducerModuleStrings(lang);
+    const reducerDict = dict?.reducer || {};
     // Technical State
     const [power, setPower] = useState(7.5); // kW
     const [ratio, setRatio] = useState(31.5);
@@ -76,9 +80,9 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Visualizer & Configuration */}
                     <div className="space-y-8">
-                        <EngineeringVisualization status={results.isCritical ? 'warning' : 'valid'} label="THERMAL CHARACTERISTIC">
+                        <EngineeringVisualization status={results.isCritical ? 'warning' : 'valid'} label={s.thermalCharacteristic}>
                             <div className="flex flex-col items-center justify-center p-8 w-full h-full min-h-[400px] relative bg-[#05080f] rounded-[3rem] border border-white/5 overflow-hidden">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.03)_0%,transparent:70%)]" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.03)_0%,transparent_70%)]" />
                                 
                                 <motion.div 
                                     animate={{ scale: [1, 1.02, 1], borderColor: results.isCritical ? ['#ef444433', '#ef444488', '#ef444433'] : [] }}
@@ -100,41 +104,41 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
 
                                 <div className="mt-12 flex gap-8">
                                     <div className="text-center">
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 font-mono">Thermal Limit</div>
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 font-mono">{s.thermalLimit}</div>
                                         <div className="text-2xl font-black text-white tabular-nums">{results.Pt.toFixed(1)} <span className="text-[10px] text-slate-600">kW</span></div>
                                     </div>
                                     <div className="w-px h-10 bg-white/10" />
                                     <div className="text-center">
-                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 font-mono">Oil Interval</div>
-                                        <div className="text-2xl font-black text-cyan-400 tabular-nums">{results.interval} <span className="text-[10px] text-slate-600">Hr</span></div>
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 font-mono">{s.oilInterval}</div>
+                                        <div className="text-2xl font-black text-cyan-400 tabular-nums">{results.interval} <span className="text-[10px] text-slate-600">{s.hr}</span></div>
                                     </div>
                                 </div>
                             </div>
                         </EngineeringVisualization>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/[0.02] border border-white/5 p-8 rounded-[2.5rem]">
-                            <CalculatorInput label="Transmitted Power" unit="kW" value={power} onChange={(e) => setPower(Number(e.target.value))} />
-                            <CalculatorInput label="Ambient Air Temp" unit="°C" value={ambientTemp} onChange={(e) => setAmbientTemp(Number(e.target.value))} />
+                            <CalculatorInput label={reducerDict.inputPower || "Transmitted Power"} unit="kW" value={power} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPower(Number(e.target.value))} />
+                            <CalculatorInput label={reducerDict.ambientTemp || "Ambient Air Temp"} unit="°C" value={ambientTemp} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmbientTemp(Number(e.target.value))} />
                             
                             <div className="space-y-2">
-                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-2">Cooling Config</span>
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-2">{s.coolingConfig}</span>
                                 <button 
                                     onClick={() => setHasFan(!hasFan)}
                                     className={`w-full py-2.5 rounded-xl border text-[10px] font-black uppercase transition-all ${hasFan ? 'bg-cyan-500/10 border-cyan-500/40 text-cyan-400' : 'bg-white/5 border-white/10 text-slate-500'}`}
                                 >
-                                    {hasFan ? 'Forced Fan Conv.' : 'Natural Conv.'}
+                                    {hasFan ? s.forcedFan : s.naturalConv}
                                 </button>
                             </div>
 
                             <div className="space-y-2">
-                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-2">Lube Standard</span>
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-2">{s.lubeStandard}</span>
                                 <select 
                                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-bold text-white outline-none"
                                     value={oilType}
                                     onChange={(e) => setOilType(e.target.value)}
                                 >
-                                    <option value="mineral" className="bg-[#0b121d]">Mineral Base (CLP)</option>
-                                    <option value="synthetic" className="bg-[#0b121d]">Synthetic PAO</option>
+                                    <option value="mineral" className="bg-[#0b121d]">{s.mineralOil}</option>
+                                    <option value="synthetic" className="bg-[#0b121d]">{s.syntheticOil}</option>
                                 </select>
                             </div>
                         </div>
@@ -143,19 +147,19 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
                     {/* Dashboard Summary */}
                     <div className="space-y-8">
                         <div className="bg-[#0a0c10] rounded-[3rem] p-10 border border-cyan-500/20 shadow-2xl relative overflow-hidden min-h-full">
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-700 mb-12">Transmission Analytics</h2>
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-700 mb-12">{s.transmissionAnalytics}</h2>
 
                             <div className="grid grid-cols-1 gap-6">
-                                <KPIBlock label="Output Torque T2" value={results.T2.toFixed(0)} unit="Nm" color="#fff" />
-                                <KPIBlock label="Estimated Operating Temp" value={results.operatingTemp.toFixed(1)} unit="°C" color={results.operatingTemp > 85 ? '#ef4444' : '#22d3ee'} />
-                                <KPIBlock label="Lubricant Volume" value={results.oilQuantity.toFixed(2)} unit="Liters" color="#f59e0b" />
+                                <KPIBlock label={s.outputTorque} value={results.T2.toFixed(0)} unit="Nm" color="#fff" />
+                                <KPIBlock label={s.estimatedTemp} value={results.operatingTemp.toFixed(1)} unit="°C" color={results.operatingTemp > 85 ? '#ef4444' : '#22d3ee'} />
+                                <KPIBlock label={s.lubricantVolume} value={results.oilQuantity.toFixed(2)} unit={s.liters} color="#f59e0b" />
                             </div>
 
                             <div className="mt-12 p-8 bg-blue-500/5 border border-blue-500/10 rounded-3xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-[0.05] pointer-events-none"><Gauge size={60}/></div>
-                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">ISO Maintenance Recommendation</div>
+                                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">{s.isoMaintenance}</div>
                                 <div className="text-sm font-medium text-slate-400 leading-relaxed">
-                                    Based on <span className="text-white font-bold">{oilType}</span> operating at <span className="text-white font-bold">{results.operatingTemp.toFixed(0)}°C</span>, oil degradation accelerates. Schedule the next flushing session in <span className="text-cyan-400 font-black">{results.interval} hours</span>.
+                                    {formatReducerMaintenance(s, oilType as 'mineral' | 'synthetic', results.operatingTemp, results.interval)}
                                 </div>
                             </div>
 
@@ -167,7 +171,9 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
                                         className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4"
                                     >
                                         <AlertTriangle className="text-red-500 animate-pulse" size={20} />
-                                        <span className="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none">Thermal saturation reached. Extra cooling required.</span>
+                                        <span className="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none">
+                                            {s.thermalSaturation}
+                                        </span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

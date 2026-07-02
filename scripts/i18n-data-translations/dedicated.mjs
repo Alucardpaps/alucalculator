@@ -1,0 +1,224 @@
+/** Dedicated calculator pages — nested beamDeflection, columnBuckling, bearingLife, vdi2230 */
+
+const EN = {
+  beamDeflection: {
+    titleMain: 'Beam', titleAccent: 'Deflection',
+    subtitle: "Roark's Formulas for Structural Beams \u2022 AluCalcOS 2.0",
+    supportMode: 'Support Mode', boundaryConditions: 'Boundary conditions', structuralMode: 'Structural Mode',
+    modeSsUniform: 'Simply Supported - Uniform Load', modeSsCenter: 'Simply Supported - Point Load at Center',
+    modeCUniform: 'Cantilever - Uniform Load', beamParameters: 'Beam Parameters',
+    loadMagnitudeUniform: 'Load magnitude (w)', loadMagnitudePoint: 'Load magnitude (W)', fineTuneLoad: 'Fine-tune Load',
+    spanLength: 'Span Length (L)', beamSpan: 'Beam Span', modulusOfElasticity: 'Modulus of Elasticity (E)',
+    inertiaMoment: 'Inertia Moment (I)', schematic: 'SCHEMATIC', maxDeflection: 'Maximum Deflection (v_max)',
+    maxMoment: 'Maximum Moment (M_max)',
+    infoText: 'Formula calculation uses Euler-Bernoulli beam theory. Moment of Inertia (I) determines the resistance to bending, and Elastic Modulus (E) reflects the structural stiffness.',
+    standard: 'Standard: AISC / Euler-Bernoulli',
+  },
+  columnBuckling: {
+    titleMain: 'Column', titleAccent: 'Buckling',
+    subtitle: 'Euler Critical Load Sizing for Slender Columns \u2022 AluCalcOS 2.0',
+    boundarySetup: 'Boundary Setup', cFactorLabel: 'C Factor =', columnEndCondition: 'Column End Condition',
+    endPinnedPinned: 'Pinned-Pinned (C=1)', endFixedFixed: 'Fixed-Fixed (C=4)', endFixedPinned: 'Fixed-Pinned (C=2)',
+    endFixedFree: 'Fixed-Free (C=0.25)', columnParameters: 'Column Parameters',
+    columnLength: 'Column Length (L)', columnHeight: 'Column Height', modulus: 'Modulus (E)', minInertia: 'Min Inertia (I)',
+    schematic: 'SCHEMATIC', eulerCriticalLoad: 'Euler Critical Load (P_cr)',
+    infoText: "Calculations use Euler's buckling theory. Euler load assumes a perfectly straight column under concentric axial load, before yielding occurs. Applicable to long slender columns (slenderness ratio \u03bb > \u03bb_c).",
+    standard: 'Standard: AISC / Euler Equation',
+  },
+  bearingLife: {
+    titleMain: 'Bearing', titleAccent: 'Life (ISO 281)',
+    subtitle: 'Rating Life Calculation for Rolling Bearings \u2022 AluCalcOS 2.0',
+    bearingGeometry: 'Bearing Geometry', loadExponentLabel: 'Load exponent p =', bearingElementType: 'Bearing Element Type',
+    ballBearing: 'Ball Bearing (p=3)', rollerBearing: 'Roller Bearing (p=10/3)', appliedLoads: 'Applied Loads',
+    dynamicLoadRating: 'Dynamic Load Rating (C)', ratingCapacity: 'Rating Capacity',
+    equivDynamicLoad: 'Equiv. Dynamic Load (P)', dynamicLoad: 'Dynamic Load',
+    rotationalSpeed: 'Rotational Speed (n)', shaftSpeed: 'Shaft Speed', ratingLife: 'Rating Life (L10h)',
+    infoText: 'Calculations use the standard ISO 281 formula L10h = (10^6 / 60n) * (C/P)^p. L10h represents the dynamic rating life with 90% reliability. Exponent p is 3 for ball bearings and 10/3 (3.33) for roller bearings.',
+    standard: 'Standard: ISO 281:2007',
+  },
+  vdi2230: {
+    titleMain: 'VDI 2230', titleAccent: 'Joint Sizing',
+    subtitle: 'Tightening Torque & Preload Calculations \u2022 AluCalcOS 2.0',
+    tighteningTorqueParams: '1. Tightening Torque Parameters', boltNominalDiameter: 'Bolt Nominal Diameter (d)',
+    nominalSize: 'Nominal Size', initialPreload: 'Initial Preload (F_M)', assemblyPreload: 'Assembly Preload',
+    nutFrictionCoefficient: 'Nut Friction Coefficient (K)', nutFrictionFactor: 'Nut Friction Factor',
+    jointStiffnessParams: '2. Joint Stiffness & Load Parameters', externalAppliedLoad: 'External Applied Load (F_ext)',
+    externalForce: 'External Force', boltStiffness: 'Bolt Stiffness (K_c)', flangeStiffness: 'Flange Stiffness (K_B)',
+    tighteningTorque: 'Tightening Torque (T)', totalWorkingBoltLoad: 'Total Working Bolt Load (F_c)',
+    infoText: 'Calculations adhere to VDI 2230 guidelines for systematic calculation of high-duty bolted joints. Bolt load Fc includes the assembly preload Fm and the portion of external load Fext transferred based on the stiffness ratio Kc / (Kc + Kb).',
+    standard: 'Standard: VDI 2230-1',
+  },
+};
+
+function deepMerge(base, patch) {
+  const out = structuredClone(base);
+  for (const [k, v] of Object.entries(patch)) {
+    if (v && typeof v === 'object' && !Array.isArray(v) && typeof out[k] === 'object') {
+      out[k] = { ...out[k], ...v };
+    } else {
+      out[k] = v;
+    }
+  }
+  return out;
+}
+
+const PATCHES = {
+  de: {
+    beamDeflection: {
+      titleMain: 'Balken', titleAccent: 'Durchbiegung', subtitle: 'Roark-Formeln für Strukturbalken \u2022 AluCalcOS 2.0',
+      supportMode: 'Lagerungsart', boundaryConditions: 'Randbedingungen', structuralMode: 'Strukturmodus',
+      modeSsUniform: 'Einfach gelagert \u2013 gleichmäßige Last', modeSsCenter: 'Einfach gelagert \u2013 Einzellast in der Mitte',
+      modeCUniform: 'Kragträger \u2013 gleichmäßige Last', beamParameters: 'Balkenparameter',
+      loadMagnitudeUniform: 'Lastgröße (w)', loadMagnitudePoint: 'Lastgröße (W)', fineTuneLoad: 'Last feinabstimmen',
+      spanLength: 'Spannweite (L)', beamSpan: 'Balkenspannweite', modulusOfElasticity: 'Elastizitätsmodul (E)',
+      inertiaMoment: 'Flächenträgheitsmoment (I)', schematic: 'SCHEMA', maxDeflection: 'Maximale Durchbiegung (v_max)',
+      maxMoment: 'Maximales Biegemoment (M_max)',
+      infoText: 'Die Berechnung verwendet die Euler-Bernoulli-Balkentheorie. Das Flächenträgheitsmoment (I) bestimmt den Widerstand gegen Biegung, der Elastizitätsmodul (E) die strukturelle Steifigkeit.',
+      standard: 'Norm: AISC / Euler-Bernoulli',
+    },
+    columnBuckling: {
+      titleMain: 'Stütze', titleAccent: 'Knickung', subtitle: 'Euler-Kritiklastauslegung für schlanke Stützen \u2022 AluCalcOS 2.0',
+      boundarySetup: 'Randbedingungen', cFactorLabel: 'C-Faktor =', columnEndCondition: 'Stützenendlagerung',
+      endPinnedPinned: 'Gelenkig-Gelenkig (C=1)', endFixedFixed: 'Eingespannt-Eingespannt (C=4)',
+      endFixedPinned: 'Eingespannt-Gelenkig (C=2)', endFixedFree: 'Eingespannt-Frei (C=0,25)',
+      columnParameters: 'Stützenparameter', columnLength: 'Stützenlänge (L)', columnHeight: 'Stützenhöhe',
+      modulus: 'Modul (E)', minInertia: 'Min. Trägheit (I)', schematic: 'SCHEMA',
+      eulerCriticalLoad: 'Euler-Kritiklast (P_cr)',
+      infoText: 'Die Berechnungen verwenden die Euler-Knicktheorie. Die Euler-Last setzt eine perfekt gerade Stütze unter zentrische Axialbelastung vor dem Fließen voraus. Gilt für lange schlanke Stützen (Schlankheit \u03bb > \u03bb_c).',
+      standard: 'Norm: AISC / Euler-Gleichung',
+    },
+    bearingLife: {
+      titleMain: 'Lager', titleAccent: 'Lebensdauer (ISO 281)',
+      subtitle: 'Nennlebensdauerberechnung für Wälzlager \u2022 AluCalcOS 2.0',
+      bearingGeometry: 'Lagergeometrie', loadExponentLabel: 'Lastexponent p =', bearingElementType: 'Lagerelementtyp',
+      ballBearing: 'Kugellager (p=3)', rollerBearing: 'Rollenlager (p=10/3)', appliedLoads: 'Angewandte Lasten',
+      dynamicLoadRating: 'Dynamische Tragzahl (C)', ratingCapacity: 'Tragfähigkeit',
+      equivDynamicLoad: 'Äquiv. dynamische Last (P)', dynamicLoad: 'Dynamische Last',
+      rotationalSpeed: 'Drehzahl (n)', shaftSpeed: 'Wellendrehzahl', ratingLife: 'Nennlebensdauer (L10h)',
+      infoText: 'Berechnungen nach ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h ist die dynamische Nennlebensdauer bei 90 % Zuverlässigkeit. Exponent p ist 3 für Kugellager und 10/3 (3,33) für Rollenlager.',
+      standard: 'Norm: ISO 281:2007',
+    },
+    vdi2230: {
+      titleMain: 'VDI 2230', titleAccent: 'Verbindungsauslegung',
+      subtitle: 'Anziehdrehmoment- und Vorspannungsberechnungen \u2022 AluCalcOS 2.0',
+      tighteningTorqueParams: '1. Anziehdrehmoment-Parameter', boltNominalDiameter: 'Schraubennenndurchmesser (d)',
+      nominalSize: 'Nenngröße', initialPreload: 'Anfangsvorspannung (F_M)', assemblyPreload: 'Montagevorspannung',
+      nutFrictionCoefficient: 'Mutternreibkoeffizient (K)', nutFrictionFactor: 'Mutternreibfaktor',
+      jointStiffnessParams: '2. Verbindungssteifigkeit & Lastparameter', externalAppliedLoad: 'Externe Last (F_ext)',
+      externalForce: 'Externe Kraft', boltStiffness: 'Schraubensteifigkeit (K_c)', flangeStiffness: 'Flanschsteifigkeit (K_B)',
+      tighteningTorque: 'Anziehdrehmoment (T)', totalWorkingBoltLoad: 'Gesamte Betriebsschraubenlast (F_c)',
+      infoText: 'Berechnungen nach VDI 2230 für hochbeanspruchte Schraubenverbindungen. Die Schraubenlast Fc umfasst die Montagevorspannung Fm und den Anteil der externen Last Fext entsprechend dem Steifigkeitsverhältnis Kc / (Kc + Kb).',
+      standard: 'Norm: VDI 2230-1',
+    },
+  },
+  es: {
+    beamDeflection: {
+      titleMain: 'Viga', titleAccent: 'Flecha', subtitle: 'Fórmulas de Roark para vigas estructurales \u2022 AluCalcOS 2.0',
+      supportMode: 'Modo de apoyo', boundaryConditions: 'Condiciones de contorno', structuralMode: 'Modo estructural',
+      modeSsUniform: 'Simplemente apoyada \u2013 carga uniforme', modeSsCenter: 'Simplemente apoyada \u2013 carga puntual en el centro',
+      modeCUniform: 'Voladizo \u2013 carga uniforme', beamParameters: 'Parámetros de la viga',
+      loadMagnitudeUniform: 'Magnitud de carga (w)', loadMagnitudePoint: 'Magnitud de carga (W)', fineTuneLoad: 'Ajustar carga',
+      spanLength: 'Longitud de vano (L)', beamSpan: 'Vano de viga', modulusOfElasticity: 'Módulo de elasticidad (E)',
+      inertiaMoment: 'Momento de inercia (I)', schematic: 'ESQUEMA', maxDeflection: 'Flecha máxima (v_max)',
+      maxMoment: 'Momento máximo (M_max)',
+      infoText: 'El cálculo utiliza la teoría de vigas Euler-Bernoulli. El momento de inercia (I) determina la resistencia a la flexión y el módulo elástico (E) refleja la rigidez estructural.',
+      standard: 'Norma: AISC / Euler-Bernoulli',
+    },
+    columnBuckling: {
+      titleMain: 'Columna', titleAccent: 'Pandeo', subtitle: 'Dimensionamiento de carga crítica de Euler para columnas esbeltas \u2022 AluCalcOS 2.0',
+      boundarySetup: 'Configuración de contorno', cFactorLabel: 'Factor C =', columnEndCondition: 'Condición de extremo de columna',
+      endPinnedPinned: 'Articulada-Articulada (C=1)', endFixedFixed: 'Empotrada-Empotrada (C=4)',
+      endFixedPinned: 'Empotrada-Articulada (C=2)', endFixedFree: 'Empotrada-Libre (C=0,25)',
+      columnParameters: 'Parámetros de columna', columnLength: 'Longitud de columna (L)', columnHeight: 'Altura de columna',
+      modulus: 'Módulo (E)', minInertia: 'Inercia mín. (I)', schematic: 'ESQUEMA', eulerCriticalLoad: 'Carga crítica de Euler (P_cr)',
+      infoText: 'Los cálculos usan la teoría de pandeo de Euler. La carga de Euler asume una columna perfectamente recta bajo carga axial concéntrica antes del fluencia. Aplicable a columnas largas y esbeltas (\u03bb > \u03bb_c).',
+      standard: 'Norma: AISC / Ecuación de Euler',
+    },
+    bearingLife: {
+      titleMain: 'Rodamiento', titleAccent: 'Vida útil (ISO 281)',
+      subtitle: 'Cálculo de vida nominal para rodamientos \u2022 AluCalcOS 2.0',
+      bearingGeometry: 'Geometría del rodamiento', loadExponentLabel: 'Exponente de carga p =', bearingElementType: 'Tipo de elemento',
+      ballBearing: 'Rodamiento de bolas (p=3)', rollerBearing: 'Rodamiento de rodillos (p=10/3)', appliedLoads: 'Cargas aplicadas',
+      dynamicLoadRating: 'Capacidad de carga dinámica (C)', ratingCapacity: 'Capacidad nominal',
+      equivDynamicLoad: 'Carga dinámica equivalente (P)', dynamicLoad: 'Carga dinámica',
+      rotationalSpeed: 'Velocidad de rotación (n)', shaftSpeed: 'Velocidad del eje', ratingLife: 'Vida nominal (L10h)',
+      infoText: 'Cálculos según ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h representa la vida nominal dinámica con 90 % de fiabilidad. El exponente p es 3 para bolas y 10/3 (3,33) para rodillos.',
+      standard: 'Norma: ISO 281:2007',
+    },
+    vdi2230: {
+      titleMain: 'VDI 2230', titleAccent: 'Dimensionamiento de unión',
+      subtitle: 'Cálculos de par de apriete y precarga \u2022 AluCalcOS 2.0',
+      tighteningTorqueParams: '1. Parámetros de par de apriete', boltNominalDiameter: 'Diámetro nominal del tornillo (d)',
+      nominalSize: 'Tamaño nominal', initialPreload: 'Precarga inicial (F_M)', assemblyPreload: 'Precarga de montaje',
+      nutFrictionCoefficient: 'Coeficiente de fricción de tuerca (K)', nutFrictionFactor: 'Factor de fricción de tuerca',
+      jointStiffnessParams: '2. Rigidez de unión y parámetros de carga', externalAppliedLoad: 'Carga externa aplicada (F_ext)',
+      externalForce: 'Fuerza externa', boltStiffness: 'Rigidez del tornillo (K_c)', flangeStiffness: 'Rigidez del brida (K_B)',
+      tighteningTorque: 'Par de apriete (T)', totalWorkingBoltLoad: 'Carga total de trabajo del tornillo (F_c)',
+      infoText: 'Los cálculos siguen VDI 2230 para uniones atornilladas de alta exigencia. La carga Fc incluye la precarga de montaje Fm y la porción de carga externa Fext según la relación de rigidez Kc / (Kc + Kb).',
+      standard: 'Norma: VDI 2230-1',
+    },
+  },
+  // Additional languages continue in workstation-style full objects below via build()
+};
+
+// Full locale objects for remaining languages (fr, it, pt, ru, ja, zh, ko, ar)
+const FULL = {
+  fr: {
+    beamDeflection: { titleMain: 'Poutre', titleAccent: 'Flèche', subtitle: 'Formules de Roark pour poutres structurelles \u2022 AluCalcOS 2.0', supportMode: 'Mode d\u2019appui', boundaryConditions: 'Conditions aux limites', structuralMode: 'Mode structural', modeSsUniform: 'Simplement appuyée \u2013 charge uniforme', modeSsCenter: 'Simplement appuyée \u2013 charge ponctuelle au centre', modeCUniform: 'Console \u2013 charge uniforme', beamParameters: 'Paramètres de poutre', loadMagnitudeUniform: 'Amplitude de charge (w)', loadMagnitudePoint: 'Amplitude de charge (W)', fineTuneLoad: 'Ajuster la charge', spanLength: 'Portée (L)', beamSpan: 'Portée de poutre', modulusOfElasticity: 'Module d\u2019élasticité (E)', inertiaMoment: 'Moment d\u2019inertie (I)', schematic: 'SCHÉMA', maxDeflection: 'Flèche maximale (v_max)', maxMoment: 'Moment maximal (M_max)', infoText: 'Le calcul utilise la théorie des poutres Euler-Bernoulli. Le moment d\u2019inertie (I) détermine la résistance à la flexion et le module élastique (E) la rigidité structurelle.', standard: 'Norme : AISC / Euler-Bernoulli' },
+    columnBuckling: { titleMain: 'Colonne', titleAccent: 'Flambement', subtitle: 'Dimensionnement charge critique d\u2019Euler pour colonnes élancées \u2022 AluCalcOS 2.0', boundarySetup: 'Configuration aux limites', cFactorLabel: 'Facteur C =', columnEndCondition: 'Condition d\u2019extrémité de colonne', endPinnedPinned: 'Articulée-Articulée (C=1)', endFixedFixed: 'Encastrée-Encastrée (C=4)', endFixedPinned: 'Encastrée-Articulée (C=2)', endFixedFree: 'Encastrée-Libre (C=0,25)', columnParameters: 'Paramètres de colonne', columnLength: 'Longueur de colonne (L)', columnHeight: 'Hauteur de colonne', modulus: 'Module (E)', minInertia: 'Inertie min. (I)', schematic: 'SCHÉMA', eulerCriticalLoad: 'Charge critique d\u2019Euler (P_cr)', infoText: 'Les calculs utilisent la théorie du flambement d\u2019Euler pour colonnes longues et élancées (\u03bb > \u03bb_c) sous charge axiale concentrique avant le fluage.', standard: 'Norme : AISC / Équation d\u2019Euler' },
+    bearingLife: { titleMain: 'Roulement', titleAccent: 'Durée de vie (ISO 281)', subtitle: 'Calcul de durée nominale pour roulements \u2022 AluCalcOS 2.0', bearingGeometry: 'Géométrie du roulement', loadExponentLabel: 'Exposant de charge p =', bearingElementType: 'Type d\u2019élément', ballBearing: 'Roulement à billes (p=3)', rollerBearing: 'Roulement à rouleaux (p=10/3)', appliedLoads: 'Charges appliquées', dynamicLoadRating: 'Capacité de charge dynamique (C)', ratingCapacity: 'Capacité nominale', equivDynamicLoad: 'Charge dynamique équivalente (P)', dynamicLoad: 'Charge dynamique', rotationalSpeed: 'Vitesse de rotation (n)', shaftSpeed: 'Vitesse d\u2019arbre', ratingLife: 'Durée nominale (L10h)', infoText: 'Calculs selon ISO 281 : L10h = (10^6 / 60n) * (C/P)^p. L10h est la durée nominale dynamique à 90 % de fiabilité. p vaut 3 pour les billes et 10/3 pour les rouleaux.', standard: 'Norme : ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: 'Dimensionnement d\u2019assemblage', subtitle: 'Calculs de couple de serrage et de précharge \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. Paramètres de couple de serrage', boltNominalDiameter: 'Diamètre nominal de boulon (d)', nominalSize: 'Taille nominale', initialPreload: 'Précharge initiale (F_M)', assemblyPreload: 'Précharge de montage', nutFrictionCoefficient: 'Coefficient de frottement écrou (K)', nutFrictionFactor: 'Facteur de frottement écrou', jointStiffnessParams: '2. Rigidité d\u2019assemblage et charges', externalAppliedLoad: 'Charge externe appliquée (F_ext)', externalForce: 'Force externe', boltStiffness: 'Rigidité du boulon (K_c)', flangeStiffness: 'Rigidité du flasque (K_B)', tighteningTorque: 'Couple de serrage (T)', totalWorkingBoltLoad: 'Charge de travail totale du boulon (F_c)', infoText: 'Calculs conformes à VDI 2230. La charge Fc inclut la précharge Fm et la part de charge externe Fext selon le rapport de rigidité Kc / (Kc + Kb).', standard: 'Norme : VDI 2230-1' },
+  },
+  it: {
+    beamDeflection: { titleMain: 'Trave', titleAccent: 'Freccia', subtitle: 'Formule di Roark per travi strutturali \u2022 AluCalcOS 2.0', supportMode: 'Modalità di vincolo', boundaryConditions: 'Condizioni al contorno', structuralMode: 'Modalità strutturale', modeSsUniform: 'Semplicemente appoggiata \u2013 carico uniforme', modeSsCenter: 'Semplicemente appoggiata \u2013 carico puntiforme al centro', modeCUniform: 'Console \u2013 carico uniforme', beamParameters: 'Parametri della trave', loadMagnitudeUniform: 'Magnitudine del carico (w)', loadMagnitudePoint: 'Magnitudine del carico (W)', fineTuneLoad: 'Regola carico', spanLength: 'Luce (L)', beamSpan: 'Campata', modulusOfElasticity: 'Modulo di elasticità (E)', inertiaMoment: 'Momento d\u2019inerzia (I)', schematic: 'SCHEMA', maxDeflection: 'Freccia massima (v_max)', maxMoment: 'Momento massimo (M_max)', infoText: 'Il calcolo usa la teoria delle travi Euler-Bernoulli. Il momento d\u2019inerzia (I) determina la resistenza a flessione e il modulo elastico (E) la rigidità strutturale.', standard: 'Norma: AISC / Euler-Bernoulli' },
+    columnBuckling: { titleMain: 'Colonna', titleAccent: 'Instabilità', subtitle: 'Dimensionamento carico critico di Euler per colonne snelle \u2022 AluCalcOS 2.0', boundarySetup: 'Configurazione al contorno', cFactorLabel: 'Fattore C =', columnEndCondition: 'Condizione di estremità', endPinnedPinned: 'Cerniera-Cerniera (C=1)', endFixedFixed: 'Incastro-Incastro (C=4)', endFixedPinned: 'Incastro-Cerniera (C=2)', endFixedFree: 'Incastro-Libero (C=0,25)', columnParameters: 'Parametri colonna', columnLength: 'Lunghezza colonna (L)', columnHeight: 'Altezza colonna', modulus: 'Modulo (E)', minInertia: 'Inerzia min. (I)', schematic: 'SCHEMA', eulerCriticalLoad: 'Carico critico di Euler (P_cr)', infoText: 'Calcoli secondo la teoria di instabilità di Euler per colonne lunghe e snelle (\u03bb > \u03bb_c) sotto carico assiale prima dello snervamento.', standard: 'Norma: AISC / Equazione di Euler' },
+    bearingLife: { titleMain: 'Cuscinetto', titleAccent: 'Vita (ISO 281)', subtitle: 'Calcolo vita nominale per cuscinetti volventi \u2022 AluCalcOS 2.0', bearingGeometry: 'Geometria cuscinetto', loadExponentLabel: 'Esponente carico p =', bearingElementType: 'Tipo di elemento', ballBearing: 'Cuscinetto a sfere (p=3)', rollerBearing: 'Cuscinetto a rulli (p=10/3)', appliedLoads: 'Carichi applicati', dynamicLoadRating: 'Capacità di carico dinamico (C)', ratingCapacity: 'Capacità nominale', equivDynamicLoad: 'Carico dinamico equivalente (P)', dynamicLoad: 'Carico dinamico', rotationalSpeed: 'Velocità di rotazione (n)', shaftSpeed: 'Velocità albero', ratingLife: 'Vita nominale (L10h)', infoText: 'Calcoli ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h è la vita nominale dinamica al 90% di affidabilità. p è 3 per sfere e 10/3 per rulli.', standard: 'Norma: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: 'Dimensionamento giunto', subtitle: 'Calcoli coppia di serraggio e precarico \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. Parametri coppia di serraggio', boltNominalDiameter: 'Diametro nominale bullone (d)', nominalSize: 'Dimensione nominale', initialPreload: 'Precarico iniziale (F_M)', assemblyPreload: 'Precarico di montaggio', nutFrictionCoefficient: 'Coefficiente attrito dado (K)', nutFrictionFactor: 'Fattore attrito dado', jointStiffnessParams: '2. Rigidità giunto e carichi', externalAppliedLoad: 'Carico esterno applicato (F_ext)', externalForce: 'Forza esterna', boltStiffness: 'Rigidità bullone (K_c)', flangeStiffness: 'Rigidità flangia (K_B)', tighteningTorque: 'Coppia di serraggio (T)', totalWorkingBoltLoad: 'Carico di lavoro totale bullone (F_c)', infoText: 'Calcoli conformi a VDI 2230. Il carico Fc include il precarico Fm e la quota di carico esterno Fext in base al rapporto di rigidità Kc / (Kc + Kb).', standard: 'Norma: VDI 2230-1' },
+  },
+  pt: {
+    beamDeflection: { titleMain: 'Viga', titleAccent: 'Flecha', subtitle: 'Fórmulas de Roark para vigas estruturais \u2022 AluCalcOS 2.0', supportMode: 'Modo de apoio', boundaryConditions: 'Condições de contorno', structuralMode: 'Modo estrutural', modeSsUniform: 'Simplesmente apoiada \u2013 carga uniforme', modeSsCenter: 'Simplesmente apoiada \u2013 carga pontual no centro', modeCUniform: 'Consola \u2013 carga uniforme', beamParameters: 'Parâmetros da viga', loadMagnitudeUniform: 'Magnitude da carga (w)', loadMagnitudePoint: 'Magnitude da carga (W)', fineTuneLoad: 'Ajustar carga', spanLength: 'Vão (L)', beamSpan: 'Vão da viga', modulusOfElasticity: 'Módulo de elasticidade (E)', inertiaMoment: 'Momento de inércia (I)', schematic: 'ESQUEMA', maxDeflection: 'Flecha máxima (v_max)', maxMoment: 'Momento máximo (M_max)', infoText: 'O cálculo usa a teoria de vigas Euler-Bernoulli. O momento de inércia (I) determina a resistência à flexão e o módulo elástico (E) a rigidez estrutural.', standard: 'Norma: AISC / Euler-Bernoulli' },
+    columnBuckling: { titleMain: 'Coluna', titleAccent: 'Flambagem', subtitle: 'Dimensionamento de carga crítica de Euler para colunas esbeltas \u2022 AluCalcOS 2.0', boundarySetup: 'Configuração de contorno', cFactorLabel: 'Fator C =', columnEndCondition: 'Condição de extremidade', endPinnedPinned: 'Articulada-Articulada (C=1)', endFixedFixed: 'Engastada-Engastada (C=4)', endFixedPinned: 'Engastada-Articulada (C=2)', endFixedFree: 'Engastada-Livre (C=0,25)', columnParameters: 'Parâmetros da coluna', columnLength: 'Comprimento da coluna (L)', columnHeight: 'Altura da coluna', modulus: 'Módulo (E)', minInertia: 'Inércia mín. (I)', schematic: 'ESQUEMA', eulerCriticalLoad: 'Carga crítica de Euler (P_cr)', infoText: 'Cálculos pela teoria de flambagem de Euler para colunas longas e esbeltas (\u03bb > \u03bb_c) sob carga axial antes do escoamento.', standard: 'Norma: AISC / Equação de Euler' },
+    bearingLife: { titleMain: 'Rolamento', titleAccent: 'Vida útil (ISO 281)', subtitle: 'Cálculo de vida nominal para rolamentos \u2022 AluCalcOS 2.0', bearingGeometry: 'Geometria do rolamento', loadExponentLabel: 'Expoente de carga p =', bearingElementType: 'Tipo de elemento', ballBearing: 'Rolamento de esferas (p=3)', rollerBearing: 'Rolamento de rolos (p=10/3)', appliedLoads: 'Cargas aplicadas', dynamicLoadRating: 'Capacidade de carga dinâmica (C)', ratingCapacity: 'Capacidade nominal', equivDynamicLoad: 'Carga dinâmica equivalente (P)', dynamicLoad: 'Carga dinâmica', rotationalSpeed: 'Velocidade de rotação (n)', shaftSpeed: 'Velocidade do eixo', ratingLife: 'Vida nominal (L10h)', infoText: 'Cálculos ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h é a vida nominal dinâmica com 90% de fiabilidade. p é 3 para esferas e 10/3 para rolos.', standard: 'Norma: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: 'Dimensionamento de junta', subtitle: 'Cálculos de torque de aperto e pré-carga \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. Parâmetros de torque de aperto', boltNominalDiameter: 'Diâmetro nominal do parafuso (d)', nominalSize: 'Tamanho nominal', initialPreload: 'Pré-carga inicial (F_M)', assemblyPreload: 'Pré-carga de montagem', nutFrictionCoefficient: 'Coeficiente de atrito da porca (K)', nutFrictionFactor: 'Fator de atrito da porca', jointStiffnessParams: '2. Rigidez da junta e cargas', externalAppliedLoad: 'Carga externa aplicada (F_ext)', externalForce: 'Força externa', boltStiffness: 'Rigidez do parafuso (K_c)', flangeStiffness: 'Rigidez da flange (K_B)', tighteningTorque: 'Torque de aperto (T)', totalWorkingBoltLoad: 'Carga total de trabalho do parafuso (F_c)', infoText: 'Cálculos conforme VDI 2230. A carga Fc inclui a pré-carga Fm e a parcela da carga externa Fext conforme a relação de rigidez Kc / (Kc + Kb).', standard: 'Norma: VDI 2230-1' },
+  },
+  ru: {
+    beamDeflection: { titleMain: 'Балка', titleAccent: 'Прогиб', subtitle: 'Формулы Roark для строительных балок \u2022 AluCalcOS 2.0', supportMode: 'Режим опирания', boundaryConditions: 'Граничные условия', structuralMode: 'Структурный режим', modeSsUniform: 'Шарнирно опёртая \u2013 равномерная нагрузка', modeSsCenter: 'Шарнирно опёртая \u2013 сосредоточенная нагрузка в центре', modeCUniform: 'Консоль \u2013 равномерная нагрузка', beamParameters: 'Параметры балки', loadMagnitudeUniform: 'Величина нагрузки (w)', loadMagnitudePoint: 'Величина нагрузки (W)', fineTuneLoad: 'Настроить нагрузку', spanLength: 'Пролёт (L)', beamSpan: 'Пролёт балки', modulusOfElasticity: 'Модуль упругости (E)', inertiaMoment: 'Момент инерции (I)', schematic: 'СХЕМА', maxDeflection: 'Максимальный прогиб (v_max)', maxMoment: 'Максимальный момент (M_max)', infoText: 'Расчёт по теории балок Эйлера-Бернулли. Момент инерции (I) определяет сопротивление изгибу, модуль упругости (E) \u2014 жёсткость конструкции.', standard: 'Стандарт: AISC / Эйлер-Бернулли' },
+    columnBuckling: { titleMain: 'Колонна', titleAccent: 'Потеря устойчивости', subtitle: 'Расчёт критической нагрузки Эйлера для гибких стоек \u2022 AluCalcOS 2.0', boundarySetup: 'Граничные условия', cFactorLabel: 'Коэффициент C =', columnEndCondition: 'Условие закрепления концов', endPinnedPinned: 'Шарнир-Шарнир (C=1)', endFixedFixed: 'Заделка-Заделка (C=4)', endFixedPinned: 'Заделка-Шарнир (C=2)', endFixedFree: 'Заделка-Свободный (C=0,25)', columnParameters: 'Параметры колонны', columnLength: 'Длина колонны (L)', columnHeight: 'Высота колонны', modulus: 'Модуль (E)', minInertia: 'Мин. инерция (I)', schematic: 'СХЕМА', eulerCriticalLoad: 'Критическая нагрузка Эйлера (P_cr)', infoText: 'Расчёты по теории продольного изгиба Эйлера для длинных гибких стоек (\u03bb > \u03bb_c) при осевой нагрузке до текучести.', standard: 'Стандарт: AISC / Уравнение Эйлера' },
+    bearingLife: { titleMain: 'Подшипник', titleAccent: 'Ресурс (ISO 281)', subtitle: 'Расчёт номинального ресурса качения \u2022 AluCalcOS 2.0', bearingGeometry: 'Геометрия подшипника', loadExponentLabel: 'Показатель нагрузки p =', bearingElementType: 'Тип элемента', ballBearing: 'Шариковый подшипник (p=3)', rollerBearing: 'Роликовый подшипник (p=10/3)', appliedLoads: 'Прикладные нагрузки', dynamicLoadRating: 'Динамическая грузоподъёмность (C)', ratingCapacity: 'Номинальная ёмкость', equivDynamicLoad: 'Эквив. динамическая нагрузка (P)', dynamicLoad: 'Динамическая нагрузка', rotationalSpeed: 'Частота вращения (n)', shaftSpeed: 'Скорость вала', ratingLife: 'Номинальный ресурс (L10h)', infoText: 'Расчёт по ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h \u2014 номинальный динамический ресурс при 90% надёжности. p = 3 для шариков и 10/3 для роликов.', standard: 'Стандарт: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: 'Расчёт соединения', subtitle: 'Расчёт момента затяжки и преднатяга \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. Параметры момента затяжки', boltNominalDiameter: 'Номинальный диаметр болта (d)', nominalSize: 'Номинальный размер', initialPreload: 'Начальный преднатяг (F_M)', assemblyPreload: 'Монтажный преднатяг', nutFrictionCoefficient: 'Коэффициент трения гайки (K)', nutFrictionFactor: 'Фактор трения гайки', jointStiffnessParams: '2. Жёсткость соединения и нагрузки', externalAppliedLoad: 'Внешняя нагрузка (F_ext)', externalForce: 'Внешняя сила', boltStiffness: 'Жёсткость болта (K_c)', flangeStiffness: 'Жёсткость фланца (K_B)', tighteningTorque: 'Момент затяжки (T)', totalWorkingBoltLoad: 'Полная рабочая нагрузка болта (F_c)', infoText: 'Расчёты по VDI 2230. Нагрузка Fc включает преднатяг Fm и долю внешней нагрузки Fext по соотношению жёсткостей Kc / (Kc + Kb).', standard: 'Стандарт: VDI 2230-1' },
+  },
+  ja: {
+    beamDeflection: { titleMain: '梁', titleAccent: 'たわみ', subtitle: '構造梁のRoark公式 \u2022 AluCalcOS 2.0', supportMode: '支持モード', boundaryConditions: '境界条件', structuralMode: '構造モード', modeSsUniform: '単純支持 \u2013 等分布荷重', modeSsCenter: '単純支持 \u2013 中央集中荷重', modeCUniform: '片持ち \u2013 等分布荷重', beamParameters: '梁パラメータ', loadMagnitudeUniform: '荷重の大きさ (w)', loadMagnitudePoint: '荷重の大きさ (W)', fineTuneLoad: '荷重を微調整', spanLength: 'スパン長 (L)', beamSpan: '梁スパン', modulusOfElasticity: 'ヤング率 (E)', inertiaMoment: '断面二次モーメント (I)', schematic: '模式図', maxDeflection: '最大たわみ (v_max)', maxMoment: '最大モーメント (M_max)', infoText: 'オイラー・ベルヌーイ梁理論を使用。断面二次モーメント (I) は曲げ抵抗、弾性係数 (E) は構造剛性を表します。', standard: '規格: AISC / オイラー・ベルヌーイ' },
+    columnBuckling: { titleMain: '柱', titleAccent: '座屈', subtitle: '細長柱のオイラー臨界荷重設計 \u2022 AluCalcOS 2.0', boundarySetup: '境界設定', cFactorLabel: 'C係数 =', columnEndCondition: '柱端条件', endPinnedPinned: 'ピン-ピン (C=1)', endFixedFixed: '固定-固定 (C=4)', endFixedPinned: '固定-ピン (C=2)', endFixedFree: '固定-自由 (C=0.25)', columnParameters: '柱パラメータ', columnLength: '柱長 (L)', columnHeight: '柱高', modulus: '弾性係数 (E)', minInertia: '最小慣性モーメント (I)', schematic: '模式図', eulerCriticalLoad: 'オイラー臨界荷重 (P_cr)', infoText: 'オイラー座屈理論を使用。細長柱 (\u03bb > \u03bb_c) の軸方向荷重下での臨界荷重を計算します。', standard: '規格: AISC / オイラー式' },
+    bearingLife: { titleMain: 'ベアリング', titleAccent: '寿命 (ISO 281)', subtitle: '転がり軸受の定格寿命計算 \u2022 AluCalcOS 2.0', bearingGeometry: '軸受形状', loadExponentLabel: '荷重指数 p =', bearingElementType: '軸受要素タイプ', ballBearing: 'ボールベアリング (p=3)', rollerBearing: 'ローラーベアリング (p=10/3)', appliedLoads: '作用荷重', dynamicLoadRating: '動定格荷重 (C)', ratingCapacity: '定格容量', equivDynamicLoad: '等価動荷重 (P)', dynamicLoad: '動荷重', rotationalSpeed: '回転速度 (n)', shaftSpeed: '軸速度', ratingLife: '定格寿命 (L10h)', infoText: 'ISO 281式 L10h = (10^6 / 60n) * (C/P)^p。L10hは90%信頼性の動定格寿命。pはボールで3、ローラーで10/3。', standard: '規格: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: '継手設計', subtitle: '締付トルクと予荷重計算 \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. 締付トルクパラメータ', boltNominalDiameter: 'ボルト公称直径 (d)', nominalSize: '公称サイズ', initialPreload: '初期予荷重 (F_M)', assemblyPreload: '組立予荷重', nutFrictionCoefficient: 'ナット摩擦係数 (K)', nutFrictionFactor: 'ナット摩擦因子', jointStiffnessParams: '2. 継手剛性と荷重パラメータ', externalAppliedLoad: '外部荷重 (F_ext)', externalForce: '外力', boltStiffness: 'ボルト剛性 (K_c)', flangeStiffness: 'フランジ剛性 (K_B)', tighteningTorque: '締付トルク (T)', totalWorkingBoltLoad: '総作動ボルト荷重 (F_c)', infoText: 'VDI 2230に準拠。ボルト荷重Fcは組立予荷重Fmと剛性比 Kc/(Kc+Kb) による外部荷重Fextの分担を含みます。', standard: '規格: VDI 2230-1' },
+  },
+  zh: {
+    beamDeflection: { titleMain: '梁', titleAccent: '挠度', subtitle: '结构梁 Roark 公式 \u2022 AluCalcOS 2.0', supportMode: '支座模式', boundaryConditions: '边界条件', structuralMode: '结构模式', modeSsUniform: '简支梁 \u2013 均布荷载', modeSsCenter: '简支梁 \u2013 跨中集中荷载', modeCUniform: '悬臂梁 \u2013 均布荷载', beamParameters: '梁参数', loadMagnitudeUniform: '荷载大小 (w)', loadMagnitudePoint: '荷载大小 (W)', fineTuneLoad: '微调荷载', spanLength: '跨度 (L)', beamSpan: '梁跨度', modulusOfElasticity: '弹性模量 (E)', inertiaMoment: '惯性矩 (I)', schematic: '示意图', maxDeflection: '最大挠度 (v_max)', maxMoment: '最大弯矩 (M_max)', infoText: '采用欧拉-伯努利梁理论。惯性矩 (I) 决定抗弯能力，弹性模量 (E) 反映结构刚度。', standard: '标准: AISC / 欧拉-伯努利' },
+    columnBuckling: { titleMain: '柱', titleAccent: '屈曲', subtitle: '细长柱欧拉临界荷载设计 \u2022 AluCalcOS 2.0', boundarySetup: '边界设置', cFactorLabel: 'C 系数 =', columnEndCondition: '柱端条件', endPinnedPinned: '铰接-铰接 (C=1)', endFixedFixed: '固定-固定 (C=4)', endFixedPinned: '固定-铰接 (C=2)', endFixedFree: '固定-自由 (C=0.25)', columnParameters: '柱参数', columnLength: '柱长 (L)', columnHeight: '柱高', modulus: '模量 (E)', minInertia: '最小惯性矩 (I)', schematic: '示意图', eulerCriticalLoad: '欧拉临界荷载 (P_cr)', infoText: '采用欧拉屈曲理论，适用于细长柱 (\u03bb > \u03bb_c) 在屈服前的同心轴压。', standard: '标准: AISC / 欧拉方程' },
+    bearingLife: { titleMain: '轴承', titleAccent: '寿命 (ISO 281)', subtitle: '滚动轴承额定寿命计算 \u2022 AluCalcOS 2.0', bearingGeometry: '轴承几何', loadExponentLabel: '荷载指数 p =', bearingElementType: '轴承元件类型', ballBearing: '球轴承 (p=3)', rollerBearing: '滚子轴承 (p=10/3)', appliedLoads: '作用荷载', dynamicLoadRating: '动额定荷载 (C)', ratingCapacity: '额定容量', equivDynamicLoad: '当量动荷载 (P)', dynamicLoad: '动荷载', rotationalSpeed: '转速 (n)', shaftSpeed: '轴速', ratingLife: '额定寿命 (L10h)', infoText: '按 ISO 281: L10h = (10^6 / 60n) * (C/P)^p。L10h 为 90% 可靠度的动额定寿命。p 对球轴承为 3，滚子为 10/3。', standard: '标准: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: '接头设计', subtitle: '拧紧扭矩与预紧力计算 \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. 拧紧扭矩参数', boltNominalDiameter: '螺栓公称直径 (d)', nominalSize: '公称尺寸', initialPreload: '初始预紧力 (F_M)', assemblyPreload: '装配预紧力', nutFrictionCoefficient: '螺母摩擦系数 (K)', nutFrictionFactor: '螺母摩擦因子', jointStiffnessParams: '2. 接头刚度与荷载参数', externalAppliedLoad: '外部施加荷载 (F_ext)', externalForce: '外力', boltStiffness: '螺栓刚度 (K_c)', flangeStiffness: '法兰刚度 (K_B)', tighteningTorque: '拧紧扭矩 (T)', totalWorkingBoltLoad: '螺栓总工作荷载 (F_c)', infoText: '按 VDI 2230 计算高负荷螺栓接头。螺栓荷载 Fc 包括装配预紧力 Fm 及按刚度比 Kc/(Kc+Kb) 传递的外荷载 Fext 部分。', standard: '标准: VDI 2230-1' },
+  },
+  ko: {
+    beamDeflection: { titleMain: '보', titleAccent: '처짐', subtitle: '구조 보용 Roark 공식 \u2022 AluCalcOS 2.0', supportMode: '지지 모드', boundaryConditions: '경계 조건', structuralMode: '구조 모드', modeSsUniform: '단순 지지 \u2013 등분포 하중', modeSsCenter: '단순 지지 \u2013 중앙 집중 하중', modeCUniform: '캔틸레버 \u2013 등분포 하중', beamParameters: '보 매개변수', loadMagnitudeUniform: '하중 크기 (w)', loadMagnitudePoint: '하중 크기 (W)', fineTuneLoad: '하중 미세 조정', spanLength: '경간 (L)', beamSpan: '보 경간', modulusOfElasticity: '탄성 계수 (E)', inertiaMoment: '관성 모멘트 (I)', schematic: '개략도', maxDeflection: '최대 처짐 (v_max)', maxMoment: '최대 모멘트 (M_max)', infoText: '오일러-베르누이 보 이론을 사용합니다. 관성 모멘트 (I)는 휨 저항, 탄성 계수 (E)는 구조 강성을 나타냅니다.', standard: '표준: AISC / 오일러-베르누이' },
+    columnBuckling: { titleMain: '기둥', titleAccent: '좌굴', subtitle: '세장한 기둥의 오일러 임계 하중 설계 \u2022 AluCalcOS 2.0', boundarySetup: '경계 설정', cFactorLabel: 'C 계수 =', columnEndCondition: '기둥 단부 조건', endPinnedPinned: '핀-핀 (C=1)', endFixedFixed: '고정-고정 (C=4)', endFixedPinned: '고정-핀 (C=2)', endFixedFree: '고정-자유 (C=0.25)', columnParameters: '기둥 매개변수', columnLength: '기둥 길이 (L)', columnHeight: '기둥 높이', modulus: '탄성 계수 (E)', minInertia: '최소 관성 (I)', schematic: '개략도', eulerCriticalLoad: '오일러 임계 하중 (P_cr)', infoText: '오일러 좌굴 이론을 사용합니다. 세장한 기둥 (\u03bb > \u03bb_c)의 축방향 하중 임계값을 계산합니다.', standard: '표준: AISC / 오일러 방정식' },
+    bearingLife: { titleMain: '베어링', titleAccent: '수명 (ISO 281)', subtitle: '구름 베어링 정격 수명 계산 \u2022 AluCalcOS 2.0', bearingGeometry: '베어링 형상', loadExponentLabel: '하중 지수 p =', bearingElementType: '베어링 요소 유형', ballBearing: '볼 베어링 (p=3)', rollerBearing: '롤러 베어링 (p=10/3)', appliedLoads: '가하 하중', dynamicLoadRating: '동정격 하중 (C)', ratingCapacity: '정격 용량', equivDynamicLoad: '등가 동하중 (P)', dynamicLoad: '동하중', rotationalSpeed: '회전 속도 (n)', shaftSpeed: '축 속도', ratingLife: '정격 수명 (L10h)', infoText: 'ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h는 90% 신뢰도의 동정격 수명입니다. p는 볼 3, 롤러 10/3.', standard: '표준: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: '이음 설계', subtitle: '체결 토크 및 예압력 계산 \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. 체결 토크 매개변수', boltNominalDiameter: '볼트 공칭 직경 (d)', nominalSize: '공칭 크기', initialPreload: '초기 예압력 (F_M)', assemblyPreload: '조립 예압력', nutFrictionCoefficient: '너트 마찰 계수 (K)', nutFrictionFactor: '너트 마찰 인자', jointStiffnessParams: '2. 이음 강성 및 하중 매개변수', externalAppliedLoad: '외부 가하 하중 (F_ext)', externalForce: '외력', boltStiffness: '볼트 강성 (K_c)', flangeStiffness: '플랜지 강성 (K_B)', tighteningTorque: '체결 토크 (T)', totalWorkingBoltLoad: '총 작동 볼트 하중 (F_c)', infoText: 'VDI 2230 준수. 볼트 하중 Fc는 조립 예압력 Fm과 강성비 Kc/(Kc+Kb)에 따른 외부 하중 Fext 분담을 포함합니다.', standard: '표준: VDI 2230-1' },
+  },
+  ar: {
+    beamDeflection: { titleMain: 'عتبة', titleAccent: 'انحراف', subtitle: 'صيغ Roark للعتبات الإنشائية \u2022 AluCalcOS 2.0', supportMode: 'وضع التثبيت', boundaryConditions: 'شروط الحدود', structuralMode: 'الوضع الإنشائي', modeSsUniform: 'مبسطة التثبيت \u2013 حمل موزع', modeSsCenter: 'مبسطة التثبيت \u2013 حمل مركز في الوسط', modeCUniform: 'كابولي \u2013 حمل موزع', beamParameters: 'معاملات العتبة', loadMagnitudeUniform: 'مقدار الحمل (w)', loadMagnitudePoint: 'مقدار الحمل (W)', fineTuneLoad: 'ضبط الحمل', spanLength: 'طول البحر (L)', beamSpan: 'فتحة العتبة', modulusOfElasticity: 'معامل المرونة (E)', inertiaMoment: 'عزم القصور (I)', schematic: 'مخطط', maxDeflection: 'أقصى انحراف (v_max)', maxMoment: 'أقصى عزم (M_max)', infoText: 'يستخدم الحساب نظرية عتبة أويلر-برنولي. عزم القصور (I) يحدد مقاومة الانحناء ومعامل المرونة (E) يعكس الصلابة الإنشائية.', standard: 'المعيار: AISC / أويلر-برنولي' },
+    columnBuckling: { titleMain: 'عمود', titleAccent: 'الانبعاج', subtitle: 'تحديد الحمل الحرج لأويلر للأعمدة النحيلة \u2022 AluCalcOS 2.0', boundarySetup: 'إعداد الحدود', cFactorLabel: 'معامل C =', columnEndCondition: 'حالة طرف العمود', endPinnedPinned: 'مفصلي-مفصلي (C=1)', endFixedFixed: 'مثبت-مثبت (C=4)', endFixedPinned: 'مثبت-مفصلي (C=2)', endFixedFree: 'مثبت-حر (C=0.25)', columnParameters: 'معاملات العمود', columnLength: 'طول العمود (L)', columnHeight: 'ارتفاع العمود', modulus: 'المعامل (E)', minInertia: 'أدنى قصور (I)', schematic: 'مخطط', eulerCriticalLoad: 'الحمل الحرج لأويلر (P_cr)', infoText: 'تستخدم الحسابات نظرية انبعاج أويلر للأعمدة الطويلة النحيلة (\u03bb > \u03bb_c) تحت حمل محوري قبل الخضوع.', standard: 'المعيار: AISC / معادلة أويلر' },
+    bearingLife: { titleMain: 'محمل', titleAccent: 'العمر (ISO 281)', subtitle: 'حساب العمر الاسمي للمحامل الدوارة \u2022 AluCalcOS 2.0', bearingGeometry: 'هندسة المحمل', loadExponentLabel: 'أس الحمل p =', bearingElementType: 'نوع عنصر المحمل', ballBearing: 'محمل كرات (p=3)', rollerBearing: 'محمل أسطواني (p=10/3)', appliedLoads: 'الأحمال المطبقة', dynamicLoadRating: 'القدرة الديناميكية (C)', ratingCapacity: 'السعة الاسمية', equivDynamicLoad: 'الحمل الديناميكي المكافئ (P)', dynamicLoad: 'الحمل الديناميكي', rotationalSpeed: 'سرعة الدوران (n)', shaftSpeed: 'سرعة العمود', ratingLife: 'العمر الاسمي (L10h)', infoText: 'حسب ISO 281: L10h = (10^6 / 60n) * (C/P)^p. L10h يمثل العمر الديناميكي الاسمي بموثوقية 90%. p = 3 للكرات و 10/3 للأسطوانات.', standard: 'المعيار: ISO 281:2007' },
+    vdi2230: { titleMain: 'VDI 2230', titleAccent: 'تصميم الوصلة', subtitle: 'حسابات عزم الشد والتحميل المسبق \u2022 AluCalcOS 2.0', tighteningTorqueParams: '1. معاملات عزم الشد', boltNominalDiameter: 'القطر الاسمي للبرغي (d)', nominalSize: 'الحجم الاسمي', initialPreload: 'التحميل المسبق الأولي (F_M)', assemblyPreload: 'التحميل المسبق للتجميع', nutFrictionCoefficient: 'معامل احتكاك الصامولة (K)', nutFrictionFactor: 'عامل احتكاك الصامولة', jointStiffnessParams: '2. صلابة الوصلة ومعاملات الحمل', externalAppliedLoad: 'الحمل الخارجي المطبق (F_ext)', externalForce: 'القوة الخارجية', boltStiffness: 'صلابة البرغي (K_c)', flangeStiffness: 'صلابة الحافة (K_B)', tighteningTorque: 'عزم الشد (T)', totalWorkingBoltLoad: 'إجمالي حمل عمل البرغي (F_c)', infoText: 'الحسابات وفق VDI 2230. يشمل حمل البرغي Fc التحميل المسبق Fm وحصة الحمل الخارجي Fext حسب نسبة الصلابة Kc/(Kc+Kb).', standard: 'المعيار: VDI 2230-1' },
+  },
+};
+
+function build(lang) {
+  if (FULL[lang]) return deepMerge(EN, FULL[lang]);
+  if (PATCHES[lang]) return deepMerge(EN, PATCHES[lang]);
+  return EN;
+}
+
+export const DEDICATED = Object.fromEntries(
+  ['de', 'es', 'fr', 'it', 'pt', 'ru', 'ja', 'zh', 'ko', 'ar'].map((lang) => [lang, build(lang)]),
+);

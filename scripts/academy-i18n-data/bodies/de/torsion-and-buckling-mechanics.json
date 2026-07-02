@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Schubspannung in Wellen unter Torsion mit τ = Tr/J berechnen",
+    "Euler-Knicklast Pcr für schlanke Stäbe bestimmen",
+    "Effektiven Längenfaktor K aus Endlagerbedingungen wählen"
+  ],
+  "keyTakeaways": [
+    "Knickung versagt auf schwächster Achse — immer minimales I verwenden",
+    "Schlankheitsgrad L/r bestimmt, ob Euler-Theorie gilt",
+    "Kombinierte Torsion und Biegung erfordern Interaktionsprüfungen über diese Lektion hinaus"
+  ],
+  "supplementalParagraph": "Plötzlicher Knickkollaps kann unterhalb der Streckgrenze auftreten. Der Stabilitäts-Kern wendet dieselbe π²EI/(KL)²-Formel an.",
+  "formula": {
+    "variables": {
+      "Pcr": "Pcr: Kritische Knicklast (N)",
+      "E": "E: Elastizitätsmodul (Pa)",
+      "I": "I: Kleinstes Flächenträgheitsmoment (m⁴)",
+      "L": "L: Ungestützte Länge (m)",
+      "K": "K: Effektiver Knicklängenfaktor"
+    }
+  },
+  "stepByStep": [
+    "Für Torsion: polares Flächenträgheitsmoment (J) berechnen.",
+    "Torsionsformel anwenden: τ = (T × r) / J.",
+    "Für Knickung: Stabendbedingungen bestimmen (eingespannt, gelenkig).",
+    "Kleinstes Flächenträgheitsmoment (schwache Achse) identifizieren.",
+    "Kritische Knicklast (Pcr) mit Euler-Formel berechnen.",
+    "Polares Moment J für Voll- und Hohlwelle unter Drehmoment berechnen.",
+    "Schlankheitsgrad L/r mit Normgrenzen für Euler-Gültigkeit prüfen."
+  ],
+  "example": {
+    "inputs": [
+      "E = 210 GPa (Steel)",
+      "L = 2 m",
+      "End condition: Pinned-Pinned (K=1.0)",
+      "I = 1,000,000 mm⁴"
+    ],
+    "calculation": "Pcr = (π² × 210e9 × 1e-6) / (2)² ≈ 518,000 N"
+  },
+  "whyThisMatters": [
+    "Verhindert katastrophales Versagen langer Strukturbauteile.",
+    "Stellt sicher, dass Wellen Drehmoment ohne Versagen übertragen können."
+  ],
+  "commonMistakes": [
+    "Stärkste Achse für Knickung verwenden — Versagen erfolgt immer auf der schwächsten.",
+    "Schlankheitsgrad (L/r)-Grenzen vernachlässigen.",
+    "Kombinierte Belastung (Torsion + Biegung) ignorieren."
+  ],
+  "engineeringTip": "Stäbe immer mit hohem Sicherheitsfaktor gegen Knickung auslegen, da Anfangsfehler früh Versagen auslösen können.",
+  "calculatorCta": {
+    "label": "Analyze structural stability with our column tools"
+  },
+  "faq": [
+    {
+      "question": "Was ist das polare Flächenträgheitsmoment (J)?",
+      "answer": "Größe zur Beschreibung des Widerstands gegen Torsionsverformung eines zylindrischen Körpers."
+    },
+    {
+      "question": "Was ist der effektive Längenfaktor K?",
+      "answer": "Multiplikator auf tatsächlicher Länge: K=1 gelenkig-gelenkig, K=0,5 eingespannt-eingespannt, K=2 Kragarm."
+    },
+    {
+      "question": "Kann ein Stab unterhalb der Streckgrenze versagen?",
+      "answer": "Ja — Knickung ist Stabilitätsversagen, nicht Materialüberlast."
+    },
+    {
+      "question": "Wie beeinflusst kombinierte Biegung Wellen?",
+      "answer": "Äquivalentes Drehmoment und Biegungsmoment kombinieren — reine Torsionsanalyse reicht nicht."
+    }
+  ]
+}

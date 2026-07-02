@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Calculer la contrainte de cisaillement dans les arbres sous torsion en utilisant τ = Tr/J",
+    "Déterminer la charge critique d'Euler Pcr pour les colonnes minces",
+    "Sélectionnez le facteur de longueur efficace K à partir des conditions de support d'extrémité"
+  ],
+  "keyTakeaways": [
+    "Le flambement échoue sur l'axe le plus faible - utilisez toujours le minimum I",
+    "Le rapport d'élancement L/r détermine si la théorie d'Euler s'applique",
+    "La torsion et la flexion combinées nécessitent des contrôles d'interaction au-delà de cette leçon"
+  ],
+  "supplementalParagraph": "Un effondrement soudain par flambage peut se produire en dessous de la limite d'élasticité du matériau. ",
+  "formula": {
+    "variables": {
+      "Pcr": "Pcr : Charge critique de flambement (N)",
+      "E": "E : Module d’élasticité (Pa)",
+      "I": "I : moindre moment d'inertie (m⁴)",
+      "L": "L : longueur non supportée (m)",
+      "K": "K : Facteur de longueur efficace de la colonne"
+    }
+  },
+  "stepByStep": [
+    "Pour la torsion : calculez le moment d'inertie polaire (J).",
+    "Appliquez la formule de torsion : τ = (T × r) / J.",
+    "Pour le flambement : déterminez les conditions d'extrémité du poteau (fixe, épinglé).",
+    "Identifiez le moindre moment d'inertie (axe faible).",
+    "Calculez la charge critique de flambement (Pcr) à l'aide de la formule d'Euler.",
+    "Calculez le moment polaire J pour les arbres pleins et creux sous couple.",
+    "Vérifiez le rapport d'élancement L/r par rapport aux limites du code pour la validité d'Euler."
+  ],
+  "example": {
+    "inputs": [
+      "E = 210 GPa (Steel)",
+      "L = 2 m",
+      "End condition: Pinned-Pinned (K=1.0)",
+      "I = 1,000,000 mm⁴"
+    ],
+    "calculation": "Pcr = (π² × 210e9 × 1e-6) / (2)² ≈ 518,000 N"
+  },
+  "whyThisMatters": [
+    "Empêche l'effondrement catastrophique des éléments structurels longs.",
+    "Garantit que les arbres de transmission de puissance peuvent gérer le couple de rotation sans défaillance."
+  ],
+  "commonMistakes": [
+    "Utiliser l'axe le plus fort pour le flambage (il échoue toujours sur le plus faible).",
+    "Négliger les limites du rapport d’élancement (L/r).",
+    "Ignorer les chargements combinés (torsion + flexion)."
+  ],
+  "engineeringTip": "Concevez toujours des poteaux avec un facteur de sécurité élevé contre le flambement, car les imperfections initiales peuvent déclencher une défaillance précoce.",
+  "calculatorCta": {
+    "label": "Analyze structural stability with our column tools"
+  },
+  "faq": [
+    {
+      "question": "Qu'est-ce que le moment d'inertie polaire (J) ?",
+      "answer": "C'est une grandeur utilisée pour décrire la résistance à la déformation en torsion d'un objet cylindrique."
+    },
+    {
+      "question": "Qu'est-ce que le facteur de longueur efficace K ?",
+      "answer": "Multiplicateur sur longueur réelle : K=1 goupillé-goupillé, K=0,5 fixe-fixe, K=2 cantilever."
+    },
+    {
+      "question": "Une colonne peut-elle échouer en dessous de la limite d'élasticité ?",
+      "answer": "Oui, le flambement est un défaut de stabilité et non une surcharge matérielle."
+    },
+    {
+      "question": "Comment la flexion combinée affecte-t-elle les arbres ?",
+      "answer": "Utilisez une interaction équivalente entre couple et moment de flexion : une analyse de torsion pure est insuffisante."
+    }
+  ]
+}

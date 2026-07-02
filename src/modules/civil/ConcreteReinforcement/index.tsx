@@ -7,8 +7,16 @@ import {
     Zap, Info, Target, Maximize2, Shield, 
     HardHat, Hammer, FileText, Settings, ShieldAlert
 } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { useOSStore } from '@/store/osStore';
+import { getConcreteReinforcementStrings, formatConcreteDeficitMsg } from '@/locales/concreteReinforcementTranslations';
 
 export default function ConcreteReinforcement() {
+    const { language } = useI18nStore();
+    const { dictionary: dict } = useOSStore();
+    const civilDict = dict?.civil || {};
+    const c = getConcreteReinforcementStrings(language);
+
     // Inputs
     const [b, setB] = useState(300); // Width (mm)
     const [h, setH] = useState(600); // Height (mm)
@@ -56,7 +64,7 @@ export default function ConcreteReinforcement() {
                             <Construction size={24} />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Rebar Node</h1>
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">{civilDict.title || "Rebar Node"}</h1>
                             <p className="text-[10px] text-orange-500/60 font-mono tracking-widest uppercase mt-1">EC2 Structural Engine</p>
                         </div>
                     </div>
@@ -66,13 +74,13 @@ export default function ConcreteReinforcement() {
                     {/* Beam Geometry */}
                     <div className="space-y-4">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
-                           <Ruler size={12} /> Beam Geometry
+                           <Ruler size={12} /> {c.beamGeometry}
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
-                            <ParameterInput label="Width (b)" unit="mm" value={b} min={150} max={1000} step={10} onChange={setB} icon={<Maximize2 size={12}/>} />
-                            <ParameterInput label="Height (h)" unit="mm" value={h} min={200} max={2000} step={10} onChange={setH} icon={<Maximize2 size={12}/>} />
+                            <ParameterInput label={c.width} unit="mm" value={b} min={150} max={1000} step={10} onChange={setB} icon={<Maximize2 size={12}/>} />
+                            <ParameterInput label={c.height} unit="mm" value={h} min={200} max={2000} step={10} onChange={setH} icon={<Maximize2 size={12}/>} />
                         </div>
-                        <ParameterInput label="Cover (c_nom)" unit="mm" value={cover} min={20} max={100} step={5} onChange={setCover} icon={<Shield size={12}/>} />
+                        <ParameterInput label={c.cover} unit="mm" value={cover} min={20} max={100} step={5} onChange={setCover} icon={<Shield size={12}/>} />
                     </div>
 
                     <div className="w-full h-px bg-white/5" />
@@ -80,11 +88,11 @@ export default function ConcreteReinforcement() {
                     {/* Material Classes */}
                     <div className="space-y-4">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
-                           <Layers size={12} /> Property Matrix
+                           <Layers size={12} /> {c.propertyMatrix}
                         </h2>
                         <div className="grid grid-cols-2 gap-4">
-                            <ParameterInput label="Concrete fck" unit="MPa" value={fck} min={20} max={60} step={5} onChange={setFck} icon={<Activity size={12}/>} />
-                            <ParameterInput label="Steel fyk" unit="MPa" value={fyk} min={400} max={600} step={10} onChange={setFyk} icon={<Activity size={12}/>} />
+                            <ParameterInput label={c.concreteFck} unit="MPa" value={fck} min={20} max={60} step={5} onChange={setFck} icon={<Activity size={12}/>} />
+                            <ParameterInput label={c.steelFyk} unit="MPa" value={fyk} min={400} max={600} step={10} onChange={setFyk} icon={<Activity size={12}/>} />
                         </div>
                     </div>
 
@@ -93,13 +101,13 @@ export default function ConcreteReinforcement() {
                     {/* Loading & Rebar */}
                     <div className="space-y-4 pb-8">
                         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
-                           <Zap size={12} /> Design Vector
+                           <Zap size={12} /> {c.designVector}
                         </h2>
-                        <ParameterInput label="Moment (M_ed)" unit="kNm" value={M_ed} min={10} max={1500} step={10} onChange={setM_ed} icon={<Target size={12}/>} />
+                        <ParameterInput label={c.moment} unit="kNm" value={M_ed} min={10} max={1500} step={10} onChange={setM_ed} icon={<Target size={12}/>} />
                         
                         <div className="mt-6 border-t border-white/5 pt-6 space-y-4">
-                             <ParameterInput label="Bar Diameter" unit="mm" value={barDia} min={8} max={40} step={2} onChange={setBarDia} icon={<Hammer size={12}/>} />
-                             <ParameterInput label="Quantity" unit="nos" value={numBars} min={2} max={12} step={1} onChange={setNumBars} icon={<Settings size={12}/>} />
+                             <ParameterInput label={c.barDiameter} unit="mm" value={barDia} min={8} max={40} step={2} onChange={setBarDia} icon={<Hammer size={12}/>} />
+                             <ParameterInput label={c.quantity} unit="" value={numBars} min={2} max={12} step={1} onChange={setNumBars} icon={<Settings size={12}/>} />
                         </div>
                     </div>
                 </div>
@@ -111,22 +119,22 @@ export default function ConcreteReinforcement() {
 
                 {/* KPI Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                    <ValueCard label="Required Area (As)" value={stats.As_req.toFixed(0)} unit="mm²" sub="TENSION REBAR" color={stats.isSafe ? '#22d3ee' : '#f87171'} />
-                    <ValueCard label="Provided Area" value={stats.As_prov.toFixed(0)} unit="mm²" sub={(stats.As_prov/stats.As_req*100).toFixed(0) + '% RATIO'} color={stats.isSafe ? '#10b981' : '#f59e0b'} />
-                    <ValueCard label="K-Factor" value={stats.K.toFixed(3)} unit="RATIO" sub={stats.K > 0.167 ? 'X-COMP REQ' : 'SINGLE REINFORCED'} color={stats.K > 0.167 ? '#ef4444' : '#64748b'} />
+                    <ValueCard label={civilDict.requiredAs || "Required Area (As)"} value={stats.As_req.toFixed(0)} unit="mm²" sub={c.tensionRebar} color={stats.isSafe ? '#22d3ee' : '#f87171'} />
+                    <ValueCard label={civilDict.actualAs || "Provided Area"} value={stats.As_prov.toFixed(0)} unit="mm²" sub={(stats.As_prov/stats.As_req*100).toFixed(0) + c.percentRatio} color={stats.isSafe ? '#10b981' : '#f59e0b'} />
+                    <ValueCard label="K-Factor" value={stats.K.toFixed(3)} unit="RATIO" sub={stats.K > 0.167 ? c.doubleReinforced : c.singleReinforced} color={stats.K > 0.167 ? '#ef4444' : '#64748b'} />
                 </div>
 
                 {/* Cross-Section Visualization */}
                 <div className="flex-1 bg-black/40 border border-white/10 rounded-[3rem] p-12 flex flex-col relative overflow-hidden backdrop-blur-md shadow-2xl">
                     <div className="absolute top-0 right-0 p-8">
                         <div className={`px-4 py-2 border rounded-xl text-[10px] font-black uppercase tracking-widest ${stats.isSafe ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
-                           {stats.isSafe ? 'Compliant with EC2' : 'Reinforcement Deficit'}
+                           {stats.isSafe ? c.ec2Compliant : c.reinforcementDeficit}
                         </div>
                     </div>
 
                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mb-12 flex items-center gap-3">
                         <HardHat size={14} className="text-orange-500" />
-                        Cast-in-Situ Structural Profile Section
+                        {c.profileSection}
                     </h3>
 
                     <div className="flex-1 flex items-center justify-center relative translate-y-[-20px]">
@@ -146,16 +154,16 @@ export default function ConcreteReinforcement() {
                              
                              {/* Tension Reinforcement (Bottom) */}
                              {Array.from({ length: numBars }).map((_, i) => (
-                                 <motion.circle 
-                                    key={i}
-                                    cx={32 + (36 / (numBars - 1)) * i} 
-                                    cy="82" 
-                                    r={barDia / 10} 
-                                    fill="#22d3ee" 
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="shadow-[0_0_10px_#22d3ee]"
-                                 />
+                                  <motion.circle 
+                                     key={i}
+                                     cx={32 + (36 / (numBars - 1)) * i} 
+                                     cy="82" 
+                                     r={barDia / 10} 
+                                     fill="#22d3ee" 
+                                     initial={{ scale: 0 }}
+                                     animate={{ scale: 1 }}
+                                     className="shadow-[0_0_10px_#22d3ee]"
+                                  />
                              ))}
 
                              {/* Compression Reinforcement (Top - 2 nominal bars) */}
@@ -173,12 +181,12 @@ export default function ConcreteReinforcement() {
                         {/* Annotations */}
                         <div className="absolute top-1/2 left-[calc(50%+100px)] flex flex-col gap-6">
                              <div className="flex gap-4 items-center">
-                                 <div className="w-3 h-3 rounded-full bg-[#22d3ee] shadow-[0_0_10px_#22d3ee]" />
-                                 <div className="text-[10px] font-bold text-slate-400">Main Tension: {numBars}xØ{barDia}</div>
+                                  <div className="w-3 h-3 rounded-full bg-[#22d3ee] shadow-[0_0_10px_#22d3ee]" />
+                                  <div className="text-[10px] font-bold text-slate-400">{c.mainTension}: {numBars}xØ{barDia}</div>
                              </div>
                              <div className="flex gap-4 items-center">
-                                 <div className="w-3 h-3 rounded-full border border-[#f87171] bg-[#f87171]/20" />
-                                 <div className="text-[10px] font-bold text-slate-400">Shear Links: H8-200</div>
+                                  <div className="w-3 h-3 rounded-full border border-[#f87171] bg-[#f87171]/20" />
+                                  <div className="text-[10px] font-bold text-slate-400">{c.shearLinks}: H8-200</div>
                              </div>
                         </div>
                     </div>
@@ -186,22 +194,22 @@ export default function ConcreteReinforcement() {
                     <div className="mt-8 flex justify-between items-end border-t border-white/5 pt-8">
                         <div className="flex gap-10">
                              <div>
-                                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Design Code</span>
-                                 <div className="text-xl font-black text-white italic">EU_STAND_EN_1992</div>
+                                  <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{c.designCode}</span>
+                                  <div className="text-xl font-black text-white italic">EU_STAND_EN_1992</div>
                              </div>
                              <div className="w-px h-8 bg-white/10 self-center" />
                              <div>
-                                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Steel Strain</span>
-                                 <div className="text-xl font-black text-orange-400">3.5‰ (YIELDED)</div>
+                                  <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{c.steelStrain}</span>
+                                  <div className="text-xl font-black text-orange-400">3.5‰ ({c.yielded})</div>
                              </div>
                         </div>
                         <div className="text-right flex gap-4 items-center">
                              <button className="p-3 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/5 transition-all text-slate-500 hover:text-white">
-                                 <FileText size={20} />
+                                  <FileText size={20} />
                              </button>
                              <div className="text-left">
-                                 <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Civil Kernel</div>
-                                 <div className="text-2xl font-black font-mono text-white tracking-tighter italic">REBAR_CORE_v6.1</div>
+                                  <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{c.civilKernel}</div>
+                                  <div className="text-2xl font-black font-mono text-white tracking-tighter italic">REBAR_CORE_v6.1</div>
                              </div>
                         </div>
                     </div>
@@ -212,8 +220,8 @@ export default function ConcreteReinforcement() {
                     <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute bottom-12 left-12 right-12 mx-auto bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-center gap-4 text-red-400 z-50 backdrop-blur-xl">
                         <ShieldAlert size={24} />
                         <div className="text-xs font-bold uppercase tracking-widest leading-relaxed">
-                            Deficit detected: Beam fails to support applied moment of {M_ed} kNm. <br/>
-                            Increase quantity or bar diameter to safely resolve load path.
+                            {formatConcreteDeficitMsg(c, M_ed)} <br/>
+                            {c.deficitHint}
                         </div>
                     </motion.div>
                 )}

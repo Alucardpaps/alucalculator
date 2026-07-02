@@ -1,0 +1,78 @@
+{
+  "learningObjectives": [
+    "Anzugsmoment über Reibungskoeffizienten (K oder μ) mit Vorspannung verknüpfen",
+    "VDI-2230-Konzepte anwenden: Streckgrenzennutzung und Gewindeausreißen prüfen",
+    "Schmierstrategie und Einfluss auf erforderliches Anzugsmoment wählen"
+  ],
+  "keyTakeaways": [
+    "Drehmoment ist indirektes Maß der Vorspannung — Reibung dominiert Streuung",
+    "Überdrehen kann Schraube verformen und Klemmkraft nach Relaxation reduzieren",
+    "Immer Innen- und Außengewindekapazität prüfen"
+  ],
+  "supplementalParagraph": "Drehmomentschlüssel-Anzeige ist nicht das Designergebnis — Klemmkraft ist es. Diese Lektion verbindet Werkstattanziehen mit dem VDI-2230-Kern in AluCalc Fastener Lab.",
+  "formula": {
+    "variables": {
+      "T": "T: Drehmoment (Nm)",
+      "K": "K: Reibungskoeffizient (0,18–0,25 typisch)",
+      "F": "F: Vorspannkraft (N)",
+      "d": "d: Nenn-Schraubendurchmesser (m)"
+    }
+  },
+  "stepByStep": [
+    "Schraubengröße bestimmen (z. B. M10).",
+    "Empfohlene Vorspannkraft aus Normen oder Tabellen ermitteln.",
+    "Reibungskoeffizient schätzen (geschmiert vs. trocken).",
+    "Durchmesser in Meter umrechnen.",
+    "Formel anwenden: T = K × F × d.",
+    "Mit Drehmomenttabellen verifizieren.",
+    "μ_thread und μ_head aus Schmierbedingungstabellen wählen.",
+    "Streckgrenzennutzung und Gewindeausreißen für Innen- und Außengewinde prüfen."
+  ],
+  "example": {
+    "inputs": [
+      "Bolt: M10 → d = 0.01 m",
+      "Preload: 20,000 N",
+      "K = 0.2"
+    ],
+    "calculation": "T = 0.2 × 20000 × 0.01 = 40 Nm"
+  },
+  "whyThisMatters": [
+    "Falsches Anzugsmoment führt zu Schraubenermüdung, Trennung der Verbindung und ungleicher Lastverteilung.",
+    "In Automobil- und Luftfahrtindustrie ist Drehmomentgenauigkeit kritisch für Sicherheit und Zuverlässigkeit."
+  ],
+  "commonMistakes": [
+    "Schmierungseffekte auf Reibungskoeffizient ignorieren.",
+    "Generische Drehmomenttabellen blind ohne Anwendungskontext verwenden.",
+    "Reibungsvariation zwischen Gewinde und Kopfauflage nicht berücksichtigen."
+  ],
+  "engineeringTip": "Drehmoment mit vorspannbasierten Berechnungen validieren, nicht nur Tabellen.",
+  "calculatorCta": {
+    "label": "Use the Bolt Torque Calculator to instantly compute torque for your application"
+  },
+  "faq": [
+    {
+      "question": "Was passiert bei zu hohem Drehmoment?",
+      "answer": "Überdrehen führt zu Überschreitung der Streckgrenze — plastische Verformung, Gewindeausreißen oder plötzliches Versagen."
+    },
+    {
+      "question": "Wie beeinflusst Schmierung das Schraubendrehmoment?",
+      "answer": "Schmierung reduziert den Reibungskoeffizienten (K) stark. Geschmierte Schraube braucht weniger Drehmoment für gleiche Vorspannung."
+    },
+    {
+      "question": "Warum Vorspannung statt nur Drehmoment?",
+      "answer": "Drehmoment ist indirektes Maß. Ziel ist Klemmkraft (Vorspannung). Vorspannberechnung sichert Verbindungsfestigkeit."
+    },
+    {
+      "question": "Typischer K-Faktor für trockenen Stahl?",
+      "answer": "K ≈ 0,20 für ungeschmiertes Stahl-auf-Stahl; sinkt auf ~0,12 mit Molybdän oder Öl."
+    },
+    {
+      "question": "Garantiert Drehmomentsteuerung die Vorspannung?",
+      "answer": "Nein — Streuung von ±25 % ist üblich. Drehmoment + Winkel oder Ultraschall verbessern die Kontrolle."
+    },
+    {
+      "question": "Wann ist VDI 2230 erforderlich?",
+      "answer": "Kritische Verbindungen in Automotive, Druckbehältern und Luftfahrt mit Nachweis der Klemmkraft."
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import {
   formatAcademyTemplate,
   getAcademyDepartments,
   getDepartmentOutcomes,
+  getAcademyCategoryLabel,
 } from '@/locales/academyPageTranslations';
 import {
   enrichCourse,
@@ -39,6 +40,7 @@ import { getCompletionPercent, getLessonProgress } from '@/lib/academyProgress';
 import { AcademyCourseCard } from '@/components/academy/AcademyCourseCard';
 import { AcademyCalculatorHub } from '@/components/academy/AcademyCalculatorHub';
 import { mergeSeoGuidesIntoDepartments } from '@/data/academySeoCourses';
+import { localizeCourseTitle } from '@/locales/academyLessonI18n';
 
 const DEPT_ICONS: Record<string, React.ReactNode> = {
   Design: <Wrench size={24} className="text-blue-400" />,
@@ -59,12 +61,19 @@ const VISITED_KEY = 'academy-visited';
 type AcademyTab = 'curriculum' | 'calculators';
 
 function AcademyPageContent() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialTab = searchParams.get('tab') === 'calculators' ? 'calculators' : 'curriculum';
   const [activeTab, setActiveTab] = useState<AcademyTab>(initialTab);
   const { language } = useI18nStore();
   const t = getAcademyPage(language);
+
+
   const departments = useMemo(
     () => mergeSeoGuidesIntoDepartments(getAcademyDepartments(language), language),
     [language],
@@ -104,7 +113,8 @@ function AcademyPageContent() {
       const c = dept.courses.find((x) => x.slug === slug);
       if (c) return c.title;
     }
-    return getAcademyArticle(slug)?.meta.title ?? slug;
+    const enTitle = getAcademyArticle(slug)?.meta.title ?? slug;
+    return localizeCourseTitle(slug, enTitle, language);
   };
 
   const resumeSlug = useMemo(() => {
@@ -158,6 +168,10 @@ function AcademyPageContent() {
       >[],
     [allCourses],
   );
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#020408]" />;
+  }
 
   return (
     <div className="relative z-10 min-h-screen bg-transparent text-white selection:bg-blue-500/30 font-sans pb-32">
@@ -328,7 +342,9 @@ function AcademyPageContent() {
                       {i + 1}
                     </div>
                     <h3 className="text-xs font-black text-white group-hover:text-blue-300 leading-snug">{course.title}</h3>
-                    <p className="text-[10px] font-mono text-cyan-500/80 mt-2 truncate">{course.formula}</p>
+                    <p className="text-[10px] font-mono text-cyan-500/80 mt-2 line-clamp-2 leading-relaxed">
+                      {course.summary.split('\n')[0]?.trim() || course.formula}
+                    </p>
                     <p className="text-[9px] text-slate-600 mt-2">{course.readingTime} {t.minutesShort}</p>
                   </Link>
                 ))}
@@ -400,6 +416,7 @@ function AcademyPageContent() {
                             difficultyLabel={difficultyLabel}
                             prereqTitle={resolvePrereqTitle}
                             visited={visited.includes(course.slug)}
+                            categoryLabel={getAcademyCategoryLabel(course.category, language)}
                           />
                         ))
                       )}

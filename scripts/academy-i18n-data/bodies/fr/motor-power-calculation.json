@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "Convertir le couple et la vitesse en puissance à l'arbre en utilisant P = T·n/9550 (kW)",
+    "Tenir compte de l'efficacité de la transmission lors du dimensionnement de la plaque signalétique du moteur",
+    "Distinguer le service continu des exigences de couple de démarrage maximal"
+  ],
+  "keyTakeaways": [
+    "Les moteurs sous-dimensionnés surchauffent ; ",
+    "Incluez toujours les pertes de la boîte de vitesses dans le calcul de la puissance du moteur",
+    "Ajoutez une marge de 15 à 20 % pour la variabilité de la production et le vieillissement"
+  ],
+  "supplementalParagraph": "Le dimensionnement du variateur relie la charge mécanique à l’alimentation électrique. ",
+  "formula": {
+    "variables": {
+      "9550": "9550 : Constante de conversion",
+      "P": "P : Puissance (kW)",
+      "T": "T : couple (Nm)",
+      "n": "n : Vitesse de rotation (RPM)"
+    }
+  },
+  "stepByStep": [
+    "Déterminez le couple de sortie requis (T).",
+    "Déterminez la vitesse de fonctionnement (n) en tr/min.",
+    "Appliquez la formule pour trouver la puissance en kW.",
+    "Tenez compte de l’efficacité de la transmission si nécessaire.",
+    "Sélectionnez un moteur avec une puissance nominale supérieure aux besoins calculés.",
+    "Identifiez le couple maximal par rapport au couple continu pour la classification des tâches.",
+    "Convertissez entre kW et HP en utilisant 1 HP ≈ 0,746 kW lors de la lecture des catalogues américains."
+  ],
+  "example": {
+    "inputs": [
+      "T = 50 Nm",
+      "n = 1450 RPM"
+    ],
+    "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
+  },
+  "whyThisMatters": [
+    "Empêche l'épuisement du moteur dû à un sous-dimensionnement.",
+    "Évite les coûts énergétiques excessifs et l’investissement initial dus au surdimensionnement."
+  ],
+  "commonMistakes": [
+    "Oublier d'inclure l'efficacité de la boîte de vitesses ou de la transmission.",
+    "Utilisation des unités HP directement dans une formule kW sans conversion.",
+    "Ne pas tenir compte du couple de démarrage maximal."
+  ],
+  "engineeringTip": "Sélectionnez toujours un moteur avec une marge de sécurité de 15 à 20 % par rapport à la puissance calculée.",
+  "calculatorCta": {
+    "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
+  },
+  "faq": [
+    {
+      "question": "Comment convertir des HP en kW ?",
+      "answer": "1 CV équivaut à environ 0,746 kW."
+    },
+    {
+      "question": "Qu'est-ce que le facteur de service ?",
+      "answer": "Un multiplicateur tenant compte des chocs, de l'inversion et du service quotidien — appliqué à la puissance calculée avant la sélection du moteur."
+    },
+    {
+      "question": "Pourquoi ajouter une marge de 15 à 20 % ?",
+      "answer": "Couvre la variation de tension, l’augmentation de la traînée des roulements au cours de la durée de vie et les tolérances de production."
+    },
+    {
+      "question": "Comment le rapport de boîte de vitesses affecte-t-il le couple du moteur ?",
+      "answer": "Couple moteur = couple de charge / (rapport × efficacité) — un rapport plus élevé réduit la demande de couple moteur."
+    }
+  ]
+}

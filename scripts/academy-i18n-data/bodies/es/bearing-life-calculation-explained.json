@@ -1,0 +1,73 @@
+{
+  "learningObjectives": [
+    "Calcule la vida útil de L10 utilizando la clasificación dinámica ISO 281 y la carga equivalente P",
+    "Aplicar exponente de vida p = 3 para rodamientos de bolas y 10/3 para rodillos",
+    "Interpretar el catálogo C versus los objetivos de confiabilidad y P operativos."
+  ],
+  "keyTakeaways": [
+    "L10 significa que el 10 % de los rodamientos fallan antes de esa vida útil con un 90 % de confiabilidad",
+    "P > C es una condición crítica de exceso de velocidad/sobrecarga: cambie el tamaño inmediatamente",
+    "La carga equivalente combina componentes radiales y axiales según las normas ISO"
+  ],
+  "supplementalParagraph": "La selección de rodamientos es un problema de fatiga, no estático. ",
+  "formula": {
+    "variables": {
+      "L10": "L10: Vida nominal básica (millones de revoluciones)",
+      "C": "C: Clasificación de carga dinámica básica (N)",
+      "P": "P: Carga dinámica equivalente del rodamiento (N)",
+      "p": "p: Exponente de la ecuación de vida (3 para bola, 10/3 para rodillo)"
+    }
+  },
+  "stepByStep": [
+    "Identifique el tipo de rodamiento y la capacidad de carga dinámica básica (C).",
+    "Calcule la carga dinámica equivalente (P) en función de las fuerzas radiales y axiales.",
+    "Determine el exponente de vida (p) según la geometría del rodamiento.",
+    "Aplica la fórmula para encontrar vida en millones de revoluciones.",
+    "Convierta revoluciones a horas si se conoce la velocidad de rotación.",
+    "Convierta cargas radiales y axiales combinadas a P equivalente según las reglas ISO.",
+    "Convierta L10 en millones de revoluciones a horas usando la velocidad de funcionamiento."
+  ],
+  "example": {
+    "inputs": [
+      "C = 25,000 N",
+      "P = 5,000 N",
+      "p = 3 (Ball Bearing)"
+    ],
+    "calculation": "L10 = (25000 / 5000)^3 = 5^3 = 125 million revolutions"
+  },
+  "whyThisMatters": [
+    "Previene el tiempo de inactividad inesperado de la máquina al predecir los intervalos de reemplazo.",
+    "Garantiza que los rodamientos tengan el tamaño correcto para el entorno operativo específico y las condiciones de carga."
+  ],
+  "commonMistakes": [
+    "Usar clasificaciones de carga estática en lugar de clasificaciones de carga dinámica en la fórmula.",
+    "No tener en cuenta las cargas axiales al calcular la carga dinámica equivalente.",
+    "Suponiendo velocidad y carga constantes cuando ambas varían en la operación real."
+  ],
+  "engineeringTip": "Aplique siempre factores de seguridad y considere las condiciones ambientales como la temperatura y la calidad de la lubricación.",
+  "calculatorCta": {
+    "label": "Open the Bearing Life Calculator to model your specific loading conditions"
+  },
+  "faq": [
+    {
+      "question": "¿Cuál es la diferencia entre L10 y L10h?",
+      "answer": "L10 es la vida en millones de revoluciones, mientras que L10h es la vida en horas de funcionamiento, que depende de la velocidad de rotación (RPM)."
+    },
+    {
+      "question": "¿La lubricación afecta la vida útil del rodamiento?",
+      "answer": "Sí, una mala lubricación reduce significativamente la vida útil del rodamiento al aumentar la fricción y el calor, lo que podría provocar una fatiga superficial prematura."
+    },
+    {
+      "question": "¿Cuál es la carga equivalente P?",
+      "answer": "Una sola carga radial que produce la misma vida útil que la carga radial y axial combinada real."
+    },
+    {
+      "question": "¿Por qué el exponente p = 3 para las bolas?",
+      "answer": "Relación tensión-vida de contacto para contacto puntual: los rodillos usan p = 10/3 para contacto lineal."
+    },
+    {
+      "question": "¿L10 es lo mismo que la vida útil de la garantía?",
+      "answer": "No, L10 es una calificación estadística; "
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Aplicar fórmulas de deflexión de Euler-Bernoulli para casos de soporte comunes",
+    "Explique por qué la deflexión se escala con L⁴ para vigas simplemente apoyadas con carga central",
+    "Relacionar los límites de capacidad de servicio (por ejemplo, L/360) con la comodidad del usuario y la integridad de la junta"
+  ],
+  "keyTakeaways": [
+    "La deflexión a menudo gobierna el diseño antes de que la tensión alcance el rendimiento.",
+    "La rigidez aumenta con E·I: duplicar I reduce a la mitad la deflexión",
+    "El peso propio y la fluencia pueden ser importantes para vigas de polímero o de luces largas"
+  ],
+  "supplementalParagraph": "La resistencia sin capacidad de servicio es un diseño fallido. ",
+  "formula": {
+    "variables": {
+      "δ": "δ: Deflexión (m)",
+      "F": "F: Carga puntual en el centro (N)",
+      "L": "L: Longitud de la viga (m)",
+      "E": "E: Módulo de elasticidad (Pa)",
+      "I": "I: Momento de inercia del área (m⁴)"
+    }
+  },
+  "stepByStep": [
+    "Determine las condiciones de soporte de la viga (por ejemplo, simplemente apoyada).",
+    "Identifique el tipo y ubicación de la carga aplicada.",
+    "Determine las propiedades del material (E) y la geometría de la sección (I).",
+    "Seleccione la fórmula de deflexión adecuada.",
+    "Calcule la deflexión máxima y compárela con los límites permitidos.",
+    "Incluya el peso propio como carga distribuida equivalente cuando la luz sea larga.",
+    "Compare el δ calculado con el límite de capacidad de servicio del código para la aplicación."
+  ],
+  "example": {
+    "inputs": [
+      "F = 10,000 N",
+      "L = 5 m",
+      "E = 210 GPa (Steel)",
+      "I = 50,000,000 mm⁴"
+    ],
+    "calculation": "δ = (10000 × 5³) / (48 × 210e9 × 50e-6) ≈ 0.00248 m (2.48 mm)"
+  },
+  "whyThisMatters": [
+    "La deflexión excesiva puede causar inestabilidad estructural o falla funcional (por ejemplo, puertas que no cierran).",
+    "Permite a los ingenieros optimizar el tamaño y el material de la viga para cumplir con los estándares de seguridad con un costo mínimo."
+  ],
+  "commonMistakes": [
+    "Unidades de mezcla (por ejemplo, usando mm para I pero m para L).",
+    "Usar la fórmula incorrecta para el soporte específico o la condición de carga.",
+    "Despreciar el peso propio de la viga para luces muy largas."
+  ],
+  "engineeringTip": "Siempre verifique las unidades dos veces; ",
+  "calculatorCta": {
+    "label": "Use the Beam Deflection Calculator to model complex loading scenarios"
+  },
+  "faq": [
+    {
+      "question": "¿Qué es la teoría del haz de Euler-Bernoulli?",
+      "answer": "Es una simplificación de la teoría elástica lineal que proporciona un medio para calcular las características de carga y deflexión de las vigas."
+    },
+    {
+      "question": "¿Por qué la deflexión aumenta con L⁴?",
+      "answer": "De δ = PL³/(48EI) — el alcance es la sensibilidad dominante en la capacidad de servicio."
+    },
+    {
+      "question": "¿Qué es L/360?",
+      "answer": "Un límite común de deflexión del piso: la deflexión de carga total no debe exceder la luz/360."
+    },
+    {
+      "question": "¿Cuándo se necesita la teoría del haz de Timoshenko?",
+      "answer": "Vigas cortas y gruesas donde la deformación por corte es significativa: Euler-Bernoulli subestima δ."
+    }
+  ]
+}

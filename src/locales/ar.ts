@@ -131,6 +131,7 @@ export default {
     architecture: "البنية",
     archName: "B-Model Cloud Hybrid",
     engineStatus: "حالة المحرك",
+    toggleDevMode: "تبديل وضع المطور",
     statusOptimized: "محسن",
     localeLatency: "زمن وصول اللغة",
     latencyValue: "2.4ms (Cache Hit)",
@@ -158,7 +159,7 @@ export default {
     modules: {
         'calculator': { title: "حاسبة علمية" },
         'unit-converter': { title: "محول الوحدات" },
-        'ai-copilot': { title: "مساعد الذكاء الاصطناعي" },
+        'ai-copilot': { title: "Aegis AI" },
         'file-explorer': { title: "مستكشف الملفات" },
         'settings': { title: "الإعدادات" },
         'handbook': { title: "كتيب الهندسة" },
@@ -190,13 +191,15 @@ export default {
         'voltage-drop': { title: "هبوط الجهد" },
         'welding-fillet': { title: "قوة اللحام الزاوي" },
         'welding-heat': { title: "دخل حرارة اللحام" },
+        'analytics-dashboard': { title: "التحليلات" },
+        'engineering-notes': { title: "ملاحظات هندسية" },
     } as Record<string, { title: string }>,
 
     // Hints
     moduleHints: {
         'calculator': "حسابات رياضية متقدمة",
         'unit-converter': "تحويل الوحدات الهندسية",
-        'ai-copilot': "مساعدة التصميم بالذكاء الاصطناعي",
+        'ai-copilot': "Aegis AI",
         'file-explorer': "إدارة ملفات النظام",
         'settings': "تفضيلات النظام",
         'handbook': "صيغ وبيانات مرجعية",
@@ -267,6 +270,7 @@ export default {
         groupExport: "تصدير",
         groupPaint: "رسم",
         groupContent: "محتوى",
+        labelWorkstation: "محطة الهندسة",
     },
 
     // Node Palette Categories

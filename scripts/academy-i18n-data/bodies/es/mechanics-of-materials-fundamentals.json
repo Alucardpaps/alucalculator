@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Calcule la tensión normal σ = F/A e interprete la tensión frente a la compresión",
+    "Aplicar la ley de Hooke para relacionar tensión, deformación y módulo elástico.",
+    "Identificar concentraciones de tensión en agujeros, filetes y cambios repentinos de sección."
+  ],
+  "keyTakeaways": [
+    "El estrés es resistencia interna; ",
+    "Manténgase por debajo del rendimiento con un factor de seguridad adecuado (1,5–3,0)",
+    "El área de corte se encuentra en el plano de la fuerza de corte, no en el área normal"
+  ],
+  "supplementalParagraph": "La estática da reacciones externas; ",
+  "formula": {
+    "variables": {
+      "σ": "σ: Estrés normal (Pa o MPa)",
+      "F": "F: Fuerza Axial (N)",
+      "A": "A: Área de sección transversal (m²)"
+    }
+  },
+  "stepByStep": [
+    "Calcule la fuerza interna en el punto de interés.",
+    "Determine el área de la sección transversal del elemento.",
+    "Aplique la fórmula de tensión: σ = F / A.",
+    "Calcule la deformación usando la ley de Hooke: ε = σ / E.",
+    "Verifique que la tensión esté por debajo del límite elástico del material.",
+    "Aplicar el factor de concentración de tensiones Kt cuando la geometría tenga discontinuidades.",
+    "Compare la tensión calculada para producir con un factor de seguridad apropiado."
+  ],
+  "example": {
+    "inputs": [
+      "Force: 50,000 N",
+      "Area: 100 mm² (0.0001 m²)"
+    ],
+    "calculation": "σ = 50000 / 0.0001 = 500,000,000 Pa = 500 MPa"
+  },
+  "whyThisMatters": [
+    "Previene fallas estructurales al garantizar que nunca se excedan los límites de materiales.",
+    "Permite la selección de materiales apropiados en función de las condiciones de carga."
+  ],
+  "commonMistakes": [
+    "Despreciando el signo del estrés (Tensión vs Compresión).",
+    "Usar el área incorrecta para el esfuerzo cortante (es el área paralela a la fuerza).",
+    "No tener en cuenta las concentraciones de tensión en agujeros o filetes."
+  ],
+  "engineeringTip": "En el diseño de ingeniería, normalmente apuntamos a un factor de seguridad (FoS) entre 1,5 y 3,0.",
+  "calculatorCta": {
+    "label": "Analyze fastener stress with our real-time integrity engine"
+  },
+  "faq": [
+    {
+      "question": "¿Cuál es la diferencia entre estrés y presión?",
+      "answer": "La presión es una fuerza externa distribuida sobre una superficie externa, mientras que la tensión es una resistencia interna distribuida sobre una sección transversal interna."
+    },
+    {
+      "question": "¿Qué es el factor de seguridad?",
+      "answer": "Relación entre tensión permitida y calculada: normalmente entre 1,5 y 3,0, dependiendo de las consecuencias de la falla y la incertidumbre de la carga."
+    },
+    {
+      "question": "¿En qué se diferencia el esfuerzo cortante?",
+      "answer": "El corte actúa paralelo al área; "
+    },
+    {
+      "question": "¿Cuándo falla la ley de Hooke?",
+      "answer": "Más allá del límite/rendimiento proporcional: la deformación plástica requiere diferentes modelos constitutivos."
+    }
+  ]
+}

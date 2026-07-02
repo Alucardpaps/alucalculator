@@ -10,6 +10,9 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Trash2, RotateCcw, AlertTriangle, CheckCircle2, Info, ChevronRight } from 'lucide-react';
 import { useSheetMetalCalculator } from '@/hooks/useSheetMetalCalculator';
+import { useI18nStore } from '@/store/i18nStore';
+import { useOSStore } from '@/store/osStore';
+import { getSheetMetalModuleStrings } from '@/locales/sheetMetalModuleTranslations';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 interface BendRow { id: string; angle: number; radius: number; flange: number; direction: 'up' | 'down'; }
@@ -969,7 +972,12 @@ function BendTable({
 }
 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
-export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
+export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: string; dict?: any }) {
+  const { language: storeLang } = useI18nStore();
+  const { dictionary: storeDict } = useOSStore();
+  const lang = propLang || storeLang;
+  const dict = propDict || storeDict;
+  const s = getSheetMetalModuleStrings(lang);
   const { materialIdx, setMaterialIdx, thickness, setThickness, length, setLength, materials } = useSheetMetalCalculator();
 
   const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
@@ -1035,7 +1043,7 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-[12px] font-black uppercase tracking-[0.25em] text-violet-400">{dict.sheetMetal?.title || 'Sheet Metal'}</p>
-              <p className="text-[10px] font-mono text-slate-600 mt-0.5">{lang === 'tr' ? 'DIN 6935 / ASME Y14.5 Standartları' : 'DIN 6935 / ASME Y14.5 Standards'}</p>
+              <p className="text-[10px] font-mono text-slate-600 mt-0.5">{s.standardsSubtitle}</p>
             </div>
             <div className="flex bg-[#080c14] p-0.5 rounded-lg border border-white/5">
               {(['metric','imperial'] as const).map(u => (
@@ -1049,7 +1057,7 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
 
           {/* Tab switcher */}
           <div className="grid grid-cols-2 gap-0.5 bg-[#060a12] rounded-xl p-0.5 border border-white/5">
-            {([['multi', lang === 'tr' ? 'Büküm Profili' : 'Bending Profile'], ['ktable', lang === 'tr' ? 'K Tablosu' : 'K Table']] as const).map(([t, label]) => (
+            {([['multi', s.bendingProfile], ['ktable', s.kTable]] as const).map(([t, label]) => (
               <button key={t} onClick={() => setActiveTab(t)}
                 className={`py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${activeTab===t ? 'bg-violet-500/25 text-violet-300' : 'text-slate-600 hover:text-slate-400'}`}>
                 {label}
@@ -1061,7 +1069,7 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
 
           {/* Global params */}
-          <Section title={lang === 'tr' ? 'Malzeme & Genel' : 'Material & General'}>
+          <Section title={s.materialGeneral}>
             <Field label={dict.sheetMetal?.inputs?.material || 'Material'}>
               <select value={materialIdx} onChange={e => setMaterialIdx(+e.target.value)}
                 className="w-full bg-[#080c14] border border-white/8 rounded-lg px-3 py-2 text-[11px] text-white font-mono outline-none focus:border-violet-500/40 appearance-none">
@@ -1081,15 +1089,15 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
 
           {/* MULTI TAB */}
           {activeTab === 'multi' && (<>
-            <Section title={lang === 'tr' ? 'İlk Kanat' : 'First Flange'}>
-              <NumInput label={lang === 'tr' ? 'F₀ — ilk kanat uzunluğu' : 'F₀ — first flange length'} unit="mm" value={firstFlange} onChange={setFirstFlange} />
+            <Section title={s.firstFlange}>
+              <NumInput label={s.firstFlangeLength} unit="mm" value={firstFlange} onChange={setFirstFlange} />
             </Section>
 
             <div className="flex items-center justify-between px-1">
-              <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">{lang === 'tr' ? 'Büküm Sırası' : 'Bend Sequence'}</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">{s.bendSequence}</p>
               <button onClick={addBend}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-500/15 border border-violet-500/25 text-violet-400 text-[10px] font-black uppercase hover:bg-violet-500/25 transition-all">
-                <Plus size={9} /> {lang === 'tr' ? 'Ekle' : 'Add'}
+                <Plus size={9} /> {s.add}
               </button>
             </div>
 
@@ -1098,17 +1106,17 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
               return (
                 <div key={b.id} className="rounded-xl border border-white/5 bg-[#080c14]/60 p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-black text-violet-400 uppercase tracking-widest">{lang === 'tr' ? 'Büküm' : 'Bend'} {i + 1}</span>
+                    <span className="text-[11px] font-black text-violet-400 uppercase tracking-widest">{s.bend} {i + 1}</span>
                     <button onClick={() => removeBend(b.id)} className="text-slate-700 hover:text-red-400 transition-colors p-0.5">
                       <Trash2 size={10} />
                     </button>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mb-2">
-                    <NumInput label={lang === 'tr' ? 'Açı θ' : 'Angle θ'} unit="°" value={b.angle} onChange={v=>updateBend(b.id,{angle:v})} min={1} max={179} />
-                    <NumInput label={lang === 'tr' ? 'Yarıçap R' : 'Radius R'} unit="mm" value={b.radius} onChange={v=>updateBend(b.id,{radius:v})} />
-                    <NumInput label={lang === 'tr' ? 'Kanat Boyu' : 'Flange Length'} unit="mm" value={b.flange} onChange={v=>updateBend(b.id,{flange:v})} />
+                    <NumInput label={s.angleTheta} unit="°" value={b.angle} onChange={v=>updateBend(b.id,{angle:v})} min={1} max={179} />
+                    <NumInput label={s.radiusR} unit="mm" value={b.radius} onChange={v=>updateBend(b.id,{radius:v})} />
+                    <NumInput label={s.flangeLength} unit="mm" value={b.flange} onChange={v=>updateBend(b.id,{flange:v})} />
                     <div className="group">
-                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1 truncate">{lang === 'tr' ? 'Yön' : 'Direction'}</p>
+                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1 truncate">{s.direction}</p>
                       <button
                         onClick={() => updateBend(b.id, { direction: b.direction === 'up' ? 'down' : 'up' })}
                         className={`w-full py-2 text-[11px] font-black uppercase rounded-lg border transition-all ${
@@ -1133,12 +1141,12 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
             })}
 
             <div className="rounded-xl border border-violet-500/20 bg-gradient-to-r from-violet-950/20 to-transparent p-4">
-              <p className="text-[11.5px] font-black uppercase tracking-widest text-violet-400/50 mb-1">{lang === 'tr' ? 'Toplam Açılım (Flat Pattern)' : 'Total Flat Length (Flat Pattern)'}</p>
+              <p className="text-[11.5px] font-black uppercase tracking-widest text-violet-400/50 mb-1">{s.totalFlatPattern}</p>
               <motion.p key={multiBends.total} initial={{opacity:0.5}} animate={{opacity:1}}
                 className="text-3xl font-black font-mono text-white">
                 {multiBends.total.toFixed(2)} <span className="text-sm text-slate-500">mm</span>
               </motion.p>
-              <p className="text-[10px] font-mono text-slate-700 mt-1">F₀ + Σ(BAᵢ + Fᵢ) — {lang === 'tr' ? 'DIN 6935 Standardı' : 'DIN 6935 Standard'}</p>
+              <p className="text-[10px] font-mono text-slate-700 mt-1">F₀ + Σ(BAᵢ + Fᵢ) — {s.dinStandard}</p>
             </div>
           </>)}
 
@@ -1146,12 +1154,12 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
           {activeTab === 'ktable' && (<>
             <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-950/20 border border-amber-500/20">
               <Info size={11} className="text-amber-400 shrink-0 mt-0.5" />
-              <p className="text-[11px] text-amber-400/80 font-mono">{lang === 'tr' ? 'K değerlerini malzeme/proses\'e göre düzenleyin. R/t oranına göre otomatik seçilir.' : 'Adjust K-factor values based on material/process. Automatically chosen based on R/t ratio.'}</p>
+              <p className="text-[11px] text-amber-400/80 font-mono">{s.kFactorHint}</p>
             </div>
 
             <div className="rounded-xl border border-white/5 overflow-hidden bg-[#080c14]/60">
               <div className="grid grid-cols-3 px-3 py-2 border-b border-white/5">
-                {[(lang === 'tr' ? 'R/t Min' : 'R/t Min'), (lang === 'tr' ? 'R/t Max' : 'R/t Max'), 'K'].map(h => (
+                {[s.rtMin, s.rtMax, 'K'].map(h => (
                   <span key={h} className="text-[10px] font-black uppercase tracking-widest text-slate-600">{h}</span>
                 ))}
               </div>
@@ -1168,10 +1176,10 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
 
             <button onClick={() => setKTable(DEFAULT_K_TABLE)}
               className="flex items-center gap-1.5 px-3 py-1.5 w-full justify-center rounded-lg border border-white/8 text-slate-600 text-[10px] font-black uppercase hover:text-slate-300 transition-all">
-              <RotateCcw size={9} /> {lang === 'tr' ? 'Varsayılana Dön (DIN 6935)' : 'Reset to Default (DIN 6935)'}
+              <RotateCcw size={9} /> {s.resetDefault}
             </button>
 
-            <Section title={lang === 'tr' ? 'R/t → K Önizleme' : 'R/t → K Preview'}>
+            <Section title={s.rtKPreview}>
               <div className="grid grid-cols-3 gap-2">
                 {[0.5, 1, 2, 3, 5, 8].map(rt => (
                   <div key={rt} className="text-center bg-[#080c14] rounded-lg p-2 border border-white/5">
@@ -1190,14 +1198,14 @@ export function SheetMetalModule({ lang, dict }: { lang: string; dict: any }) {
 
         {/* KPI Strip */}
         <div className="flex-none flex items-center gap-6 px-6 py-3 border-b border-white/5 bg-[#030609]/80 flex-wrap">
-          <KPI label={lang === 'tr' ? 'Toplam Açınım' : 'Total Flat Length'} value={dp(multiBends.total, 3)} color="#a78bfa" />
-          <KPI label={lang === 'tr' ? 'Toplam Düşüm' : 'Total Deduction'} value={dp(totalBD, 3)} color="#38bdf8" />
-          <KPI label={lang === 'tr' ? 'Büküm Sayısı' : 'Bend Count'} value={bends.length.toString()} color="#f59e0b" />
-          <KPI label={lang === 'tr' ? 'Maks. Tonnaj' : 'Max Tonnage'} value={`${maxTon.toFixed(2)} ton`} color="#fb7185" />
+          <KPI label={s.totalFlatLength} value={dp(multiBends.total, 3)} color="#a78bfa" />
+          <KPI label={s.totalDeduction} value={dp(totalBD, 3)} color="#38bdf8" />
+          <KPI label={s.bendCount} value={bends.length.toString()} color="#f59e0b" />
+          <KPI label={s.maxTonnage} value={`${maxTon.toFixed(2)} ton`} color="#fb7185" />
           <div className="ml-auto">
             {hasCrackingRisk
-              ? <Badge color="red" text={lang === 'tr' ? '⚠ Çatlama Riski' : '⚠ Cracking Risk'} />
-              : <Badge color="green" text={lang === 'tr' ? '✓ Güvenli' : '✓ Safe'} />}
+              ? <Badge color="red" text={s.crackingRisk} />
+              : <Badge color="green" text={s.safe} />}
           </div>
         </div>
 

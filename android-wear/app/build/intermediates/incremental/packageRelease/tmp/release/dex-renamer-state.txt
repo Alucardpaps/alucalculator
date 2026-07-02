@@ -1,0 +1,4 @@
+#Tue Jun 30 00:32:00 TRT 2026
+base.0=C\:\\Users\\apo_q\\.gemini\\antigravity\\scratch\\alucalculator\\android-wear\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
