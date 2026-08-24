@@ -318,6 +318,9 @@ export function SimulationFEAModule() {
                 ))}
               </div>
             )}
+            <p className="text-[10px] font-mono text-slate-500 pt-1">
+              Beta tip: Optimized for small to medium STL meshes (&lt; 50k triangles).
+            </p>
           </div>
 
           {/* 2. Material Selection Card */}
