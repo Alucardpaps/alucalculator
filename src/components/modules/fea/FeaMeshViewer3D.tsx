@@ -209,8 +209,8 @@ export function FeaMeshViewer3D({
 
       {/* Stress Color Bar Legend */}
       <div className="absolute left-4 bottom-4 p-3 rounded-xl bg-[#080d1a]/90 backdrop-blur-xl border border-white/10 shadow-2xl font-mono text-[11px] space-y-2 pointer-events-none">
-        <div className="flex items-center justify-between text-slate-300 font-bold">
-          <span>von Mises Stress</span>
+        <div className="flex items-center justify-between text-slate-300 font-bold gap-2">
+          <span>von Mises (Beta)</span>
           <span className="text-[10px] text-cyan-400">[MPa]</span>
         </div>
 
@@ -246,7 +246,7 @@ export function FeaMeshViewer3D({
           {analysis.status === 'SAFE' && <CheckCircle2 size={16} />}
           {analysis.status === 'WARNING' && <AlertTriangle size={16} />}
           {analysis.status === 'CRITICAL' && <ShieldAlert size={16} />}
-          <span>SF = {analysis.safetyFactor} ({analysis.status})</span>
+          <span>SF = {analysis.safetyFactor} ({analysis.status} · Beta)</span>
         </div>
       </div>
     </div>

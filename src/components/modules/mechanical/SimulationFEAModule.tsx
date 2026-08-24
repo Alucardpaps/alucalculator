@@ -1,10 +1,12 @@
 'use client';
 
 /**
- * 🏗️ FINITE ELEMENT ANALYSIS (FEA) 3D STRESS SIMULATION WORKSTATION
+ * 🏗️ BETA 3D FINITE ELEMENT ANALYSIS (FEA) STRESS SIMULATOR
  * 
- * True 3D linear-elastic stress analysis for imported STL parts
- * and parametric engineering CAD models with von Mises heatmaps.
+ * Approximate 3D linear-elastic stress tensor & von Mises contour solver
+ * for imported STL models and parametric engineering CAD parts.
+ * 
+ * ⚠️ DISCLAIMER: Beta feature for educational and preliminary evaluation only.
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
@@ -12,7 +14,7 @@ import dynamic from 'next/dynamic';
 import {
   Activity, Layers, ShieldCheck, Play, Download,
   Settings2, Upload, AlertTriangle, ShieldAlert, CheckCircle2,
-  Box, Cpu, FileSpreadsheet, RotateCcw, Sliders, Info, Eye
+  Box, Cpu, FileSpreadsheet, RotateCcw, Sliders, Info, Eye, Sparkles
 } from 'lucide-react';
 import {
   FEA_MATERIALS,
@@ -62,7 +64,7 @@ export function SimulationFEAModule() {
   const [forceZ, setForceZ] = useState<number>(0);
 
   // View state
-  const [deformationScale, setDeformationScale] = useState<number>(10);
+  const [deformationScale, setDeformationScale] = useState<number>(20);
   const [showWireframe, setShowWireframe] = useState<boolean>(false);
   const [showProbes, setShowProbes] = useState<boolean>(true);
 
@@ -84,7 +86,7 @@ export function SimulationFEAModule() {
     return solve3DFea(activeGeometry, selectedMaterialKey, loadCondition);
   }, [activeGeometry, selectedMaterialKey, forceX, forceY, forceZ, supportPlane]);
 
-  // Handle STL file upload
+  // Handle STL file upload (ASCII and Binary)
   const handleStlUpload = useCallback((buffer: ArrayBuffer, fileName: string) => {
     try {
       const geom = parseStlFile(buffer);
@@ -93,7 +95,7 @@ export function SimulationFEAModule() {
       setCustomFileName(fileName);
     } catch (err) {
       console.error('Failed to parse STL file:', err);
-      alert('Error parsing STL file. Please check file format.');
+      alert('Error parsing STL file. Please verify it is a valid ASCII or Binary STL file.');
     }
   }, []);
 
@@ -114,9 +116,15 @@ export function SimulationFEAModule() {
     setCustomFileName('');
   };
 
-  // Export CSV results
+  // Export CSV results with Beta disclaimer
   const exportCsvData = () => {
-    let csv = `Node_Index,von_Mises_MPa,Displacement_X_mm,Displacement_Y_mm,Displacement_Z_mm\n`;
+    let csv = `# ALU CALC OS - 3D FEA STRESS ANALYSIS REPORT (BETA)\n`;
+    csv += `# DISCLAIMER: Approximate linear-elastic analysis for educational/preliminary use only. Not certified for flight or structural compliance.\n`;
+    csv += `# Model: ${customFileName || activePreset} | Material: ${material.name} (Sy=${material.yieldStrength} MPa, E=${material.elasticModulus} GPa)\n`;
+    csv += `# Applied Load: Fx=${forceX} N, Fy=${forceY} N, Fz=${forceZ} N | Fixed Support: ${supportPlane.toUpperCase()}\n`;
+    csv += `# Max von Mises Stress: ${analysis.maxVonMisesMpa} MPa | Max Deflection: ${analysis.maxDisplacementMm} mm | Safety Factor: ${analysis.safetyFactor} (${analysis.status})\n\n`;
+    csv += `Node_Index,von_Mises_MPa,Displacement_X_mm,Displacement_Y_mm,Displacement_Z_mm\n`;
+
     const count = Math.min(analysis.nodeCount, 2000);
     for (let i = 0; i < count; i++) {
       csv += `${i},${analysis.vonMisesStress[i].toFixed(2)},${analysis.displacements[i * 3].toFixed(4)},${analysis.displacements[i * 3 + 1].toFixed(4)},${analysis.displacements[i * 3 + 2].toFixed(4)}\n`;
@@ -125,28 +133,28 @@ export function SimulationFEAModule() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `AluCalc_FEA_Stress_Data_${customFileName || activePreset}.csv`;
+    a.download = `AluCalc_FEA_Beta_${customFileName || activePreset}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
     <div className="flex flex-col h-full bg-[#020408] text-slate-200 p-3 sm:p-5 space-y-4 font-sans select-none">
-      {/* ─── WORKSTATION HEADER ─── */}
+      {/* ─── WORKSTATION HEADER WITH PROMINENT BETA BADGE ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
             <Activity size={20} />
           </div>
           <div>
             <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
               <span>3D Finite Element Analysis (FEA) Simulator</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-black">
-                v5.25 KERNEL
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black tracking-wider">
+                BETA
               </span>
             </h1>
             <p className="text-xs text-slate-400 font-mono">
-              Linear-elastic stress tensor & von Mises contour solver for custom 3D STL & CAD components
+              Linear-elastic stress tensor & von Mises contour solver for custom 3D STL & CAD components (Educational & Preliminary use)
             </p>
           </div>
         </div>
@@ -163,12 +171,20 @@ export function SimulationFEAModule() {
             type="button"
             onClick={exportCsvData}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-xs font-mono transition-all"
-            title="Export Stress CSV Data"
+            title="Export Stress CSV Data (Beta)"
           >
             <FileSpreadsheet size={14} />
             <span>Export CSV</span>
           </button>
         </div>
+      </div>
+
+      {/* ─── MANDATORY BETA DISCLAIMER BANNER ─── */}
+      <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-[11.5px] font-mono text-amber-200/90 shadow-lg">
+        <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+        <span>
+          <strong className="text-amber-300 font-bold">Beta Engineering Notice:</strong> Approximate linear-elastic analysis for educational & preliminary engineering assessment. Not a certified replacement for commercial FEA suites (ANSYS, Abaqus, SolidWorks).
+        </span>
       </div>
 
       {/* ─── MAIN WORKSPACE GRID ─── */}
@@ -208,16 +224,16 @@ export function SimulationFEAModule() {
               </button>
 
               <div className="flex items-center gap-2 px-2.5 py-1 border-l border-white/10">
-                <span className="text-slate-400">Scale:</span>
+                <span className="text-slate-400">Deform Scale:</span>
                 <input
                   type="range"
                   min={1}
-                  max={200}
+                  max={500}
                   value={deformationScale}
                   onChange={(e) => setDeformationScale(Number(e.target.value))}
                   className="w-20 accent-cyan-400 cursor-pointer"
                 />
-                <span className="text-cyan-400 font-bold w-8">{deformationScale}×</span>
+                <span className="text-cyan-400 font-bold w-10">{deformationScale}×</span>
               </div>
             </div>
           </div>
@@ -243,7 +259,7 @@ export function SimulationFEAModule() {
               }`}>
                 {analysis.safetyFactor}
               </div>
-              <div className="text-[10px] font-mono text-slate-500">Margin: {analysis.status}</div>
+              <div className="text-[10px] font-mono text-slate-500">Status: {analysis.status}</div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-[#070b14] border border-white/5 space-y-1">

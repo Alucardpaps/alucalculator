@@ -20,8 +20,11 @@ const SimulationFEAModule = dynamic(
             <Activity className="w-6 h-6 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white tracking-tight">Finite Element Analysis (FEA) Engine</h2>
-            <p className="text-xs text-slate-400 mt-1 font-mono">Initializing WebGL stiffness solver & mesh matrix...</p>
+            <h2 className="text-base font-bold text-white tracking-tight flex items-center justify-center gap-2">
+              <span>3D Finite Element Analysis (FEA)</span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">BETA</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-1 font-mono">Initializing WebGL stiffness solver & approximate mesh matrix...</p>
           </div>
           <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5 text-[11px] font-mono text-slate-300">
             <div className="p-2 rounded-lg bg-white/5 border border-white/5 flex flex-col items-center gap-1">

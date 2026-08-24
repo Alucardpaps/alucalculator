@@ -77,7 +77,7 @@ export const ALL_NAV_GROUPS: {
     items: [
       { id: 'design-studio', href: '/design-studio', labelEn: '3D Parametric CAD (STL)', labelTr: '3D Parametrik CAD (STL)', icon: Box, color: '#00e5ff', badge: '3D', keywords: ['3d', 'stl', 'parametric', 'design', 'solid'] },
       { id: 'cad-editor', href: '/cad-editor', labelEn: '2D AluCAD Drafting', labelTr: '2D AluCAD Çizim', icon: Pencil, color: '#a855f7', badge: '2D', keywords: ['2d', 'dxf', 'autocad', 'dwg', 'cizim', 'paper'] },
-      { id: 'fea-studio', href: '/fea', labelEn: 'FEA Stress Simulator', labelTr: 'FEA Gerilme Analizi', icon: Activity, color: '#ef4444', badge: 'FEA', keywords: ['fea', 'stress', 'simulation', 'gerilme', 'von mises'] },
+      { id: 'fea-studio', href: '/fea', labelEn: 'FEA Stress Simulator', labelTr: 'FEA Gerilme Analizi', icon: Activity, color: '#ef4444', badge: 'BETA', keywords: ['fea', 'stress', 'simulation', 'gerilme', 'von mises'] },
       { id: 'nesting', href: '/nesting-2d', labelEn: '2D Sheet Nesting', labelTr: '2D Plaka Yerleşim', icon: Scissors, color: '#f59e0b', keywords: ['nesting', 'cut', 'yerlesim', 'plaka'] },
       { id: 'cutting', href: '/cutting-optimizer', labelEn: '1D Linear Cut Optimizer', labelTr: '1D Profil Kesim Opt.', icon: Scissors, color: '#f97316', keywords: ['cutting', '1d', 'linear', 'kesim', 'profil'] },
       { id: 'sketch-pad', href: '/sketch-pad', labelEn: 'Technical Sketch Pad', labelTr: 'Mühendislik Şema Tahtası', icon: PenTool, color: '#eab308', keywords: ['sketch', 'pad', 'cizim', 'sema', 'excalidraw'] },

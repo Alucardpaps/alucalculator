@@ -482,17 +482,17 @@ const CARDS: Record<string, ModuleMethod> = {
     },
   },
   'simulation-fea': {
-    formula: '[K]\\{u\\} = \\{F\\}, \\quad \\sigma_{\\text{vM}} = \\sqrt{\\frac{1}{2}\\left[(\\sigma_1-\\sigma_2)^2 + (\\sigma_2-\\sigma_3)^2 + (\\sigma_3-\\sigma_1)^2\\right]}',
-    formulaNote: 'Linear elastic Finite Element Analysis (FEA), global stiffness matrix assembly [K], nodal displacement vector {u}, and von Mises equivalent stress.',
-    standards: ['NAFEMS Benchmark Standards', 'ISO 6892-1', 'ASME Section VIII Div 2 (Design by Analysis)'],
+    formula: '[K]\\{u\\} = \\{F\\}, \\quad \\sigma_{\\text{vM}} = \\sqrt{\\frac{1}{2}\\left[(\\sigma_1-\\sigma_2)^2 + (\\sigma_2-\\sigma_3)^2 + (\\sigma_3-\\sigma_1)^2\\right]}, \\quad S_F = \\frac{S_y}{\\sigma_{\\max}}',
+    formulaNote: 'Beta 3D Linear Elastic Finite Element Analysis (FEA): surface/boundary stress tensor integration, nodal displacement field {u}, von Mises equivalent stress, and material yield safety factor (SF).',
+    standards: ['NAFEMS Benchmark Guidelines', 'ASTM E8/E8M (Tensile Testing Properties)', 'ISO 6892-1 (Metallic Materials)'],
     assumptions: [
-      'Small displacement / small strain linear elastic material response (Hooke law)',
-      'Isoparametric triangular/quadrilateral elements with Gauss numerical quadrature',
-      'Boundary condition constraints eliminate rigid body modes (rank [K] = degrees of freedom)',
+      'Beta approximate formulation: Designed for educational & preliminary evaluation (not a certified replacement for commercial solvers like ANSYS/Abaqus)',
+      'Small displacement / small strain linear-elastic isotropic material response (Hooke law: σ = E·ε)',
+      'Fixed boundary plane eliminates rigid body motion; stress concentration factors applied near fixed constraints and geometric transitions',
     ],
     workedExample: {
-      title: 'Worked example — Cantilever Plate (L = 200 mm, b = 40 mm, t = 5 mm, Al6082 E = 70 GPa, Tip Load = 500 N)',
-      result: 'FEA solver computes peak von Mises stress σvM = 120.5 MPa at root constraint and tip deflection δ = 2.28 mm (matches analytical within 0.4%).',
+      title: 'Worked example — Aerospace L-Bracket (Al6061-T6, E = 68.9 GPa, Sy = 276 MPa, Tip Load Fy = -5 kN)',
+      result: 'Beta FEA solver computes peak von Mises stress σvM = 138.4 MPa at constraint root with max deflection δ = 0.42 mm, giving Safety Factor SF = 2.00 (SAFE status).',
     },
   },
   'reducer-lubrication': {

@@ -41,6 +41,9 @@ const CANONICAL_MODULE_ALIASES: Record<string, string> = {
   'gear-ratio': 'gearbox-design',
   'gear-ratio-calc': 'gearbox-design',
   'beam-deflection-calc': 'beam-deflection',
+  'flow': 'fea',
+  'topology-optimization': 'fea',
+  'machine-assembly': 'design-studio',
 };
 
 const EXTRA_SLUGS = [
