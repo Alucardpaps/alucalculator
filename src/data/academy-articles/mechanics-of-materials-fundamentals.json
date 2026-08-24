@@ -1,0 +1,98 @@
+{
+    "slug": "mechanics-of-materials-fundamentals",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [
+        "fundamentals-of-statics"
+    ],
+    "meta": {
+        "title": "Mechanics of Materials: Stress, Strain, and Deformation",
+        "description": "An introductory course to Mechanics of Materials (Strength of Materials). Learn about axial loading, normal stress, shear stress, and Hooke's Law."
+    },
+    "hero": {
+        "h1": "Mechanics of Materials: Stress, Strain, and Deformation",
+        "intro": "While Statics deals with external forces, Mechanics of Materials looks inside. How do materials respond to those forces? Do they stretch, bend, or break? This course defines the internal resistance of solid bodies to external loads.\n\nOnce reactions are known from statics, you must ask whether the material survives. Normal stress σ = F/A and Hooke's law ε = σ/E link force to deformation. Stress concentrations at holes and fillets can locally exceed nominal values.\n\nEvery strength calculator in AluCalc — from fasteners to beams — builds on this σ–ε foundation."
+    },
+    "formula": {
+        "equation": "σ = F / A",
+        "variables": {
+            "σ": "Normal Stress (Pa or MPa)",
+            "F": "Axial Force (N)",
+            "A": "Cross-sectional Area (m²)"
+        }
+    },
+    "stepByStep": [
+        "Calculate the internal force at the point of interest.",
+        "Determine the cross-sectional area of the element.",
+        "Apply the stress formula: σ = F / A.",
+        "Calculate strain using Hooke's Law: ε = σ / E.",
+        "Verify that stress is below the material's yield strength.",
+        "Apply stress concentration factor Kt when geometry has discontinuities.",
+        "Compare computed stress to yield with an appropriate factor of safety."
+    ],
+    "example": {
+        "inputs": [
+            "Force: 50,000 N",
+            "Area: 100 mm² (0.0001 m²)"
+        ],
+        "calculation": "σ = 50000 / 0.0001 = 500,000,000 Pa = 500 MPa"
+    },
+    "whyThisMatters": [
+        "Prevents structural failure by ensuring material limits are never exceeded.",
+        "Allows for the selection of appropriate materials based on loading conditions."
+    ],
+    "commonMistakes": [
+        "Neglecting the sign of the stress (Tension vs Compression).",
+        "Using the wrong area for shear stress (it's the area parallel to the force).",
+        "Failing to account for stress concentrations at holes or fillets."
+    ],
+    "engineeringTip": "In engineering design, we usually target a Factor of Safety (FoS) between 1.5 and 3.0.",
+    "calculatorCta": {
+        "targetSlug": "bolt-stress-calc",
+        "label": "Analyze fastener stress with our real-time integrity engine"
+    },
+    "faq": [
+        {
+            "question": "What is the difference between stress and pressure?",
+            "answer": "Pressure is an external force distributed over an external surface, while stress is an internal resistance distributed over an internal cross-section."
+        },
+        {
+            "question": "What is factor of safety?",
+            "answer": "Ratio of allowable to computed stress — typically 1.5–3.0 depending on consequence of failure and load uncertainty."
+        },
+        {
+            "question": "How is shear stress different?",
+            "answer": "Shear acts parallel to the area; area is the section in the plane of shear, not perpendicular to force."
+        },
+        {
+            "question": "When does Hooke's law fail?",
+            "answer": "Beyond proportional limit / yield — plastic deformation requires different constitutive models."
+        }
+    ],
+    "relatedArticles": [
+        "mohrs-circle-stress-analysis",
+        "fundamentals-of-statics"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Mukavemet Dersine Giriş ve Kavramlar",
+            "filename": "2-mukavemet_dersine_giris_ve_kavramlari_(rev).ppt"
+        },
+        {
+            "title": "Engineering Fundamentals Handbook",
+            "filename": "engineering fundamentals.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Compute normal stress σ = F/A and interpret tension vs compression",
+        "Apply Hooke's law to relate stress, strain, and elastic modulus",
+        "Identify stress concentrations at holes, fillets, and sudden section changes"
+    ],
+    "keyTakeaways": [
+        "Stress is internal resistance; pressure acts on external surfaces",
+        "Stay below yield with an appropriate factor of safety (1.5–3.0)",
+        "Shear area lies in the plane of the shear force — not the normal area"
+    ]
+}

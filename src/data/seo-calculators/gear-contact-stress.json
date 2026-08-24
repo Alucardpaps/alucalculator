@@ -1,0 +1,32 @@
+{
+  "id": "gear-contact-stress",
+  "title": "Gear Contact Stress Calculator & Guide - AluCalc",
+  "slug": "gear-contact-stress",
+  "keyword": "gear contact stress calculator",
+  "intent": "unified_guide",
+  "meta": {
+    "title": "Gear Contact Stress Calculator & Guide - AluCalc | Professional Engineering Tool",
+    "description": "Unique gear contact stress calculator and engineering guide. Includes General Engineering Practice formulas, worked examples, and step-by-step logic."
+  },
+  "seo": {
+    "h1": "Gear Contact Stress Calculator & Guide - AluCalc",
+    "intro": "Advanced calculation for gear contact stress within the Alucalc OS suite.",
+    "formula": "Result = f(Inputs, K)",
+    "variables": {
+      "Input_1": "Primary parameter",
+      "Input_2": "Secondary parameter"
+    },
+    "step_by_step": "1. Identify the input constants for gear contact stress.\n2. Apply the specific General Engineering Practice formula.\n3. Validate results against mechanical safety factors.",
+    "practical": "In gears applications, gear contact stress is essential for ensuring structural integrity and operational efficiency.",
+    "example": "A typical example involves substituting standard material properties into the Result = f(Inputs, K) equation to determine optimal sizing."
+  },
+  "related": [
+    "gear-contact-stress-formula",
+    "engineering-standards",
+    "material-science"
+  ],
+  "cta": {
+    "label": "Launch AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

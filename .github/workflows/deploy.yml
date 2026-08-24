@@ -1,0 +1,35 @@
+name: Hostinger'a Dağıt
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: Build ve Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Çek (Checkout)
+        uses: actions/checkout@v3
+
+      - name: Node.js Kurulumu
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Bağımlılıkları Yükle (Install)
+        run: npm ci
+
+      - name: Projeyi Derle (Build)
+        run: npm run build
+
+      - name: FTP ile Yükle (Hostinger)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          try-implicit-tls: false # Hostinger bazen düz FTP gerektirebilir
+          local-dir: ./out/      # Next.js build çıktısı
+          server-dir: ./public_html/

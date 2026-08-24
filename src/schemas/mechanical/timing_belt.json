@@ -1,0 +1,83 @@
+{
+  "id": "timing_belt",
+  "name": "Timing Belt Drive Design",
+  "category": "mechanical",
+  "description": "Complete timing belt (kayış-kasnak) design: pulley sizing, belt length, tension, and power verification for HTD/GT profiles.",
+  "inputs": [
+    { "key": "P", "type": "number", "unit": "kW", "description": "Transmitted Power", "default": 5 },
+    { "key": "n1", "type": "number", "unit": "rpm", "description": "Driver Pulley Speed", "default": 1500 },
+    { "key": "n2", "type": "number", "unit": "rpm", "description": "Driven Pulley Speed", "default": 500 },
+    { "key": "pitch", "type": "number", "unit": "mm", "description": "Belt Pitch (e.g. 5 for HTD-5M, 8 for HTD-8M)", "default": 5 },
+    { "key": "C", "type": "number", "unit": "mm", "description": "Center Distance (approx.)", "default": 250 },
+    { "key": "Ks", "type": "number", "unit": "-", "description": "Service Factor", "default": 1.5 }
+  ],
+  "steps": [
+    {
+      "id": "i",
+      "formula": "n1 / n2",
+      "description": "Transmission ratio",
+      "latex": "i = \\frac{n_1}{n_2}"
+    },
+    {
+      "id": "P_design",
+      "formula": "P * Ks",
+      "description": "Design power with service factor",
+      "latex": "P_{design} = P \\times K_s"
+    },
+    {
+      "id": "T1",
+      "formula": "(9550 * P_design) / n1",
+      "description": "Driver torque",
+      "latex": "T_1 = \\frac{9550 \\times P_{design}}{n_1}"
+    },
+    {
+      "id": "z1",
+      "formula": "max(floor(60000 / (pitch * n1)), 14)",
+      "description": "Driver pulley teeth (min 14)",
+      "latex": "z_1 = \\max\\left(\\lfloor\\frac{60000}{p \\times n_1}\\rfloor, 14\\right)"
+    },
+    {
+      "id": "z2",
+      "formula": "round(z1 * i)",
+      "description": "Driven pulley teeth",
+      "latex": "z_2 = z_1 \\times i"
+    },
+    {
+      "id": "d1",
+      "formula": "(z1 * pitch) / 3.14159",
+      "description": "Driver pulley pitch diameter",
+      "latex": "d_1 = \\frac{z_1 \\times p}{\\pi}"
+    },
+    {
+      "id": "d2",
+      "formula": "(z2 * pitch) / 3.14159",
+      "description": "Driven pulley pitch diameter",
+      "latex": "d_2 = \\frac{z_2 \\times p}{\\pi}"
+    },
+    {
+      "id": "L_belt",
+      "formula": "2 * C + 3.14159 / 2 * (d1 + d2) + ((d2 - d1)^2) / (4 * C)",
+      "description": "Required belt length",
+      "latex": "L = 2C + \\frac{\\pi}{2}(d_1 + d_2) + \\frac{(d_2 - d_1)^2}{4C}"
+    },
+    {
+      "id": "z_belt",
+      "formula": "round(L_belt / pitch)",
+      "description": "Belt teeth count (rounded to standard)",
+      "latex": "z_{belt} = \\frac{L}{p}"
+    },
+    {
+      "id": "v_belt",
+      "formula": "(d1 * 3.14159 * n1) / 60000",
+      "description": "Belt linear velocity (m/s)",
+      "latex": "v = \\frac{\\pi \\cdot d_1 \\cdot n_1}{60000}"
+    },
+    {
+      "id": "F_t",
+      "formula": "(P_design * 1000) / v_belt",
+      "description": "Tangential belt force (effective pull)",
+      "latex": "F_t = \\frac{P_{design} \\times 1000}{v}"
+    }
+  ],
+  "outputs": ["i", "T1", "z1", "z2", "d1", "d2", "L_belt", "z_belt", "v_belt", "F_t", "P_design"]
+}

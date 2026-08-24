@@ -1,0 +1,90 @@
+{
+    "slug": "engineering-units-and-standards",
+    "academicYear": 1,
+    "department": "General",
+    "difficulty": "Basic",
+    "readingTime": 5,
+    "prerequisites": [],
+    "meta": {
+        "title": "Engineering Units and Standards (SI vs Imperial)",
+        "description": "A fundamental guide to units used in engineering, including SI and Imperial systems, conversion factors, and common standards like ISO and DIN."
+    },
+    "hero": {
+        "h1": "Engineering Units and Standards (SI vs Imperial)",
+        "intro": "Engineering is a quantitative discipline. Without standardized units, global collaboration and manufacturing would be impossible. In this module, we explore the International System of Units (SI) and the Imperial system, focusing on how to convert between them accurately.\n\nModern supply chains span continents — a drawing in millimeters must mate with tooling calibrated in inches. The SI system (meter, kilogram, second, ampere, kelvin, mole, candela) is the international reference, while Imperial units persist in US aerospace and legacy machinery.\n\nThis lesson establishes the conversion discipline used throughout AluCalc: exact constants, consistent significant figures, and explicit unit labels on every intermediate result."
+    },
+    "formula": {
+        "equation": "1 inch = 25.4 mm",
+        "variables": {
+            "mm": "Millimeters",
+            "inch": "Inches (Imperial)"
+        }
+    },
+    "stepByStep": [
+        "Identify the source unit (e.g., mm).",
+        "Identify the target unit (e.g., inch).",
+        "Apply the conversion factor.",
+        "Verify the magnitude of the result.",
+        "Round to the appropriate significant figures.",
+        "Document the unit system on the calculation worksheet header.",
+        "Convert temperature to kelvin when using gas laws or thermal expansion."
+    ],
+    "example": {
+        "inputs": [
+            "Value: 100 mm",
+            "Target: Inches"
+        ],
+        "calculation": "100 / 25.4 ≈ 3.937 inches"
+    },
+    "whyThisMatters": [
+        "Incorrect unit conversion led to the loss of the Mars Climate Orbiter.",
+        "Manufacturing tolerances are often specified in microns (μm), requiring high precision."
+    ],
+    "commonMistakes": [
+        "Using decimal points incorrectly in different locales (comma vs point).",
+        "Mixing mass (kg) and force (N) units in calculations.",
+        "Neglecting temperature unit shifts (Celsius to Kelvin)."
+    ],
+    "engineeringTip": "Always use SI units for internal calculations and only convert to Imperial for final presentation if required.",
+    "calculatorCta": {
+        "targetSlug": "unit-converter",
+        "label": "Use the Unit Converter for instant professional transformations"
+    },
+    "faq": [
+        {
+            "question": "What is the base unit of length in SI?",
+            "answer": "The meter (m)."
+        },
+        {
+            "question": "Why is 25.4 mm/in exact?",
+            "answer": "The inch was redefined in 1959 so that 1 in = 25.4 mm exactly — use this value, not 25.0, for precision fits."
+        },
+        {
+            "question": "Can I use kg and N interchangeably?",
+            "answer": "No. kg is mass; N is force (kg·m/s²). Weight in newtons equals mass times local gravity."
+        },
+        {
+            "question": "When should I convert to Imperial?",
+            "answer": "Convert only at presentation boundaries — carry SI internally through all calculation steps."
+        }
+    ],
+    "relatedArticles": [
+        "fundamentals-of-statics"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Birimler ve Standartlar Sunumu",
+            "filename": "birimler.ppt"
+        }
+    ],
+    "learningObjectives": [
+        "Convert between SI and Imperial length, mass, and force units without ambiguity",
+        "Identify when mass (kg) must not be substituted for force (N) in equilibrium equations",
+        "Apply ISO/DIN rounding rules for manufacturing tolerances expressed in microns"
+    ],
+    "keyTakeaways": [
+        "Always carry SI internally; convert only at presentation boundaries",
+        "1 in = 25.4 mm exactly — never approximate for precision fits",
+        "Unit errors propagate silently until they cause field failures"
+    ]
+}

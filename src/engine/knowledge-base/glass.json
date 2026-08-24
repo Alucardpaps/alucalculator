@@ -1,0 +1,26 @@
+{
+  "types": {
+    "Tempered": {
+      "name": "Tempered Glass",
+      "density": 2500,
+      "youngsModulus": 72000,
+      "yieldStrength": 120,
+      "ultimateTensileStrength": 120,
+      "poissonRatio": 0.22,
+      "thermalExpansion": 9.0,
+      "default": true,
+      "description": "Safety glass processed by controlled thermal or chemical treatments."
+    },
+    "Architectural": {
+      "name": "Architectural Float Glass",
+      "density": 2500,
+      "youngsModulus": 70000,
+      "yieldStrength": 40,
+      "ultimateTensileStrength": 40,
+      "poissonRatio": 0.22,
+      "thermalExpansion": 9.0,
+      "default": false,
+      "description": "Standard float glass used in windows and facades."
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "newton-second-law",
+  "title": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc",
+  "slug": "newton-second-law",
+  "keyword": "force calculation (f=ma) calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Force Calculation (F=ma) guide with Newtonian Physics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc",
+    "intro": "The fundamental law of motion relating force, mass, and acceleration.",
+    "formula": "F = m \\cdot a",
+    "variables": {
+      "F": "Force (N)",
+      "m": "Mass (kg)",
+      "a": "Acceleration (m/s²)"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify net force vectors",
+      "Check for friction components"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Force Calculation (F=ma).\n2. Consult the technical reference table for material constants.\n3. Apply the Newtonian Physics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Force Calculation (F=ma) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

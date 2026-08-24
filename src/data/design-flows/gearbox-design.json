@@ -1,0 +1,48 @@
+{
+  "id": "gearbox-design",
+  "name": "Gearbox Design Workflow",
+  "description": "Complete drivetrain design flow: from power/speed requirements to shaft sizing, bearing selection, gear ratio, and optional belt drive.",
+  "steps": [
+    {
+      "order": 1,
+      "calcId": "torque_calculation",
+      "label": "1. Calculate Torque",
+      "description": "Determine shaft torque from motor power and speed."
+    },
+    {
+      "order": 2,
+      "calcId": "shaft-design",
+      "label": "2. Size the Shaft",
+      "description": "Calculate minimum shaft diameter from torque and allowable stress."
+    },
+    {
+      "order": 3,
+      "calcId": "bearings",
+      "label": "3. Select Bearings",
+      "description": "Verify bearing life under the calculated shaft loads."
+    },
+    {
+      "order": 4,
+      "calcId": "gear-spur",
+      "label": "4. Design Gears",
+      "description": "Determine gear sizes and output torque."
+    },
+    {
+      "order": 5,
+      "calcId": "belt-drive",
+      "label": "5. Belt Drive (Optional)",
+      "description": "Design timing belt transmission if belt stage is needed."
+    },
+    {
+      "order": 6,
+      "calcId": "motor-selection",
+      "label": "6. Select Motor",
+      "description": "Match calculated power to a standard IEC motor."
+    }
+  ],
+  "mappings": [
+    { "from": "torque_calculation.T", "to": "shaft-design.T" },
+    { "from": "torque_calculation.T", "to": "belt-drive.P", "note": "Approximate — user should verify" },
+    { "from": "shaft-design.d_standard", "to": "bearings.d", "note": "Shaft diameter feeds bearing bore" }
+  ]
+}

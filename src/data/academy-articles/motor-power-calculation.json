@@ -1,0 +1,93 @@
+{
+    "slug": "motor-power-calculation",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Intermediate",
+    "readingTime": 8,
+    "prerequisites": [],
+    "meta": {
+        "title": "Motor Power Calculation (Torque and Speed Relationship)",
+        "description": "Learn how to calculate the power required for an electric motor based on torque and angular velocity. Includes efficiency and unit conversion guide."
+    },
+    "hero": {
+        "h1": "Motor Power Calculation (Torque and Speed Relationship)",
+        "intro": "Sizing an electric motor requires understanding the dynamic relationship between rotational speed and the torque required to overcome load resistance and friction.\n\nElectric motors are sized on power, but loads present as torque at a speed. The bridge equation P = T·n/9550 (kW) appears in every drive catalog. Gearboxes, belts, and couplings add efficiency losses that must be added back to the motor nameplate.\n\nThis lesson prepares you for belt-drive and motor sizing tools in AluCalc where the same torque–speed–power triangle applies."
+    },
+    "formula": {
+        "equation": "P = (T × n) / 9550",
+        "variables": {
+            "9550": "Conversion constant",
+            "P": "Power (kW)",
+            "T": "Torque (Nm)",
+            "n": "Rotational speed (RPM)"
+        }
+    },
+    "stepByStep": [
+        "Determine the required output torque (T).",
+        "Determine the operational speed (n) in RPM.",
+        "Apply the formula to find the power in kW.",
+        "Account for transmission efficiency if necessary.",
+        "Select a motor with a power rating higher than the calculated requirement.",
+        "Identify peak vs continuous torque for duty classification.",
+        "Convert between kW and HP using 1 HP ≈ 0.746 kW when reading US catalogs."
+    ],
+    "example": {
+        "inputs": [
+            "T = 50 Nm",
+            "n = 1450 RPM"
+        ],
+        "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
+    },
+    "whyThisMatters": [
+        "Prevents motor burnout due to undersizing.",
+        "Avoids excessive energy costs and initial investment due to oversizing."
+    ],
+    "commonMistakes": [
+        "Forgetting to include the efficiency of the gearbox or transmission.",
+        "Using HP units directly in a kW formula without conversion.",
+        "Failing to account for peak starting torque."
+    ],
+    "engineeringTip": "Always select a motor with a 15-20% safety margin over the calculated power.",
+    "calculatorCta": {
+        "targetSlug": "motor-power-calc",
+        "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
+    },
+    "faq": [
+        {
+            "question": "How do I convert HP to kW?",
+            "answer": "1 HP is approximately 0.746 kW."
+        },
+        {
+            "question": "What is service factor?",
+            "answer": "A multiplier accounting for shock, reversing, and daily duty — applied to calculated power before motor selection."
+        },
+        {
+            "question": "Why add 15–20% margin?",
+            "answer": "Covers voltage variation, bearing drag increase over life, and production tolerances."
+        },
+        {
+            "question": "How does gearbox ratio affect motor torque?",
+            "answer": "Motor torque = load torque / (ratio × efficiency) — higher ratio reduces motor torque demand."
+        }
+    ],
+    "relatedArticles": [
+        "pressure-drop-calculation-guide",
+        "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Mechanical Engineering Handbook - Drives Section",
+            "filename": "Mechanical Engineering Handbook.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Convert torque and speed to shaft power using P = T·n/9550 (kW)",
+        "Account for transmission efficiency when sizing the motor nameplate",
+        "Distinguish continuous duty from peak starting torque requirements"
+    ],
+    "keyTakeaways": [
+        "Undersized motors overheat; oversized motors waste capital and efficiency",
+        "Always include gearbox losses in the motor power calculation",
+        "Add 15–20% margin for production variability and aging"
+    ]
+}

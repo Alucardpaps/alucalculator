@@ -1,0 +1,51 @@
+{
+  "id": "reynolds-number",
+  "title": "Reynolds Number Calculator & Engineering Guide - AluCalc",
+  "slug": "reynolds-number",
+  "keyword": "reynolds number calculator",
+  "category": "fluids",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Reynolds Number Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Reynolds Number guide with Standard Fluid Dynamics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Reynolds Number Calculator & Engineering Guide - AluCalc",
+    "intro": "A dimensionless number used to characterize the flow regime (Laminar vs Turbulent).",
+    "formula": "Re = \\frac{\\rho v D}{\\mu}",
+    "variables": {
+      "rho": "Density",
+      "v": "Velocity",
+      "D": "Diameter",
+      "mu": "Viscosity"
+    },
+    "technical_data": [
+      {
+        "name": "Flow Regimes",
+        "rows": [
+          {
+            "Regime": "Laminar",
+            "Re": "< 2300"
+          },
+          {
+            "Regime": "Turbulent",
+            "Re": "> 4000"
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Check Re limit",
+      "Temperature adjustment"
+    ],
+    "pitfalls": [
+      "Assuming laminar in industrial pipes"
+    ],
+    "step_by_step": "1. Define system parameters for Reynolds Number.\n2. Consult the technical reference table for material constants.\n3. Apply the Standard Fluid Dynamics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Fluids applications, accurate Reynolds Number analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

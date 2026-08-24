@@ -1,0 +1,4 @@
+:HL["/_next/static/chunks/062told8ezld_.css","style"]
+:HC["/",""]
+:HL["/_next/static/chunks/048w-y385pyr6.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"module","param":{"type":"d","key":"fluids","siblings":["academy","api","calculators","compare","dashboard","developers","engineering-test","failure-diagnosis","guides","handbook","license","lite","login","materials","naval-hydrostatics","pricing","sales","shafts","workspace"]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"build-1787077130189"}

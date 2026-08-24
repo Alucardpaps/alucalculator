@@ -1,0 +1,15 @@
+{
+  "types": {
+    "Carbon Fiber (CFRP)": {
+      "name": "Carbon Fiber",
+      "density": 1600,
+      "youngsModulus": 150000,
+      "yieldStrength": 1200,
+      "ultimateTensileStrength": 2500,
+      "poissonRatio": 0.3,
+      "thermalExpansion": 0.0,
+      "default": true,
+      "description": "High-performance carbon fiber reinforced polymer."
+    }
+  }
+}

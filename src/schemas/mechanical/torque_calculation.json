@@ -1,0 +1,25 @@
+{
+  "id": "torque_calculation",
+  "name": "Torque from Power & Speed",
+  "category": "mechanical",
+  "description": "Calculate shaft torque from motor power and rotational speed. Fundamental first step in any drivetrain design.",
+  "inputs": [
+    { "key": "P", "type": "number", "unit": "kW", "description": "Motor Power", "default": 10 },
+    { "key": "n", "type": "number", "unit": "rpm", "description": "Rotational Speed", "default": 1500 }
+  ],
+  "steps": [
+    {
+      "id": "T",
+      "formula": "(9550 * P) / n",
+      "description": "Torque from power and speed (ISO standard)",
+      "latex": "T = \\frac{9550 \\times P}{n}"
+    },
+    {
+      "id": "omega",
+      "formula": "(2 * 3.14159 * n) / 60",
+      "description": "Angular velocity",
+      "latex": "\\omega = \\frac{2\\pi n}{60}"
+    }
+  ],
+  "outputs": ["T", "omega"]
+}

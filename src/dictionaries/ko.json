@@ -1,0 +1,661 @@
+{
+  "nav": {
+    "home": "홈",
+    "dashboard": "대시보드",
+    "modules": "모듈",
+    "settings": "설정",
+    "homeDesc": "메인 대시보드",
+    "fits": "끼워맞춤 계산기",
+    "handbook": "엔지니어 핸드북",
+    "library": "모듈 라이브러리",
+    "available": "사용 가능한 모듈",
+    "news": "산업 뉴스",
+    "mechanical": "기계",
+    "civil": "토목",
+    "electrical": "전기",
+    "science": "과학",
+    "finance": "금융",
+    "software": "소프트웨어",
+    "other": "기타"
+  },
+  "modules": {
+    "aluminum": {
+      "title": "프로필 중량 계산기",
+      "desc": "질량 및 비용 추정"
+    },
+    "fits": {
+      "title": "끼워맞춤 & 공차",
+      "desc": "ISO 286 축/구멍"
+    },
+    "gears": {
+      "title": "기어 계산기",
+      "desc": "평기어 & 헬리컬 형상"
+    },
+    "strength": {
+      "title": "강도 (모어)",
+      "desc": "응력 분석"
+    },
+    "bearings": {
+      "title": "베어링 (L10)",
+      "desc": "수명 예측"
+    },
+    "welding": {
+      "title": "용접 열",
+      "desc": "공정 입력"
+    },
+    "sheetMetal": {
+      "title": "판금",
+      "desc": "굽힘 하중"
+    },
+    "pumps": {
+      "title": "펌프",
+      "desc": "동력 & NPSH"
+    },
+    "fasteners": {
+      "title": "패스너",
+      "desc": "ISO 메트릭 나사"
+    },
+    "converter": {
+      "title": "변환기",
+      "desc": "단위 & 동력"
+    },
+    "handbook": {
+      "title": "핸드북",
+      "desc": "베어링 표, ISO 공차, G-코드 참조."
+    }
+  },
+  "common": {
+    "calculate": "계산",
+    "reset": "초기화",
+    "inputs": "입력",
+    "results": "결과",
+    "dimensions": "치수",
+    "material": "재료",
+    "weight": "중량",
+    "cost": "비용",
+    "unitPrice": "단가",
+    "quantity": "수량",
+    "total": "합계",
+    "save": "저장",
+    "export": "내보내기",
+    "generatedBy": "AluCalc OS 생성",
+    "design": "설계",
+    "view2d": "2D 보기",
+    "view3d": "3D 보기",
+    "designParams": "설계 파라미터",
+    "analysisResults": "해석 결과",
+    "prodNotes": "제작 메모",
+    "unitWeight": "단위 중량",
+    "totalWeight": "총 중량",
+    "result": "결과",
+    "hole": "구멍",
+    "shaft": "축",
+    "min": "최소",
+    "max": "최대",
+    "nominalDia": "호칭 지름",
+    "explanation": "상세 설명",
+    "toleranceValues": "공차 값",
+    "mountingCalc": "장착 계산",
+    "pressure": "접촉 압력",
+    "force": "압입 힘",
+    "torque": "전달 토크",
+    "metric": "미터법",
+    "imperial": "야드파운드법",
+    "from": "시작",
+    "to": "끝",
+    "language": "언어",
+    "calcTool": "계산 도구",
+    "formula": "계산식",
+    "ratio": "비율",
+    "stress": "응력",
+    "beam": "보",
+    "cantilever": "캔틸레버",
+    "simple": "단순 지지",
+    "share": "계산 공유",
+    "copied": "복사됨!",
+    "loadGeometry": "하중 & 형상",
+    "beamParams": "보 파라미터",
+    "calculatedStress": "계산된 응력",
+    "maxDeflection": "최대 처짐",
+    "safetyFactor": "안전계수",
+    "centerDist": "중심거리 (awt)",
+    "outputSpeed": "출력 속도"
+  },
+  "dimensions": {
+    "width": "폭",
+    "height": "높이",
+    "thickness": "두께",
+    "wallThickness": "벽 두께",
+    "outerDiameter": "외경",
+    "diameter": "지름",
+    "length": "길이"
+  },
+  "aluminum": {
+    "title": "프로필 중량 계산기",
+    "shapes": {
+      "box": "박스 프로필",
+      "sheet": "판재",
+      "pipe": "원형 튜브",
+      "bar": "솔리드 바",
+      "angle": "앵글 (L)",
+      "beam": "빔 (I/H)",
+      "channel": "채널 (U)",
+      "tee": "T-프로필",
+      "hex": "육각 봉"
+    },
+    "params": {
+      "width": "폭 (A)",
+      "height": "높이 (B)",
+      "thickness": "두께 (t)",
+      "wall": "벽 (t)",
+      "diameter": "지름 (D)",
+      "length": "길이",
+      "web": "웹 (tw)",
+      "flange": "플랜지 (tf)"
+    },
+    "theory": {
+      "densityTitle": "밀도 (ρ)",
+      "densityDesc": "밀도는 단위 부피당 질량입니다. 합금 원소에 따라 알루미늄 계열의 밀도는 약간 다릅니다.",
+      "series1000": "1000계열 (순알루미늄): 약 2.70 g/cm³",
+      "series6000": "6000계열 (Mg+Si): 약 2.70 g/cm³",
+      "series7000": "7000계열 (Zn): 약 2.81 g/cm³ (더 무거움)",
+      "formula": "질량 = 부피 × 밀도",
+      "plateFormula": "판재: 길이 × 폭 × 두께 × ρ"
+    },
+    "disclaimer": "계산은 이론 밀도(~2.70 g/cm³)를 기준으로 합니다. 실제 중량은 제조 공차에 따라 ±5% 변동될 수 있습니다(ASTM B221). 정확한 값 입력을 권장합니다.",
+    "projectList": {
+      "title": "프로젝트 목록 (BOM)",
+      "add": "목록에 추가",
+      "clear": "목록 비우기",
+      "empty": "목록이 비어 있습니다.",
+      "totalWeight": "총 중량 합계",
+      "totalCost": "총 프로젝트 비용",
+      "columns": {
+        "id": "#",
+        "desc": "재료 / 치수",
+        "qty": "수량",
+        "unitWeight": "단위 중량",
+        "totalWeight": "총 중량",
+        "actions": "작업"
+      }
+    },
+    "costData": {
+      "pricePerKg": "단가 (/kg)",
+      "estimatedCost": "예상 비용"
+    },
+    "engineering": {
+      "title": "공학 분석",
+      "surfaceArea": "표면적(도장)",
+      "mechProps": "기계적 성질",
+      "yield": "항복강도",
+      "tensile": "인장강도",
+      "hardness": "경도",
+      "weldability": "용접성",
+      "sectionProps": "단면 성질",
+      "inertia": "단면 2차 모멘트",
+      "modulus": "단면 계수",
+      "radius": "회전 반경"
+    },
+    "simulation": {
+      "title": "보 처짐 시뮬레이션",
+      "open": "시뮬레이터 열기",
+      "close": "닫기",
+      "length": "보 길이 (L)",
+      "load": "하중 (F)",
+      "support": "지지 형식",
+      "simple": "단순 지지",
+      "cantilever": "캔틸레버",
+      "result": "최대 처짐",
+      "safe": "안전",
+      "unsafe": "위험 (>L/300)",
+      "warning": "주의: 단순 추정입니다. 중요한 하중에는 FEA 사용을 권장합니다."
+    },
+    "export": {
+      "pdf": "견적서 다운로드 (PDF)",
+      "dxf": "DXF 다운로드 (CAD)"
+    }
+  },
+  "handbook": {
+    "title": "재료 과학 가이드"
+  },
+  "fit": {
+    "title": "끼워맞춤 계산기",
+    "subtitle": "ISO 공차 시스템 및 간섭",
+    "tabs": {
+      "standard": "표준 끼워맞춤",
+      "manual": "수동 공차"
+    },
+    "fitTypes": {
+      "h7h6": {
+        "name": "슬라이딩 끼워맞춤",
+        "desc": "윤활 상태에서 손으로 슬라이딩"
+      },
+      "h7g6": {
+        "name": "러닝 끼워맞춤",
+        "desc": "회전 부품용"
+      },
+      "h7f7": {
+        "name": "자유 러닝 끼워맞춤",
+        "desc": "큰 여유"
+      },
+      "h7k6": {
+        "name": "전이 끼워맞춤",
+        "desc": "약한 간섭/여유"
+      },
+      "h7m6": {
+        "name": "전이 끼워맞춤",
+        "desc": "보통 약한 간섭"
+      },
+      "h7n6": {
+        "name": "전이 끼워맞춤",
+        "desc": "간섭 경향"
+      },
+      "h7p6": {
+        "name": "약한 압입",
+        "desc": "가벼운 해머 조립"
+      },
+      "h7r6": {
+        "name": "압입",
+        "desc": "유압 프레스 필요"
+      },
+      "h7s6": {
+        "name": "강한 압입",
+        "desc": "가열/냉각 조립"
+      }
+    },
+    "inputs": {
+      "nominalSize": "호칭 치수",
+      "fitLength": "끼워맞춤 길이",
+      "elasticModulus": "탄성계수 E",
+      "frictionCoeff": "마찰계수 (μ)"
+    },
+    "results": {
+      "fitType": "끼워맞춤 유형",
+      "clearanceAmount": "여유량",
+      "interferenceAmount": "간섭량",
+      "clearance": "여유",
+      "transition": "전이",
+      "interference": "간섭"
+    }
+  },
+  "gear": {
+    "title": "기어 계산기",
+    "subtitle": "평기어, 헬리컬, 베벨 형상",
+    "types": {
+      "spur": "평기어",
+      "helical": "헬리컬 기어",
+      "bevel": "베벨 기어",
+      "worm": "웜 기어"
+    },
+    "inputs": {
+      "module": "모듈 (m)",
+      "pressureAngle": "압력각",
+      "pinionTeeth": "Z1 (피니언)",
+      "gearTeeth": "Z2 (기어)",
+      "helixAngle": "헬릭스 각",
+      "faceWidth": "치폭",
+      "power": "동력 (kW)",
+      "rpm": "회전수 (RPM)"
+    },
+    "results": {
+      "calculatedTorque": "토크",
+      "transmissionRatio": "비율",
+      "pitchDiameter": "피치 지름",
+      "forcesAndStress": "힘 & 응력"
+    },
+    "outputs": {
+      "tipDia": "치첨 지름",
+      "rootDia": "치저 지름"
+    }
+  },
+  "strength": {
+    "title": "강도 계산기",
+    "subtitle": "응력 분석 & 모어의 원",
+    "inputs": {
+      "sigmaX": "시그마 X (σx)",
+      "sigmaY": "시그마 Y (σy)",
+      "tauXY": "타우 XY (τxy)",
+      "theta": "각도 (θ)"
+    },
+    "results": {
+      "principalStresses": "주응력",
+      "maxShear": "최대 전단 (τmax)",
+      "vonMises": "폰 미제스",
+      "transformed": "변환 상태"
+    }
+  },
+  "bearing": {
+    "title": "베어링 수명 계산",
+    "subtitle": "L10 수명 & 하중 분석",
+    "inputs": {
+      "series": "시리즈",
+      "code": "베어링 코드",
+      "radialLoad": "방사 하중 (Fr)",
+      "axialLoad": "축 하중 (Fa)",
+      "rpm": "회전수 (RPM)",
+      "reliability": "신뢰도"
+    },
+    "results": {
+      "lifeHours": "L10 수명 (시간)",
+      "lifeRevs": "L10 수명 (M 회전)",
+      "equivalentLoad": "등가 하중 (P)",
+      "staticSafety": "정적 안전 (s0)"
+    }
+  },
+  "welding": {
+    "title": "용접 계산기",
+    "subtitle": "열 입력 & 응력 분석",
+    "inputs": {
+      "method": "방법",
+      "type": "조인트 유형",
+      "current": "전류 (I)",
+      "voltage": "전압 (V)",
+      "speed": "속도 (v)",
+      "legSize": "다리 길이 (a)",
+      "thickness": "두께 (t)",
+      "length": "길이 (L)",
+      "load": "하중 (F)"
+    },
+    "results": {
+      "heatInput": "열 입력",
+      "stress": "응력",
+      "safetyFactor": "안전계수",
+      "efficiency": "효율 (η)"
+    },
+    "types": {
+      "fillet": "필릿 용접",
+      "butt": "맞대기 용접",
+      "doubleFillet": "이중 필릿"
+    }
+  },
+  "sheetMetal": {
+    "bendAngle": "굽힘 각",
+    "innerRadius": "내부 반경",
+    "bendLength": "굽힘 길이",
+    "kFactor": "K-팩터",
+    "title": "판금 계산기",
+    "subtitle": "굽힘 하중 & 전개 길이",
+    "inputs": {
+      "material": "재료",
+      "thickness": "두께 (t)",
+      "angle": "굽힘 각 (α)",
+      "radius": "내부 반경 (ri)",
+      "length": "굽힘 길이 (L)",
+      "vOpening": "V-다이 개구 (V)",
+      "flange1": "플랜지 A",
+      "flange2": "플랜지 B",
+      "kFactor": "K-팩터"
+    },
+    "results": {
+      "force": "필요 힘",
+      "flatLength": "전개 길이",
+      "bendAllowance": "굽힘 허용 (BA)",
+      "bendDeduction": "굽힘 공제 (BD)",
+      "recV": "권장 V-다이"
+    }
+  },
+  "pump": {
+    "title": "펌프 계산기",
+    "subtitle": "수력 동력 & NPSH",
+    "inputs": {
+      "flow": "유량 (Q)",
+      "head": "전양정 (H)",
+      "rpm": "회전수 (RPM)",
+      "eff": "효율 (η)",
+      "density": "밀도 (ρ)",
+      "npsh": "가용 NPSH"
+    },
+    "results": {
+      "hydPower": "수력 동력",
+      "shaftPower": "축 동력",
+      "specSpeed": "특정 속도 (ns)",
+      "type": "펌프 유형",
+      "flowVelocity": "유속",
+      "reynolds": "레이놀즈 수"
+    },
+    "types": {
+      "radial": "방사류",
+      "mixed": "혼합류",
+      "axial": "축류"
+    }
+  },
+  "fastener": {
+    "title": "패스너 & 나사",
+    "subtitle": "메트릭 ISO 나사 데이터",
+    "inputs": {
+      "size": "나사 호칭 (M)",
+      "pitch": "피치 (P)",
+      "class": "공차 등급"
+    },
+    "results": {
+      "tapDrill": "탭 드릴 사이즈",
+      "majorDia": "외경 (d)",
+      "minorDia": "내경 (d1)",
+      "pitchDia": "피치 지름 (d2)",
+      "clearingDrill": "클리어런스 홀",
+      "tensileArea": "유효 단면 (As)"
+    }
+  },
+  "converter": {
+    "title": "단위 변환기",
+    "categories": {
+      "length": "길이",
+      "weight": "질량",
+      "pressure": "압력",
+      "power": "동력"
+    }
+  },
+  "beam-deflection": {
+    "title": "보 처짐",
+    "desc": "처짐 & 응력 계산"
+  },
+  "concrete-reinforcement": {
+    "title": "콘크리트 철근",
+    "desc": "철근 단면적"
+  },
+  "ohms-law": {
+    "title": "옴의 법칙",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "전압 강하",
+    "desc": "케이블 선정"
+  },
+  "periodic-table": {
+    "title": "주기율표",
+    "desc": "화학 원소"
+  },
+  "calculator": {
+    "title": "과학 계산기",
+    "desc": "고급 수학"
+  },
+  "vat-calculator": {
+    "title": "부가세 계산기",
+    "desc": "세금 계산"
+  },
+  "excel-helper": {
+    "title": "엑셀 도우미",
+    "desc": "수식 생성기"
+  },
+  "json-formatter": {
+    "title": "JSON 포맷터",
+    "desc": "JSON 정리"
+  },
+  "regex-tester": {
+    "title": "정규식 테스터",
+    "desc": "패턴 테스트"
+  },
+  "feedback": {
+    "title": "피드백",
+    "desc": "의견 보내기"
+  },
+  "driveTrain": {
+    "title": "구동계 설계",
+    "subtitle": "모터 • 변속 • 하중 분석",
+    "primeMover": "1. 구동원 (IEC)",
+    "application": "2. 적용 하중",
+    "transmission": "3. 변속 설계",
+    "analysis": "4. 공학 분석",
+    "manufacturing": "4a. 검사 데이터 (M / Wk)",
+    "engineering": "4b. 공학 분석"
+  },
+  "motor": {
+    "nominalPower": "정격 출력",
+    "speedPoles": "속도 (극수)",
+    "nominalTorque": "정격 토크",
+    "efficiency": "효율",
+    "inputPower": "입력 P",
+    "ratio": "비율",
+    "torqueOut": "출력 토크"
+  },
+  "manufacturing": {
+    "profileMod": "프로파일 수정 (x)",
+    "shiftCoeff": "전위 계수",
+    "checkPin": "핀 지름 확인",
+    "overPins": "핀 걸침 치수 (M)",
+    "baseTangent": "기저 접선 길이 (Wk)",
+    "pinion": "피니언",
+    "gear": "기어",
+    "teeth": "치수"
+  },
+  "safety": {
+    "loadFactors": "하중 계수",
+    "tangentialForce": "접선 힘 (Ft)",
+    "radialForce": "반경 힘 (Fr)",
+    "axialForce": "축방향 힘 (Fa)",
+    "safetyEst": "안전 추정 (ISO 6336 기준)",
+    "bendingSafety": "굽힘 안전 (SF)",
+    "pittingSafety": "피팅 안전 (SH)",
+    "stress": "응력",
+    "contactStress": "접촉 응력",
+    "limit": "한계",
+    "serviceFactor": "서비스 계수 (KA)",
+    "safetyWarning": "안전계수는 단순화된 Lewis 식과 Hertz 접촉 응력을 기반으로 한 추정치입니다. 중요한 적용에는 ISO 6336 또는 AGMA 2001 해석을 권장합니다."
+  },
+  "market": {
+    "title": "시장 데이터",
+    "aluminum": "LME 알루미늄",
+    "copper": "LME 구리",
+    "live": "실시간",
+    "useLivePrice": "실시간 가격 사용"
+  },
+  "news": {
+    "title": "산업 뉴스",
+    "subtitle": "공학, 금속공학 및 시장 업데이트",
+    "breaking": "속보",
+    "readMore": "전체 기사 읽기",
+    "loading": "피드 로딩 중..."
+  },
+  "project": {
+    "title": "프로젝트 견적",
+    "manager": "프로젝트 관리자",
+    "grid": "데이터 그리드",
+    "nesting": "네스팅 최적화",
+    "exportPdf": "PDF 내보내기",
+    "clear": "비우기",
+    "empty": "프로젝트 목록이 비어 있습니다. 계산기에서 항목을 추가하세요.",
+    "settings": "최적화 설정",
+    "rawLength": "원자재 길이",
+    "bladeWidth": "톱날 폭",
+    "calculate": "절단 계산",
+    "totalBars": "총 바 수",
+    "efficiency": "효율",
+    "waste": "총 폐기",
+    "rem": "잔여"
+  },
+  "nesting": {
+    "title": "절단 최적화",
+    "subtitle": "1D 선형 네스팅",
+    "stockLength": "원자재 길이",
+    "kerf": "톱날 폭 (커프)",
+    "trimStart": "시작 여유",
+    "trimEnd": "끝 여유",
+    "addPart": "부품 추가",
+    "removePart": "제거",
+    "calculate": "절단 최적화",
+    "partLabel": "라벨",
+    "partLength": "길이",
+    "partQty": "수량",
+    "barsUsed": "사용 바 수",
+    "efficiency": "재료 효율",
+    "totalWaste": "총 폐기",
+    "algorithm": "알고리즘",
+    "noResults": "부품을 추가하고 최적화를 눌러 결과를 확인하세요"
+  },
+  "nesting2d": {
+    "title": "2D 네스팅",
+    "subtitle": "실형상 네스팅",
+    "dropSvg": "SVG 파일을 드롭하거나 클릭하여 업로드",
+    "sheetWidth": "판 폭",
+    "sheetHeight": "판 높이",
+    "spacing": "부품 간격",
+    "rotation": "회전 단계",
+    "optimize": "최적화",
+    "exportDxf": "DXF 내보내기",
+    "sheets": "판",
+    "efficiency": "효율",
+    "waste": "폐기",
+    "parts": "부품",
+    "unplaced": "배치되지 않은 부품"
+  },
+  "gears": {
+    "title": "기어 계산기",
+    "module": "모듈 (m)",
+    "teeth": "치수 (z)",
+    "pressureAngle": "압력각",
+    "helixAngle": "헬릭스 각",
+    "faceWidth": "치폭",
+    "addendum": "이끝 높이 (ha)",
+    "dedendum": "이바닥 높이 (hf)",
+    "circularPitch": "원주 피치 (p)",
+    "recFaceWidth": "권장 치폭 (6m-10m)"
+  },
+  "science": {
+    "title": "주기율표",
+    "meltingPoint": "융점",
+    "boilingPoint": "끓는점",
+    "discoveredBy": "발견자",
+    "categories": {
+      "alkali metal": "알칼리 금속",
+      "alkaline earth metal": "알칼리 토금속",
+      "transition metal": "전이 금속",
+      "noble gas": "비활성 기체",
+      "halogen": "할로겐",
+      "metalloid": "준금속",
+      "nonmetal": "비금속",
+      "lanthanide": "란타넘족",
+      "actinide": "악티늄족"
+    }
+  },
+  "materials": {
+    "aluminum": "알루미늄",
+    "steel": "강",
+    "stainless": "스테인리스강",
+    "plastic": "플라스틱",
+    "nonferrous": "비철금속",
+    "superalloy": "초합금"
+  },
+  "civil": {
+    "title": "콘크리트 철근",
+    "requiredAs": "필요 As",
+    "actualAs": "실제 As",
+    "effectiveD": "유효 d"
+  },
+  "electrical": {
+    "title": "전압 강하",
+    "powerFactor": "역률",
+    "cableRes": "케이블 저항",
+    "powerLoss": "전력 손실",
+    "recSize": "권장 규격"
+  },
+  "reducer": {
+    "inputPower": "입력 동력",
+    "ambientTemp": "주위 온도"
+  },
+  "cutting": {
+    "stockLength": "원자재 길이",
+    "bladeKerf": "톱날 폭",
+    "trimStart": "시작 여유",
+    "trimEnd": "끝 여유"
+  }
+}

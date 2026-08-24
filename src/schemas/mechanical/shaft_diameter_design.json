@@ -1,0 +1,38 @@
+{
+  "id": "shaft_diameter_design",
+  "name": "Shaft Diameter from Torque",
+  "category": "mechanical",
+  "description": "Calculate minimum shaft diameter based on applied torque and allowable shear stress. Uses the torsion formula for solid circular shafts.",
+  "inputs": [
+    { "key": "T", "type": "number", "unit": "Nm", "description": "Applied Torque", "default": 63.66 },
+    { "key": "tau_allow", "type": "number", "unit": "MPa", "description": "Allowable Shear Stress", "default": 40 },
+    { "key": "SF", "type": "number", "unit": "-", "description": "Safety Factor", "default": 2 }
+  ],
+  "steps": [
+    {
+      "id": "T_design",
+      "formula": "T * SF",
+      "description": "Design torque with safety factor",
+      "latex": "T_{design} = T \\times SF"
+    },
+    {
+      "id": "d_min_m",
+      "formula": "((16 * T_design) / (3.14159 * tau_allow * 1e6))^(1/3)",
+      "description": "Minimum shaft diameter (meters)",
+      "latex": "d_{min} = \\sqrt[3]{\\frac{16 \\cdot T_{design}}{\\pi \\cdot \\tau_{allow}}}"
+    },
+    {
+      "id": "d_min_mm",
+      "formula": "d_min_m * 1000",
+      "description": "Minimum shaft diameter (millimeters)",
+      "latex": "d_{min} = d_{min,m} \\times 1000"
+    },
+    {
+      "id": "d_standard",
+      "formula": "ceil(d_min_mm / 5) * 5",
+      "description": "Rounded up to nearest 5mm standard size",
+      "latex": "d_{std} = \\lceil d_{min} / 5 \\rceil \\times 5"
+    }
+  ],
+  "outputs": ["d_min_mm", "d_standard", "T_design"]
+}

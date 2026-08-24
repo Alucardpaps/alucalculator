@@ -1,0 +1,97 @@
+{
+    "slug": "introduction-to-machine-elements",
+    "academicYear": 1,
+    "department": "Mechanical",
+    "difficulty": "Basic",
+    "readingTime": 8,
+    "prerequisites": [
+        "fundamentals-of-statics"
+    ],
+    "meta": {
+        "title": "Introduction to Machine Elements (Design Overview)",
+        "description": "An overview of common machine elements including fasteners, bearings, gears, and shafts. Learn why we use them and the basic design constraints."
+    },
+    "hero": {
+        "h1": "Introduction to Machine Elements (Design Overview)",
+        "intro": "Machines are composed of standard building blocks called Machine Elements. From the simplest screw to complex planetary gears, understanding these components is the first step toward becoming a machine designer.\n\nDesigners rarely invent new parts from scratch. They select standardized machine elements — bolts, bearings, gears, belts, shafts, keys, and seals — and compose them into functional assemblies. Each element family has catalog ratings, failure modes, and ISO/DIN standards.\n\nThis overview maps those families to the specialized academy lessons and AluCalc calculators you will use for quantitative sizing."
+    },
+    "formula": {
+        "equation": "Machine = Σ Elements + Power",
+        "variables": {
+            "Elements": "Fasteners, Gears, Bearings, etc.",
+            "Power": "Torque × Speed"
+        }
+    },
+    "stepByStep": [
+        "Identify the motion required (Linear vs Rotational).",
+        "Select the power transmission element (Gear, Belt, Chain).",
+        "Choose the support element (Bearing, Shaft).",
+        "Specify the joining method (Bolt, Weld, Rivet).",
+        "Verify sizing using engineering standards.",
+        "Estimate duty cycle and environmental exposure before catalog lookup.",
+        "Verify interchangeability with supplier drawings and ISO designation."
+    ],
+    "example": {
+        "inputs": [
+            "Requirement: Join two plates",
+            "Option: M10 Bolt"
+        ],
+        "calculation": "Selection: Threaded Fastener (M10 ISO 262)"
+    },
+    "whyThisMatters": [
+        "Standardized elements allow for interchangeable parts and easier maintenance.",
+        "Knowing the right element for the job prevents over-engineering and reduces cost."
+    ],
+    "commonMistakes": [
+        "Choosing an element without considering the environment (Corrosion, Heat).",
+        "Neglecting the dynamic loads (Vibration) on static fasteners.",
+        "Using non-standard sizes that are hard to source."
+    ],
+    "engineeringTip": "Always design for disassembly unless the joint is intended to be permanent.",
+    "calculatorCta": {
+        "targetSlug": "bolt-torque-calc",
+        "label": "Start exploring machine elements with our Bolt Designer"
+    },
+    "faq": [
+        {
+            "question": "What is the most common machine element?",
+            "answer": "Threaded fasteners (bolts and screws) are by far the most widely used elements in engineering."
+        },
+        {
+            "question": "What distinguishes a machine element from a raw part?",
+            "answer": "Machine elements are standardized, cataloged components with defined interfaces and performance ratings."
+        },
+        {
+            "question": "When is welding preferred over bolting?",
+            "answer": "When permanent, high-stiffness joints are needed and disassembly is not required — but inspectability suffers."
+        },
+        {
+            "question": "How do bearings differ from bushings?",
+            "answer": "Rolling-element bearings use balls/rollers for low friction; bushings are plain sleeves suited to oscillating or dirty environments."
+        }
+    ],
+    "relatedArticles": [
+        "how-to-calculate-bolt-torque",
+        "bearing-life-calculation-explained"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Engineering Fundamentals Handbook",
+            "filename": "engineering fundamentals.pdf"
+        },
+        {
+            "title": "Mühendislik Bilgileri Web Sitesi Dökümantasyonu",
+            "filename": "Mühendislik Bilgileri Web Sitesi Dökümantasyonu.pdf"
+        }
+    ],
+    "learningObjectives": [
+        "Classify machine elements by function: power transmission, support, and joining",
+        "Map design requirements to standard catalog components (ISO, DIN)",
+        "Recognize when a custom element is justified versus over-engineering"
+    ],
+    "keyTakeaways": [
+        "Standard elements enable interchangeability and lower lifecycle cost",
+        "Environment (corrosion, temperature, vibration) drives element selection",
+        "Design for disassembly unless the joint is intentionally permanent"
+    ]
+}

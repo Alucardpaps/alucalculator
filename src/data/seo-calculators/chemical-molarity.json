@@ -1,0 +1,33 @@
+{
+  "id": "chemical-molarity",
+  "title": "Molarity Calculation Calculator & Engineering Guide - AluCalc",
+  "slug": "chemical-molarity",
+  "keyword": "molarity calculation calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Molarity Calculation Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Molarity Calculation guide with Chemistry Lab Standards formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Molarity Calculation Calculator & Engineering Guide - AluCalc",
+    "intro": "Measures the concentration of a chemical species in a solution.",
+    "formula": "M = \\frac{n}{V}",
+    "variables": {
+      "n": "Moles of solute",
+      "V": "Volume of solution (L)"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Ensure volume is in Liters",
+      "Calculate molar mass correctly"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Molarity Calculation.\n2. Consult the technical reference table for material constants.\n3. Apply the Chemistry Lab Standards formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Molarity Calculation analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

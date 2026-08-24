@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "60°-Metrik/UN-Gewinde von 55°-Whitworth und 30°-Trapezprofilen unterscheiden",
+    "Toleranzbezeichnungen (6g/6H, 4h) und Montagefolgen lesen",
+    "Spannungsquerschnitt aus Steigung und Außendurchmesser für Schraubendimensionierung schätzen"
+  ],
+  "keyTakeaways": [
+    "Profilwinkelfehlanpassung zerstört Gewinde bei erster Montage",
+    "Toleranzklasse steuert Passung — 4h ist enger als 6g für kritische Verbindungen",
+    "Teilprofilwerkzeuge tauschen Flexibilität gegen scharfe Gewindebögen"
+  ],
+  "supplementalParagraph": "Gewindegeometrie ist die DNA jeder Schraubverbindung. CNC-Programmierer und Schraubendesigner nutzen dieselben ISO-Tabellen.",
+  "formula": {
+    "variables": {
+      "Metrik (M)": "Metrik (M): 60° Profilwinkel",
+      "Unified (UN)": "Unified (UN): 60° Profilwinkel",
+      "Whitworth (W)": "Whitworth (W): 55° Profilwinkel",
+      "Trapezoidal (Tr)": "Trapezoidal (Tr): 30° Profilwinkel"
+    }
+  },
+  "stepByStep": [
+    "Primäres Gewindesystem identifizieren (Metrik vs. Zoll).",
+    "Profilwinkel prüfen (z. B. 60° für ISO-Metrik).",
+    "Passende Toleranzklasse wählen (4h eng, 6g Standard).",
+    "Außen- und Kerndurchmesser aus Steigung berechnen.",
+    "Passendes Bearbeitungswerkzeug nach Profil wählen.",
+    "Spannungsquerschnitt As aus Steigung und Flankendurchmesser für Festigkeitsprüfungen berechnen.",
+    "Bohrergröße gegen Kerndurchmesser vor Serienfertigung prüfen."
+  ],
+  "example": {
+    "inputs": [
+      "Thread: M16 x 1.5",
+      "Standard: ISO 262",
+      "Angle: 60°"
+    ],
+    "calculation": "Major Diameter = 16 mm, Pitch = 1.5 mm, Minor Diameter ≈ 14.16 mm"
+  },
+  "whyThisMatters": [
+    "Profilfehlanpassung (z. B. UN in M-Loch) zerstört Gewinde sofort.",
+    "Toleranzgrade (6g vs. 4h) bestimmen Passung und Montierbarkeit in der Massenfertigung."
+  ],
+  "commonMistakes": [
+    "60° (Metrik) und 55° (Whitworth) verwechseln — sehen fast gleich aus.",
+    "Gewindetoleranzen (6g/6H) in kritischen Strukturanwendungen ignorieren.",
+    "Teilprofilwerkzeuge für Vollprofilanforderungen verwenden."
+  ],
+  "calculatorCta": {
+    "label": "Design custom thread profiles in the Fastener Lab"
+  },
+  "faq": [
+    {
+      "question": "Unterschied zwischen Toleranzen 6g und 4h?",
+      "answer": "6g ist Standard-Passung, 4h ist engere Präzisionspassung für hohe Vibration."
+    },
+    {
+      "question": "Was bedeutet 6g/6H?",
+      "answer": "6g ist Außengewindetoleranz (Schraube); 6H ist Innengewinde (Mutter). Kleinere Zahlen = engere Passung."
+    },
+    {
+      "question": "Warum Whitworth-Gewinde 55°?",
+      "answer": "Historische britische Norm — inkompatibel mit 60°-Metrik/UN trotz ähnlichem Aussehen."
+    },
+    {
+      "question": "Wann werden Trapezgewinde (Tr) verwendet?",
+      "answer": "Spindel- und Trapezgewinde, wenn Wirkungsgrad und Kraftübertragung wichtiger als schnelle Montage."
+    }
+  ]
+}

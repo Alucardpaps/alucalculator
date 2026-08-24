@@ -1,0 +1,22 @@
+{
+    "id": "alucalc.mechanical.mfg-readiness",
+    "version": "1.0.0",
+    "type": "manufacturing-readiness",
+    "category": "mechanical",
+    "title": "Manufacturing Analyzer",
+    "description": "Analyzes CAD geometry for CNC, 3D printing, and bending manufacturability (Score 0-100).",
+    "icon": "Factory",
+    "defaultSize": {
+        "width": 900,
+        "height": 700
+    },
+    "capabilities": [
+        "geometry-analysis",
+        "report-generation"
+    ],
+    "permissions": [
+        "project.read"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

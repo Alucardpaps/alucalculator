@@ -1,0 +1,21 @@
+{
+    "id": "alucalc.finance.real-time-cost",
+    "version": "1.0.0",
+    "type": "cost-estimator",
+    "category": "finance",
+    "title": "Real-Time Cost Engine",
+    "description": "Estimates machining time, material cost, and total production cost interactively.",
+    "icon": "DollarSign",
+    "defaultSize": {
+        "width": 800,
+        "height": 700
+    },
+    "capabilities": [
+        "cost-calculation"
+    ],
+    "permissions": [
+        "project.read"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

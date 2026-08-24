@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.alucard.alucalcos",
+      "sha256_cert_fingerprints": [
+        "E1:D2:9E:5C:3C:7F:52:E1:E6:F7:1D:42:EE:8A:72:45:1A:53:33:1C:AE:52:4E:FF:11:46:92:D1:EB:F4:C2:B1"
+      ]
+    }
+  }
+]

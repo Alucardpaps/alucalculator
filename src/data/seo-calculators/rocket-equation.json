@@ -1,0 +1,35 @@
+{
+  "id": "rocket-equation",
+  "title": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc",
+  "slug": "rocket-equation",
+  "keyword": "tsiolkovsky rocket equation calculator",
+  "category": "aerospace",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Tsiolkovsky Rocket Equation guide with Orbital Mechanics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the maximum change in velocity a rocket can achieve.",
+    "formula": "\\Delta v = v_e \\ln \\frac{m_0}{m_f}",
+    "variables": {
+      "dv": "Delta-V",
+      "ve": "Exhaust velocity",
+      "m0": "Initial mass",
+      "mf": "Final mass"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check Isp conversion to Ve",
+      "Account for gravity losses"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Tsiolkovsky Rocket Equation.\n2. Consult the technical reference table for material constants.\n3. Apply the Orbital Mechanics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Aerospace applications, accurate Tsiolkovsky Rocket Equation analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

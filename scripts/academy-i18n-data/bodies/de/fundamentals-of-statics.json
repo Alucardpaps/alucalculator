@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Vollständige Freikörperbilder mit korrekten Kraftrichtungen zeichnen",
+    "ΣF = 0 und ΣM = 0 anwenden, um unbekannte Reaktionen zu lösen",
+    "Geneigte Kräfte in orthogonale Komponenten zerlegen"
+  ],
+  "keyTakeaways": [
+    "Eine fehlende Kraft im FKB macht jedes Folgeergebnis ungültig",
+    "Momentenzentrum mit den meisten Unbekannten wählen, um Algebra zu vereinfachen",
+    "Statik ist Voraussetzung für jede Struktur- und Maschinenberechnung"
+  ],
+  "supplementalParagraph": "Vor Balken- oder Schraubendimensionierung müssen Lagerreaktionen bekannt sein. Die Fachwerk- und Balken-Engines in AluCalc setzen Gleichgewicht voraus.",
+  "formula": {
+    "variables": {
+      "ΣF": "ΣF: Summe aller Kräfte (N)",
+      "ΣM": "ΣM: Summe aller Momente (Nm)"
+    }
+  },
+  "stepByStep": [
+    "Alle äußeren Kräfte auf den Körper identifizieren.",
+    "Freikörperbild (FKB) zeichnen.",
+    "Kräfte in X-, Y- und Z-Komponenten zerlegen.",
+    "Gleichgewichtsgleichungen anwenden: ΣFx=0, ΣFy=0.",
+    "Momente um einen Punkt summieren, um Unbekannte zu finden: ΣM=0.",
+    "Prüfen, dass die Anzahl der Unbekannten den unabhängigen Gleichgewichtsgleichungen entspricht.",
+    "Ergebnisse durch Einsetzen der Reaktionen in ein zweites Momentenzentrum verifizieren."
+  ],
+  "example": {
+    "inputs": [
+      "Force 1: 100 N (Up)",
+      "Reaction 1: R1 (Down)"
+    ],
+    "calculation": "ΣFy = 100 - R1 = 0 → R1 = 100 N"
+  },
+  "whyThisMatters": [
+    "Stellt sicher, dass Strukturen und Maschinen angreifende Lasten ohne Bewegung oder Versagen aushalten.",
+    "Ermöglicht Berechnung der Reaktionskräfte an Lagern."
+  ],
+  "commonMistakes": [
+    "Nicht alle Kräfte im Freikörperbild berücksichtigen.",
+    "Richtung (Vorzeichen) von Kräften oder Momenten falsch angeben.",
+    "Gewicht des Körpers vernachlässigen, wenn es signifikant ist."
+  ],
+  "engineeringTip": "Punkt mit den meisten unbekannten Kräften für Momentensumme wählen, um Rechnung zu vereinfachen.",
+  "calculatorCta": {
+    "label": "Analyze beam equilibrium using our advanced structural tools"
+  },
+  "faq": [
+    {
+      "question": "Was ist ein Moment?",
+      "answer": "Moment ist das Maß der Tendenz einer Kraft, einen Körper um einen Punkt oder eine Achse zu drehen."
+    },
+    {
+      "question": "Was ist ein Freikörperbild?",
+      "answer": "Isolierte Skizze eines Körpers mit allen äußeren Kräften und Momenten — obligatorischer erster Schritt in Statik."
+    },
+    {
+      "question": "Kann Gleichgewicht scheitern, wenn ΣF = 0, aber ΣM ≠ 0?",
+      "answer": "Ja. Beide Bedingungen sind nötig; sonst beschleunigt der Körper rotationell, auch wenn die resultierende Kraft null ist."
+    },
+    {
+      "question": "Wann wird Eigengewicht einbezogen?",
+      "answer": "Eigengewicht einbeziehen, wenn es mit angreifenden Lasten vergleichbar ist — besonders bei langen Balken."
+    }
+  ]
+}

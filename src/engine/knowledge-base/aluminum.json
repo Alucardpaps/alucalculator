@@ -1,0 +1,40 @@
+{
+  "alloys": {
+    "6063-T6": {
+      "name": "6063",
+      "temper": "T6",
+      "density": 2700,
+      "youngsModulus": 69000,
+      "yieldStrength": 214,
+      "ultimateTensileStrength": 241,
+      "poissonRatio": 0.33,
+      "thermalExpansion": 23.4,
+      "default": true,
+      "description": "Architectural standard alloy, excellent extrudability and finishing characteristics."
+    },
+    "6061-T6": {
+      "name": "6061",
+      "temper": "T6",
+      "density": 2700,
+      "youngsModulus": 68900,
+      "yieldStrength": 276,
+      "ultimateTensileStrength": 310,
+      "poissonRatio": 0.33,
+      "thermalExpansion": 23.6,
+      "default": false,
+      "description": "Structural standard alloy, higher strength than 6063, good weldability."
+    },
+    "7075-T6": {
+      "name": "7075",
+      "temper": "T6",
+      "density": 2810,
+      "youngsModulus": 71700,
+      "yieldStrength": 503,
+      "ultimateTensileStrength": 572,
+      "poissonRatio": 0.33,
+      "thermalExpansion": 23.6,
+      "default": false,
+      "description": "High-strength aerospace alloy, relatively poor corrosion resistance."
+    }
+  }
+}

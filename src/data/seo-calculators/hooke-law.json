@@ -1,0 +1,33 @@
+{
+  "id": "hooke-law",
+  "title": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc",
+  "slug": "hooke-law",
+  "keyword": "hooke's law (spring force) calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Hooke's Law (Spring Force) guide with Elasticity Theory formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc",
+    "intro": "Relates the force exerted by a spring to its displacement from equilibrium.",
+    "formula": "F = k \\cdot x",
+    "variables": {
+      "F": "Restoring force",
+      "k": "Spring constant",
+      "x": "Displacement"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify elastic limit not exceeded"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Hooke's Law (Spring Force).\n2. Consult the technical reference table for material constants.\n3. Apply the Elasticity Theory formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Hooke's Law (Spring Force) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

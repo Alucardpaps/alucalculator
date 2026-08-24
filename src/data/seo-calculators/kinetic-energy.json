@@ -1,0 +1,34 @@
+{
+  "id": "kinetic-energy",
+  "title": "Kinetic Energy Calculator & Engineering Guide - AluCalc",
+  "slug": "kinetic-energy",
+  "keyword": "kinetic energy calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Kinetic Energy Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Kinetic Energy guide with Classical Mechanics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Kinetic Energy Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the energy an object possesses due to its motion.",
+    "formula": "E_k = \\frac{1}{2} m v^2",
+    "variables": {
+      "m": "Mass (kg)",
+      "v": "Velocity (m/s)"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify relativistic effects if v > 0.1c"
+    ],
+    "pitfalls": [
+      "Using weight instead of mass"
+    ],
+    "step_by_step": "1. Define system parameters for Kinetic Energy.\n2. Consult the technical reference table for material constants.\n3. Apply the Classical Mechanics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Kinetic Energy analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

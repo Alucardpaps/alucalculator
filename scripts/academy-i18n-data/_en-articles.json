@@ -1,0 +1,1295 @@
+{
+  "beam-deflection-formula-explained": {
+    "slug": "beam-deflection-formula-explained",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [],
+    "meta": {
+      "title": "Beam Deflection Formulas (Structural Mechanics Explained)",
+      "description": "Understand the Euler-Bernoulli beam theory and how to calculate deflection for various loading conditions. Includes UDL, point load, and cantilever examples."
+    },
+    "hero": {
+      "h1": "Beam Deflection Formulas (Structural Mechanics Explained)",
+      "intro": "Structural integrity relies on controlling deformation. Deflection is the displacement of a structural element under load, and calculating it is critical for ensuring serviceability and safety in engineering design.\n\nStrength alone does not make a good design — users feel deflection. Serviceability limits like L/360 for floors and L/250 for crane rails often govern before stress reaches yield. Euler–Bernoulli beam theory gives closed-form δ for standard supports.\n\nThe Beam Deflection Engine in AluCalc uses the same PL³/(48EI) backbone for simply supported center loads."
+    },
+    "formula": {
+      "equation": "δ = (F × L³) / (48 × E × I)",
+      "variables": {
+        "δ": "Deflection (m)",
+        "F": "Point load at center (N)",
+        "L": "Beam length (m)",
+        "E": "Modulus of elasticity (Pa)",
+        "I": "Area moment of inertia (m⁴)"
+      }
+    },
+    "stepByStep": [
+      "Determine the beam support conditions (e.g., simply supported).",
+      "Identify the type and location of the applied load.",
+      "Determine the material properties (E) and section geometry (I).",
+      "Select the appropriate deflection formula.",
+      "Calculate the maximum deflection and compare with allowable limits.",
+      "Include self-weight as equivalent distributed load when span is long.",
+      "Compare computed δ to code serviceability limit for the application."
+    ],
+    "example": {
+      "inputs": [
+        "F = 10,000 N",
+        "L = 5 m",
+        "E = 210 GPa (Steel)",
+        "I = 50,000,000 mm⁴"
+      ],
+      "calculation": "δ = (10000 × 5³) / (48 × 210e9 × 50e-6) ≈ 0.00248 m (2.48 mm)"
+    },
+    "whyThisMatters": [
+      "Excessive deflection can cause structural instability or functional failure (e.g., doors not closing).",
+      "Allows engineers to optimize beam size and material to meet safety standards with minimal cost."
+    ],
+    "commonMistakes": [
+      "Mixing units (e.g., using mm for I but m for L).",
+      "Using the wrong formula for the specific support or loading condition.",
+      "Neglecting the beam's own weight for very long spans."
+    ],
+    "engineeringTip": "Always verify units twice; displacement units are often small and sensitive to power-of-ten errors.",
+    "calculatorCta": {
+      "targetSlug": "beam-deflection-calc",
+      "label": "Use the Beam Deflection Calculator to model complex loading scenarios"
+    },
+    "faq": [
+      {
+        "question": "What is the Euler-Bernoulli beam theory?",
+        "answer": "It is a simplification of linear elastic theory which provides a means of calculating the load-carrying and deflection characteristics of beams."
+      },
+      {
+        "question": "Why does deflection scale with L⁴?",
+        "answer": "From δ = PL³/(48EI) — span is the dominant sensitivity in serviceability."
+      },
+      {
+        "question": "What is L/360?",
+        "answer": "A common floor deflection limit — total load deflection must not exceed span/360."
+      },
+      {
+        "question": "When is Timoshenko beam theory needed?",
+        "answer": "Short, thick beams where shear deformation is significant — Euler–Bernoulli underestimates δ."
+      }
+    ],
+    "relatedArticles": [
+      "bearing-life-calculation-explained",
+      "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Roark's Formulas For Stress And Strain - Beams Section",
+        "filename": "Roark's Formulas For Stress And Strain.pdf"
+      },
+      {
+        "title": "Mukavemet - Eğme Momenti ve Atalet Momenti",
+        "filename": "5-egme_momenti__atalet_momenti_ve_basit_destekli_kirisler.ppt"
+      }
+    ],
+    "learningObjectives": [
+      "Apply Euler–Bernoulli deflection formulas for common support cases",
+      "Explain why deflection scales with L⁴ for center-loaded simply supported beams",
+      "Relate serviceability limits (e.g. L/360) to user comfort and gasket integrity"
+    ],
+    "keyTakeaways": [
+      "Deflection often governs design before stress reaches yield",
+      "Stiffness scales with E·I — doubling I halves deflection",
+      "Self-weight and creep may matter for long-span or polymer beams"
+    ]
+  },
+  "bearing-life-calculation-explained": {
+    "slug": "bearing-life-calculation-explained",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Advanced",
+    "readingTime": 15,
+    "prerequisites": [
+      "how-to-calculate-bolt-torque"
+    ],
+    "meta": {
+      "title": "Bearing Life Calculation (ISO 281 L10 Explained)",
+      "description": "Comprehensive guide to calculating bearing life using the ISO 281 L10 formula. Learn about dynamic load ratings, equivalent loads, and reliability factors."
+    },
+    "hero": {
+      "h1": "Bearing Life Calculation (ISO 281 L10 Explained)",
+      "intro": "Predicting the operational lifespan of a rolling-element bearing is vital for maintenance planning and machine reliability. The L10 life represents the life that 90% of a group of identical bearings will achieve or exceed before the first sign of fatigue develops.\n\nBearings fail by rolling-contact fatigue long before static strength limits are reached. ISO 281 defines dynamic load rating C and life L10 — the revolutions at which 10% of bearings fail under equivalent load P at 90% reliability.\n\nThis lesson teaches the same (C/P)^p relationship implemented in the AluCalc ISO 281 Bearing Engine."
+    },
+    "formula": {
+      "equation": "L10 = (C / P)^p",
+      "variables": {
+        "L10": "Basic rating life (millions of revolutions)",
+        "C": "Basic dynamic load rating (N)",
+        "P": "Equivalent dynamic bearing load (N)",
+        "p": "Exponent for life equation (3 for ball, 10/3 for roller)"
+      }
+    },
+    "stepByStep": [
+      "Identify the bearing type and basic dynamic load rating (C).",
+      "Calculate the equivalent dynamic load (P) based on radial and axial forces.",
+      "Determine the life exponent (p) based on bearing geometry.",
+      "Apply the formula to find life in millions of revolutions.",
+      "Convert revolutions to hours if rotational speed is known.",
+      "Convert combined radial and axial loads to equivalent P per ISO rules.",
+      "Convert L10 in millions of revolutions to hours using operating speed."
+    ],
+    "example": {
+      "inputs": [
+        "C = 25,000 N",
+        "P = 5,000 N",
+        "p = 3 (Ball Bearing)"
+      ],
+      "calculation": "L10 = (25000 / 5000)^3 = 5^3 = 125 million revolutions"
+    },
+    "whyThisMatters": [
+      "Prevents unexpected machine downtime by predicting replacement intervals.",
+      "Ensures bearings are correctly sized for the specific operating environment and load conditions."
+    ],
+    "commonMistakes": [
+      "Using static load ratings instead of dynamic load ratings in the formula.",
+      "Failing to account for axial loads when calculating the equivalent dynamic load.",
+      "Assuming constant speed and load when both vary in actual operation."
+    ],
+    "engineeringTip": "Always apply safety factors and consider environmental conditions like temperature and lubrication quality.",
+    "calculatorCta": {
+      "targetSlug": "bearing-life-calc",
+      "label": "Open the Bearing Life Calculator to model your specific loading conditions"
+    },
+    "faq": [
+      {
+        "question": "What is the difference between L10 and L10h?",
+        "answer": "L10 is life in millions of revolutions, while L10h is life in operating hours, which depends on the rotational speed (RPM)."
+      },
+      {
+        "question": "Does lubrication affect bearing life?",
+        "answer": "Yes, poor lubrication significantly reduces bearing life by increasing friction and heat, potentially leading to premature surface fatigue."
+      },
+      {
+        "question": "What is equivalent load P?",
+        "answer": "A single radial load producing the same life as the actual combined radial and axial loading."
+      },
+      {
+        "question": "Why exponent p = 3 for balls?",
+        "answer": "Contact stress-life relationship for point contact — rollers use p = 10/3 for line contact."
+      },
+      {
+        "question": "Is L10 the same as warranty life?",
+        "answer": "No — L10 is a statistical rating; field life depends on lubrication, contamination, and mounting."
+      }
+    ],
+    "relatedArticles": [
+      "how-to-calculate-bolt-torque",
+      "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mechanical Engineering Handbook - Rolling Bearings Section",
+        "filename": "Mechanical Engineering Handbook.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Compute L10 life using ISO 281 dynamic rating and equivalent load P",
+      "Apply life exponent p = 3 for ball bearings and 10/3 for rollers",
+      "Interpret catalog C versus operating P and reliability targets"
+    ],
+    "keyTakeaways": [
+      "L10 means 10% of bearings fail before that life at 90% reliability",
+      "P > C is a critical overspeed/overload condition — resize immediately",
+      "Equivalent load combines radial and axial components per ISO rules"
+    ]
+  },
+  "chip-breaker-logic": {
+    "slug": "chip-breaker-logic",
+    "academicYear": 3,
+    "department": "Manufacturing",
+    "difficulty": "Advanced",
+    "readingTime": 10,
+    "prerequisites": [
+      "thread-geometry-standards"
+    ],
+    "meta": {
+      "title": "Chip Breaker Logic: TQ Geometry & Cutting Forces",
+      "description": "An advanced machining module exploring chip control in threading. Learn about asymmetric point design, radial feed vs. modified flank feed, and cutting force reduction."
+    },
+    "hero": {
+      "h1": "Chip Breaker Logic: Mastering the Physics of Metal Removal",
+      "intro": "In high-speed CNC threading, the chip is your enemy. If it doesn't break, it nests around the tool, destroying the surface finish and the insert. Modern TQ geometries solve this with asymmetric pressure points. This course breaks down the fluid-like behavior of metal during the cut.\n\nCNC threading is a controlled metal-cutting process. Chip form determines whether you get short broken chips or a bird's nest wrapped around the tool. TQ geometries use asymmetric points to steer chip flow and cut cutting forces by 15–21%.\n\nThis lesson connects Kyocera threading data to the Machining Time engine in AluCalc."
+    },
+    "formula": {
+      "equation": "Cutting Force (Fc) ∝ (ap × f × Kc)",
+      "variables": {
+        "ap": "Depth of Cut (mm)",
+        "f": "Feed per Revolution (mm/rev)",
+        "Kc": "Specific Cutting Force (N/mm²)"
+      }
+    },
+    "stepByStep": [
+      "Select the chip breaker geometry based on the material (e.g., TF for general, TQ for stability).",
+      "Choose the feed method: Radial Infeed vs. Flank Infeed (3°–5°).",
+      "Determine the number of passes based on thread pitch (from tables).",
+      "Monitor chip flow direction using the asymmetric point logic.",
+      "Adjust cutting speed (Vc) based on tool wear patterns.",
+      "Set first threading pass depth above minimum chip breaker activation ap.",
+      "Apply high-pressure coolant for internal threads (SINR/CINR operations)."
+    ],
+    "example": {
+      "inputs": [
+        "Material: 15CrMo4",
+        "Tool: 16ER150 ISO-TQ",
+        "Feed: Radial"
+      ],
+      "calculation": "Using TQ geometry: Cutting force reduced by 15%, Vibration suppressed."
+    },
+    "whyThisMatters": [
+      "Incorrect chip control leads to 'bird-nesting', which is the #1 cause of tool failure.",
+      "Modified flank feed (3°–5°) significantly improves tool life by distributing heat."
+    ],
+    "commonMistakes": [
+      "Using constant depth of cut for all passes (the first pass must be deeper).",
+      "Failing to use high-pressure coolant in internal threading (SINR/CINR).",
+      "Neglecting the minimum depth of cut (ap) required to trigger the chip breaker."
+    ],
+    "textbookInsights": [
+      {
+        "page": "J6",
+        "insight": "TQ talaş kırıcı, asimetrik nokta tasarımı sayesinde talaş akış yönünü kontrol eder ve kesme kuvvetlerini %15-21 oranında bastırır.",
+        "source": "Kyocera Bolum-J"
+      },
+      {
+        "page": "J37",
+        "insight": "Paslanmaz çelikte diş açarken, standart tablo değerlerinden 2-3 paso daha fazla ayarlanması stabilite için tavsiye edilir.",
+        "source": "Kyocera Bolum-J"
+      },
+      {
+        "page": "J47",
+        "insight": "İç çap diş açmada 'Dengeleme Deliği Çapı' ucu korumak için kritik öneme sahiptir. İlk pasoda '0' kesme (sıfır kesme) yapılmalıdır.",
+        "source": "Kyocera Bolum-J"
+      }
+    ],
+    "calculatorCta": {
+      "targetSlug": "reducer-lubrication",
+      "label": "Analyze tool load in the Gearbox Simulation suite"
+    },
+    "faq": [
+      {
+        "question": "Why use modified flank feed?",
+        "answer": "It ensures that only one edge of the insert is doing the heavy work, reducing heat and preventing vibration (chatter)."
+      },
+      {
+        "question": "Radial vs flank infeed?",
+        "answer": "Radial loads both edges equally; modified flank (3°–5°) loads one edge for stability and heat control."
+      },
+      {
+        "question": "What is specific cutting force Kc?",
+        "answer": "Force per unit chip area — material property used to estimate Fc = ap × f × Kc."
+      },
+      {
+        "question": "Why extra passes for stainless?",
+        "answer": "Work hardening and springback require 2–3 more passes than carbon steel tables suggest."
+      }
+    ],
+    "relatedArticles": [
+      "thread-geometry-standards",
+      "mechanics-of-materials-fundamentals"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Kyocera Machining Standards",
+        "filename": "bolum-j.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Select chip breaker geometry (TF, TQ) based on material and operation",
+      "Compare radial infeed vs modified flank infeed for threading stability",
+      "Relate depth of cut, feed, and specific cutting force to tool load"
+    ],
+    "keyTakeaways": [
+      "Uncontrolled chips cause bird-nesting — the primary threading failure mode",
+      "Modified flank feed reduces heat load on one insert edge",
+      "Minimum depth of cut is required to activate the chip breaker groove"
+    ]
+  },
+  "engineering-units-and-standards": {
+    "slug": "engineering-units-and-standards",
+    "academicYear": 1,
+    "department": "General",
+    "difficulty": "Basic",
+    "readingTime": 5,
+    "prerequisites": [],
+    "meta": {
+      "title": "Engineering Units and Standards (SI vs Imperial)",
+      "description": "A fundamental guide to units used in engineering, including SI and Imperial systems, conversion factors, and common standards like ISO and DIN."
+    },
+    "hero": {
+      "h1": "Engineering Units and Standards (SI vs Imperial)",
+      "intro": "Engineering is a quantitative discipline. Without standardized units, global collaboration and manufacturing would be impossible. In this module, we explore the International System of Units (SI) and the Imperial system, focusing on how to convert between them accurately.\n\nModern supply chains span continents — a drawing in millimeters must mate with tooling calibrated in inches. The SI system (meter, kilogram, second, ampere, kelvin, mole, candela) is the international reference, while Imperial units persist in US aerospace and legacy machinery.\n\nThis lesson establishes the conversion discipline used throughout AluCalc: exact constants, consistent significant figures, and explicit unit labels on every intermediate result."
+    },
+    "formula": {
+      "equation": "1 inch = 25.4 mm",
+      "variables": {
+        "mm": "Millimeters",
+        "inch": "Inches (Imperial)"
+      }
+    },
+    "stepByStep": [
+      "Identify the source unit (e.g., mm).",
+      "Identify the target unit (e.g., inch).",
+      "Apply the conversion factor.",
+      "Verify the magnitude of the result.",
+      "Round to the appropriate significant figures.",
+      "Document the unit system on the calculation worksheet header.",
+      "Convert temperature to kelvin when using gas laws or thermal expansion."
+    ],
+    "example": {
+      "inputs": [
+        "Value: 100 mm",
+        "Target: Inches"
+      ],
+      "calculation": "100 / 25.4 ≈ 3.937 inches"
+    },
+    "whyThisMatters": [
+      "Incorrect unit conversion led to the loss of the Mars Climate Orbiter.",
+      "Manufacturing tolerances are often specified in microns (μm), requiring high precision."
+    ],
+    "commonMistakes": [
+      "Using decimal points incorrectly in different locales (comma vs point).",
+      "Mixing mass (kg) and force (N) units in calculations.",
+      "Neglecting temperature unit shifts (Celsius to Kelvin)."
+    ],
+    "engineeringTip": "Always use SI units for internal calculations and only convert to Imperial for final presentation if required.",
+    "calculatorCta": {
+      "targetSlug": "unit-converter",
+      "label": "Use the Unit Converter for instant professional transformations"
+    },
+    "faq": [
+      {
+        "question": "What is the base unit of length in SI?",
+        "answer": "The meter (m)."
+      },
+      {
+        "question": "Why is 25.4 mm/in exact?",
+        "answer": "The inch was redefined in 1959 so that 1 in = 25.4 mm exactly — use this value, not 25.0, for precision fits."
+      },
+      {
+        "question": "Can I use kg and N interchangeably?",
+        "answer": "No. kg is mass; N is force (kg·m/s²). Weight in newtons equals mass times local gravity."
+      },
+      {
+        "question": "When should I convert to Imperial?",
+        "answer": "Convert only at presentation boundaries — carry SI internally through all calculation steps."
+      }
+    ],
+    "relatedArticles": [
+      "fundamentals-of-statics"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Birimler ve Standartlar Sunumu",
+        "filename": "birimler.ppt"
+      }
+    ],
+    "learningObjectives": [
+      "Convert between SI and Imperial length, mass, and force units without ambiguity",
+      "Identify when mass (kg) must not be substituted for force (N) in equilibrium equations",
+      "Apply ISO/DIN rounding rules for manufacturing tolerances expressed in microns"
+    ],
+    "keyTakeaways": [
+      "Always carry SI internally; convert only at presentation boundaries",
+      "1 in = 25.4 mm exactly — never approximate for precision fits",
+      "Unit errors propagate silently until they cause field failures"
+    ]
+  },
+  "fundamentals-of-statics": {
+    "slug": "fundamentals-of-statics",
+    "academicYear": 1,
+    "department": "Mechanical",
+    "difficulty": "Basic",
+    "readingTime": 10,
+    "prerequisites": [
+      "engineering-units-and-standards"
+    ],
+    "meta": {
+      "title": "Fundamentals of Statics (Equilibrium Analysis)",
+      "description": "Learn the core principles of engineering statics, including Newton's laws, force vectors, and the conditions for static equilibrium (ΣF=0, ΣM=0)."
+    },
+    "hero": {
+      "h1": "Fundamentals of Statics (Equilibrium Analysis)",
+      "intro": "Statics is the branch of mechanics that deals with physical systems in equilibrium. Understanding how forces and moments interact is the foundation for all structural analysis and machine design.\n\nEvery machine frame, building support, and lifting rig must satisfy equilibrium before you size members. Statics ignores deformation — it answers whether the body remains at rest under applied loads.\n\nYou will use the same ΣF = 0 and ΣM = 0 logic that powers the Truss Analysis engine: isolate the body, account for every external action, and solve for unknown reactions."
+    },
+    "formula": {
+      "equation": "ΣF = 0 , ΣM = 0",
+      "variables": {
+        "ΣF": "Sum of all forces (N)",
+        "ΣM": "Sum of all moments (Nm)"
+      }
+    },
+    "stepByStep": [
+      "Identify all external forces acting on the body.",
+      "Draw a Free Body Diagram (FBD).",
+      "Resolve forces into X, Y, and Z components.",
+      "Apply equilibrium equations: ΣFx=0, ΣFy=0.",
+      "Sum moments about a point to find unknowns: ΣM=0.",
+      "Check that the number of unknowns equals independent equilibrium equations.",
+      "Verify results by substituting reactions back into a second moment center."
+    ],
+    "example": {
+      "inputs": [
+        "Force 1: 100 N (Up)",
+        "Reaction 1: R1 (Down)"
+      ],
+      "calculation": "ΣFy = 100 - R1 = 0 → R1 = 100 N"
+    },
+    "whyThisMatters": [
+      "Ensures structures and machines can withstand applied loads without moving or failing.",
+      "Allows for the calculation of reaction forces at supports."
+    ],
+    "commonMistakes": [
+      "Failing to include all forces in the Free Body Diagram.",
+      "Incorrectly identifying the direction (sign) of forces or moments.",
+      "Neglecting the weight of the object when it is significant."
+    ],
+    "engineeringTip": "Always choose a point with the most unknown forces when summing moments to simplify the math.",
+    "calculatorCta": {
+      "targetSlug": "beam-deflection-calc",
+      "label": "Analyze beam equilibrium using our advanced structural tools"
+    },
+    "faq": [
+      {
+        "question": "What is a moment?",
+        "answer": "A moment is a measure of the tendency of a force to cause a body to rotate about a specific point or axis."
+      },
+      {
+        "question": "What is a Free Body Diagram?",
+        "answer": "An isolated sketch of a body showing all external forces and moments — the mandatory first step in any statics solution."
+      },
+      {
+        "question": "Can equilibrium fail if ΣF = 0 but ΣM ≠ 0?",
+        "answer": "Yes. Both conditions are required; otherwise the body accelerates rotationally even if net force is zero."
+      },
+      {
+        "question": "When is body weight included?",
+        "answer": "Include self-weight when it is comparable to applied loads — especially for long beams and heavy fixtures."
+      }
+    ],
+    "relatedArticles": [
+      "engineering-units-and-standards",
+      "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mukavemet - Reaksiyon Kuvvetleri",
+        "filename": "3_reaksiyon_kuvvetleri_ve_poisson_ratio.ppt"
+      }
+    ],
+    "learningObjectives": [
+      "Draw complete free-body diagrams with correct force directions",
+      "Apply ΣF = 0 and ΣM = 0 to solve for unknown reactions",
+      "Decompose inclined forces into orthogonal components"
+    ],
+    "keyTakeaways": [
+      "A missing force on the FBD invalidates every downstream result",
+      "Choose the moment center with the most unknowns to simplify algebra",
+      "Statics is prerequisite to every structural and machine design check"
+    ]
+  },
+  "how-to-calculate-bolt-torque": {
+    "slug": "how-to-calculate-bolt-torque",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Intermediate",
+    "readingTime": 10,
+    "prerequisites": [],
+    "meta": {
+      "title": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
+      "description": "Learn how to calculate bolt torque for mechanical assembly using preload force, friction coefficient, and bolt diameter. Includes formula, examples, and VDI 2230 methodology."
+    },
+    "hero": {
+      "h1": "How to Calculate Bolt Torque (Step-by-Step Guide for Real Applications)",
+      "intro": "Bolt torque calculation is one of the most critical aspects of mechanical assembly. Incorrect torque leads to joint failure, loosening, or even catastrophic structural damage. In real-world engineering, torque must be calculated using preload force, friction coefficient, and bolt diameter — not guesswork.\n\nClamp force — not torque — is the design output of a bolted joint. Torque is merely the shop-floor input, distorted by friction at the threads and under the head. VDI 2230 formalizes the relationship between torque, preload, and thread utilization.\n\nThis lesson connects handbook shortcuts (T = K·F·d) to the full friction model in the AluCalc Fastener Engine."
+    },
+    "formula": {
+      "equation": "T = K × F × d",
+      "variables": {
+        "T": "Torque (Nm)",
+        "K": "Friction coefficient (0.18–0.25 typical)",
+        "F": "Preload force (N)",
+        "d": "Nominal bolt diameter (m)"
+      }
+    },
+    "stepByStep": [
+      "Determine bolt size (e.g., M10).",
+      "Find recommended preload (from standards or tables).",
+      "Estimate friction coefficient (lubricated vs dry).",
+      "Convert diameter to meters.",
+      "Apply the formula: T = K × F × d.",
+      "Verify against torque tables.",
+      "Select μ_thread and μ_head from lubrication condition tables.",
+      "Verify yield utilization and thread stripping for both internal and external threads."
+    ],
+    "example": {
+      "inputs": [
+        "Bolt: M10 → d = 0.01 m",
+        "Preload: 20,000 N",
+        "K = 0.2"
+      ],
+      "calculation": "T = 0.2 × 20000 × 0.01 = 40 Nm"
+    },
+    "whyThisMatters": [
+      "Improper torque leads to bolt fatigue, joint separation, and uneven load distribution.",
+      "In industries like automotive and aerospace, torque accuracy is critical for safety and reliability."
+    ],
+    "commonMistakes": [
+      "Ignoring lubrication effects on friction coefficient.",
+      "Using generic torque tables blindly without considering specific application context.",
+      "Not accounting for friction variation between threads and under-head surfaces."
+    ],
+    "engineeringTip": "Always validate torque with preload-based calculations, not just tables.",
+    "calculatorCta": {
+      "targetSlug": "bolt-torque-calc",
+      "label": "Use the Bolt Torque Calculator to instantly compute torque for your application"
+    },
+    "faq": [
+      {
+        "question": "What happens if torque is too high?",
+        "answer": "Over-torquing a bolt causes it to exceed its yield strength, leading to plastic deformation, thread stripping, or sudden failure."
+      },
+      {
+        "question": "How does lubrication affect bolt torque?",
+        "answer": "Lubrication drastically reduces the friction coefficient (K). A lubricated bolt requires significantly less torque to achieve the same preload compared to a dry bolt."
+      },
+      {
+        "question": "Why use preload instead of just torque?",
+        "answer": "Torque is an indirect measure. The actual goal is to achieve clamping force (preload) to hold the joint together securely. Using preload calculation ensures accurate joint strength."
+      },
+      {
+        "question": "What is a typical K factor for dry steel?",
+        "answer": "K ≈ 0.20 for unlubricated steel-on-steel; drops to ~0.12 with moly or oil."
+      },
+      {
+        "question": "Does torque control guarantee preload?",
+        "answer": "No — scatter of ±25% is common. Torque + angle or ultrasonic measurement improves control."
+      },
+      {
+        "question": "When is VDI 2230 required?",
+        "answer": "Critical joints in automotive, pressure vessels, and aerospace where proof of clamp force is mandatory."
+      }
+    ],
+    "relatedArticles": [
+      "bearing-life-calculation-explained",
+      "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "VDI 2230 Systematic Calculation of High Strength Bolted Joints",
+        "filename": "bolum-j.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Relate applied torque to bolt preload via friction coefficients (K or μ)",
+      "Apply VDI 2230 concepts: yield utilization and thread stripping checks",
+      "Select lubrication strategy and its effect on required tightening torque"
+    ],
+    "keyTakeaways": [
+      "Torque is an indirect measure of preload — friction dominates scatter",
+      "Over-torquing can yield the bolt and reduce clamp force after relaxation",
+      "Always verify both internal and external thread capacity"
+    ]
+  },
+  "introduction-to-machine-elements": {
+    "slug": "introduction-to-machine-elements",
+    "academicYear": 1,
+    "department": "Mechanical",
+    "difficulty": "Basic",
+    "readingTime": 8,
+    "prerequisites": [
+      "fundamentals-of-statics"
+    ],
+    "meta": {
+      "title": "Introduction to Machine Elements (Design Overview)",
+      "description": "An overview of common machine elements including fasteners, bearings, gears, and shafts. Learn why we use them and the basic design constraints."
+    },
+    "hero": {
+      "h1": "Introduction to Machine Elements (Design Overview)",
+      "intro": "Machines are composed of standard building blocks called Machine Elements. From the simplest screw to complex planetary gears, understanding these components is the first step toward becoming a machine designer.\n\nDesigners rarely invent new parts from scratch. They select standardized machine elements — bolts, bearings, gears, belts, shafts, keys, and seals — and compose them into functional assemblies. Each element family has catalog ratings, failure modes, and ISO/DIN standards.\n\nThis overview maps those families to the specialized academy lessons and AluCalc calculators you will use for quantitative sizing."
+    },
+    "formula": {
+      "equation": "Machine = Σ Elements + Power",
+      "variables": {
+        "Elements": "Fasteners, Gears, Bearings, etc.",
+        "Power": "Torque × Speed"
+      }
+    },
+    "stepByStep": [
+      "Identify the motion required (Linear vs Rotational).",
+      "Select the power transmission element (Gear, Belt, Chain).",
+      "Choose the support element (Bearing, Shaft).",
+      "Specify the joining method (Bolt, Weld, Rivet).",
+      "Verify sizing using engineering standards.",
+      "Estimate duty cycle and environmental exposure before catalog lookup.",
+      "Verify interchangeability with supplier drawings and ISO designation."
+    ],
+    "example": {
+      "inputs": [
+        "Requirement: Join two plates",
+        "Option: M10 Bolt"
+      ],
+      "calculation": "Selection: Threaded Fastener (M10 ISO 262)"
+    },
+    "whyThisMatters": [
+      "Standardized elements allow for interchangeable parts and easier maintenance.",
+      "Knowing the right element for the job prevents over-engineering and reduces cost."
+    ],
+    "commonMistakes": [
+      "Choosing an element without considering the environment (Corrosion, Heat).",
+      "Neglecting the dynamic loads (Vibration) on static fasteners.",
+      "Using non-standard sizes that are hard to source."
+    ],
+    "engineeringTip": "Always design for disassembly unless the joint is intended to be permanent.",
+    "calculatorCta": {
+      "targetSlug": "bolt-torque-calc",
+      "label": "Start exploring machine elements with our Bolt Designer"
+    },
+    "faq": [
+      {
+        "question": "What is the most common machine element?",
+        "answer": "Threaded fasteners (bolts and screws) are by far the most widely used elements in engineering."
+      },
+      {
+        "question": "What distinguishes a machine element from a raw part?",
+        "answer": "Machine elements are standardized, cataloged components with defined interfaces and performance ratings."
+      },
+      {
+        "question": "When is welding preferred over bolting?",
+        "answer": "When permanent, high-stiffness joints are needed and disassembly is not required — but inspectability suffers."
+      },
+      {
+        "question": "How do bearings differ from bushings?",
+        "answer": "Rolling-element bearings use balls/rollers for low friction; bushings are plain sleeves suited to oscillating or dirty environments."
+      }
+    ],
+    "relatedArticles": [
+      "how-to-calculate-bolt-torque",
+      "bearing-life-calculation-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Engineering Fundamentals Handbook",
+        "filename": "engineering fundamentals.pdf"
+      },
+      {
+        "title": "Mühendislik Bilgileri Web Sitesi Dökümantasyonu",
+        "filename": "Mühendislik Bilgileri Web Sitesi Dökümantasyonu.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Classify machine elements by function: power transmission, support, and joining",
+      "Map design requirements to standard catalog components (ISO, DIN)",
+      "Recognize when a custom element is justified versus over-engineering"
+    ],
+    "keyTakeaways": [
+      "Standard elements enable interchangeability and lower lifecycle cost",
+      "Environment (corrosion, temperature, vibration) drives element selection",
+      "Design for disassembly unless the joint is intentionally permanent"
+    ]
+  },
+  "mechanics-of-materials-fundamentals": {
+    "slug": "mechanics-of-materials-fundamentals",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [
+      "fundamentals-of-statics"
+    ],
+    "meta": {
+      "title": "Mechanics of Materials: Stress, Strain, and Deformation",
+      "description": "An introductory course to Mechanics of Materials (Strength of Materials). Learn about axial loading, normal stress, shear stress, and Hooke's Law."
+    },
+    "hero": {
+      "h1": "Mechanics of Materials: Stress, Strain, and Deformation",
+      "intro": "While Statics deals with external forces, Mechanics of Materials looks inside. How do materials respond to those forces? Do they stretch, bend, or break? This course defines the internal resistance of solid bodies to external loads.\n\nOnce reactions are known from statics, you must ask whether the material survives. Normal stress σ = F/A and Hooke's law ε = σ/E link force to deformation. Stress concentrations at holes and fillets can locally exceed nominal values.\n\nEvery strength calculator in AluCalc — from fasteners to beams — builds on this σ–ε foundation."
+    },
+    "formula": {
+      "equation": "σ = F / A",
+      "variables": {
+        "σ": "Normal Stress (Pa or MPa)",
+        "F": "Axial Force (N)",
+        "A": "Cross-sectional Area (m²)"
+      }
+    },
+    "stepByStep": [
+      "Calculate the internal force at the point of interest.",
+      "Determine the cross-sectional area of the element.",
+      "Apply the stress formula: σ = F / A.",
+      "Calculate strain using Hooke's Law: ε = σ / E.",
+      "Verify that stress is below the material's yield strength.",
+      "Apply stress concentration factor Kt when geometry has discontinuities.",
+      "Compare computed stress to yield with an appropriate factor of safety."
+    ],
+    "example": {
+      "inputs": [
+        "Force: 50,000 N",
+        "Area: 100 mm² (0.0001 m²)"
+      ],
+      "calculation": "σ = 50000 / 0.0001 = 500,000,000 Pa = 500 MPa"
+    },
+    "whyThisMatters": [
+      "Prevents structural failure by ensuring material limits are never exceeded.",
+      "Allows for the selection of appropriate materials based on loading conditions."
+    ],
+    "commonMistakes": [
+      "Neglecting the sign of the stress (Tension vs Compression).",
+      "Using the wrong area for shear stress (it's the area parallel to the force).",
+      "Failing to account for stress concentrations at holes or fillets."
+    ],
+    "engineeringTip": "In engineering design, we usually target a Factor of Safety (FoS) between 1.5 and 3.0.",
+    "calculatorCta": {
+      "targetSlug": "bolt-stress-calc",
+      "label": "Analyze fastener stress with our real-time integrity engine"
+    },
+    "faq": [
+      {
+        "question": "What is the difference between stress and pressure?",
+        "answer": "Pressure is an external force distributed over an external surface, while stress is an internal resistance distributed over an internal cross-section."
+      },
+      {
+        "question": "What is factor of safety?",
+        "answer": "Ratio of allowable to computed stress — typically 1.5–3.0 depending on consequence of failure and load uncertainty."
+      },
+      {
+        "question": "How is shear stress different?",
+        "answer": "Shear acts parallel to the area; area is the section in the plane of shear, not perpendicular to force."
+      },
+      {
+        "question": "When does Hooke's law fail?",
+        "answer": "Beyond proportional limit / yield — plastic deformation requires different constitutive models."
+      }
+    ],
+    "relatedArticles": [
+      "mohrs-circle-stress-analysis",
+      "fundamentals-of-statics"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mukavemet Dersine Giriş ve Kavramlar",
+        "filename": "2-mukavemet_dersine_giris_ve_kavramlari_(rev).ppt"
+      },
+      {
+        "title": "Engineering Fundamentals Handbook",
+        "filename": "engineering fundamentals.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Compute normal stress σ = F/A and interpret tension vs compression",
+      "Apply Hooke's law to relate stress, strain, and elastic modulus",
+      "Identify stress concentrations at holes, fillets, and sudden section changes"
+    ],
+    "keyTakeaways": [
+      "Stress is internal resistance; pressure acts on external surfaces",
+      "Stay below yield with an appropriate factor of safety (1.5–3.0)",
+      "Shear area lies in the plane of the shear force — not the normal area"
+    ]
+  },
+  "mohrs-circle-stress-analysis": {
+    "slug": "mohrs-circle-stress-analysis",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Advanced",
+    "readingTime": 15,
+    "prerequisites": [
+      "mechanics-of-materials-fundamentals"
+    ],
+    "meta": {
+      "title": "Mohr's Circle Stress Analysis (Principal Stresses)",
+      "description": "Learn how to use Mohr's Circle to determine principal stresses and maximum shear stress in a material. Essential for advanced structural engineering and failure analysis."
+    },
+    "hero": {
+      "h1": "Mohr's Circle Stress Analysis (Principal Stresses)",
+      "intro": "In multi-axial loading, the stress at a point depends on the orientation of the plane you are looking at. Mohr's Circle is a powerful graphical method (and mathematical model) to find the maximum and minimum stresses a material will ever see.\n\nReal components rarely see pure axial stress. Bending, torsion, and press fits combine into plane-stress states (σx, σy, τxy). Mohr's circle transforms these components to principal stresses and maximum shear — the values used in ductile failure criteria.\n\nThe Principal Stress Simulator in this lesson mirrors the analytical kernel in AluCalc Mohr Circle Lab."
+    },
+    "formula": {
+      "equation": "σ1,2 = (σx + σy)/2 ± √[((σx - σy)/2)² + τxy²]",
+      "variables": {
+        "σ1,2": "Principal Stresses (MPa)",
+        "σx, σy": "Normal stresses in X and Y (MPa)",
+        "τxy": "Shear stress (MPa)"
+      }
+    },
+    "stepByStep": [
+      "Determine the initial stress state (σx, σy, τxy).",
+      "Plot the points (σx, τxy) and (σy, -τxy) on the stress axes.",
+      "Draw the circle passing through these two points.",
+      "Locate the center and calculate the radius (R).",
+      "Identify σ1 (max) and σ2 (min) as the intersections with the horizontal axis.",
+      "Plot σx, σy, τxy on Mohr circle to read σ1, σ2, and τ_max.",
+      "Compare τ_max to yield/2 for ductile materials per Tresca criterion."
+    ],
+    "example": {
+      "inputs": [
+        "σx = 100 MPa",
+        "σy = 40 MPa",
+        "τxy = 40 MPa"
+      ],
+      "calculation": "Center = 70. Radius = √[(30)² + 40²] = 50. → σ1 = 120 MPa, σ2 = 20 MPa."
+    },
+    "whyThisMatters": [
+      "Ductile materials typically fail due to maximum shear stress (τmax).",
+      "Brittle materials fail due to maximum principal stress (σ1).",
+      "Mohr's Circle allows designers to predict the angle of failure."
+    ],
+    "commonMistakes": [
+      "Confusing the 2θ angle in Mohr's Circle with the θ angle in the physical world.",
+      "Incorrectly plotting the sign of the shear stress.",
+      "Forgetting to check the 3D stress state (Triaxial stress)."
+    ],
+    "engineeringTip": "The center of the circle always represents the average normal stress at that point.",
+    "calculatorCta": {
+      "targetSlug": "beam-deflection-calc",
+      "label": "Open the Analysis Lab to visualize complex stress states"
+    },
+    "faq": [
+      {
+        "question": "What is a principal stress?",
+        "answer": "It is a normal stress that acts on a plane where the shear stress is exactly zero."
+      },
+      {
+        "question": "Are principal stresses unique?",
+        "answer": "Yes — σ1 and σ2 are invariants; only the orientation of principal planes changes with loading."
+      },
+      {
+        "question": "What is plane stress?",
+        "answer": "One principal stress is zero (thin plates, free surfaces) — simplifies 3D problems to 2D."
+      },
+      {
+        "question": "When is Mohr circle insufficient?",
+        "answer": "Triaxial stress states require 3D failure criteria (von Mises in full tensor form)."
+      }
+    ],
+    "relatedArticles": [
+      "mechanics-of-materials-fundamentals",
+      "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mohr Dairesi Analizi Sunumu",
+        "filename": "10-_mohr_dairesi_(rev).ppt"
+      }
+    ],
+    "learningObjectives": [
+      "Transform plane-stress components to find principal stresses σ1, σ2",
+      "Compute maximum shear τ_max from Mohr circle geometry",
+      "Explain why principal values are invariant while σ(θ) and τ(θ) rotate"
+    ],
+    "keyTakeaways": [
+      "Principal planes have zero shear — design checks often use σ1",
+      "τ_max = Mohr circle radius — drives yielding in ductile materials",
+      "Combined loading requires plane-stress analysis before failure criteria"
+    ]
+  },
+  "motor-power-calculation": {
+    "slug": "motor-power-calculation",
+    "academicYear": 3,
+    "department": "Mechanical",
+    "difficulty": "Intermediate",
+    "readingTime": 8,
+    "prerequisites": [],
+    "meta": {
+      "title": "Motor Power Calculation (Torque and Speed Relationship)",
+      "description": "Learn how to calculate the power required for an electric motor based on torque and angular velocity. Includes efficiency and unit conversion guide."
+    },
+    "hero": {
+      "h1": "Motor Power Calculation (Torque and Speed Relationship)",
+      "intro": "Sizing an electric motor requires understanding the dynamic relationship between rotational speed and the torque required to overcome load resistance and friction.\n\nElectric motors are sized on power, but loads present as torque at a speed. The bridge equation P = T·n/9550 (kW) appears in every drive catalog. Gearboxes, belts, and couplings add efficiency losses that must be added back to the motor nameplate.\n\nThis lesson prepares you for belt-drive and motor sizing tools in AluCalc where the same torque–speed–power triangle applies."
+    },
+    "formula": {
+      "equation": "P = (T × n) / 9550",
+      "variables": {
+        "9550": "Conversion constant",
+        "P": "Power (kW)",
+        "T": "Torque (Nm)",
+        "n": "Rotational speed (RPM)"
+      }
+    },
+    "stepByStep": [
+      "Determine the required output torque (T).",
+      "Determine the operational speed (n) in RPM.",
+      "Apply the formula to find the power in kW.",
+      "Account for transmission efficiency if necessary.",
+      "Select a motor with a power rating higher than the calculated requirement.",
+      "Identify peak vs continuous torque for duty classification.",
+      "Convert between kW and HP using 1 HP ≈ 0.746 kW when reading US catalogs."
+    ],
+    "example": {
+      "inputs": [
+        "T = 50 Nm",
+        "n = 1450 RPM"
+      ],
+      "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
+    },
+    "whyThisMatters": [
+      "Prevents motor burnout due to undersizing.",
+      "Avoids excessive energy costs and initial investment due to oversizing."
+    ],
+    "commonMistakes": [
+      "Forgetting to include the efficiency of the gearbox or transmission.",
+      "Using HP units directly in a kW formula without conversion.",
+      "Failing to account for peak starting torque."
+    ],
+    "engineeringTip": "Always select a motor with a 15-20% safety margin over the calculated power.",
+    "calculatorCta": {
+      "targetSlug": "motor-power-calc",
+      "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
+    },
+    "faq": [
+      {
+        "question": "How do I convert HP to kW?",
+        "answer": "1 HP is approximately 0.746 kW."
+      },
+      {
+        "question": "What is service factor?",
+        "answer": "A multiplier accounting for shock, reversing, and daily duty — applied to calculated power before motor selection."
+      },
+      {
+        "question": "Why add 15–20% margin?",
+        "answer": "Covers voltage variation, bearing drag increase over life, and production tolerances."
+      },
+      {
+        "question": "How does gearbox ratio affect motor torque?",
+        "answer": "Motor torque = load torque / (ratio × efficiency) — higher ratio reduces motor torque demand."
+      }
+    ],
+    "relatedArticles": [
+      "pressure-drop-calculation-guide",
+      "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mechanical Engineering Handbook - Drives Section",
+        "filename": "Mechanical Engineering Handbook.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Convert torque and speed to shaft power using P = T·n/9550 (kW)",
+      "Account for transmission efficiency when sizing the motor nameplate",
+      "Distinguish continuous duty from peak starting torque requirements"
+    ],
+    "keyTakeaways": [
+      "Undersized motors overheat; oversized motors waste capital and efficiency",
+      "Always include gearbox losses in the motor power calculation",
+      "Add 15–20% margin for production variability and aging"
+    ]
+  },
+  "pressure-drop-calculation-guide": {
+    "slug": "pressure-drop-calculation-guide",
+    "academicYear": 2,
+    "department": "Thermodynamics",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [],
+    "meta": {
+      "title": "Pressure Drop in Pipes (Darcy-Weisbach Guide)",
+      "description": "Learn how to calculate pressure loss in fluid systems using the Darcy-Weisbach equation. Understand the roles of friction factor and Reynolds number."
+    },
+    "hero": {
+      "h1": "Pressure Drop in Pipes (Darcy-Weisbach Guide)",
+      "intro": "Fluid transport requires energy to overcome internal friction. Pressure drop calculation is the cornerstone of pump sizing and piping system design.\n\nPumps are sized on flow and head — head includes friction losses in pipe, fittings, and valves. Darcy–Weisbach relates pressure drop to friction factor, geometry, and velocity head. Reynolds number selects laminar vs turbulent correlations.\n\nThe Fluid Flow engine in AluCalc evaluates the same ΔP = f·(L/D)·ρV²/2 relationship for line sizing."
+    },
+    "formula": {
+      "equation": "ΔP = f × (L/D) × (ρv²/2)",
+      "variables": {
+        "ΔP": "Pressure drop (Pa)",
+        "f": "Darcy friction factor",
+        "L": "Pipe length (m)",
+        "D": "Pipe diameter (m)",
+        "ρ": "Fluid density (kg/m³)",
+        "v": "Fluid velocity (m/s)"
+      }
+    },
+    "stepByStep": [
+      "Determine fluid properties (density, viscosity).",
+      "Calculate the Reynolds number to determine flow type (laminar vs turbulent).",
+      "Find the friction factor (f) using the Moody chart or equations.",
+      "Apply the Darcy-Weisbach equation.",
+      "Account for local losses (valves, elbows) if applicable.",
+      "Compute Reynolds number Re = ρVD/μ to select friction factor.",
+      "Sum minor losses from fittings using equivalent length or K factors."
+    ],
+    "example": {
+      "inputs": [
+        "f = 0.02",
+        "L = 100 m",
+        "D = 0.1 m",
+        "ρ = 1000 kg/m³ (Water)",
+        "v = 2 m/s"
+      ],
+      "calculation": "ΔP = 0.02 × (100 / 0.1) × (1000 × 2² / 2) = 40,000 Pa (0.4 bar)"
+    },
+    "whyThisMatters": [
+      "Inadequate pump sizing leads to system failure or insufficient flow.",
+      "Excessive pressure drop results in high energy consumption and piping wear."
+    ],
+    "commonMistakes": [
+      "Ignoring the effect of pipe roughness on the friction factor.",
+      "Assuming laminar flow when it is actually turbulent.",
+      "Failing to convert units correctly (e.g., bar to Pascal)."
+    ],
+    "engineeringTip": "In turbulent flow, doubling the velocity increases the pressure drop by a factor of four.",
+    "calculatorCta": {
+      "targetSlug": "pressure-drop-calc",
+      "label": "Use the Pipe Flow Tool to calculate losses in complex piping networks"
+    },
+    "faq": [
+      {
+        "question": "What is the Reynolds number?",
+        "answer": "It is a dimensionless quantity that helps predict flow patterns in fluid flow situations."
+      },
+      {
+        "question": "What is the velocity head?",
+        "answer": "ρV²/2 — kinetic energy per unit volume; doubling velocity quadruples dynamic pressure."
+      },
+      {
+        "question": "How does pipe roughness affect f?",
+        "answer": "Higher relative roughness ε/D increases friction factor, especially in turbulent regime."
+      },
+      {
+        "question": "Why size pipe diameter early?",
+        "answer": "Diameter sets velocity and ΔP — undersized pipe wastes pump energy; oversized adds cost."
+      }
+    ],
+    "relatedArticles": [
+      "motor-power-calculation",
+      "bearing-life-calculation-explained"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Mechanical Engineering Handbook - Fluid Mechanics",
+        "filename": "Mechanical Engineering Handbook.pdf"
+      },
+      {
+        "title": "Mekanik Uygulamalar - Akışkanlar",
+        "filename": "MekanikUygulamalar.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Apply Darcy–Weisbach to relate friction factor, geometry, and velocity head",
+      "Estimate Reynolds number to select laminar vs turbulent friction correlations",
+      "Size pumps using pressure drop and required flow rate"
+    ],
+    "keyTakeaways": [
+      "ΔP scales with f·(L/D)·ρV²/2 — velocity dominates in small pipes",
+      "Larger diameter cuts velocity quadratically for the same flow",
+      "Always verify NPSH after calculating line losses"
+    ]
+  },
+  "thread-geometry-standards": {
+    "slug": "thread-geometry-standards",
+    "academicYear": 1,
+    "department": "Manufacturing",
+    "difficulty": "Intermediate",
+    "readingTime": 12,
+    "prerequisites": [
+      "introduction-to-machine-elements"
+    ],
+    "meta": {
+      "title": "Thread Geometry & Standards (Metrik, UN, W, Tr Profiles)",
+      "description": "A comprehensive guide to thread profiles, angles, and tolerances used in modern manufacturing. Covers ISO Metric, Unified National, Whitworth, and Trapezoidal standards."
+    },
+    "hero": {
+      "h1": "Thread Geometry & Standards: The DNA of Mechanical Joints",
+      "intro": "Every bolt is a complex mathematical helix. To the untrained eye, they look similar, but the difference between a 60° Metric thread and a 55° Whitworth thread is the difference between a secure joint and a catastrophic failure. This module decodes the geometric standards used in modern CNC machining.\n\nThread standards encode helix geometry in a compact designation — M16×1.5-6g tells a machinist the nominal diameter, pitch, and tolerance band. CNC threading cycles, tap drill charts, and fastener strength calculations all depend on reading these symbols correctly.\n\nThis module aligns shop-floor vocabulary with the Thread Geometry engine in AluCalc, covering metric, UN, Whitworth, and trapezoidal families."
+    },
+    "formula": {
+      "equation": "Profile Angle (θ) / Pitch (P) / Diameter (D)",
+      "variables": {
+        "Metrik (M)": "60° Profile Angle",
+        "Unified (UN)": "60° Profile Angle",
+        "Whitworth (W)": "55° Profile Angle",
+        "Trapezoidal (Tr)": "30° Profile Angle"
+      }
+    },
+    "stepByStep": [
+      "Identify the primary thread system (Metrik vs. Inch).",
+      "Verify the profile angle (e.g., 60° for ISO Metrik).",
+      "Select the appropriate tolerance class (4h for tight, 6g for standard).",
+      "Calculate the major and minor diameters based on the pitch.",
+      "Choose the correct machining tool based on the profile.",
+      "Calculate stress area As from pitch and pitch diameter for strength checks.",
+      "Verify tap drill size against minor diameter before production run."
+    ],
+    "example": {
+      "inputs": [
+        "Thread: M16 x 1.5",
+        "Standard: ISO 262",
+        "Angle: 60°"
+      ],
+      "calculation": "Major Diameter = 16 mm, Pitch = 1.5 mm, Minor Diameter ≈ 14.16 mm"
+    },
+    "whyThisMatters": [
+      "Profile mismatch (e.g., trying to fit a UN into an M hole) destroys threads immediately.",
+      "Tolerance grades (6g vs 4h) determine the 'fit' and assembly ease in mass production."
+    ],
+    "commonMistakes": [
+      "Mixing up 60° (Metric) and 55° (Whitworth) threads, which look nearly identical.",
+      "Ignoring thread tolerances (6g/6H) in critical structural applications.",
+      "Using partial profile tools for full-profile requirements."
+    ],
+    "textbookInsights": [
+      {
+        "page": "J2",
+        "insight": "Kısmi profil (partial profile) kesici uçlar, aynı uçla farklı hatveleri işleyebilir ancak diş tepesinde keskin kenar bırakır.",
+        "source": "Kyocera Bolum-J"
+      },
+      {
+        "page": "J3",
+        "insight": "Diş hassasiyeti (6g, 4h vb.) imalat kalitesini ve montaj sıkılığını belirleyen en kritik parametredir.",
+        "source": "Kyocera Bolum-J"
+      },
+      {
+        "page": "J54",
+        "init": "Trapez dişler (Tr) 30° tepe açısına sahiptir ve genellikle güç iletimi için kullanılır.",
+        "source": "Kyocera Bolum-J"
+      }
+    ],
+    "calculatorCta": {
+      "targetSlug": "bolt-torque-calc",
+      "label": "Design custom thread profiles in the Fastener Lab"
+    },
+    "faq": [
+      {
+        "question": "What is the difference between 6g and 4h tolerances?",
+        "answer": "6g is the standard commercial fit, while 4h is a tighter, precision fit used in high-vibration environments."
+      },
+      {
+        "question": "What does 6g/6H mean?",
+        "answer": "6g is external thread tolerance (bolt); 6H is internal (nut). Lower numbers mean tighter fits."
+      },
+      {
+        "question": "Why are Whitworth threads 55°?",
+        "answer": "Historical British standard — incompatible with 60° metric/UN profiles despite similar appearance."
+      },
+      {
+        "question": "When are trapezoidal (Tr) threads used?",
+        "answer": "Power screws and lead screws where efficiency and load transmission matter more than fast assembly."
+      }
+    ],
+    "relatedArticles": [
+      "introduction-to-machine-elements",
+      "how-to-calculate-bolt-torque"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Kyocera Threading Manual (Turkish)",
+        "filename": "bolum-j.pdf"
+      }
+    ],
+    "learningObjectives": [
+      "Distinguish 60° metric/UN threads from 55° Whitworth and 30° trapezoidal profiles",
+      "Read tolerance designations (6g/6H, 4h) and their assembly implications",
+      "Estimate stress area from pitch and major diameter for fastener sizing"
+    ],
+    "keyTakeaways": [
+      "Profile angle mismatch destroys threads on first assembly",
+      "Tolerance class controls fit — 4h is tighter than 6g for critical joints",
+      "Partial-profile tools trade flexibility for crest sharpness"
+    ]
+  },
+  "torsion-and-buckling-mechanics": {
+    "slug": "torsion-and-buckling-mechanics",
+    "academicYear": 2,
+    "department": "Structural",
+    "difficulty": "Intermediate",
+    "readingTime": 15,
+    "prerequisites": [
+      "mechanics-of-materials-fundamentals"
+    ],
+    "meta": {
+      "title": "Torsion and Buckling: Shaft and Column Stability",
+      "description": "An analysis of rotational twisting (torsion) in shafts and sudden failure in columns (buckling) under compressive loads. Based on Euler's formula."
+    },
+    "hero": {
+      "h1": "Torsion and Buckling: Shaft and Column Stability",
+      "intro": "Not all failures are caused by direct stress. Torsion causes shafts to twist and shear, while Buckling causes slender columns to suddenly collapse under loads they would otherwise carry. Understanding these two phenomena is critical for machine and structural stability.\n\nShafts fail in shear from torsion; slender columns fail in buckling at loads far below material yield. Euler's Pcr = π²EI/(KL)² depends on end conditions through K and always uses the minimum moment of inertia.\n\nThe Column Buckling engine in AluCalc applies this same stability check with your actual boundary conditions."
+    },
+    "formula": {
+      "equation": "Pcr = (π² × E × I) / (K × L)²",
+      "variables": {
+        "Pcr": "Critical Buckling Load (N)",
+        "E": "Modulus of Elasticity (Pa)",
+        "I": "Least Moment of Inertia (m⁴)",
+        "L": "Unsupported length (m)",
+        "K": "Column effective length factor"
+      }
+    },
+    "stepByStep": [
+      "For Torsion: Calculate the polar moment of inertia (J).",
+      "Apply the torsion formula: τ = (T × r) / J.",
+      "For Buckling: Determine the column end conditions (Fixed, Pinned).",
+      "Identify the least moment of inertia (weak axis).",
+      "Calculate the critical buckling load (Pcr) using Euler's formula.",
+      "Compute polar moment J for solid and hollow shafts under torque.",
+      "Check slenderness ratio L/r against code limits for Euler validity."
+    ],
+    "example": {
+      "inputs": [
+        "E = 210 GPa (Steel)",
+        "L = 2 m",
+        "End condition: Pinned-Pinned (K=1.0)",
+        "I = 1,000,000 mm⁴"
+      ],
+      "calculation": "Pcr = (π² × 210e9 × 1e-6) / (2)² ≈ 518,000 N"
+    },
+    "whyThisMatters": [
+      "Prevents catastrophic collapse of long structural members.",
+      "Ensures power transmission shafts can handle rotational torque without failure."
+    ],
+    "commonMistakes": [
+      "Using the strongest axis for buckling (it always fails on the weakest).",
+      "Neglecting the slenderness ratio (L/r) limits.",
+      "Ignoring combined loading (Torsion + Bending)."
+    ],
+    "engineeringTip": "Always design columns with a high safety factor against buckling, as initial imperfections can trigger failure early.",
+    "calculatorCta": {
+      "targetSlug": "beam-deflection-calc",
+      "label": "Analyze structural stability with our column tools"
+    },
+    "faq": [
+      {
+        "question": "What is polar moment of inertia (J)?",
+        "answer": "It is a quantity used to describe resistance to torsional deformation of a cylindrical object."
+      },
+      {
+        "question": "What is effective length factor K?",
+        "answer": "Multiplier on actual length: K=1 pinned-pinned, K=0.5 fixed-fixed, K=2 cantilever."
+      },
+      {
+        "question": "Can a column fail below yield stress?",
+        "answer": "Yes — buckling is stability failure, not material overload."
+      },
+      {
+        "question": "How does combined bending affect shafts?",
+        "answer": "Use equivalent torque and bending moment interaction — pure torsion analysis is insufficient."
+      }
+    ],
+    "relatedArticles": [
+      "mechanics-of-materials-fundamentals",
+      "mohrs-circle-stress-analysis"
+    ],
+    "downloadableResources": [
+      {
+        "title": "Burulma (Torsion) ve Burkulma (Buckling) Ders Notları",
+        "filename": "9-burulma_(torsion)-burkulma_(bucling)_28eylul.ppt"
+      }
+    ],
+    "learningObjectives": [
+      "Calculate shear stress in shafts under torsion using τ = Tr/J",
+      "Determine Euler critical load Pcr for slender columns",
+      "Select effective length factor K from end support conditions"
+    ],
+    "keyTakeaways": [
+      "Buckling fails on the weakest axis — always use minimum I",
+      "Slenderness ratio L/r determines whether Euler theory applies",
+      "Combined torsion and bending require interaction checks beyond this lesson"
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Zwischen SI- und Imperial-Länge, Masse und Kraft ohne Mehrdeutigkeit umrechnen",
+    "Erkennen, wann Masse (kg) nicht für Kraft (N) in Gleichgewichtsgleichungen steht",
+    "ISO/DIN-Rundungsregeln für Fertigungstoleranzen in Mikrometern anwenden"
+  ],
+  "keyTakeaways": [
+    "Intern immer SI führen; nur an Darstellungsgrenzen umrechnen",
+    "1 in = 25,4 mm exakt — nie für Präzisionspassungen approximieren",
+    "Einheitenfehler verbreiten sich still bis zum Feldausfall"
+  ],
+  "supplementalParagraph": "Jeder AluCalc-Kern rechnet intern in SI. Diese Lektion hilft, gemischte Einheitenfallen zu erkennen, bevor sie Zeichnung und Stückliste erreichen.",
+  "formula": {
+    "variables": {
+      "mm": "mm: Millimeter",
+      "inch": "inch: Zoll (Imperial)"
+    }
+  },
+  "stepByStep": [
+    "Quelleneinheit identifizieren (z. B. mm).",
+    "Zieleinheit identifizieren (z. B. Zoll).",
+    "Umrechnungsfaktor anwenden.",
+    "Größenordnung des Ergebnisses prüfen.",
+    "Auf passende signifikante Stellen runden.",
+    "Einheitensystem im Kopf des Berechnungsblatts dokumentieren.",
+    "Temperatur in Kelvin umrechnen bei Gasgesetzen oder Wärmeausdehnung."
+  ],
+  "example": {
+    "inputs": [
+      "Value: 100 mm",
+      "Target: Inches"
+    ],
+    "calculation": "100 / 25.4 ≈ 3.937 inches"
+  },
+  "whyThisMatters": [
+    "Falsche Einheitenumrechnung führte zum Verlust des Mars Climate Orbiter.",
+    "Fertigungstoleranzen werden oft in Mikrometern (μm) angegeben und erfordern hohe Präzision."
+  ],
+  "commonMistakes": [
+    "Dezimalpunkt und -komma je nach Locale falsch verwenden.",
+    "Masse (kg) und Kraft (N) in Berechnungen mischen.",
+    "Temperaturumrechnung Celsius–Kelvin vergessen."
+  ],
+  "engineeringTip": "Intern immer SI verwenden; nur für Enddarstellung auf Imperial umrechnen, wenn nötig.",
+  "calculatorCta": {
+    "label": "Use the Unit Converter for instant professional transformations"
+  },
+  "faq": [
+    {
+      "question": "Was ist die SI-Basiseinheit der Länge?",
+      "answer": "Der Meter (m)."
+    },
+    {
+      "question": "Warum ist 25,4 mm/in exakt?",
+      "answer": "Der Zoll wurde 1959 so definiert, dass 1 in = 25,4 mm exakt gilt — nicht 25,0 für Präzisionspassungen."
+    },
+    {
+      "question": "Kann ich kg und N austauschbar verwenden?",
+      "answer": "Nein. kg ist Masse; N ist Kraft (kg·m/s²). Gewicht in Newton ist Masse mal lokaler Erdbeschleunigung."
+    },
+    {
+      "question": "Wann auf Imperial umrechnen?",
+      "answer": "Nur an Darstellungsgrenzen umrechnen — intern in allen Schritten SI führen."
+    }
+  ]
+}

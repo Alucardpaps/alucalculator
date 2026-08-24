@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "Distinguer les filetages métriques/UN 60° des profils Whitworth 55° et trapézoïdaux 30°",
+    "Lire les désignations de tolérance (6g/6H, 4h) et leurs implications en matière d'assemblage",
+    "Estimer la zone de contrainte à partir du pas et du diamètre principal pour le dimensionnement des fixations"
+  ],
+  "keyTakeaways": [
+    "La non-concordance des angles de profil détruit les filetages lors du premier assemblage",
+    "La classe de tolérance contrôle l'ajustement - 4h est plus serré que 6g pour les joints critiques",
+    "Les outils à profil partiel troquent la flexibilité contre la netteté de la crête"
+  ],
+  "supplementalParagraph": "La géométrie du filetage est l'ADN de chaque assemblage boulonné. ",
+  "formula": {
+    "variables": {
+      "Metrik (M)": "Métrique (M) : angle de profil de 60°",
+      "Unified (UN)": "Unifié (UN) : angle de profil de 60°",
+      "Whitworth (W)": "Whitworth (W) : angle de profil de 55°",
+      "Trapezoidal (Tr)": "Trapézoïdal (Tr) : Angle de profil de 30°"
+    }
+  },
+  "stepByStep": [
+    "Identifiez le système de filetage principal (Metrik vs Inch).",
+    "Vérifiez l'angle du profil (par exemple, 60 ° pour ISO Metrik).",
+    "Sélectionnez la classe de tolérance appropriée (4h pour serré, 6g pour standard).",
+    "Calculez les diamètres majeur et mineur en fonction du pas.",
+    "Choisissez l'outil d'usinage correct en fonction du profil.",
+    "Calculer la zone de contrainte À partir du pas et du diamètre primitif pour les contrôles de résistance.",
+    "Vérifiez la taille du foret par rapport au diamètre mineur avant le lancement de la production."
+  ],
+  "example": {
+    "inputs": [
+      "Thread: M16 x 1.5",
+      "Standard: ISO 262",
+      "Angle: 60°"
+    ],
+    "calculation": "Major Diameter = 16 mm, Pitch = 1.5 mm, Minor Diameter ≈ 14.16 mm"
+  },
+  "whyThisMatters": [
+    "Une inadéquation de profil (par exemple, essayer d'insérer un UN dans un trou M) détruit immédiatement les filetages.",
+    "Les degrés de tolérance (6 g contre 4 h) déterminent « l'ajustement » et la facilité d'assemblage dans la production de masse."
+  ],
+  "commonMistakes": [
+    "Mélange de filetages 60° (métrique) et 55° (Whitworth), qui semblent presque identiques.",
+    "Ignorer les tolérances de filetage (6g/6H) dans les applications structurelles critiques.",
+    "Utilisation d'outils de profil partiel pour les exigences de profil complet."
+  ],
+  "calculatorCta": {
+    "label": "Design custom thread profiles in the Fastener Lab"
+  },
+  "faq": [
+    {
+      "question": "Quelle est la différence entre les tolérances de 6g et 4h ?",
+      "answer": "6g est l'ajustement commercial standard, tandis que 4h est un ajustement plus serré et précis utilisé dans les environnements à fortes vibrations."
+    },
+    {
+      "question": "Que signifie 6g/6H ?",
+      "answer": "6g est la tolérance du filetage externe (boulon) ; "
+    },
+    {
+      "question": "Pourquoi les filetages Whitworth sont-ils à 55° ?",
+      "answer": "Norme britannique historique — incompatible avec les profils métriques/UN 60° malgré une apparence similaire."
+    },
+    {
+      "question": "Quand utilise-t-on des filetages trapézoïdaux (Tr) ?",
+      "answer": "Vis électriques et vis mères pour lesquelles l'efficacité et la transmission de charge comptent plus qu'un assemblage rapide."
+    }
+  ]
+}

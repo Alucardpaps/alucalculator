@@ -1,0 +1,494 @@
+/**
+ * CAD-Aesthetic Dashboard CSS Variables
+ * 
+ * Engineering workstation design system with:
+ * - Dark theme optimized for long sessions
+ * - Monospaced typography for precision data
+ * - Accent colors for status indicators
+ * - Grid-based layouts
+ */
+
+:root {
+    /* === SURFACES === */
+    --surface-0: #0a0a12;
+    /* Deepest background */
+    --surface-1: #0f0f1a;
+    /* Primary background */
+    --surface-2: #1a1a2e;
+    /* Elevated cards */
+    --surface-3: #252545;
+    /* Hover states */
+    --surface-4: #2f2f5a;
+    /* Active states */
+
+    /* === TEXT === */
+    --text-primary: #f4f4f8;
+    --text-secondary: #a0a0b8;
+    --text-dim: #606080;
+    --text-inverse: #0f0f1a;
+
+    /* === BORDERS === */
+    --border: #2a2a4a;
+    --border-dim: #1a1a30;
+    --border-focus: #6366f1;
+
+    /* === ACCENTS === */
+    --accent: #6366f1;
+    /* Primary accent (Indigo) */
+    --accent-hover: #818cf8;
+    --accent-dim: rgba(99, 102, 241, 0.15);
+
+    --secondary: #8b5cf6;
+    /* Secondary (Purple) */
+    --secondary-dim: rgba(139, 92, 246, 0.15);
+
+    /* === STATUS COLORS === */
+    --success: #10b981;
+    --success-dim: rgba(16, 185, 129, 0.15);
+    --warning: #f59e0b;
+    --warning-dim: rgba(245, 158, 11, 0.15);
+    --danger: #ef4444;
+    --danger-dim: rgba(239, 68, 68, 0.15);
+    --info: #06b6d4;
+    --info-dim: rgba(6, 182, 212, 0.15);
+
+    /* === TYPOGRAPHY === */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+
+    --text-xs: 10px;
+    --text-sm: 12px;
+    --text-base: 14px;
+    --text-lg: 16px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 32px;
+
+    /* === SPACING === */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+
+    /* === RADII === */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* === SHADOWS === */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+
+    /* === TRANSITIONS === */
+    --transition-fast: 0.1s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    /* === Z-INDEX === */
+    --z-dropdown: 100;
+    --z-modal: 200;
+    --z-tooltip: 300;
+    --z-toast: 400;
+}
+
+/* === GLOBAL RESETS === */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background: var(--surface-0);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* === MONOSPACE DATA DISPLAY === */
+.mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+/* === CAD CARD === */
+.cad-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.cad-card:hover {
+    border-color: var(--border-focus);
+}
+
+.cad-card.elevated {
+    background: var(--surface-2);
+    box-shadow: var(--shadow-md);
+}
+
+.cad-card.glow {
+    box-shadow: var(--shadow-glow);
+}
+
+/* === CAD HEADER === */
+.cad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-dim);
+    margin-bottom: var(--space-4);
+}
+
+.cad-header h1,
+.cad-header h2,
+.cad-header h3 {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.cad-header h1 {
+    font-size: var(--text-2xl);
+}
+
+.cad-header h2 {
+    font-size: var(--text-xl);
+}
+
+.cad-header h3 {
+    font-size: var(--text-lg);
+}
+
+/* === CAD LABEL / VALUE === */
+.cad-label {
+    display: block;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    margin-bottom: var(--space-1);
+}
+
+.cad-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.cad-value.success {
+    color: var(--success);
+}
+
+.cad-value.warning {
+    color: var(--warning);
+}
+
+.cad-value.danger {
+    color: var(--danger);
+}
+
+/* === CAD INPUT === */
+.cad-input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.cad-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.cad-input::placeholder {
+    color: var(--text-dim);
+}
+
+/* === CAD BUTTON === */
+.cad-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background var(--transition-base), transform var(--transition-fast);
+}
+
+.cad-button:hover {
+    background: var(--accent-hover);
+}
+
+.cad-button:active {
+    transform: scale(0.98);
+}
+
+.cad-button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.cad-button.secondary:hover {
+    background: var(--surface-3);
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.cad-button.ghost {
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.cad-button.ghost:hover {
+    background: var(--surface-2);
+    color: var(--text-primary);
+}
+
+/* === CAD TABLE === */
+.cad-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.cad-table th,
+.cad-table td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.cad-table th {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    background: var(--surface-2);
+}
+
+.cad-table td {
+    font-family: var(--font-mono);
+}
+
+.cad-table tr:hover td {
+    background: var(--surface-2);
+}
+
+/* === CAD BADGE === */
+.cad-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cad-badge.accent {
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+.cad-badge.success {
+    background: var(--success-dim);
+    color: var(--success);
+}
+
+.cad-badge.warning {
+    background: var(--warning-dim);
+    color: var(--warning);
+}
+
+.cad-badge.danger {
+    background: var(--danger-dim);
+    color: var(--danger);
+}
+
+/* === CAD GRID === */
+.cad-grid {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.cad-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.cad-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.cad-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+
+    .cad-grid.cols-2,
+    .cad-grid.cols-3,
+    .cad-grid.cols-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* === CAD STAT BLOCK === */
+.cad-stat {
+    background: var(--surface-2);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    border-left: 3px solid var(--accent);
+}
+
+.cad-stat.success {
+    border-left-color: var(--success);
+}
+
+.cad-stat.warning {
+    border-left-color: var(--warning);
+}
+
+.cad-stat.danger {
+    border-left-color: var(--danger);
+}
+
+/* === CAD DIVIDER === */
+.cad-divider {
+    height: 1px;
+    background: var(--border-dim);
+    margin: var(--space-6) 0;
+}
+
+/* === CAD TOOLTIP === */
+.cad-tooltip {
+    position: relative;
+}
+
+.cad-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-4);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+    z-index: var(--z-tooltip);
+}
+
+.cad-tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* === ENGINEERING UNITS === */
+.unit {
+    font-size: 0.75em;
+    color: var(--text-dim);
+    margin-left: 2px;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--surface-3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--surface-4);
+}
+
+/* === SELECTION === */
+::selection {
+    background: var(--accent);
+    color: white;
+}
+
+/* === FOCUS VISIBLE === */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* === ANIMATIONS === */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

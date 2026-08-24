@@ -1,0 +1,93 @@
+{
+    "slug": "fundamentals-of-statics",
+    "academicYear": 1,
+    "department": "Mechanical",
+    "difficulty": "Basic",
+    "readingTime": 10,
+    "prerequisites": [
+        "engineering-units-and-standards"
+    ],
+    "meta": {
+        "title": "Fundamentals of Statics (Equilibrium Analysis)",
+        "description": "Learn the core principles of engineering statics, including Newton's laws, force vectors, and the conditions for static equilibrium (ΣF=0, ΣM=0)."
+    },
+    "hero": {
+        "h1": "Fundamentals of Statics (Equilibrium Analysis)",
+        "intro": "Statics is the branch of mechanics that deals with physical systems in equilibrium. Understanding how forces and moments interact is the foundation for all structural analysis and machine design.\n\nEvery machine frame, building support, and lifting rig must satisfy equilibrium before you size members. Statics ignores deformation — it answers whether the body remains at rest under applied loads.\n\nYou will use the same ΣF = 0 and ΣM = 0 logic that powers the Truss Analysis engine: isolate the body, account for every external action, and solve for unknown reactions."
+    },
+    "formula": {
+        "equation": "ΣF = 0 , ΣM = 0",
+        "variables": {
+            "ΣF": "Sum of all forces (N)",
+            "ΣM": "Sum of all moments (Nm)"
+        }
+    },
+    "stepByStep": [
+        "Identify all external forces acting on the body.",
+        "Draw a Free Body Diagram (FBD).",
+        "Resolve forces into X, Y, and Z components.",
+        "Apply equilibrium equations: ΣFx=0, ΣFy=0.",
+        "Sum moments about a point to find unknowns: ΣM=0.",
+        "Check that the number of unknowns equals independent equilibrium equations.",
+        "Verify results by substituting reactions back into a second moment center."
+    ],
+    "example": {
+        "inputs": [
+            "Force 1: 100 N (Up)",
+            "Reaction 1: R1 (Down)"
+        ],
+        "calculation": "ΣFy = 100 - R1 = 0 → R1 = 100 N"
+    },
+    "whyThisMatters": [
+        "Ensures structures and machines can withstand applied loads without moving or failing.",
+        "Allows for the calculation of reaction forces at supports."
+    ],
+    "commonMistakes": [
+        "Failing to include all forces in the Free Body Diagram.",
+        "Incorrectly identifying the direction (sign) of forces or moments.",
+        "Neglecting the weight of the object when it is significant."
+    ],
+    "engineeringTip": "Always choose a point with the most unknown forces when summing moments to simplify the math.",
+    "calculatorCta": {
+        "targetSlug": "beam-deflection-calc",
+        "label": "Analyze beam equilibrium using our advanced structural tools"
+    },
+    "faq": [
+        {
+            "question": "What is a moment?",
+            "answer": "A moment is a measure of the tendency of a force to cause a body to rotate about a specific point or axis."
+        },
+        {
+            "question": "What is a Free Body Diagram?",
+            "answer": "An isolated sketch of a body showing all external forces and moments — the mandatory first step in any statics solution."
+        },
+        {
+            "question": "Can equilibrium fail if ΣF = 0 but ΣM ≠ 0?",
+            "answer": "Yes. Both conditions are required; otherwise the body accelerates rotationally even if net force is zero."
+        },
+        {
+            "question": "When is body weight included?",
+            "answer": "Include self-weight when it is comparable to applied loads — especially for long beams and heavy fixtures."
+        }
+    ],
+    "relatedArticles": [
+        "engineering-units-and-standards",
+        "beam-deflection-formula-explained"
+    ],
+    "downloadableResources": [
+        {
+            "title": "Mukavemet - Reaksiyon Kuvvetleri",
+            "filename": "3_reaksiyon_kuvvetleri_ve_poisson_ratio.ppt"
+        }
+    ],
+    "learningObjectives": [
+        "Draw complete free-body diagrams with correct force directions",
+        "Apply ΣF = 0 and ΣM = 0 to solve for unknown reactions",
+        "Decompose inclined forces into orthogonal components"
+    ],
+    "keyTakeaways": [
+        "A missing force on the FBD invalidates every downstream result",
+        "Choose the moment center with the most unknowns to simplify algebra",
+        "Statics is prerequisite to every structural and machine design check"
+    ]
+}

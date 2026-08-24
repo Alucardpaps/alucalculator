@@ -1,0 +1,37 @@
+{
+  "id": "v-belt-power",
+  "title": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc",
+  "slug": "v-belt-power",
+  "keyword": "v-belt power capacity calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional V-Belt Power Capacity guide with RMA/MPTA IP-20 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc",
+    "intro": "Determines friction-based power transmission capacity for mechanical drives.",
+    "formula": "P_{adj} = P_{base} \\cdot C_l \\cdot C_a",
+    "variables": {
+      "P_adj": "Adjusted power",
+      "P_base": "Basic rating",
+      "Cl": "Length factor",
+      "Ca": "Arc factor"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify belt velocity limit",
+      "Check arc of contact"
+    ],
+    "pitfalls": [
+      "Ignoring temperature derating"
+    ],
+    "step_by_step": "1. Define system parameters for V-Belt Power Capacity.\n2. Consult the technical reference table for material constants.\n3. Apply the RMA/MPTA IP-20 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate V-Belt Power Capacity analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

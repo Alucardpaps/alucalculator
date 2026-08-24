@@ -1,0 +1,50 @@
+{
+  "id": "bom_roi",
+  "name": "BOM ROI & Break-Even Analysis",
+  "category": "finance",
+  "inputs": [
+    { "key": "CF", "type": "number", "unit": "Currency" },
+    { "key": "CV", "type": "number", "unit": "Currency/Unit" },
+    { "key": "P", "type": "number", "unit": "Currency/Unit" },
+    { "key": "n", "type": "number", "unit": "Units" }
+  ],
+  "steps": [
+    {
+      "id": "CT",
+      "formula": "CF + (n * CV)",
+      "description": "Calculate Total Cost for Target Production",
+      "latex": "CT = CF + (n \\cdot CV)"
+    },
+    {
+      "id": "TR",
+      "formula": "n * P",
+      "description": "Calculate Total Revenue",
+      "latex": "TR = n \\cdot P"
+    },
+    {
+      "id": "Q_b",
+      "formula": "CF / (P - CV)",
+      "description": "Calculate Break-Even Quantity",
+      "latex": "Q_b = \\frac{CF}{P - CV}"
+    },
+    {
+      "id": "NP",
+      "formula": "TR - CT",
+      "description": "Calculate Net Profit / Loss",
+      "latex": "NP = TR - CT"
+    },
+    {
+      "id": "ROI",
+      "formula": "(NP / CT) * 100",
+      "description": "Calculate Return on Investment (ROI %)",
+      "latex": "ROI (\\%) = \\left( \\frac{TR - CT}{CT} \\right) \\cdot 100"
+    }
+  ],
+  "outputs": [
+    "CT",
+    "TR",
+    "Q_b",
+    "NP",
+    "ROI"
+  ]
+}

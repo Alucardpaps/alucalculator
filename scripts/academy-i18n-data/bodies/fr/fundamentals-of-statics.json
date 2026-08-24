@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Dessinez des diagrammes complets de corps libres avec les directions de force correctes",
+    "Appliquer ΣF = 0 et ΣM = 0 pour résoudre les réactions inconnues",
+    "Décomposer les forces inclinées en composants orthogonaux"
+  ],
+  "keyTakeaways": [
+    "Une force manquante sur le FBD invalide chaque résultat en aval",
+    "Choisissez le centre du moment avec le plus d'inconnues pour simplifier l'algèbre",
+    "La statique est une condition préalable à tout contrôle de conception de structure et de machine"
+  ],
+  "supplementalParagraph": "Avant de dimensionner une poutre ou un boulon, vous devez connaître les réactions au niveau des supports. ",
+  "formula": {
+    "variables": {
+      "ΣF": "ΣF : Somme de toutes les forces (N)",
+      "ΣM": "ΣM : Somme de tous les moments (Nm)"
+    }
+  },
+  "stepByStep": [
+    "Identifiez toutes les forces externes agissant sur le corps.",
+    "Dessinez un diagramme de corps libre (FBD).",
+    "Résolvez les forces en composants X, Y et Z.",
+    "Appliquer les équations d'équilibre : ΣFx=0, ΣFy=0.",
+    "Additionnez les moments autour d'un point pour trouver des inconnues : ΣM=0.",
+    "Vérifiez que le nombre d'inconnues est égal aux équations d'équilibre indépendantes.",
+    "Vérifiez les résultats en remplaçant les réactions dans un deuxième centre de moment."
+  ],
+  "example": {
+    "inputs": [
+      "Force 1: 100 N (Up)",
+      "Reaction 1: R1 (Down)"
+    ],
+    "calculation": "ΣFy = 100 - R1 = 0 → R1 = 100 N"
+  },
+  "whyThisMatters": [
+    "Garantit que les structures et les machines peuvent résister aux charges appliquées sans bouger ni tomber en panne.",
+    "Permet le calcul des forces de réaction au niveau des supports."
+  ],
+  "commonMistakes": [
+    "Ne pas inclure toutes les forces dans le diagramme du corps libre.",
+    "Identifier incorrectement la direction (signe) des forces ou des moments.",
+    "Négliger le poids de l'objet alors qu'il est important."
+  ],
+  "engineeringTip": "Choisissez toujours un point avec les forces les plus inconnues lors de la somme des moments pour simplifier les calculs.",
+  "calculatorCta": {
+    "label": "Analyze beam equilibrium using our advanced structural tools"
+  },
+  "faq": [
+    {
+      "question": "Qu'est-ce qu'un instant ?",
+      "answer": "Un moment est une mesure de la tendance d’une force à faire tourner un corps autour d’un point ou d’un axe spécifique."
+    },
+    {
+      "question": "Qu'est-ce qu'un diagramme de corps libre ?",
+      "answer": "Une esquisse isolée d'un corps montrant toutes les forces et moments externes — la première étape obligatoire de toute solution statique."
+    },
+    {
+      "question": "L’équilibre peut-il échouer si ΣF = 0 mais ΣM ≠ 0 ?",
+      "answer": "Oui. "
+    },
+    {
+      "question": "Quand le poids corporel est-il inclus ?",
+      "answer": "Incluez le poids propre lorsqu'il est comparable aux charges appliquées, en particulier pour les poutres longues et les luminaires lourds."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "heat-transfer-conduction",
+  "title": "Heat Conduction Calculator & Engineering Guide - AluCalc",
+  "slug": "heat-transfer-conduction",
+  "keyword": "heat conduction calculator",
+  "category": "thermal",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Heat Conduction Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Heat Conduction guide with ASTM C177 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Heat Conduction Calculator & Engineering Guide - AluCalc",
+    "intro": "Fourier's Law for heat transfer through solid materials.",
+    "formula": "Q = -k A \\frac{dT}{dx}",
+    "variables": {
+      "Q": "Heat flow",
+      "k": "Conductivity",
+      "A": "Area"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check thermal contact resistance",
+      "Verify insulation thickness"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Heat Conduction.\n2. Consult the technical reference table for material constants.\n3. Apply the ASTM C177 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Thermal applications, accurate Heat Conduction analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

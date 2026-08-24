@@ -1,0 +1,155 @@
+[
+    {
+        "id": "1100",
+        "name": "1100 (Pure Al)",
+        "density": 2.71,
+        "price_index": 0.9,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 23.6,
+        "properties": {
+            "hardness": "23 HB",
+            "yield_strength_mpa": 35,
+            "weldability": "Excellent",
+            "machinability": "Poor",
+            "corrosion_resistance": "Excellent"
+        }
+    },
+    {
+        "id": "2024",
+        "name": "2024 (Al-Cu)",
+        "density": 2.78,
+        "price_index": 1.5,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 22.9,
+        "properties": {
+            "hardness": "120 HB",
+            "yield_strength_mpa": 310,
+            "weldability": "Poor",
+            "machinability": "Good",
+            "corrosion_resistance": "Fair"
+        }
+    },
+    {
+        "id": "3003",
+        "name": "3003 (Al-Mn)",
+        "density": 2.73,
+        "price_index": 0.95,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 23.2,
+        "properties": {
+            "hardness": "40 HB",
+            "yield_strength_mpa": 145,
+            "weldability": "Excellent",
+            "machinability": "Fair",
+            "corrosion_resistance": "Excellent"
+        }
+    },
+    {
+        "id": "5052",
+        "name": "5052 (Al-Mg)",
+        "density": 2.68,
+        "price_index": 1.1,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 23.8,
+        "properties": {
+            "hardness": "60 HB",
+            "yield_strength_mpa": 195,
+            "weldability": "Excellent",
+            "machinability": "Fair",
+            "corrosion_resistance": "Excellent"
+        }
+    },
+    {
+        "id": "5083",
+        "name": "5083 (Al-Mg)",
+        "density": 2.65,
+        "price_index": 1.2,
+        "standard_ref": "EN 573-3",
+        "thermal_expansion": 23.4,
+        "properties": {
+            "hardness": "75 HB",
+            "yield_strength_mpa": 230,
+            "weldability": "Excellent",
+            "machinability": "Fair",
+            "corrosion_resistance": "Excellent",
+            "note": "Best for marine environments"
+        }
+    },
+    {
+        "id": "6061",
+        "name": "6061 (Al-Mg-Si)",
+        "density": 2.70,
+        "price_index": 1.0,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 23.6,
+        "properties": {
+            "hardness": "95 HB",
+            "yield_strength_mpa": 275,
+            "weldability": "Good",
+            "machinability": "Good",
+            "corrosion_resistance": "Good"
+        }
+    },
+    {
+        "id": "6063",
+        "name": "6063 (Al-Mg-Si)",
+        "density": 2.70,
+        "price_index": 0.95,
+        "standard_ref": "ASTM B221",
+        "thermal_expansion": 23.4,
+        "properties": {
+            "hardness": "73 HB",
+            "yield_strength_mpa": 215,
+            "weldability": "Good",
+            "machinability": "Good",
+            "corrosion_resistance": "Excellent",
+            "note": "Best for extrusions and architectural"
+        }
+    },
+    {
+        "id": "6082",
+        "name": "6082 (Al-Mg-Si)",
+        "density": 2.70,
+        "price_index": 1.05,
+        "standard_ref": "EN 573-3",
+        "thermal_expansion": 23.1,
+        "properties": {
+            "hardness": "90 HB",
+            "yield_strength_mpa": 260,
+            "weldability": "Good",
+            "machinability": "Good",
+            "corrosion_resistance": "Good"
+        }
+    },
+    {
+        "id": "7005",
+        "name": "7005 (Al-Zn)",
+        "density": 2.78,
+        "price_index": 1.4,
+        "standard_ref": "ASTM B221",
+        "thermal_expansion": 23.5,
+        "properties": {
+            "hardness": "100 HB",
+            "yield_strength_mpa": 290,
+            "weldability": "Fair",
+            "machinability": "Good",
+            "corrosion_resistance": "Good"
+        }
+    },
+    {
+        "id": "7075",
+        "name": "7075 (Al-Zn)",
+        "density": 2.81,
+        "price_index": 1.8,
+        "standard_ref": "ASTM B209",
+        "thermal_expansion": 23.4,
+        "properties": {
+            "hardness": "150 HB",
+            "yield_strength_mpa": 505,
+            "weldability": "Poor",
+            "machinability": "Fair",
+            "corrosion_resistance": "Fair",
+            "note": "Not recommended for welding. Aerospace grade."
+        }
+    }
+]

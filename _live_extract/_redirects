@@ -1,0 +1,22 @@
+# Netlify / Cloudflare Pages style permanent redirects for legacy calculator URLs
+/calculators/bearing-life       /bearings/           301
+/calculators/bearing-life/      /bearings/           301
+/calculators/vdi2230            /bolt-torque/        301
+/calculators/vdi2230/           /bolt-torque/        301
+/calculators/bolt-torque-calc   /bolt-torque/        301
+/calculators/bolt-torque-calc/  /bolt-torque/        301
+/calculators/bearing-life-calc  /bearings/           301
+/calculators/bearing-life-calc/ /bearings/           301
+/calculators/beam-deflection-calc /beam-deflection/  301
+/calculators/beam-deflection-calc/ /beam-deflection/ 301
+/calculators/gear-ratio-calc    /gears/              301
+/calculators/gear-ratio-calc/   /gears/              301
+/calculators/shaft-diameter-calc /strength/          301
+/calculators/shaft-diameter-calc/ /strength/         301
+/calculators/tolerance-stackup  /fits/               301
+/calculators/tolerance-stackup/ /fits/               301
+/calculators/fits-tolerances    /fits/               301
+/calculators/fits-tolerances/   /fits/               301
+/calculators/machine-assembly   /workspace/          301
+/calculators/machine-assembly/  /workspace/          301
+/calculators/*                  /:splat/             301

@@ -1,0 +1,22 @@
+{
+    "id": "alucalc.software.ai-copilot",
+    "version": "1.0.0",
+    "type": "ai-copilot",
+    "category": "software",
+    "title": "AI Co-Pilot",
+    "description": "Contextual engineering assistant powered by metadata analysis.",
+    "icon": "Bot",
+    "defaultSize": {
+        "width": 600,
+        "height": 800
+    },
+    "capabilities": [
+        "assistant",
+        "metadata-analysis"
+    ],
+    "permissions": [
+        "project.read"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

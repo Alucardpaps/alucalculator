@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Convertissez entre les unités SI et impériales de longueur, de masse et de force sans ambiguïté",
+    "Identifier quand la masse (kg) ne doit pas être remplacée par la force (N) dans les équations d'équilibre",
+    "Appliquer les règles d'arrondi ISO/DIN pour les tolérances de fabrication exprimées en microns"
+  ],
+  "keyTakeaways": [
+    "Ayez toujours SI en interne ; ",
+    "1 po = 25,4 mm exactement — jamais approximatif pour des ajustements précis",
+    "Les erreurs d'unité se propagent silencieusement jusqu'à ce qu'elles provoquent des défaillances sur le terrain"
+  ],
+  "supplementalParagraph": "Chaque noyau AluCalc assume SI en interne. ",
+  "formula": {
+    "variables": {
+      "mm": "mm : millimètres",
+      "inch": "pouce : pouces (impérial)"
+    }
+  },
+  "stepByStep": [
+    "Identifiez l’unité source (par exemple, mm).",
+    "Identifiez l'unité cible (par exemple, le pouce).",
+    "Appliquez le facteur de conversion.",
+    "Vérifiez l’ampleur du résultat.",
+    "Arrondissez aux chiffres significatifs appropriés.",
+    "Documentez le système d’unités sur l’en-tête de la feuille de calcul.",
+    "Convertissez la température en kelvin lorsque vous utilisez les lois des gaz ou la dilatation thermique."
+  ],
+  "example": {
+    "inputs": [
+      "Value: 100 mm",
+      "Target: Inches"
+    ],
+    "calculation": "100 / 25.4 ≈ 3.937 inches"
+  },
+  "whyThisMatters": [
+    "Une conversion d'unité incorrecte a entraîné la perte du Mars Climate Orbiter.",
+    "Les tolérances de fabrication sont souvent spécifiées en microns (μm), ce qui nécessite une grande précision."
+  ],
+  "commonMistakes": [
+    "Utilisation incorrecte des points décimaux dans différents paramètres régionaux (virgule ou point).",
+    "Mélanger les unités de masse (kg) et de force (N) dans les calculs.",
+    "Négliger les changements d'unité de température (Celsius vers Kelvin)."
+  ],
+  "engineeringTip": "Utilisez toujours les unités SI pour les calculs internes et convertissez-les uniquement en unités impériales pour la présentation finale si nécessaire.",
+  "calculatorCta": {
+    "label": "Use the Unit Converter for instant professional transformations"
+  },
+  "faq": [
+    {
+      "question": "Quelle est l’unité de base de longueur en SI ?",
+      "answer": "Le mètre (m)."
+    },
+    {
+      "question": "Pourquoi 25,4 mm/po est-il exact ?",
+      "answer": "Le pouce a été redéfini en 1959 de sorte que 1 pouce = 25,4 mm exactement — utilisez cette valeur, et non 25,0, pour des ajustements précis."
+    },
+    {
+      "question": "Puis-je utiliser kg et N de manière interchangeable ?",
+      "answer": "Le nombre de kg est la masse ; "
+    },
+    {
+      "question": "Quand dois-je passer à l’Impérial ?",
+      "answer": "Convertissez uniquement aux limites de la présentation – transportez SI en interne à travers toutes les étapes de calcul."
+    }
+  ]
+}

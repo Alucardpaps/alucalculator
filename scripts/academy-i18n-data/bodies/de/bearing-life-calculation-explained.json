@@ -1,0 +1,73 @@
+{
+  "learningObjectives": [
+    "L10-Lebensdauer mit ISO-281-Dynamiktragzahl und äquivalenter Last P berechnen",
+    "Lebensdauerexponent p = 3 für Kugellager und 10/3 für Rollenlager anwenden",
+    "Katalog-C vs. Betriebs-P und Zuverlässigkeitsziele interpretieren"
+  ],
+  "keyTakeaways": [
+    "L10 bedeutet: 10 % der Lager versagen vor dieser Lebensdauer bei 90 % Zuverlässigkeit",
+    "P > C ist kritische Überlast — sofort neu dimensionieren",
+    "Äquivalente Last kombiniert Radial- und Axialanteile nach ISO-Regeln"
+  ],
+  "supplementalParagraph": "Lagerauswahl ist ein Ermüdungsproblem, nicht statisch. Der ISO-281-Kern in AluCalc nutzt denselben C/P-Exponent.",
+  "formula": {
+    "variables": {
+      "L10": "L10: Nennlebensdauer (Millionen Umdrehungen)",
+      "C": "C: Dynamische Grundtragzahl (N)",
+      "P": "P: Äquivalente dynamische Lagerlast (N)",
+      "p": "p: Exponent in Lebensdauergleichung (3 Kugel, 10/3 Rolle)"
+    }
+  },
+  "stepByStep": [
+    "Lagertyp und dynamische Grundtragzahl (C) identifizieren.",
+    "Äquivalente dynamische Last (P) aus Radial- und Axialkräften berechnen.",
+    "Lebensdauerexponent (p) anhand der Lagergeometrie bestimmen.",
+    "Formel anwenden, um die Lebensdauer in Millionen Umdrehungen zu finden.",
+    "Umdrehungen in Stunden umrechnen, wenn die Drehzahl bekannt ist.",
+    "Kombinierte Radial- und Axiallasten nach ISO-Regeln in äquivalentes P umrechnen.",
+    "L10 in Millionen Umdrehungen mit Betriebsdrehzahl in Stunden umrechnen."
+  ],
+  "example": {
+    "inputs": [
+      "C = 25,000 N",
+      "P = 5,000 N",
+      "p = 3 (Ball Bearing)"
+    ],
+    "calculation": "L10 = (25000 / 5000)^3 = 5^3 = 125 million revolutions"
+  },
+  "whyThisMatters": [
+    "Verhindert unerwarteten Maschinenausfall durch Vorhersage von Austauschintervallen.",
+    "Stellt sicher, dass Lager für spezifische Betriebsumgebung und Last korrekt dimensioniert sind."
+  ],
+  "commonMistakes": [
+    "Statische statt dynamische Tragzahlen in der Formel verwenden.",
+    "Axiallasten bei äquivalenter dynamischer Last nicht berücksichtigen.",
+    "Konstante Drehzahl und Last annehmen, wenn beides in der Praxis variiert."
+  ],
+  "engineeringTip": "Sicherheitsfaktoren anwenden und Umgebungsbedingungen wie Temperatur und Schmierqualität berücksichtigen.",
+  "calculatorCta": {
+    "label": "Open the Bearing Life Calculator to model your specific loading conditions"
+  },
+  "faq": [
+    {
+      "question": "Was ist der Unterschied zwischen L10 und L10h?",
+      "answer": "L10 ist Lebensdauer in Millionen Umdrehungen, L10h in Betriebsstunden abhängig von der Drehzahl (U/min)."
+    },
+    {
+      "question": "Beeinflusst Schmierung die Lagerlebensdauer?",
+      "answer": "Ja, schlechte Schmierung reduziert die Lagerlebensdauer stark durch mehr Reibung und Wärme."
+    },
+    {
+      "question": "Was ist die äquivalente Last P?",
+      "answer": "Eine einzelne Radiallast mit gleicher Lebensdauer wie die tatsächliche kombinierte Radial- und Axialbelastung."
+    },
+    {
+      "question": "Warum Exponent p = 3 bei Kugellagern?",
+      "answer": "Kontaktspannungs-Lebensdauer-Beziehung für Punktkontakt — Rollen p = 10/3 für Linienkontakt."
+    },
+    {
+      "question": "Ist L10 gleich Garantielebensdauer?",
+      "answer": "Nein — L10 ist statistische Bewertung; Felddauer hängt von Schmierung, Verunreinigung und Montage ab."
+    }
+  ]
+}

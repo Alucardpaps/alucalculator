@@ -1,0 +1,33 @@
+{
+  "id": "tolerance-stackup",
+  "title": "Tolerance Stackup Calculator & Engineering Guide - AluCalc",
+  "slug": "tolerance-stackup",
+  "keyword": "tolerance stackup calculator",
+  "category": "manufacturing",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Tolerance Stackup Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Tolerance Stackup guide with ASME Y14.5 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Tolerance Stackup Calculator & Engineering Guide - AluCalc",
+    "intro": "RSS (Root Sum Squares) analysis for assembly fit-up.",
+    "formula": "T_{total} = \\sqrt{\\sum T_i^2}",
+    "variables": {
+      "Ttotal": "Assem tolerance",
+      "Ti": "Component tolerance"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify worst case vs RSS",
+      "Check datum alignment"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Tolerance Stackup.\n2. Consult the technical reference table for material constants.\n3. Apply the ASME Y14.5 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Manufacturing applications, accurate Tolerance Stackup analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

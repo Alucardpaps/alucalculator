@@ -1,0 +1,34 @@
+{
+  "id": "pressure-drop",
+  "title": "Pressure Drop Calculator & Engineering Guide - AluCalc",
+  "slug": "pressure-drop",
+  "keyword": "pressure drop calculator",
+  "category": "fluids",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Pressure Drop Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Pressure Drop guide with Crane TP-410 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Pressure Drop Calculator & Engineering Guide - AluCalc",
+    "intro": "Darcy-Weisbach equation for energy loss in piping systems.",
+    "formula": "\\Delta P = f \\frac{L}{D} \\frac{\\rho v^2}{2}",
+    "variables": {
+      "deltaP": "Pressure loss",
+      "f": "Friction factor",
+      "rho": "Density"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check pipe roughness",
+      "Verify head loss"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Pressure Drop.\n2. Consult the technical reference table for material constants.\n3. Apply the Crane TP-410 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Fluids applications, accurate Pressure Drop analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

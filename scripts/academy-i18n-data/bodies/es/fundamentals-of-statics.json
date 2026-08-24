@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Dibujar diagramas de cuerpo libre completos con direcciones de fuerza correctas.",
+    "Aplique ΣF = 0 y ΣM = 0 para resolver reacciones desconocidas",
+    "Descomponer fuerzas inclinadas en componentes ortogonales."
+  ],
+  "keyTakeaways": [
+    "Una fuerza faltante en el FBD invalida todos los resultados posteriores",
+    "Elige el centro de momento con más incógnitas para simplificar el álgebra.",
+    "La estática es un requisito previo para cada verificación de diseño estructural y de máquinas."
+  ],
+  "supplementalParagraph": "Antes de dimensionar una viga o un perno, debe conocer las reacciones en los apoyos. ",
+  "formula": {
+    "variables": {
+      "ΣF": "ΣF: Suma de todas las fuerzas (N)",
+      "ΣM": "ΣM: Suma de todos los momentos (Nm)"
+    }
+  },
+  "stepByStep": [
+    "Identificar todas las fuerzas externas que actúan sobre el cuerpo.",
+    "Dibuje un diagrama de cuerpo libre (FBD).",
+    "Resuelva las fuerzas en componentes X, Y y Z.",
+    "Aplicar ecuaciones de equilibrio: ΣFx=0, ΣFy=0.",
+    "Sumar momentos respecto de un punto para encontrar incógnitas: ΣM=0.",
+    "Compruebe que el número de incógnitas es igual a las ecuaciones de equilibrio independientes.",
+    "Verifique los resultados sustituyendo las reacciones nuevamente en un segundo centro de momento."
+  ],
+  "example": {
+    "inputs": [
+      "Force 1: 100 N (Up)",
+      "Reaction 1: R1 (Down)"
+    ],
+    "calculation": "ΣFy = 100 - R1 = 0 → R1 = 100 N"
+  },
+  "whyThisMatters": [
+    "Garantiza que las estructuras y máquinas puedan soportar las cargas aplicadas sin moverse ni fallar.",
+    "Permite el cálculo de fuerzas de reacción en los apoyos."
+  ],
+  "commonMistakes": [
+    "No incluir todas las fuerzas en el diagrama de cuerpo libre.",
+    "Identificar incorrectamente la dirección (signo) de fuerzas o momentos.",
+    "Despreciar el peso del objeto cuando es significativo."
+  ],
+  "engineeringTip": "Elija siempre un punto con la mayor cantidad de fuerzas desconocidas al sumar momentos para simplificar las matemáticas.",
+  "calculatorCta": {
+    "label": "Analyze beam equilibrium using our advanced structural tools"
+  },
+  "faq": [
+    {
+      "question": "¿Qué es un momento?",
+      "answer": "Un momento es una medida de la tendencia de una fuerza a hacer que un cuerpo gire alrededor de un punto o eje específico."
+    },
+    {
+      "question": "¿Qué es un diagrama de cuerpo libre?",
+      "answer": "Un boceto aislado de un cuerpo que muestra todas las fuerzas y momentos externos: el primer paso obligatorio en cualquier solución estática."
+    },
+    {
+      "question": "¿Puede fallar el equilibrio si ΣF = 0 pero ΣM ≠ 0?",
+      "answer": "Sí. "
+    },
+    {
+      "question": "¿Cuándo se incluye el peso corporal?",
+      "answer": "Incluya el peso propio cuando sea comparable a las cargas aplicadas, especialmente para vigas largas y accesorios pesados."
+    }
+  ]
+}

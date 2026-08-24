@@ -1,0 +1,78 @@
+{
+  "learningObjectives": [
+    "Relier le couple appliqué à la précharge du boulon via les coefficients de frottement (K ou μ)",
+    "Appliquer les concepts VDI 2230 : utilisation du rendement et contrôles de suppression de threads",
+    "Sélectionnez la stratégie de lubrification et son effet sur le couple de serrage requis"
+  ],
+  "keyTakeaways": [
+    "Le couple est une mesure indirecte de la précharge : la friction domine la dispersion",
+    "Un serrage excessif peut céder le boulon et réduire la force de serrage après relâchement",
+    "Vérifiez toujours la capacité du filetage interne et externe"
+  ],
+  "supplementalParagraph": "La lecture d'une clé dynamométrique ne constitue pas le résultat de conception : la force de serrage l'est. ",
+  "formula": {
+    "variables": {
+      "T": "T : couple (Nm)",
+      "K": "K : coefficient de friction (0,18 à 0,25 typique)",
+      "F": "F : Force de précharge (N)",
+      "d": "d : diamètre nominal du boulon (m)"
+    }
+  },
+  "stepByStep": [
+    "Déterminez la taille des boulons (par exemple, M10).",
+    "Recherchez la précharge recommandée (à partir de normes ou de tableaux).",
+    "Estimer le coefficient de frottement (lubrifié vs sec).",
+    "Convertissez le diamètre en mètres.",
+    "Appliquez la formule : T = K × F × d.",
+    "Vérifiez par rapport aux tableaux de couple.",
+    "Sélectionnez μ_thread et μ_head dans les tableaux des conditions de lubrification.",
+    "Vérifiez l'utilisation du rendement et le dénudage des filetages internes et externes."
+  ],
+  "example": {
+    "inputs": [
+      "Bolt: M10 → d = 0.01 m",
+      "Preload: 20,000 N",
+      "K = 0.2"
+    ],
+    "calculation": "T = 0.2 × 20000 × 0.01 = 40 Nm"
+  },
+  "whyThisMatters": [
+    "Un couple inapproprié entraîne une fatigue des boulons, une séparation des joints et une répartition inégale de la charge.",
+    "Dans des secteurs comme l'automobile et l'aérospatiale, la précision du couple est essentielle pour la sécurité et la fiabilité."
+  ],
+  "commonMistakes": [
+    "Ignorer les effets de la lubrification sur le coefficient de frottement.",
+    "Utiliser aveuglément des tableaux de couples génériques sans tenir compte du contexte d'application spécifique.",
+    "Ne tient pas compte de la variation de friction entre les filetages et les surfaces sous la tête."
+  ],
+  "engineeringTip": "Validez toujours le couple avec des calculs basés sur la précharge, et pas seulement avec des tableaux.",
+  "calculatorCta": {
+    "label": "Use the Bolt Torque Calculator to instantly compute torque for your application"
+  },
+  "faq": [
+    {
+      "question": "Que se passe-t-il si le couple est trop élevé ?",
+      "answer": "Un serrage excessif d'un boulon l'amène à dépasser sa limite d'élasticité, entraînant une déformation plastique, un dénudage du filetage ou une défaillance soudaine."
+    },
+    {
+      "question": "Comment la lubrification affecte-t-elle le couple des boulons ?",
+      "answer": "La lubrification réduit considérablement le coefficient de frottement (K). "
+    },
+    {
+      "question": "Pourquoi utiliser la précharge au lieu du simple couple ?",
+      "answer": "Le couple est une mesure indirecte. "
+    },
+    {
+      "question": "Quel est le facteur K typique pour l’acier sec ?",
+      "answer": "K ≈ 0,20 pour acier sur acier non lubrifié ; "
+    },
+    {
+      "question": "Le contrôle du couple garantit-il la précharge ?",
+      "answer": "Non : une dispersion de ± 25 % est courante. "
+    },
+    {
+      "question": "Quand VDI 2230 est-il requis ?",
+      "answer": "Joints critiques dans l’automobile, les appareils sous pression et l’aérospatiale où la preuve de la force de serrage est obligatoire."
+    }
+  ]
+}

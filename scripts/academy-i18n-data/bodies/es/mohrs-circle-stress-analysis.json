@@ -1,0 +1,69 @@
+{
+  "learningObjectives": [
+    "Transforme los componentes de tensión plana para encontrar las tensiones principales σ1, σ2",
+    "Calcule el corte máximo τ_max a partir de la geometría del círculo de Mohr",
+    "Explique por qué los valores principales son invariantes mientras σ(θ) y τ(θ) rotan"
+  ],
+  "keyTakeaways": [
+    "Los planos principales tienen corte cero; las comprobaciones de diseño suelen utilizar σ1",
+    "τ_max = Radio del círculo de Mohr: accionamientos elásticos en materiales dúctiles",
+    "La carga combinada requiere un análisis de tensión plana antes de los criterios de falla"
+  ],
+  "supplementalParagraph": "Uniaxial σ = F/A no es suficiente cuando coexisten flexión y torsión. ",
+  "formula": {
+    "variables": {
+      "σ1,2": "σ1,2: Esfuerzos Principales (MPa)",
+      "σx, σy": "σx, σy: Tensiones normales en X e Y (MPa)",
+      "τxy": "τxy: Esfuerzo cortante (MPa)"
+    }
+  },
+  "stepByStep": [
+    "Determine el estado tensional inicial (σx, σy, τxy).",
+    "Trace los puntos (σx, τxy) y (σy, -τxy) en los ejes de tensión.",
+    "Dibuja el círculo que pasa por estos dos puntos.",
+    "Localice el centro y calcule el radio (R).",
+    "Identifique σ1 (max) y σ2 (min) como las intersecciones con el eje horizontal.",
+    "Trace σx, σy, τxy en el círculo de Mohr para leer σ1, σ2 y τ_max.",
+    "Compare τ_max con el rendimiento/2 para materiales dúctiles según el criterio de Tresca."
+  ],
+  "example": {
+    "inputs": [
+      "σx = 100 MPa",
+      "σy = 40 MPa",
+      "τxy = 40 MPa"
+    ],
+    "calculation": "Center = 70. Radius = √[(30)² + 40²] = 50. → σ1 = 120 MPa, σ2 = 20 MPa."
+  },
+  "whyThisMatters": [
+    "Los materiales dúctiles normalmente fallan debido al esfuerzo cortante máximo (τmax).",
+    "Los materiales frágiles fallan debido a la tensión principal máxima (σ1).",
+    "El círculo de Mohr permite a los diseñadores predecir el ángulo de falla."
+  ],
+  "commonMistakes": [
+    "Confundir el ángulo 2θ en el Círculo de Mohr con el ángulo θ en el mundo físico.",
+    "Trazar incorrectamente el signo del esfuerzo cortante.",
+    "Olvidar comprobar el estado de tensión 3D (tensión triaxial)."
+  ],
+  "engineeringTip": "El centro del círculo siempre representa la tensión normal promedio en ese punto.",
+  "calculatorCta": {
+    "label": "Open the Analysis Lab to visualize complex stress states"
+  },
+  "faq": [
+    {
+      "question": "¿Qué es una tensión principal?",
+      "answer": "Es un esfuerzo normal que actúa en un plano donde el esfuerzo cortante es exactamente cero."
+    },
+    {
+      "question": "¿Son únicas las tensiones principales?",
+      "answer": "Sí, σ1 y σ2 son invariantes; "
+    },
+    {
+      "question": "¿Qué es el estrés plano?",
+      "answer": "Una tensión principal es cero (placas delgadas, superficies libres): simplifica los problemas 3D a 2D."
+    },
+    {
+      "question": "¿Cuándo es insuficiente el círculo de Mohr?",
+      "answer": "Los estados de tensión triaxiales requieren criterios de falla 3D (von Mises en forma de tensor completo)."
+    }
+  ]
+}

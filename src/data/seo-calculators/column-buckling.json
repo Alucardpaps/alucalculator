@@ -1,0 +1,37 @@
+{
+  "id": "column-buckling",
+  "title": "Column Buckling Calculator & Engineering Guide - AluCalc",
+  "slug": "column-buckling",
+  "keyword": "column buckling calculator",
+  "category": "structures",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Column Buckling Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Column Buckling guide with AISI S100 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Column Buckling Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the axial load limit before lateral instability occurs.",
+    "formula": "P_{cr} = \\frac{\\pi^2 E I}{(KL)^2}",
+    "variables": {
+      "Pcr": "Critical load",
+      "E": "Modulus",
+      "I": "Min Inertia",
+      "KL": "Effective length"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check slenderness ratio",
+      "Verify end fixity"
+    ],
+    "pitfalls": [
+      "Assuming perfect concentric load"
+    ],
+    "step_by_step": "1. Define system parameters for Column Buckling.\n2. Consult the technical reference table for material constants.\n3. Apply the AISI S100 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Structures applications, accurate Column Buckling analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

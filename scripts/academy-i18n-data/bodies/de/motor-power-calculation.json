@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "Drehmoment und Drehzahl in Wellenleistung umrechnen: P = T·n/9550 (kW)",
+    "Getriebewirkungsgrad bei Motornennleistung berücksichtigen",
+    "Dauerbetrieb von Spitzanlaufdrehmoment unterscheiden"
+  ],
+  "keyTakeaways": [
+    "Unterdimensionierte Motoren überhitzen; überdimensionierte verschwenden Kapital und Wirkungsgrad",
+    "Getriebeverluste immer in Motorleistungsberechnung einbeziehen",
+    "15–20 % Reserve für Fertigungsstreuung und Alterung hinzufügen"
+  ],
+  "supplementalParagraph": "Antriebsauslegung verbindet mechanische Last mit elektrischer Versorgung. Belt- und Motorrechner in AluCalc erwarten kW aus derselben Drehmoment-Drehzahl-Beziehung.",
+  "formula": {
+    "variables": {
+      "9550": "9550: Umrechnungskonstante",
+      "P": "P: Leistung (kW)",
+      "T": "T: Drehmoment (Nm)",
+      "n": "n: Drehzahl (U/min)"
+    }
+  },
+  "stepByStep": [
+    "Erforderliches Abtriebsdrehmoment (T) bestimmen.",
+    "Betriebsdrehzahl (n) in U/min bestimmen.",
+    "Formel anwenden, um die Leistung in kW zu finden.",
+    "Getriebewirkungsgrad berücksichtigen, falls nötig.",
+    "Motor mit höherer Nennleistung als berechnet wählen.",
+    "Spitz- vs. Dauerdrehmoment für Einsatzklassifizierung unterscheiden.",
+    "Zwischen kW und PS mit 1 PS ≈ 0,746 kW bei US-Katalogen umrechnen."
+  ],
+  "example": {
+    "inputs": [
+      "T = 50 Nm",
+      "n = 1450 RPM"
+    ],
+    "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
+  },
+  "whyThisMatters": [
+    "Verhindert Motorüberhitzung durch Unterdimensionierung.",
+    "Vermeidet übermäßige Energiekosten und Investition durch Überdimensionierung."
+  ],
+  "commonMistakes": [
+    "Wirkungsgrad von Getriebe oder Übertragung vergessen.",
+    "PS-Einheiten direkt in kW-Formel ohne Umrechnung verwenden.",
+    "Spitzanlaufdrehmoment nicht berücksichtigen."
+  ],
+  "engineeringTip": "Motor mit 15–20 % Sicherheitsreserve über berechneter Leistung wählen.",
+  "calculatorCta": {
+    "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
+  },
+  "faq": [
+    {
+      "question": "Wie PS in kW umrechnen?",
+      "answer": "1 PS entspricht etwa 0,746 kW."
+    },
+    {
+      "question": "Was ist der Betriebsfaktor?",
+      "answer": "Multiplikator für Stoß, Umkehr und Tageseinsatz — auf berechnete Leistung vor Motorauswahl."
+    },
+    {
+      "question": "Warum 15–20 % Reserve?",
+      "answer": "Deckt Spannungsschwankungen, Lagerreibungsanstieg und Fertigungstoleranzen ab."
+    },
+    {
+      "question": "Wie beeinflusst das Übersetzungsverhältnis das Motordrehmoment?",
+      "answer": "Motordrehmoment = Lastmoment / (Übersetzung × Wirkungsgrad) — höhere Übersetzung senkt Motordrehmoment."
+    }
+  ]
+}

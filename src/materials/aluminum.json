@@ -1,0 +1,7 @@
+{
+  "name": "Aluminum 6061-T6",
+  "density": 2700,
+  "young_modulus": 68.9e9,
+  "yield_strength": 276e6,
+  "thermal_conductivity": 167
+}

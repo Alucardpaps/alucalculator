@@ -1,0 +1,20 @@
+{
+  "id": "shaft_stress",
+  "name": "Shaft Shear Stress (Torsion)",
+  "category": "mechanical",
+  "inputs": [
+    { "key": "T", "type": "number", "unit": "Nm", "description": "Applied Torque" },
+    { "key": "d", "type": "number", "unit": "m", "description": "Shaft Diameter" }
+  ],
+  "steps": [
+    {
+      "id": "tau",
+      "formula": "(16 * T) / (3.14159 * d^3)",
+      "description": "Calculate maximum shear stress",
+      "latex": "\\tau_{max} = \\frac{16 \\cdot T}{\\pi \\cdot d^3}"
+    }
+  ],
+  "outputs": [
+    "tau"
+  ]
+}

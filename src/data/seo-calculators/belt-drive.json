@@ -1,0 +1,37 @@
+{
+  "id": "belt-drive",
+  "title": "Belt Drive Calculator & Engineering Guide - AluCalc",
+  "slug": "belt-drive",
+  "keyword": "belt drive calculator pulley tension",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Belt Drive Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Belt Drive guide with ISO 5291 / Shigley formulas for length, wrap angle, and belt tension."
+  },
+  "seo": {
+    "h1": "Belt Drive Calculator & Engineering Guide - AluCalc",
+    "intro": "Open belt drive analysis for flat and V-belt transmissions.",
+    "formula": "L \\\\approx 2C + 1.57(d_1+d_2) + \\\\frac{(d_2-d_1)^2}{4C}",
+    "variables": {
+      "L": "Belt length (mm)",
+      "C": "Center distance (mm)",
+      "d1": "Driver pulley diameter (mm)",
+      "d2": "Driven pulley diameter (mm)"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify wrap angle >= 120 deg",
+      "Check belt velocity limits"
+    ],
+    "pitfalls": [
+      "Ignoring V-belt groove angle in tension ratio"
+    ],
+    "step_by_step": "1. Enter pulley diameters and center distance.\\n2. Select belt type (flat or V-belt).\\n3. Review belt length, wrap angle, and tensions.\\n4. Adjust center distance if wrap angle is too low.",
+    "practical": "In mechanical power transmission, accurate belt drive sizing prevents slip and premature wear."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/belt-drive"
+  }
+}

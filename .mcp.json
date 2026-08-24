@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "nextjs": {
+      "command": "npx",
+      "args": ["next-devtools-mcp"]
+    },
+    "magic-ui": {
+      "command": "npx",
+      "args": ["-y", "@magicuidesign/mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@mcp/playwright"]
+    },
+    "math": {
+      "command": "npx",
+      "args": ["-y", "math-mcp"]
+    },
+    "data-commons": {
+      "command": "npx",
+      "args": ["-y", "@mcp/data-commons"]
+    },
+    "materials-project": {
+      "command": "npx",
+      "args": ["-y", "benedictdebrah/materials-project-mcp"],
+      "env": {
+        "MP_API_KEY": "YOUR_MATERIALS_PROJECT_API_KEY"
+      }
+    },
+    "phys-mcp": {
+      "command": "npx",
+      "args": ["-y", "phys-mcp"]
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "YOUR_FIGMA_ACCESS_TOKEN"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "c:/Users/apo_q/.gemini/antigravity/scratch/alucalculator"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"]
+    }
+  }
+}

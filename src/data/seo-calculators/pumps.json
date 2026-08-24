@@ -1,0 +1,37 @@
+{
+  "id": "pumps",
+  "title": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc",
+  "slug": "pumps",
+  "keyword": "centrifugal pump performance calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Centrifugal Pump Performance guide with HI 9.6.1 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates pump head, power requirements, and cavitation risks (NPSH) for industrial fluid systems.",
+    "formula": "NPSH_a = h_{atm} + h_s - h_f - h_{vp}",
+    "variables": {
+      "NPSHa": "Available Net Positive Suction Head",
+      "hs": "Static head",
+      "hf": "Friction loss",
+      "hvp": "Vapor pressure"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify NPSHa > NPSHr",
+      "Check specific speed (Ns)"
+    ],
+    "pitfalls": [
+      "Assuming pump curve is linear at low flows"
+    ],
+    "step_by_step": "1. Define system parameters for Centrifugal Pump Performance.\n2. Consult the technical reference table for material constants.\n3. Apply the HI 9.6.1 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Centrifugal Pump Performance analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

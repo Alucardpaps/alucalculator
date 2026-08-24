@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Appliquer les formules de déflexion d'Euler – Bernoulli pour les cas de support courants",
+    "Expliquer pourquoi les échelles de déflexion avec L⁴ pour les poutres simplement appuyées chargées au centre",
+    "Relier les limites de facilité d'entretien (par exemple L/360) au confort de l'utilisateur et à l'intégrité du joint."
+  ],
+  "keyTakeaways": [
+    "La déviation régit souvent la conception avant que la contrainte n'atteigne la limite d'élasticité",
+    "La rigidité évolue avec E·I – doubler I réduit de moitié la déviation",
+    "Le poids propre et le fluage peuvent être importants pour les poutres à longue portée ou en polymère"
+  ],
+  "supplementalParagraph": "La solidité sans la facilité d’entretien est une conception ratée. ",
+  "formula": {
+    "variables": {
+      "δ": "δ : Déflexion (m)",
+      "F": "F : Charge ponctuelle au centre (N)",
+      "L": "L : longueur de la poutre (m)",
+      "E": "E : Module d'élasticité (Pa)",
+      "I": "I : moment d'inertie surfacique (m⁴)"
+    }
+  },
+  "stepByStep": [
+    "Déterminez les conditions de support de la poutre (par exemple, simplement supportée).",
+    "Identifiez le type et l’emplacement de la charge appliquée.",
+    "Déterminez les propriétés du matériau (E) et la géométrie de la section (I).",
+    "Sélectionnez la formule de déflexion appropriée.",
+    "Calculez la déviation maximale et comparez-la aux limites autorisées.",
+    "Incluez le poids propre comme charge distribuée équivalente lorsque la portée est longue.",
+    "Comparez le δ calculé à la limite de fonctionnalité du code pour l'application."
+  ],
+  "example": {
+    "inputs": [
+      "F = 10,000 N",
+      "L = 5 m",
+      "E = 210 GPa (Steel)",
+      "I = 50,000,000 mm⁴"
+    ],
+    "calculation": "δ = (10000 × 5³) / (48 × 210e9 × 50e-6) ≈ 0.00248 m (2.48 mm)"
+  },
+  "whyThisMatters": [
+    "Une déflexion excessive peut provoquer une instabilité structurelle ou une défaillance fonctionnelle (par exemple, des portes qui ne se ferment pas).",
+    "Permet aux ingénieurs d'optimiser la taille et les matériaux des poutres pour répondre aux normes de sécurité à un coût minimal."
+  ],
+  "commonMistakes": [
+    "Unités de mélange (par exemple, en utilisant mm pour I mais m pour L).",
+    "Utiliser la mauvaise formule pour le support ou la condition de chargement spécifique.",
+    "Négliger le poids propre de la poutre sur de très longues portées."
+  ],
+  "engineeringTip": "Vérifiez toujours les unités deux fois ; ",
+  "calculatorCta": {
+    "label": "Use the Beam Deflection Calculator to model complex loading scenarios"
+  },
+  "faq": [
+    {
+      "question": "Qu'est-ce que la théorie des poutres d'Euler-Bernoulli ?",
+      "answer": "Il s'agit d'une simplification de la théorie élastique linéaire qui fournit un moyen de calculer les caractéristiques de charge et de déflexion des poutres."
+    },
+    {
+      "question": "Pourquoi la déflexion évolue-t-elle avec L⁴ ?",
+      "answer": "De δ = PL³/(48EI) — la portée est la sensibilité dominante en matière de facilité de service."
+    },
+    {
+      "question": "Qu'est-ce que L/360 ?",
+      "answer": "Une limite commune de déflexion du plancher : la déflexion de la charge totale ne doit pas dépasser la portée/360."
+    },
+    {
+      "question": "Quand la théorie des poutres de Timoshenko est-elle nécessaire ?",
+      "answer": "Poutres courtes et épaisses où la déformation par cisaillement est importante — Euler – Bernoulli sous-estime δ."
+    }
+  ]
+}

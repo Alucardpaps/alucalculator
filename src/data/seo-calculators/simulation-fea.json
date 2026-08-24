@@ -1,0 +1,36 @@
+{
+  "id": "simulation-fea",
+  "title": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc",
+  "slug": "simulation-fea",
+  "keyword": "finite element analysis (fea) calculator",
+  "category": "manufacturing",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Finite Element Analysis (FEA) guide with ASME V&V 10 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc",
+    "intro": "Numerical analysis for structural stress distribution, thermal gradients, and modal frequencies.",
+    "formula": "[K]\\{u} = {F}",
+    "variables": {
+      "K": "Stiffness matrix",
+      "u": "Displacement vector",
+      "F": "Force vector"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check mesh convergence",
+      "Verify boundary condition constraints"
+    ],
+    "pitfalls": [
+      "Using singular elements at stress concentrations"
+    ],
+    "step_by_step": "1. Define system parameters for Finite Element Analysis (FEA).\n2. Consult the technical reference table for material constants.\n3. Apply the ASME V&V 10 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Manufacturing applications, accurate Finite Element Analysis (FEA) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

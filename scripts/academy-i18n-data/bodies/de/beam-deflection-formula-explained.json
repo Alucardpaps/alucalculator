@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Euler-Bernoulli-Durchbiegungsformeln für gängige Lagerfälle anwenden",
+    "Erklären, warum Durchbiegung mit L⁴ bei mittiger Last, einfach gelagert, skaliert",
+    "Gebrauchstauglichkeitsgrenzen (z. B. L/360) mit Komfort und Dichtintegrität verknüpfen"
+  ],
+  "keyTakeaways": [
+    "Durchbiegung regelt oft das Design, bevor Spannung die Streckgrenze erreicht",
+    "Steifigkeit skaliert mit E·I — Verdopplung von I halbiert Durchbiegung",
+    "Eigengewicht und Kriechen können bei langen Spannweiten oder Polymerbalken wichtig sein"
+  ],
+  "supplementalParagraph": "Festigkeit ohne Gebrauchstauglichkeit ist gescheitertes Design. Roark- und AISC-Grenzen werden im Balkendurchbiegungs-Engine mit demselben PL³/(48EI)-Rückgrat durchgesetzt.",
+  "formula": {
+    "variables": {
+      "δ": "δ: Durchbiegung (m)",
+      "F": "F: Punktlast in der Mitte (N)",
+      "L": "L: Balkenlänge (m)",
+      "E": "E: Elastizitätsmodul (Pa)",
+      "I": "I: Flächenträgheitsmoment (m⁴)"
+    }
+  },
+  "stepByStep": [
+    "Bestimmen Sie die Balkenlagerbedingungen (z. B. einfach gelagert).",
+    "Art und Lage der angreifenden Last identifizieren.",
+    "Werkstoffeigenschaften (E) und Querschnittsgeometrie (I) bestimmen.",
+    "Geeignete Durchbiegungsformel auswählen.",
+    "Maximale Durchbiegung berechnen und mit zulässigen Grenzen vergleichen.",
+    "Eigengewicht als äquivalente Streckenlast berücksichtigen, wenn die Spannweite lang ist.",
+    "Berechnetes δ mit der Gebrauchstauglichkeitsgrenze der Norm für die Anwendung vergleichen."
+  ],
+  "example": {
+    "inputs": [
+      "F = 10,000 N",
+      "L = 5 m",
+      "E = 210 GPa (Steel)",
+      "I = 50,000,000 mm⁴"
+    ],
+    "calculation": "δ = (10000 × 5³) / (48 × 210e9 × 50e-6) ≈ 0.00248 m (2.48 mm)"
+  },
+  "whyThisMatters": [
+    "Übermäßige Durchbiegung kann strukturelle Instabilität oder Funktionsausfall verursachen (z. B. Türen schließen nicht).",
+    "Ermöglicht Optimierung von Balkengröße und Material für Sicherheit bei minimalem Kostenaufwand."
+  ],
+  "commonMistakes": [
+    "Einheiten mischen (z. B. mm für I, aber m für L).",
+    "Falsche Formel für spezifische Lager- oder Lastbedingung verwenden.",
+    "Eigengewicht des Balkens bei sehr langen Spannweiten vernachlässigen."
+  ],
+  "engineeringTip": "Einheiten immer doppelt prüfen; Verschiebungseinheiten sind oft klein und empfindlich für Zehnerpotenzfehler.",
+  "calculatorCta": {
+    "label": "Use the Beam Deflection Calculator to model complex loading scenarios"
+  },
+  "faq": [
+    {
+      "question": "Was ist die Euler-Bernoulli-Balkentheorie?",
+      "answer": "Vereinfachung der linear-elastischen Theorie zur Berechnung von Tragfähigkeit und Durchbiegung von Balken."
+    },
+    {
+      "question": "Warum skaliert die Durchbiegung mit L⁴?",
+      "answer": "Aus δ = PL³/(48EI) — Spannweite ist der dominante Faktor bei Gebrauchstauglichkeit."
+    },
+    {
+      "question": "Was bedeutet L/360?",
+      "answer": "Übliche Grenze für Bodendurchbiegung — Gesamtlastdurchbiegung darf Spannweite/360 nicht überschreiten."
+    },
+    {
+      "question": "Wann ist Timoshenko-Balkentheorie nötig?",
+      "answer": "Kurze, dicke Balken mit signifikanter Schubverformung — Euler-Bernoulli unterschätzt δ."
+    }
+  ]
+}

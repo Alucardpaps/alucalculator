@@ -1,0 +1,45 @@
+{
+  "id": "motor_selection",
+  "name": "Motor Selection Engine",
+  "category": "mechanical",
+  "description": "Calculate required motor power from load and speed, then match to nearest standard motor size (IEC frame sizes).",
+  "inputs": [
+    { "key": "T_load", "type": "number", "unit": "Nm", "description": "Load Torque", "default": 50 },
+    { "key": "n_required", "type": "number", "unit": "rpm", "description": "Required Speed", "default": 1500 },
+    { "key": "eta_drive", "type": "number", "unit": "-", "description": "Drive Train Efficiency (0-1)", "default": 0.9 },
+    { "key": "SF", "type": "number", "unit": "-", "description": "Service Factor", "default": 1.25 }
+  ],
+  "steps": [
+    {
+      "id": "omega",
+      "formula": "(2 * 3.14159 * n_required) / 60",
+      "description": "Angular velocity",
+      "latex": "\\omega = \\frac{2\\pi n}{60}"
+    },
+    {
+      "id": "P_load",
+      "formula": "(T_load * omega) / 1000",
+      "description": "Mechanical power at the load (kW)",
+      "latex": "P_{load} = \\frac{T \\times \\omega}{1000}"
+    },
+    {
+      "id": "P_motor_required",
+      "formula": "(P_load * SF) / eta_drive",
+      "description": "Required motor power accounting for efficiency and service factor",
+      "latex": "P_{motor} = \\frac{P_{load} \\times SF}{\\eta_{drive}}"
+    },
+    {
+      "id": "P_motor_standard",
+      "formula": "P_motor_required <= 0.37 ? 0.37 : P_motor_required <= 0.55 ? 0.55 : P_motor_required <= 0.75 ? 0.75 : P_motor_required <= 1.1 ? 1.1 : P_motor_required <= 1.5 ? 1.5 : P_motor_required <= 2.2 ? 2.2 : P_motor_required <= 3 ? 3 : P_motor_required <= 4 ? 4 : P_motor_required <= 5.5 ? 5.5 : P_motor_required <= 7.5 ? 7.5 : P_motor_required <= 11 ? 11 : P_motor_required <= 15 ? 15 : P_motor_required <= 18.5 ? 18.5 : P_motor_required <= 22 ? 22 : P_motor_required <= 30 ? 30 : P_motor_required <= 37 ? 37 : P_motor_required <= 45 ? 45 : P_motor_required <= 55 ? 55 : P_motor_required <= 75 ? 75 : P_motor_required <= 90 ? 90 : P_motor_required <= 110 ? 110 : 132",
+      "description": "Nearest standard IEC motor power (kW)",
+      "latex": "P_{std} = \\text{next IEC size} \\geq P_{motor}"
+    },
+    {
+      "id": "utilization",
+      "formula": "(P_motor_required / P_motor_standard) * 100",
+      "description": "Motor utilization percentage",
+      "latex": "\\text{Util.} = \\frac{P_{req}}{P_{std}} \\times 100\\%"
+    }
+  ],
+  "outputs": ["P_load", "P_motor_required", "P_motor_standard", "utilization", "omega"]
+}

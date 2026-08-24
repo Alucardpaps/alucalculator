@@ -1,0 +1,27 @@
+{
+  "id": "gear_ratio",
+  "name": "Gear Ratio Calculation",
+  "category": "mechanical",
+  "inputs": [
+    { "key": "N1", "type": "number", "unit": "teeth" },
+    { "key": "N2", "type": "number", "unit": "teeth" },
+    { "key": "T1", "type": "number", "unit": "Nm" }
+  ],
+  "steps": [
+    {
+      "id": "ratio",
+      "formula": "N2 / N1",
+      "description": "Calculate gear ratio",
+      "latex": "i = \\frac{N_2}{N_1}"
+    },
+    {
+      "id": "T2",
+      "formula": "T1 * ratio",
+      "description": "Output torque",
+      "latex": "T_2 = T_1 \\times i"
+    }
+  ],
+  "outputs": [
+    "T2"
+  ]
+}

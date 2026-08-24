@@ -1,0 +1,24 @@
+{
+    "id": "alucalc.mechanical.sheet-metal-advanced",
+    "version": "1.0.0",
+    "type": "sheet-metal",
+    "category": "mechanical",
+    "title": "Sheet Metal Advanced",
+    "description": "Calculate bend allowance, deduction, and K-Factor for sheet metal flat patterns.",
+    "icon": "Layers",
+    "defaultSize": {
+        "width": 800,
+        "height": 700
+    },
+    "capabilities": [
+        "pdf-export",
+        "dxf-export",
+        "parametric-sync"
+    ],
+    "permissions": [
+        "project.read",
+        "project.write"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "AluCalc Engineering Team"
+}

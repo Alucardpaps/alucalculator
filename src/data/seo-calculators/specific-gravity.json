@@ -1,0 +1,32 @@
+{
+  "id": "specific-gravity",
+  "title": "Specific Gravity Calculator & Engineering Guide - AluCalc",
+  "slug": "specific-gravity",
+  "keyword": "specific gravity calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Specific Gravity Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Specific Gravity guide with ASTM D792 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Specific Gravity Calculator & Engineering Guide - AluCalc",
+    "intro": "Ratio of the density of a substance to the density of water at 4°C.",
+    "formula": "SG = \\frac{\\rho_{substance}}{\\rho_{water}}",
+    "variables": {
+      "rho_sub": "Substance density",
+      "rho_water": "Reference density"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify temperature of reference fluid"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Specific Gravity.\n2. Consult the technical reference table for material constants.\n3. Apply the ASTM D792 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Specific Gravity analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

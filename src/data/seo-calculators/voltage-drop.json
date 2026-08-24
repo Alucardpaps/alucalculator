@@ -1,0 +1,35 @@
+{
+  "id": "voltage-drop",
+  "title": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc",
+  "slug": "voltage-drop",
+  "keyword": "conductor voltage drop calculator",
+  "category": "electrical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Conductor Voltage Drop guide with NEC Chapter 9 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the voltage loss across long electrical transmission lines to ensure equipment voltage stability.",
+    "formula": "\\Delta V = \\frac{2 L I (R \\cos \\phi + X \\sin \\phi)}{1000}",
+    "variables": {
+      "L": "Cable length",
+      "R": "Resistance",
+      "X": "Reactance",
+      "phi": "Phase angle"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify drop < 3% for feeders",
+      "Check terminal temperature rating"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Conductor Voltage Drop.\n2. Consult the technical reference table for material constants.\n3. Apply the NEC Chapter 9 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Electrical applications, accurate Conductor Voltage Drop analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

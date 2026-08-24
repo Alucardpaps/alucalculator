@@ -1,0 +1,26 @@
+{
+  "grades": {
+    "C25/30": {
+      "name": "C25/30",
+      "density": 2400,
+      "youngsModulus": 31000,
+      "yieldStrength": 25,
+      "ultimateTensileStrength": 2.6,
+      "poissonRatio": 0.2,
+      "thermalExpansion": 10.0,
+      "default": true,
+      "description": "Standard structural concrete (25 MPa cylinder strength / 30 MPa cube strength)."
+    },
+    "C30/37": {
+      "name": "C30/37",
+      "density": 2400,
+      "youngsModulus": 33000,
+      "yieldStrength": 30,
+      "ultimateTensileStrength": 2.9,
+      "poissonRatio": 0.2,
+      "thermalExpansion": 10.0,
+      "default": false,
+      "description": "Higher strength structural concrete."
+    }
+  }
+}

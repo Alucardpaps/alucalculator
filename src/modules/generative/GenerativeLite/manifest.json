@@ -1,0 +1,23 @@
+{
+    "id": "alucalc.generative.lite",
+    "version": "1.0.0",
+    "type": "topology-optimization",
+    "category": "generative",
+    "title": "Generative Design Lite",
+    "description": "AI-assisted topology reduction and material optimization engine.",
+    "icon": "Cpu",
+    "defaultSize": {
+        "width": 900,
+        "height": 700
+    },
+    "capabilities": [
+        "topology-reduction",
+        "stress-heatmap"
+    ],
+    "permissions": [
+        "project.read",
+        "project.write"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "Antigravity Engineering OS"
+}

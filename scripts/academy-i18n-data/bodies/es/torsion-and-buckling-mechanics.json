@@ -1,0 +1,71 @@
+{
+  "learningObjectives": [
+    "Calcule el esfuerzo cortante en ejes sometidos a torsión usando τ = Tr/J",
+    "Determine la carga crítica de Euler Pcr para columnas esbeltas",
+    "Seleccione el factor de longitud efectiva K de las condiciones de soporte final."
+  ],
+  "keyTakeaways": [
+    "El pandeo falla en el eje más débil; utilice siempre I mínimo",
+    "La relación de esbeltez L/r determina si se aplica la teoría de Euler",
+    "La torsión y flexión combinadas requieren comprobaciones de interacción más allá de esta lección"
+  ],
+  "supplementalParagraph": "El colapso por pandeo repentino puede ocurrir por debajo del límite elástico del material. ",
+  "formula": {
+    "variables": {
+      "Pcr": "Pcr: Carga crítica de pandeo (N)",
+      "E": "E: Módulo de elasticidad (Pa)",
+      "I": "I: Mínimo Momento de Inercia (m⁴)",
+      "L": "L: Longitud sin soporte (m)",
+      "K": "K: Factor de longitud efectiva de la columna"
+    }
+  },
+  "stepByStep": [
+    "Para torsión: Calcule el momento polar de inercia (J).",
+    "Aplicar la fórmula de torsión: τ = (T × r) / J.",
+    "Para pandeo: determine las condiciones del extremo de la columna (fijo, fijado).",
+    "Identificar el menor momento de inercia (eje débil).",
+    "Calcule la carga crítica de pandeo (Pcr) utilizando la fórmula de Euler.",
+    "Calcule el momento polar J para ejes sólidos y huecos bajo torsión.",
+    "Verifique la relación de esbeltez L/r con los límites del código para determinar la validez de Euler."
+  ],
+  "example": {
+    "inputs": [
+      "E = 210 GPa (Steel)",
+      "L = 2 m",
+      "End condition: Pinned-Pinned (K=1.0)",
+      "I = 1,000,000 mm⁴"
+    ],
+    "calculation": "Pcr = (π² × 210e9 × 1e-6) / (2)² ≈ 518,000 N"
+  },
+  "whyThisMatters": [
+    "Previene el colapso catastrófico de miembros estructurales largos.",
+    "Garantiza que los ejes de transmisión de potencia puedan manejar el par de rotación sin fallas."
+  ],
+  "commonMistakes": [
+    "Utilizar el eje más fuerte para pandear (siempre falla en el más débil).",
+    "Despreciando los límites de la relación de esbeltez (L/r).",
+    "Ignorando la carga combinada (Torsión + Flexión)."
+  ],
+  "engineeringTip": "Diseñe siempre columnas con un alto factor de seguridad contra el pandeo, ya que las imperfecciones iniciales pueden provocar una falla temprana.",
+  "calculatorCta": {
+    "label": "Analyze structural stability with our column tools"
+  },
+  "faq": [
+    {
+      "question": "¿Qué es el momento polar de inercia (J)?",
+      "answer": "Es una cantidad utilizada para describir la resistencia a la deformación torsional de un objeto cilíndrico."
+    },
+    {
+      "question": "¿Qué es el factor de longitud efectiva K?",
+      "answer": "Multiplicador sobre longitud real: K=1 clavado-clavado, K=0,5 fijo-fijo, K=2 voladizo."
+    },
+    {
+      "question": "¿Puede una columna fallar por debajo del límite elástico?",
+      "answer": "Sí, el pandeo es una falla de estabilidad, no una sobrecarga de material."
+    },
+    {
+      "question": "¿Cómo afecta la flexión combinada a los ejes?",
+      "answer": "Utilice una interacción equivalente entre par y momento flector; el análisis puro de torsión es insuficiente."
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "learningObjectives": [
+    "Spanbrechergeometrie (TF, TQ) nach Werkstoff und Operation wählen",
+    "Radialzustellung vs. modifizierter Flankenvorschub für Gewindestabilität vergleichen",
+    "Schnitttiefe, Vorschub und spezifische Schnittkraft mit Werkzeuglast verknüpfen"
+  ],
+  "keyTakeaways": [
+    "Unkontrollierte Späne verursachen Bird-Nesting — Hauptfehler beim Gewindeschneiden",
+    "Modifizierter Flankenvorschub reduziert Wärmelast auf eine Insert-Kante",
+    "Mindestschnitttiefe ist nötig, um die Spanbrechernut zu aktivieren"
+  ],
+  "supplementalParagraph": "Gewindeschneiden ist ein Zerspanungsproblem in Gewindegeometrie-Verkleidung. Kyocera-TQ-Daten in dieser Lektion speisen dasselbe spezifische-Kraft-Modell wie der Bearbeitungszeit-Engine.",
+  "formula": {
+    "variables": {
+      "ap": "ap: Schnitttiefe (mm)",
+      "f": "f: Vorschub pro Umdrehung (mm/U)",
+      "Kc": "Kc: Spezifische Schnittkraft (N/mm²)"
+    }
+  },
+  "stepByStep": [
+    "Spanbrechergeometrie nach Werkstoff wählen (z. B. TF allgemein, TQ für Stabilität).",
+    "Vorschubmethode wählen: Radialzustellung vs. Flankenvorschub (3°–5°).",
+    "Anzahl der Zustellungen aus Gewindesteigungstabellen bestimmen.",
+    "Spanflussrichtung mit asymmetrischer Spitzenlogik überwachen.",
+    "Schnittgeschwindigkeit (Vc) anhand von Werkzeugverschleißmustern anpassen.",
+    "Erste Gewindeschneidzustellung über der minimalen Spanbrecheraktivierung ap setzen.",
+    "Hochdruckkühlmittel für Innengewinde (SINR/CINR) anwenden."
+  ],
+  "example": {
+    "inputs": [
+      "Material: 15CrMo4",
+      "Tool: 16ER150 ISO-TQ",
+      "Feed: Radial"
+    ],
+    "calculation": "Using TQ geometry: Cutting force reduced by 15%, Vibration suppressed."
+  },
+  "whyThisMatters": [
+    "Falsche Spanbildung führt zu „Bird-Nesting“ — Hauptursache für Werkzeugausfall beim Gewindeschneiden.",
+    "Modifizierter Flankenvorschub (3°–5°) verbessert deutlich die Standzeit durch Wärmeverteilung."
+  ],
+  "commonMistakes": [
+    "Konstante Schnitttiefe für alle Zustellungen (erste Zustellung muss tiefer sein).",
+    "Kein Hochdruckkühlmittel bei Innengewinden (SINR/CINR).",
+    "Mindestschnitttiefe (ap) für Spanbrecheraktivierung vernachlässigen."
+  ],
+  "calculatorCta": {
+    "label": "Analyze tool load in the Gearbox Simulation suite"
+  },
+  "faq": [
+    {
+      "question": "Warum modifizierten Flankenvorschub verwenden?",
+      "answer": "Nur eine Insert-Kante trägt die Hauptlast — reduziert Wärme und verhindert Vibration (Rattern)."
+    },
+    {
+      "question": "Radial- vs. Flankenvorschub?",
+      "answer": "Radial belastet beide Kanten gleich; modifizierter Flankenvorschub (3°–5°) belastet eine Kante für Stabilität."
+    },
+    {
+      "question": "Was ist die spezifische Schnittkraft Kc?",
+      "answer": "Kraft pro Spanflächeneinheit — Werkstoffgröße für Fc = ap × f × Kc."
+    },
+    {
+      "question": "Warum zusätzliche Zustellungen bei Edelstahl?",
+      "answer": "Kaltverfestigung und Rückfederung erfordern 2–3 Zustellungen mehr als Kohlenstoffstahl-Tabellen."
+    }
+  ]
+}

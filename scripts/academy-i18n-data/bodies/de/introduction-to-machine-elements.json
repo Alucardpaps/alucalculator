@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Maschinenelemente nach Funktion klassifizieren: Kraftübertragung, Lagerung, Verbindung",
+    "Anforderungen auf Standardkatalogbauteile (ISO, DIN) abbilden",
+    "Erkennen, wann ein Sonderelement gerechtfertigt ist vs. Überdimensionierung"
+  ],
+  "keyTakeaways": [
+    "Standardelemente ermöglichen Austauschbarkeit und geringere Lebenszykluskosten",
+    "Umgebung (Korrosion, Temperatur, Vibration) bestimmt Elementauswahl",
+    "Auf Demontage auslegen, sofern die Verbindung nicht dauerhaft sein soll"
+  ],
+  "supplementalParagraph": "Maschinenbau ist nicht das Erfinden neuer Teile — es ist das Zusammensetzen bewährter Elemente. Dieser Überblick verknüpft jede Elementfamilie mit den folgenden Lektionen und Rechnern.",
+  "formula": {
+    "variables": {
+      "Elements": "Elements: Verbindungen, Zahnräder, Lager usw.",
+      "Power": "Power: Drehmoment × Drehzahl"
+    }
+  },
+  "stepByStep": [
+    "Erforderliche Bewegung identifizieren (linear vs. rotationell).",
+    "Kraftübertragungselement wählen (Zahnrad, Riemen, Kette).",
+    "Lagerelement wählen (Lager, Welle).",
+    "Verbindungsmethode festlegen (Schraube, Schweißnaht, Niet).",
+    "Dimensionierung nach Ingenieurnormen verifizieren.",
+    "Einsatzfaktor und Umgebungseinflüsse vor Katalogauswahl abschätzen.",
+    "Austauschbarkeit mit Lieferantenzeichnungen und ISO-Bezeichnung prüfen."
+  ],
+  "example": {
+    "inputs": [
+      "Requirement: Join two plates",
+      "Option: M10 Bolt"
+    ],
+    "calculation": "Selection: Threaded Fastener (M10 ISO 262)"
+  },
+  "whyThisMatters": [
+    "Standardisierte Elemente ermöglichen austauschbare Teile und einfachere Wartung.",
+    "Das richtige Element für die Aufgabe verhindert Überdimensionierung und senkt Kosten."
+  ],
+  "commonMistakes": [
+    "Element ohne Umgebung (Korrosion, Hitze) wählen.",
+    "Dynamische Lasten (Vibration) auf statische Verbindungen vernachlässigen.",
+    "Nicht standardisierte Größen wählen, die schwer beschaffbar sind."
+  ],
+  "engineeringTip": "Immer auf Demontage auslegen, sofern die Verbindung nicht dauerhaft sein soll.",
+  "calculatorCta": {
+    "label": "Start exploring machine elements with our Bolt Designer"
+  },
+  "faq": [
+    {
+      "question": "Was ist das häufigste Maschinenelement?",
+      "answer": "Gewindeverbindungen (Schrauben) sind mit Abstand die am weitesten verbreiteten Elemente."
+    },
+    {
+      "question": "Was unterscheidet ein Maschinenelement von einem Rohbauteil?",
+      "answer": "Maschinenelemente sind normierte, katalogisierte Bauteile mit definierten Schnittstellen und Leistungsdaten."
+    },
+    {
+      "question": "Wann ist Schweißen Schrauben vorzuziehen?",
+      "answer": "Wenn dauerhafte, steife Verbindungen nötig sind und Demontage nicht erforderlich — aber Prüfbarkeit leidet."
+    },
+    {
+      "question": "Wie unterscheiden sich Lager von Buchsen?",
+      "answer": "Wälzlager nutzen Kugeln/Rollen für geringe Reibung; Buchsen sind Gleitlager für oszillierende oder verschmutzte Umgebungen."
+    }
+  ]
+}

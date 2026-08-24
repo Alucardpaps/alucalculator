@@ -1,0 +1,68 @@
+{
+  "learningObjectives": [
+    "Convierta el par y la velocidad a potencia del eje usando P = T·n/9550 (kW)",
+    "Tenga en cuenta la eficiencia de la transmisión al dimensionar la placa de identificación del motor.",
+    "Distinga el servicio continuo de los requisitos de par de arranque máximo"
+  ],
+  "keyTakeaways": [
+    "Los motores de tamaño insuficiente se sobrecalientan; ",
+    "Incluya siempre las pérdidas de la caja de cambios en el cálculo de la potencia del motor.",
+    "Agregue un margen de 15 a 20 % para la variabilidad de la producción y el envejecimiento"
+  ],
+  "supplementalParagraph": "El tamaño del variador conecta la carga mecánica al suministro eléctrico. ",
+  "formula": {
+    "variables": {
+      "9550": "9550: Constante de conversión",
+      "P": "P: Potencia (kW)",
+      "T": "T: Par (Nm)",
+      "n": "n: Velocidad de rotación (RPM)"
+    }
+  },
+  "stepByStep": [
+    "Determine el par de salida requerido (T).",
+    "Determine la velocidad operativa (n) en RPM.",
+    "Aplica la fórmula para encontrar la potencia en kW.",
+    "Tenga en cuenta la eficiencia de la transmisión si es necesario.",
+    "Seleccione un motor con una potencia nominal superior a la requerida calculada.",
+    "Identifique el par máximo frente al par continuo para la clasificación de servicio.",
+    "Convierta entre kW y HP usando 1 HP ≈ 0,746 kW al leer catálogos de EE. UU."
+  ],
+  "example": {
+    "inputs": [
+      "T = 50 Nm",
+      "n = 1450 RPM"
+    ],
+    "calculation": "P = (50 × 1450) / 9550 ≈ 7.59 kW"
+  },
+  "whyThisMatters": [
+    "Previene el desgaste del motor debido a un tamaño insuficiente.",
+    "Evita excesivos costes energéticos e inversión inicial por sobredimensionamiento."
+  ],
+  "commonMistakes": [
+    "Olvidándose de incluir la eficiencia de la caja de cambios o transmisión.",
+    "Usar unidades HP directamente en una fórmula de kW sin conversión.",
+    "No tener en cuenta el par de arranque máximo."
+  ],
+  "engineeringTip": "Seleccione siempre un motor con un margen de seguridad del 15-20% sobre la potencia calculada.",
+  "calculatorCta": {
+    "label": "Open the Motor Sizing Tool to find the perfect drive for your system"
+  },
+  "faq": [
+    {
+      "question": "¿Cómo convierto HP a kW?",
+      "answer": "1 HP equivale aproximadamente a 0,746 kW."
+    },
+    {
+      "question": "¿Qué es el factor de servicio?",
+      "answer": "Un multiplicador que tiene en cuenta los golpes, la marcha atrás y el servicio diario, aplicado a la potencia calculada antes de la selección del motor."
+    },
+    {
+      "question": "¿Por qué añadir un margen del 15 al 20 %?",
+      "answer": "Cubre la variación de voltaje, el aumento de la resistencia del rodamiento durante su vida útil y las tolerancias de producción."
+    },
+    {
+      "question": "¿Cómo afecta la relación de la caja de cambios al par del motor?",
+      "answer": "Par del motor = par de carga / (relación × eficiencia): una relación más alta reduce la demanda de par del motor."
+    }
+  ]
+}

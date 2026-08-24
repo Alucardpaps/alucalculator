@@ -1,0 +1,50 @@
+{
+  "id": "gear-ratio",
+  "title": "Gear Ratio Calculator & Engineering Guide - AluCalc",
+  "slug": "gear-ratio",
+  "keyword": "gear ratio calculator",
+  "category": "mechanical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Gear Ratio Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Gear Ratio guide with AGMA Standards formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Gear Ratio Calculator & Engineering Guide - AluCalc",
+    "intro": "Defines the speed/torque transformation between gears.",
+    "formula": "R = \\frac{N_{driven}}{N_{driver}}",
+    "variables": {
+      "N_driver": "Pinion teeth",
+      "N_driven": "Gear teeth"
+    },
+    "technical_data": [
+      {
+        "name": "Efficiency",
+        "rows": [
+          {
+            "Type": "Spur",
+            "Eff": "98%"
+          },
+          {
+            "Type": "Worm",
+            "Eff": "70%"
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Watch for interference",
+      "Lubricant choice"
+    ],
+    "pitfalls": [
+      "Ignoring backlash",
+      "Thermal buildup"
+    ],
+    "step_by_step": "1. Define system parameters for Gear Ratio.\n2. Consult the technical reference table for material constants.\n3. Apply the AGMA Standards formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Mechanical applications, accurate Gear Ratio analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

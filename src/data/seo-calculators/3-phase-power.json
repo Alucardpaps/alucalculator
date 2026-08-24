@@ -1,0 +1,35 @@
+{
+  "id": "3-phase-power",
+  "title": "3-Phase Power Calculator & Engineering Guide - AluCalc",
+  "slug": "3-phase-power",
+  "keyword": "3-phase power calculator",
+  "category": "electrical",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "3-Phase Power Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional 3-Phase Power guide with IEEE 141 formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "3-Phase Power Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates real power in a industrial 3-phase AC system.",
+    "formula": "P = \\sqrt{3} \\cdot V \\cdot I \\cdot PF",
+    "variables": {
+      "P": "Power",
+      "V": "Voltage",
+      "I": "Current",
+      "PF": "Power Factor"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Check phase balance",
+      "Verify line current"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for 3-Phase Power.\n2. Consult the technical reference table for material constants.\n3. Apply the IEEE 141 formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Electrical applications, accurate 3-Phase Power analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "mohrs_circle",
+  "name": "Mohr's Circle & 2D Principal Stress",
+  "category": "math",
+  "inputs": [
+    { "key": "sigma_x", "type": "number", "unit": "MPa" },
+    { "key": "sigma_y", "type": "number", "unit": "MPa" },
+    { "key": "tau_xy", "type": "number", "unit": "MPa" }
+  ],
+  "steps": [
+    {
+      "id": "C",
+      "formula": "(sigma_x + sigma_y) / 2",
+      "description": "Calculate Center of Mohr's Circle (Average Stress)",
+      "latex": "C = \\sigma_{avg} = \\frac{\\sigma_x + \\sigma_y}{2}"
+    },
+    {
+      "id": "R",
+      "formula": "sqrt(((sigma_x - sigma_y) / 2)^2 + tau_xy^2)",
+      "description": "Calculate Radius (Maximum In-Plane Shear Stress)",
+      "latex": "R = \\tau_{max} = \\sqrt{\\left(\\frac{\\sigma_x - \\sigma_y}{2}\\right)^2 + \\tau_{xy}^2}"
+    },
+    {
+      "id": "sigma_1",
+      "formula": "C + R",
+      "description": "Calculate Principal Stress 1 (Maximum Normal Stress)",
+      "latex": "\\sigma_1 = C + R"
+    },
+    {
+      "id": "sigma_2",
+      "formula": "C - R",
+      "description": "Calculate Principal Stress 2 (Minimum Normal Stress)",
+      "latex": "\\sigma_2 = C - R"
+    },
+    {
+      "id": "angle_p",
+      "formula": "0.5 * atan2(2 * tau_xy, sigma_x - sigma_y) * (180 / pi)",
+      "description": "Calculate Principal Angle in degrees",
+      "latex": "\\phi_p = \\frac{1}{2} \\tan^{-1}\\left(\\frac{2\\tau_{xy}}{\\sigma_x - \\sigma_y}\\right)"
+    },
+    {
+      "id": "tau_abs_max",
+      "formula": "(max(sigma_1, sigma_2, 0) - min(sigma_1, sigma_2, 0)) / 2",
+      "description": "Calculate Absolute Maximum Shear Stress (assuming plane stress, sigma_3 = 0)",
+      "latex": "\\tau_{abs\\ max} = \\frac{\\sigma_{max} - \\sigma_{min}}{2}"
+    }
+  ],
+  "outputs": [
+    "C",
+    "R",
+    "sigma_1",
+    "sigma_2",
+    "angle_p",
+    "tau_abs_max"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "radioactive-decay",
+  "title": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc",
+  "slug": "radioactive-decay",
+  "keyword": "radioactive decay (half-life) calculator",
+  "category": "science",
+  "intent": "professional_handbook",
+  "meta": {
+    "title": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+    "description": "Professional Radioactive Decay (Half-Life) guide with Nuclear Physics formulas, technical tables, and design checklists."
+  },
+  "seo": {
+    "h1": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc",
+    "intro": "Calculates the remaining quantity of a radioactive substance over time.",
+    "formula": "N(t) = N_0 e^{-\\lambda t}",
+    "variables": {
+      "N0": "Initial quantity",
+      "lambda": "Decay constant",
+      "t": "Time elapsed"
+    },
+    "technical_data": [],
+    "checklist": [
+      "Verify half-life vs decay constant conversion"
+    ],
+    "pitfalls": [],
+    "step_by_step": "1. Define system parameters for Radioactive Decay (Half-Life).\n2. Consult the technical reference table for material constants.\n3. Apply the Nuclear Physics formula.\n4. Run the post-calculation design checks.",
+    "practical": "In Science applications, accurate Radioactive Decay (Half-Life) analysis is vital for safety and performance."
+  },
+  "cta": {
+    "label": "Open in AluCalc OS",
+    "link": "/os?module=calculator"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "learningObjectives": [
+    "Clasificar los elementos de la máquina por función: transmisión de potencia, soporte y unión.",
+    "Asigne los requisitos de diseño a los componentes del catálogo estándar (ISO, DIN)",
+    "Reconocer cuándo un elemento personalizado está justificado frente a una ingeniería excesiva"
+  ],
+  "keyTakeaways": [
+    "Los elementos estándar permiten la intercambiabilidad y un menor costo del ciclo de vida",
+    "El entorno (corrosión, temperatura, vibración) impulsa la selección de elementos.",
+    "Diseño para desmontaje a menos que la unión sea intencionalmente permanente."
+  ],
+  "supplementalParagraph": "El diseño de máquinas no consiste en inventar piezas nuevas, sino en componer elementos probados en un sistema confiable. ",
+  "formula": {
+    "variables": {
+      "Elements": "Elementos: Sujeciones, Engranajes, Rodamientos, etc.",
+      "Power": "Potencia: Torque × Velocidad"
+    }
+  },
+  "stepByStep": [
+    "Identifique el movimiento requerido (lineal vs rotacional).",
+    "Seleccione el elemento de transmisión de potencia (engranaje, correa, cadena).",
+    "Elija el elemento de soporte (Cojinete, Eje).",
+    "Especifique el método de unión (Perno, Soldadura, Remache).",
+    "Verifique el tamaño utilizando estándares de ingeniería.",
+    "Calcule el ciclo de trabajo y la exposición ambiental antes de buscar en el catálogo.",
+    "Verifique la intercambiabilidad con los planos del proveedor y la designación ISO."
+  ],
+  "example": {
+    "inputs": [
+      "Requirement: Join two plates",
+      "Option: M10 Bolt"
+    ],
+    "calculation": "Selection: Threaded Fastener (M10 ISO 262)"
+  },
+  "whyThisMatters": [
+    "Los elementos estandarizados permiten piezas intercambiables y un mantenimiento más sencillo.",
+    "Conocer el elemento adecuado para el trabajo evita el exceso de ingeniería y reduce los costos."
+  ],
+  "commonMistakes": [
+    "Elegir un elemento sin considerar el medio ambiente (Corrosión, Calor).",
+    "Despreciando las cargas dinámicas (vibración) en sujetadores estáticos.",
+    "Utilizar tamaños no estándar que son difíciles de conseguir."
+  ],
+  "engineeringTip": "Diseñe siempre para el desmontaje a menos que se pretenda que la unión sea permanente.",
+  "calculatorCta": {
+    "label": "Start exploring machine elements with our Bolt Designer"
+  },
+  "faq": [
+    {
+      "question": "¿Cuál es el elemento de máquina más común?",
+      "answer": "Los elementos de fijación roscados (pernos y tornillos) son, con diferencia, los elementos más utilizados en ingeniería."
+    },
+    {
+      "question": "¿Qué distingue un elemento de máquina de una pieza en bruto?",
+      "answer": "Los elementos de la máquina son componentes estandarizados y catalogados con interfaces y clasificaciones de rendimiento definidas."
+    },
+    {
+      "question": "¿Cuándo se prefiere soldar a atornillar?",
+      "answer": "Cuando se necesitan uniones permanentes de alta rigidez y no es necesario el desmontaje, pero la inspeccionabilidad se ve afectada."
+    },
+    {
+      "question": "¿En qué se diferencian los rodamientos de los casquillos?",
+      "answer": "Los rodamientos de elementos rodantes utilizan bolas/rodillos para reducir la fricción; "
+    }
+  ]
+}

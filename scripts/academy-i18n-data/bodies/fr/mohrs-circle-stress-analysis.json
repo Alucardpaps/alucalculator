@@ -1,0 +1,69 @@
+{
+  "learningObjectives": [
+    "Transformez les composants de contraintes planes pour trouver les contraintes principales σ1, σ2",
+    "Calculer le cisaillement maximal τ_max à partir de la géométrie du cercle de Mohr",
+    "Expliquer pourquoi les valeurs principales sont invariantes pendant que σ(θ) et τ(θ) tournent"
+  ],
+  "keyTakeaways": [
+    "Les plans principaux ont un cisaillement nul — les contrôles de conception utilisent souvent σ1",
+    "τ_max = rayon du cercle de Mohr — entraînements élastiques dans les matériaux ductiles",
+    "Le chargement combiné nécessite une analyse des contraintes planes avant les critères de rupture"
+  ],
+  "supplementalParagraph": "Uniaxial σ = F/A n'est pas suffisant lorsque flexion et torsion coexistent. ",
+  "formula": {
+    "variables": {
+      "σ1,2": "σ1,2 : Contraintes principales (MPa)",
+      "σx, σy": "σx, σy : Contraintes normales en X et Y (MPa)",
+      "τxy": "τxy : contrainte de cisaillement (MPa)"
+    }
+  },
+  "stepByStep": [
+    "Déterminez l’état de contrainte initial (σx, σy, τxy).",
+    "Tracez les points (σx, τxy) et (σy, -τxy) sur les axes de contrainte.",
+    "Tracez le cercle passant par ces deux points.",
+    "Localisez le centre et calculez le rayon (R).",
+    "Identifiez σ1 (max) et σ2 (min) comme les intersections avec l'axe horizontal.",
+    "Tracez σx, σy, τxy sur le cercle de Mohr pour lire σ1, σ2 et τ_max.",
+    "Comparez τ_max au rendement/2 pour les matériaux ductiles selon le critère Tresca."
+  ],
+  "example": {
+    "inputs": [
+      "σx = 100 MPa",
+      "σy = 40 MPa",
+      "τxy = 40 MPa"
+    ],
+    "calculation": "Center = 70. Radius = √[(30)² + 40²] = 50. → σ1 = 120 MPa, σ2 = 20 MPa."
+  },
+  "whyThisMatters": [
+    "Les matériaux ductiles échouent généralement en raison d'une contrainte de cisaillement maximale (τmax).",
+    "Les matériaux fragiles échouent en raison de la contrainte principale maximale (σ1).",
+    "Le cercle de Mohr permet aux concepteurs de prédire l'angle de défaillance."
+  ],
+  "commonMistakes": [
+    "Confondre l'angle 2θ dans le cercle de Mohr avec l'angle θ dans le monde physique.",
+    "Traçage incorrect du signe de la contrainte de cisaillement.",
+    "Oublier de vérifier l'état de contrainte 3D (contrainte triaxiale)."
+  ],
+  "engineeringTip": "Le centre du cercle représente toujours la contrainte normale moyenne à ce point.",
+  "calculatorCta": {
+    "label": "Open the Analysis Lab to visualize complex stress states"
+  },
+  "faq": [
+    {
+      "question": "Qu'est-ce qu'un stress principal ?",
+      "answer": "C'est une contrainte normale qui agit sur un plan où la contrainte de cisaillement est exactement nulle."
+    },
+    {
+      "question": "Les contraintes principales sont-elles uniques ?",
+      "answer": "Oui — σ1 et σ2 sont des invariants ; "
+    },
+    {
+      "question": "Qu'est-ce que la contrainte plane ?",
+      "answer": "L'une des contraintes principales est nulle (plaques minces, surfaces libres) – ce qui simplifie les problèmes 3D en 2D."
+    },
+    {
+      "question": "Quand le cercle de Mohr est-il insuffisant ?",
+      "answer": "Les états de contraintes triaxiales nécessitent des critères de rupture 3D (von Mises sous forme tensorielle complète)."
+    }
+  ]
+}

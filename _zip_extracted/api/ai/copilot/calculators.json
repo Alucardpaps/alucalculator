@@ -1,0 +1,1666 @@
+[
+  {
+    "id": "3-phase-power",
+    "title": "3-Phase Power Calculator & Engineering Guide - AluCalc",
+    "slug": "3-phase-power",
+    "keyword": "3-phase power calculator",
+    "category": "electrical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "3-Phase Power Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional 3-Phase Power guide with IEEE 141 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "3-Phase Power Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates real power in a industrial 3-phase AC system.",
+      "formula": "P = \\sqrt{3} \\cdot V \\cdot I \\cdot PF",
+      "variables": {
+        "P": "Power",
+        "V": "Voltage",
+        "I": "Current",
+        "PF": "Power Factor"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check phase balance",
+        "Verify line current"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for 3-Phase Power.\n2. Consult the technical reference table for material constants.\n3. Apply the IEEE 141 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Electrical applications, accurate 3-Phase Power analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "beam-deflection",
+    "title": "Beam Deflection Calculator & Engineering Guide - AluCalc",
+    "slug": "beam-deflection",
+    "keyword": "beam deflection calculator",
+    "category": "structures",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Beam Deflection Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Beam Deflection guide with AISC Steel Manual formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Beam Deflection Calculator & Engineering Guide - AluCalc",
+      "intro": "Predicts the vertical displacement of a beam under uniform load.",
+      "formula": "\\delta = \\frac{5 w L^4}{384 E I}",
+      "variables": {
+        "delta": "Deflection",
+        "w": "Load",
+        "L": "Span",
+        "E": "Modulus",
+        "I": "Inertia"
+      },
+      "technical_data": [
+        {
+          "name": "Modulus (E)",
+          "rows": [
+            {
+              "Material": "Steel",
+              "E": "200 GPa"
+            },
+            {
+              "Material": "Alu",
+              "E": "69 GPa"
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Check L/360 limit",
+        "Shear stress check"
+      ],
+      "pitfalls": [
+        "Mixing units",
+        "Ignoring self-weight"
+      ],
+      "step_by_step": "1. Define system parameters for Beam Deflection.\n2. Consult the technical reference table for material constants.\n3. Apply the AISC Steel Manual formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Structures applications, accurate Beam Deflection analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "belt-drive",
+    "title": "Belt Drive Calculator & Engineering Guide - AluCalc",
+    "slug": "belt-drive",
+    "keyword": "belt drive calculator pulley tension",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Belt Drive Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Belt Drive guide with ISO 5291 / Shigley formulas for length, wrap angle, and belt tension."
+    },
+    "seo": {
+      "h1": "Belt Drive Calculator & Engineering Guide - AluCalc",
+      "intro": "Open belt drive analysis for flat and V-belt transmissions.",
+      "formula": "L \\\\approx 2C + 1.57(d_1+d_2) + \\\\frac{(d_2-d_1)^2}{4C}",
+      "variables": {
+        "L": "Belt length (mm)",
+        "C": "Center distance (mm)",
+        "d1": "Driver pulley diameter (mm)",
+        "d2": "Driven pulley diameter (mm)"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify wrap angle >= 120 deg",
+        "Check belt velocity limits"
+      ],
+      "pitfalls": [
+        "Ignoring V-belt groove angle in tension ratio"
+      ],
+      "step_by_step": "1. Enter pulley diameters and center distance.\\n2. Select belt type (flat or V-belt).\\n3. Review belt length, wrap angle, and tensions.\\n4. Adjust center distance if wrap angle is too low.",
+      "practical": "In mechanical power transmission, accurate belt drive sizing prevents slip and premature wear."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/belt-drive"
+    }
+  },
+  {
+    "id": "bend-allowance",
+    "title": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc",
+    "slug": "bend-allowance",
+    "keyword": "sheet metal bend allowance calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Sheet Metal Bend Allowance guide with ANSI Standard formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Sheet Metal Bend Allowance Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the flat blank length for precision sheet metal bending.",
+      "formula": "BA = A (R + K \\cdot T)",
+      "variables": {
+        "BA": "Bend allowance",
+        "A": "Angle",
+        "R": "Rad",
+        "K": "K-factor"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify K-factor for material",
+        "Check bend radius limit"
+      ],
+      "pitfalls": [
+        "Ignoring springback"
+      ],
+      "step_by_step": "1. Define system parameters for Sheet Metal Bend Allowance.\n2. Consult the technical reference table for material constants.\n3. Apply the ANSI Standard formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Sheet Metal Bend Allowance analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "bending-moment",
+    "title": "Bending Moment Calculator & Guide - AluCalc",
+    "slug": "bending-moment",
+    "keyword": "bending moment calculator",
+    "intent": "unified_guide",
+    "meta": {
+      "title": "Bending Moment Calculator & Guide - AluCalc | Professional Engineering Tool",
+      "description": "Unique bending moment calculator and engineering guide. Includes General Engineering Practice formulas, worked examples, and step-by-step logic."
+    },
+    "seo": {
+      "h1": "Bending Moment Calculator & Guide - AluCalc",
+      "intro": "Advanced calculation for bending moment within the Alucalc OS suite.",
+      "formula": "Result = f(Inputs, K)",
+      "variables": {
+        "Input_1": "Primary parameter",
+        "Input_2": "Secondary parameter"
+      },
+      "step_by_step": "1. Identify the input constants for bending moment.\n2. Apply the specific General Engineering Practice formula.\n3. Validate results against mechanical safety factors.",
+      "practical": "In beams applications, bending moment is essential for ensuring structural integrity and operational efficiency.",
+      "example": "A typical example involves substituting standard material properties into the Result = f(Inputs, K) equation to determine optimal sizing."
+    },
+    "related": [
+      "bending-moment-formula",
+      "engineering-standards",
+      "material-science"
+    ],
+    "cta": {
+      "label": "Launch AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "biology-genetics",
+    "title": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc",
+    "slug": "biology-genetics",
+    "keyword": "population genetics (hardy-weinberg) calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Population Genetics (Hardy-Weinberg) guide with Statistical Genetics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Population Genetics (Hardy-Weinberg) Calculator & Engineering Guide - AluCalc",
+      "intro": "Mathematical model for predicting genetic variation in populations under equilibrium.",
+      "formula": "p^2 + 2pq + q^2 = 1",
+      "variables": {
+        "p/q": "Allele frequencies"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify random mating assumption",
+        "Account for mutation rate"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Population Genetics (Hardy-Weinberg).\n2. Consult the technical reference table for material constants.\n3. Apply the Statistical Genetics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Population Genetics (Hardy-Weinberg) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "bolt-torque",
+    "title": "Bolt Torque Calculator & Engineering Guide - AluCalc",
+    "slug": "bolt-torque",
+    "keyword": "bolt torque calculator",
+    "category": "fasteners",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Bolt Torque Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Bolt Torque guide with ASME B18.2.1 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Bolt Torque Calculator & Engineering Guide - AluCalc",
+      "intro": "Determines the required torque to produce a specific clamp force while overcoming friction.",
+      "formula": "T = K \\cdot D \\cdot F_p",
+      "variables": {
+        "T": "Torque",
+        "K": "Nut factor",
+        "D": "Diameter",
+        "Fp": "Preload"
+      },
+      "technical_data": [
+        {
+          "name": "Nut Factor (K)",
+          "rows": [
+            {
+              "Condition": "Zinc-plated",
+              "K": 0.22
+            },
+            {
+              "Condition": "Lubricated",
+              "K": 0.15
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Verify bolt grade",
+        "Check engagement length"
+      ],
+      "pitfalls": [
+        "Using K=0.2 for lubricated bolts"
+      ],
+      "step_by_step": "1. Define system parameters for Bolt Torque.\n2. Consult the technical reference table for material constants.\n3. Apply the ASME B18.2.1 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Fasteners applications, accurate Bolt Torque analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/bolt-torque"
+    }
+  },
+  {
+    "id": "centripetal-force",
+    "title": "Centripetal Force Calculator & Engineering Guide - AluCalc",
+    "slug": "centripetal-force",
+    "keyword": "centripetal force calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Centripetal Force Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Centripetal Force guide with Circular Motion formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Centripetal Force Calculator & Engineering Guide - AluCalc",
+      "intro": "The force necessary to keep an object moving in a curved path.",
+      "formula": "F_c = \\frac{m v^2}{r}",
+      "variables": {
+        "m": "Mass",
+        "v": "Tangential velocity",
+        "r": "Radius of curve"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check bank angle requirements",
+        "Verify friction limits"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Centripetal Force.\n2. Consult the technical reference table for material constants.\n3. Apply the Circular Motion formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Centripetal Force analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "chemical-molarity",
+    "title": "Molarity Calculation Calculator & Engineering Guide - AluCalc",
+    "slug": "chemical-molarity",
+    "keyword": "molarity calculation calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Molarity Calculation Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Molarity Calculation guide with Chemistry Lab Standards formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Molarity Calculation Calculator & Engineering Guide - AluCalc",
+      "intro": "Measures the concentration of a chemical species in a solution.",
+      "formula": "M = \\frac{n}{V}",
+      "variables": {
+        "n": "Moles of solute",
+        "V": "Volume of solution (L)"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Ensure volume is in Liters",
+        "Calculate molar mass correctly"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Molarity Calculation.\n2. Consult the technical reference table for material constants.\n3. Apply the Chemistry Lab Standards formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Molarity Calculation analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "column-buckling",
+    "title": "Column Buckling Calculator & Engineering Guide - AluCalc",
+    "slug": "column-buckling",
+    "keyword": "column buckling calculator",
+    "category": "structures",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Column Buckling Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Column Buckling guide with AISI S100 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Column Buckling Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the axial load limit before lateral instability occurs.",
+      "formula": "P_{cr} = \\frac{\\pi^2 E I}{(KL)^2}",
+      "variables": {
+        "Pcr": "Critical load",
+        "E": "Modulus",
+        "I": "Min Inertia",
+        "KL": "Effective length"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check slenderness ratio",
+        "Verify end fixity"
+      ],
+      "pitfalls": [
+        "Assuming perfect concentric load"
+      ],
+      "step_by_step": "1. Define system parameters for Column Buckling.\n2. Consult the technical reference table for material constants.\n3. Apply the AISI S100 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Structures applications, accurate Column Buckling analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "concrete-reinforcement",
+    "title": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc",
+    "slug": "concrete-reinforcement",
+    "keyword": "reinforced concrete (rc) design calculator",
+    "category": "civil",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Reinforced Concrete (RC) Design guide with ACI 318 / Eurocode 2 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Reinforced Concrete (RC) Design Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the required reinforcement steel for concrete structural elements according to limit state design.",
+      "formula": "M_u = \\phi A_s f_y (d - \\frac{a}{2})",
+      "variables": {
+        "Mu": "Flexural strength",
+        "As": "Rebar area",
+        "fy": "Yield strength",
+        "d": "Effective depth"
+      },
+      "technical_data": [
+        {
+          "name": "Standard Rebar Sizes",
+          "rows": [
+            {
+              "Bar #": "4",
+              "Dia (mm)": 12.7
+            },
+            {
+              "Bar #": "8",
+              "Dia (mm)": 25.4
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Check minimum steel ratio",
+        "Verify crack width limits"
+      ],
+      "pitfalls": [
+        "Ignoring compression steel in deep beams"
+      ],
+      "step_by_step": "1. Define system parameters for Reinforced Concrete (RC) Design.\n2. Consult the technical reference table for material constants.\n3. Apply the ACI 318 / Eurocode 2 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Civil applications, accurate Reinforced Concrete (RC) Design analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "failure-diagnosis",
+    "title": "Engineering Failure Diagnosis Calculator & Engineering Guide - AluCalc",
+    "slug": "failure-diagnosis",
+    "keyword": "engineering failure diagnosis calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Engineering Failure Diagnosis Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Engineering Failure Diagnosis guide with ISO 17359 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Engineering Failure Diagnosis Calculator & Engineering Guide - AluCalc",
+      "intro": "Probabilistic framework for diagnosing mechanical failures based on multi-sensor input and symptom telemetry.",
+      "formula": "P(A|B) = \\frac{P(B|A)P(A)}{P(B)}",
+      "variables": {
+        "P": "Probability of root cause given symptoms"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Cross-validate acoustic vs thermal data",
+        "Check oil debris count"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Engineering Failure Diagnosis.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 17359 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Engineering Failure Diagnosis analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "failure-prediction",
+    "title": "AI Failure Prediction & Reliability Calculator & Engineering Guide - AluCalc",
+    "slug": "failure-prediction",
+    "keyword": "ai failure prediction & reliability calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "AI Failure Prediction & Reliability Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional AI Failure Prediction & Reliability guide with ISO 13381-1 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "AI Failure Prediction & Reliability Calculator & Engineering Guide - AluCalc",
+      "intro": "Uses statistical models and AI patterns to predict the Remaining Useful Life (RUL) of mechanical components.",
+      "formula": "R(t) = e^{-\\lambda t}",
+      "variables": {
+        "Rt": "Reliability at time t",
+        "lambda": "Failure rate",
+        "t": "Time"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify MTBF data quality",
+        "Check vibration spectral trends"
+      ],
+      "pitfalls": [
+        "Ignoring non-linear wear stages"
+      ],
+      "step_by_step": "1. Define system parameters for AI Failure Prediction & Reliability.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 13381-1 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate AI Failure Prediction & Reliability analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "gear-contact-stress",
+    "title": "Gear Contact Stress Calculator & Guide - AluCalc",
+    "slug": "gear-contact-stress",
+    "keyword": "gear contact stress calculator",
+    "intent": "unified_guide",
+    "meta": {
+      "title": "Gear Contact Stress Calculator & Guide - AluCalc | Professional Engineering Tool",
+      "description": "Unique gear contact stress calculator and engineering guide. Includes General Engineering Practice formulas, worked examples, and step-by-step logic."
+    },
+    "seo": {
+      "h1": "Gear Contact Stress Calculator & Guide - AluCalc",
+      "intro": "Advanced calculation for gear contact stress within the Alucalc OS suite.",
+      "formula": "Result = f(Inputs, K)",
+      "variables": {
+        "Input_1": "Primary parameter",
+        "Input_2": "Secondary parameter"
+      },
+      "step_by_step": "1. Identify the input constants for gear contact stress.\n2. Apply the specific General Engineering Practice formula.\n3. Validate results against mechanical safety factors.",
+      "practical": "In gears applications, gear contact stress is essential for ensuring structural integrity and operational efficiency.",
+      "example": "A typical example involves substituting standard material properties into the Result = f(Inputs, K) equation to determine optimal sizing."
+    },
+    "related": [
+      "gear-contact-stress-formula",
+      "engineering-standards",
+      "material-science"
+    ],
+    "cta": {
+      "label": "Launch AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "gear-module",
+    "title": "Gear Module Calculator & Engineering Guide - AluCalc",
+    "slug": "gear-module",
+    "keyword": "gear module calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Gear Module Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Gear Module guide with DIN 867 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Gear Module Calculator & Engineering Guide - AluCalc",
+      "intro": "Fundamental gear size parameter defining pitch and geometry.",
+      "formula": "m = \\frac{d}{N}",
+      "variables": {
+        "m": "Module (mm)",
+        "d": "Pitch Dia",
+        "N": "Teeth"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify profile shift",
+        "Check addendum height"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Gear Module.\n2. Consult the technical reference table for material constants.\n3. Apply the DIN 867 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Gear Module analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "gear-ratio",
+    "title": "Gear Ratio Calculator & Engineering Guide - AluCalc",
+    "slug": "gear-ratio",
+    "keyword": "gear ratio calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Gear Ratio Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Gear Ratio guide with AGMA Standards formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Gear Ratio Calculator & Engineering Guide - AluCalc",
+      "intro": "Defines the speed/torque transformation between gears.",
+      "formula": "R = \\frac{N_{driven}}{N_{driver}}",
+      "variables": {
+        "N_driver": "Pinion teeth",
+        "N_driven": "Gear teeth"
+      },
+      "technical_data": [
+        {
+          "name": "Efficiency",
+          "rows": [
+            {
+              "Type": "Spur",
+              "Eff": "98%"
+            },
+            {
+              "Type": "Worm",
+              "Eff": "70%"
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Watch for interference",
+        "Lubricant choice"
+      ],
+      "pitfalls": [
+        "Ignoring backlash",
+        "Thermal buildup"
+      ],
+      "step_by_step": "1. Define system parameters for Gear Ratio.\n2. Consult the technical reference table for material constants.\n3. Apply the AGMA Standards formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Gear Ratio analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "heat-transfer-conduction",
+    "title": "Heat Conduction Calculator & Engineering Guide - AluCalc",
+    "slug": "heat-transfer-conduction",
+    "keyword": "heat conduction calculator",
+    "category": "thermal",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Heat Conduction Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Heat Conduction guide with ASTM C177 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Heat Conduction Calculator & Engineering Guide - AluCalc",
+      "intro": "Fourier's Law for heat transfer through solid materials.",
+      "formula": "Q = -k A \\frac{dT}{dx}",
+      "variables": {
+        "Q": "Heat flow",
+        "k": "Conductivity",
+        "A": "Area"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check thermal contact resistance",
+        "Verify insulation thickness"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Heat Conduction.\n2. Consult the technical reference table for material constants.\n3. Apply the ASTM C177 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Thermal applications, accurate Heat Conduction analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "hooke-law",
+    "title": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc",
+    "slug": "hooke-law",
+    "keyword": "hooke's law (spring force) calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Hooke's Law (Spring Force) guide with Elasticity Theory formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Hooke's Law (Spring Force) Calculator & Engineering Guide - AluCalc",
+      "intro": "Relates the force exerted by a spring to its displacement from equilibrium.",
+      "formula": "F = k \\cdot x",
+      "variables": {
+        "F": "Restoring force",
+        "k": "Spring constant",
+        "x": "Displacement"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify elastic limit not exceeded"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Hooke's Law (Spring Force).\n2. Consult the technical reference table for material constants.\n3. Apply the Elasticity Theory formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Hooke's Law (Spring Force) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "ideal-gas-law",
+    "title": "Ideal Gas Law Calculator & Engineering Guide - AluCalc",
+    "slug": "ideal-gas-law",
+    "keyword": "ideal gas law calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Ideal Gas Law Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Ideal Gas Law guide with Thermodynamics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Ideal Gas Law Calculator & Engineering Guide - AluCalc",
+      "intro": "Equation of state for a hypothetical ideal gas.",
+      "formula": "PV = nRT",
+      "variables": {
+        "P": "Pressure",
+        "V": "Volume",
+        "n": "Moles",
+        "R": "Gas constant",
+        "T": "Abs Temp"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Ensure temperature is in Kelvin",
+        "Check pressure units"
+      ],
+      "pitfalls": [
+        "Using Celsius for T"
+      ],
+      "step_by_step": "1. Define system parameters for Ideal Gas Law.\n2. Consult the technical reference table for material constants.\n3. Apply the Thermodynamics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Ideal Gas Law analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "kinetic-energy",
+    "title": "Kinetic Energy Calculator & Engineering Guide - AluCalc",
+    "slug": "kinetic-energy",
+    "keyword": "kinetic energy calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Kinetic Energy Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Kinetic Energy guide with Classical Mechanics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Kinetic Energy Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the energy an object possesses due to its motion.",
+      "formula": "E_k = \\frac{1}{2} m v^2",
+      "variables": {
+        "m": "Mass (kg)",
+        "v": "Velocity (m/s)"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify relativistic effects if v > 0.1c"
+      ],
+      "pitfalls": [
+        "Using weight instead of mass"
+      ],
+      "step_by_step": "1. Define system parameters for Kinetic Energy.\n2. Consult the technical reference table for material constants.\n3. Apply the Classical Mechanics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Kinetic Energy analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "lift-coefficient",
+    "title": "Lift Force Calculator & Engineering Guide - AluCalc",
+    "slug": "lift-coefficient",
+    "keyword": "lift force calculator",
+    "category": "aerospace",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Lift Force Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Lift Force guide with Aerodynamics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Lift Force Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the lift force generated by an airfoil or wing surface.",
+      "formula": "L = \\frac{1}{2} \\rho v^2 S C_L",
+      "variables": {
+        "rho": "Air density",
+        "v": "Velocity",
+        "S": "Wing area",
+        "CL": "Lift coefficient"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check stall angle (Alpha critical)",
+        "Verify Reynolds number effect"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Lift Force.\n2. Consult the technical reference table for material constants.\n3. Apply the Aerodynamics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Aerospace applications, accurate Lift Force analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "machine-assembly",
+    "title": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc",
+    "slug": "machine-assembly",
+    "keyword": "precision machine assembly calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Precision Machine Assembly guide with ISO 1101 / ASME Y14.5 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Precision Machine Assembly Calculator & Engineering Guide - AluCalc",
+      "intro": "Geometric and dimensional analysis for complex mechanical assemblies and fit-up sequences.",
+      "formula": "T_{assem} = \\sqrt{\\sum Tol_i^2}",
+      "variables": {
+        "Tol": "Component tolerances"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify datum precedence",
+        "Check clearance at max material condition"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Precision Machine Assembly.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 1101 / ASME Y14.5 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Precision Machine Assembly analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "machining-time",
+    "title": "Machining Time (Turning) Calculator & Engineering Guide - AluCalc",
+    "slug": "machining-time",
+    "keyword": "machining time (turning) calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Machining Time (Turning) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Machining Time (Turning) guide with ISO 3685 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Machining Time (Turning) Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates production time for CNC lathe operations.",
+      "formula": "T = \\frac{L}{f \\cdot N}",
+      "variables": {
+        "T": "Time (min)",
+        "L": "Length",
+        "f": "Feed",
+        "N": "RPM"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check tool life",
+        "Verify feed rate limits"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Machining Time (Turning).\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 3685 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Machining Time (Turning) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "naval-hydrostatics",
+    "title": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc",
+    "slug": "naval-hydrostatics",
+    "keyword": "naval hydrostatics & stability calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Naval Hydrostatics & Stability guide with IMO Code on Intact Stability formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Naval Hydrostatics & Stability Calculator & Engineering Guide - AluCalc",
+      "intro": "Analysis of ship stability and buoyancy including transverse/longitudinal metacentric height calculations.",
+      "formula": "GM = KB + BM - KG",
+      "variables": {
+        "GM": "Metacentric height",
+        "KB": "Center of buoyancy",
+        "BM": "Metacentric radius",
+        "KG": "Center of gravity"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check righting lever (GZ) curve",
+        "Verify floodpoint height"
+      ],
+      "pitfalls": [
+        "Ignoring free surface effect of tanks"
+      ],
+      "step_by_step": "1. Define system parameters for Naval Hydrostatics & Stability.\n2. Consult the technical reference table for material constants.\n3. Apply the IMO Code on Intact Stability formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Naval Hydrostatics & Stability analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "newton-second-law",
+    "title": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc",
+    "slug": "newton-second-law",
+    "keyword": "force calculation (f=ma) calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Force Calculation (F=ma) guide with Newtonian Physics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Force Calculation (F=ma) Calculator & Engineering Guide - AluCalc",
+      "intro": "The fundamental law of motion relating force, mass, and acceleration.",
+      "formula": "F = m \\cdot a",
+      "variables": {
+        "F": "Force (N)",
+        "m": "Mass (kg)",
+        "a": "Acceleration (m/s²)"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify net force vectors",
+        "Check for friction components"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Force Calculation (F=ma).\n2. Consult the technical reference table for material constants.\n3. Apply the Newtonian Physics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Force Calculation (F=ma) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "ohms-law",
+    "title": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc",
+    "slug": "ohms-law",
+    "keyword": "ohm's law (advanced dc/ac) calculator",
+    "category": "electrical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Ohm's Law (Advanced DC/AC) guide with IEC 60038 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Ohm's Law (Advanced DC/AC) Calculator & Engineering Guide - AluCalc",
+      "intro": "Fundamental relationship between potential difference, flow, and combined resistance/reactance.",
+      "formula": "V = I \\cdot Z",
+      "variables": {
+        "V": "Voltage",
+        "I": "Current",
+        "Z": "Impedance"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify resistor power rating (P=I²R)",
+        "Check voltage drop limits"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Ohm's Law (Advanced DC/AC).\n2. Consult the technical reference table for material constants.\n3. Apply the IEC 60038 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Electrical applications, accurate Ohm's Law (Advanced DC/AC) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "physics-solver",
+    "title": "Computational Physics Solver Calculator & Engineering Guide - AluCalc",
+    "slug": "physics-solver",
+    "keyword": "computational physics solver calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Computational Physics Solver Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Computational Physics Solver guide with General Physics Framework formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Computational Physics Solver Calculator & Engineering Guide - AluCalc",
+      "intro": "Multi-physics engine for solving complex kinematic, dynamic, and electrodynamic differential equations.",
+      "formula": "\\vec{F} = \\frac{d\\vec{p}}{dt}",
+      "variables": {
+        "F": "Force vector",
+        "p": "Momentum"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify energy conservation",
+        "Check time-step stability in integration"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Computational Physics Solver.\n2. Consult the technical reference table for material constants.\n3. Apply the General Physics Framework formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Computational Physics Solver analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "pressure-drop",
+    "title": "Pressure Drop Calculator & Engineering Guide - AluCalc",
+    "slug": "pressure-drop",
+    "keyword": "pressure drop calculator",
+    "category": "fluids",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Pressure Drop Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Pressure Drop guide with Crane TP-410 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Pressure Drop Calculator & Engineering Guide - AluCalc",
+      "intro": "Darcy-Weisbach equation for energy loss in piping systems.",
+      "formula": "\\Delta P = f \\frac{L}{D} \\frac{\\rho v^2}{2}",
+      "variables": {
+        "deltaP": "Pressure loss",
+        "f": "Friction factor",
+        "rho": "Density"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check pipe roughness",
+        "Verify head loss"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Pressure Drop.\n2. Consult the technical reference table for material constants.\n3. Apply the Crane TP-410 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Fluids applications, accurate Pressure Drop analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "pumps",
+    "title": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc",
+    "slug": "pumps",
+    "keyword": "centrifugal pump performance calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Centrifugal Pump Performance guide with HI 9.6.1 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Centrifugal Pump Performance Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates pump head, power requirements, and cavitation risks (NPSH) for industrial fluid systems.",
+      "formula": "NPSH_a = h_{atm} + h_s - h_f - h_{vp}",
+      "variables": {
+        "NPSHa": "Available Net Positive Suction Head",
+        "hs": "Static head",
+        "hf": "Friction loss",
+        "hvp": "Vapor pressure"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify NPSHa > NPSHr",
+        "Check specific speed (Ns)"
+      ],
+      "pitfalls": [
+        "Assuming pump curve is linear at low flows"
+      ],
+      "step_by_step": "1. Define system parameters for Centrifugal Pump Performance.\n2. Consult the technical reference table for material constants.\n3. Apply the HI 9.6.1 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Centrifugal Pump Performance analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "radioactive-decay",
+    "title": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc",
+    "slug": "radioactive-decay",
+    "keyword": "radioactive decay (half-life) calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Radioactive Decay (Half-Life) guide with Nuclear Physics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Radioactive Decay (Half-Life) Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the remaining quantity of a radioactive substance over time.",
+      "formula": "N(t) = N_0 e^{-\\lambda t}",
+      "variables": {
+        "N0": "Initial quantity",
+        "lambda": "Decay constant",
+        "t": "Time elapsed"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify half-life vs decay constant conversion"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Radioactive Decay (Half-Life).\n2. Consult the technical reference table for material constants.\n3. Apply the Nuclear Physics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Radioactive Decay (Half-Life) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "reducer-lubrication",
+    "title": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc",
+    "slug": "reducer-lubrication",
+    "keyword": "gearbox lubrication & thermal calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Gearbox Lubrication & Thermal guide with AGMA 9005-F16 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Gearbox Lubrication & Thermal Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the thermal capacity and lubrication requirements for industrial gear reducers.",
+      "formula": "Q = P(1-\\eta)",
+      "variables": {
+        "Q": "Heat generated",
+        "P": "Input Power",
+        "eta": "Efficiency"
+      },
+      "technical_data": [
+        {
+          "name": "ISO Viscosity Grades",
+          "rows": [
+            {
+              "Ambient": "0-10C",
+              "ISO VG": 150
+            },
+            {
+              "Ambient": "10-30C",
+              "ISO VG": 220
+            },
+            {
+              "Ambient": "30-50C",
+              "ISO VG": 320
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Check oil splash level",
+        "Verify breather capacity"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Gearbox Lubrication & Thermal.\n2. Consult the technical reference table for material constants.\n3. Apply the AGMA 9005-F16 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Gearbox Lubrication & Thermal analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "reynolds-number",
+    "title": "Reynolds Number Calculator & Engineering Guide - AluCalc",
+    "slug": "reynolds-number",
+    "keyword": "reynolds number calculator",
+    "category": "fluids",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Reynolds Number Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Reynolds Number guide with Standard Fluid Dynamics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Reynolds Number Calculator & Engineering Guide - AluCalc",
+      "intro": "A dimensionless number used to characterize the flow regime (Laminar vs Turbulent).",
+      "formula": "Re = \\frac{\\rho v D}{\\mu}",
+      "variables": {
+        "rho": "Density",
+        "v": "Velocity",
+        "D": "Diameter",
+        "mu": "Viscosity"
+      },
+      "technical_data": [
+        {
+          "name": "Flow Regimes",
+          "rows": [
+            {
+              "Regime": "Laminar",
+              "Re": "< 2300"
+            },
+            {
+              "Regime": "Turbulent",
+              "Re": "> 4000"
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Check Re limit",
+        "Temperature adjustment"
+      ],
+      "pitfalls": [
+        "Assuming laminar in industrial pipes"
+      ],
+      "step_by_step": "1. Define system parameters for Reynolds Number.\n2. Consult the technical reference table for material constants.\n3. Apply the Standard Fluid Dynamics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Fluids applications, accurate Reynolds Number analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "rocket-equation",
+    "title": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc",
+    "slug": "rocket-equation",
+    "keyword": "tsiolkovsky rocket equation calculator",
+    "category": "aerospace",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Tsiolkovsky Rocket Equation guide with Orbital Mechanics formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Tsiolkovsky Rocket Equation Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the maximum change in velocity a rocket can achieve.",
+      "formula": "\\Delta v = v_e \\ln \\frac{m_0}{m_f}",
+      "variables": {
+        "dv": "Delta-V",
+        "ve": "Exhaust velocity",
+        "m0": "Initial mass",
+        "mf": "Final mass"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check Isp conversion to Ve",
+        "Account for gravity losses"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Tsiolkovsky Rocket Equation.\n2. Consult the technical reference table for material constants.\n3. Apply the Orbital Mechanics formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Aerospace applications, accurate Tsiolkovsky Rocket Equation analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "roller-chain-drive",
+    "title": "Roller Chain Drive Calculator & Engineering Guide - AluCalc",
+    "slug": "roller-chain-drive",
+    "keyword": "roller chain drive calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Roller Chain Drive Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Roller Chain Drive guide with ANSI B29.1 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Roller Chain Drive Calculator & Engineering Guide - AluCalc",
+      "intro": "Industrial chain drive analysis for heavy load transmission.",
+      "formula": "P = 0.0022 \\cdot p^2 \\cdot n \\cdot T^{1.5}",
+      "variables": {
+        "P": "Power (kW)",
+        "p": "Pitch",
+        "n": "RPM",
+        "T": "Teeth"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check elongation limit",
+        "Lubrication type"
+      ],
+      "pitfalls": [
+        "Using odd number of links"
+      ],
+      "step_by_step": "1. Define system parameters for Roller Chain Drive.\n2. Consult the technical reference table for material constants.\n3. Apply the ANSI B29.1 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Roller Chain Drive analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/chain-drive"
+    }
+  },
+  {
+    "id": "simulation-fea",
+    "title": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc",
+    "slug": "simulation-fea",
+    "keyword": "finite element analysis (fea) calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Finite Element Analysis (FEA) guide with ASME V&V 10 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Finite Element Analysis (FEA) Calculator & Engineering Guide - AluCalc",
+      "intro": "Numerical analysis for structural stress distribution, thermal gradients, and modal frequencies.",
+      "formula": "[K]\\{u} = {F}",
+      "variables": {
+        "K": "Stiffness matrix",
+        "u": "Displacement vector",
+        "F": "Force vector"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check mesh convergence",
+        "Verify boundary condition constraints"
+      ],
+      "pitfalls": [
+        "Using singular elements at stress concentrations"
+      ],
+      "step_by_step": "1. Define system parameters for Finite Element Analysis (FEA).\n2. Consult the technical reference table for material constants.\n3. Apply the ASME V&V 10 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Finite Element Analysis (FEA) analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "specific-gravity",
+    "title": "Specific Gravity Calculator & Engineering Guide - AluCalc",
+    "slug": "specific-gravity",
+    "keyword": "specific gravity calculator",
+    "category": "science",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Specific Gravity Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Specific Gravity guide with ASTM D792 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Specific Gravity Calculator & Engineering Guide - AluCalc",
+      "intro": "Ratio of the density of a substance to the density of water at 4°C.",
+      "formula": "SG = \\frac{\\rho_{substance}}{\\rho_{water}}",
+      "variables": {
+        "rho_sub": "Substance density",
+        "rho_water": "Reference density"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify temperature of reference fluid"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Specific Gravity.\n2. Consult the technical reference table for material constants.\n3. Apply the ASTM D792 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Science applications, accurate Specific Gravity analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "thermal-expansion",
+    "title": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc",
+    "slug": "thermal-expansion",
+    "keyword": "linear thermal expansion calculator",
+    "category": "thermal",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Linear Thermal Expansion guide with Standard Thermal Sci formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Linear Thermal Expansion Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the dimensional change due to temperature variation.",
+      "formula": "\\Delta L = \\alpha L_0 \\Delta T",
+      "variables": {
+        "alpha": "Exp coeff",
+        "L0": "Init length",
+        "dT": "Temp diff"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check stress if fixed",
+        "Verify gap clearance"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Linear Thermal Expansion.\n2. Consult the technical reference table for material constants.\n3. Apply the Standard Thermal Sci formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Thermal applications, accurate Linear Thermal Expansion analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "thread-stripping-area",
+    "title": "Thread Stripping Area Calculator & Guide - AluCalc",
+    "slug": "thread-stripping-area",
+    "keyword": "thread stripping area calculator",
+    "intent": "unified_guide",
+    "meta": {
+      "title": "Thread Stripping Area Calculator & Guide - AluCalc | Professional Engineering Tool",
+      "description": "Unique thread stripping area calculator and engineering guide. Includes General Engineering Practice formulas, worked examples, and step-by-step logic."
+    },
+    "seo": {
+      "h1": "Thread Stripping Area Calculator & Guide - AluCalc",
+      "intro": "Advanced calculation for thread stripping area within the Alucalc OS suite.",
+      "formula": "Result = f(Inputs, K)",
+      "variables": {
+        "Input_1": "Primary parameter",
+        "Input_2": "Secondary parameter"
+      },
+      "step_by_step": "1. Identify the input constants for thread stripping area.\n2. Apply the specific General Engineering Practice formula.\n3. Validate results against mechanical safety factors.",
+      "practical": "In fasteners applications, thread stripping area is essential for ensuring structural integrity and operational efficiency.",
+      "example": "A typical example involves substituting standard material properties into the Result = f(Inputs, K) equation to determine optimal sizing."
+    },
+    "related": [
+      "thread-stripping-area-formula",
+      "engineering-standards",
+      "material-science"
+    ],
+    "cta": {
+      "label": "Launch AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "timing-belt-design",
+    "title": "Timing Belt Design Calculator & Engineering Guide - AluCalc",
+    "slug": "timing-belt-design",
+    "keyword": "timing belt design calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Timing Belt Design Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Timing Belt Design guide with ISO 5296 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Timing Belt Design Calculator & Engineering Guide - AluCalc",
+      "intro": "Synchronous power transmission design focusing on precise positioning and load distribution.",
+      "formula": "L = 2C + 1.57(D+d) + \\frac{(D-d)^2}{4C}",
+      "variables": {
+        "L": "Belt length",
+        "C": "Center distance",
+        "D": "Pulley 1 Dia",
+        "d": "Pulley 2 Dia"
+      },
+      "technical_data": [
+        {
+          "name": "Service Factors",
+          "rows": [
+            {
+              "Load": "Uniform",
+              "SF": 1
+            },
+            {
+              "Load": "Heavy",
+              "SF": 1.7
+            }
+          ]
+        }
+      ],
+      "checklist": [
+        "Check tooth shear",
+        "Validate tensioner range"
+      ],
+      "pitfalls": [
+        "Underestimating startup torque"
+      ],
+      "step_by_step": "1. Define system parameters for Timing Belt Design.\n2. Consult the technical reference table for material constants.\n3. Apply the ISO 5296 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate Timing Belt Design analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "tolerance-stackup",
+    "title": "Tolerance Stackup Calculator & Engineering Guide - AluCalc",
+    "slug": "tolerance-stackup",
+    "keyword": "tolerance stackup calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Tolerance Stackup Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Tolerance Stackup guide with ASME Y14.5 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Tolerance Stackup Calculator & Engineering Guide - AluCalc",
+      "intro": "RSS (Root Sum Squares) analysis for assembly fit-up.",
+      "formula": "T_{total} = \\sqrt{\\sum T_i^2}",
+      "variables": {
+        "Ttotal": "Assem tolerance",
+        "Ti": "Component tolerance"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify worst case vs RSS",
+        "Check datum alignment"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Tolerance Stackup.\n2. Consult the technical reference table for material constants.\n3. Apply the ASME Y14.5 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Tolerance Stackup analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "topology-optimization",
+    "title": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc",
+    "slug": "topology-optimization",
+    "keyword": "generative topology optimization calculator",
+    "category": "manufacturing",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Generative Topology Optimization guide with Advanced Design Optimization formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Generative Topology Optimization Calculator & Engineering Guide - AluCalc",
+      "intro": "Mathematics of material distribution to optimize stiffness while minimizing mass for 3D printing and advanced casting.",
+      "formula": "\\min C(\\rho) = \\int f(x) (\\rho(x))^p dx",
+      "variables": {
+        "C": "Compliance",
+        "rho": "Material density distribution"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify manufacturing constraints (Overhangs)",
+        "Check minimum member size"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Generative Topology Optimization.\n2. Consult the technical reference table for material constants.\n3. Apply the Advanced Design Optimization formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Manufacturing applications, accurate Generative Topology Optimization analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "transformer-calculation",
+    "title": "Transformer Scaling Calculator & Engineering Guide - AluCalc",
+    "slug": "transformer-calculation",
+    "keyword": "transformer scaling calculator",
+    "category": "electrical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Transformer Scaling Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Transformer Scaling guide with IEC 60076 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Transformer Scaling Calculator & Engineering Guide - AluCalc",
+      "intro": "Basic induction-based voltage and current scaling.",
+      "formula": "\\frac{V_p}{V_s} = \\frac{N_p}{N_s}",
+      "variables": {
+        "Vp": "Prim Volts",
+        "Vs": "Sec Volts",
+        "Np": "Prim Turns"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Check efficiency loss",
+        "Verify core saturation"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Transformer Scaling.\n2. Consult the technical reference table for material constants.\n3. Apply the IEC 60076 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Electrical applications, accurate Transformer Scaling analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "truss-analysis",
+    "title": "Truss Member Analysis Calculator & Engineering Guide - AluCalc",
+    "slug": "truss-analysis",
+    "keyword": "truss member analysis calculator",
+    "category": "structures",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Truss Member Analysis Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Truss Member Analysis guide with ASCE 7 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Truss Member Analysis Calculator & Engineering Guide - AluCalc",
+      "intro": "Analysis of pinned structures where members only carry axial loads.",
+      "formula": "\\sum F_x = 0, \\sum F_y = 0",
+      "variables": {
+        "Fx": "Horizontal forces",
+        "Fy": "Vertical forces"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Identify zero-force members",
+        "Check nodal stability"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Truss Member Analysis.\n2. Consult the technical reference table for material constants.\n3. Apply the ASCE 7 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Structures applications, accurate Truss Member Analysis analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "v-belt-power",
+    "title": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc",
+    "slug": "v-belt-power",
+    "keyword": "v-belt power capacity calculator",
+    "category": "mechanical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional V-Belt Power Capacity guide with RMA/MPTA IP-20 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "V-Belt Power Capacity Calculator & Engineering Guide - AluCalc",
+      "intro": "Determines friction-based power transmission capacity for mechanical drives.",
+      "formula": "P_{adj} = P_{base} \\cdot C_l \\cdot C_a",
+      "variables": {
+        "P_adj": "Adjusted power",
+        "P_base": "Basic rating",
+        "Cl": "Length factor",
+        "Ca": "Arc factor"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify belt velocity limit",
+        "Check arc of contact"
+      ],
+      "pitfalls": [
+        "Ignoring temperature derating"
+      ],
+      "step_by_step": "1. Define system parameters for V-Belt Power Capacity.\n2. Consult the technical reference table for material constants.\n3. Apply the RMA/MPTA IP-20 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Mechanical applications, accurate V-Belt Power Capacity analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  },
+  {
+    "id": "voltage-drop",
+    "title": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc",
+    "slug": "voltage-drop",
+    "keyword": "conductor voltage drop calculator",
+    "category": "electrical",
+    "intent": "professional_handbook",
+    "meta": {
+      "title": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc | Professional Handbook",
+      "description": "Professional Conductor Voltage Drop guide with NEC Chapter 9 formulas, technical tables, and design checklists."
+    },
+    "seo": {
+      "h1": "Conductor Voltage Drop Calculator & Engineering Guide - AluCalc",
+      "intro": "Calculates the voltage loss across long electrical transmission lines to ensure equipment voltage stability.",
+      "formula": "\\Delta V = \\frac{2 L I (R \\cos \\phi + X \\sin \\phi)}{1000}",
+      "variables": {
+        "L": "Cable length",
+        "R": "Resistance",
+        "X": "Reactance",
+        "phi": "Phase angle"
+      },
+      "technical_data": [],
+      "checklist": [
+        "Verify drop < 3% for feeders",
+        "Check terminal temperature rating"
+      ],
+      "pitfalls": [],
+      "step_by_step": "1. Define system parameters for Conductor Voltage Drop.\n2. Consult the technical reference table for material constants.\n3. Apply the NEC Chapter 9 formula.\n4. Run the post-calculation design checks.",
+      "practical": "In Electrical applications, accurate Conductor Voltage Drop analysis is vital for safety and performance."
+    },
+    "cta": {
+      "label": "Open in AluCalc OS",
+      "link": "/os?module=calculator"
+    }
+  }
+]
