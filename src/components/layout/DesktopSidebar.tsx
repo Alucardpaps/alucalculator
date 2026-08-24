@@ -81,9 +81,6 @@ export const ALL_NAV_GROUPS: {
       { id: 'nesting', href: '/nesting-2d', labelEn: '2D Sheet Nesting', labelTr: '2D Plaka Yerleşim', icon: Scissors, color: '#f59e0b', keywords: ['nesting', 'cut', 'yerlesim', 'plaka'] },
       { id: 'cutting', href: '/cutting-optimizer', labelEn: '1D Linear Cut Optimizer', labelTr: '1D Profil Kesim Opt.', icon: Scissors, color: '#f97316', keywords: ['cutting', '1d', 'linear', 'kesim', 'profil'] },
       { id: 'sketch-pad', href: '/sketch-pad', labelEn: 'Technical Sketch Pad', labelTr: 'Mühendislik Şema Tahtası', icon: PenTool, color: '#eab308', keywords: ['sketch', 'pad', 'cizim', 'sema', 'excalidraw'] },
-      { id: 'flow', href: '/flow', labelEn: 'Visual Node Flow', labelTr: 'Görsel Düğüm Motoru', icon: Workflow, color: '#10b981', badge: 'PRO', keywords: ['flow', 'node', 'graph', 'canvas'] },
-      { id: 'topology-opt', href: '/topology-optimization', labelEn: 'Topology Optimization', labelTr: 'Topoloji Optimizasyonu', icon: Sparkles, color: '#38bdf8', keywords: ['topology', 'optimizasyon', 'weight', 'fem'] },
-      { id: 'machine-assembly', href: '/machine-assembly', labelEn: 'Machine Assembly 3D', labelTr: 'Makine Montaj Stüdyosu', icon: Wrench, color: '#ec4899', keywords: ['assembly', 'montaj', 'machine', '3d'] },
     ],
   },
   {
@@ -187,7 +184,7 @@ export const ALL_NAV_GROUPS: {
   },
 ];
 
-export function DesktopSidebar() {
+export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) {
   const pathname = usePathname() ?? '';
   const { language, setLanguage } = useI18nStore();
   const tr = language === 'tr';
@@ -241,7 +238,9 @@ export function DesktopSidebar() {
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-white/10 bg-[#05080e]/95 backdrop-blur-2xl transition-all duration-300 select-none z-40 shrink-0 h-full ${
+      className={`hidden lg:flex flex-col border-r border-white/10 bg-[#05080e]/95 backdrop-blur-2xl transition-all duration-300 select-none z-40 shrink-0 sticky self-start overflow-hidden ${
+        topOffsetClass || 'top-12 h-[calc(100vh-3rem)]'
+      } ${
         collapsed ? 'w-16' : 'w-72'
       }`}
     >
@@ -325,7 +324,7 @@ export function DesktopSidebar() {
       )}
 
       {/* ─── NAVIGATION SCROLL AREA ─── */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-3 space-y-4 custom-scrollbar">
         {filteredGroups.map((group) => (
           <div key={group.id} className="space-y-1">
             {!collapsed && (

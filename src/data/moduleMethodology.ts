@@ -523,20 +523,6 @@ const CARDS: Record<string, ModuleMethod> = {
       result: 'Iterates 42 FEA density loops, achieving 65% weight reduction while preserving 82% of original structural stiffness.',
     },
   },
-  'machine-assembly': {
-    formula: 'T_{\\text{stack}} = \\sqrt{\\sum T_i^2} \\quad (\\text{RSS Statistical}), \\quad T_{\\text{wc}} = \\sum |T_i| \\quad (\\text{Worst Case})',
-    formulaNote: '1D/3D tolerance stackup analysis, Root Sum of Squares (RSS) normal distribution, 6-Sigma Cp/Cpk quality capability, and assembly clearance.',
-    standards: ['ASME Y14.5 (GD&T)', 'ISO 2768 (General tolerances)', 'ISO 286'],
-    assumptions: [
-      'Individual component manufacturing variations are statistically independent and normally distributed',
-      'Assembly process capability index Cpk ≥ 1.33 for statistical quality assurance',
-      'Thermal expansion coefficients considered when multi-material joints operate across wide temperature ranges',
-    ],
-    workedExample: {
-      title: 'Worked example — 5-Component Spindle Assembly (Nominal clearance = 0.50 mm, 5 parts each ±0.08 mm)',
-      result: 'Worst-case stackup ±0.40 mm (Clearance 0.10 to 0.90 mm). RSS statistical stackup ±0.179 mm (99.73% of assemblies maintain clearance 0.32 to 0.68 mm).',
-    },
-  },
   'chemistry-reactions': {
     formula: 'aA + bB \\rightarrow cC + dD, \\quad \\Delta H_{\\text{rxn}}^\\circ = \\sum n_p \\Delta H_f^\\circ(\\text{prod}) - \\sum n_r \\Delta H_f^\\circ(\\text{react})',
     formulaNote: 'Stoichiometric molar balance, limiting reagent determination, standard enthalpy of reaction, and Gibbs free energy ΔG = ΔH - TΔS.',
@@ -648,7 +634,6 @@ const ALIAS: Record<string, string> = {
   fea: 'simulation-fea',
   'reducer-lubrication': 'reducer-lubrication',
   'topology-optimization': 'topology-optimization',
-  'machine-assembly': 'machine-assembly',
   'chemistry-reactions': 'chemistry-reactions',
   'unit-converter': 'unit-converter',
   converter: 'unit-converter',

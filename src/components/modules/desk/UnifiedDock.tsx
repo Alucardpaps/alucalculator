@@ -56,7 +56,6 @@ const DOCK_GROUPS = [
             { id: 'bolt-torque', label: 'Bolt Torque', icon: <Wrench size={22} strokeWidth={1.5} />, color: 'amber' },
             { id: 'fatigue-advanced', label: 'Adv. Fatigue', icon: <Activity size={22} strokeWidth={1.5} />, color: 'fuchsia' },
             { id: 'profile-weight', label: 'Profile Wgt', icon: <Database size={22} strokeWidth={1.5} />, color: 'teal' },
-            { id: 'machine-assembly', label: 'Assembly', icon: <Blocks size={22} strokeWidth={1.5} />, color: 'amber' },
             { id: 'materials-db', label: 'Materials', icon: <Database size={22} strokeWidth={1.5} />, color: 'purple' },
             { id: 'handbook', label: 'Handbook', icon: <Library size={22} strokeWidth={1.5} />, color: 'blue' },
             { id: 'cost-estimator', label: 'Cost Est.', icon: <Landmark size={22} strokeWidth={1.5} />, color: 'green' }

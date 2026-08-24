@@ -80,8 +80,6 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   'cutting-optimizer':      'cutting-optimizer',
   // — Materials DB —
   'materials-db':           'materials-db',
-  // — Machine Assembly —
-  'machine-assembly':       'machine-assembly',
   // — Fatigue Advanced —
   'fatigue-advanced':       'fatigue-advanced',
   // — Motor Selection —
@@ -97,8 +95,6 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   'failure-diagnosis':      'failure-diagnosis',
   // — Simulation FEA —
   'simulation-fea':         'simulation-fea',
-  // — Topology Optimization —
-  'topology-optimization':  'topology-optimization',
   // — Calculator —
   'calculator':             'calculator',
   // — Reducer Lubrication —
@@ -235,14 +231,12 @@ export async function generateStaticParams() {
     'kinematics', 'physics-kinematics',
     'mfg-readiness', 'manufacturing-readiness',
     'mfg-sandbox', 'manufacturing-sandbox',
-    'machine-assembly',
     'fatigue-advanced',
     'motor-selection', 'motor-selection-std',
     'gearbox-design',
     'materials-explorer',
     'failure-prediction',
     'failure-diagnosis',
-    'topology-optimization',
     'concrete-reinforcement',
     'ohms-law',
     'voltage-drop',

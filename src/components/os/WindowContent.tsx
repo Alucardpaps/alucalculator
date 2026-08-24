@@ -259,8 +259,6 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'simulation-fea': return <SimulationFEAModule />;
         case 'sketch-pad': return <ExcalidrawModule />;
         case 'manufacturing-readiness': return <MfgReadinessModule />;
-        case 'topology-optimization': return <GenerativeLiteModule />;
-        case 'machine-assembly': return <DragAndBuildModule />;
         case 'failure-prediction': return <FailurePredictionModule />;
         case 'materials-explorer': return <MaterialsExplorer />;
         case 'physics-solver': return <PhysicsSolver />;

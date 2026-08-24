@@ -40,8 +40,6 @@ export type ModuleType =
     | 'manufacturing-sandbox'
     | 'engineering-selection'
     | 'manufacturing-readiness'
-    | 'topology-optimization'
-    | 'machine-assembly'
     | 'failure-prediction'
     | 'fatigue-analysis'
     | 'fluid-dynamics'
@@ -417,20 +415,6 @@ export const BASE_REGISTRY = {
         iconName: 'Activity',
         defaultSize: { width: 1000, height: 750 }
     },
-    'topology-optimization': {
-        type: 'topology-optimization',
-        title: 'Topology Optimization',
-        category: 'manufacturing',
-        iconName: 'Sparkles',
-        defaultSize: { width: 1100, height: 850 }
-    },
-    'machine-assembly': {
-        type: 'machine-assembly',
-        title: 'Advanced Machine Assembly',
-        category: 'manufacturing',
-        iconName: 'Wrench',
-        defaultSize: { width: 1300, height: 950 }
-    },
     'materials-explorer': {
         type: 'materials-explorer',
         title: 'Materials Intelligence',
@@ -656,6 +640,8 @@ export const MODULE_ALIASES: Record<string, string> = {
     'reynolds-number': 'fluid-dynamics',
     'heat-transfer-conduction': 'thermal-expansion',
     'hooke-law': 'advanced-spring',
+    'machine-assembly': 'design-studio',
+    'topology-optimization': 'fea',
 };
 
 calculatorsDB.forEach((calc: any) => {

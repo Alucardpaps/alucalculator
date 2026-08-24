@@ -96,15 +96,6 @@ export const META_KNOWLEDGE = {
         standard: "Advanced Design Optimization",
         checks: ["Verify manufacturing constraints (Overhangs)", "Check minimum member size"]
     },
-    "machine-assembly": {
-        domain: "Manufacturing",
-        topic: "Precision Machine Assembly",
-        formula: "T_{assem} = \\sqrt{\\sum Tol_i^2}",
-        variables: { "Tol": "Component tolerances" },
-        description: "Geometric and dimensional analysis for complex mechanical assemblies and fit-up sequences.",
-        standard: "ISO 1101 / ASME Y14.5",
-        checks: ["Verify datum precedence", "Check clearance at max material condition"]
-    },
 
     // ⚡ ELECTRICAL
     "ohms-law": {

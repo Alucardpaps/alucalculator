@@ -5,7 +5,6 @@ export type WorkspaceTab =
   | 'cad-editor'
   | '3d-assembly'
   | 'parametric-cad'
-  | 'machine-assembly'
   | 'sketch-pad'
   | 'simulation-fea'
   | 'nesting-2d'
