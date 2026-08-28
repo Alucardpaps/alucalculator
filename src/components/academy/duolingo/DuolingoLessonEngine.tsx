@@ -232,6 +232,16 @@ export function DuolingoLessonEngine({
                       {currentStep.conceptData.formula}
                     </div>
                   )}
+                  {currentStep.conceptData.keyTakeaways?.length > 0 && (
+                    <ul className="space-y-1.5">
+                      {currentStep.conceptData.keyTakeaways.map((k, i) => (
+                        <li key={i} className="text-xs text-cyan-100/80 flex gap-2">
+                          <span className="text-cyan-400 font-mono">▸</span>
+                          <span>{k[lang]}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             )}

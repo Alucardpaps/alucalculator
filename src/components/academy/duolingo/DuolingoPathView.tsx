@@ -7,12 +7,13 @@ import {
   ShieldCheck, AlertTriangle, Layers, ArrowRight, X
 } from 'lucide-react';
 import {
-  DUOLINGO_UNITS,
   CurriculumLesson,
   CurriculumUnit,
   SupportedLanguage,
   DUOLINGO_I18N
 } from './DuolingoCurriculumData';
+import { DUOLINGO_UNITS } from './academyCurriculum';
+import { ModalityIcon } from './AcademyModalityIcons';
 import { useAcademyGamificationStore } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
 
@@ -98,18 +99,8 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
       return <Lock size={18} className="text-slate-600" />;
     }
 
-    // Active icons by modality
-    switch (lesson.primaryType) {
-      case 'calculation':
-        return <Calculator size={24} className="text-slate-950" />;
-      case 'drawing':
-        return <PenTool size={22} className="text-slate-950" />;
-      case 'visual':
-        return <ImageIcon size={22} className="text-slate-950" />;
-      case 'quiz':
-      default:
-        return <Zap size={24} className="text-slate-950 fill-slate-950" />;
-    }
+    const iconType = lesson.isBoss ? 'boss' : lesson.primaryType;
+    return <ModalityIcon type={iconType} size={lesson.isBoss ? 30 : 24} />;
   };
 
   const getModalityLabel = (pType: string) => {
@@ -270,8 +261,8 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
                 {renderNodeIcon(lesson, status)}
 
                 {/* Small Badge for Modality */}
-                <span className="absolute -top-1 -left-1 text-[11px] drop-shadow">
-                  {lesson.primaryType === 'calculation' ? '🧮' : lesson.primaryType === 'drawing' ? '✏️' : lesson.primaryType === 'visual' ? '🖼️' : isBoss ? '👑' : '⚡'}
+                <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-slate-950/90 border border-white/20 flex items-center justify-center shadow-lg">
+                  <ModalityIcon type={isBoss ? 'boss' : lesson.primaryType} size={14} />
                 </span>
 
                 {/* Small Gold Star for Completed */}

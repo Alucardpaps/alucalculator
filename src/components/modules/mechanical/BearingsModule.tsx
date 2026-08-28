@@ -11,6 +11,7 @@ import {
     getBearingTypeInfo,
 } from '@/data/skfBearings';
 import { useI18nStore } from '@/store/i18nStore';
+import { BearingBlueprint } from '@/components/visualizers/BearingBlueprint';
 import {
     CalculatorWorkbench,
     WorkbenchField,
@@ -202,61 +203,17 @@ export function BearingsModule() {
                                 {selected.code} {selected.type.replace(/-/g, ' ')} {selected.d}×{selected.D}×{selected.B}
                             </div>
                             
-                            <div className="h-44 w-full flex items-center justify-center relative">
-                                <svg viewBox="0 0 200 200" className="w-40 h-40 overflow-visible text-cyan-400 font-mono text-[8px]">
-                                    <style>{`
-                                        @keyframes bearingSpin {
-                                            0% { transform: rotate(0deg); }
-                                            100% { transform: rotate(360deg); }
-                                        }
-                                    `}</style>
-                                    {/* Outer Ring */}
-                                    <circle cx="100" cy="100" r="90" fill="none" stroke="#00e5ff" strokeWidth="2.5" />
-                                    <circle cx="100" cy="100" r="76" fill="rgba(0,229,255,0.04)" stroke="#00e5ff" strokeWidth="1.2" strokeDasharray="3,2" />
-                                    
-                                    {/* Rotating Cage and Rolling Elements (Balls) */}
-                                    <g style={{
-                                        transformOrigin: '100px 100px',
-                                        transformBox: 'view-box',
-                                        animation: rpm > 0 ? `bearingSpin ${Math.max((60 / rpm) * 10, 0.5)}s linear infinite` : 'none'
-                                    }}>
-                                        {/* Cage Guide Circle */}
-                                        <circle cx="100" cy="100" r="59" fill="none" stroke="rgba(0,229,255,0.2)" strokeWidth="1" strokeDasharray="2,2" />
-                                        {[0, 45, 90, 135, 180, 225, 270, 315].map((ang) => {
-                                            const rad = (ang * Math.PI) / 180;
-                                            const cx = 100 + 59 * Math.cos(rad);
-                                            const cy = 100 + 59 * Math.sin(rad);
-                                            return (
-                                                <g key={ang}>
-                                                    <circle
-                                                        cx={cx}
-                                                        cy={cy}
-                                                        r="14"
-                                                        fill="rgba(0,229,255,0.15)"
-                                                        stroke="#00e5ff"
-                                                        strokeWidth="1.5"
-                                                    />
-                                                    <circle cx={cx - 4} cy={cy - 4} r="3" fill="#ffffff" opacity="0.4" />
-                                                </g>
-                                            );
-                                        })}
-                                    </g>
-                                    
-                                    {/* Inner Ring (Rotates with shaft) */}
-                                    <g style={{
-                                        transformOrigin: '100px 100px',
-                                        transformBox: 'view-box',
-                                        animation: rpm > 0 ? `bearingSpin ${Math.max((60 / rpm) * 5, 0.25)}s linear infinite` : 'none'
-                                    }}>
-                                        <circle cx="100" cy="100" r="42" fill="rgba(0,229,255,0.06)" stroke="#00e5ff" strokeWidth="1.2" strokeDasharray="4,2" />
-                                        <circle cx="100" cy="100" r="28" fill="#040810" stroke="#00e5ff" strokeWidth="2.5" />
-                                        {/* Keyway Notch */}
-                                        <rect x="97" y="70" width="6" height="5" fill="#00e5ff" opacity="0.6" />
-                                    </g>
-
-                                    {/* Center Hub */}
-                                    <circle cx="100" cy="100" r="2.5" fill="#00e5ff" />
-                                </svg>
+                            <div className="h-48 w-full flex items-center justify-center relative">
+                                <BearingBlueprint
+                                    type={selected.type}
+                                    code={selected.code}
+                                    d={selected.d}
+                                    D={selected.D}
+                                    B={selected.B}
+                                    rpm={rpm}
+                                    fr={fr}
+                                    fa={fa}
+                                />
                             </div>
 
                             <div className="text-[10px] font-mono text-slate-400 mt-2">
@@ -268,10 +225,12 @@ export function BearingsModule() {
                         <div className="p-4 rounded-2xl border border-white/10 bg-[#080c14] flex flex-col justify-between">
                             <div>
                                 <h4 className="text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-400 mb-1">
-                                    SELECTED BEARING
+                                    {isTr ? 'SEÇİLİ RULMAN' : 'SELECTED BEARING'}
                                 </h4>
                                 <p className="text-xs text-slate-400 leading-relaxed">
-                                    Most common type. Handles radial and moderate axial loads.
+                                    {typeInfo?.description || (isTr
+                                        ? 'ISO 281 eşdeğer yük ve L10 ömür hesabı.'
+                                        : 'ISO 281 equivalent load and L10 rating life.')}
                                 </p>
                             </div>
 

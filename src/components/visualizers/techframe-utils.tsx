@@ -60,6 +60,121 @@ export function openDrivePath(
     return { d, phi, thetaRad };
 }
 
+export interface DriveSamplePoint {
+    x: number;
+    y: number;
+    ang: number;
+}
+
+function sampleLinePts(ax: number, ay: number, bx: number, by: number, n: number): DriveSamplePoint[] {
+    const pts: DriveSamplePoint[] = [];
+    const ang = Math.atan2(by - ay, bx - ax);
+    for (let i = 0; i <= n; i++) {
+        const t = i / Math.max(1, n);
+        pts.push({ x: ax + (bx - ax) * t, y: ay + (by - ay) * t, ang });
+    }
+    return pts;
+}
+
+function sampleClockwiseArc(
+    cx: number,
+    cy: number,
+    r: number,
+    aStart: number,
+    aEnd: number,
+    n: number,
+): DriveSamplePoint[] {
+    let delta = aStart - aEnd;
+    while (delta <= 0) delta += Math.PI * 2;
+    while (delta > Math.PI * 2) delta -= Math.PI * 2;
+    const pts: DriveSamplePoint[] = [];
+    for (let i = 0; i <= n; i++) {
+        const a = aStart - (delta * i) / Math.max(1, n);
+        pts.push({
+            x: cx + r * Math.cos(a),
+            y: cy - r * Math.sin(a),
+            ang: a - Math.PI / 2,
+        });
+    }
+    return pts;
+}
+
+/** Sample the open-drive wrap as ordered points (top span → driven wrap → bottom span → driver wrap). */
+export function sampleOpenDrive(
+    cx1: number,
+    cy: number,
+    r1: number,
+    cx2: number,
+    r2: number,
+    spacing = 10,
+): DriveSamplePoint[] | null {
+    const dx = cx2 - cx1;
+    const C = Math.hypot(dx, 0);
+    if (C <= 0 || r1 <= 0 || r2 <= 0 || C <= Math.abs(r2 - r1)) return null;
+    const theta = Math.acos((r1 - r2) / C);
+    const aTop = theta;
+    const aBot = -theta;
+    const p1t = polar(cx1, cy, r1, aTop);
+    const p2t = polar(cx2, cy, r2, aTop);
+    const p2b = polar(cx2, cy, r2, aBot);
+    const p1b = polar(cx1, cy, r1, aBot);
+    const topLen = Math.hypot(p2t.x - p1t.x, p2t.y - p1t.y);
+    const botLen = Math.hypot(p1b.x - p2b.x, p1b.y - p2b.y);
+    const wrap2 = (aTop - aBot + Math.PI * 4) % (Math.PI * 2);
+    const wrap1 = wrap2;
+    const nTop = Math.max(2, Math.round(topLen / spacing));
+    const nBot = Math.max(2, Math.round(botLen / spacing));
+    const nA2 = Math.max(6, Math.round((r2 * wrap2) / spacing));
+    const nA1 = Math.max(6, Math.round((r1 * wrap1) / spacing));
+    const top = sampleLinePts(p1t.x, p1t.y, p2t.x, p2t.y, nTop);
+    const arc2 = sampleClockwiseArc(cx2, cy, r2, aTop, aBot, nA2).slice(1);
+    const bot = sampleLinePts(p2b.x, p2b.y, p1b.x, p1b.y, nBot).slice(1);
+    const arc1 = sampleClockwiseArc(cx1, cy, r1, aBot + Math.PI * 2, aTop, nA1).slice(1, -1);
+    return [...top, ...arc2, ...bot, ...arc1];
+}
+
+/** ISO 606-style sprocket outline (roller seats + pointed teeth). */
+export function sprocketOutlinePath(
+    cx: number,
+    cy: number,
+    z: number,
+    pitchPx: number,
+    phase = 0,
+): string {
+    const zc = Math.max(8, Math.round(z));
+    const d = pitchPx / Math.sin(Math.PI / zc);
+    const rP = d / 2;
+    const rTip = rP + 0.28 * pitchPx;
+    const rRoot = Math.max(rP * 0.62, rP - 0.5 * pitchPx);
+    const step = (2 * Math.PI) / zc;
+    const parts: string[] = [];
+    for (let i = 0; i < zc; i++) {
+        const a = phase - Math.PI / 2 + step * i;
+        const aL = a - step * 0.22;
+        const aR = a + step * 0.22;
+        const aGap = a + step * 0.5;
+        const tip = `${(cx + rTip * Math.cos(a)).toFixed(2)} ${(cy + rTip * Math.sin(a)).toFixed(2)}`;
+        const fL = `${(cx + rP * Math.cos(aL)).toFixed(2)} ${(cy + rP * Math.sin(aL)).toFixed(2)}`;
+        const fR = `${(cx + rP * Math.cos(aR)).toFixed(2)} ${(cy + rP * Math.sin(aR)).toFixed(2)}`;
+        const gap = `${(cx + rRoot * Math.cos(aGap)).toFixed(2)} ${(cy + rRoot * Math.sin(aGap)).toFixed(2)}`;
+        parts.push(`${i === 0 ? 'M' : 'L'} ${fL} L ${tip} L ${fR} L ${gap}`);
+    }
+    return `${parts.join(' ')} Z`;
+}
+
+export function hubKeyway(
+    cx: number,
+    cy: number,
+    rHub: number,
+    stroke: string,
+): { bore: number; key: { x: number; y: number; w: number; h: number } } {
+    const bore = Math.max(3.5, rHub * 0.42);
+    return {
+        bore,
+        key: { x: cx - bore * 0.16, y: cy - bore - bore * 0.28, w: bore * 0.32, h: bore * 0.38 },
+    };
+}
+
 /** Layout helper: scale mm geometry into SVG px with correct center distance. */
 export function openDriveLayout(
     d1Mm: number,

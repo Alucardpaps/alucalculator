@@ -319,7 +319,7 @@ export default {
             title: "Bolt Torque & Preload"
         },
         "chain-drive": {
-            title: "Roller Chain Drive"
+            title: "Transmisión por cadena de rodillos"
         },
         "physics-kinematics": {
             title: "Physics & Kinematics"

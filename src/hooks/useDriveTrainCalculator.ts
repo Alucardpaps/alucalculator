@@ -195,6 +195,17 @@ export const useDriveTrainCalculator = () => {
         const SF_bending = material.sigma_Flim / estBendingStress;
         const SF_contact = material.sigma_Hlim / estContactStress;
 
+        // Pitch-line velocity (m/s) and ISO 6336-ish contact ratio / undercut screen
+        const pitchVelocity = (Math.PI * d1 * motorSpeed) / 60000;
+        const zMinUndercut = Math.ceil(2 / (Math.sin(alphaRad) ** 2));
+        const undercut = z1 < zMinUndercut && x1 < (zMinUndercut - z1) / zMinUndercut;
+        const epsilonAlpha = (0.5 / Math.PI) * (
+            Math.sqrt(Math.max(0, Math.pow(da1 / 2, 2) - Math.pow((d1 / 2) * Math.cos(alpha_t_rad), 2))) +
+            Math.sqrt(Math.max(0, Math.pow(da2 / 2, 2) - Math.pow((d2 / 2) * Math.cos(alpha_t_rad), 2)))
+            - a_wt * Math.sin(alpha_wt)
+        ) / (gearModule * Math.cos(alphaRad));
+        const Kv = 1 + pitchVelocity / 20;
+
         return {
             motorSpeed,
             motorTorque,
@@ -218,6 +229,11 @@ export const useDriveTrainCalculator = () => {
             estContactStress,
             SF_bending,
             SF_contact,
+            pitchVelocity,
+            zMinUndercut,
+            undercut,
+            epsilonAlpha,
+            Kv,
             Wk1, Wk2, M1, M2,
             // YR Data
             requiredFs,

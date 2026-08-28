@@ -274,6 +274,8 @@ export function GearsModule({ lang, dict: dictProp }: { lang?: string, dict?: an
                         <div className="flex flex-row md:flex-col gap-4 md:gap-2 text-left md:text-right pt-2 flex-wrap">
                             <QuickStat label={dict.common?.ratio || "Ratio"} value={`${results.ratio.toFixed(2)}:1`} color="#00e5ff" />
                             <QuickStat label={dict.common?.centerDist || "Center Dist"} value={`${results.a.toFixed(1)} mm`} color="#6366f1" />
+                            <QuickStat label="v" value={`${results.pitchVelocity.toFixed(2)} m/s`} color="#f59e0b" />
+                            <QuickStat label="εα" value={results.epsilonAlpha.toFixed(2)} color={results.epsilonAlpha >= 1.2 ? '#10b981' : '#ef4444'} />
                             <QuickStat label={dict.gears?.circularPitch || "Circ. Pitch"} value={`${(Math.PI * gearModule).toFixed(2)} mm`} color="#818cf8" />
                         </div>
                     </div>
@@ -282,6 +284,11 @@ export function GearsModule({ lang, dict: dictProp }: { lang?: string, dict?: an
                 <div className="flex-1 flex flex-col 2xl:flex-row min-h-0">
                     {/* 2D Animated Visualization Area */}
                     <div className="flex-1 relative mx-6 my-4 2xl:my-0 2xl:mb-6 rounded-[32px] overflow-hidden border border-cyan-500/20 bg-gradient-to-b from-[#0a1018] to-black shadow-inner min-h-[300px]">
+                        {results.undercut && (
+                            <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 text-[10px] font-mono text-amber-300">
+                                {s.alertTitle ? `${s.alertTitle} · z₁ < ${results.zMinUndercut}` : `Undercut risk · z₁ < ${results.zMinUndercut}`}
+                            </div>
+                        )}
                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
                         
                         <div className="absolute top-5 left-5 z-20 text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -597,10 +604,12 @@ function GearShape2D({ cx, cy, rRef, teeth, m, color, strokeWidth, opacity, isPr
             transform={rotateDir === 'ccw' ? `rotate(${180 / teeth}, ${cx}, ${cy})` : undefined}
         >
             <g style={animStyle}>
-                {/* Gear Body (Teeth Path) */}
+                <circle cx={cx} cy={cy} r={rTip} fill="none" stroke={color} strokeWidth="0.5" strokeDasharray="2 3" opacity={0.25} />
+                <circle cx={cx} cy={cy} r={rRef} fill="none" stroke={color} strokeWidth="0.7" strokeDasharray="4 3" opacity={0.45} />
+                <circle cx={cx} cy={cy} r={Math.max(4, rRoot)} fill="none" stroke={color} strokeWidth="0.5" opacity={0.2} />
                 <path
                     d={toothPath}
-                    fill={isPrint ? "none" : "rgba(0, 229, 255, 0.03)"}
+                    fill={isPrint ? "none" : "rgba(0, 229, 255, 0.07)"}
                     stroke={color}
                     strokeWidth={strokeWidth}
                     strokeLinejoin="round"
@@ -697,8 +706,10 @@ function GearSVG2D({ z1, z2, m, a, rpm, isPrint = false }: { z1: number; z2: num
                 isPrint={isPrint} rotateDir="ccw" rpm={gearRpm}
             />
 
-            {/* Center distance line */}
+            {/* Pitch line + pressure-angle mesh mark */}
             <line x1={cx1} y1={150} x2={cx2} y2={150} stroke={textColor} strokeWidth="1" strokeDasharray="6,6" />
+            <circle cx={(cx1 + cx2) / 2} cy={150} r="7" fill="none" stroke="#f59e0b" strokeWidth="1.2" opacity="0.8" />
+            <line x1={(cx1 + cx2) / 2 - 12} y1={138} x2={(cx1 + cx2) / 2 + 12} y2={162} stroke="#f59e0b" strokeWidth="1" opacity="0.7" />
             
             {/* Labels */}
             <text x={cx1} y={150 + (r1 * scale) + 24} textAnchor="middle" fill={color1} fontSize="11" fontWeight="bold" fontFamily="monospace">z₁={z1}</text>

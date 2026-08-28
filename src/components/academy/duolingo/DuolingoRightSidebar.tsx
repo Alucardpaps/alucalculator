@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
-import { DUOLINGO_UNITS, DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
+import { DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
+import { DUOLINGO_UNITS } from './academyCurriculum';
 
 interface DuolingoRightSidebarProps {
   onOpenCertificates: () => void;

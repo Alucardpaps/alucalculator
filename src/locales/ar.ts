@@ -318,7 +318,7 @@ export default {
             title: "Bolt Torque & Preload"
         },
         "chain-drive": {
-            title: "Roller Chain Drive"
+            title: "ناقل الحركة بالسلسلة الأسطوانية"
         },
         "physics-kinematics": {
             title: "Physics & Kinematics"

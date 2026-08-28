@@ -25,7 +25,7 @@ function mergeLocaleWithFallback(locale: any, lang: Language): typeof en {
         ...en,
         ...locale,
         modules: { ...en.modules, ...(locale?.modules ?? {}) },
-        moduleHints: { ...getModuleHints(lang), ...(locale?.moduleHints ?? {}) },
+        moduleHints: { ...en.moduleHints, ...(locale?.moduleHints ?? {}), ...getModuleHints(lang) },
         categories: { ...en.categories, ...(locale?.categories ?? {}) },
         ribbon: { ...en.ribbon, ...(locale?.ribbon ?? {}) },
         handbook: locale?.handbook ? { ...en.handbook, ...locale.handbook, shortcuts: { ...en.handbook?.shortcuts, ...(locale.handbook?.shortcuts ?? {}) } } : en.handbook,

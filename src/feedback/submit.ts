@@ -59,20 +59,36 @@ export async function submitFeedback(
         : null,
     };
 
-    const res = await fetch('/api/feedback', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const responseText = await res.text();
+    const body = JSON.stringify(payload);
+    const endpoints = ['/api/feedback/', '/api/feedback.php', '/api/feedback'];
+    let res: Response | null = null;
     let result: any = null;
-    try {
-      result = JSON.parse(responseText);
-    } catch {
-      result = null;
+    let responseText = '';
+
+    for (const url of endpoints) {
+      try {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        });
+      } catch {
+        continue;
+      }
+      responseText = await res.text();
+      const contentType = res.headers.get('content-type') || '';
+      const looksHtml = /^\s*</.test(responseText) || contentType.includes('text/html');
+      if (looksHtml) {
+        result = null;
+        continue;
+      }
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = null;
+        continue;
+      }
+      break;
     }
 
     if (res.ok && result?.success) {
