@@ -35,8 +35,8 @@ const nextConfig: NextConfig = {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
-        path: require.resolve('path-browserify'),
-        url: require.resolve('url'),
+        path: (() => { try { return require.resolve('path-browserify'); } catch { return false; } })(),
+        url: (() => { try { return require.resolve('url'); } catch { return false; } })(),
         module: false,
         'a': false,
       };
