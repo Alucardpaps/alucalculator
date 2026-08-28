@@ -44,10 +44,7 @@ export function NavigationHeader() {
         {/* Brand & Left Navigation */}
         <div className="flex min-w-0 items-center gap-3 sm:gap-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 group">
-            <div className="relative">
-              <AluCalcLogo size={24} />
-              <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            </div>
+            <AluCalcLogo size={24} />
             <span className="text-[13px] font-mono font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors uppercase">AluCalc</span>
           </Link>
 
