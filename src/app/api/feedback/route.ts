@@ -181,40 +181,8 @@ async function sendFeedbackEmail(options: {
     }
   }
 
-  // Provider 2: Nodemailer (if installed and configured with SMTP)
-  if (process.env.SMTP_HOST) {
-    try {
-      // @ts-ignore - optional dynamic import
-      const nodemailer = await import('nodemailer' as any).catch(() => null);
-      if (nodemailer) {
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: Number(process.env.SMTP_PORT) || 587,
-          secure: process.env.SMTP_SECURE === 'true',
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-
-        await transporter.sendMail({
-          from: process.env.FEEDBACK_FROM || process.env.SMTP_USER,
-          to,
-          subject,
-          text: textBody,
-          attachments: screenshotBuffer
-            ? [{ filename: 'screenshot.webp', content: screenshotBuffer }]
-            : undefined,
-        });
-        return;
-      }
-    } catch (err) {
-      console.error('Failed to send email via Nodemailer:', err);
-    }
-  }
-
   // If running in development/test without external mail credentials, log on server
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
     console.log(`[FEEDBACK MAIL MOCK -> ${to}] Subject: ${subject}`);
   }
 }
