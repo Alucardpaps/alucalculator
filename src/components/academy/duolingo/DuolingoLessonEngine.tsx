@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   X, Heart, CheckCircle2, AlertCircle, Award, RotateCcw,
   ChevronRight, Sparkles, Trophy, Volume2, HelpCircle, Check, ArrowRight
 } from 'lucide-react';
-import { DuolingoLesson, DuolingoLessonStep } from './DuolingoCurriculumData';
+import { DuolingoLesson, DuolingoLessonStep, getDuolingoUiText } from './DuolingoCurriculumData';
 import { useAcademyGamificationStore } from '@/store/useAcademyGamificationStore';
+import { useI18nStore } from '@/store/i18nStore';
 
 interface DuolingoLessonEngineProps {
   lesson: DuolingoLesson;
   isOpen: boolean;
   onClose: () => void;
   onCompleted: (lessonId: string, earnedXp: number) => void;
-  tr: boolean;
 }
 
 export function DuolingoLessonEngine({
@@ -21,9 +21,10 @@ export function DuolingoLessonEngine({
   isOpen,
   onClose,
   onCompleted,
-  tr,
 }: DuolingoLessonEngineProps) {
-  const { hearts, loseHeart, refillHearts, completeLesson } = useAcademyGamificationStore();
+  const { hearts, loseHeart, completeLesson } = useAcademyGamificationStore();
+  const { language } = useI18nStore();
+  const tr = language === 'tr';
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -61,19 +62,16 @@ export function DuolingoLessonEngine({
     if (side === 'left') {
       setSelectedLeft(item);
     } else if (side === 'right' && selectedLeft) {
-      // Check if matches
       const pairs = tr ? currentStep.pairsTr : currentStep.pairsEn;
       const validPair = pairs?.find((p) => p.left === selectedLeft && p.right === item);
       if (validPair) {
         setMatchedPairs((prev) => [...prev, selectedLeft]);
         setSelectedLeft(null);
-        // If all pairs matched
         if (pairs && matchedPairs.length + 1 >= pairs.length) {
           setIsAnswerCorrect(true);
           setIsAnswerChecked(true);
         }
       } else {
-        // Wrong match
         loseHeart();
         setSelectedLeft(null);
       }
@@ -90,7 +88,6 @@ export function DuolingoLessonEngine({
     if (currentStepIndex < lesson.steps.length - 1) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
-      // Finished lesson!
       const stars = hearts >= 4 ? 3 : hearts >= 2 ? 2 : 1;
       setEarnedStars(stars);
       setIsFinished(true);
@@ -165,7 +162,7 @@ export function DuolingoLessonEngine({
               <div className="space-y-6">
                 <div className="space-y-1">
                   <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
-                    {tr ? 'Soru' : 'Question'} {currentStepIndex + 1}
+                    {getDuolingoUiText(language, 'question')} {currentStepIndex + 1}
                   </span>
                   <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
                     {tr ? currentStep.questionTr : currentStep.questionEn}
@@ -292,22 +289,22 @@ export function DuolingoLessonEngine({
 
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-white tracking-tight">
-                {tr ? 'Harika İş Çıkardın!' : 'Lesson Completed!'}
+                {getDuolingoUiText(language, 'lessonCompleted')}
               </h2>
               <p className="text-xs text-slate-400 font-mono">
-                {tr ? `${lesson.titleTr} ünitesini başarıyla tamamladınız.` : `You mastered ${lesson.titleEn}.`}
+                {tr ? `${lesson.titleTr} başarıyla tamamlandı.` : `You mastered ${lesson.titleEn}.`}
               </p>
             </div>
 
             {/* Rewards */}
             <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto font-mono">
               <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-center">
-                <span className="text-[10px] text-cyan-400 uppercase font-bold block">Kazanılan XP</span>
+                <span className="text-[10px] text-cyan-400 uppercase font-bold block">{getDuolingoUiText(language, 'earnedXp')}</span>
                 <p className="text-xl font-black text-white mt-0.5">+{lesson.xpReward} XP</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
-                <span className="text-[10px] text-amber-400 uppercase font-bold block">Yıldız Skoru</span>
+                <span className="text-[10px] text-amber-400 uppercase font-bold block">{getDuolingoUiText(language, 'starScore')}</span>
                 <p className="text-xl font-black text-yellow-300 mt-0.5">
                   {'★'.repeat(earnedStars)}{'☆'.repeat(3 - earnedStars)}
                 </p>
@@ -319,7 +316,7 @@ export function DuolingoLessonEngine({
               onClick={onClose}
               className="w-full max-w-xs mx-auto py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold font-mono text-xs uppercase tracking-wider shadow-lg transition cursor-pointer"
             >
-              {tr ? 'Müfredata Dön' : 'Continue to Path'}
+              {getDuolingoUiText(language, 'backToPath')}
             </button>
           </div>
         )}
@@ -351,8 +348,8 @@ export function DuolingoLessonEngine({
                   <div>
                     <h4 className={`text-sm font-bold ${isAnswerCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
                       {isAnswerCorrect
-                        ? (tr ? 'Mükemmel! Doğru Yanıt' : 'Nicely Done!')
-                        : (tr ? 'Doğru Cevap Değil' : 'Incorrect')}
+                        ? getDuolingoUiText(language, 'nicelyDone')
+                        : getDuolingoUiText(language, 'incorrect')}
                     </h4>
                     <p className="text-xs text-slate-300 font-sans mt-0.5 line-clamp-1">
                       {tr ? currentStep.explanationTr : currentStep.explanationEn}
@@ -376,7 +373,7 @@ export function DuolingoLessonEngine({
                   onClick={handleNextStep}
                   className="px-6 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-xs uppercase tracking-wider shadow-lg transition cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>{tr ? 'Anladım, Devam Et' : 'Continue'}</span>
+                  <span>{getDuolingoUiText(language, 'continue')}</span>
                   <ChevronRight size={16} />
                 </button>
               ) : !isAnswerChecked ? (
@@ -386,7 +383,7 @@ export function DuolingoLessonEngine({
                   onClick={handleCheckAnswer}
                   className="px-8 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold font-mono text-xs uppercase tracking-wider shadow-lg transition cursor-pointer"
                 >
-                  {tr ? 'Kontrol Et' : 'Check'}
+                  {getDuolingoUiText(language, 'checkAnswer')}
                 </button>
               ) : (
                 <button
@@ -398,7 +395,7 @@ export function DuolingoLessonEngine({
                       : 'bg-rose-500 hover:bg-rose-400 text-white'
                   }`}
                 >
-                  {tr ? 'Devam Et' : 'Continue'}
+                  {getDuolingoUiText(language, 'continue')}
                 </button>
               )}
             </div>
