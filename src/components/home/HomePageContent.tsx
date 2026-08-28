@@ -138,22 +138,22 @@ export function HomePageContent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-4">
           
           {/* Pillar 1 */}
-          <div className="space-y-3.5 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20 transition-colors">
-              <ShieldCheck size={20} />
+          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-cyan-500/30 transition-all duration-300 shadow-lg space-y-4 group">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20 group-hover:scale-105 transition-all">
+              <ShieldCheck size={22} />
             </div>
             <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">
               100+ Deterministik Çözücü
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-              Cıvata ön gerilimi (VDI 2230), rulman ömrü (ISO 281), dişli mukavemeti (ISO 6336), kiriş sehimleri ve mil burulması hesaplamalarında sıfır yapay zeka halüsinasyonu ile garantili matematiksel doğruluk.
+              Cıvata ön gerilimi (VDI 2230), rulman ömrü (ISO 281), dişli mukavemeti (ISO 6336), kiriş sehimleri ve mil burulması hesaplamalarında sıfır halüsinasyon ile garantili matematiksel doğruluk.
             </p>
             <Link
               href="/calculators"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 pt-1 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 pt-2 transition-colors"
             >
               <span>Tüm Çözücüleri Keşfet</span>
               <ArrowRight size={13} />
@@ -161,19 +161,19 @@ export function HomePageContent() {
           </div>
 
           {/* Pillar 2 */}
-          <div className="space-y-3.5 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:bg-sky-500/20 transition-colors">
-              <Box size={20} />
+          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-sky-500/30 transition-all duration-300 shadow-lg space-y-4 group">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:bg-sky-500/20 group-hover:scale-105 transition-all">
+              <Box size={22} />
             </div>
             <h3 className="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
               2D & 3D Parametrik CAD
             </h3>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-              Web tarayıcınızda çalışan donanım hızlandırmalı 3D parça konfigüratörü ve 2D AluCAD motoru. Delik, havşa, kanal ve özel alüminyum profil geometrilerini anında STL, STEP veya DXF olarak dışa aktarın.
+              Web tarayıcınızda çalışan donanım hızlandırmalı 3D parça konfigüratörü ve 2D AluCAD motoru. Delik, havşa ve özel alüminyum profil geometrilerini anında STL, STEP veya DXF olarak dışa aktarın.
             </p>
             <Link
               href="/design-studio"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 pt-1 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 pt-2 transition-colors"
             >
               <span>Design Studio'yu Başlat</span>
               <ArrowRight size={13} />
@@ -181,9 +181,9 @@ export function HomePageContent() {
           </div>
 
           {/* Pillar 3 */}
-          <div className="space-y-3.5 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors">
-              <GraduationCap size={20} />
+          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-blue-500/30 transition-all duration-300 shadow-lg space-y-4 group">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20 group-hover:scale-105 transition-all">
+              <GraduationCap size={22} />
             </div>
             <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
               Mühendislik Akademisi & Saha
@@ -193,7 +193,7 @@ export function HomePageContent() {
             </p>
             <Link
               href="/academy"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 pt-1 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 pt-2 transition-colors"
             >
               <span>Akademiye Göz At</span>
               <ArrowRight size={13} />
@@ -203,14 +203,14 @@ export function HomePageContent() {
       </section>
 
       {/* ─── 4. STREAMLINED DOWNLOAD BAR (MINIMAL, ELEGANT) ─── */}
-      <section className="rounded-2xl bg-gradient-to-r from-[#0a1224] to-[#060b18] border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-1 text-left">
+      <section className="rounded-2xl bg-gradient-to-r from-[#0a1224]/90 via-[#060b18]/90 to-[#020408]/90 border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-xl shadow-2xl">
+        <div className="space-y-1.5 text-left">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-cyan-400 uppercase">Mobil & Giyilebilir Platform</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950 border border-emerald-500/30 text-emerald-400">v5.0 İmzalı</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950 border border-emerald-500/30 text-emerald-400 font-semibold">v5.0 İmzalı</span>
           </div>
-          <h3 className="text-xl font-bold text-white">AluCalc OS'u Cebinize ve Saatinize Taşıyın</h3>
-          <p className="text-xs text-slate-400 max-w-xl">
+          <h3 className="text-xl font-bold text-white tracking-tight">AluCalc OS'u Cebinize ve Saatinize Taşıyın</h3>
+          <p className="text-xs text-slate-400 max-w-xl font-normal leading-relaxed">
             Atölyede veya şantiyede internet olmadan dahi çalışan bağımsız Android (1.16 MB) ve Wear OS akıllı saat APK paketleri.
           </p>
         </div>
@@ -219,18 +219,18 @@ export function HomePageContent() {
           <a
             href="/app/alucalc-release.apk"
             download="alucalc-release.apk"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-[0.98]"
           >
-            <HardDriveDownload size={15} />
+            <HardDriveDownload size={16} />
             <span>Telefon APK (1.16 MB)</span>
           </a>
 
           <a
             href="/app/alucalc-wear-release.apk"
             download="alucalc-wear-release.apk"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs uppercase tracking-wider transition-all"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-white font-semibold text-xs uppercase tracking-wider transition-all backdrop-blur-md active:scale-[0.98]"
           >
-            <Smartphone size={15} className="text-sky-400" />
+            <Smartphone size={16} className="text-sky-400" />
             <span>Wear OS APK</span>
           </a>
         </div>

@@ -39,43 +39,46 @@ export function NavigationHeader() {
   const currentLang = LANGUAGE_LIST.find((l) => l.id === language) ?? LANGUAGE_LIST[0];
 
   return (
-    <nav className="sticky top-0 z-50 w-full shrink-0 border-b border-[var(--line)] bg-[var(--bg-1)]/95 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 w-full shrink-0 border-b border-white/[0.08] bg-[#030712]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-[52px] max-w-[1400px] items-center justify-between gap-2 px-3 sm:px-4 md:px-6">
         {/* Brand & Left Navigation */}
         <div className="flex min-w-0 items-center gap-3 sm:gap-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 group">
-            <AluCalcLogo size={24} />
-            <span className="text-[13px] font-mono font-bold tracking-tight text-[var(--ink)] group-hover:text-[var(--cyan)] transition-colors uppercase">AluCalc</span>
+            <div className="relative">
+              <AluCalcLogo size={24} />
+              <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            </div>
+            <span className="text-[13px] font-mono font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors uppercase">AluCalc</span>
           </Link>
 
-          <div className="hidden items-center gap-3 sm:flex font-mono text-[11px]">
+          <div className="hidden items-center gap-2 sm:flex font-mono text-[11px]">
             <Link
               href="/academy/"
-              className="inline-flex items-center gap-1.5 font-medium transition-colors text-[var(--alu-dim)] hover:text-[var(--ink)]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all text-slate-400 hover:text-white hover:bg-white/[0.04]"
             >
-              <Award size={13} className="text-[var(--warn)]" />
+              <Award size={13} className="text-amber-400" />
               <span>{c.academy}</span>
             </Link>
 
             <Link
               href="/design-studio/"
-              className="inline-flex items-center gap-1.5 font-medium transition-colors text-[var(--alu-dim)] hover:text-[var(--ink)]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all text-slate-400 hover:text-white hover:bg-white/[0.04]"
             >
-              <Cuboid size={13} className="text-[var(--cyan)]" />
+              <Cuboid size={13} className="text-cyan-400" />
               <span>{c.studio3d}</span>
             </Link>
 
             <Link
               href="/lite/"
-              className="inline-flex items-center gap-1.5 font-medium transition-colors text-[var(--alu-dim)] hover:text-[var(--ink)]"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-medium transition-all text-slate-400 hover:text-white hover:bg-white/[0.04]"
             >
-              <LayoutGrid size={13} className="text-[var(--std)]" />
+              <LayoutGrid size={13} className="text-blue-400" />
               <span>{c.lite}</span>
             </Link>
 
             <Link
               href="/pricing/"
-              className="hidden lg:inline font-medium transition-colors text-[var(--alu-dim)] hover:text-[var(--ink)]"
+              className="hidden lg:inline-flex items-center px-2.5 py-1 rounded-lg font-medium transition-all text-slate-400 hover:text-white hover:bg-white/[0.04]"
             >
               <span>{c.pricing}</span>
             </Link>

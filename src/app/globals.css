@@ -1,32 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  /* surfaces — cooler, denser, CNC instrument panel */
-  --bg-0: #07090c;
-  --bg-1: #0c1016;
-  --bg-2: #121821;
-  --bg-3: #18202b;
-  --line: #243041;
-  --line-strong: #334155;
+  /* surfaces — ultra-deep rich obsidian & cyber slate */
+  --bg-0: #030712;
+  --bg-1: #080d1a;
+  --bg-2: #0f172a;
+  --bg-3: #1e293b;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
 
-  /* aluminum + warning amber, keep cyan but shift to instrument cyan */
-  --alu: #c5cdd6;
-  --alu-dim: #8b96a4;
-  --ink: #e7edf4;
-  --muted: #8a96a6;
+  /* aluminum & refined typography tones */
+  --alu: #cbd5e1;
+  --alu-dim: #94a3b8;
+  --ink: #f8fafc;
+  --muted: #64748b;
 
-  --cyan: #3ad0e6;
-  --cyan-dim: #1a8fa3;
-  --cyan-glow: color-mix(in oklab, var(--cyan) 22%, transparent);
+  /* electric cyber cyan */
+  --cyan: #00e5ff;
+  --cyan-dim: #0284c7;
+  --cyan-glow: rgba(0, 229, 255, 0.25);
 
-  --ok: #3dd68c;
-  --warn: #e6b84a;
-  --bad: #e85d5d;
-  --std: #7aa2ff; /* ISO/DIN chip */
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --std: #60a5fa; /* ISO/DIN chip */
 
-  --radius-s: 4px;   /* controls, chips — tighter */
-  --radius-m: 8px;   /* cards */
-  --radius-l: 12px;  /* shells only */
+  --radius-s: 8px;   /* controls, chips, buttons */
+  --radius-m: 12px;  /* cards, inputs */
+  --radius-l: 16px;  /* modals, shells */
 
   --font-ui: var(--font-inter, Inter, ui-sans-serif, system-ui, sans-serif);
   --font-mono: var(--font-jetbrains-mono, "JetBrains Mono", ui-monospace, monospace);
@@ -34,7 +35,7 @@
   --sidebar-w: 272px;
   --topbar-h: 52px;
 
-  --foreground-rgb: 231, 237, 244;
+  --foreground-rgb: 248, 250, 252;
 }
 
 @theme {
@@ -113,81 +114,76 @@
 /* Custom Utilities that use the theme values */
 
 @utility btn-primary {
-  @apply bg-transparent border border-[#3ad0e6] text-[#3ad0e6] font-bold py-2.5 px-5 rounded-[4px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-[11px] font-mono flex items-center justify-center gap-2;
-  box-shadow: 0 0 8px rgba(58, 208, 230, 0.15);
-
-  &:hover {
-    @apply bg-[#3ad0e6]/10 border-[#3ad0e6] text-white;
-    box-shadow: 0 0 12px rgba(58, 208, 230, 0.25);
-  }
+  @apply bg-gradient-to-r from-[#00e5ff] to-[#0284c7] hover:from-[#38bdf8] hover:to-[#0369a1] text-slate-950 font-bold py-2.5 px-5 rounded-[8px] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-[11px] font-mono flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:shadow-[0_0_30px_rgba(0,229,255,0.5)] active:scale-[0.98];
 }
 
 @utility btn-secondary {
-  @apply bg-[#121821] border border-[#243041] text-[#c5cdd6] py-2.5 px-5 rounded-[4px] hover:bg-[#18202b] hover:text-[#e7edf4] hover:border-[#334155] transition-colors uppercase tracking-wider text-[11px] font-mono font-bold flex items-center justify-center gap-2;
+  @apply bg-[#0f172a]/80 hover:bg-[#1e293b] border border-white/10 hover:border-white/20 text-[#cbd5e1] hover:text-white py-2.5 px-5 rounded-[8px] transition-all uppercase tracking-wider text-[11px] font-mono font-bold flex items-center justify-center gap-2 backdrop-blur-md active:scale-[0.98];
 }
 
 @utility input-tech {
-  @apply w-full bg-[#07090c] border border-[#243041] rounded-[4px] p-2.5 text-[#e7edf4] font-mono text-[11px] focus:outline-none focus:border-[#3ad0e6] focus:ring-1 focus:ring-[#3ad0e6]/40 transition-colors placeholder:text-[#8b96a4]/50;
+  @apply w-full bg-[#030712] border border-white/10 rounded-[8px] p-2.5 text-[#f8fafc] font-mono text-[11px] focus:outline-none focus:border-[#00e5ff] focus:ring-2 focus:ring-[#00e5ff]/20 transition-all placeholder:text-[#64748b];
 }
 
 @utility card-tech {
-  @apply bg-[#0c1016] border border-[#243041] rounded-[8px] p-5 relative overflow-hidden;
+  @apply bg-[#080d1a]/80 border border-white/[0.08] hover:border-white/[0.14] rounded-[12px] p-5 relative overflow-hidden backdrop-blur-xl shadow-xl transition-all;
 }
 
 @utility field-label {
-  @apply block text-[10px] font-bold text-[#8b96a4] uppercase tracking-widest mb-1.5 font-mono;
+  @apply block text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-1.5 font-mono;
 }
 
 /* ════════════════════════════════════════════════════════════
-   CANONICAL HUD PRIMITIVES — Instrument Workshop styling
+   CANONICAL HUD PRIMITIVES — Modern Instrument styling
    ════════════════════════════════════════════════════════════ */
 
 /* Instrument panel/card */
 @utility hud-card {
-  @apply rounded-[8px] border border-[#243041] p-5 relative overflow-hidden bg-[#0c1016];
+  @apply rounded-[12px] border border-white/[0.08] hover:border-white/[0.14] p-5 relative overflow-hidden bg-[#080d1a]/80 backdrop-blur-xl shadow-xl transition-all;
 }
 
 /* Section / panel heading — small mono caps with accent */
 @utility hud-section-title {
-  @apply text-[11px] font-mono font-bold uppercase tracking-[0.2em] flex items-center gap-2 text-[#3ad0e6];
+  @apply text-[11px] font-mono font-bold uppercase tracking-[0.2em] flex items-center gap-2 text-[#00e5ff];
 }
 
 /* Small dim label above an input or stat */
 @utility hud-label {
-  @apply block text-[10px] font-mono font-bold uppercase tracking-widest mb-1 text-[#8b96a4];
+  @apply block text-[10px] font-mono font-bold uppercase tracking-widest mb-1 text-[#94a3b8];
 }
 
 /* Large primary readout number */
 @utility hud-stat-value {
-  @apply font-mono font-bold tabular-nums tracking-tight leading-none text-[#e7edf4];
+  @apply font-mono font-bold tabular-nums tracking-tight leading-none text-[#f8fafc];
 }
 
 /* Hairline divider */
 @utility hud-divider {
-  @apply w-full h-px my-3 bg-[#243041];
+  @apply w-full h-px my-3 bg-white/[0.08];
 }
 
 /* Pill/chip toggle in its active state */
 @utility hud-chip-active {
-  background: rgba(58, 208, 230, 0.12);
-  border: 1px solid var(--cyan-dim);
+  background: rgba(0, 229, 255, 0.15);
+  border: 1px solid rgba(0, 229, 255, 0.4);
   color: var(--cyan);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
 }
 
 @utility calc-btn {
-  @apply w-full h-full rounded-[4px] font-bold flex items-center justify-center active:translate-y-[1px] transition-all select-none;
+  @apply w-full h-full rounded-[8px] font-bold flex items-center justify-center active:translate-y-[1px] transition-all select-none;
 }
 
 @utility calc-btn-func {
-  @apply bg-[#18202b] hover:bg-[#243041] text-[#c5cdd6] text-xs font-mono;
+  @apply bg-[#1e293b] hover:bg-[#334155] text-[#cbd5e1] hover:text-white text-xs font-mono border border-white/5;
 }
 
 @utility calc-btn-num {
-  @apply bg-[#121821] hover:bg-[#18202b] text-[#e7edf4] text-base font-mono;
+  @apply bg-[#0f172a] hover:bg-[#1e293b] text-[#f8fafc] text-base font-mono border border-white/5;
 }
 
 @utility calc-btn-accent {
-  @apply bg-[#1a8fa3] hover:bg-[#3ad0e6] text-[#07090c] font-mono font-bold;
+  @apply bg-gradient-to-r from-[#00e5ff] to-[#0284c7] hover:from-[#38bdf8] hover:to-[#0369a1] text-[#030712] font-mono font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)];
 }
 
 html,
@@ -197,21 +193,22 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  @apply bg-[#020408];
+  background-color: #030712;
   background-image:
-    radial-gradient(ellipse at 50% -20%, rgba(0, 229, 255, 0.04), transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.02), transparent 40%),
-    linear-gradient(to bottom, transparent, #020408 90%);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 85% 60%, rgba(99, 102, 241, 0.05), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 15% 40%, rgba(14, 165, 233, 0.04), transparent 50%);
 }
 
 @variant dark (&:where(.dark, .dark *));
 
 :is(html.dark body) {
-  --foreground-rgb: 236, 254, 255;
-  @apply bg-[#020408];
+  --foreground-rgb: 248, 250, 252;
+  background-color: #030712;
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.05), transparent 60%),
-    linear-gradient(to bottom, transparent, #020408 80%);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 229, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 85% 60%, rgba(99, 102, 241, 0.05), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 15% 40%, rgba(14, 165, 233, 0.04), transparent 50%);
 }
 
 /* ═══ THEME VARIANTS ═══ */
