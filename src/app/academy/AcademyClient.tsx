@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
@@ -25,8 +25,8 @@ const AcademyMvpHub = dynamic(
 
 export function AcademyClient() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-[#03060a] overflow-y-auto">
-      <Suspense fallback={<div className="min-h-screen bg-[#03060a]" />}>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-[#030712] overflow-y-auto">
+      <Suspense fallback={<div className="min-h-screen bg-[#030712]" />}>
         <AcademyMvpHub />
       </Suspense>
     </div>

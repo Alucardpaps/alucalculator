@@ -1,15 +1,16 @@
 'use client';
 
 /**
- * 🎓 ALUCALC ACADEMY MVP — 15 CURATED ENGINEERING UNITS
+ * 🎓 ALUCALC ENGINEERING ACADEMY CAMPUS 2.0
  * 
- * Interactive Hub featuring:
- * - 15 Verified Core Units (VDI 2230, ISO 281, ISO 6336, DIN 743, Euler-Bernoulli, FEA, Nesting, etc.)
- * - Normative Formulas & Theory
- * - Direct Live Solver Links
- * - Interactive 5-Question Multiple Choice Quizzes
- * - Verified PDF Certificate Generator (SHA-verification code)
- * - Local Progress Tracking (X / 15 Units)
+ * Complete Next-Gen Interactive Engineering Learning & Accreditation Campus:
+ * - 15 Verified Core Units (VDI 2230, ISO 281, ISO 6336, DIN 743, Euler Buckling, FEA, Nesting, etc.)
+ * - Gamified Engineer Rank & XP Progression HUD
+ * - Live Interactive Parameter Simulators (Bolt, Bearing, Beam, Gear, Column)
+ * - Step-by-Step Question Verification Quiz
+ * - Cryptographically Verified PDF Certificate Generator
+ * - Dedicated Interactive Labs Hub (Mohr's Circle, Beam Visualizer, Dynamics)
+ * - 50+ In-Depth Engineering Guides Catalog
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -17,420 +18,460 @@ import Link from 'next/link';
 import {
   GraduationCap, CheckCircle2, ChevronRight, Calculator,
   Award, BookOpen, Layers, Activity, Wrench, ShieldCheck,
-  Check, X, RotateCcw, ArrowRight, Sparkles, ExternalLink, Filter
+  Check, X, RotateCcw, ArrowRight, Sparkles, ExternalLink,
+  Search, Filter, Play, Zap, Flame, Compass, Eye, Trophy, Clock
 } from 'lucide-react';
 import { ACADEMY_MVP_UNITS, AcademyMvpUnit } from '@/data/academyMvpUnits';
-import { CertificateModal } from './CertificateModal';
+import { ACADEMY_ARTICLES } from '@/data/academyIndex';
+import { AcademyUnitModal } from './AcademyUnitModal';
 import { useI18nStore } from '@/store/i18nStore';
 
-const STORAGE_KEY = 'alucalc-academy-completed-units';
+const STORAGE_KEY_UNITS = 'alucalc-academy-completed-units';
+const STORAGE_KEY_XP = 'alucalc-academy-user-xp';
 
 export function AcademyMvpHub() {
   const { language } = useI18nStore();
   const tr = language === 'tr';
 
-  const [completedUnits, setCompletedUnits] = useState<string[]>([]);
-  const [selectedUnitId, setSelectedUnitId] = useState<string>(ACADEMY_MVP_UNITS[0].id);
+  // Navigation mode
+  const [campusMode, setCampusMode] = useState<'curriculum' | 'labs' | 'guides'>('curriculum');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
-  // Quiz state for selected unit
-  const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
-  const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
-  const [certificateOpen, setCertificateOpen] = useState<boolean>(false);
-  const [certUnit, setCertUnit] = useState<AcademyMvpUnit>(ACADEMY_MVP_UNITS[0]);
-  const [certScore, setCertScore] = useState<number>(100);
+  // Gamification state
+  const [completedUnits, setCompletedUnits] = useState<string[]>([]);
+  const [userXp, setUserXp] = useState<number>(0);
 
-  // Load completed units from localStorage
+  // Active Unit Modal state
+  const [selectedUnit, setSelectedUnit] = useState<AcademyMvpUnit | null>(null);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  // Load progress from localStorage
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setCompletedUnits(JSON.parse(raw));
+      const rawUnits = localStorage.getItem(STORAGE_KEY_UNITS);
+      if (rawUnits) setCompletedUnits(JSON.parse(rawUnits));
+
+      const rawXp = localStorage.getItem(STORAGE_KEY_XP);
+      if (rawXp) setUserXp(Number(rawXp));
     } catch {
       setCompletedUnits([]);
+      setUserXp(0);
     }
   }, []);
 
-  // Save completed units
-  const markUnitCompleted = (unitId: string) => {
+  // Handle unit completion & XP reward
+  const handleUnitCompleted = (unitId: string, earnedXp: number) => {
     setCompletedUnits((prev) => {
       if (prev.includes(unitId)) return prev;
       const updated = [...prev, unitId];
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        localStorage.setItem(STORAGE_KEY_UNITS, JSON.stringify(updated));
       } catch {}
       return updated;
     });
+
+    setUserXp((prev) => {
+      const newXp = prev + earnedXp;
+      try {
+        localStorage.setItem(STORAGE_KEY_XP, String(newXp));
+      } catch {}
+      return newXp;
+    });
   };
 
-  const selectedUnit = useMemo(
-    () => ACADEMY_MVP_UNITS.find((u) => u.id === selectedUnitId) || ACADEMY_MVP_UNITS[0],
-    [selectedUnitId]
-  );
+  // Engineer Rank Calculation
+  const engineerRank = useMemo(() => {
+    if (userXp >= 1500) {
+      return { title: tr ? 'Başmühendis & Baş Analist' : 'Principal Engineer', level: 5, color: '#f59e0b', nextXp: 2000 };
+    }
+    if (userXp >= 1000) {
+      return { title: tr ? 'Kıdemli Tasarım Mühendisi' : 'Senior Design Engineer', level: 4, color: '#a855f7', nextXp: 1500 };
+    }
+    if (userXp >= 500) {
+      return { title: tr ? 'Mekanik Tasarım Uzmanı' : 'Mechanical Specialist', level: 3, color: '#00e5ff', nextXp: 1000 };
+    }
+    if (userXp >= 200) {
+      return { title: tr ? 'Tasarım Mühendisi' : 'Design Engineer', level: 2, color: '#38bdf8', nextXp: 500 };
+    }
+    return { title: tr ? 'Aday / Çırak Mühendis' : 'Apprentice Engineer', level: 1, color: '#94a3b8', nextXp: 200 };
+  }, [userXp, tr]);
 
-  // Reset quiz state when switching units
-  useEffect(() => {
-    setUserAnswers({});
-    setQuizSubmitted(false);
-  }, [selectedUnitId]);
-
+  // Filter categories
   const categories = useMemo(() => {
     const cats = Array.from(new Set(ACADEMY_MVP_UNITS.map((u) => u.category)));
     return ['All', ...cats];
   }, []);
 
+  // Filtered units based on search & category
   const filteredUnits = useMemo(() => {
-    if (activeCategory === 'All') return ACADEMY_MVP_UNITS;
-    return ACADEMY_MVP_UNITS.filter((u) => u.category === activeCategory);
-  }, [activeCategory]);
-
-  const handleSelectOption = (questionId: string, optionIdx: number) => {
-    if (quizSubmitted) return;
-    setUserAnswers((prev) => ({ ...prev, [questionId]: optionIdx }));
-  };
-
-  const handleEvaluateQuiz = () => {
-    setQuizSubmitted(true);
-    let correct = 0;
-    selectedUnit.questions.forEach((q) => {
-      if (userAnswers[q.id] === q.correctIndex) {
-        correct++;
-      }
+    return ACADEMY_MVP_UNITS.filter((u) => {
+      const matchesCategory = activeCategory === 'All' || u.category === activeCategory;
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        u.titleTr.toLowerCase().includes(q) ||
+        u.titleEn.toLowerCase().includes(q) ||
+        u.standard.toLowerCase().includes(q) ||
+        u.summaryTr.toLowerCase().includes(q) ||
+        u.category.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
     });
+  }, [activeCategory, searchQuery]);
 
-    const scorePct = Math.round((correct / selectedUnit.questions.length) * 100);
-    if (scorePct >= 80) {
-      markUnitCompleted(selectedUnit.id);
-    }
-  };
-
-  const currentScore = useMemo(() => {
-    if (!quizSubmitted) return 0;
-    let correct = 0;
-    selectedUnit.questions.forEach((q) => {
-      if (userAnswers[q.id] === q.correctIndex) correct++;
-    });
-    return Math.round((correct / selectedUnit.questions.length) * 100);
-  }, [quizSubmitted, userAnswers, selectedUnit]);
-
-  const isPassed = currentScore >= 80;
-
-  const handleOpenCert = () => {
-    setCertUnit(selectedUnit);
-    setCertScore(currentScore > 0 ? currentScore : 100);
-    setCertificateOpen(true);
-  };
+  // Filtered technical guides
+  const filteredGuides = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return ACADEMY_ARTICLES;
+    return ACADEMY_ARTICLES.filter((a) =>
+      a.title.toLowerCase().includes(q) ||
+      a.description.toLowerCase().includes(q) ||
+      a.slug.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
 
   const progressPercent = Math.round((completedUnits.length / ACADEMY_MVP_UNITS.length) * 100);
 
+  const openUnit = (unit: AcademyMvpUnit) => {
+    setSelectedUnit(unit);
+    setModalOpen(true);
+  };
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6 text-slate-200">
-      {/* ─── TOP HEADER & PROGRESS ─── */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 border border-cyan-400/40 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25">
-            <GraduationCap size={24} />
-          </div>
-          <div>
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-8 text-slate-200 select-none">
+      
+      {/* ─── 1. CAMPUS HERO & PROGRESSION HUD ─── */}
+      <section className="relative rounded-3xl bg-gradient-to-r from-[#080d1a] via-[#050914] to-[#02050c] border border-white/10 p-6 sm:p-8 shadow-2xl overflow-hidden">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Hero Left Content */}
+          <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                AluCalc Engineering Academy
-              </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                15 MVP Units
+              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
+                <Sparkles size={13} />
+                <span>AluCalc OS Engineering Campus</span>
               </span>
+              <span className="text-xs font-mono text-slate-500">ISO / DIN / VDI Akredite</span>
             </div>
-            <p className="text-xs font-mono text-slate-400 mt-0.5">
-              {tr
-                ? 'Normatif Mühendislik Teorisi · Canlı Hesaplama · İnteraktif Sınav · Doğrulanabilir PDF Sertifika'
-                : 'Normative Theory · Interactive Solvers · Verification Quizzes · Official PDF Certificates'}
+
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Mühendislik Akademisi & Sertifikasyon
+            </h1>
+
+            <p className="text-sm text-slate-400 leading-relaxed font-normal">
+              15 doğrulanmış temel müfredat ünitesi, canlı simülasyon laboratuvarları, formül türetimleri ve resmi kriptografik PDF sertifikalarıyla mekanik tasarım yetkinliğinizi belgeleyin.
             </p>
           </div>
-        </div>
 
-        {/* Global Progress Bar */}
-        <div className="flex flex-col sm:items-end gap-1.5 font-mono text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-slate-400">{tr ? 'Müfredat İlerlemesi:' : 'Curriculum Progress:'}</span>
-            <span className="font-black text-cyan-300">
-              {completedUnits.length} / {ACADEMY_MVP_UNITS.length} {tr ? 'Ünite' : 'Units'} ({progressPercent}%)
-            </span>
-          </div>
-          <div className="w-full sm:w-48 h-2 bg-black/60 rounded-full overflow-hidden border border-white/10">
-            <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-500 rounded-full"
-              style={{ width: `${progressPercent}%` }}
-            />
+          {/* Gamified Engineer Rank & XP Card */}
+          <div className="p-5 rounded-2xl bg-black/50 border border-white/10 backdrop-blur-md space-y-3 min-w-[280px] lg:w-80 shrink-0 font-mono shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-400 uppercase font-semibold">Mühendislik Rütbesi</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Seviye {engineerRank.level}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-950 font-bold shadow"
+                style={{ backgroundColor: engineerRank.color }}
+              >
+                <Trophy size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white leading-tight">{engineerRank.title}</p>
+                <p className="text-xs text-cyan-400 mt-0.5">{userXp} XP <span className="text-slate-500 font-normal">/ {engineerRank.nextXp} XP</span></p>
+              </div>
+            </div>
+
+            {/* Curriculum Progress Bar */}
+            <div className="space-y-1 pt-1 border-t border-white/5">
+              <div className="flex justify-between text-[11px] text-slate-400">
+                <span>Tamamlanan Ünite:</span>
+                <strong className="text-white">{completedUnits.length} / {ACADEMY_MVP_UNITS.length} (%{progressPercent})</strong>
+              </div>
+              <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
+                <div
+                  className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      {/* ─── CATEGORY FILTER PILLS ─── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {categories.map((cat) => (
+      {/* ─── 2. CAMPUS MODE TABS & LIVE SEARCH ─── */}
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+        {/* 3 Main View Tabs */}
+        <div className="flex items-center gap-2 font-mono text-xs overflow-x-auto pb-1">
           <button
-            key={cat}
             type="button"
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all whitespace-nowrap ${
-              activeCategory === cat
-                ? 'bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 shadow-md'
+            onClick={() => setCampusMode('curriculum')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
+              campusMode === 'curriculum'
+                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
                 : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
           >
-            {cat}
+            <GraduationCap size={16} />
+            <span>1. {tr ? 'Akredite Müfredat (15 Ünite)' : 'Curriculum Units'}</span>
           </button>
-        ))}
-      </div>
 
-      {/* ─── MAIN 2-COLUMN WORKBENCH ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* LEFT COLUMN: 15-Unit Navigation List (4 Cols) */}
-        <div className="lg:col-span-4 space-y-2 max-h-[750px] overflow-y-auto pr-1">
-          {filteredUnits.map((u) => {
-            const isCompleted = completedUnits.includes(u.id);
-            const isSelected = u.id === selectedUnitId;
-            return (
+          <button
+            type="button"
+            onClick={() => setCampusMode('labs')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
+              campusMode === 'labs'
+                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
+                : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Activity size={16} />
+            <span>2. {tr ? 'İnteraktif Laboratuvarlar' : 'Interactive Labs'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCampusMode('guides')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
+              campusMode === 'guides'
+                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
+                : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <BookOpen size={16} />
+            <span>3. {tr ? 'Teknik Kılavuzlar (50+)' : 'Technical Guides'}</span>
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative w-full md:w-72">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={tr ? 'Ünite, formül veya standart ara...' : 'Search units or standards...'}
+            className="w-full bg-[#080d1a] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition"
+          />
+        </div>
+      </section>
+
+      {/* ─── 3. VIEW 1: CURRICULUM TRACKS (15 UNITS) ─── */}
+      {campusMode === 'curriculum' && (
+        <section className="space-y-6">
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 font-mono text-xs">
+            {categories.map((cat) => (
               <button
-                key={u.id}
+                key={cat}
                 type="button"
-                onClick={() => setSelectedUnitId(u.id)}
-                className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 group ${
-                  isSelected
-                    ? 'bg-gradient-to-r from-blue-950/60 to-cyan-950/40 border-cyan-500/60 shadow-lg shadow-cyan-500/10'
-                    : 'bg-[#080d1a] border-white/5 hover:border-white/15 hover:bg-[#0c1222]'
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
+                  activeCategory === cat
+                    ? 'bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 font-bold shadow'
+                    : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono text-xs font-black shrink-0 ${
-                      isCompleted
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                        : isSelected
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                        : 'bg-white/5 text-slate-400 border border-white/10'
-                    }`}
-                  >
-                    {isCompleted ? <Check size={14} /> : u.unitNumber}
-                  </div>
-                  <div className="truncate">
-                    <p className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-slate-300'}`}>
-                      {tr ? u.titleTr : u.titleEn}
-                    </p>
-                    <p className="text-[10px] font-mono text-slate-500 truncate mt-0.5">
-                      {u.standard} · {u.category}
-                    </p>
-                  </div>
-                </div>
-
-                <ChevronRight
-                  size={14}
-                  className={`shrink-0 transition-transform ${
-                    isSelected ? 'text-cyan-400 translate-x-1' : 'text-slate-600 group-hover:text-slate-400'
-                  }`}
-                />
+                {cat}
               </button>
-            );
-          })}
-        </div>
-
-        {/* RIGHT COLUMN: Active Unit Detail, Theory, Formulas, Live Solver & Quiz (8 Cols) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Unit Header Card */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
-              <div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  Unit {selectedUnit.unitNumber} · {selectedUnit.standard}
-                </span>
-                <h2 className="text-lg sm:text-xl font-black text-white mt-1.5">
-                  {tr ? selectedUnit.titleTr : selectedUnit.titleEn}
-                </h2>
-              </div>
-
-              {/* Direct Link to Live Solver */}
-              <Link
-                href={selectedUnit.solverRoute}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25 text-xs font-mono font-bold transition-all shadow-md active:scale-95"
-              >
-                <Calculator size={14} />
-                <span>{tr ? 'Canlı Çözücüyü Aç' : 'Open Live Solver'}</span>
-                <ExternalLink size={12} />
-              </Link>
-            </div>
-
-            {/* Theory Explanation */}
-            <div className="space-y-3 text-xs leading-relaxed text-slate-300 font-sans">
-              <p>{tr ? selectedUnit.theoryTr : selectedUnit.theoryEn}</p>
-            </div>
-
-            {/* Normative Formulas Grid */}
-            <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3 font-mono text-xs">
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                <BookOpen size={13} />
-                <span>{tr ? 'Temel Normatif Formüller' : 'Governing Normative Formulas'}</span>
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {selectedUnit.formulas.map((f, idx) => (
-                  <div key={idx} className="p-2.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
-                    <span className="text-[10px] text-slate-400 font-sans">{f.label}</span>
-                    <p className="text-xs font-bold text-amber-300 overflow-x-auto whitespace-nowrap">{f.latex}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* ─── INTERACTIVE QUIZ SECTION ─── */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-6 shadow-xl font-sans">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={18} className="text-cyan-400" />
-                <h3 className="text-sm font-black text-white uppercase tracking-wider font-mono">
-                  {tr ? 'Teknik Doğrulama Sınavı (5 Soru)' : 'Technical Verification Quiz (5 Questions)'}
-                </h3>
-              </div>
-              <span className="text-xs font-mono text-slate-400">
-                {tr ? 'Geçme Notu: %80 (En az 4 doğru)' : 'Pass Threshold: 80% (Min 4 correct)'}
-              </span>
-            </div>
+          {/* Units Card Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredUnits.map((u) => {
+              const isCompleted = completedUnits.includes(u.id);
 
-            {/* Questions List */}
-            <div className="space-y-6">
-              {selectedUnit.questions.map((q, qIndex) => {
-                const selectedOpt = userAnswers[q.id];
-                const isAnswered = selectedOpt !== undefined;
-                const isCorrect = selectedOpt === q.correctIndex;
-
-                return (
-                  <div key={q.id} className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                    <p className="text-xs font-bold text-slate-200">
-                      <span className="text-cyan-400 font-mono mr-2">{qIndex + 1}.</span>
-                      {tr ? q.questionTr : q.questionEn}
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {(tr ? q.optionsTr : q.optionsEn).map((opt, oIndex) => {
-                        const isThisSelected = selectedOpt === oIndex;
-                        const isThisCorrectAnswer = oIndex === q.correctIndex;
-
-                        let btnClass = 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10';
-                        if (quizSubmitted) {
-                          if (isThisCorrectAnswer) {
-                            btnClass = 'bg-emerald-950/60 border-emerald-500/80 text-emerald-300 font-bold';
-                          } else if (isThisSelected && !isCorrect) {
-                            btnClass = 'bg-rose-950/60 border-rose-500/80 text-rose-300';
-                          }
-                        } else if (isThisSelected) {
-                          btnClass = 'bg-cyan-950/80 border-cyan-500 text-cyan-200 font-bold';
-                        }
-
-                        return (
-                          <button
-                            key={oIndex}
-                            type="button"
-                            disabled={quizSubmitted}
-                            onClick={() => handleSelectOption(q.id, oIndex)}
-                            className={`p-3 rounded-xl border text-xs text-left transition-all ${btnClass}`}
-                          >
-                            <span className="font-mono text-[10px] text-slate-500 mr-1.5">
-                              {String.fromCharCode(65 + oIndex)}.
-                            </span>
-                            <span>{opt}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Feedback Explanation */}
-                    {quizSubmitted && (
-                      <div
-                        className={`p-2.5 rounded-xl text-[11px] font-mono leading-relaxed border ${
-                          isCorrect
-                            ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300'
-                            : 'bg-rose-950/30 border-rose-500/30 text-rose-300'
-                        }`}
-                      >
-                        <span className="font-bold mr-1">{isCorrect ? '✓ Doğru:' : '✗ Yanlış:'}</span>
-                        {tr ? q.explanationTr : q.explanationEn}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Quiz Action Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
-              {!quizSubmitted ? (
-                <button
-                  type="button"
-                  disabled={Object.keys(userAnswers).length < selectedUnit.questions.length}
-                  onClick={handleEvaluateQuiz}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-cyan-500/25"
+              return (
+                <div
+                  key={u.id}
+                  onClick={() => openUnit(u)}
+                  className="p-5 rounded-3xl bg-[#080d1a]/90 hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/40 transition-all duration-200 shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between space-y-4 group cursor-pointer"
                 >
-                  {tr ? 'Cevapları Gönder & Değerlendir' : 'Submit & Evaluate Answers'}
-                </button>
-              ) : (
-                <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`px-3 py-1.5 rounded-xl font-mono text-xs font-black border ${
-                        isPassed
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                          : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                      }`}
-                    >
-                      {tr ? 'Puan: %' : 'Score: '}{currentScore}% ({isPassed ? (tr ? 'BAŞARILI' : 'PASSED') : (tr ? 'TEKRAR DENE' : 'RETRY')})
-                    </div>
-                    {isPassed && (
-                      <span className="text-xs font-mono text-emerald-400">
-                        {tr ? '✓ Ünite Tamamlandı & Sertifikaya Hak Kazandınız!' : '✓ Unit Completed & Certificate Unlocked!'}
+                  {/* Card Header */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-mono text-xs font-black text-cyan-300">
+                        {u.unitNumber}
                       </span>
-                    )}
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                          {u.standard}
+                        </span>
+                        {isCompleted && (
+                          <span className="p-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                            <Check size={12} />
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider block">
+                        {u.category}
+                      </span>
+                      <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors mt-0.5">
+                        {tr ? u.titleTr : u.titleEn}
+                      </h3>
+                    </div>
+
+                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                      {tr ? u.summaryTr : u.summaryEn}
+                    </p>
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Card Footer Actions */}
+                  <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <Clock size={12} /> 10-15 dk
+                    </span>
+
                     <button
                       type="button"
-                      onClick={() => {
-                        setUserAnswers({});
-                        setQuizSubmitted(false);
-                      }}
-                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono transition-all"
+                      className="inline-flex items-center gap-1.5 font-bold text-cyan-400 group-hover:text-cyan-300 transition-colors"
                     >
-                      <RotateCcw size={12} className="inline mr-1" />
-                      {tr ? 'Tekrar Çöz' : 'Retake'}
+                      <span>{isCompleted ? (tr ? 'Tekrar İncele' : 'Review Unit') : (tr ? 'Derse Başla' : 'Start Lesson')}</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </button>
-
-                    {isPassed && (
-                      <button
-                        type="button"
-                        onClick={handleOpenCert}
-                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/30 flex items-center gap-1.5"
-                      >
-                        <Award size={14} />
-                        <span>{tr ? 'PDF Sertifikasını Al' : 'Claim Certificate'}</span>
-                      </button>
-                    )}
                   </div>
                 </div>
-              )}
-            </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        </section>
+      )}
 
-      {/* Official Certificate Modal */}
-      <CertificateModal
-        isOpen={certificateOpen}
-        onClose={() => setCertificateOpen(false)}
-        completedCount={completedUnits.length}
-        unitTitle={tr ? certUnit.titleTr : certUnit.titleEn}
-        unitStandard={certUnit.standard}
-        score={certScore}
-      />
+      {/* ─── 4. VIEW 2: INTERACTIVE LABS SHOWCASE ─── */}
+      {campusMode === 'labs' && (
+        <section className="space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-white">İnteraktif Deney & Simülasyon Odaları</h2>
+            <p className="text-xs text-slate-400">
+              Formüllerin fiziksel davranışlarını gerçek zamanlı 3D ve 2D parametrelerle test edebileceğiniz laboratuvarlar.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Lab 1: Dynamics & Vibration */}
+            <Link
+              href="/academy/dynamics"
+              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/40 p-6 space-y-4 shadow-xl transition group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+                <Activity size={24} />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-cyan-400">Dinamik & Titreşim</span>
+                <h3 className="text-lg font-bold text-white group-hover:text-cyan-300">Dinamik Sistemler Simülatörü</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sönümlü serbest titreşim, rezonans frekansı ve harmonik zorlamalı hareket denklemlerini grafik üzerinde interaktif test edin.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400">
+                <span>Laboratuvara Gir</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Lab 2: Additive Manufacturing */}
+            <Link
+              href="/academy/additive-manufacturing"
+              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-purple-500/40 p-6 space-y-4 shadow-xl transition group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+                <Layers size={24} />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-purple-400">İleri İmalat</span>
+                <h3 className="text-lg font-bold text-white group-hover:text-purple-300">Katmanlı İmalat & Topoloji</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  3D baskı parametreleri, dolgu geometrileri, anizotropik mukavemet ve DfAM (Design for Additive Manufacturing) kuralları.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-mono font-bold text-purple-400">
+                <span>Laboratuvara Gir</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Lab 3: Sandbox Visualizer */}
+            <Link
+              href="/academy/sandbox"
+              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-emerald-500/40 p-6 space-y-4 shadow-xl transition group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                <Compass size={24} />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-emerald-400">Yapısal Deney</span>
+                <h3 className="text-lg font-bold text-white group-hover:text-emerald-300">Kiriş & Sehim Sandbox</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Serbest mesnetli, ankastre ve konsol kirişlerde yayılı ve tekil yüklerin oluşturduğu eğilme momenti ve sehim eğrileri.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
+                <span>Laboratuvara Gir</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* ─── 5. VIEW 3: TECHNICAL GUIDES & ARTICLES (50+) ─── */}
+      {campusMode === 'guides' && (
+        <section className="space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-white">Derinlemesine Mühendislik Kılavuzları ({filteredGuides.length})</h2>
+            <p className="text-xs text-slate-400">
+              Formül arkasındaki mantığı, endüstriyel vaka incelemelerini ve pratik atölye hesaplarını açıklayan detaylı rehberler.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredGuides.map((guide) => (
+              <Link
+                key={guide.slug}
+                href={`/academy/${guide.slug}`}
+                className="p-5 rounded-2xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/30 transition flex items-start justify-between gap-4 group shadow-lg"
+              >
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-mono font-bold uppercase text-cyan-400">Teknik Kılavuz</span>
+                  <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                    {guide.title}
+                  </h4>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                    {guide.description}
+                  </p>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white/5 group-hover:bg-cyan-500 group-hover:text-slate-950 text-slate-400 transition shrink-0 mt-1">
+                  <ChevronRight size={16} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── 6. INTERACTIVE FULL-FEATURED UNIT WORKBENCH MODAL ─── */}
+      {selectedUnit && (
+        <AcademyUnitModal
+          unit={selectedUnit}
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onUnitCompleted={handleUnitCompleted}
+          isCompleted={completedUnits.includes(selectedUnit.id)}
+          tr={tr}
+        />
+      )}
+
     </div>
   );
 }
-
-export default AcademyMvpHub;
