@@ -220,28 +220,28 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-white/10 bg-[#05080e]/95 backdrop-blur-2xl transition-all duration-300 select-none z-40 shrink-0 sticky self-start overflow-hidden ${
-        topOffsetClass || 'top-12 h-[calc(100vh-3rem)]'
+      className={`hidden lg:flex flex-col border-r border-[var(--line)] bg-[var(--bg-1)] transition-all duration-200 select-none z-40 shrink-0 sticky self-start overflow-hidden ${
+        topOffsetClass || 'top-[52px] h-[calc(100vh-52px)]'
       } ${
-        collapsed ? 'w-16' : 'w-72'
+        collapsed ? 'w-16' : 'w-[272px]'
       }`}
     >
       {/* ─── SIDEBAR TOP SEARCH & TOGGLE ─── */}
-      <div className="flex h-11 items-center justify-between px-2.5 border-b border-white/5 bg-[#03060a]">
+      <div className="flex h-10 items-center justify-between px-3 border-b border-[var(--line)] bg-[var(--bg-0)]">
         {!collapsed ? (
           <div className="flex items-center justify-between w-full gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--alu-dim)]">
                 {c.workspace}
               </span>
-              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/5 border border-white/10 text-cyan-400 font-bold">
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] text-[var(--cyan)] font-bold">
                 {totalToolCount}
               </span>
             </div>
             <button
               type="button"
               onClick={toggleCollapse}
-              className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors shrink-0"
+              className="rounded-[var(--radius-s)] p-1 text-[var(--alu-dim)] hover:text-white hover:bg-[var(--bg-2)] transition-colors shrink-0"
               title={c.collapse}
             >
               <ChevronLeft size={14} />
@@ -251,7 +251,7 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
           <button
             type="button"
             onClick={toggleCollapse}
-            className="mx-auto rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+            className="mx-auto rounded-[var(--radius-s)] p-1 text-[var(--alu-dim)] hover:text-white hover:bg-[var(--bg-2)] transition-colors"
             title={c.expand}
           >
             <ChevronRight size={15} />
@@ -261,21 +261,21 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
 
       {/* ─── SEARCH BAR & QUICK FILTERS (Visible when Expanded) ─── */}
       {!collapsed && (
-        <div className="p-2 border-b border-white/5 bg-[#070b12]/50 space-y-2">
+        <div className="p-2 border-b border-[var(--line)] bg-[var(--bg-0)] space-y-1.5">
           <div className="relative">
-            <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={12} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--alu-dim)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={c.searchTools.replace('{n}', String(totalToolCount))}
-              className="w-full rounded-xl border border-white/10 bg-black/40 py-1.5 pl-8 pr-3 text-[11px] font-mono text-slate-200 placeholder-slate-500 outline-none focus:border-cyan-400 transition-all"
+              className="w-full rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--bg-2)] py-1.5 pl-7 pr-3 text-[11px] font-mono text-[var(--ink)] placeholder-[var(--alu-dim)]/60 outline-none focus:border-[var(--cyan)] transition-colors"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-500 hover:text-white"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--alu-dim)] hover:text-white"
               >
                 ✕
               </button>
@@ -285,21 +285,21 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
           {/* Featured / Lite Hub Direct Shortcut */}
           <Link
             href="/lite"
-            className={`w-full group flex items-center justify-between px-2.5 py-1.5 rounded-xl border transition-all ${
+            className={`w-full group flex items-center justify-between px-2.5 py-1.5 rounded-[var(--radius-s)] border transition-colors ${
               pathname === '/lite'
-                ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200 font-bold shadow-[0_0_15px_rgba(0,229,255,0.15)]'
-                : 'bg-gradient-to-r from-cyan-950/30 to-blue-950/20 border-cyan-500/20 text-slate-300 hover:border-cyan-400/60 hover:text-white'
+                ? 'bg-[var(--bg-3)] border-[var(--cyan)] text-[var(--cyan)] font-bold'
+                : 'bg-[var(--bg-2)] border-[var(--line)] text-[var(--alu)] hover:border-[var(--line-strong)] hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 group-hover:scale-115 group-hover:rotate-12 transition-all duration-300">
-                <LayoutGrid size={13} className="transition-transform duration-300 group-hover:scale-110" />
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[var(--radius-s)] bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 text-[var(--cyan)]">
+                <LayoutGrid size={12} />
               </div>
               <span className="text-[11px] font-mono font-bold tracking-tight">
                 {c.liteHub.replace('{n}', TOTAL_CALCULATORS_LABEL)}
               </span>
             </div>
-            <span className="text-[8px] font-mono font-black uppercase px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            <span className="text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-[var(--radius-s)] bg-[var(--cyan)]/10 text-[var(--cyan)] border border-[var(--cyan)]/30">
               GRID
             </span>
           </Link>
@@ -307,13 +307,13 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
       )}
 
       {/* ─── NAVIGATION SCROLL AREA ─── */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-3 space-y-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-1.5 py-2 space-y-3 custom-scrollbar">
         {filteredGroups.map((group) => (
-          <div key={group.id} className="space-y-1">
+          <div key={group.id} className="space-y-0.5">
             {!collapsed && (
-              <div className="px-2 py-1.5 text-[9px] font-mono font-black tracking-wider text-slate-500 uppercase flex items-center justify-between">
+              <div className="px-2 py-1 text-[10px] font-mono font-bold tracking-wider text-[var(--alu-dim)] uppercase flex items-center justify-between">
                 <span>{getLocalizedNavTitle(group.id, language)}</span>
-                <span className="text-[8px] text-slate-600 font-normal">({group.items.length})</span>
+                <span className="text-[9px] text-[var(--alu-dim)]/60 font-normal">({group.items.length})</span>
               </div>
             )}
 
@@ -327,10 +327,10 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
                     key={item.id}
                     href={item.href}
                     title={collapsed ? localizedLabel : undefined}
-                    className={`group relative flex items-center gap-2 rounded-xl px-2 py-1.5 text-xs font-bold transition-all ${
+                    className={`group relative flex items-center gap-2 rounded-[var(--radius-s)] px-2 py-1.5 text-xs transition-colors ${
                       isActive
-                        ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-[0_0_15px_rgba(0,229,255,0.1)] font-black'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                        ? 'bg-[var(--bg-3)] text-[var(--cyan)] border-l-2 border-[var(--cyan)] font-bold pl-2.5'
+                        : 'text-[var(--alu-dim)] hover:bg-[var(--bg-2)] hover:text-[var(--ink)] border-l-2 border-transparent'
                     }`}
                   >
                     <SidebarAnimatedIcon
@@ -348,11 +348,11 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
 
                     {!collapsed && item.badge && (
                       <span
-                        className="px-1.5 py-0.5 rounded text-[8px] font-mono font-black uppercase"
+                        className="px-1.5 py-0.5 rounded-[var(--radius-s)] text-[8px] font-mono font-bold uppercase"
                         style={{
-                          backgroundColor: `${item.color || '#00e5ff'}15`,
-                          borderColor: `${item.color || '#00e5ff'}30`,
-                          color: item.color || '#00e5ff',
+                          backgroundColor: `${item.color || 'var(--cyan)'}15`,
+                          borderColor: `${item.color || 'var(--cyan)'}30`,
+                          color: item.color || 'var(--cyan)',
                           borderWidth: '1px'
                         }}
                       >
@@ -368,7 +368,7 @@ export function DesktopSidebar({ topOffsetClass }: { topOffsetClass?: string }) 
       </div>
 
       {/* ─── BOTTOM AEGIS COPILOT & UPWARD EXPANDING BUBBLE ─── */}
-      <div className="border-t border-white/5 p-2 bg-[#03060a]">
+      <div className="border-t border-[var(--line)] p-1.5 bg-[var(--bg-0)]">
         <AegisSidebarBubble collapsed={collapsed} />
       </div>
     </aside>

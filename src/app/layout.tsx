@@ -1,5 +1,19 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+
+const inter = Inter({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-inter',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-jetbrains-mono',
+});
+
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { GoogleAnalytics } from "@/components/os/GoogleAnalytics";
 
@@ -11,7 +25,7 @@ import { ThemeSettingsProvider } from "@/components/os/ThemeSettingsProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 
 export const viewport: Viewport = {
-    themeColor: '#020408',
+    themeColor: '#07090c',
     width: 'device-width',
     initialScale: 1,
 };
@@ -83,7 +97,7 @@ export default function RootLayout({
     return (
         <html lang="en" className="dark">
             <body
-                className="font-sans h-full w-full bg-[#020408] text-slate-200 selection:bg-blue-500/30"
+                className={`${inter.variable} ${jetbrainsMono.variable} font-sans h-full w-full bg-[var(--bg-0)] text-[var(--ink)] selection:bg-[var(--cyan-glow)]`}
                 suppressHydrationWarning
             >
                 <ThemeSettingsProvider />

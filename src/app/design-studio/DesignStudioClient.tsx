@@ -13,32 +13,32 @@ import { useDesignStore } from '@/design-studio/designStore';
 import { generateSolidFromPrompt } from '@/engines/cad/AegisGenerativeEngine';
 
 const StudioLoadingFallback = ({ title, sub }: { title: string; sub: string }) => (
-  <div className="w-full h-full min-h-[500px] flex flex-col items-center justify-center bg-[#05080c] px-4 text-center">
-    <div className="max-w-md w-full p-6 rounded-2xl bg-[#080d1a] border border-cyan-500/20 shadow-2xl space-y-4">
-      <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+  <div className="w-full h-full min-h-[500px] flex flex-col items-center justify-center bg-[var(--bg-0)] px-4 text-center">
+    <div className="max-w-md w-full p-6 rounded-[var(--radius-m)] bg-[var(--bg-1)] border border-[var(--line)] shadow-2xl space-y-4">
+      <div className="w-12 h-12 rounded-[var(--radius-s)] bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 flex items-center justify-center mx-auto text-[var(--cyan)]">
         <Box className="w-6 h-6 animate-pulse" />
       </div>
       <div>
-        <h2 className="text-base font-bold text-white tracking-tight">{title}</h2>
-        <p className="text-xs text-slate-400 mt-1 font-mono">{sub}</p>
+        <h2 className="text-base font-bold text-[var(--ink)] tracking-tight uppercase font-mono">{title}</h2>
+        <p className="text-xs text-[var(--alu-dim)] mt-1 font-mono">{sub}</p>
       </div>
 
       {/* Animated Loading Progress */}
-      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-        <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full w-2/3 animate-pulse" />
+      <div className="w-full bg-[var(--bg-2)] rounded-[var(--radius-s)] h-1.5 overflow-hidden border border-[var(--line)]">
+        <div className="bg-[var(--cyan)] h-full w-2/3 animate-pulse" />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5 text-[11px] font-mono text-slate-300">
-        <div className="p-2 rounded-lg bg-white/5 border border-white/5 flex flex-col items-center gap-1">
-          <Box size={14} className="text-cyan-400" />
+      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[var(--line)] text-[11px] font-mono text-[var(--alu)]">
+        <div className="p-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] flex flex-col items-center gap-1">
+          <Box size={14} className="text-[var(--cyan)]" />
           <span>WebGL 3D</span>
         </div>
-        <div className="p-2 rounded-lg bg-white/5 border border-white/5 flex flex-col items-center gap-1">
-          <Pencil size={14} className="text-purple-400" />
+        <div className="p-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] flex flex-col items-center gap-1">
+          <Pencil size={14} className="text-[var(--std)]" />
           <span>2D Drafting</span>
         </div>
-        <div className="p-2 rounded-lg bg-white/5 border border-white/5 flex flex-col items-center gap-1">
-          <Sparkles size={14} className="text-amber-400" />
+        <div className="p-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] flex flex-col items-center gap-1">
+          <Sparkles size={14} className="text-[var(--warn)]" />
           <span>Parametric</span>
         </div>
       </div>
@@ -136,46 +136,46 @@ export function DesignStudioClient() {
   };
 
   return (
-    <div className="w-full h-[calc(100dvh-3.5rem)] pb-16 sm:pb-0 flex flex-col overflow-hidden bg-[#05080c] select-none">
+    <div className="w-full h-[calc(100dvh-3.5rem)] pb-16 sm:pb-0 flex flex-col overflow-hidden bg-[var(--bg-0)] select-none">
       {/* ─── Mode Switcher Header (3D / 2D / Invent) ─── */}
-      <div className="flex-none flex items-center justify-center p-1.5 border-b border-white/10 bg-[#070b12] z-30 shadow-md">
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-black/60 border border-white/10 shadow-inner">
+      <div className="flex-none flex items-center justify-center p-1.5 border-b border-[var(--line)] bg-[var(--bg-1)] z-30">
+        <div className="flex items-center gap-1 p-1 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] font-mono">
           <button
             type="button"
             onClick={() => setActiveTab('3d')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === '3d'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
+                : 'text-[var(--alu-dim)] hover:text-white'
             }`}
           >
-            <Box size={14} />
+            <Box size={13} />
             <span>3D</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('2d')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === '2d'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
+                : 'text-[var(--alu-dim)] hover:text-white'
             }`}
           >
-            <Pencil size={14} />
+            <Pencil size={13} />
             <span>2D</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('invent')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-black transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === 'invent'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
+                : 'text-[var(--alu-dim)] hover:text-white'
             }`}
           >
-            <Sparkles size={14} className="text-cyan-300" />
+            <Sparkles size={13} className={activeTab === 'invent' ? 'text-[var(--bg-0)]' : 'text-[var(--cyan)]'} />
             <span>Invent</span>
           </button>
         </div>
@@ -213,16 +213,16 @@ export function DesignStudioClient() {
 
         {/* Invent AI Tab */}
         {activeTab === 'invent' && (
-          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[#070b14] space-y-6 overflow-y-auto custom-scrollbar">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
-              <Wand2 size={32} className="animate-pulse" />
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[var(--bg-0)] space-y-6 overflow-y-auto custom-scrollbar">
+            <div className="w-14 h-14 rounded-[var(--radius-s)] bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 flex items-center justify-center text-[var(--cyan)]">
+              <Wand2 size={28} className="animate-pulse" />
             </div>
 
             <div className="max-w-lg space-y-2">
-              <h2 className="text-xl font-black text-white flex items-center justify-center gap-2">
+              <h2 className="text-lg font-mono font-bold text-[var(--ink)] flex items-center justify-center gap-2 uppercase">
                 <span>{tr ? 'AeGiS Yapay Zeka CAD Üretici' : 'AeGiS Generative CAD Engine'}</span>
               </h2>
-              <p className="text-xs text-slate-400 leading-relaxed font-mono">
+              <p className="text-xs text-[var(--alu-dim)] leading-relaxed font-sans">
                 {tr
                   ? 'Doğal dilde istediğiniz her türlü mekanik parçayı tarif edin. Sistem ölçüleri, metrik delikleri, federleri ve malzemeyi otomatik çözümler ve 3D katı modelini oluşturur.'
                   : 'Describe any mechanical part in natural language. The engine calculates geometry, metric hole patterns, and material to synthesize a full 3D solid.'}
@@ -240,7 +240,7 @@ export function DesignStudioClient() {
                   }
                 }}
                 placeholder={tr ? 'Örn: 4 delikli M12 flanş, 50x50 L braket, Ø25x120 kamalı mil...' : 'e.g., 4-hole M12 flange, 50x50 L-bracket, Ø25x120 keyway shaft...'}
-                className="w-full p-4 rounded-2xl bg-black/80 border border-cyan-500/40 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-cyan-400 shadow-inner"
+                className="w-full p-3.5 rounded-[var(--radius-s)] bg-[var(--bg-1)] border border-[var(--line)] text-[var(--ink)] text-xs placeholder-[var(--alu-dim)]/50 focus:outline-none focus:border-[var(--cyan)]"
               />
 
               {/* Quick Preset Prompts */}
@@ -259,7 +259,7 @@ export function DesignStudioClient() {
                     onClick={() => {
                       setInventPrompt(item.prompt);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-[10px] hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-500/30 transition-all"
+                    className="px-2.5 py-1 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] text-[var(--alu)] text-[10px] hover:bg-[var(--bg-3)] hover:text-[var(--cyan)] hover:border-[var(--cyan)]/30 transition-colors"
                   >
                     {tr ? item.tr : item.en}
                   </button>
@@ -270,9 +270,9 @@ export function DesignStudioClient() {
                 type="button"
                 onClick={handleGenerateSolid}
                 disabled={!inventPrompt.trim() || inventLoading}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-slate-950 text-xs font-black uppercase tracking-wider disabled:opacity-40 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+                className="w-full py-3 rounded-[var(--radius-s)] bg-[var(--cyan)] hover:bg-[var(--cyan-dim)] text-[var(--bg-0)] hover:text-white text-xs font-bold uppercase tracking-wider disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
               >
-                <Wand2 size={16} className={inventLoading ? 'animate-spin' : ''} />
+                <Wand2 size={15} className={inventLoading ? 'animate-spin' : ''} />
                 <span>{inventLoading ? (tr ? '3D Katı Model Çözümleniyor...' : 'Synthesizing 3D Solid...') : (tr ? '✨ 3D Katı Modeli Çiz & Aç' : '✨ Generate & Open 3D Solid')}</span>
               </button>
             </div>

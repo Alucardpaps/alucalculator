@@ -352,40 +352,40 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
         <WindowContent type={type} />
       </div>
       <SolverTransparencyDrawer solverId={moduleSlug} />
-      <section className="shrink-0 border-t border-white/[0.06] bg-[#0a0c12]" aria-label="Calculation methodology">
+      <section className="shrink-0 border-t border-[var(--line)] bg-[var(--bg-1)]" aria-label="Calculation methodology">
         <details className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
-          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-white/30 hover:text-white/50 [&::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-[var(--alu-dim)]/50 hover:text-[var(--alu-dim)] [&::-webkit-details-marker]:hidden">
             <span className="inline-flex items-center gap-2">
-              <span className="text-white/20">▸</span>
+              <span className="text-[var(--alu-dim)]/40">▸</span>
               Formula · assumptions · example
-              <span className="font-mono font-normal normal-case tracking-normal text-white/20">
+              <span className="font-mono font-normal normal-case tracking-normal text-[var(--alu-dim)]/50">
                 ({method.standards.slice(0, 3).join(' · ')})
               </span>
             </span>
           </summary>
-          <div className="mt-3 grid gap-3 border-t border-white/[0.05] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="work-panel rounded-lg p-3">
+          <div className="mt-3 grid gap-3 border-t border-[var(--line)] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-white/85">{method.formula}</p>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-white/35">{method.formulaNote}</p>
+              <p className="font-mono text-[12px] leading-relaxed text-[var(--ink)]">{method.formula}</p>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--alu-dim)]">{method.formulaNote}</p>
             </div>
-            <div className="work-panel rounded-lg p-3">
+            <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5">Assumptions</h2>
               <ul className="space-y-1">
                 {method.assumptions.map((a) => (
-                  <li key={a} className="text-[11px] leading-snug text-white/45">· {a}</li>
+                  <li key={a} className="text-[11px] leading-snug text-[var(--alu-dim)]">· {a}</li>
                 ))}
               </ul>
               {method.academyHref && (
-                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[#6b9fff]/80 hover:text-[#9bbdff]">
+                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[var(--cyan)] hover:text-[var(--cyan-dim)] font-mono">
                   {method.academyLabel} →
                 </Link>
               )}
             </div>
-            <div className="work-panel rounded-lg p-3 sm:col-span-2 lg:col-span-1">
+            <div className="work-panel rounded-[var(--radius-s)] p-3 sm:col-span-2 lg:col-span-1 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5">Worked example</h2>
-              <p className="text-[11px] text-white/50">{method.workedExample?.title || `Worked example — ${seo.title.split('|')[0].trim()}`}</p>
-              <p className="mt-1 font-mono text-[12px] text-white/80">
+              <p className="text-[11px] text-[var(--alu-dim)]">{method.workedExample?.title || `Worked example — ${seo.title.split('|')[0].trim()}`}</p>
+              <p className="mt-1 font-mono text-[12px] text-[var(--ink)]">
                 {method.workedExample?.result || 'Open the workbench to run the live solver with the same engine used in production.'}
               </p>
             </div>

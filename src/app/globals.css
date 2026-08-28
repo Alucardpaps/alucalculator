@@ -1,10 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap');
 @import "tailwindcss";
+
+:root {
+  /* surfaces — cooler, denser, CNC instrument panel */
+  --bg-0: #07090c;
+  --bg-1: #0c1016;
+  --bg-2: #121821;
+  --bg-3: #18202b;
+  --line: #243041;
+  --line-strong: #334155;
+
+  /* aluminum + warning amber, keep cyan but shift to instrument cyan */
+  --alu: #c5cdd6;
+  --alu-dim: #8b96a4;
+  --ink: #e7edf4;
+  --muted: #8a96a6;
+
+  --cyan: #3ad0e6;
+  --cyan-dim: #1a8fa3;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 22%, transparent);
+
+  --ok: #3dd68c;
+  --warn: #e6b84a;
+  --bad: #e85d5d;
+  --std: #7aa2ff; /* ISO/DIN chip */
+
+  --radius-s: 4px;   /* controls, chips — tighter */
+  --radius-m: 8px;   /* cards */
+  --radius-l: 12px;  /* shells only */
+
+  --font-ui: var(--font-inter, Inter, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-jetbrains-mono, "JetBrains Mono", ui-monospace, monospace);
+
+  --sidebar-w: 272px;
+  --topbar-h: 52px;
+
+  --foreground-rgb: 231, 237, 244;
+}
 
 @theme {
   /* Fonts */
-  --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-jetbrains-mono: 'JetBrains Mono', monospace;
+  --font-inter: var(--font-ui);
+  --font-jetbrains-mono: var(--font-mono);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+
+  /* Instrument Surfaces & Accents */
+  --color-bg-0: var(--bg-0);
+  --color-bg-1: var(--bg-1);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-alu: var(--alu);
+  --color-alu-dim: var(--alu-dim);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+
+  --color-cyan: var(--cyan);
+  --color-cyan-dim: var(--cyan-dim);
+  --color-cyan-glow: var(--cyan-glow);
+
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-std: var(--std);
 
   /* Core Brand Colors */
   --color-brand-blue: #0A2342;
@@ -25,37 +85,23 @@
   --color-surface-950: #020617;
 
   /* ════════════════════════════════════════════════════════════
-     AluCalc OS — CANONICAL THEME ("Cyber-Industrial Blueprint")
-     Single source of truth for ALL pages/modules. Components must
-     pull accents from these tokens instead of hardcoding hexes so
-     every screen shares one visual identity.
-     • Primary accent  : electric cyan  #00e5ff
-     • Secondary accent: violet         #8b5cf6  (secondary data series)
-     • Tertiary accent : amber          #f59e0b  (highlights / torque)
-     • Semantic        : success/warn/danger
+     AluCalc OS — CANONICAL INSTRUMENT THEME
      ════════════════════════════════════════════════════════════ */
-  --color-os-canvas: #020408;
-  --color-os-panel: rgba(5, 9, 14, 0.85);
-  --color-os-header: rgba(0, 0, 0, 0.4);
-  --color-os-border: rgba(0, 229, 255, 0.15);
-  --color-os-accent: #00e5ff;
-  --color-os-accent-dim: rgba(0, 229, 255, 0.3);
-  /* Secondary / tertiary accents (use for 2nd & 3rd data series) */
-  --color-os-accent-2: #8b5cf6;
-  --color-os-accent-2-dim: rgba(139, 92, 246, 0.3);
-  --color-os-accent-3: #f59e0b;
-  --color-os-accent-3-dim: rgba(245, 158, 11, 0.3);
-  --color-os-text-primary: #ecfeff;
-  /* cyan-50 */
-  --color-os-text-secondary: rgba(236, 254, 255, 0.5);
-  /* cyan-50/50 */
-  --color-os-success: #10b981;
-  --color-os-warning: #f59e0b;
-  --color-os-danger: #ef4444;
-
-  /* Fonts mapping */
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains-mono);
+  --color-os-canvas: var(--bg-0);
+  --color-os-panel: var(--bg-2);
+  --color-os-header: var(--bg-1);
+  --color-os-border: var(--line);
+  --color-os-accent: var(--cyan);
+  --color-os-accent-dim: var(--cyan-dim);
+  --color-os-accent-2: #7aa2ff;
+  --color-os-accent-2-dim: rgba(122, 162, 255, 0.3);
+  --color-os-accent-3: var(--warn);
+  --color-os-accent-3-dim: rgba(230, 184, 74, 0.3);
+  --color-os-text-primary: var(--ink);
+  --color-os-text-secondary: var(--alu-dim);
+  --color-os-success: var(--ok);
+  --color-os-warning: var(--warn);
+  --color-os-danger: var(--bad);
 
   /* Shared Backgrounds */
   --background-image-blueprint: linear-gradient(to right, #E2E8F0 1px, transparent 1px),
@@ -65,101 +111,83 @@
 }
 
 /* Custom Utilities that use the theme values */
-/* Note: In v4, we use standard CSS @layer utilities if we want to add custom utility classes */
 
 @utility btn-primary {
-  @apply bg-transparent border border-[#00e5ff]/50 text-[#00e5ff] font-bold py-3 px-6 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest text-[10px] font-mono flex items-center justify-center gap-2;
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.1), inset 0 0 8px rgba(0, 229, 255, 0.1);
+  @apply bg-transparent border border-[#3ad0e6] text-[#3ad0e6] font-bold py-2.5 px-5 rounded-[4px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-[11px] font-mono flex items-center justify-center gap-2;
+  box-shadow: 0 0 8px rgba(58, 208, 230, 0.15);
 
   &:hover {
-    @apply bg-[#00e5ff]/10 border-[#00e5ff];
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2), inset 0 0 12px rgba(0, 229, 255, 0.2);
+    @apply bg-[#3ad0e6]/10 border-[#3ad0e6] text-white;
+    box-shadow: 0 0 12px rgba(58, 208, 230, 0.25);
   }
 }
 
 @utility btn-secondary {
-  @apply bg-black/40 border border-cyan-900/30 text-cyan-50/70 py-3 px-6 rounded-md hover:bg-cyan-900/20 hover:text-[#00e5ff] hover:border-[#00e5ff]/30 transition-all uppercase tracking-[0.2em] text-[10px] font-mono font-bold flex items-center justify-center gap-2;
+  @apply bg-[#121821] border border-[#243041] text-[#c5cdd6] py-2.5 px-5 rounded-[4px] hover:bg-[#18202b] hover:text-[#e7edf4] hover:border-[#334155] transition-colors uppercase tracking-wider text-[11px] font-mono font-bold flex items-center justify-center gap-2;
 }
 
 @utility input-tech {
-  @apply w-full bg-[#020408]/60 backdrop-blur-sm border border-cyan-900/30 rounded-md p-3 text-cyan-50 font-mono text-[11px] focus:outline-none focus:border-[#00e5ff]/50 focus:ring-1 focus:ring-[#00e5ff]/30 transition-all placeholder:text-cyan-900/50 shadow-inner;
+  @apply w-full bg-[#07090c] border border-[#243041] rounded-[4px] p-2.5 text-[#e7edf4] font-mono text-[11px] focus:outline-none focus:border-[#3ad0e6] focus:ring-1 focus:ring-[#3ad0e6]/40 transition-colors placeholder:text-[#8b96a4]/50;
 }
 
 @utility card-tech {
-  @apply bg-[#05090e]/85 backdrop-blur-2xl border border-cyan-900/40 rounded-xl p-6 relative overflow-hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  @apply bg-[#0c1016] border border-[#243041] rounded-[8px] p-5 relative overflow-hidden;
 }
 
 @utility field-label {
-  @apply block text-[9px] font-bold text-cyan-900/60 uppercase tracking-widest mb-2 font-mono;
+  @apply block text-[10px] font-bold text-[#8b96a4] uppercase tracking-widest mb-1.5 font-mono;
 }
 
 /* ════════════════════════════════════════════════════════════
-   CANONICAL HUD PRIMITIVES — shared across every module so all
-   pages render with one consistent visual language. Prefer these
-   over per-component bespoke styling.
+   CANONICAL HUD PRIMITIVES — Instrument Workshop styling
    ════════════════════════════════════════════════════════════ */
 
-/* Glass panel/card used for every grouped section */
+/* Instrument panel/card */
 @utility hud-card {
-  @apply rounded-2xl border p-5 relative overflow-hidden;
-  background: var(--color-os-panel);
-  border-color: var(--color-os-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.04);
+  @apply rounded-[8px] border border-[#243041] p-5 relative overflow-hidden bg-[#0c1016];
 }
 
 /* Section / panel heading — small mono caps with accent */
 @utility hud-section-title {
-  @apply text-[10px] font-bold uppercase tracking-[0.25em] font-mono flex items-center gap-2;
-  color: var(--color-os-accent);
+  @apply text-[11px] font-mono font-bold uppercase tracking-[0.2em] flex items-center gap-2 text-[#3ad0e6];
 }
 
 /* Small dim label above an input or stat */
 @utility hud-label {
-  @apply block text-[9px] font-bold uppercase tracking-widest mb-1.5 font-mono;
-  color: var(--color-os-text-secondary);
+  @apply block text-[10px] font-mono font-bold uppercase tracking-widest mb-1 text-[#8b96a4];
 }
 
 /* Large primary readout number */
 @utility hud-stat-value {
-  @apply font-mono font-black tabular-nums tracking-tighter leading-none;
-  color: var(--color-os-accent);
+  @apply font-mono font-bold tabular-nums tracking-tight leading-none text-[#e7edf4];
 }
 
-/* Hairline divider tinted with the accent */
+/* Hairline divider */
 @utility hud-divider {
-  @apply w-full h-px my-3;
-  background: linear-gradient(90deg, transparent, var(--color-os-border), transparent);
+  @apply w-full h-px my-3 bg-[#243041];
 }
 
 /* Pill/chip toggle in its active state */
 @utility hud-chip-active {
-  background: color-mix(in srgb, var(--color-os-accent) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-os-accent) 50%, transparent);
-  color: var(--color-os-accent);
+  background: rgba(58, 208, 230, 0.12);
+  border: 1px solid var(--cyan-dim);
+  color: var(--cyan);
 }
 
 @utility calc-btn {
-  @apply w-full h-full rounded-lg font-bold flex items-center justify-center active:shadow-none active:translate-y-[2px] active:border-t-2 active:border-black/5 transition-all select-none;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  @apply w-full h-full rounded-[4px] font-bold flex items-center justify-center active:translate-y-[1px] transition-all select-none;
 }
 
 @utility calc-btn-func {
-  @apply bg-surface-800 hover:bg-surface-700 text-white text-xs;
+  @apply bg-[#18202b] hover:bg-[#243041] text-[#c5cdd6] text-xs font-mono;
 }
 
 @utility calc-btn-num {
-  @apply bg-white hover:bg-surface-50 text-surface-900 text-lg;
+  @apply bg-[#121821] hover:bg-[#18202b] text-[#e7edf4] text-base font-mono;
 }
 
 @utility calc-btn-accent {
-  @apply bg-brand-orange hover:bg-brand-orange/90 text-white;
-}
-
-:root {
-  --foreground-rgb: 15, 23, 42;
+  @apply bg-[#1a8fa3] hover:bg-[#3ad0e6] text-[#07090c] font-mono font-bold;
 }
 
 html,
@@ -404,35 +432,35 @@ body {
   width: 100%;
 }
 .work-kicker {
-  @apply mb-2 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-[#9bbdff];
+  @apply mb-2 text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-[#3ad0e6];
 }
 .work-title {
   @apply mb-3 text-2xl sm:text-3xl font-black tracking-tight text-white;
 }
 .work-lead {
-  @apply mb-6 text-sm text-slate-400 leading-relaxed max-w-2xl;
+  @apply mb-6 text-sm text-[#8b96a4] leading-relaxed max-w-2xl;
 }
 .work-card {
-  @apply rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-5;
+  @apply rounded-[8px] border border-[#243041] bg-[#0c1016] p-4 sm:p-5;
 }
 .work-btn {
-  @apply inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-[11px] font-bold text-slate-200 hover:border-white/30 hover:bg-white/[0.08] transition-colors;
+  @apply inline-flex items-center justify-center rounded-[4px] border border-[#243041] bg-[#121821] px-3 py-2 text-[11px] font-bold text-[#c5cdd6] hover:border-[#334155] hover:bg-[#18202b] hover:text-white transition-colors font-mono;
 }
 .work-btn-primary {
-  @apply inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#6b9fff] to-[#4b86e8] px-3 py-2 text-[11px] font-black text-black hover:scale-[1.02] transition-transform;
+  @apply inline-flex items-center justify-center rounded-[4px] bg-[#3ad0e6] px-3 py-2 text-[11px] font-bold text-[#07090c] hover:bg-[#1a8fa3] hover:text-white transition-colors font-mono;
 }
 .work-btn-solid {
-  @apply inline-flex items-center justify-center rounded-xl bg-white text-black px-3 py-2 text-[11px] font-black hover:bg-slate-100 transition-colors;
+  @apply inline-flex items-center justify-center rounded-[4px] bg-white text-black px-3 py-2 text-[11px] font-bold hover:bg-slate-200 transition-colors font-mono;
 }
 .work-page {
-  @apply min-h-screen flex flex-col;
+  @apply min-h-screen flex flex-col bg-[#07090c];
 }
 
 .work-panel {
-  @apply border border-white/[0.08] bg-black/30;
+  @apply rounded-[4px] border border-[#243041] bg-[#0c1016];
 }
 .work-label {
-  @apply text-[10px] font-black uppercase tracking-[0.18em] text-white/40 mb-1.5;
+  @apply text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[#8b96a4] mb-1.5;
 }
 
 .module-page-frame {

@@ -9,13 +9,19 @@
  * - Calculators: Stale-While-Revalidate
  */
 
-const CACHE_NAME = 'alucalc-v2.0.0';
-const STATIC_CACHE = 'alucalc-static-v2';
-const DYNAMIC_CACHE = 'alucalc-dynamic-v2';
+const CACHE_NAME = 'alucalc-v5.2.0';
+const STATIC_CACHE = 'alucalc-static-v5.2';
+const DYNAMIC_CACHE = 'alucalc-dynamic-v5.2';
 
-// Assets to cache immediately on install
+// HTML navigation routes and manifests to precache (NO hardcoded chunk hashes)
 const STATIC_ASSETS = [
     '/',
+    '/lite',
+    '/workspace',
+    '/design-studio',
+    '/cad-editor',
+    '/bolt-torque',
+    '/bearings',
     '/manifest.json',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png',
@@ -23,12 +29,14 @@ const STATIC_ASSETS = [
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing Service Worker v2...');
+    console.log('[SW] Installing Service Worker v5.2...');
 
     event.waitUntil(
         caches.open(STATIC_CACHE).then((cache) => {
-            console.log('[SW] Precaching static assets');
-            return cache.addAll(STATIC_ASSETS);
+            console.log('[SW] Precaching core routes and manifest');
+            return cache.addAll(STATIC_ASSETS).catch((err) => {
+                console.warn('[SW] Precache non-fatal warning:', err);
+            });
         })
     );
 
@@ -38,7 +46,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating Service Worker v2...');
+    console.log('[SW] Activating Service Worker v5.2...');
 
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -68,11 +76,6 @@ self.addEventListener('fetch', (event) => {
     if (url.origin !== location.origin) return;
 
     // Rewrite Next.js client dynamic route RSC payload fetch calls.
-    // Next.js static export generates nested directory payloads like:
-    // .../__next.calculators/$d$slug/
-    // but the client-side router requests dot-separated files like:
-    // .../__next.calculators.$d$slug.txt or .../__next.calculators.$d$slug.__PAGE__.txt
-    // We rewrite the dot separator back to a slash.
     if (url.pathname.includes('__next.')) {
         let rewrittenPathname = url.pathname;
         if (rewrittenPathname.includes('.$d$slug')) {
@@ -96,13 +99,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets: Cache first
+    // Runtime cache-first for Next static assets (/_next/static/*, fonts, images, wasm)
     if (isStaticAsset(url.pathname)) {
         event.respondWith(cacheFirst(request));
         return;
     }
 
-    // Everything else: Stale-while-revalidate
+    // Navigation and other pages: Stale-while-revalidate with network fallback
     event.respondWith(staleWhileRevalidate(request));
 });
 
@@ -116,12 +119,14 @@ async function cacheFirst(request) {
 
     try {
         const response = await fetch(request);
-        const cache = await caches.open(STATIC_CACHE);
-        cache.put(request, response.clone());
+        if (response && response.status === 200) {
+            const cache = await caches.open(STATIC_CACHE);
+            cache.put(request, response.clone());
+        }
         return response;
     } catch (error) {
         console.log('[SW] Cache-first fetch failed:', error);
-        return new Response('Offline', { status: 503 });
+        return cached || new Response('Offline', { status: 503 });
     }
 }
 
@@ -129,7 +134,9 @@ async function networkFirst(request) {
     try {
         const response = await fetch(request);
         const cache = await caches.open(DYNAMIC_CACHE);
-        cache.put(request, response.clone());
+        if (response && response.status === 200) {
+            cache.put(request, response.clone());
+        }
         return response;
     } catch (error) {
         const cached = await caches.match(request);
@@ -147,7 +154,9 @@ async function staleWhileRevalidate(request) {
 
     // Revalidate in background
     const fetchPromise = fetch(request).then((response) => {
-        cache.put(request, response.clone());
+        if (response && response.status === 200) {
+            cache.put(request, response.clone());
+        }
         return response;
     }).catch(() => null);
 
@@ -161,13 +170,17 @@ async function staleWhileRevalidate(request) {
 
 function isStaticAsset(pathname) {
     return (
+        pathname.startsWith('/_next/static/') ||
+        pathname.startsWith('/fonts/') ||
         pathname.endsWith('.js') ||
         pathname.endsWith('.css') ||
         pathname.endsWith('.png') ||
         pathname.endsWith('.jpg') ||
         pathname.endsWith('.svg') ||
         pathname.endsWith('.woff2') ||
-        pathname.endsWith('.ico')
+        pathname.endsWith('.woff') ||
+        pathname.endsWith('.ico') ||
+        pathname.endsWith('.wasm')
     );
 }
 

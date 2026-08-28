@@ -76,26 +76,26 @@ const CalculationHistoryCard = ({ id }: { id: string }) => {
   if (history.length === 0) return null;
 
   return (
-    <div className="p-6 border border-white/5 rounded-2xl bg-[#0a1018]/15 space-y-4">
-      <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-        <History size={14} className="text-[#00e5ff]" />
-        <h4 className="text-[10px] font-mono text-white/55 uppercase tracking-widest font-bold">{t.calculationHistory}</h4>
+    <div className="p-4 border border-[var(--line)] rounded-[var(--radius-m)] bg-[var(--bg-1)] space-y-3">
+      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-2">
+        <History size={14} className="text-[var(--cyan)]" />
+        <h4 className="text-[10px] font-mono text-[var(--alu-dim)] uppercase tracking-wider font-bold">{t.calculationHistory}</h4>
       </div>
-      <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+      <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar">
         {history.map((item, index) => (
           <button
             key={index}
             onClick={() => handleRestore(item)}
-            className="w-full text-left p-2.5 rounded-lg bg-white/[0.02] hover:bg-[#00e5ff]/10 border border-white/5 hover:border-[#00e5ff]/30 transition-all font-mono text-[9px] text-white/60 space-y-1 block cursor-pointer"
+            className="w-full text-left p-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] border border-[var(--line)] hover:border-[var(--cyan)]/40 transition-colors font-mono text-[10px] text-[var(--alu)] space-y-0.5 block cursor-pointer"
           >
-            <div className="flex justify-between items-center text-[8px] text-white/30">
+            <div className="flex justify-between items-center text-[8px] text-[var(--alu-dim)]">
               <span>{new Date(item.timestamp).toLocaleTimeString()}</span>
-              <span className="text-[#00e5ff]">{t.load} ↩</span>
+              <span className="text-[var(--cyan)]">{t.load} ↩</span>
             </div>
             <div className="truncate">
               {Object.entries(item.inputs).map(([k, v]) => `${k}=${v}`).join(', ')}
             </div>
-            <div className="text-[10px] font-bold text-white">
+            <div className="text-[10px] font-bold text-[var(--ink)]">
               {t.result}: {typeof item.result === 'number' ? item.result.toFixed(4) : String(item.result)}
             </div>
           </button>
@@ -120,66 +120,60 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
   const calcName = data.seo.h1.replace(/ — .*$/, '').replace(/ & Engineering.*$/, '');
 
   return (
-    <main className="min-h-screen bg-transparent text-[#C5C6C7] selection:bg-[#00e5ff]/30 relative overflow-x-hidden">
-      {/* Dynamic Grid Overlay */}
-      <div className="fixed inset-0 z-0 opacity-5 pointer-events-none"
-           style={{ backgroundImage: 'radial-gradient(#00e5ff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-24 safe-bottom">
+    <main className="min-h-screen bg-transparent text-[var(--alu)] selection:bg-[var(--cyan-glow)] relative overflow-x-hidden">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-12 safe-bottom">
         {/* Breadcrumbs */}
-        <nav className="flex flex-wrap mb-8 text-[10px] font-mono uppercase tracking-widest text-white/30" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-[#00e5ff] transition-colors">AluCalc OS</Link>
-          <span className="mx-2">/</span>
-          <Link href="/academy?tab=calculators" className="hover:text-[#00e5ff] transition-colors">{t.calculators}</Link>
-          <span className="mx-2">/</span>
-          <span className="text-white/60">{data.id}</span>
+        <nav className="flex flex-wrap mb-6 text-[10px] font-mono uppercase tracking-wider text-[var(--alu-dim)]" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-[var(--cyan)] transition-colors">AluCalc</Link>
+          <span className="mx-2 text-[var(--line)]">/</span>
+          <Link href="/academy?tab=calculators" className="hover:text-[var(--cyan)] transition-colors">{t.calculators}</Link>
+          <span className="mx-2 text-[var(--line)]">/</span>
+          <span className="text-[var(--ink)] font-bold">{data.id}</span>
         </nav>
 
         {/* Header */}
-        <header className="mb-16 space-y-4">
+        <header className="mb-10 space-y-3 font-mono">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-6 bg-[#00e5ff] rounded-full"></span>
-            <span className="text-[10px] font-mono tracking-[0.3em] text-[#00e5ff] uppercase">{t.engineeringWorkspace}</span>
+            <span className="h-1.5 w-4 bg-[var(--cyan)] rounded-[1px]"></span>
+            <span className="text-[10px] font-mono tracking-wider text-[var(--cyan)] uppercase font-bold">{t.engineeringWorkspace}</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-white uppercase max-w-4xl leading-tight">
+          <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-[var(--ink)] uppercase max-w-4xl leading-tight">
             {data.seo.h1}
           </h1>
-          <p className="text-sm md:text-base text-white/50 leading-relaxed max-w-3xl pt-2">
+          <p className="text-xs md:text-sm text-[var(--alu-dim)] font-sans leading-relaxed max-w-3xl pt-1">
             {data.seo.intro}
           </p>
         </header>
 
         {/* 12-Column Responsive Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Main Calculation & Content Area */}
-          <div className="lg:col-span-8 space-y-16">
+          <div className="lg:col-span-8 space-y-8">
 
             {/* Formula Information Panel */}
-            <section className="bg-[#0a1018]/20 backdrop-blur-xl border border-white/5 p-6 rounded-2xl relative overflow-hidden" aria-labelledby="formula-heading">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#00e5ff]/5 blur-3xl rounded-full pointer-events-none" />
-              <h2 id="formula-heading" className="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff] mb-4 flex items-center">
-                <span className="inline-block w-4 h-[1px] bg-[#00e5ff] mr-3" />
+            <section className="bg-[var(--bg-1)] border border-[var(--line)] p-5 rounded-[var(--radius-m)] relative overflow-hidden" aria-labelledby="formula-heading">
+              <h2 id="formula-heading" className="text-[10px] font-mono uppercase tracking-wider text-[var(--cyan)] mb-3 flex items-center font-bold">
+                <span className="inline-block w-3 h-[2px] bg-[var(--cyan)] mr-2" />
                 {t.mathematicalDefinition}
               </h2>
-              <div className="font-mono text-xl md:text-2xl text-white mb-6 tracking-tight bg-black/40 p-4 rounded-xl border border-white/5">{data.seo.formula}</div>
+              <div className="font-mono text-lg md:text-xl text-[var(--ink)] mb-4 tracking-tight bg-[var(--bg-0)] p-3 rounded-[var(--radius-s)] border border-[var(--line)]">{data.seo.formula}</div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                 {Object.entries(data.seo.variables).map(([key, desc]) => (
-                  <div key={key} className="flex items-center gap-2 border border-white/[0.02] bg-white/[0.01] p-2.5 rounded-lg">
-                    <span className="font-bold text-[#00e5ff] bg-[#00e5ff]/10 px-2 py-0.5 rounded">{key}</span>
-                    <span className="text-white/40">=</span>
-                    <span className="text-white/60 truncate">{desc}</span>
+                  <div key={key} className="flex items-center gap-2 border border-[var(--line)] bg-[var(--bg-2)] p-2 rounded-[var(--radius-s)]">
+                    <span className="font-bold text-[var(--cyan)] bg-[var(--cyan)]/10 px-1.5 py-0.5 rounded-[var(--radius-s)] text-[11px]">{key}</span>
+                    <span className="text-[var(--alu-dim)]">=</span>
+                    <span className="text-[var(--alu)] truncate">{desc}</span>
                   </div>
                 ))}
               </div>
             </section>
 
             {/* Dynamic Formula Calculator Engine */}
-            <section className="bg-[#0a1018]/30 border border-white/5 p-6 md:p-8 rounded-3xl backdrop-blur-xl relative" aria-labelledby="calc-heading">
-              <div className="absolute top-0 left-0 w-48 h-48 bg-[#00e5ff]/5 blur-[100px] rounded-full pointer-events-none" />
-              <h2 id="calc-heading" className="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff] mb-6 flex items-center">
-                <span className="inline-block w-4 h-[1px] bg-[#00e5ff] mr-3" />
+            <section className="bg-[var(--bg-1)] border border-[var(--line)] p-5 md:p-6 rounded-[var(--radius-m)] relative" aria-labelledby="calc-heading">
+              <h2 id="calc-heading" className="text-[10px] font-mono uppercase tracking-wider text-[var(--cyan)] mb-4 flex items-center font-bold">
+                <span className="inline-block w-3 h-[2px] bg-[var(--cyan)] mr-2" />
                 {t.realTimeSolver}
               </h2>
               <InteractiveFormula id={data.id} formula={data.seo.formula} variables={data.seo.variables} />
@@ -187,18 +181,18 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
 
             {/* How to Calculate (Step-by-Step) */}
             {steps.length > 0 && (
-              <section aria-labelledby="steps-heading" className="space-y-6">
-                <h2 id="steps-heading" className="text-xl font-black uppercase text-white tracking-widest flex items-center gap-2">
-                  <span className="h-1.5 w-4 bg-[#00e5ff] rounded-full"></span>
+              <section aria-labelledby="steps-heading" className="space-y-4 font-mono">
+                <h2 id="steps-heading" className="text-sm font-bold uppercase text-[var(--ink)] tracking-wider flex items-center gap-2">
+                  <span className="h-1.5 w-3 bg-[var(--cyan)] rounded-[1px]"></span>
                   {t.calculationProcedure}
                 </h2>
-                <ol className="space-y-3 list-none">
+                <ol className="space-y-2 list-none">
                   {steps.map((step, i) => {
                     const text = step.replace(/^\d+\.\s*/, '');
                     return (
-                      <li key={i} className="flex gap-4 p-4 bg-[#0a1018]/15 border border-white/5 rounded-xl items-center hover:border-white/10 transition-colors">
-                        <span className="flex-shrink-0 w-8 h-8 bg-[#00e5ff]/10 text-[#00e5ff] border border-[#00e5ff]/20 rounded-lg flex items-center justify-center text-sm font-mono font-bold">{i + 1}</span>
-                        <p className="text-white/60 leading-relaxed text-sm">{text}</p>
+                      <li key={i} className="flex gap-3 p-3 bg-[var(--bg-1)] border border-[var(--line)] rounded-[var(--radius-s)] items-center">
+                        <span className="flex-shrink-0 w-6 h-6 bg-[var(--cyan)]/10 text-[var(--cyan)] border border-[var(--cyan)]/30 rounded-[var(--radius-s)] flex items-center justify-center text-xs font-mono font-bold">{i + 1}</span>
+                        <p className="text-[var(--alu)] leading-relaxed text-xs font-sans">{text}</p>
                       </li>
                     );
                   })}
@@ -207,19 +201,19 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
             )}
 
             {/* Why This Matters */}
-            <section aria-labelledby="practical-heading" className="space-y-4">
-              <h2 id="practical-heading" className="text-xl font-black uppercase text-white tracking-widest flex items-center gap-2">
-                <span className="h-1.5 w-4 bg-[#00e5ff] rounded-full"></span>
+            <section aria-labelledby="practical-heading" className="space-y-3 font-mono">
+              <h2 id="practical-heading" className="text-sm font-bold uppercase text-[var(--ink)] tracking-wider flex items-center gap-2">
+                <span className="h-1.5 w-3 bg-[var(--cyan)] rounded-[1px]"></span>
                 {t.practicalApplication}
               </h2>
-              <p className="text-white/50 leading-relaxed text-base">{data.seo.practical}</p>
+              <p className="text-[var(--alu)] leading-relaxed text-xs font-sans">{data.seo.practical}</p>
             </section>
 
             {/* Worked Example */}
             {data.seo.example && (
-              <section className="border-l-2 border-[#00e5ff] pl-6 py-1" aria-labelledby="example-heading">
-                <h2 id="example-heading" className="text-[10px] font-mono uppercase tracking-widest text-white/30 mb-2">{t.workedReferenceExample}</h2>
-                <p className="text-white/50 leading-relaxed text-sm italic">{data.seo.example}</p>
+              <section className="border-l-2 border-[var(--cyan)] pl-4 py-1 font-mono" aria-labelledby="example-heading">
+                <h2 id="example-heading" className="text-[10px] font-mono uppercase tracking-wider text-[var(--alu-dim)] mb-1">{t.workedReferenceExample}</h2>
+                <p className="text-[var(--alu)] leading-relaxed text-xs font-sans">{data.seo.example}</p>
               </section>
             )}
 
@@ -227,21 +221,21 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
             {technicalData.length > 0 && technicalData.map((table, idx) => {
               const isKTable = table.name.toLowerCase().includes('nut factor') || table.name.toLowerCase().includes('k-factor') || table.name.toLowerCase().includes('friction');
               return (
-                <section key={idx} className="overflow-x-auto space-y-4" aria-labelledby={`table-heading-${idx}`}>
-                  <h2 id={`table-heading-${idx}`} className="text-md font-bold text-white tracking-wide">
+                <section key={idx} className="overflow-x-auto space-y-3 font-mono" aria-labelledby={`table-heading-${idx}`}>
+                  <h2 id={`table-heading-${idx}`} className="text-xs font-bold text-[var(--ink)] tracking-wider uppercase">
                     {table.name}
-                    {isKTable && <span className="text-[10px] font-mono text-[#00e5ff]/60 ml-3 lowercase font-normal">(click row to select factor)</span>}
+                    {isKTable && <span className="text-[10px] text-[var(--cyan)] ml-2 lowercase font-normal">(click row to select factor)</span>}
                   </h2>
-                  <div className="rounded-xl border border-white/5 bg-[#0a1018]/10">
+                  <div className="rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--bg-1)]">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#0a1018]/30 text-[10px] font-mono uppercase tracking-wider text-white/40 border-b border-white/5">
+                      <thead className="bg-[var(--bg-2)] text-[10px] font-mono uppercase tracking-wider text-[var(--alu-dim)] border-b border-[var(--line)]">
                         <tr>
                           {Object.keys(table.rows[0] || {}).map((h, i) => (
-                            <th key={i} className="px-6 py-3.5 font-bold">{h}</th>
+                            <th key={i} className="px-4 py-2.5 font-bold">{h}</th>
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5 font-mono">
+                      <tbody className="divide-y divide-[var(--line)] font-mono">
                         {table.rows.map((row, i) => (
                           <tr 
                             key={i} 
@@ -252,10 +246,10 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
                                 }));
                               }
                             }}
-                            className={`transition-colors ${isKTable ? 'cursor-pointer hover:bg-[#00e5ff]/10' : 'hover:bg-[#00e5ff]/5'}`}
+                            className={`transition-colors ${isKTable ? 'cursor-pointer hover:bg-[var(--bg-3)]' : 'hover:bg-[var(--bg-2)]'}`}
                           >
                             {Object.values(row).map((cell, j) => (
-                              <td key={j} className="px-6 py-3.5 text-white/60">{String(cell)}</td>
+                              <td key={j} className="px-4 py-2.5 text-[var(--alu)]">{String(cell)}</td>
                             ))}
                           </tr>
                         ))}
@@ -268,26 +262,26 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
 
             {/* Checklist & Pitfalls */}
             {(checklist.length > 0 || pitfalls.length > 0) && (
-              <section className="grid md:grid-cols-2 gap-6" aria-labelledby="checks-heading">
+              <section className="grid md:grid-cols-2 gap-4 font-mono" aria-labelledby="checks-heading">
                 {checklist.length > 0 && (
-                  <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl space-y-3">
-                    <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-widest font-mono">✓ {t.designChecklist}</h3>
-                    <ul className="space-y-2">
+                  <div className="p-4 bg-[var(--ok)]/10 border border-[var(--ok)]/20 rounded-[var(--radius-s)] space-y-2">
+                    <h3 className="text-xs font-bold text-[var(--ok)] uppercase tracking-wider">✓ {t.designChecklist}</h3>
+                    <ul className="space-y-1.5">
                       {checklist.map((item, i) => (
-                        <li key={i} className="text-xs text-white/60 flex items-start gap-2">
-                          <span className="text-emerald-500 mt-0.5">•</span> {item}
+                        <li key={i} className="text-xs text-[var(--alu)] flex items-start gap-1.5 font-sans">
+                          <span className="text-[var(--ok)] font-mono">•</span> {item}
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
                 {pitfalls.length > 0 && (
-                  <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl space-y-3">
-                    <h3 className="text-xs font-bold text-red-400 uppercase tracking-widest font-mono">⚠️ {t.commonPitfalls}</h3>
-                    <ul className="space-y-2">
+                  <div className="p-4 bg-[var(--bad)]/10 border border-[var(--bad)]/20 rounded-[var(--radius-s)] space-y-2">
+                    <h3 className="text-xs font-bold text-[var(--bad)] uppercase tracking-wider">⚠️ {t.commonPitfalls}</h3>
+                    <ul className="space-y-1.5">
                       {pitfalls.map((item, i) => (
-                        <li key={i} className="text-xs text-white/60 flex items-start gap-2">
-                          <span className="text-red-500 mt-0.5">•</span> {item}
+                        <li key={i} className="text-xs text-[var(--alu)] flex items-start gap-1.5 font-sans">
+                          <span className="text-[var(--bad)] font-mono">•</span> {item}
                         </li>
                       ))}
                     </ul>
@@ -298,19 +292,19 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
 
             {/* FAQ Accordions */}
             {faq.length > 0 && (
-              <section aria-labelledby="faq-heading" className="space-y-6">
-                <h2 id="faq-heading" className="text-xl font-black uppercase text-white tracking-widest flex items-center gap-2">
-                  <span className="h-1.5 w-4 bg-[#00e5ff] rounded-full"></span>
+              <section aria-labelledby="faq-heading" className="space-y-3 font-mono">
+                <h2 id="faq-heading" className="text-sm font-bold uppercase text-[var(--ink)] tracking-wider flex items-center gap-2">
+                  <span className="h-1.5 w-3 bg-[var(--cyan)] rounded-[1px]"></span>
                   {t.faq}
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {faq.map((item, i) => (
-                    <details key={i} className="p-5 bg-[#0a1018]/15 border border-white/5 rounded-2xl group transition-all">
-                      <summary className="text-white font-medium cursor-pointer list-none flex items-center justify-between text-sm select-none">
+                    <details key={i} className="p-3.5 bg-[var(--bg-1)] border border-[var(--line)] rounded-[var(--radius-s)] group transition-all">
+                      <summary className="text-[var(--ink)] font-bold cursor-pointer list-none flex items-center justify-between text-xs select-none">
                         {item.q}
-                        <span className="text-white/40 group-open:rotate-45 transition-transform text-lg">+</span>
+                        <span className="text-[var(--alu-dim)] group-open:rotate-45 transition-transform text-sm">+</span>
                       </summary>
-                      <p className="text-white/50 mt-3 leading-relaxed text-xs font-sans">{item.a}</p>
+                      <p className="text-[var(--alu)] mt-2 leading-relaxed text-xs font-sans">{item.a}</p>
                     </details>
                   ))}
                 </div>
@@ -319,26 +313,26 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
 
             {/* Legacy Technical Sections */}
             {data.technicalSections?.map((section, idx) => (
-              <section key={idx} className="space-y-6 pt-8 border-t border-white/5">
-                <h2 className="text-xl font-black uppercase text-white tracking-widest flex items-center gap-4">
-                  <span className="text-[#00e5ff] text-xs font-mono">0{idx + 1}</span>
+              <section key={idx} className="space-y-4 pt-6 border-t border-[var(--line)] font-mono">
+                <h2 className="text-sm font-bold uppercase text-[var(--ink)] tracking-wider flex items-center gap-2">
+                  <span className="text-[var(--cyan)] text-xs font-mono">0{idx + 1}</span>
                   {section.title}
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {section.content.map((para, pIdx) => (
-                    <p key={pIdx} className="text-white/50 leading-relaxed text-sm">{para}</p>
+                    <p key={pIdx} className="text-[var(--alu)] leading-relaxed text-xs font-sans">{para}</p>
                   ))}
                 </div>
                 {section.table && (
-                  <div className="overflow-x-auto rounded-xl border border-white/5 bg-[#0a1018]/10">
+                  <div className="overflow-x-auto rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--bg-1)]">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#0a1018]/30 text-[10px] font-mono uppercase tracking-wider text-white/40 border-b border-white/5">
-                        <tr>{section.table.headers.map((h, i) => <th key={i} className="px-6 py-3">{h}</th>)}</tr>
+                      <thead className="bg-[var(--bg-2)] text-[10px] font-mono uppercase tracking-wider text-[var(--alu-dim)] border-b border-[var(--line)]">
+                        <tr>{section.table.headers.map((h, i) => <th key={i} className="px-4 py-2">{h}</th>)}</tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5 font-mono">
+                      <tbody className="divide-y divide-[var(--line)] font-mono">
                         {section.table.rows.map((row, i) => (
-                          <tr key={i} className="hover:bg-[#00e5ff]/5 transition-colors">
-                            {row.map((cell, j) => <td key={j} className="px-6 py-3 text-white/60">{cell}</td>)}
+                          <tr key={i} className="hover:bg-[var(--bg-2)] transition-colors">
+                            {row.map((cell, j) => <td key={j} className="px-4 py-2 text-[var(--alu)]">{cell}</td>)}
                           </tr>
                         ))}
                       </tbody>
@@ -350,36 +344,35 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
           </div>
 
           {/* Sidebar Area */}
-          <aside className="lg:col-span-4 space-y-6">
-            <div className="sticky top-8 space-y-6">
+          <aside className="lg:col-span-4 space-y-4 font-mono">
+            <div className="sticky top-16 space-y-4">
               
               {/* App Suite Card */}
-              <div className="bg-[#0a1018]/30 backdrop-blur-xl border border-white/5 p-6 md:p-8 rounded-2xl relative overflow-hidden space-y-6">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#00e5ff]/5 blur-2xl rounded-full pointer-events-none" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-widest font-mono">{t.engineeringSuite}</h3>
-                <p className="text-xs text-white/40 leading-relaxed">
+              <div className="bg-[var(--bg-1)] border border-[var(--line)] p-5 rounded-[var(--radius-m)] space-y-4">
+                <h3 className="text-xs font-bold text-[var(--ink)] uppercase tracking-wider">{t.engineeringSuite}</h3>
+                <p className="text-[11px] text-[var(--alu-dim)] font-sans leading-relaxed">
                   Access advanced 3D visual CAD modelling, live material databases, and professional datasheet generations inside AluCalc OS.
                 </p>
                 <Link href={data.cta.link || '/workspace'}
-                      className="block w-full bg-[#00e5ff] hover:bg-[#00e5ff]/80 text-black font-extrabold py-3.5 px-4 rounded-xl text-xs text-center transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)] hover:scale-105 active:scale-95">
+                      className="block w-full bg-[var(--cyan)] hover:bg-[var(--cyan-dim)] text-[var(--bg-0)] hover:text-white font-bold py-2.5 px-3 rounded-[var(--radius-s)] text-xs text-center uppercase tracking-wider transition-colors">
                   {data.cta.label || 'Open Workspace'}
                 </Link>
               </div>
 
               {/* Quick Actions Card */}
-              <div className="p-6 border border-white/5 rounded-2xl bg-[#0a1018]/15 space-y-4">
-                <h4 className="text-[9px] font-mono text-white/30 uppercase tracking-widest">{t.workspaceShortcuts}</h4>
-                <ul className="text-[10px] space-y-3 text-white/60 font-mono">
+              <div className="p-4 border border-[var(--line)] rounded-[var(--radius-m)] bg-[var(--bg-1)] space-y-3">
+                <h4 className="text-[10px] font-mono text-[var(--alu-dim)] uppercase tracking-wider font-bold">{t.workspaceShortcuts}</h4>
+                <ul className="text-[11px] space-y-2 text-[var(--alu)] font-mono">
                   <li>
-                    <button className="flex items-center hover:text-[#00e5ff] group w-full text-left" onClick={() => window.print()}>
-                      <span className="w-1.5 h-1.5 bg-[#00e5ff] rounded-full mr-2.5 group-hover:scale-150 transition-transform" />
+                    <button className="flex items-center hover:text-[var(--cyan)] group w-full text-left" onClick={() => window.print()}>
+                      <span className="w-1.5 h-1.5 bg-[var(--cyan)] rounded-[1px] mr-2" />
                       Print / Save PDF Specification
                     </button>
                   </li>
                   <li>
-                    <Link href={data.cta.link || '/workspace'} className="flex items-center hover:text-purple-400 group">
-                      <span className="w-1.5 h-1.5 bg-purple-500 rounded-full mr-2.5 group-hover:scale-150 transition-transform" />
-                      Load inside desktop environment
+                    <Link href={data.cta.link || '/workspace'} className="flex items-center hover:text-[var(--cyan)] group">
+                      <span className="w-1.5 h-1.5 bg-[var(--std)] rounded-[1px] mr-2" />
+                      Load inside workspace
                     </Link>
                   </li>
                 </ul>
@@ -388,58 +381,26 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
               {/* Calculation History */}
               <CalculationHistoryCard id={data.id} />
             </div>
-            
-            {/* PDF Print Override Styles */}
-            <style dangerouslySetInnerHTML={{ __html: `
-              @media print {
-                body, main, #__next {
-                  background: #ffffff !important;
-                  color: #000000 !important;
-                }
-                nav, aside, footer, button, .pointer-events-none, input[type="range"], .h-0.5, .bg-white\\/[0.02], select, .bg-\\[\\#0a1018\\]\\/20 {
-                  display: none !important;
-                }
-                section {
-                  background: transparent !important;
-                  border: 1px solid #e2e8f0 !important;
-                  color: #000000 !important;
-                  page-break-inside: avoid;
-                  margin-bottom: 1.5rem !important;
-                  border-radius: 8px !important;
-                  padding: 15px !important;
-                }
-                h1, h2, h3, h4, text, span, p, td, th {
-                  color: #000000 !important;
-                }
-                input[type="number"], input {
-                  border: none !important;
-                  background: transparent !important;
-                  color: #000000 !important;
-                  font-weight: bold;
-                  text-align: left !important;
-                }
-              }
-            `}} />
           </aside>
         </div>
 
         {/* Related Calculators */}
         {data.relatedCalculators && data.relatedCalculators.length > 0 && (
-          <section className="mt-24 pt-16 border-t border-white/5" aria-labelledby="related-heading">
-            <h2 id="related-heading" className="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff] mb-10 flex items-center">
-              <span className="inline-block w-4 h-[1px] bg-[#00e5ff] mr-3" />
+          <section className="mt-16 pt-8 border-t border-[var(--line)] font-mono" aria-labelledby="related-heading">
+            <h2 id="related-heading" className="text-[10px] font-mono uppercase tracking-wider text-[var(--cyan)] mb-4 flex items-center font-bold">
+              <span className="inline-block w-3 h-[2px] bg-[var(--cyan)] mr-2" />
               {t.relatedCalculators}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {data.relatedCalculators.map((related) => (
                 <Link
                   key={related.slug}
                   href={`/calculators/${related.slug}`}
-                  className="group block p-5 bg-[#0a1018]/10 border border-white/5 hover:border-[#00e5ff]/40 rounded-xl transition-all hover:bg-[#00e5ff]/5"
+                  className="group block p-3.5 bg-[var(--bg-1)] border border-[var(--line)] hover:border-[var(--cyan)] rounded-[var(--radius-s)] transition-colors hover:bg-[var(--bg-2)]"
                 >
-                  <h3 className="text-white font-medium group-hover:text-[#00e5ff] transition-colors mb-2 text-xs truncate">{related.title}</h3>
-                  <div className="flex items-center text-[9px] font-mono text-white/30 uppercase tracking-wider">
-                    {t.analyzeNow} <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                  <h3 className="text-[var(--ink)] font-bold group-hover:text-[var(--cyan)] transition-colors mb-1 text-xs truncate uppercase">{related.title}</h3>
+                  <div className="flex items-center text-[9px] font-mono text-[var(--alu-dim)] uppercase tracking-wider">
+                    {t.analyzeNow} <span className="ml-1.5 group-hover:translate-x-0.5 transition-transform">→</span>
                   </div>
                 </Link>
               ))}
