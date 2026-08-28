@@ -13,7 +13,8 @@ export function middleware(request: NextRequest) {
       request.cookies.get('ADMIN_KEY')?.value || request.cookies.get('alu_admin_key')?.value;
     const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : null;
-    const providedKey = adminKeyCookie || bearerToken;
+    const urlKey = request.nextUrl.searchParams.get('key');
+    const providedKey = adminKeyCookie || bearerToken || urlKey;
 
     if (!verifyAdminKey(providedKey)) {
       if (pathname.startsWith('/api/')) {
@@ -23,6 +24,20 @@ export function middleware(request: NextRequest) {
         );
       }
       return new NextResponse('Unauthorized', { status: 401 });
+    }
+
+    // If access was granted via URL query key, set the session cookie and redirect clean
+    if (urlKey && verifyAdminKey(urlKey)) {
+      const cleanUrl = request.nextUrl.clone();
+      cleanUrl.searchParams.delete('key');
+      const response = NextResponse.redirect(cleanUrl);
+      response.cookies.set('alu_admin_key', urlKey, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      });
+      return response;
     }
 
     return NextResponse.next();
