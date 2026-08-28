@@ -4,11 +4,12 @@ import React from 'react';
 import { Flame, Gem, Heart, Trophy, Volume2, VolumeX, Globe, ShieldAlert } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore, Language } from '@/store/i18nStore';
-import { getDuolingoUiText } from './DuolingoCurriculumData';
+import { DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
 
 export function DuolingoTopBar() {
   const { xp, gems, hearts, maxHearts, streak, soundEnabled, toggleSound, buyHeartRefill } = useAcademyGamificationStore();
   const { language, setLanguage } = useI18nStore();
+  const lang = (language in DUOLINGO_I18N.startLesson ? language : 'tr') as SupportedLanguage;
   const leagueInfo = getLeagueInfo(xp);
 
   const LANGUAGES: { code: Language; label: string; flag: string }[] = [
@@ -40,7 +41,7 @@ export function DuolingoTopBar() {
               AluDuolingo
             </span>
             <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/40">
-              100 Sections · 10 Units
+              150 Sections · 10 Units
             </span>
           </div>
           <span className="text-[10px] text-slate-400 block -mt-0.5 font-sans">
@@ -55,7 +56,7 @@ export function DuolingoTopBar() {
         {/* Streak */}
         <div
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 font-bold"
-          title={getDuolingoUiText(language, 'dailyStreak')}
+          title="Günlük Seri"
         >
           <Flame size={15} className="fill-orange-500 animate-pulse text-orange-500" />
           <span>{streak}</span>
@@ -64,7 +65,7 @@ export function DuolingoTopBar() {
         {/* Gems */}
         <div
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold"
-          title={getDuolingoUiText(language, 'gems')}
+          title="Elmaslar"
         >
           <Gem size={14} className="text-cyan-400 fill-cyan-400/30" />
           <span>{gems}</span>
@@ -81,7 +82,7 @@ export function DuolingoTopBar() {
               ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
               : 'bg-rose-950 border border-rose-500 text-rose-300 animate-bounce'
           }`}
-          title={getDuolingoUiText(language, 'hearts')}
+          title="Canlar"
         >
           <Heart size={14} className={hearts > 0 ? 'fill-rose-500 text-rose-500' : 'text-rose-400'} />
           <span>{hearts}</span>
@@ -90,7 +91,7 @@ export function DuolingoTopBar() {
         {/* League */}
         <div
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
-          title={getDuolingoUiText(language, 'league')}
+          title="Lig"
         >
           <Trophy size={14} className="text-amber-400" />
           <span className="capitalize">{leagueInfo.current.label}</span>

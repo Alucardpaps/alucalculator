@@ -7,19 +7,26 @@ import {
 } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
-import { getDuolingoUiText, DUOLINGO_100_SECTIONS } from './DuolingoCurriculumData';
+import { DUOLINGO_UNITS, DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
 
 interface DuolingoRightSidebarProps {
   onOpenCertificates: () => void;
+  selectedUnitIndex: number;
+  onSelectUnit: (index: number) => void;
 }
 
-export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSidebarProps) {
+export function DuolingoRightSidebar({
+  onOpenCertificates,
+  selectedUnitIndex,
+  onSelectUnit,
+}: DuolingoRightSidebarProps) {
   const { xp, gems, hearts, maxHearts, streak, buyHeartRefill, buyStreakFreeze, hasStreakFreeze, lessonScores } = useAcademyGamificationStore();
   const { language } = useI18nStore();
-  const tr = language === 'tr';
+  const lang = (language in DUOLINGO_I18N.startLesson ? language : 'tr') as SupportedLanguage;
+  const tr = lang === 'tr';
   const leagueInfo = getLeagueInfo(xp);
 
-  const totalLessons = 100;
+  const totalLessons = 150;
   const completedCount = Object.values(lessonScores).filter((s) => s.stars > 0).length;
   const progressPct = Math.round((completedCount / totalLessons) * 100);
 
@@ -32,17 +39,10 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
     { name: 'Dr. Thomas Weber', xp: Math.max(xp - 220, 260), avatar: '🧑‍🔧', rank: 5 },
   ];
 
-  const handleJumpToUnit = (unitId: string) => {
-    const el = document.getElementById(unitId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
     <aside className="w-full lg:w-80 space-y-5 select-none font-mono text-xs">
       
-      {/* ─── 1. GLOBAL 100-SECTION PROGRESS ─── */}
+      {/* ─── 1. GLOBAL 150-SECTION PROGRESS ─── */}
       <div className="p-5 rounded-3xl bg-gradient-to-b from-[#080d1a] to-[#040711] border border-cyan-500/30 space-y-3 shadow-xl">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -60,7 +60,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
         </div>
 
         <div className="flex justify-between text-[10px] text-slate-400 pt-0.5">
-          <span>{completedCount} / 100 {tr ? 'Ders Tamamlandı' : 'Lessons Done'}</span>
+          <span>{completedCount} / 150 {tr ? 'Ders Tamamlandı' : 'Lessons Done'}</span>
           <span>10 Ünite</span>
         </div>
       </div>
@@ -71,26 +71,29 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
           <div className="flex items-center gap-2">
             <Navigation size={15} className="text-cyan-400" />
             <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              {getDuolingoUiText(language, 'jumpToUnit')}
+              {DUOLINGO_I18N.jumpToUnit[lang]}
             </span>
           </div>
           <span className="text-[10px] text-slate-500 font-sans">10 Ünite</span>
         </div>
 
         <div className="grid grid-cols-5 gap-1.5">
-          {DUOLINGO_100_SECTIONS.map((unit) => {
+          {DUOLINGO_UNITS.map((unit, idx) => {
             const isExtreme = unit.difficulty === 'extreme';
+            const isCurrent = idx === selectedUnitIndex;
             return (
               <button
                 key={unit.id}
                 type="button"
-                onClick={() => handleJumpToUnit(unit.id)}
+                onClick={() => onSelectUnit(idx)}
                 className={`py-2 rounded-xl border text-center font-bold transition cursor-pointer text-xs ${
-                  isExtreme
-                    ? 'bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/50 text-amber-300 shadow-md shadow-amber-500/20'
+                  isCurrent
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 border-cyan-300 font-black shadow-md shadow-cyan-500/30'
+                    : isExtreme
+                    ? 'bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/50 text-amber-300'
                     : 'bg-white/5 hover:bg-cyan-500/20 border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-white'
                 }`}
-                title={tr ? unit.titleTr : unit.titleEn}
+                title={unit.title[lang]}
               >
                 {isExtreme ? '👑 10' : `U${unit.number}`}
               </button>
@@ -105,7 +108,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
           <div className="flex items-center gap-2">
             <Trophy size={16} className="text-amber-400" />
             <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              {leagueInfo.current.label} {getDuolingoUiText(language, 'league')}
+              {leagueInfo.current.label} Lig Tablosu
             </span>
           </div>
           <span className="text-[10px] text-slate-500 font-sans">Haftalık</span>
@@ -140,7 +143,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
           <div className="flex items-center gap-2">
             <Target size={16} className="text-cyan-400" />
             <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              {getDuolingoUiText(language, 'dailyQuests')}
+              Günlük Görevler
             </span>
           </div>
           <span className="text-[10px] text-cyan-400 font-bold">3 Görev</span>
@@ -175,7 +178,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
       {/* ─── 5. REFILL & SHOP ─── */}
       <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3 shadow-xl">
         <span className="font-bold text-white uppercase tracking-wider text-[11px] block border-b border-white/10 pb-2">
-          {getDuolingoUiText(language, 'engineerShop')}
+          Mühendis Mağazası
         </span>
 
         <button
@@ -187,7 +190,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
           <div className="flex items-center gap-2">
             <Heart size={16} className="fill-rose-500 text-rose-500" />
             <div>
-              <span className="text-white font-bold block text-[11px]">{getDuolingoUiText(language, 'refillHearts')}</span>
+              <span className="text-white font-bold block text-[11px]">Canları Doldur</span>
               <span className="text-[10px] text-slate-500">{hearts}/{maxHearts} Can</span>
             </div>
           </div>
@@ -205,7 +208,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
           <div className="flex items-center gap-2">
             <Flame size={16} className="text-blue-400" />
             <div>
-              <span className="text-white font-bold block text-[11px]">{getDuolingoUiText(language, 'streakFreeze')}</span>
+              <span className="text-white font-bold block text-[11px]">Seri Dondurucu</span>
               <span className="text-[10px] text-slate-500">{hasStreakFreeze ? (tr ? 'Aktif' : 'Active') : (tr ? '1 Gün Korur' : 'Protect 1 Day')}</span>
             </div>
           </div>
@@ -222,7 +225,7 @@ export function DuolingoRightSidebar({ onOpenCertificates }: DuolingoRightSideba
         className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-500/20 hover:from-amber-500/30 hover:to-yellow-500/25 border border-amber-500/40 text-amber-300 font-bold flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
       >
         <Award size={18} className="text-yellow-400" />
-        <span>{getDuolingoUiText(language, 'myCertificates')}</span>
+        <span>Sertifikalarım</span>
       </button>
 
     </aside>
