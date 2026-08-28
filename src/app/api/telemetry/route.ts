@@ -1,9 +1,8 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 import { NextRequest, NextResponse } from 'next/server';
 import { adminInboxStore } from '@/admin/inbox-store';
 import { TelemetryEvent } from '@/telemetry/events';
+
+export const dynamic = 'force-static';
 
 export async function POST(req: NextRequest) {
   try {

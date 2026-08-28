@@ -15,9 +15,36 @@ import {
 import { FeatureCounter } from './inbox-store';
 
 export const AdminDashboard: React.FC = () => {
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<'status' | 'features'>('status');
   const [featureCounters, setFeatureCounters] = useState<FeatureCounter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlKey = urlParams.get('key');
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+      const cookieKey = getCookie('alu_admin_key') || getCookie('ADMIN_KEY');
+      const key = urlKey || cookieKey;
+      const expectedKey = 'ALU_SEC_V12_i7roXvJJBFgCKwnIl_4g4lyv3bmrY-B4uoXv4g-wzjeQg7vl09BepvzwNfwxtus__d46498ca17db5c7b71eb7770e8a0c05b59dac56cfd5cea95c91e081e1fd63d9c';
+
+      if (key && key === expectedKey) {
+        if (urlKey) {
+          document.cookie = `alu_admin_key=${urlKey}; path=/; max-age=604800; SameSite=Lax; secure`;
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    }
+  }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -35,8 +62,40 @@ export const AdminDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthorized) {
+      fetchData();
+    }
+  }, [isAuthorized]);
+
+  if (isAuthorized === null) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-xs">
+        Yetkilendirme kontrol ediliyor...
+      </div>
+    );
+  }
+
+  if (isAuthorized === false) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-md p-8 bg-slate-900 border border-red-500/30 rounded-3xl space-y-4 shadow-2xl">
+          <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl w-fit mx-auto">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h1 className="text-xl font-bold text-white tracking-tight">401 — Yetkisiz Giriş</h1>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Bu alana yalnızca yetkili <strong>AluCalc Admin Anahtarı</strong> ile erişilebilir. Lütfen masaüstünüzdeki güvenli başlatıcıyı kullanın.
+          </p>
+          <a
+            href="/"
+            className="inline-block px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition"
+          >
+            Ana Sayfaya Dön
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   const totalTelemetryCalls = featureCounters.reduce((acc, c) => acc + c.totalCalls, 0);
 

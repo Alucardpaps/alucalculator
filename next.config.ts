@@ -6,7 +6,7 @@ const buildTimestamp = isDev ? "dev" : new Date().toISOString();
 const buildId = isDev ? "dev-local" : `build-${Date.now()}`;
 
 const nextConfig: NextConfig = {
-  ...(process.env.STATIC_EXPORT === 'true' ? { output: 'export' } : {}),
+  output: 'export',
   trailingSlash: true,
   env: {
     BUILD_ID: buildId,
