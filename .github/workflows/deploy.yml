@@ -18,9 +18,11 @@ jobs:
           node-version: '20'
 
       - name: Bağımlılıkları Yükle (Install)
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Projeyi Derle (Build)
+        env:
+          CI: true
         run: npm run build
 
       - name: FTP ile Yükle (Hostinger)
