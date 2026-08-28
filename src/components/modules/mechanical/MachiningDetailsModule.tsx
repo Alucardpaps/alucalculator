@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Circle, Square, Wrench, CircleSlash, BoxSelect, Droplet, ShieldCheck } from 'lucide-react';
 import { CalculatorInput } from "@/components/CalculatorInput";
+import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
 import { useI18nStore } from '@/store/i18nStore';
 import { getMachiningDetailsStrings } from '@/locales/machiningDetailsTranslations';
 import {
@@ -50,13 +51,11 @@ export default function MachiningDetailsModule() {
         <div className="relative z-10 flex flex-col h-full bg-[#020408] text-slate-200 select-none font-sans overflow-hidden">
             <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
 
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                        <Wrench size={24} />
-                    </div>
+                <div className="flex items-center gap-3.5 group cursor-default">
+                    <SidebarAnimatedIcon itemId="machining-details" size={36} color="#a855f7" />
                     <div>
-                        <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">{t.title}</h1>
-                        <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase mt-1">{t.subtitle}</p>
+                        <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none text-white group-hover:text-purple-300 transition-colors">{t.title}</h1>
+                        <p className="text-[10px] text-purple-400/80 font-mono tracking-widest uppercase mt-1">{t.subtitle}</p>
                     </div>
                 </div>
 

@@ -5,6 +5,10 @@ import { HANDBOOK_DATA, HandbookChapter, HandbookSection, HandbookEntry } from '
 import EN_DICT from './en_dict.json';
 import DE_DICT from './de_dict.json';
 import ES_DICT from './es_dict.json';
+import FR_DICT from './fr_dict.json';
+import IT_DICT from './it_dict.json';
+import PT_DICT from './pt_dict.json';
+import RU_DICT from './ru_dict.json';
 import ZH_DICT from './zh_dict.json';
 import JA_DICT from './ja_dict.json';
 import KO_DICT from './ko_dict.json';
@@ -60,16 +64,14 @@ export function getLocalizedHandbookData(lang: string): HandbookChapter[] {
         case 'en': dict = EN_DICT; break;
         case 'de': dict = DE_DICT; break;
         case 'es': dict = ES_DICT; break;
+        case 'fr': dict = FR_DICT; break;
+        case 'it': dict = IT_DICT; break;
+        case 'pt': dict = PT_DICT; break;
+        case 'ru': dict = RU_DICT; break;
         case 'zh': dict = ZH_DICT; break;
         case 'ja': dict = JA_DICT; break;
         case 'ko': dict = KO_DICT; break;
         case 'ar': dict = AR_DICT; break;
-        case 'fr':
-        case 'it':
-        case 'pt':
-        case 'ru':
-            dict = EN_DICT;
-            break;
         default:
             dict = EN_DICT;
             break;

@@ -39,7 +39,7 @@ export function HomeFooterSection() {
                 <h4 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">{col.title}</h4>
                 <ul className="space-y-2">
                   {col.links.map((link) => (
-                    <li key={link.href}>
+                    <li key={`${col.title}-${link.href}-${link.label}`}>
                       <Link href={link.href} className="text-xs text-slate-600 hover:text-white transition-colors">
                         {link.label}
                       </Link>
@@ -55,7 +55,12 @@ export function HomeFooterSection() {
               <Hexagon size={22} className="text-white" />
               <span className="text-xs font-black tracking-[0.4em] text-white uppercase">AluCalc OS</span>
             </div>
-            <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">{f.copyright}</p>
+            <div className="flex items-center gap-6">
+              <Link href="/privacy" className="text-[10px] font-bold text-slate-500 hover:text-cyan-400 uppercase tracking-widest transition-colors">
+                Privacy & KVKK
+              </Link>
+              <p className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">{f.copyright}</p>
+            </div>
           </div>
         </div>
       </footer>

@@ -12,6 +12,8 @@ import { CalculatorInput } from "@/components/CalculatorInput";
 
 import { getReducerModuleStrings, formatReducerMaintenance } from '@/locales/reducerModuleTranslations';
 
+import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
+
 export default function ReducerModule({ lang, dict }: { lang: string, dict: any }) {
     const s = getReducerModuleStrings(lang);
     const reducerDict = dict?.reducer || {};
@@ -38,7 +40,7 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
         // Max permissible oil temperature
         const T_oil_limit = oilType === 'synthetic' ? 95 : 80;
         
-        // Thermal Power Limit (kW) - Pt = (alpha * A * (T_oil - T_amb)) / 1000
+        // Thermal Power Limit (kW) - Pt = (alpha * area * (T_oil - T_amb)) / 1000
         const Pt = (alpha * area * (T_oil_limit - ambientTemp)) / 1000;
         
         // Estimated Operating Temperature
@@ -66,13 +68,11 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
                 
                 {/* Header Side */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                            <Droplets size={24} />
-                        </div>
+                    <div className="flex items-center gap-3.5 group cursor-default">
+                        <SidebarAnimatedIcon itemId="reducer-lubrication" size={36} color="#00e5ff" />
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">LubePulse</h1>
-                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase mt-1">ISO TR 14179 Thermal Monitor</p>
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none text-white group-hover:text-cyan-300 transition-colors">LubePulse</h1>
+                            <p className="text-[10px] text-cyan-400/80 font-mono tracking-widest uppercase mt-1">ISO TR 14179 Thermal Monitor</p>
                         </div>
                     </div>
                 </div>
@@ -82,27 +82,36 @@ export default function ReducerModule({ lang, dict }: { lang: string, dict: any 
                     <div className="space-y-8">
                         <EngineeringVisualization status={results.isCritical ? 'warning' : 'valid'} label={s.thermalCharacteristic}>
                             <div className="flex flex-col items-center justify-center p-8 w-full h-full min-h-[400px] relative bg-[#05080f] rounded-[3rem] border border-white/5 overflow-hidden">
-                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.03)_0%,transparent_70%)]" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.04)_0%,transparent_70%)]" />
                                 
                                 <motion.div 
-                                    animate={{ scale: [1, 1.02, 1], borderColor: results.isCritical ? ['#ef444433', '#ef444488', '#ef444433'] : [] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="w-48 h-48 bg-[#0a0f18] border border-white/10 rounded-[2.5rem] flex items-center justify-center relative overflow-hidden shadow-2xl"
+                                    animate={{ scale: [1, 1.02, 1], borderColor: results.isCritical ? ['#ef444444', '#ef444499', '#ef444444'] : ['#00e5ff33', '#00e5ff66', '#00e5ff33'] }}
+                                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                                    className="w-52 h-52 bg-[#080d16] border rounded-[2.5rem] flex items-center justify-center relative overflow-hidden shadow-2xl"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent" />
-                                    <div className="relative flex flex-col items-center">
-                                        <Thermometer size={48} className={results.isCritical ? 'text-red-500' : 'text-cyan-400'} />
-                                        <span className="text-2xl font-black font-mono mt-4 tabular-nums">{results.operatingTemp.toFixed(0)}°C</span>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/5" />
+                                    
+                                    <div className="relative flex flex-col items-center z-10">
+                                        <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 shadow-inner">
+                                            <Thermometer size={42} className={results.isCritical ? 'text-rose-500 animate-pulse' : 'text-cyan-400'} />
+                                        </div>
+                                        <span className="text-3xl font-black font-mono mt-3 tabular-nums text-white tracking-tight">
+                                            {results.operatingTemp.toFixed(0)}°C
+                                        </span>
+                                        <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400 mt-0.5">
+                                            {results.isCritical ? 'OVERHEAT' : 'STABLE TEMP'}
+                                        </span>
                                     </div>
-                                    {/* Procedural Oil Level Animation */}
+                                    
+                                    {/* Procedural Oil Wave Level Animation */}
                                     <motion.div 
-                                        animate={{ y: [4, 0, 4] }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                                        className="absolute bottom-0 left-0 w-full h-12 bg-cyan-500/10 backdrop-blur-md" 
+                                        animate={{ y: [6, 0, 6] }}
+                                        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                                        className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-cyan-500/20 to-transparent backdrop-blur-sm" 
                                     />
                                 </motion.div>
 
-                                <div className="mt-12 flex gap-8">
+                                <div className="mt-10 flex gap-8">
                                     <div className="text-center">
                                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 font-mono">{s.thermalLimit}</div>
                                         <div className="text-2xl font-black text-white tabular-nums">{results.Pt.toFixed(1)} <span className="text-[10px] text-slate-600">kW</span></div>

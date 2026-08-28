@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { getGamificationStrings } from '@/locales/gamificationTranslations';
 
 export function AcademyGamificationHUD() {
   const { 
@@ -35,6 +36,7 @@ export function AcademyGamificationHUD() {
 
   const { language } = useI18nStore();
   const isTr = language === 'tr';
+  const tGame = getGamificationStrings(language);
 
   const [activeModal, setActiveModal] = useState<'shop' | 'streak' | 'hearts' | 'league' | null>(null);
   const leagueInfo = getLeagueInfo(xp);
@@ -49,12 +51,12 @@ export function AcademyGamificationHUD() {
             type="button"
             onClick={() => setActiveModal('streak')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all text-xs font-black"
-            title={isTr ? `${streak} Günlük Seri` : `${streak} Day Streak`}
+            title={tGame.streakDays(streak)}
           >
             <Flame size={15} className={`text-amber-400 ${streak > 0 ? 'animate-bounce' : 'opacity-60'}`} />
             <span>{streak}</span>
             <span className="hidden md:inline text-[10px] uppercase tracking-widest text-amber-300/80">
-              {isTr ? 'GÜN' : 'DAYS'}
+              {tGame.dayBadge}
             </span>
           </button>
 
@@ -87,7 +89,7 @@ export function AcademyGamificationHUD() {
             type="button"
             onClick={() => setActiveModal('shop')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/25 text-cyan-400 hover:bg-cyan-500/20 active:scale-95 transition-all text-xs font-black"
-            title={isTr ? 'Elmas Marketi' : 'Gems Store'}
+            title={tGame.gemsStore}
           >
             <Gem size={14} className="text-cyan-400" />
             <span className="font-mono">{gems}</span>
@@ -98,7 +100,7 @@ export function AcademyGamificationHUD() {
             type="button"
             onClick={() => setActiveModal('hearts')}
             className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 hover:bg-rose-500/20 active:scale-95 transition-all text-xs font-black"
-            title={isTr ? `${hearts}/${maxHearts} Can` : `${hearts}/${maxHearts} Hearts`}
+            title={tGame.heartsCount(hearts, maxHearts)}
           >
             <Heart size={14} className="text-rose-500 fill-rose-500" />
             <span className="font-mono">{hearts}</span>
@@ -109,7 +111,7 @@ export function AcademyGamificationHUD() {
             type="button"
             onClick={toggleSound}
             className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
-            title={soundEnabled ? (isTr ? 'Sesleri Kapat' : 'Mute Sounds') : (isTr ? 'Sesleri Aç' : 'Enable Sounds')}
+            title={soundEnabled ? tGame.muteSounds : tGame.enableSounds}
           >
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
           </button>
@@ -134,10 +136,10 @@ export function AcademyGamificationHUD() {
                 {activeModal === 'shop' && <Gem className="text-cyan-400" size={22} />}
                 {activeModal === 'league' && <Trophy className="text-blue-400" size={22} />}
                 <h3 className="text-base font-black text-white">
-                  {activeModal === 'streak' && (isTr ? 'Günlük Seri (Streak)' : 'Daily Streak')}
-                  {activeModal === 'hearts' && (isTr ? 'Mühendislik Canları' : 'Engineering Hearts')}
-                  {activeModal === 'shop' && (isTr ? 'Akademi Marketi' : 'Academy Gem Store')}
-                  {activeModal === 'league' && (isTr ? 'Mühendislik Kademesi' : 'Engineering League')}
+                  {activeModal === 'streak' && tGame.streakTitle}
+                  {activeModal === 'hearts' && tGame.heartsTitle}
+                  {activeModal === 'shop' && tGame.shopTitle}
+                  {activeModal === 'league' && tGame.leagueTitle}
                 </h3>
               </div>
               <button 
@@ -155,7 +157,7 @@ export function AcademyGamificationHUD() {
                   <Flame size={36} className="animate-pulse" />
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-white">{streak} {isTr ? 'Günlük Seri' : 'Days Streak'}</p>
+                  <p className="text-2xl font-black text-white">{tGame.streakDays(streak)}</p>
                   <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                     {isTr 
                       ? 'Her gün en az 1 interaktif ders çözerek serinizi canlı tutun ve mühendislik reflekslerinizi geliştirin.'

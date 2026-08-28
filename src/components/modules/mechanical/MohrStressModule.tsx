@@ -8,29 +8,50 @@ import {
 } from 'lucide-react';
 import { EngineeringVisualization } from "@/components/ui/EngineeringVisualization";
 import { CalculatorInput } from "@/components/CalculatorInput";
+import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
 
-export default function MohrStressModule() {
-    const [sigmaX, setSigmaX] = useState(100); // MPa
-    const [sigmaY, setSigmaY] = useState(40);  // MPa
-    const [tauXY, setTauXY] = useState(30);    // MPa
-    const [angle, setAngle] = useState(0);      // degrees — rotation angle
+export default function MohrStressModule({ lang }: { lang: string }) {
+    // Technical State
+    const [sigmaX, setSigmaX] = useState(120); // MPa
+    const [sigmaY, setSigmaY] = useState(-40);  // MPa
+    const [tauXY, setTauXY] = useState(60);    // MPa
+    const [angle, setAngle] = useState(0);     // Degrees
 
+    // Analytical Solution (Mohr's Circle)
     const results = useMemo(() => {
-        const sigmaAvg = (sigmaX + sigmaY) / 2;
-        const R = Math.sqrt(Math.pow((sigmaX - sigmaY) / 2, 2) + Math.pow(tauXY, 2));
+        const center = (sigmaX + sigmaY) / 2;
+        const radius = Math.sqrt(Math.pow((sigmaX - sigmaY) / 2, 2) + Math.pow(tauXY, 2));
+        
+        const sigma1 = center + radius;
+        const sigma2 = center - radius;
+        const tauMax = radius;
+        
+        // Principal Angle
+        const thetaP = (Math.atan2(2 * tauXY, sigmaX - sigmaY) / 2) * (180 / Math.PI);
+        
+        // Rotated State
+        const rad = (angle * Math.PI) / 180;
+        const sigmaXPrime = center + ((sigmaX - sigmaY) / 2) * Math.cos(2 * rad) + tauXY * Math.sin(2 * rad);
+        const sigmaYPrime = center - ((sigmaX - sigmaY) / 2) * Math.cos(2 * rad) - tauXY * Math.sin(2 * rad);
+        const tauXYPrime = -((sigmaX - sigmaY) / 2) * Math.sin(2 * rad) + tauXY * Math.cos(2 * rad);
 
-        const sigma1 = sigmaAvg + R;
-        const sigma2 = sigmaAvg - R;
-        const tauMax = R;
+        // Von Mises
+        const vonMises = Math.sqrt(Math.pow(sigma1, 2) - sigma1 * sigma2 + Math.pow(sigma2, 2));
 
-        const theta_p = (Math.atan2(2 * tauXY, sigmaX - sigmaY) / 2) * (180 / Math.PI);
-        const vonMises = Math.sqrt(sigma1 * sigma1 - sigma1 * sigma2 + sigma2 * sigma2);
-
-        const thetaRad = angle * Math.PI / 180;
-        const sigma_n = sigmaAvg + ((sigmaX - sigmaY) / 2) * Math.cos(2 * thetaRad) + tauXY * Math.sin(2 * thetaRad);
-        const tau_n = -((sigmaX - sigmaY) / 2) * Math.sin(2 * thetaRad) + tauXY * Math.cos(2 * thetaRad);
-
-        return { sigmaAvg, R, sigma1, sigma2, tauMax, theta_p, vonMises, sigma_n, tau_n };
+        return {
+            center,
+            radius,
+            sigma1,
+            sigma2,
+            tauMax,
+            thetaP,
+            sigmaXPrime,
+            sigmaYPrime,
+            tauXYPrime,
+            sigma_n: sigmaXPrime,
+            tau_n: tauXYPrime,
+            vonMises
+        };
     }, [sigmaX, sigmaY, tauXY, angle]);
 
     const status = results.vonMises < 250 ? 'valid' : 'warning';
@@ -41,13 +62,11 @@ export default function MohrStressModule() {
                 
                 {/* Header Section */}
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-                            <Activity size={24} />
-                        </div>
+                    <div className="flex items-center gap-3.5 group cursor-default">
+                        <SidebarAnimatedIcon itemId="fea-studio" size={36} color="#00e5ff" />
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Stress Node</h1>
-                            <p className="text-[10px] text-cyan-500/60 font-mono tracking-widest uppercase mt-1">Mohr Circle Analytics v4.1</p>
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none text-white group-hover:text-cyan-300 transition-colors">Stress Node</h1>
+                            <p className="text-[10px] text-cyan-400/80 font-mono tracking-widest uppercase mt-1">Mohr Circle Analytics v4.1</p>
                         </div>
                     </div>
                 </div>

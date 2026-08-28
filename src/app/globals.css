@@ -480,3 +480,159 @@ body {
     min-height: 0;
   }
 }
+
+/* ── AeGiS cinematic motion ── */
+@keyframes aegis-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes aegis-orbit-rev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes aegis-scan {
+  0% { transform: translateY(-120%); opacity: 0; }
+  12% { opacity: 0.55; }
+  88% { opacity: 0.35; }
+  100% { transform: translateY(220%); opacity: 0; }
+}
+@keyframes aegis-mote {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.15; }
+  50% { transform: translate3d(var(--mx, 8px), var(--my, -18px), 0); opacity: 0.85; }
+}
+@keyframes aegis-bloom {
+  0%, 100% { opacity: 0.35; transform: scale(0.92); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+@keyframes aegis-ring-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.7; }
+}
+@keyframes aegis-beam {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.42; }
+}
+@keyframes aegis-pose-in {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
+.aegis-hero-stage {
+  --aegis-cyan: #00e5ff;
+  isolation: isolate;
+}
+.aegis-hero-floor {
+  background:
+    linear-gradient(to bottom, transparent 0%, rgba(0, 229, 255, 0.06) 100%),
+    repeating-linear-gradient(90deg, rgba(0, 229, 255, 0.09) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.09) 0 1px, transparent 1px 28px);
+  transform: perspective(520px) rotateX(68deg) scale(1.35);
+  transform-origin: center bottom;
+}
+.aegis-scan-line {
+  animation: aegis-scan 5.4s ease-in-out infinite;
+}
+.aegis-orbit {
+  animation: aegis-orbit 22s linear infinite;
+}
+.aegis-orbit-slow {
+  animation: aegis-orbit 38s linear infinite;
+}
+.aegis-orbit-rev {
+  animation: aegis-orbit-rev 16s linear infinite;
+}
+.aegis-mote {
+  animation: aegis-mote var(--dur, 5s) ease-in-out infinite;
+}
+.aegis-bloom {
+  animation: aegis-bloom 3.6s ease-in-out infinite;
+}
+.aegis-ring-pulse {
+  animation: aegis-ring-pulse 2.8s ease-in-out infinite;
+}
+.aegis-beam {
+  animation: aegis-beam 2.4s ease-in-out infinite;
+}
+.aegis-pose-in {
+  animation: aegis-pose-in 0.55s ease-out both;
+}
+@keyframes aegis-cloud-drift {
+  0% { transform: translateX(-8%); }
+  100% { transform: translateX(8%); }
+}
+.aegis-cloud-drift {
+  animation: aegis-cloud-drift 9s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aegis-scan-line,
+  .aegis-orbit,
+  .aegis-orbit-slow,
+  .aegis-orbit-rev,
+  .aegis-mote,
+  .aegis-bloom,
+  .aegis-ring-pulse,
+  .aegis-beam,
+  .aegis-pose-in,
+  .aegis-root-character {
+    animation: none !important;
+  }
+}
+
+/* ── Solver SVG motion (17 protected calculators) ── */
+@keyframes solver-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes solver-spin-rev {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+@keyframes solver-torque {
+  0%, 100% { transform: rotate(-8deg); opacity: 0.55; }
+  50% { transform: rotate(22deg); opacity: 1; }
+}
+@keyframes solver-haz {
+  0%, 100% { opacity: 0.22; }
+  50% { opacity: 0.72; }
+}
+@keyframes solver-dash {
+  to { stroke-dashoffset: -28; }
+}
+@keyframes solver-scan {
+  0% { transform: translateX(-18px); opacity: 0; }
+  35% { opacity: 0.85; }
+  100% { transform: translateX(22px); opacity: 0; }
+}
+@keyframes solver-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(1.6px); }
+}
+@keyframes solver-weld-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+.solver-spin,
+.solver-spin-rev,
+.solver-torque,
+.solver-bob {
+  transform-box: view-box;
+  transform-origin: center;
+}
+.solver-spin { animation: solver-spin 7.2s linear infinite; }
+.solver-spin-rev { animation: solver-spin-rev 9s linear infinite; }
+.solver-spin-fast { animation: solver-spin 2.8s linear infinite; transform-box: view-box; transform-origin: center; }
+.solver-torque { animation: solver-torque 1.6s ease-in-out infinite; }
+.solver-haz { animation: solver-haz 2.4s ease-in-out infinite; }
+.solver-dash { animation: solver-dash 1.6s linear infinite; }
+.solver-scan { animation: solver-scan 2.8s ease-in-out infinite; }
+.solver-bob { animation: solver-bob 2.8s ease-in-out infinite; }
+.solver-weld { animation: solver-weld-glow 1.8s ease-in-out infinite; }
+.sai-icon.is-on .solver-spin { animation-duration: 3s; }
+.sai-icon.is-on .solver-spin-rev { animation-duration: 4.2s; }
+@media (prefers-reduced-motion: reduce) {
+  .solver-spin, .solver-spin-rev, .solver-spin-fast, .solver-torque,
+  .solver-haz, .solver-dash, .solver-scan, .solver-bob, .solver-weld {
+    animation: none !important;
+  }
+}

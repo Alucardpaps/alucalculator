@@ -68,7 +68,7 @@ export function ChainDriveBlueprint(props: ChainDriveBlueprintProps) {
                     100% { transform: rotate(360deg); }
                 }
                 @media (prefers-reduced-motion: reduce) {
-                    .chain-run { animation: none !important; }
+                    .chain-run, [style*="sprocketSpin"] { animation: none !important; }
                 }
             `}</style>
             <rect width={W} height={H} fill="#040810" rx="8" />
@@ -83,6 +83,7 @@ export function ChainDriveBlueprint(props: ChainDriveBlueprintProps) {
             {/* Driver Sprocket 1 (Rotates with rpm1) */}
             <g style={{
                 transformOrigin: `${layout.cx1}px ${layout.cy}px`,
+                transformBox: 'view-box',
                 animation: `sprocketSpin ${Math.max((60 / (rpm1 || 1450)) * 12, 0.4)}s linear infinite`
             }}>
                 <path
@@ -102,6 +103,7 @@ export function ChainDriveBlueprint(props: ChainDriveBlueprintProps) {
             {/* Driven Sprocket 2 (Rotates at rpm1 / ratio) */}
             <g style={{
                 transformOrigin: `${layout.cx2}px ${layout.cy}px`,
+                transformBox: 'view-box',
                 animation: `sprocketSpin ${Math.max((60 / (rpm1 || 1450)) * 12 * iVal, 0.8)}s linear infinite`
             }}>
                 <path

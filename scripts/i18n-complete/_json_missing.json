@@ -1,0 +1,202 @@
+{
+  "nav.mechanical": {
+    "en": "Mechanical",
+    "tr": "Mekanik"
+  },
+  "nav.civil": {
+    "en": "Civil",
+    "tr": "İnşaat"
+  },
+  "nav.electrical": {
+    "en": "Electrical",
+    "tr": "Elektrik"
+  },
+  "nav.science": {
+    "en": "Science",
+    "tr": "Bilim"
+  },
+  "nav.finance": {
+    "en": "Finance",
+    "tr": "Finans"
+  },
+  "nav.software": {
+    "en": "Software",
+    "tr": "Yazılım"
+  },
+  "nav.other": {
+    "en": "Other",
+    "tr": "Diğer"
+  },
+  "modules.thermalExpansion.title": {
+    "en": "Thermal Expansion",
+    "tr": "Termal Genleşme"
+  },
+  "modules.thermalExpansion.desc": {
+    "en": "Dimensional Stability Analysis",
+    "tr": "Boyutsal Kararlılık Analizi"
+  },
+  "modules.manufacturingSandbox.title": {
+    "en": "Mfg. Sandbox",
+    "tr": "Üretim Simülatörü"
+  },
+  "modules.manufacturingSandbox.desc": {
+    "en": "Virtual Production Line",
+    "tr": "Sanal İmalat Hattı"
+  },
+  "modules.simulationFea.title": {
+    "en": "FEA Simulation",
+    "tr": "FEA Simülasyonu"
+  },
+  "modules.simulationFea.desc": {
+    "en": "Stress & Deformation",
+    "tr": "Gerilme & Deformasyon"
+  },
+  "modules.analytics.title": {
+    "en": "Analytics Dashboard",
+    "tr": "Analitik Paneli"
+  },
+  "modules.analytics.desc": {
+    "en": "System Performance Data",
+    "tr": "Sistem Performans Verileri"
+  },
+  "modules.fileExplorer.title": {
+    "en": "File Explorer",
+    "tr": "Dosya Gezgini"
+  },
+  "modules.fileExplorer.desc": {
+    "en": "OS File System",
+    "tr": "OS Dosya Sistemi"
+  },
+  "modules.terminal.title": {
+    "en": "Terminal",
+    "tr": "Terminal"
+  },
+  "modules.terminal.desc": {
+    "en": "Command Line Interface",
+    "tr": "Komut Satırı Arayüzü"
+  },
+  "modules.settings.title": {
+    "en": "Settings",
+    "tr": "Ayarlar"
+  },
+  "modules.settings.desc": {
+    "en": "System Configuration",
+    "tr": "Sistem Yapılandırması"
+  },
+  "gear.outputs.tipDia": {
+    "en": "Tip Diameter",
+    "tr": "Diş Üstü Çapı (da)"
+  },
+  "gear.outputs.rootDia": {
+    "en": "Root Diameter",
+    "tr": "Diş Dibi Çapı (df)"
+  },
+  "beam-deflection.title": {
+    "en": "Beam Deflection",
+    "tr": "Kiriş Sehim Hesabı"
+  },
+  "beam-deflection.desc": {
+    "en": "Calculate Deflection & Stress",
+    "tr": "Sehim & Gerilme Analizi"
+  },
+  "concrete-reinforcement.title": {
+    "en": "Concrete Rebar",
+    "tr": "Beton Donatı Hesabı"
+  },
+  "concrete-reinforcement.desc": {
+    "en": "Reinforcement Area",
+    "tr": "İnşaat Demir Hesabı"
+  },
+  "ohms-law.title": {
+    "en": "Ohm's Law",
+    "tr": "Ohm Kanunu"
+  },
+  "ohms-law.desc": {
+    "en": "V = I × R",
+    "tr": "V = I × R"
+  },
+  "voltage-drop.title": {
+    "en": "Voltage Drop",
+    "tr": "Gerilim Düşümü"
+  },
+  "voltage-drop.desc": {
+    "en": "Cable Sizing",
+    "tr": "Kablo Kesit Hesabı"
+  },
+  "periodic-table.title": {
+    "en": "Periodic Table",
+    "tr": "Periyodik Tablo"
+  },
+  "periodic-table.desc": {
+    "en": "Chemical Elements",
+    "tr": "Elementler ve Özellikleri"
+  },
+  "calculator.title": {
+    "en": "Scientific Calculator",
+    "tr": "Bilimsel Hesap Makinesi"
+  },
+  "calculator.desc": {
+    "en": "Advanced Math",
+    "tr": "İleri Matematik"
+  },
+  "vat-calculator.title": {
+    "en": "VAT Calculator",
+    "tr": "KDV Hesaplayıcı"
+  },
+  "vat-calculator.desc": {
+    "en": "Tax Calculation",
+    "tr": "Vergi Dahil/Hariç"
+  },
+  "excel-helper.title": {
+    "en": "Excel Helper",
+    "tr": "Excel Yardımcısı"
+  },
+  "excel-helper.desc": {
+    "en": "Formula Generator",
+    "tr": "Formül Oluşturucu"
+  },
+  "json-formatter.title": {
+    "en": "JSON Formatter",
+    "tr": "JSON Biçimlendirici"
+  },
+  "json-formatter.desc": {
+    "en": "Prettify JSON",
+    "tr": "JSON Doğrulama & Format"
+  },
+  "regex-tester.title": {
+    "en": "Regex Tester",
+    "tr": "Regex Test Aracı"
+  },
+  "regex-tester.desc": {
+    "en": "Test Patterns",
+    "tr": "Düzenli İfade Testi"
+  },
+  "feedback.title": {
+    "en": "Feedback",
+    "tr": "Geri Bildirim"
+  },
+  "feedback.desc": {
+    "en": "Send us your thoughts",
+    "tr": "Görüşlerinizi Bildirin"
+  },
+  "thermal.initialLength": {
+    "en": "Initial Length",
+    "tr": "İlk Uzunluk"
+  },
+  "thermal.tempDelta": {
+    "en": "Temperature Delta",
+    "tr": "Sıcaklık Farkı"
+  },
+  "thermal.finalLength": {
+    "en": "Final Length",
+    "tr": "Son Uzunluk"
+  },
+  "thermal.expansion": {
+    "en": "Expansion Amount",
+    "tr": "Genleşme Miktarı"
+  },
+  "thermal.strain": {
+    "en": "Strain Rate",
+    "tr": "Birim Şekil Değişimi"
+  }
+}

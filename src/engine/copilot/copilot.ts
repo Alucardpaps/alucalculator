@@ -105,9 +105,9 @@ export class EngineeringCopilot {
     const isNegativeFeedback = /(yanlış|hata|bozuk|kusur|olmadı|saçma|wrong|error|broken|incorrect|invalid|fail|stupid|bad|sucks|trash)/.test(q);
     if (isNegativeFeedback) {
       intent.showSupportButton = true;
-      intent.replyOverride = s.feedbackReply;
-      intent.actionLabel = s.feedbackAction;
-      intent.actionUrl = 'mailto:abdulsametyildirim95@gmail.com?subject=Technical Feedback Report';
+      intent.replyOverride = 'Teknik bir hata veya tutarsızlık tespit ettiyseniz lütfen mühendislik ekibimizle iletişime geçin.';
+      intent.actionUrl = 'mailto:contact@alucalculator.com?subject=Technical Feedback Report';
+      intent.actionLabel = 'Destek ile İletişime Geç';
       return intent;
     }
 

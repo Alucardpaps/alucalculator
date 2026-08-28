@@ -217,6 +217,7 @@ export function BearingsModule() {
                                     {/* Rotating Cage and Rolling Elements (Balls) */}
                                     <g style={{
                                         transformOrigin: '100px 100px',
+                                        transformBox: 'view-box',
                                         animation: rpm > 0 ? `bearingSpin ${Math.max((60 / rpm) * 10, 0.5)}s linear infinite` : 'none'
                                     }}>
                                         {/* Cage Guide Circle */}
@@ -244,6 +245,7 @@ export function BearingsModule() {
                                     {/* Inner Ring (Rotates with shaft) */}
                                     <g style={{
                                         transformOrigin: '100px 100px',
+                                        transformBox: 'view-box',
                                         animation: rpm > 0 ? `bearingSpin ${Math.max((60 / rpm) * 5, 0.25)}s linear infinite` : 'none'
                                     }}>
                                         <circle cx="100" cy="100" r="42" fill="rgba(0,229,255,0.06)" stroke="#00e5ff" strokeWidth="1.2" strokeDasharray="4,2" />

@@ -374,6 +374,27 @@ export class PDFReportEngine {
     }
 
     public save(filename?: string) {
+        // Apply Free Tier Watermark across all pages if not on a paid plan
+        try {
+            const { useLicenseStore } = require('@/store/licenseStore');
+            const plan = useLicenseStore.getState().plan;
+            if (plan === 'free') {
+                const totalPages = this.doc.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    this.doc.setPage(i);
+                    this.doc.setTextColor(215, 220, 228);
+                    this.doc.setFontSize(22);
+                    this.doc.setFont("helvetica", "bold");
+                    this.doc.text("ALUCALC OS — FREE TIER (WATERMARKED)", 105, 160, {
+                        align: "center",
+                        angle: 45
+                    });
+                }
+            }
+        } catch {
+            // Gracefully ignore in non-browser environments
+        }
+
         // Redraw footer at the very end to ensure accurate page counts
         this.drawFooter();
         const fname = filename || `AluCalc_Report_${new Date().toISOString().slice(0, 10)}.pdf`;

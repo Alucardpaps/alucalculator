@@ -171,7 +171,7 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
 // MAIN COMPONENT
 // ════════════════════════════════════════════
 
-export function FastenersModule({ lang, dict }: { lang: string, dict: any }) {
+export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = {}) {
     const { language } = useI18nStore();
     const t = getFastenersModuleUiStrings(language);
 

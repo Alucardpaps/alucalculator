@@ -279,3 +279,5 @@ export function Mobile2DCad({ onTransferTo3D }: Props) {
     </div>
   );
 }
+
+export default Mobile2DCad;

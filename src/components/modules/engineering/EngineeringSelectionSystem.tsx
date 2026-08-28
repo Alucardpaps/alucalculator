@@ -1613,8 +1613,8 @@ export default function EngineeringSelectionSystem() {
                                 {/* Render matching module directly, pass full height classes */}
                                 <div className="w-full h-full pt-20 pb-0 overflow-y-auto">
                                     {activeCalculator === 'bearings' && <BearingsModule />}
-                                    {activeCalculator === 'gears-bearings' && <GearsModule lang="en" dict={{}} />}
-                                    {activeCalculator === 'fasteners' && <FastenersModule lang="en" dict={{}} />}
+                                    {activeCalculator === 'gears-bearings' && <GearsModule />}
+                                    {activeCalculator === 'fasteners' && <FastenersModule />}
                                     {activeCalculator === 'thermal-expansion' && <ThermalExpansionModule />}
                                     {/* Fallback if no specific highly-styled module exists yet */}
                                     {!['bearings', 'gears-bearings', 'fasteners', 'thermal-expansion'].includes(activeCalculator!) && (

@@ -62,6 +62,34 @@
     "handbook": {
       "title": "핸드북",
       "desc": "베어링 표, ISO 공차, G-코드 참조."
+    },
+    "thermalExpansion": {
+      "title": "열팽창",
+      "desc": "치수 안정성 분석"
+    },
+    "manufacturingSandbox": {
+      "title": "제조 시뮬레이터",
+      "desc": "가상 생산 라인"
+    },
+    "simulationFea": {
+      "title": "FEA 시뮬레이션",
+      "desc": "응력 및 변형"
+    },
+    "analytics": {
+      "title": "분석 대시보드",
+      "desc": "시스템 성능 데이터"
+    },
+    "fileExplorer": {
+      "title": "파일 탐색기",
+      "desc": "OS 파일 시스템"
+    },
+    "terminal": {
+      "title": "터미널",
+      "desc": "명령줄 인터페이스"
+    },
+    "settings": {
+      "title": "설정",
+      "desc": "시스템 구성"
     }
   },
   "common": {
@@ -304,8 +332,8 @@
       "forcesAndStress": "힘 & 응력"
     },
     "outputs": {
-      "tipDia": "치첨 지름",
-      "rootDia": "치저 지름"
+      "tipDia": "이끝원 지름",
+      "rootDia": "이뿌리원 지름"
     }
   },
   "strength": {
@@ -447,7 +475,7 @@
   },
   "beam-deflection": {
     "title": "보 처짐",
-    "desc": "처짐 & 응력 계산"
+    "desc": "처짐 및 응력 계산"
   },
   "concrete-reinforcement": {
     "title": "콘크리트 철근",
@@ -459,7 +487,7 @@
   },
   "voltage-drop": {
     "title": "전압 강하",
-    "desc": "케이블 선정"
+    "desc": "케이블 단면 선정"
   },
   "periodic-table": {
     "title": "주기율표",
@@ -487,7 +515,7 @@
   },
   "feedback": {
     "title": "피드백",
-    "desc": "의견 보내기"
+    "desc": "의견을 보내 주세요"
   },
   "driveTrain": {
     "title": "구동계 설계",
@@ -657,5 +685,12 @@
     "bladeKerf": "톱날 폭",
     "trimStart": "시작 여유",
     "trimEnd": "끝 여유"
+  },
+  "thermal": {
+    "initialLength": "초기 길이",
+    "tempDelta": "온도 차이",
+    "finalLength": "최종 길이",
+    "expansion": "팽창량",
+    "strain": "변형률"
   }
 }

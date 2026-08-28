@@ -29,7 +29,7 @@ const SUPPORTED_LOCALES: SupportedLocale[] = [
 ];
 
 export function t(entry: TranslationInput): TranslationEntry {
-    const fallback = entry.tr ?? entry.en;
+    const fallback = entry.en;
     const result: Partial<TranslationEntry> = {};
     for (const locale of SUPPORTED_LOCALES) {
         result[locale] = entry[locale] ?? fallback;

@@ -5,9 +5,10 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Box, Cylinder, Layers, MousePointer2, Move, RotateCcw, RotateCw,
-  SlidersHorizontal, Plus, Download, Grid3X3, Undo2, Redo2,
+  SlidersHorizontal, Plus, Download, Upload, Grid3X3, Undo2, Redo2,
   Trash2, Copy, Sparkles, Pencil, X, HelpCircle, Eye, EyeOff,
-  Wrench, Check, Disc, Cuboid
+  Wrench, Check, Disc, Cuboid, Settings2, Sliders, Scissors, FileText,
+  Activity, Compass, ChevronDown, ChevronUp, Maximize2
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import {
@@ -16,11 +17,17 @@ import {
   PART_COLORS,
   type DesignKind,
   type DesignTool,
-  type DesignPart
+  type DesignPart,
+  type RenderMode,
+  type SectionAxis
 } from './designStore';
 import { exportPartsToSTL, downloadFile } from './exporter';
+import { loadCADFile } from './cadImporter';
+import { ENGINEERING_MATERIALS, calculateAssemblyMassProperties } from './materialsEngine';
+import { generateTechnicalDrawingSVG, generateBatchDrawingsHTML, type DrawingTemplateStyle, type DrawingColorTheme, type DrawingSheetConfig } from './technicalDrawingGenerator';
 
-const DesignViewport = dynamic(() => import('./DesignViewport').then((m) => m.DesignViewport), {
+
+const DesignViewport = dynamic(() => import('./DesignViewport').then((m) => m.DesignViewport || m.default), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center bg-[#070b10] text-[11px] font-mono text-white/35">
@@ -47,6 +54,8 @@ export function MobileDesignStudio() {
   const [isExporting, setIsExporting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [dismissWelcome, setDismissWelcome] = useState(false);
+  const [showExplodeHUD, setShowExplodeHUD] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'explode' | 'render' | 'measure' | 'section' | 'drawing'>('explode');
 
   const parts = useDesignStore((s) => s.parts);
   const selectedId = useDesignStore((s) => s.selectedId);
@@ -66,6 +75,36 @@ export function MobileDesignStudio() {
   const clearScene = useDesignStore((s) => s.clearScene);
   const undo = useDesignStore((s) => s.undo);
   const redo = useDesignStore((s) => s.redo);
+  const explodeFactor = useDesignStore((s) => s.explodeFactor);
+  const setExplodeFactor = useDesignStore((s) => s.setExplodeFactor);
+  const explodeDirection = useDesignStore((s) => s.explodeDirection);
+  const setExplodeDirection = useDesignStore((s) => s.setExplodeDirection);
+
+  const renderMode = useDesignStore((s) => s.renderMode);
+  const setRenderMode = useDesignStore((s) => s.setRenderMode);
+  const sectionAxis = useDesignStore((s) => s.sectionAxis);
+  const setSectionAxis = useDesignStore((s) => s.setSectionAxis);
+  const sectionOffset = useDesignStore((s) => s.sectionOffset);
+  const setSectionOffset = useDesignStore((s) => s.setSectionOffset);
+  const sectionSolidCap = useDesignStore((s) => s.sectionSolidCap);
+  const setSectionSolidCap = useDesignStore((s) => s.setSectionSolidCap);
+  const measureMode = useDesignStore((s) => s.measureMode);
+  const setMeasureMode = useDesignStore((s) => s.setMeasureMode);
+  const measurements = useDesignStore((s) => s.measurements);
+  const clearMeasurements = useDesignStore((s) => s.clearMeasurements);
+  const showCenterOfGravity = useDesignStore((s) => s.showCenterOfGravity);
+  const setShowCenterOfGravity = useDesignStore((s) => s.setShowCenterOfGravity);
+  const showTechnicalDrawingModal = useDesignStore((s) => s.showTechnicalDrawingModal);
+  const setShowTechnicalDrawingModal = useDesignStore((s) => s.setShowTechnicalDrawingModal);
+  const ghostIsolated = useDesignStore((s) => s.ghostIsolated);
+  const setGhostIsolated = useDesignStore((s) => s.setGhostIsolated);
+  const projectName = useDesignStore((s) => s.projectName);
+  const selectedMaterialId = useDesignStore((s) => s.selectedMaterialId);
+
+  const massProps = calculateAssemblyMassProperties(parts, selectedMaterialId);
+  const activeMaterial = ENGINEERING_MATERIALS.find((m) => m.id === selectedMaterialId) || ENGINEERING_MATERIALS[0];
+  const [templateStyle, setTemplateStyle] = useState<DrawingTemplateStyle>('iso7200');
+  const [colorTheme, setColorTheme] = useState<DrawingColorTheme>('classic');
 
   // Sketch selectors & actions
   const sketchPoints = useDesignStore((s) => s.sketchPoints);
@@ -92,6 +131,18 @@ export function MobileDesignStudio() {
     showToast(tr ? `+ ${kindLabel(kind, true)} eklendi` : `+ Added ${kindLabel(kind, false)}`);
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCADImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+      const res = await loadCADFile(files[i]);
+      showToast(res.message);
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleExport = async () => {
     if (!parts.some((p) => p.visible)) {
       showToast(tr ? 'Sahne boş!' : 'Scene empty!');
@@ -114,15 +165,21 @@ export function MobileDesignStudio() {
     { id: 'select', label: tr ? 'Seç' : 'Select', icon: MousePointer2, active: tool === 'select' && sheetMode === 'none', onClick: () => { setTool('select'); setSheetMode('none'); } },
     { id: 'move', label: tr ? 'Taşı' : 'Move', icon: Move, active: tool === 'move', onClick: () => { if (!selectedId) showToast(tr ? 'Önce parça seçin' : 'Select a part first'); setTool('move'); } },
     { id: 'rotate', label: tr ? 'Dön' : 'Rotate', icon: RotateCcw, active: tool === 'rotate', onClick: () => { if (!selectedId) showToast(tr ? 'Önce parça seçin' : 'Select a part first'); setTool('rotate'); } },
-    { id: 'sculpt', label: tr ? 'Hamur' : 'Sculpt', icon: Sparkles, active: tool === 'scale', primary: true, onClick: () => { setTool(tool === 'scale' ? 'select' : 'scale'); } },
     { id: 'add', label: tr ? 'Ekle' : 'Add', icon: Plus, active: sheetMode === 'shapes', onClick: () => setSheetMode(sheetMode === 'shapes' ? 'none' : 'shapes') },
-    { id: 'edit', label: tr ? 'Düzenle' : 'Edit', icon: SlidersHorizontal, active: sheetMode === 'edit', onClick: () => { if (selected) setSheetMode(sheetMode === 'edit' ? 'none' : 'edit'); else showToast(tr ? 'Parçaya dokunun' : 'Tap a part'); } },
-    { id: 'draw', label: tr ? 'Çiz' : 'Draw', icon: Pencil, active: tool === 'sketch-add', onClick: () => { setTool('sketch-add'); setSheetMode('none'); } },
     { id: 'list', label: tr ? 'Liste' : 'List', icon: Layers, active: sheetMode === 'parts', badge: parts.length > 0 ? String(parts.length) : undefined, onClick: () => setSheetMode(sheetMode === 'parts' ? 'none' : 'parts') },
+    { id: 'settings', label: tr ? 'Araçlar' : 'Tools', icon: Settings2, active: sheetMode === 'settings', onClick: () => setSheetMode(sheetMode === 'settings' ? 'none' : 'settings') },
   ];
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#05080c] select-none">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".stl,.obj,.gltf,.glb,.step,.stp,.x_t,.x_b,.iges,.igs,.brep"
+        multiple
+        className="hidden"
+        onChange={handleCADImport}
+      />
       {/* ─── Top Mobile Quick Toolbar ─── */}
       <div className="flex-none flex items-center justify-between gap-1.5 px-3 py-2 border-b border-white/10 bg-[#0a0d16] z-20 shadow-md">
         <button
@@ -144,6 +201,15 @@ export function MobileDesignStudio() {
         </div>
 
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 active:scale-90"
+            title={tr ? 'CAD İçe Aktar (.stl, .obj, .step)' : 'Import CAD (.stl, .obj, .step)'}
+          >
+            <Upload size={16} />
+          </button>
+
           <button
             type="button"
             onClick={() => setShowGrid(!showGrid)}
@@ -255,6 +321,155 @@ export function MobileDesignStudio() {
             </div>
           </div>
         )}
+
+        {/* Floating Quick Action HUD (Explode, Render, Tools) */}
+        {tool !== 'sketch-add' && tool !== 'sketch-cut' && tool !== 'sketch-loft' && (
+          <div className="absolute top-2 inset-x-2 z-20 flex items-center justify-between gap-1.5 pointer-events-none">
+            <div className="flex items-center gap-1.5 pointer-events-auto">
+              <button
+                type="button"
+                onClick={() => setShowExplodeHUD(!showExplodeHUD)}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[10px] font-black uppercase backdrop-blur-md shadow-lg transition-all active:scale-95 ${
+                  showExplodeHUD || explodeFactor > 0
+                    ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-amber-500/20'
+                    : 'bg-slate-950/80 border-white/15 text-slate-300'
+                }`}
+              >
+                <span>💥</span>
+                <span>{tr ? 'Patlat' : 'Explode'}</span>
+                {explodeFactor > 0 && <span className="text-amber-400 font-mono">({explodeFactor}%)</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const modes: RenderMode[] = ['solid', 'wire', 'matcap', 'xray', 'edges'];
+                  const curIdx = modes.indexOf(renderMode);
+                  const nextMode = modes[(curIdx + 1) % modes.length];
+                  setRenderMode(nextMode);
+                  showToast(tr ? `Görünüm: ${nextMode.toUpperCase()}` : `Render: ${nextMode.toUpperCase()}`);
+                }}
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-300 text-[10px] font-black uppercase backdrop-blur-md shadow-lg active:scale-95"
+                title="Cycle Render Mode"
+              >
+                <span>🎨</span>
+                <span>{renderMode === 'solid' ? 'KATI' : renderMode === 'wire' ? 'TEL' : renderMode.toUpperCase()}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1 pointer-events-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  setSettingsTab('drawing');
+                  setSheetMode('settings');
+                }}
+                className="p-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 backdrop-blur-md shadow-lg active:scale-95"
+                title={tr ? '2D Teknik Çizim' : '2D Drawing'}
+              >
+                <FileText size={15} />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSettingsTab('explode');
+                  setSheetMode('settings');
+                }}
+                className="p-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-slate-200 backdrop-blur-md shadow-lg active:scale-95"
+                title={tr ? 'Tüm Görünüm & Patlatma Ayarları' : 'Settings & Tools'}
+              >
+                <Settings2 size={15} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Quick Explosion Control Bar */}
+        <AnimatePresence>
+          {showExplodeHUD && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-12 inset-x-2 z-30 p-3 rounded-2xl border border-amber-500/40 bg-slate-950/95 backdrop-blur-2xl shadow-2xl space-y-2.5 font-mono"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  💥 {tr ? 'Montaj Patlatma Ayarı' : 'Explosion Control'} ({explodeFactor}%)
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {explodeFactor > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setExplodeFactor(0)}
+                      className="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 text-[9px] font-bold border border-rose-500/30"
+                    >
+                      {tr ? 'Sıfırla' : 'Reset'}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowExplodeHUD(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Slider with - / + buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setExplodeFactor(Math.max(0, explodeFactor - 10))}
+                  className="w-7 h-7 rounded-lg bg-white/10 text-white font-black text-xs flex items-center justify-center active:scale-90"
+                >
+                  -
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={150}
+                  step={1}
+                  value={explodeFactor}
+                  onChange={(e) => setExplodeFactor(Number(e.target.value))}
+                  className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setExplodeFactor(Math.min(150, explodeFactor + 10))}
+                  className="w-7 h-7 rounded-lg bg-white/10 text-white font-black text-xs flex items-center justify-center active:scale-90"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Direction Chips */}
+              <div className="grid grid-cols-5 gap-1 pt-1">
+                {[
+                  { id: 'radial', label: tr ? '↗ Radyal' : '↗ Rad' },
+                  { id: 'axial-y', label: tr ? '↕ Y Dikey' : '↕ Y' },
+                  { id: 'axial-x', label: tr ? '↔ X Yatay' : '↔ X' },
+                  { id: 'axial-z', label: tr ? '↕ Z Derin' : '↕ Z' },
+                  { id: 'linear-sequence', label: tr ? '⇣ Sıra' : '⇣ Seq' },
+                ].map((d) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => setExplodeDirection(d.id as any)}
+                    className={`py-1 rounded-lg text-[9px] font-bold border transition-all text-center truncate ${
+                      explodeDirection === d.id
+                        ? 'bg-amber-500/25 border-amber-400 text-amber-300'
+                        : 'bg-white/5 border-white/10 text-slate-400'
+                    }`}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <DesignViewport />
 
@@ -409,6 +624,7 @@ export function MobileDesignStudio() {
                   {sheetMode === 'shapes' && (tr ? '3D Şekil Ekle' : 'Add 3D Shape')}
                   {sheetMode === 'edit' && (tr ? 'Parça Düzenle' : 'Edit Part')}
                   {sheetMode === 'parts' && (tr ? 'Parça Listesi' : 'Parts List')}
+                  {sheetMode === 'settings' && (tr ? '⚙️ Görünüm & CAD Araçları' : '⚙️ View & CAD Tools')}
                   {sheetMode === 'export' && (tr ? '3D Dışa Aktar' : 'Export 3D')}
                   {sheetMode === 'help' && (tr ? 'CAD Kılavuzu' : 'CAD Guide')}
                 </h3>
@@ -592,6 +808,37 @@ export function MobileDesignStudio() {
                     ))
                   )}
 
+                  {parts.length > 1 && (
+                    <div className="p-3 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] uppercase text-amber-400 font-bold">💥 {tr ? 'Montaj Patlatma' : 'Assembly Explode'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="range"
+                          min={0}
+                          max={150}
+                          step={1}
+                          value={explodeFactor}
+                          onChange={(e) => setExplodeFactor(Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                        />
+                        <span className="text-[10px] text-slate-300 font-bold w-8 text-right">{explodeFactor}%</span>
+                      </div>
+                      <select
+                        value={explodeDirection}
+                        onChange={(e) => setExplodeDirection(e.target.value as any)}
+                        className="w-full bg-slate-800 border border-white/10 text-[10px] text-slate-300 font-bold rounded-lg px-2 py-1.5 cursor-pointer outline-none"
+                      >
+                        <option value="radial">{tr ? '↗ Radyal (Tüm Yönler)' : '↗ Radial (All Directions)'}</option>
+                        <option value="axial-y">{tr ? '↕ Dikey (Y)' : '↕ Vertical (Y)'}</option>
+                        <option value="axial-x">{tr ? '↔ Yatay (X)' : '↔ Horizontal (X)'}</option>
+                        <option value="axial-z">{tr ? '↕ Derinlik (Z)' : '↕ Depth (Z)'}</option>
+                        <option value="linear-sequence">{tr ? '⇣ Sıralı Dizilim' : '⇣ Linear Sequence'}</option>
+                      </select>
+                    </div>
+                  )}
+
                   {parts.length > 0 && (
                     <button
                       type="button"
@@ -627,6 +874,323 @@ export function MobileDesignStudio() {
                 </div>
               )}
 
+              {/* Sheet Content: Settings & View Tools */}
+              {sheetMode === 'settings' && (
+                <div className="overflow-y-auto py-2 space-y-3 font-mono text-xs">
+                  {/* Tabs */}
+                  <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl p-1 gap-1">
+                    {[
+                      { id: 'explode', label: tr ? '💥 Patlatma' : '💥 Explode' },
+                      { id: 'render', label: tr ? '🎨 Görünüm' : '🎨 Render' },
+                      { id: 'measure', label: tr ? '📐 Kumpas' : '📐 Caliper' },
+                      { id: 'section', label: tr ? '✂️ Kesit' : '✂️ Section' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setSettingsTab(tab.id as any)}
+                        className={`flex-1 py-1.5 rounded-xl text-[10px] font-black uppercase text-center transition-all ${
+                          settingsTab === tab.id
+                            ? 'bg-cyan-500 text-black shadow-md'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tab 1: Explode */}
+                  {settingsTab === 'explode' && (
+                    <div className="space-y-3 p-1">
+                      <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-amber-300 uppercase text-[11px]">💥 {tr ? 'Montaj Patlatma Oranı' : 'Assembly Explode Factor'}</span>
+                          <span className="font-black text-amber-400 text-sm">{explodeFactor}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setExplodeFactor(Math.max(0, explodeFactor - 10))}
+                            className="w-8 h-8 rounded-xl bg-white/10 text-white font-black text-sm flex items-center justify-center active:scale-90"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="range"
+                            min={0}
+                            max={150}
+                            step={1}
+                            value={explodeFactor}
+                            onChange={(e) => setExplodeFactor(Number(e.target.value))}
+                            className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setExplodeFactor(Math.min(150, explodeFactor + 10))}
+                            className="w-8 h-8 rounded-xl bg-white/10 text-white font-black text-sm flex items-center justify-center active:scale-90"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Patlatma Yönü' : 'Explosion Direction'}</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'radial', label: tr ? '↗ Radyal (Tüm Yönler)' : '↗ Radial' },
+                            { id: 'axial-y', label: tr ? '↕ Dikey (Y Ekseni)' : '↕ Vertical (Y)' },
+                            { id: 'axial-x', label: tr ? '↔ Yatay (X Ekseni)' : '↔ Horizontal (X)' },
+                            { id: 'axial-z', label: tr ? '↕ Derinlik (Z Ekseni)' : '↕ Depth (Z)' },
+                            { id: 'linear-sequence', label: tr ? '⇣ Sıralı Dizilim' : '⇣ Linear Seq' },
+                          ].map((d) => (
+                            <button
+                              key={d.id}
+                              type="button"
+                              onClick={() => setExplodeDirection(d.id as any)}
+                              className={`p-2.5 rounded-xl border text-[11px] font-bold text-left transition-all ${
+                                explodeDirection === d.id
+                                  ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                                  : 'bg-white/[0.03] border-white/10 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {d.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setGhostIsolated(!ghostIsolated)}
+                          className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all ${
+                            ghostIsolated
+                              ? 'bg-purple-500/20 border-purple-400 text-purple-300'
+                              : 'bg-white/[0.03] border-white/10 text-slate-400'
+                          }`}
+                        >
+                          👻 {tr ? 'Hayalet Parçalar' : 'Ghost Mode'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCenterOfGravity(!showCenterOfGravity);
+                            showToast(showCenterOfGravity ? (tr ? 'Ağırlık merkezi gizlendi' : 'CoG hidden') : (tr ? `🎯 Ağırlık Merkezi: ${massProps.massKg} kg` : `🎯 CoG Active`));
+                          }}
+                          className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all ${
+                            showCenterOfGravity
+                              ? 'bg-rose-500/20 border-rose-400 text-rose-300'
+                              : 'bg-white/[0.03] border-white/10 text-slate-400'
+                          }`}
+                        >
+                          🎯 {tr ? `Ağırlık Merkezi (${massProps.massKg}kg)` : `CoG (${massProps.massKg}kg)`}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 2: Render */}
+                  {settingsTab === 'render' && (
+                    <div className="space-y-3 p-1">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? '3D Render Modu' : '3D Render Mode'}</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'solid', label: tr ? '🧱 Katı (Solid)' : 'Solid' },
+                            { id: 'wire', label: tr ? '🕸️ Tel Kafes (Wire)' : 'Wireframe' },
+                            { id: 'matcap', label: tr ? '🗿 MatCap (Teknik)' : 'MatCap' },
+                            { id: 'pbr', label: tr ? '✨ PBR (Gerçekçi)' : 'PBR Realistic' },
+                            { id: 'xray', label: tr ? '🩻 Röntgen (X-Ray)' : 'X-Ray' },
+                            { id: 'normals', label: tr ? '🌈 Normaller' : 'Normals' },
+                            { id: 'edges', label: tr ? '📐 Keskin Kenarlar' : 'Edges Only' },
+                          ].map((rm) => (
+                            <button
+                              key={rm.id}
+                              type="button"
+                              onClick={() => setRenderMode(rm.id as any)}
+                              className={`p-2.5 rounded-xl border text-[11px] font-bold text-left transition-all ${
+                                renderMode === rm.id
+                                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                                  : 'bg-white/[0.03] border-white/10 text-slate-400'
+                              }`}
+                            >
+                              {rm.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10">
+                        <span className="text-slate-300 font-bold text-xs">{tr ? 'Zemin CAD Izgarası' : 'Ground CAD Grid'}</span>
+                        <button
+                          type="button"
+                          onClick={() => setShowGrid(!showGrid)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all ${
+                            showGrid ? 'bg-cyan-500 text-black' : 'bg-white/10 text-slate-400'
+                          }`}
+                        >
+                          {showGrid ? (tr ? 'Açık' : 'ON') : (tr ? 'Kapalı' : 'OFF')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 3: Measure */}
+                  {settingsTab === 'measure' && (
+                    <div className="space-y-3 p-1">
+                      <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-cyan-300 text-xs">📏 {tr ? '3D Kumpas / Ölçüm Aracı' : '3D CAD Caliper'}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const nextTool = tool === 'measure' ? 'select' : 'measure';
+                              setTool(nextTool);
+                              showToast(nextTool === 'measure' ? (tr ? '📏 Kumpas Aktif' : 'Caliper Active') : (tr ? 'Seçim Modu' : 'Select Mode'));
+                            }}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all ${
+                              tool === 'measure' ? 'bg-cyan-500 text-black' : 'bg-white/10 text-slate-400'
+                            }`}
+                          >
+                            {tool === 'measure' ? (tr ? 'Aktif' : 'Active') : (tr ? 'Aç' : 'Enable')}
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-cyan-400/80">
+                          {tr ? 'Yüzeylere veya delik kenarlarına dokunarak milimetrik hassas ölçü alın.' : 'Tap surfaces or holes to measure distance and diameters.'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Ölçüm Yöntemi' : 'Measure Mode'}</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { id: 'auto', label: tr ? '🪄 Oto' : 'Auto' },
+                            { id: 'distance', label: tr ? '📐 Mesafe' : 'Distance' },
+                            { id: 'diameter', label: tr ? '⌀ Çap' : 'Diameter' },
+                          ].map((mm) => (
+                            <button
+                              key={mm.id}
+                              type="button"
+                              onClick={() => {
+                                setMeasureMode(mm.id as any);
+                                if (tool !== 'measure') setTool('measure');
+                              }}
+                              className={`p-2 rounded-xl border text-[10px] font-bold text-center transition-all ${
+                                measureMode === mm.id && tool === 'measure'
+                                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                                  : 'bg-white/[0.03] border-white/10 text-slate-400'
+                              }`}
+                            >
+                              {mm.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {measurements && measurements.length > 0 && (
+                        <div className="p-3 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-white text-xs">{tr ? `Aktif Ölçüler (${measurements.length})` : `Active Measurements (${measurements.length})`}</span>
+                            <button
+                              type="button"
+                              onClick={clearMeasurements}
+                              className="text-[10px] text-rose-400 font-bold hover:underline"
+                            >
+                              {tr ? 'Temizle' : 'Clear'}
+                            </button>
+                          </div>
+                          <div className="max-h-24 overflow-y-auto space-y-1">
+                            {measurements.map((m, idx) => (
+                              <div key={m.id || idx} className="flex items-center justify-between text-[11px] text-slate-300 py-1 border-b border-white/5">
+                                <span>{m.type === 'diameter' ? `⌀ Çap / Radius` : `Mesafe #${idx + 1}`}</span>
+                                <span className="font-mono font-bold text-cyan-300">{m.distance} mm</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab 4: Section */}
+                  {settingsTab === 'section' && (
+                    <div className="space-y-3 p-1">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Kesit Düzlemi Ekseni' : 'Section Plane Axis'}</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[
+                            { id: 'NONE', label: tr ? 'Yok' : 'None' },
+                            { id: 'X', label: 'X (Sol-Sağ)' },
+                            { id: 'Y', label: 'Y (Üst-Alt)' },
+                            { id: 'Z', label: 'Z (Ön-Arka)' },
+                          ].map((ax) => (
+                            <button
+                              key={ax.id}
+                              type="button"
+                              onClick={() => setSectionAxis(ax.id as any)}
+                              className={`p-2 rounded-xl border text-[10px] font-bold text-center transition-all ${
+                                sectionAxis === ax.id
+                                  ? 'bg-rose-500/20 border-rose-400 text-rose-300'
+                                  : 'bg-white/[0.03] border-white/10 text-slate-400'
+                              }`}
+                            >
+                              {ax.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {sectionAxis !== 'NONE' && (
+                        <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold text-rose-300">{tr ? 'Kesit Konumu' : 'Section Offset'}</span>
+                            <span className="font-mono font-bold text-rose-400">{sectionOffset} mm</span>
+                          </div>
+                          <input
+                            type="range"
+                            min={-150}
+                            max={150}
+                            step={1}
+                            value={sectionOffset}
+                            onChange={(e) => setSectionOffset(Number(e.target.value))}
+                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                          />
+                          <div className="flex items-center justify-between pt-1">
+                            <span className="text-[10px] text-slate-400">{tr ? 'Katı Kesit Kapağı' : 'Solid Section Cap'}</span>
+                            <button
+                              type="button"
+                              onClick={() => setSectionSolidCap(!sectionSolidCap)}
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
+                                sectionSolidCap ? 'bg-rose-500 text-white' : 'bg-white/10 text-slate-400'
+                              }`}
+                            >
+                              {sectionSolidCap ? (tr ? 'Dolu' : 'Solid') : (tr ? 'Boş' : 'Hollow')}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 2D Technical Drawing Portföy Açıcı */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSheetMode('none');
+                        setShowTechnicalDrawingModal(true);
+                      }}
+                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
+                    >
+                      <FileText size={16} />
+                      <span>{tr ? '📄 2D Teknik Çizim & PDF Portföyü' : '📄 2D Drawing & Batch PDF'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Sheet Content: Help Guide */}
               {sheetMode === 'help' && (
                 <div className="overflow-y-auto py-3 space-y-3 font-mono text-xs text-slate-300 leading-relaxed">
@@ -652,6 +1216,108 @@ export function MobileDesignStudio() {
           </>
         )}
       </AnimatePresence>
+
+      {/* ─── Mobile 2D Technical Drawing Sheet Modal ─── */}
+      {showTechnicalDrawingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-2 animate-in fade-in">
+          <div className="w-full h-full max-h-[96vh] flex flex-col rounded-3xl bg-slate-900 border border-cyan-500/40 shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-slate-950">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-white font-mono uppercase">
+                  📄 {tr ? '2D TEKNİK ÇİZİM' : '2D DRAWING'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const svgData = generateTechnicalDrawingSVG(parts, massProps, {
+                      projectName,
+                      materialName: activeMaterial.nameTr,
+                      templateStyle,
+                      colorTheme,
+                    });
+                    downloadFile(svgData, `${projectName}_Drawing.svg`, 'image/svg+xml');
+                    showToast(tr ? 'SVG İndirildi' : 'SVG Downloaded');
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-300 font-bold text-xs border border-cyan-500/30"
+                >
+                  <Download size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const sheets: Array<{ target: DesignPart | DesignPart[]; massProps: any; config: Partial<DrawingSheetConfig> }> = [
+                      {
+                        target: parts,
+                        massProps,
+                        config: {
+                          projectName,
+                          materialName: activeMaterial.nameTr,
+                          templateStyle,
+                          colorTheme,
+                        },
+                      },
+                    ];
+                    for (const p of parts) {
+                      const pMass = calculateAssemblyMassProperties([p], selectedMaterialId);
+                      sheets.push({
+                        target: [p],
+                        massProps: pMass,
+                        config: {
+                          projectName,
+                          partName: p.name || 'Parça Detayı',
+                          materialName: activeMaterial.nameTr,
+                          templateStyle,
+                          colorTheme,
+                        },
+                      });
+                    }
+                    const fullHtml = generateBatchDrawingsHTML(sheets, `${projectName} - Teknik Resim Portföyü`);
+                    const printWin = window.open('', '_blank');
+                    if (printWin) {
+                      printWin.document.write(fullHtml);
+                      printWin.document.close();
+                      setTimeout(() => {
+                        printWin.focus();
+                        printWin.print();
+                      }, 500);
+                    }
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-xs"
+                >
+                  🖨️ PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowTechnicalDrawingModal(false)}
+                  className="p-1.5 rounded-xl bg-white/10 text-slate-300"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 p-2 bg-slate-950 flex items-center justify-center overflow-auto">
+              <div
+                className="w-full h-full rounded-xl shadow-xl flex items-center justify-center overflow-hidden transition-all"
+                style={{
+                  background: colorTheme === 'blueprint' ? '#091833' : colorTheme === 'dark' ? '#080c14' : '#ffffff',
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: generateTechnicalDrawingSVG(parts, massProps, {
+                    projectName,
+                    materialName: activeMaterial.nameTr,
+                    templateStyle,
+                    colorTheme,
+                  }),
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export default MobileDesignStudio;

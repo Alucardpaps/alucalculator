@@ -22,10 +22,12 @@ import {
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { HomeFooterSection } from '@/components/home/HomeFooterSection';
+import { getAppPages } from '@/locales/appPagesTranslations';
 
 export default function DownloadClientPage() {
   const { language } = useI18nStore();
   const tr = language === 'tr';
+  const t = getAppPages(language).download;
   const [copiedAdb, setCopiedAdb] = useState(false);
 
   const adbWatchCmd = 'adb install -r alucalc-wear-release.apk';
@@ -43,31 +45,18 @@ export default function DownloadClientPage() {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold tracking-wider uppercase">
             <Sparkles size={14} className="text-cyan-400 animate-pulse" />
-            <span>{tr ? 'Resmi Yayın • Sürüm 5.0' : 'Official Release • Version 5.0'}</span>
+            <span>{t.badge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            {tr ? (
-              <>
-                AluCalc OS <br />
-                <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
-                  Mobil & Akıllı Saat Uygulamaları
-                </span>
-              </>
-            ) : (
-              <>
-                AluCalc OS <br />
-                <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
-                  Mobile & Smartwatch APK Downloads
-                </span>
-              </>
-            )}
+            AluCalc OS <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+              {t.title}
+            </span>
           </h1>
 
           <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-            {tr
-              ? 'Tüm mühendislik hesaplayıcılarını, 2D/3D CAD tasarım stüdyosunu ve saha telemetri araçlarını internet bağlantısı olmadan telefonunuzda ve Wear OS akıllı saatinizde kullanın.'
-              : 'Take the entire deterministic engineering suite, 2D/3D CAD workstation, and field telemetry tools offline on your Android devices and Wear OS smartwatches.'}
+            {t.lead}
           </p>
         </div>
 
@@ -89,26 +78,24 @@ export default function DownloadClientPage() {
 
               <div>
                 <h2 className="text-2xl font-black text-white mb-2">
-                  AluCalc OS Android App
+                  {t.androidTitle}
                 </h2>
                 <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                  {tr
-                    ? 'Telefon ve tabletler için optimize edilmiş tam kapsamlı mühendislik işletim sistemi. Çevrimdışı hesaplama motoru, Jiroskopik Su Terazisi ve 2D AluCAD.'
-                    : 'Full deterministic engineering OS optimized for Android smartphones and tablets with offline solvers, gyro level, and 2D AluCAD.'}
+                  {t.androidDesc}
                 </p>
               </div>
 
               <div className="space-y-2 font-mono text-xs text-slate-300">
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Dosya Boyutu' : 'File Size'}</span>
+                  <span className="text-slate-400">{t.fileSize}</span>
                   <span className="font-bold text-white">1.16 MB (Ultra Light)</span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Gereksinim' : 'Requirement'}</span>
+                  <span className="text-slate-400">{t.requirement}</span>
                   <span className="font-bold text-white">Android 7.0+ (Nougat - Android 16)</span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Sertifika' : 'Signature'}</span>
+                  <span className="text-slate-400">{t.signature}</span>
                   <span className="font-bold text-emerald-400">RSA-2048 (SHA-256 Validated)</span>
                 </div>
               </div>
@@ -121,12 +108,12 @@ export default function DownloadClientPage() {
                 className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_30px_rgba(0,229,255,0.3)] group active:scale-[0.99]"
               >
                 <HardDriveDownload size={20} className="group-hover:-translate-y-0.5 transition-transform" />
-                <span>{tr ? 'Doğrudan APK İndir (v5.0)' : 'Download APK Directly (v5.0)'}</span>
+                <span>{t.downloadApk}</span>
               </a>
 
               <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1">
                 <a href="/app/alucalc-release.aab" download="alucalc-release.aab" className="hover:text-cyan-300 hover:underline">
-                  {tr ? 'Google Play AAB İndir' : 'Download Google Play AAB'}
+                  {t.downloadAab}
                 </a>
                 <span className="text-slate-600">v5.0.0</span>
               </div>
@@ -149,18 +136,16 @@ export default function DownloadClientPage() {
 
               <div>
                 <h2 className="text-2xl font-black text-white mb-2">
-                  AluCalc OS Wear OS Smartwatch
+                  {t.watchTitle}
                 </h2>
                 <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                  {tr
-                    ? 'Samsung Galaxy Watch, Google Pixel Watch ve Wear OS 3+ akıllı saatler için bağımsız saha asistanı. Titreşim analizi ve hızlı birim çevirici.'
-                    : 'Standalone smartwatch app for Samsung Galaxy Watch, Google Pixel Watch, and Wear OS 3+ devices with vibration analysis and tap charts.'}
+                  {t.watchDesc}
                 </p>
               </div>
 
               <div className="space-y-2 font-mono text-xs text-slate-300">
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Dosya Boyutu' : 'File Size'}</span>
+                  <span className="text-slate-400">{t.fileSize}</span>
                   <span className="font-bold text-white">1.16 MB (Optimized)</span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">

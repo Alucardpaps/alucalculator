@@ -12,9 +12,9 @@
     "news": "أخبار الصناعة",
     "mechanical": "ميكانيكا",
     "civil": "مدني",
-    "electrical": "كهرباء",
+    "electrical": "كهربائي",
     "science": "علوم",
-    "finance": "ماليات",
+    "finance": "مالية",
     "software": "برمجيات",
     "other": "أخرى"
   },
@@ -62,6 +62,34 @@
     "handbook": {
       "title": "الدليل",
       "desc": "جداول المحامل، تسامحات ISO، مرجع G‑Code."
+    },
+    "thermalExpansion": {
+      "title": "التمدد الحراري",
+      "desc": "تحليل الاستقرار البعدي"
+    },
+    "manufacturingSandbox": {
+      "title": "محاكي التصنيع",
+      "desc": "خط إنتاج افتراضي"
+    },
+    "simulationFea": {
+      "title": "محاكاة العناصر المحدودة",
+      "desc": "الإجهاد والتشوه"
+    },
+    "analytics": {
+      "title": "لوحة التحليلات",
+      "desc": "بيانات أداء النظام"
+    },
+    "fileExplorer": {
+      "title": "مستكشف الملفات",
+      "desc": "نظام ملفات نظام التشغيل"
+    },
+    "terminal": {
+      "title": "الطرفية",
+      "desc": "واجهة سطر الأوامر"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "desc": "إعداد النظام"
     }
   },
   "common": {
@@ -304,7 +332,7 @@
       "forcesAndStress": "قوى وإجهاد"
     },
     "outputs": {
-      "tipDia": "قطر السن",
+      "tipDia": "قطر الرأس",
       "rootDia": "قطر الجذر"
     }
   },
@@ -446,8 +474,8 @@
     }
   },
   "beam-deflection": {
-    "title": "ترخيم العارضة",
-    "desc": "حساب الترخيم والإجهاد"
+    "title": "انحراف العارضة",
+    "desc": "حساب الانحراف والإجهاد"
   },
   "concrete-reinforcement": {
     "title": "تسليح الخرسانة",
@@ -474,20 +502,20 @@
     "desc": "حساب الضريبة"
   },
   "excel-helper": {
-    "title": "مساعد إكسل",
-    "desc": "مولد معادلات"
+    "title": "مساعد Excel",
+    "desc": "مولّد الصيغ"
   },
   "json-formatter": {
     "title": "منسق JSON",
     "desc": "تنسيق JSON"
   },
   "regex-tester": {
-    "title": "مختبر Regex",
+    "title": "مختبر التعبيرات النمطية",
     "desc": "اختبار الأنماط"
   },
   "feedback": {
     "title": "ملاحظات",
-    "desc": "أرسل لنا رأيك"
+    "desc": "أرسل لنا ملاحظاتك"
   },
   "driveTrain": {
     "title": "تصميم منظومة نقل الحركة",
@@ -657,5 +685,12 @@
     "bladeKerf": "عرض الشفرة",
     "trimStart": "قص البداية",
     "trimEnd": "قص النهاية"
+  },
+  "thermal": {
+    "initialLength": "الطول الابتدائي",
+    "tempDelta": "فرق الحرارة",
+    "finalLength": "الطول النهائي",
+    "expansion": "مقدار التمدد",
+    "strain": "معدل الانفعال"
   }
 }

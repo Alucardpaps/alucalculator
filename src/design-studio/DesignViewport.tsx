@@ -6,6 +6,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, TransformControls, Edges, Line, Html } from '@react-three/drei';
 import {
   useDesignStore,
+  customCADGeometries,
   type DesignPart,
   type RenderMode,
   type SectionAxis,
@@ -15,695 +16,9 @@ import {
 } from './designStore';
 import { loadCADFile } from './cadImporter';
 import { calculateAssemblyMassProperties } from './materialsEngine';
-import { checkHoleInterferences, ISO_METRIC_HOLES, type HoleItem } from './holeStandards';
+import { checkHoleInterferences, ISO_METRIC_HOLES, type HoleItem, type SurfaceFace, type SurfaceCutItem } from './holeStandards';
+import { createCustomGeometry } from './geometryFactory';
 
-// Revolve Solid Generator for Arbitrary 2D Sketch Profiles
-function createRevolveGeometry(pts: Point2D[], angleDeg = 360, radiusOffset = 0): THREE.BufferGeometry {
-  const angle = (Math.min(360, Math.max(15, angleDeg)) * Math.PI) / 180;
-  const segments = Math.max(16, Math.round((angleDeg / 360) * 48));
-  const N = pts.length;
-  if (N < 3) return new THREE.BufferGeometry();
-
-  let minX = Infinity;
-  pts.forEach((p) => { if (p.x < minX) minX = p.x; });
-  const rShift = Math.max(0.5, -minX / 10 + 0.5 + radiusOffset / 10);
-
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-
-  for (let s = 0; s <= segments; s++) {
-    const theta = (s / segments) * angle;
-    const cosT = Math.cos(theta);
-    const sinT = Math.sin(theta);
-
-    for (let i = 0; i < N; i++) {
-      const r = pts[i].x / 10 + rShift;
-      const y = pts[i].y / 10;
-      const x = r * cosT;
-      const z = r * sinT;
-
-      positions.push(x, y, z);
-      uvs.push(s / segments, i / N);
-    }
-  }
-
-  for (let s = 0; s < segments; s++) {
-    for (let i = 0; i < N; i++) {
-      const nextI = (i + 1) % N;
-      const a = s * N + i;
-      const b = s * N + nextI;
-      const c = (s + 1) * N + nextI;
-      const d = (s + 1) * N + i;
-
-      indices.push(a, b, c);
-      indices.push(a, c, d);
-    }
-  }
-
-  if (angle < Math.PI * 2 - 0.01) {
-    const shape = new THREE.Shape();
-    shape.moveTo(pts[0].x / 10 + rShift, pts[0].y / 10);
-    for (let i = 1; i < N; i++) {
-      shape.lineTo(pts[i].x / 10 + rShift, pts[i].y / 10);
-    }
-    shape.closePath();
-    const capGeom = new THREE.ShapeGeometry(shape);
-    const capPos = capGeom.attributes.position;
-    const capIndices = capGeom.index?.array || [];
-
-    const baseOffset = positions.length / 3;
-    for (let i = 0; i < capPos.count; i++) {
-      positions.push(capPos.getX(i), capPos.getY(i), 0);
-      uvs.push(0, 0);
-    }
-    for (let i = 0; i < capIndices.length; i += 3) {
-      indices.push(baseOffset + capIndices[i], baseOffset + capIndices[i + 2], baseOffset + capIndices[i + 1]);
-    }
-
-    const endOffset = positions.length / 3;
-    const cosA = Math.cos(angle);
-    const sinA = Math.sin(angle);
-    for (let i = 0; i < capPos.count; i++) {
-      const r = capPos.getX(i);
-      const y = capPos.getY(i);
-      positions.push(r * cosA, y, r * sinA);
-      uvs.push(1, 1);
-    }
-    for (let i = 0; i < capIndices.length; i += 3) {
-      indices.push(endOffset + capIndices[i], endOffset + capIndices[i + 1], endOffset + capIndices[i + 2]);
-    }
-  }
-
-  const geom = new THREE.BufferGeometry();
-  geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geom.setIndex(indices);
-  geom.computeVertexNormals();
-  return geom;
-}
-
-// Loft Solid Generator (Morphing / Tapered Loft)
-function createLoftGeometry(pts: Point2D[], heightMm = 40, topScale = 0.5, twistDeg = 0): THREE.BufferGeometry {
-  const H = (heightMm || 40) / 10;
-  const N = pts.length;
-  if (N < 3) return new THREE.BufferGeometry();
-
-  const twist = ((twistDeg || 0) * Math.PI) / 180;
-  const numSteps = 16;
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
-
-  for (let s = 0; s <= numSteps; s++) {
-    const t = s / numSteps;
-    const curH = t * H;
-    const curScale = 1.0 - t * (1.0 - topScale);
-    const curAngle = t * twist;
-    const cosA = Math.cos(curAngle);
-    const sinA = Math.sin(curAngle);
-
-    for (let i = 0; i < N; i++) {
-      const origX = (pts[i].x / 10) * curScale;
-      const origZ = (pts[i].y / 10) * curScale;
-
-      const x = origX * cosA - origZ * sinA;
-      const z = origX * sinA + origZ * cosA;
-
-      positions.push(x, curH - H / 2, z);
-      uvs.push(t, i / N);
-    }
-  }
-
-  for (let s = 0; s < numSteps; s++) {
-    for (let i = 0; i < N; i++) {
-      const nextI = (i + 1) % N;
-      const a = s * N + i;
-      const b = s * N + nextI;
-      const c = (s + 1) * N + nextI;
-      const d = (s + 1) * N + i;
-
-      indices.push(a, b, c);
-      indices.push(a, c, d);
-    }
-  }
-
-  const shape = new THREE.Shape();
-  shape.moveTo(pts[0].x / 10, pts[0].y / 10);
-  for (let i = 1; i < N; i++) {
-    shape.lineTo(pts[i].x / 10, pts[i].y / 10);
-  }
-  shape.closePath();
-  const capGeom = new THREE.ShapeGeometry(shape);
-  const capPos = capGeom.attributes.position;
-  const capIndices = capGeom.index?.array || [];
-
-  const bottomOffset = positions.length / 3;
-  for (let i = 0; i < capPos.count; i++) {
-    positions.push(capPos.getX(i), -H / 2, capPos.getY(i));
-    uvs.push(0, 0);
-  }
-  for (let i = 0; i < capIndices.length; i += 3) {
-    indices.push(bottomOffset + capIndices[i], bottomOffset + capIndices[i + 2], bottomOffset + capIndices[i + 1]);
-  }
-
-  if (topScale > 0.01) {
-    const topOffset = positions.length / 3;
-    const cosT = Math.cos(twist);
-    const sinT = Math.sin(twist);
-    for (let i = 0; i < capPos.count; i++) {
-      const origX = capPos.getX(i) * topScale;
-      const origZ = capPos.getY(i) * topScale;
-      const x = origX * cosT - origZ * sinT;
-      const z = origX * sinT + origZ * cosT;
-      positions.push(x, H / 2, z);
-      uvs.push(1, 1);
-    }
-    for (let i = 0; i < capIndices.length; i += 3) {
-      indices.push(topOffset + capIndices[i], topOffset + capIndices[i + 1], topOffset + capIndices[i + 2]);
-    }
-  }
-
-  const geom = new THREE.BufferGeometry();
-  geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geom.setIndex(indices);
-  geom.computeVertexNormals();
-  return geom;
-}
-
-// Helper to construct parametric 3D geometries for all 27 CAD shapes
-function createCustomGeometry(part: DesignPart, isSculpt = false): THREE.BufferGeometry {
-  const p = part.params;
-  const kind = part.kind;
-
-  // 0. Imported CAD Model (STL, OBJ, GLTF, STEP)
-  if (kind === 'imported-model') {
-    if (part.customGeometry) return part.customGeometry;
-    const cache = useDesignStore.getState().customGeometries;
-    if (cache[part.id]) return cache[part.id];
-    return new THREE.BoxGeometry(4, 4, 4);
-  }
-
-  // 1. Custom 2D Profile Solid (Extrude, Revolve, Loft, Cut)
-  if (kind === 'profile' && part.outer && part.outer.length >= 3) {
-    const pts = part.outer;
-
-    if (part.solidOp === 'revolve') {
-      return createRevolveGeometry(pts, p.revolveAngle || 360, p.revolveRadius || 0);
-    }
-
-    if (part.solidOp === 'loft') {
-      const scale = (p.loftScale ?? 50) / 100;
-      return createLoftGeometry(pts, p.loftHeight || 40, scale, p.loftTwist || 0);
-    }
-
-    const shape = new THREE.Shape();
-    shape.moveTo(pts[0].x / 10, pts[0].y / 10);
-    for (let i = 1; i < pts.length; i++) {
-      shape.lineTo(pts[i].x / 10, pts[i].y / 10);
-    }
-    shape.closePath();
-
-    const depth = (p.extrudeDepth || 20) / 10;
-    const extrude = new THREE.ExtrudeGeometry(shape, {
-      depth,
-      bevelEnabled: (p.filletR || 0) > 0,
-      bevelSize: (p.filletR || 0) / 10,
-      bevelThickness: (p.filletR || 0) / 10,
-      curveSegments: isSculpt ? 32 : 12,
-    });
-    
-    // Rotate +90 deg around X so 2D profile (u=X, v=Z) sits flat in XZ plane with +X and +Z perfectly preserved without mirroring!
-    extrude.rotateX(Math.PI / 2);
-    // Center vertically around Y=0
-    extrude.translate(0, depth / 2, 0);
-    return extrude;
-  }
-
-  // 2. Spur Gear Blank with Involute Teeth & Center Bore
-  if (kind === 'gear-blank') {
-    const teeth = Math.max(8, Math.round(p.teeth || 24));
-    const mod = (p.module || 1.5);
-    const pitchR = (teeth * mod) / 20;
-    const addendum = mod / 10;
-    const dedendum = 1.25 * mod / 10;
-    const tipR = pitchR + addendum;
-    const rootR = Math.max(0.1, pitchR - dedendum);
-    const depth = (p.depth || 15) / 10;
-    const boreR = Math.min((p.bore || 12) / 20, rootR * 0.7);
-
-    const shape = new THREE.Shape();
-    const totalSteps = teeth * 8;
-    for (let i = 0; i <= totalSteps; i++) {
-      const theta = (i / totalSteps) * Math.PI * 2;
-      const cycle = (i / totalSteps) * teeth % 1;
-      const r = cycle < 0.45 ? tipR : rootR;
-      const x = Math.cos(theta) * r;
-      const y = Math.sin(theta) * r;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.closePath();
-
-    if (boreR > 0.1) {
-      const hole = new THREE.Path();
-      hole.absarc(0, 0, boreR, 0, Math.PI * 2, true);
-      shape.holes.push(hole);
-    }
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 3. V-Belt Pulley with Lathe Profile
-  if (kind === 'pulley') {
-    const dia = (p.diameter || 50) / 10;
-    const bore = (p.innerDiameter || p.bore || 12) / 10;
-    const grooveD = (p.grooveDepth || 4) / 10;
-    const rOuter = dia / 2;
-    const rInner = Math.max(0.1, bore / 2);
-    const grooveMax = Math.min(grooveD, rOuter - rInner - 0.2);
-
-    const profilePts = [
-      new THREE.Vector2(rInner, -0.9),
-      new THREE.Vector2(rOuter, -0.9),
-      new THREE.Vector2(rOuter - grooveMax, -0.3),
-      new THREE.Vector2(rOuter - grooveMax, 0.3),
-      new THREE.Vector2(rOuter, 0.9),
-      new THREE.Vector2(rInner, 0.9),
-    ];
-    const lathe = new THREE.LatheGeometry(profilePts, 48);
-    lathe.center();
-    return lathe;
-  }
-
-  // 4. Hex Bolt
-  if (kind === 'hex-bolt') {
-    const dia = (p.diameter || 10) / 10;
-    const len = (p.length || 40) / 10;
-    const headSize = (p.headSize || 17) / 20;
-    const headH = (p.headHeight || 7) / 10;
-    return new THREE.CylinderGeometry(headSize, headSize, headH + len, 6);
-  }
-
-  // 5. Hex Nut
-  if (kind === 'hex-nut') {
-    const headSize = (p.headSize || 17) / 20;
-    const innerDia = (p.innerDiameter || 10) / 20;
-    const depth = (p.depth || 8) / 10;
-
-    const shape = new THREE.Shape();
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      const x = Math.cos(a) * headSize;
-      const y = Math.sin(a) * headSize;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.closePath();
-
-    const hole = new THREE.Path();
-    hole.absarc(0, 0, Math.max(0.1, innerDia), 0, Math.PI * 2, true);
-    shape.holes.push(hole);
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05 });
-    geom.center();
-    return geom;
-  }
-
-  // 6. Deep Groove Ball Bearing Race
-  if (kind === 'bearing-race') {
-    const diaOuter = (p.diameter || 47) / 20;
-    const diaInner = (p.innerDiameter || 20) / 20;
-    const depth = (p.depth || 14) / 10;
-    const shoulder = (p.shoulder || 2.5) / 10;
-    const grooveR = Math.min(shoulder, (diaOuter - diaInner) * 0.35);
-
-    const pts = [
-      new THREE.Vector2(diaInner, -depth / 2),
-      new THREE.Vector2(diaOuter, -depth / 2),
-      new THREE.Vector2(diaOuter, depth / 2),
-      new THREE.Vector2(diaInner, depth / 2),
-      new THREE.Vector2(diaInner, depth / 2 - grooveR),
-      new THREE.Vector2(diaInner + grooveR * 0.6, 0),
-      new THREE.Vector2(diaInner, -depth / 2 + grooveR),
-    ];
-    const lathe = new THREE.LatheGeometry(pts, 48);
-    lathe.center();
-    return lathe;
-  }
-
-  // 7. Keyway Shaft
-  if (kind === 'keyway-shaft') {
-    const dia = (p.diameter || 20) / 20;
-    const len = (p.length || 60) / 10;
-    const keyW = (p.keyWidth || 6) / 20;
-    const keyD = (p.keyDepth || 3.5) / 10;
-
-    const shape = new THREE.Shape();
-    const steps = 48;
-    const angleLimit = Math.asin(Math.min(0.95, keyW / dia));
-    for (let i = 0; i <= steps; i++) {
-      const theta = angleLimit + (i / steps) * (Math.PI * 2 - 2 * angleLimit);
-      const x = Math.cos(theta) * dia;
-      const y = Math.sin(theta) * dia;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.lineTo(dia - keyD, -keyW);
-    shape.lineTo(dia - keyD, keyW);
-    shape.closePath();
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 8. D-Shaft
-  if (kind === 'd-shaft') {
-    const dia = (p.diameter || 20) / 20;
-    const len = (p.length || 50) / 10;
-    const flatOff = (p.flatOffset || 7) / 10;
-    const flatX = Math.min(dia - 0.1, flatOff);
-    const halfChord = Math.sqrt(Math.max(0.01, dia * dia - flatX * flatX));
-
-    const shape = new THREE.Shape();
-    const startAngle = Math.atan2(halfChord, flatX);
-    const endAngle = Math.atan2(-halfChord, flatX) + Math.PI * 2;
-    const steps = 48;
-
-    for (let i = 0; i <= steps; i++) {
-      const theta = startAngle + (i / steps) * (endAngle - startAngle);
-      const x = Math.cos(theta) * dia;
-      const y = Math.sin(theta) * dia;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.lineTo(flatX, halfChord);
-    shape.closePath();
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 9. Slot Plate
-  if (kind === 'slot-plate') {
-    const w = (p.width || 60) / 10;
-    const h = (p.height || 40) / 10;
-    const depth = (p.depth || 6) / 10;
-    const slotL = (p.slotLength || 30) / 10;
-    const slotW = (p.slotWidth || 10) / 10;
-
-    const shape = new THREE.Shape();
-    shape.moveTo(-w / 2, -h / 2);
-    shape.lineTo(w / 2, -h / 2);
-    shape.lineTo(w / 2, h / 2);
-    shape.lineTo(-w / 2, h / 2);
-    shape.closePath();
-
-    const slotR = slotW / 2;
-    const straightHalf = Math.max(0, slotL / 2 - slotR);
-    const hole = new THREE.Path();
-    hole.absarc(straightHalf, 0, slotR, -Math.PI / 2, Math.PI / 2, false);
-    hole.absarc(-straightHalf, 0, slotR, Math.PI / 2, 3 * Math.PI / 2, false);
-    hole.closePath();
-    shape.holes.push(hole);
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 10. Star Prism
-  if (kind === 'star-prism') {
-    const outerR = (p.diameter || 36) / 20;
-    const innerR = (p.innerRadius || 14) / 10;
-    const pts = Math.max(3, Math.round(p.starPoints || 5));
-    const depth = (p.depth || 10) / 10;
-
-    const shape = new THREE.Shape();
-    const total = pts * 2;
-    for (let i = 0; i < total; i++) {
-      const theta = (i / total) * Math.PI * 2 - Math.PI / 2;
-      const r = i % 2 === 0 ? outerR : innerR;
-      const x = Math.cos(theta) * r;
-      const y = Math.sin(theta) * r;
-      if (i === 0) shape.moveTo(x, y);
-      else shape.lineTo(x, y);
-    }
-    shape.closePath();
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 11. Cross Prism
-  if (kind === 'cross-prism') {
-    const w = (p.width || 40) / 10;
-    const wall = (p.wall || 10) / 10;
-    const depth = (p.depth || 15) / 10;
-    const a = w / 2;
-    const b = wall / 2;
-
-    const shape = new THREE.Shape();
-    shape.moveTo(-b, -a);
-    shape.lineTo(b, -a);
-    shape.lineTo(b, -b);
-    shape.lineTo(a, -b);
-    shape.lineTo(a, b);
-    shape.lineTo(b, b);
-    shape.lineTo(b, a);
-    shape.lineTo(-b, a);
-    shape.lineTo(-b, b);
-    shape.lineTo(-a, b);
-    shape.lineTo(-a, -b);
-    shape.lineTo(-b, -b);
-    shape.closePath();
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 12. Torus
-  if (kind === 'torus') {
-    const r = (p.diameter || 30) / 20;
-    const tube = (p.tube || 8) / 20;
-    return new THREE.TorusGeometry(r, tube, isSculpt ? 32 : 20, isSculpt ? 64 : 36);
-  }
-
-  // 13. Pyramid
-  if (kind === 'pyramid') {
-    const r = (p.width || 40) / 20;
-    const h = (p.height || p.length || 40) / 10;
-    return new THREE.ConeGeometry(r * 1.414, h, 4, isSculpt ? 16 : 1);
-  }
-
-  // 14. Wedge
-  if (kind === 'wedge') {
-    const w = (p.width || 40) / 10;
-    const h = (p.height || 40) / 10;
-    const d = (p.depth || 30) / 10;
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.lineTo(w, 0);
-    shape.lineTo(0, h);
-    shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 15. Hex Prism
-  if (kind === 'hex-prism') {
-    const r = (p.diameter || 32) / 20;
-    const h = (p.length || 40) / 10;
-    return new THREE.CylinderGeometry(r, r, h, 6, isSculpt ? 16 : 1);
-  }
-
-  // 16. Cylinder
-  if (kind === 'cylinder') {
-    const r = (p.diameter || 30) / 20;
-    const h = (p.length || 40) / 10;
-    return new THREE.CylinderGeometry(r, r, h, isSculpt ? 48 : 32, isSculpt ? 32 : 1);
-  }
-
-  // 17. Cone
-  if (kind === 'cone') {
-    const r = (p.diameter || 30) / 20;
-    const h = (p.length || 40) / 10;
-    return new THREE.ConeGeometry(r, h, isSculpt ? 48 : 32, isSculpt ? 32 : 1);
-  }
-
-  // 18. Sphere
-  if (kind === 'sphere') {
-    const r = (p.diameter || 30) / 20;
-    return new THREE.SphereGeometry(r, isSculpt ? 48 : 32, isSculpt ? 48 : 24);
-  }
-
-  // 19. Tube & Washer
-  if (kind === 'tube' || kind === 'washer') {
-    const rOuter = (p.diameter || 30) / 20;
-    const rInner = (p.innerDiameter || p.diameter ? (p.diameter - 2 * (p.wall || 4)) : 16) / 20;
-    const h = (p.length || p.depth || 30) / 10;
-    const shape = new THREE.Shape();
-    shape.absarc(0, 0, rOuter, 0, Math.PI * 2, false);
-    const hole = new THREE.Path();
-    hole.absarc(0, 0, Math.max(0.1, rInner), 0, Math.PI * 2, true);
-    shape.holes.push(hole);
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 20. L-Bracket
-  if (kind === 'L-bracket') {
-    const w = (p.flangeW || p.width || 50) / 10;
-    const h = (p.webH || p.height || 50) / 10;
-    const tf = (p.flangeT || p.thickness || 6) / 10;
-    const tw = (p.webT || p.thickness || 6) / 10;
-    const d = (p.length || p.depth || 40) / 10;
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.lineTo(w, 0);
-    shape.lineTo(w, tf);
-    shape.lineTo(tw, tf);
-    shape.lineTo(tw, h);
-    shape.lineTo(0, h);
-    shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 21. U-Channel
-  if (kind === 'U-channel') {
-    const w = (p.flangeW || p.width || 50) / 10;
-    const h = (p.webH || p.height || 35) / 10;
-    const tf = (p.flangeT || p.thickness || 5) / 10;
-    const tw = (p.webT || p.thickness || 5) / 10;
-    const d = (p.length || p.depth || 60) / 10;
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.lineTo(w, 0);
-    shape.lineTo(w, h);
-    shape.lineTo(w - tf, h);
-    shape.lineTo(w - tf, tw);
-    shape.lineTo(tf, tw);
-    shape.lineTo(tf, h);
-    shape.lineTo(0, h);
-    shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 22. I-Beam
-  if (kind === 'I-beam') {
-    const w = (p.flangeW || p.width || 50) / 10;
-    const h = (p.webH || p.height || 60) / 10;
-    const tf = (p.flangeT || 6) / 10;
-    const tw = (p.webT || 5) / 10;
-    const d = (p.length || 80) / 10;
-    const shape = new THREE.Shape();
-    const xMid = w / 2;
-    const xWebL = xMid - tw / 2;
-    const xWebR = xMid + tw / 2;
-    shape.moveTo(0, 0);
-    shape.lineTo(w, 0);
-    shape.lineTo(w, tf);
-    shape.lineTo(xWebR, tf);
-    shape.lineTo(xWebR, h - tf);
-    shape.lineTo(w, h - tf);
-    shape.lineTo(w, h);
-    shape.lineTo(0, h);
-    shape.lineTo(0, h - tf);
-    shape.lineTo(xWebL, h - tf);
-    shape.lineTo(xWebL, tf);
-    shape.lineTo(0, tf);
-    shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 23. T-Beam
-  if (kind === 'T-beam') {
-    const w = (p.flangeW || p.width || 50) / 10;
-    const h = (p.webH || p.height || 50) / 10;
-    const tf = (p.flangeT || 6) / 10;
-    const tw = (p.webT || 5) / 10;
-    const d = (p.length || 80) / 10;
-    const xMid = w / 2;
-
-    const shape = new THREE.Shape();
-    shape.moveTo(xMid - tw / 2, 0);
-    shape.lineTo(xMid + tw / 2, 0);
-    shape.lineTo(xMid + tw / 2, h - tf);
-    shape.lineTo(w, h - tf);
-    shape.lineTo(w, h);
-    shape.lineTo(0, h);
-    shape.lineTo(0, h - tf);
-    shape.lineTo(xMid - tw / 2, h - tf);
-    shape.closePath();
-
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 24. Trapezoid
-  if (kind === 'trapezoid') {
-    const wTop = (p.widthTop || 25) / 10;
-    const wBot = (p.widthBottom || 45) / 10;
-    const h = (p.height || 35) / 10;
-    const d = (p.depth || 25) / 10;
-    const shape = new THREE.Shape();
-    const diff = (wBot - wTop) / 2;
-    shape.moveTo(0, 0);
-    shape.lineTo(wBot, 0);
-    shape.lineTo(wBot - diff, h);
-    shape.lineTo(diff, h);
-    shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // 25. Plate
-  if (kind === 'plate') {
-    const w = (p.width || 60) / 10;
-    const h = (p.height || 40) / 10;
-    const d = (p.depth || 6) / 10;
-    const holeR = (p.holeRadius || 0) / 10;
-
-    const shape = new THREE.Shape();
-    shape.moveTo(-w / 2, -h / 2);
-    shape.lineTo(w / 2, -h / 2);
-    shape.lineTo(w / 2, h / 2);
-    shape.lineTo(-w / 2, h / 2);
-    shape.closePath();
-
-    if (holeR > 0.1) {
-      const hole = new THREE.Path();
-      hole.absarc(0, 0, holeR, 0, Math.PI * 2, true);
-      shape.holes.push(hole);
-    }
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
-    geom.center();
-    return geom;
-  }
-
-  // Default Box (subdivided for sculpt if sculpt mode)
-  const w = (p.width || 40) / 10;
-  const h = (p.height || 40) / 10;
-  const d = (p.depth || p.length || 20) / 10;
-  return new THREE.BoxGeometry(w, h, d, isSculpt ? 32 : 1, isSculpt ? 32 : 1, isSculpt ? 32 : 1);
-}
 
 // ─── BLENDER-STYLE 3D SCULPTING MESH COMPONENT ───
 function SolidMesh({ 
@@ -711,66 +26,75 @@ function SolidMesh({
   renderMode, 
   clippingPlanes,
   isSculptMode,
-  onSculptStroke
+  onSculptStroke,
+  partIndex,
+  totalParts,
 }: { 
   part: DesignPart; 
   renderMode: RenderMode; 
-  clippingPlanes: THREE.Plane[];
-  isSculptMode: boolean;
-  onSculptStroke: () => void;
+  clippingPlanes?: THREE.Plane[];
+  isSculptMode?: boolean;
+  onSculptStroke?: (mutatedGeom: THREE.BufferGeometry) => void;
+  partIndex: number;
+  totalParts: number;
 }) {
+  const isSelected = useDesignStore((s) => s.selectedId === part.id);
   const select = useDesignStore((s) => s.select);
-  const selectedId = useDesignStore((s) => s.selectedId);
-  const isSelected = selectedId === part.id;
+  const tool = useDesignStore((s) => s.tool);
+  const studioMode = useDesignStore((s) => s.studioMode);
+  const explodeFactor = useDesignStore((s) => s.explodeFactor);
+  const explodeDirection = useDesignStore((s) => s.explodeDirection);
   const sculptBrush = useDesignStore((s) => s.sculptBrush);
   const sculptRadius = useDesignStore((s) => s.sculptRadius);
   const sculptStrength = useDesignStore((s) => s.sculptStrength);
   const sculptDirection = useDesignStore((s) => s.sculptDirection);
   const sculptSymmetry = useDesignStore((s) => s.sculptSymmetry);
   const sculptVersion = useDesignStore((s) => s.sculptVersion);
-
-  const explodeFactor = useDesignStore((s) => s.explodeFactor);
   const isolatedPartId = useDesignStore((s) => s.isolatedPartId);
   const ghostIsolated = useDesignStore((s) => s.ghostIsolated);
-  const tool = useDesignStore((s) => s.tool);
-  const studioMode = useDesignStore((s) => s.studioMode);
-  const activeMeasureStart = useDesignStore((s) => s.activeMeasureStart);
   const addMeasurement = useDesignStore((s) => s.addMeasurement);
+  const addDiameterMeasurement = useDesignStore((s) => s.addDiameterMeasurement);
+  const activeMeasureStart = useDesignStore((s) => s.activeMeasureStart);
   const setActiveMeasureStart = useDesignStore((s) => s.setActiveMeasureStart);
 
+  const measureMode = useDesignStore((s) => s.measureMode);
+  const sectionSolidCap = useDesignStore((s) => s.sectionSolidCap);
+  const facePickMode = useDesignStore((s) => s.facePickMode);
+  const setActiveFace = useDesignStore((s) => s.setActiveFace);
+  const setFacePickMode = useDesignStore((s) => s.setFacePickMode);
+  const clickToPlaceHole = useDesignStore((s) => s.clickToPlaceHole);
+  const activeFace = useDesignStore((s) => s.activeFace);
+
   const isGhost = isolatedPartId ? isolatedPartId !== part.id : false;
+  const holes = useDesignStore((s) => s.holes);
+  const cuts = useDesignStore((s) => s.cuts);
+  const effectiveHoles = useMemo(() => {
+    if (isSelected && holes && holes.length > 0) return holes;
+    return part.holes || [];
+  }, [isSelected, holes, part.holes]);
+  const effectiveCuts = useMemo(() => {
+    if (isSelected && cuts && cuts.length > 0) return cuts;
+    return part.cuts || [];
+  }, [isSelected, cuts, part.cuts]);
 
   const meshRef = useRef<THREE.Mesh>(null);
   const isPointerDownRef = useRef(false);
 
-  if (!part.visible && !isGhost) return null;
-  if (isGhost && !ghostIsolated) return null;
-
-  // Generate base geometry (with dense subdivision if sculpt mode is active)
+  // Generate base geometry (with dense subdivision if sculpt mode is active and boolean CSG cuts)
   const geom = useMemo(() => {
-    return createCustomGeometry(part, isSculptMode);
-  }, [part.kind, part.params, part.outer, part.solidOp, isSculptMode, sculptVersion, part.customGeometry]);
+    return createCustomGeometry(part, isSculptMode, effectiveHoles, effectiveCuts);
+  }, [part.id, part.kind, part.params, part.outer, part.solidOp, isSculptMode, sculptVersion, part.customGeometry, effectiveHoles, effectiveCuts]);
 
-  // Exploded View offset
-  let finalPos: [number, number, number] = [part.position.x / 10, part.position.y / 10, part.position.z / 10];
-  if (explodeFactor > 0) {
-    const f = explodeFactor / 100;
-    finalPos = [
-      (part.position.x / 10) * (1 + f * 0.75),
-      (part.position.y / 10) * (1 + f * 0.75),
-      (part.position.z / 10) * (1 + f * 0.75),
-    ];
-  }
-
-  const rot: [number, number, number] = [
-    (part.rotation.x * Math.PI) / 180,
-    (part.rotation.y * Math.PI) / 180,
-    (part.rotation.z * Math.PI) / 180,
-  ];
-  const scale: [number, number, number] = [part.scale.x, part.scale.y, part.scale.z];
-
-  const color = isGhost ? '#94a3b8' : part.color;
-  const emissive = isSelected ? '#1e3a8a' : '#000000';
+  // ─── 3D RADIAL CAD ASSEMBLY EXPLODED VIEW ENGINE ───
+  const geomCenter = useMemo(() => {
+    if (!geom) return new THREE.Vector3(0, 0, 0);
+    geom.computeBoundingBox();
+    const c = new THREE.Vector3();
+    if (geom.boundingBox) {
+      geom.boundingBox.getCenter(c);
+    }
+    return c;
+  }, [geom]);
 
   // ─── BLENDER REAL-TIME VERTEX DEFORMATION ENGINE ───
   const applySculptAtPoint = useCallback((worldHitPoint: THREE.Vector3, worldNormal: THREE.Vector3) => {
@@ -841,9 +165,101 @@ function SolidMesh({
     if (modified) {
       posAttr.needsUpdate = true;
       geometry.computeVertexNormals();
-      onSculptStroke();
+      if (onSculptStroke) onSculptStroke(geometry);
     }
   }, [sculptBrush, sculptRadius, sculptStrength, sculptDirection, sculptSymmetry, onSculptStroke]);
+
+
+  // Solid Section Stencil Capping Plane calculation
+  const capPlaneData = useMemo(() => {
+    if (!sectionSolidCap || !clippingPlanes || clippingPlanes.length === 0) return null;
+    const p = clippingPlanes[0];
+    const normal = p.normal;
+    const d = p.constant;
+    const pos: [number, number, number] = [normal.x * -d, normal.y * -d, normal.z * -d];
+    const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+    return { pos, quat };
+  }, [sectionSolidCap, clippingPlanes]);
+
+  // Safe visibility check after all hooks have run
+  if (!part.visible && !isGhost) return null;
+  if (isGhost && !ghostIsolated) return null;
+
+  let finalPos: [number, number, number] = [part.position.x / 10, part.position.y / 10, part.position.z / 10];
+  if (explodeFactor > 0) {
+    const f = explodeFactor / 100;
+    const basePos = new THREE.Vector3(part.position.x / 10, part.position.y / 10, part.position.z / 10);
+    const combinedCenter = new THREE.Vector3().addVectors(basePos, geomCenter);
+    const dist = combinedCenter.length();
+
+    let explodeOffset = new THREE.Vector3();
+    const idx = partIndex || 0;
+    const total = Math.max(1, totalParts || 1);
+
+    if (explodeDirection === 'axial-y') {
+      // Vertical explosion: spread parts along Y axis based on their Y position
+      const ySign = combinedCenter.y >= 0 ? 1 : -1;
+      const magnitude = Math.max(1.5, Math.abs(combinedCenter.y) * 2.5);
+      explodeOffset.set(0, ySign * magnitude * f, 0);
+      if (Math.abs(combinedCenter.y) < 0.1) {
+        // Concentric on Y — use index-based vertical spread
+        explodeOffset.set(0, ((idx / total) - 0.5) * 8.0 * f, 0);
+      }
+    } else if (explodeDirection === 'axial-x') {
+      // Horizontal X explosion
+      const xSign = combinedCenter.x >= 0 ? 1 : -1;
+      const magnitude = Math.max(1.5, Math.abs(combinedCenter.x) * 2.5);
+      explodeOffset.set(xSign * magnitude * f, 0, 0);
+      if (Math.abs(combinedCenter.x) < 0.1) {
+        explodeOffset.set(((idx / total) - 0.5) * 8.0 * f, 0, 0);
+      }
+    } else if (explodeDirection === 'axial-z') {
+      // Depth Z explosion
+      const zSign = combinedCenter.z >= 0 ? 1 : -1;
+      const magnitude = Math.max(1.5, Math.abs(combinedCenter.z) * 2.5);
+      explodeOffset.set(0, 0, zSign * magnitude * f);
+      if (Math.abs(combinedCenter.z) < 0.1) {
+        explodeOffset.set(0, 0, ((idx / total) - 0.5) * 8.0 * f);
+      }
+    } else if (explodeDirection === 'linear-sequence') {
+      // Spread parts sequentially along Y axis with even spacing
+      const spacing = 4.0 * f;
+      const totalSpan = (total - 1) * spacing;
+      const yOffset = -totalSpan / 2 + idx * spacing;
+      explodeOffset.set(0, yOffset, 0);
+    } else {
+      // Default: radial explosion (original behavior)
+      if (dist > 0.1) {
+        const dir = combinedCenter.clone().normalize();
+        const radialMagnitude = Math.max(1.8, dist * 2.2);
+        explodeOffset = dir.multiplyScalar(radialMagnitude * f);
+      } else {
+        const angle = (idx / total) * Math.PI * 2;
+        const elev = ((idx % 3) - 1) * 0.5;
+        explodeOffset = new THREE.Vector3(
+          Math.cos(angle) * 4.0 * f,
+          elev * 4.0 * f,
+          Math.sin(angle) * 4.0 * f
+        );
+      }
+    }
+
+    finalPos = [
+      basePos.x + explodeOffset.x,
+      basePos.y + explodeOffset.y,
+      basePos.z + explodeOffset.z,
+    ];
+  }
+
+  const rot: [number, number, number] = [
+    (part.rotation.x * Math.PI) / 180,
+    (part.rotation.y * Math.PI) / 180,
+    (part.rotation.z * Math.PI) / 180,
+  ];
+  const scale: [number, number, number] = [part.scale.x, part.scale.y, part.scale.z];
+
+  const color = isGhost ? '#94a3b8' : part.color;
+  const emissive = isSelected ? '#1e3a8a' : '#000000';
 
   // If Ghost mode for non-isolated part in assembly
   if (isGhost) {
@@ -856,130 +272,397 @@ function SolidMesh({
           wireframe={false}
           roughness={0.9}
         />
-        <Edges scale={1.001} color="#64748b" threshold={20} />
+        <Edges scale={1.001} color="#64748b" threshold={35} />
       </mesh>
     );
   }
 
   return (
-    <mesh
-      ref={meshRef}
-      geometry={geom}
-      position={finalPos}
-      rotation={rot}
-      scale={scale}
-      onClick={(e) => {
-        if (tool === 'measure' || studioMode === 'inspect') {
-          e.stopPropagation();
-          const pt = {
-            x: Math.round(e.point.x * 10),
-            y: Math.round(e.point.y * 10),
-            z: Math.round(e.point.z * 10),
-          };
-          if (!activeMeasureStart) {
-            setActiveMeasureStart(pt);
-          } else {
-            addMeasurement(activeMeasureStart, pt);
-          }
-          return;
-        }
-        if (!isSculptMode) {
-          e.stopPropagation();
-          select(part.id);
-        }
-      }}
-      onPointerDown={(e) => {
-        if (isSculptMode && isSelected) {
-          e.stopPropagation();
-          isPointerDownRef.current = true;
-          if (e.point && e.face?.normal) {
-            applySculptAtPoint(e.point, e.face.normal);
-          }
-        }
-      }}
-      onPointerMove={(e) => {
-        if (isSculptMode && isSelected && isPointerDownRef.current) {
-          e.stopPropagation();
-          if (e.point && e.face?.normal) {
-            applySculptAtPoint(e.point, e.face.normal);
-          }
-        }
-      }}
-      onPointerUp={() => {
-        isPointerDownRef.current = false;
-      }}
-      onPointerLeave={() => {
-        isPointerDownRef.current = false;
-      }}
-    >
-      {renderMode === 'wire' ? (
-        <meshBasicMaterial 
-          color={color} 
-          wireframe 
-          side={THREE.DoubleSide}
-          clippingPlanes={clippingPlanes} 
-          clipShadows 
-        />
-      ) : renderMode === 'normals' ? (
-        <meshNormalMaterial 
-          side={THREE.DoubleSide}
-          clippingPlanes={clippingPlanes} 
-          clipShadows 
-        />
-      ) : renderMode === 'xray' ? (
-        <meshStandardMaterial
-          color={color}
-          transparent
-          opacity={0.35}
-          roughness={0.1}
-          metalness={0.8}
-          side={THREE.DoubleSide}
-          emissive={isSelected ? '#38bdf8' : '#000'}
-          clippingPlanes={clippingPlanes}
-          clipShadows
-        />
-      ) : renderMode === 'pbr' ? (
-        <meshPhysicalMaterial
-          color={color}
-          roughness={0.15}
-          metalness={0.7}
-          clearcoat={0.3}
-          side={THREE.DoubleSide}
-          emissive={emissive}
-          clippingPlanes={clippingPlanes}
-          clipShadows
-        />
-      ) : renderMode === 'matcap' ? (
-        <meshStandardMaterial
-          color={color}
-          roughness={0.4}
-          metalness={0.6}
-          side={THREE.DoubleSide}
-          emissive={isSelected ? '#38bdf8' : '#111'}
-          clippingPlanes={clippingPlanes}
-          clipShadows
-        />
-      ) : (
-        <meshStandardMaterial
-          color={color}
-          roughness={0.3}
-          metalness={0.2}
-          side={THREE.DoubleSide}
-          emissive={emissive}
-          clippingPlanes={clippingPlanes}
-          clipShadows
-        />
+    <group>
+      {/* ─── STENCIL PASS 1: BACK FACES INCREMENT STENCIL ─── */}
+      {sectionSolidCap && clippingPlanes && clippingPlanes.length > 0 && (
+        <mesh
+          geometry={geom}
+          position={finalPos}
+          rotation={rot}
+          scale={scale}
+          renderOrder={1}
+        >
+          <meshBasicMaterial
+            colorWrite={false}
+            depthWrite={false}
+            side={THREE.BackSide}
+            clippingPlanes={clippingPlanes}
+            stencilWrite={true}
+            stencilRef={0}
+            stencilZPass={THREE.IncrementWrapStencilOp}
+          />
+        </mesh>
       )}
 
-      {/* Edge Highlights */}
-      {(renderMode === 'edges' || isSelected) && (
-        <Edges
-          scale={1.002}
-          threshold={15}
-          color={isSelected ? '#00e5ff' : '#ffffff'}
-        />
+      {/* ─── STENCIL PASS 2: FRONT FACES DECREMENT STENCIL ─── */}
+      {sectionSolidCap && clippingPlanes && clippingPlanes.length > 0 && (
+        <mesh
+          geometry={geom}
+          position={finalPos}
+          rotation={rot}
+          scale={scale}
+          renderOrder={2}
+        >
+          <meshBasicMaterial
+            colorWrite={false}
+            depthWrite={false}
+            side={THREE.FrontSide}
+            clippingPlanes={clippingPlanes}
+            stencilWrite={true}
+            stencilRef={0}
+            stencilZPass={THREE.DecrementWrapStencilOp}
+          />
+        </mesh>
       )}
-    </mesh>
+
+      {/* ─── MAIN SOLID VISIBLE MESH ─── */}
+      <mesh
+        ref={meshRef}
+        geometry={geom}
+        position={finalPos}
+        rotation={rot}
+        scale={scale}
+        renderOrder={3}
+        onClick={(e) => {
+          // ─── 0. FACE PICK MODE (Yüzey Seçimi) ───
+          if (facePickMode && e.face && meshRef.current) {
+            e.stopPropagation();
+            const mesh = meshRef.current;
+            mesh.updateMatrixWorld(true);
+            const norm = e.face.normal.clone().transformDirection(mesh.matrixWorld).normalize();
+            const absX = Math.abs(norm.x);
+            const absY = Math.abs(norm.y);
+            const absZ = Math.abs(norm.z);
+            let picked: SurfaceFace = 'top';
+            if (absY >= absX && absY >= absZ) {
+              picked = norm.y > 0 ? 'top' : 'bottom';
+            } else if (absZ >= absX && absZ >= absY) {
+              picked = norm.z > 0 ? 'front' : 'back';
+            } else {
+              picked = norm.x > 0 ? 'right' : 'left';
+            }
+            setActiveFace(picked);
+            setFacePickMode(false);
+            return;
+          }
+
+          if (tool === 'measure' || studioMode === 'inspect') {
+            e.stopPropagation();
+            const mesh = meshRef.current;
+
+            let normalWorld: THREE.Vector3 | undefined = undefined;
+            if (e.face && e.face.normal && mesh) {
+              mesh.updateMatrixWorld(true);
+              normalWorld = e.face.normal.clone().transformDirection(mesh.matrixWorld).normalize();
+            }
+
+            const pt: { x: number; y: number; z: number; nx?: number; ny?: number; nz?: number } = {
+              x: Math.round(e.point.x * 100) / 10,
+              y: Math.round(e.point.y * 100) / 10,
+              z: Math.round(e.point.z * 100) / 10,
+              nx: normalWorld ? Math.round(normalWorld.x * 1000) / 1000 : undefined,
+              ny: normalWorld ? Math.round(normalWorld.y * 1000) / 1000 : undefined,
+              nz: normalWorld ? Math.round(normalWorld.z * 1000) / 1000 : undefined,
+            };
+
+            // ─── 1. CYLINDER / HOLE / DIAMETER AUTO-DETECTION ───
+            const p = part.params || {};
+            let detectedDiameter: number | null = null;
+            let detectedCenter: { x: number; y: number; z: number } | null = null;
+
+            if (part.kind === 'cylinder' || part.kind === 'tube' || part.kind === 'pulley') {
+              const r = p.radius || (p.diameter ? p.diameter / 2 : 25);
+              detectedDiameter = Math.round(r * 2 * 10) / 10;
+              detectedCenter = {
+                x: Math.round(part.position.x),
+                y: Math.round(e.point.y * 10),
+                z: Math.round(part.position.z),
+              };
+            } else if (part.kind === 'sphere') {
+              const r = p.radius || 25;
+              detectedDiameter = Math.round(r * 2 * 10) / 10;
+              detectedCenter = {
+                x: Math.round(part.position.x),
+                y: Math.round(part.position.y),
+                z: Math.round(part.position.z),
+              };
+            } else {
+              // Check if click is near a fastener hole
+              const checkHoles = effectiveHoles || [];
+              for (const h of checkHoles) {
+                const hx = part.position.x + h.x;
+                const hz = part.position.z + h.y;
+                const distToHole = Math.hypot(pt.x - hx, pt.z - hz);
+                const dia = h.size === 'M3' ? 3.4 : h.size === 'M4' ? 4.5 : h.size === 'M5' ? 5.5 : h.size === 'M6' ? 6.6 : h.size === 'M8' ? 9.0 : h.size === 'M10' ? 11.0 : 6.0;
+                if (distToHole < dia * 1.6) {
+                  detectedDiameter = dia;
+                  detectedCenter = { x: Math.round(hx), y: Math.round(pt.y), z: Math.round(hz) };
+                  break;
+                }
+              }
+
+              // If in diameter mode or curved mesh triangle
+              if (!detectedDiameter && e.face && mesh) {
+                const geomMesh = mesh.geometry;
+                const posAttr = geomMesh.attributes.position;
+                if (posAttr) {
+                  const idx0 = e.face.a;
+                  const idx1 = e.face.b;
+                  const idx2 = e.face.c;
+                  const v0 = new THREE.Vector3().fromBufferAttribute(posAttr, idx0).applyMatrix4(mesh.matrixWorld);
+                  const v1 = new THREE.Vector3().fromBufferAttribute(posAttr, idx1).applyMatrix4(mesh.matrixWorld);
+                  const v2 = new THREE.Vector3().fromBufferAttribute(posAttr, idx2).applyMatrix4(mesh.matrixWorld);
+
+                  const a = v0.distanceTo(v1);
+                  const b = v1.distanceTo(v2);
+                  const c = v2.distanceTo(v0);
+                  const s = (a + b + c) / 2;
+                  const area = Math.sqrt(Math.max(0, s * (s - a) * (s - b) * (s - c)));
+                  if (area > 0.0001) {
+                    const circumR = (a * b * c) / (4 * area) * 10;
+                    if (circumR >= 1.0 && circumR <= 800) {
+                      if (measureMode === 'diameter' || (measureMode === 'auto' && e.shiftKey)) {
+                        detectedDiameter = Math.round(circumR * 2 * 10) / 10;
+                        detectedCenter = {
+                          x: Math.round(((v0.x + v1.x + v2.x) / 3) * 10),
+                          y: Math.round(((v0.y + v1.y + v2.y) / 3) * 10),
+                          z: Math.round(((v0.z + v1.z + v2.z) / 3) * 10),
+                        };
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            if (detectedDiameter && detectedCenter && (measureMode === 'diameter' || (!activeMeasureStart && (part.kind === 'cylinder' || part.kind === 'tube' || part.kind === 'pulley')))) {
+              addDiameterMeasurement(
+                detectedCenter,
+                detectedDiameter,
+                normalWorld ? { x: normalWorld.x, y: normalWorld.y, z: normalWorld.z } : undefined,
+                pt
+              );
+              return;
+            }
+
+            // ─── 2. SURFACE & POINT DISTANCE MEASUREMENT ───
+            if (!activeMeasureStart) {
+              setActiveMeasureStart(pt);
+            } else {
+              addMeasurement(activeMeasureStart, pt);
+            }
+            return;
+          }
+          if (!isSculptMode) {
+            e.stopPropagation();
+            select(part.id);
+          }
+        }}
+        onPointerDown={(e) => {
+          if (isSculptMode && isSelected) {
+            e.stopPropagation();
+            isPointerDownRef.current = true;
+            if (e.point && e.face?.normal) {
+              applySculptAtPoint(e.point, e.face.normal);
+            }
+          }
+        }}
+        onPointerMove={(e) => {
+          if (isSculptMode && isSelected && isPointerDownRef.current) {
+            e.stopPropagation();
+            if (e.point && e.face?.normal) {
+              applySculptAtPoint(e.point, e.face.normal);
+            }
+          }
+        }}
+        onPointerUp={() => {
+          isPointerDownRef.current = false;
+        }}
+        onPointerLeave={() => {
+          isPointerDownRef.current = false;
+        }}
+      >
+        {renderMode === 'wire' ? (
+          <meshBasicMaterial 
+            color={color} 
+            wireframe 
+            side={THREE.DoubleSide}
+            clippingPlanes={clippingPlanes} 
+            clipShadows 
+          />
+        ) : renderMode === 'normals' ? (
+          <meshNormalMaterial 
+            side={THREE.DoubleSide}
+            clippingPlanes={clippingPlanes} 
+            clipShadows 
+          />
+        ) : renderMode === 'xray' ? (
+          <meshStandardMaterial
+            color={color}
+            transparent
+            opacity={0.35}
+            roughness={0.1}
+            metalness={0.8}
+            side={THREE.DoubleSide}
+            emissive={isSelected ? '#38bdf8' : '#000'}
+            clippingPlanes={clippingPlanes}
+            clipShadows
+          />
+        ) : renderMode === 'pbr' ? (
+          <meshPhysicalMaterial
+            color={color}
+            roughness={0.15}
+            metalness={0.7}
+            clearcoat={0.3}
+            side={THREE.DoubleSide}
+            emissive={emissive}
+            clippingPlanes={clippingPlanes}
+            clipShadows
+          />
+        ) : renderMode === 'matcap' ? (
+          <meshStandardMaterial
+            color={color}
+            roughness={0.4}
+            metalness={0.6}
+            side={THREE.DoubleSide}
+            emissive={isSelected ? '#38bdf8' : '#111'}
+            clippingPlanes={clippingPlanes}
+            clipShadows
+          />
+        ) : (
+          <meshStandardMaterial
+            color={color}
+            roughness={0.3}
+            metalness={0.2}
+            side={THREE.DoubleSide}
+            emissive={emissive}
+            clippingPlanes={clippingPlanes}
+            clipShadows
+          />
+        )}
+
+        {/* Edge Highlights */}
+        {(renderMode === 'edges' || isSelected) && (
+          <Edges
+            scale={1.002}
+            threshold={35}
+            color={isSelected ? '#00e5ff' : '#ffffff'}
+          />
+        )}
+      </mesh>
+
+      {/* ─── STENCIL CAP PLANE: FILLS SOLID CROSS-SECTION INTERIOR ─── */}
+      {capPlaneData && (
+        <mesh
+          position={capPlaneData.pos}
+          quaternion={capPlaneData.quat}
+          renderOrder={4}
+        >
+          <planeGeometry args={[100, 100]} />
+          <meshStandardMaterial
+            color={color}
+            roughness={0.35}
+            metalness={0.2}
+            side={THREE.DoubleSide}
+            stencilWrite={true}
+            stencilRef={0}
+            stencilFunc={THREE.NotEqualStencilFunc}
+            stencilFail={THREE.ReplaceStencilOp}
+            stencilZFail={THREE.ReplaceStencilOp}
+            stencilZPass={THREE.ReplaceStencilOp}
+          />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+// ─── HIGH-PRECISION CAD SURFACE TARGET MARKER ───
+function CADSurfaceMarker({
+  pos,
+  normal,
+  label,
+  color = '#00e5ff',
+}: {
+  pos: [number, number, number];
+  normal?: { x: number; y: number; z: number };
+  label: string;
+  color?: string;
+}) {
+  const normVec = useMemo(() => {
+    if (!normal) return null;
+    const len = Math.hypot(normal.x, normal.y, normal.z);
+    if (len < 0.001) return null;
+    return new THREE.Vector3(normal.x / len, normal.y / len, normal.z / len);
+  }, [normal]);
+
+  const quat = useMemo(() => {
+    if (!normVec) return null;
+    return new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normVec);
+  }, [normVec]);
+
+  // Elevation slightly off the surface to avoid z-fighting
+  const elevatedPos: [number, number, number] = useMemo(() => {
+    if (!normVec) return pos;
+    return [
+      pos[0] + normVec.x * 0.04,
+      pos[1] + normVec.y * 0.04,
+      pos[2] + normVec.z * 0.04,
+    ];
+  }, [pos, normVec]);
+
+  return (
+    <group position={elevatedPos}>
+      {/* 1. Center Target Dot */}
+      <mesh>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color={color} depthTest={false} transparent opacity={0.95} />
+      </mesh>
+
+      {/* 2. Precision CAD Reticle Rings & Crosshairs */}
+      {quat && (
+        <group quaternion={quat}>
+          <mesh>
+            <ringGeometry args={[0.22, 0.28, 32]} />
+            <meshBasicMaterial color={color} side={THREE.DoubleSide} depthTest={false} transparent opacity={0.85} />
+          </mesh>
+          <mesh>
+            <ringGeometry args={[0.42, 0.45, 32]} />
+            <meshBasicMaterial color={color} side={THREE.DoubleSide} depthTest={false} transparent opacity={0.4} />
+          </mesh>
+          <Line points={[[-0.55, 0, 0], [0.55, 0, 0]]} color={color} lineWidth={1.5} depthTest={false} transparent opacity={0.7} />
+          <Line points={[[0, -0.55, 0], [0, 0.55, 0]]} color={color} lineWidth={1.5} depthTest={false} transparent opacity={0.7} />
+        </group>
+      )}
+
+      {/* 3. Surface Normal Laser Ray & Arrowhead */}
+      {normVec && (
+        <group>
+          <Line points={[[0, 0, 0], [normVec.x * 0.6, normVec.y * 0.6, normVec.z * 0.6]]} color={color} lineWidth={2} depthTest={false} />
+          <mesh
+            position={[normVec.x * 0.65, normVec.y * 0.65, normVec.z * 0.65]}
+            quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), normVec)}
+          >
+            <coneGeometry args={[0.07, 0.18, 16]} />
+            <meshBasicMaterial color={color} depthTest={false} />
+          </mesh>
+        </group>
+      )}
+
+      {/* 4. Minimalist Leader Label */}
+      <Html position={[0, 0.35, 0]} center distanceFactor={22}>
+        <div className="rounded-lg bg-slate-950/90 text-cyan-300 font-mono text-[8px] font-black px-2 py-0.5 shadow-xl border border-cyan-500/40 pointer-events-none select-none backdrop-blur-md whitespace-nowrap flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span>{label}</span>
+        </div>
+      </Html>
+    </group>
   );
 }
 
@@ -991,61 +674,194 @@ function MeasurementLayer() {
 
   return (
     <group>
-      {/* Active Measurement Start Pin */}
+      {/* Active Measurement Start Pin & Surface Indicator */}
       {activeMeasureStart && (
-        <group>
-          <mesh position={[activeMeasureStart.x / 10, activeMeasureStart.y / 10, activeMeasureStart.z / 10]}>
-            <sphereGeometry args={[0.35, 16, 16]} />
-            <meshBasicMaterial color="#f59e0b" />
-          </mesh>
-
-          <Html position={[activeMeasureStart.x / 10, activeMeasureStart.y / 10 + 0.5, activeMeasureStart.z / 10]} center>
-            <div className="rounded bg-amber-500/95 text-slate-950 font-mono text-[9px] font-black px-2 py-0.5 shadow-xl border border-amber-300 pointer-events-none select-none animate-bounce">
-              📍 P1 (Ölçü Başlangıcı) · İkinci yüzeye/noktaya tıklayın
-            </div>
-          </Html>
-        </group>
+        <CADSurfaceMarker
+          pos={[activeMeasureStart.x / 10, activeMeasureStart.y / 10, activeMeasureStart.z / 10]}
+          normal={
+            activeMeasureStart.nx !== undefined
+              ? { x: activeMeasureStart.nx, y: activeMeasureStart.ny || 0, z: activeMeasureStart.nz || 0 }
+              : undefined
+          }
+          label="YÜZEY 1 (BAŞLANGIÇ)"
+          color="#f59e0b"
+        />
       )}
 
-      {/* Saved 3D Measurements */}
+      {/* Saved 3D Surface, Distance & Diameter Measurements */}
       {measurements.map((m) => {
+        // ─── CASE A: DIAMETER / RADIUS MEASUREMENT ───
+        if (m.type === 'diameter' && m.center) {
+          const centerPos: [number, number, number] = [m.center.x / 10, m.center.y / 10, m.center.z / 10];
+          const r = (m.radius || 10) / 10;
+          const diaMm = m.diameter || Math.round(r * 20);
+          const radMm = m.radius || Math.round(r * 10);
+          const norm = m.normal1 ? new THREE.Vector3(m.normal1.x, m.normal1.y, m.normal1.z).normalize() : new THREE.Vector3(0, 1, 0);
+          const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), norm);
+
+          return (
+            <group key={m.id} position={centerPos}>
+              {/* 1. Center Mark Crosshairs */}
+              <group quaternion={quat}>
+                {/* Diameter Boundary Ring */}
+                <mesh>
+                  <ringGeometry args={[r * 0.97, r * 1.03, 64]} />
+                  <meshBasicMaterial color="#10b981" side={THREE.DoubleSide} depthTest={false} transparent opacity={0.9} />
+                </mesh>
+                <mesh>
+                  <circleGeometry args={[r, 64]} />
+                  <meshBasicMaterial color="#10b981" side={THREE.DoubleSide} transparent opacity={0.12} />
+                </mesh>
+
+                {/* Center Reticle Crosshairs */}
+                <mesh>
+                  <sphereGeometry args={[0.15, 16, 16]} />
+                  <meshBasicMaterial color="#10b981" depthTest={false} />
+                </mesh>
+                <Line points={[[-r * 1.25, 0, 0], [r * 1.25, 0, 0]]} color="#10b981" lineWidth={2} depthTest={false} />
+                <Line points={[[0, -r * 1.25, 0], [0, r * 1.25, 0]]} color="#10b981" lineWidth={2} depthTest={false} />
+
+                {/* Diameter Arrowheads across circumference */}
+                <mesh position={[-r, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <coneGeometry args={[0.1, 0.25, 16]} />
+                  <meshBasicMaterial color="#10b981" depthTest={false} />
+                </mesh>
+                <mesh position={[r, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+                  <coneGeometry args={[0.1, 0.25, 16]} />
+                  <meshBasicMaterial color="#10b981" depthTest={false} />
+                </mesh>
+              </group>
+
+              {/* Floating Diameter HUD Callout */}
+              <Html position={[0, r + 0.6, 0]} center>
+                <div className="flex flex-col gap-1.5 rounded-2xl bg-slate-950/95 p-3 font-mono text-[10px] text-white border border-emerald-400/80 shadow-2xl backdrop-blur-xl select-none min-w-[190px] animate-in fade-in zoom-in-95">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-1">
+                    <span className="text-[10px] font-black text-emerald-300 flex items-center gap-1">
+                      ⌀ ÇAP & RADYUS ÖLÇÜSÜ
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeMeasurement(m.id);
+                      }}
+                      className="w-4 h-4 rounded-full bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white flex items-center justify-center text-[10px] font-bold transition-all ml-2"
+                      title="Ölçüyü Sil"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="flex items-baseline justify-between bg-emerald-950/50 rounded-xl px-2.5 py-1.5 border border-emerald-500/40">
+                    <span className="text-emerald-300 text-[9px] font-bold">Çap (Diameter ⌀):</span>
+                    <span className="text-emerald-400 font-black text-[15px]">⌀ {diaMm} mm</span>
+                  </div>
+
+                  <div className="flex items-baseline justify-between px-1 text-[9px] text-slate-300">
+                    <span>Yarıçap (Radius R):</span>
+                    <span className="text-cyan-300 font-bold text-[11px]">R {radMm} mm</span>
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-white/10 pt-1 text-[8px] text-slate-400">
+                    <span>Çevre: <b className="text-slate-200">{(Math.PI * diaMm).toFixed(1)}</b> mm</span>
+                    <span>Alan: <b className="text-slate-200">{(Math.PI * Math.pow(radMm, 2)).toFixed(1)}</b> mm²</span>
+                  </div>
+                </div>
+              </Html>
+            </group>
+          );
+        }
+
+        // ─── CASE B: DISTANCE & SURFACE MEASUREMENT ───
         const p1: [number, number, number] = [m.p1.x / 10, m.p1.y / 10, m.p1.z / 10];
         const p2: [number, number, number] = [m.p2.x / 10, m.p2.y / 10, m.p2.z / 10];
-        const mid: [number, number, number] = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 + 0.3, (p1[2] + p2[2]) / 2];
+        const mid: [number, number, number] = [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 + 0.4, (p1[2] + p2[2]) / 2];
+
+        const perpPos: [number, number, number] | null = m.perpPoint
+          ? [m.perpPoint.x / 10, m.perpPoint.y / 10, m.perpPoint.z / 10]
+          : null;
 
         return (
           <group key={m.id}>
-            {/* End Point Pins */}
-            <mesh position={p1}>
-              <sphereGeometry args={[0.25, 16, 16]} />
-              <meshBasicMaterial color="#38bdf8" />
-            </mesh>
-            <mesh position={p2}>
-              <sphereGeometry args={[0.25, 16, 16]} />
-              <meshBasicMaterial color="#38bdf8" />
-            </mesh>
+            {/* Precision CAD Surface Markers */}
+            <CADSurfaceMarker
+              pos={p1}
+              normal={m.normal1}
+              label="YÜZEY A"
+              color={m.isParallelSurfaces ? '#10b981' : '#38bdf8'}
+            />
+            <CADSurfaceMarker
+              pos={p2}
+              normal={m.normal2}
+              label="YÜZEY B"
+              color={m.isParallelSurfaces ? '#10b981' : '#38bdf8'}
+            />
 
-            {/* Glowing 3D Dimension Line */}
-            <Line points={[p1, p2]} color="#00e5ff" lineWidth={3.5} />
+            {/* Direct Line between Click Points */}
+            <Line points={[p1, p2]} color={m.isParallelSurfaces ? '#34d399' : '#00e5ff'} lineWidth={2.5} depthTest={false} />
 
-            {/* Floating Dimension Callout Badge */}
+            {/* Perpendicular Projection Line for Surface-to-Surface Gap */}
+            {perpPos && m.perpendicularDist !== undefined && m.perpendicularDist > 0.1 && (
+              <Line
+                points={[p1, perpPos]}
+                color="#fbbf24"
+                lineWidth={2}
+                dashed
+                dashScale={1.5}
+                dashSize={0.5}
+                gapSize={0.3}
+                depthTest={false}
+              />
+            )}
+
+            {/* Rich Engineering Dimension Callout Card */}
             <Html position={mid} center>
-              <div className="flex items-center gap-1.5 rounded-xl bg-slate-950/95 px-2.5 py-1 font-mono text-[10px] font-bold text-white border border-cyan-400/60 shadow-2xl backdrop-blur-md select-none animate-in fade-in">
-                <span className="text-cyan-300 font-black">📏 {m.distance} mm</span>
-                <span className="text-slate-400 text-[8px]">
-                  (ΔX: {m.dx} · ΔY: {m.dy} · ΔZ: {m.dz})
-                </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeMeasurement(m.id);
-                  }}
-                  className="ml-1 text-rose-400 hover:text-rose-200 font-bold"
-                  title="Ölçüyü Sil"
-                >
-                  ✕
-                </button>
+              <div className="flex flex-col gap-1.5 rounded-2xl bg-slate-950/95 p-3 font-mono text-[10px] text-white border border-cyan-400/80 shadow-2xl backdrop-blur-xl select-none min-w-[210px] animate-in fade-in zoom-in-95">
+                <div className="flex items-center justify-between border-b border-white/10 pb-1">
+                  <span className="text-[10px] font-black text-cyan-300 flex items-center gap-1">
+                    {m.isParallelSurfaces
+                      ? '⫽ PARALEL YÜZEY MESAFESİ'
+                      : m.perpendicularDist !== undefined
+                      ? '📐 YÜZEY DİK MESAFESİ'
+                      : '📏 3D KUMPAS ÖLÇÜSÜ'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeMeasurement(m.id);
+                    }}
+                    className="w-4 h-4 rounded-full bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white flex items-center justify-center text-[10px] font-bold transition-all ml-2"
+                    title="Ölçüyü Sil"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {m.perpendicularDist !== undefined && (
+                  <div className="flex items-baseline justify-between bg-emerald-950/40 rounded-xl px-2.5 py-1.5 border border-emerald-500/40">
+                    <span className="text-emerald-300 text-[9px] font-bold">Yüzeyler Arası (Dik):</span>
+                    <span className="text-emerald-400 font-black text-[14px]">{m.perpendicularDist} mm</span>
+                  </div>
+                )}
+
+                <div className="flex items-baseline justify-between px-1 text-[9px] text-slate-300">
+                  <span>Noktadan Noktaya:</span>
+                  <span className="text-cyan-300 font-bold text-[11px]">{m.distance} mm</span>
+                </div>
+
+                {m.angleDeg !== undefined && m.angleDeg > 0.5 && !m.isParallelSurfaces && (
+                  <div className="flex items-baseline justify-between px-1 text-[9px] text-amber-300">
+                    <span>Yüzey Açısı:</span>
+                    <span className="font-bold">{m.angleDeg}°</span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between border-t border-white/10 pt-1 text-[8px] text-slate-400">
+                  <span>ΔX: <b className="text-slate-200 font-bold">{m.dx}</b></span>
+                  <span>ΔY: <b className="text-slate-200 font-bold">{m.dy}</b></span>
+                  <span>ΔZ: <b className="text-slate-200 font-bold">{m.dz}</b> mm</span>
+                </div>
               </div>
             </Html>
           </group>
@@ -1115,20 +931,29 @@ function FastenerHolesLayer() {
   if (!selectedPart || holes.length === 0) return null;
 
   const p = selectedPart.params || {};
-  const halfH = ((p.height || 40) / 10) / 2;
-  const partW = p.width || 60;
-  const partH = p.length || p.depth || 40;
+  const partW = (p.width || p.diameter || 60) / 10;
+  const partH = (p.height || p.length || 40) / 10;
+  const partD = (p.depth || p.length || p.diameter || 40) / 10;
 
-  const issues = checkHoleInterferences(holes, { width: partW, height: partH });
+  const halfW = partW / 2;
+  const halfH = partH / 2;
+  const halfD = partD / 2;
+
+  const issues = checkHoleInterferences(holes, { width: partW * 10, height: partH * 10 });
 
   const partPos: [number, number, number] = [
     selectedPart.position.x / 10,
-    selectedPart.position.y / 10 + halfH + 0.02,
+    selectedPart.position.y / 10,
     selectedPart.position.z / 10,
+  ];
+  const partRot: [number, number, number] = [
+    (selectedPart.rotation.x * Math.PI) / 180,
+    (selectedPart.rotation.y * Math.PI) / 180,
+    (selectedPart.rotation.z * Math.PI) / 180,
   ];
 
   return (
-    <group position={partPos}>
+    <group position={partPos} rotation={partRot}>
       {holes.map((h) => {
         const std = ISO_METRIC_HOLES.find((s) => s.size === h.size) || {
           size: h.size,
@@ -1144,26 +969,49 @@ function FastenerHolesLayer() {
         const hasWarning = issues.some((iss) => (iss.holeIdA === h.id || iss.holeIdB === h.id) && iss.severity === 'WARNING');
 
         const color = hasCritical ? '#ef4444' : hasWarning ? '#f59e0b' : '#00e5ff';
+        const face: SurfaceFace = h.face || 'top';
+        const hx = h.x / 10;
+        const hy = h.y / 10;
+
+        let pos: [number, number, number] = [hx, halfH + 0.02, hy];
+        let rot: [number, number, number] = [-Math.PI / 2, 0, 0];
+
+        if (face === 'bottom') {
+          pos = [hx, -halfH - 0.02, hy];
+          rot = [Math.PI / 2, 0, 0];
+        } else if (face === 'front') {
+          pos = [hx, hy, halfD + 0.02];
+          rot = [0, 0, 0];
+        } else if (face === 'back') {
+          pos = [-hx, hy, -halfD - 0.02];
+          rot = [0, Math.PI, 0];
+        } else if (face === 'right') {
+          pos = [halfW + 0.02, hy, hx];
+          rot = [0, Math.PI / 2, 0];
+        } else if (face === 'left') {
+          pos = [-halfW - 0.02, hy, -hx];
+          rot = [0, -Math.PI / 2, 0];
+        }
 
         return (
-          <group key={h.id} position={[h.x / 10, 0, h.y / 10]}>
+          <group key={h.id} position={pos} rotation={rot}>
             {/* Outer Bore Ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[r * 0.9, r, 32]} />
+            <mesh>
+              <ringGeometry args={[r * 0.85, r, 32]} />
               <meshBasicMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.9} />
             </mesh>
 
-            {/* Counterbore Outer Ring if applicable */}
+            {/* Counterbore Outer Ring */}
             {h.type === 'counterbore' && (
-              <mesh rotation={[-Math.PI / 2, 0, 0]}>
+              <mesh>
                 <ringGeometry args={[cbR * 0.95, cbR, 32]} />
-                <meshBasicMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.5} />
+                <meshBasicMaterial color={color} side={THREE.DoubleSide} transparent opacity={0.6} />
               </mesh>
             )}
 
             {/* Crosshair */}
             <Line points={[[-r * 1.5, 0, 0], [r * 1.5, 0, 0]]} color={color} lineWidth={1.5} />
-            <Line points={[[0, 0, -r * 1.5], [0, 0, r * 1.5]]} color={color} lineWidth={1.5} />
+            <Line points={[[0, -r * 1.5, 0], [0, r * 1.5, 0]]} color={color} lineWidth={1.5} />
 
             {/* Adaptive Hole Callout Badge */}
             <Html position={[0, 0.35, 0]} center>
@@ -1183,6 +1031,192 @@ function FastenerHolesLayer() {
     </group>
   );
 }
+
+// ─── 3D ACTIVE FACE CAD GUIDE OVERLAY ───
+function ActiveFaceGuideLayer() {
+  const selectedPart = useDesignStore((s) => s.getSelected());
+  const activeFace = useDesignStore((s) => s.activeFace);
+  const facePickMode = useDesignStore((s) => s.facePickMode);
+
+  if (!selectedPart) return null;
+
+  const p = selectedPart.params || {};
+  const partW = (p.width || p.diameter || 60) / 10;
+  const partH = (p.height || p.length || 40) / 10;
+  const partD = (p.depth || p.length || p.diameter || 40) / 10;
+
+  const halfW = partW / 2;
+  const halfH = partH / 2;
+  const halfD = partD / 2;
+
+  let planeW = partW;
+  let planeH = partD;
+  let pos: [number, number, number] = [0, halfH + 0.015, 0];
+  let rot: [number, number, number] = [-Math.PI / 2, 0, 0];
+
+  if (activeFace === 'bottom') {
+    planeW = partW;
+    planeH = partD;
+    pos = [0, -halfH - 0.015, 0];
+    rot = [Math.PI / 2, 0, 0];
+  } else if (activeFace === 'front') {
+    planeW = partW;
+    planeH = partH;
+    pos = [0, 0, halfD + 0.015];
+    rot = [0, 0, 0];
+  } else if (activeFace === 'back') {
+    planeW = partW;
+    planeH = partH;
+    pos = [0, 0, -halfD - 0.015];
+    rot = [0, Math.PI, 0];
+  } else if (activeFace === 'right') {
+    planeW = partD;
+    planeH = partH;
+    pos = [halfW + 0.015, 0, 0];
+    rot = [0, Math.PI / 2, 0];
+  } else if (activeFace === 'left') {
+    planeW = partD;
+    planeH = partH;
+    pos = [-halfW - 0.015, 0, 0];
+    rot = [0, -Math.PI / 2, 0];
+  }
+
+  const partPos: [number, number, number] = [
+    selectedPart.position.x / 10,
+    selectedPart.position.y / 10,
+    selectedPart.position.z / 10,
+  ];
+  const partRot: [number, number, number] = [
+    (selectedPart.rotation.x * Math.PI) / 180,
+    (selectedPart.rotation.y * Math.PI) / 180,
+    (selectedPart.rotation.z * Math.PI) / 180,
+  ];
+
+  return (
+    <group position={partPos} rotation={partRot}>
+      <group position={pos} rotation={rot}>
+        <mesh>
+          <planeGeometry args={[planeW, planeH]} />
+          <meshBasicMaterial
+            color={facePickMode ? '#f59e0b' : '#00e5ff'}
+            transparent
+            opacity={facePickMode ? 0.22 : 0.08}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+
+        <Line
+          points={[
+            [-planeW / 2, -planeH / 2, 0],
+            [planeW / 2, -planeH / 2, 0],
+            [planeW / 2, planeH / 2, 0],
+            [-planeW / 2, planeH / 2, 0],
+            [-planeW / 2, -planeH / 2, 0],
+          ]}
+          color={facePickMode ? '#f59e0b' : '#00e5ff'}
+          lineWidth={2}
+          dashed
+          dashSize={0.2}
+          gapSize={0.1}
+        />
+
+        {/* Origin (0,0) indicator */}
+        <Line points={[[-0.3, 0, 0], [0.3, 0, 0]]} color="#00e5ff" lineWidth={1.5} />
+        <Line points={[[0, -0.3, 0], [0, 0.3, 0]]} color="#00e5ff" lineWidth={1.5} />
+      </group>
+    </group>
+  );
+}
+
+// ─── 3D SURFACE CUTS VISUALIZATION LAYER ───
+function SurfaceCutsPreviewLayer() {
+  const cuts = useDesignStore((s) => s.cuts);
+  const selectedPart = useDesignStore((s) => s.getSelected());
+
+  if (!selectedPart || cuts.length === 0) return null;
+
+  const p = selectedPart.params || {};
+  const partW = (p.width || p.diameter || 60) / 10;
+  const partH = (p.height || p.length || 40) / 10;
+  const partD = (p.depth || p.length || p.diameter || 40) / 10;
+
+  const halfW = partW / 2;
+  const halfH = partH / 2;
+  const halfD = partD / 2;
+
+  const partPos: [number, number, number] = [
+    selectedPart.position.x / 10,
+    selectedPart.position.y / 10,
+    selectedPart.position.z / 10,
+  ];
+  const partRot: [number, number, number] = [
+    (selectedPart.rotation.x * Math.PI) / 180,
+    (selectedPart.rotation.y * Math.PI) / 180,
+    (selectedPart.rotation.z * Math.PI) / 180,
+  ];
+
+  return (
+    <group position={partPos} rotation={partRot}>
+      {cuts.map((c) => {
+        const face: SurfaceFace = c.face || 'top';
+        const cx = c.x / 10;
+        const cy = c.y / 10;
+        const cw = (c.width || 30) / 10;
+        const cl = (c.length || 40) / 10;
+        const cd = ((c.diameter || 25) / 10) / 2;
+
+        let pos: [number, number, number] = [cx, halfH + 0.02, cy];
+        let rot: [number, number, number] = [-Math.PI / 2, 0, 0];
+
+        if (face === 'bottom') {
+          pos = [cx, -halfH - 0.02, cy];
+          rot = [Math.PI / 2, 0, 0];
+        } else if (face === 'front') {
+          pos = [cx, cy, halfD + 0.02];
+          rot = [0, 0, 0];
+        } else if (face === 'back') {
+          pos = [-cx, cy, -halfD - 0.02];
+          rot = [0, Math.PI, 0];
+        } else if (face === 'right') {
+          pos = [halfW + 0.02, cy, cx];
+          rot = [0, Math.PI / 2, 0];
+        } else if (face === 'left') {
+          pos = [-halfW - 0.02, cy, -cx];
+          rot = [0, -Math.PI / 2, 0];
+        }
+
+        return (
+          <group key={c.id} position={pos} rotation={rot}>
+            {c.type === 'circle' ? (
+              <mesh>
+                <ringGeometry args={[cd * 0.9, cd, 32]} />
+                <meshBasicMaterial color="#f43f5e" side={THREE.DoubleSide} transparent opacity={0.8} />
+              </mesh>
+            ) : (
+              <Line
+                points={[
+                  [-cw / 2, -cl / 2, 0],
+                  [cw / 2, -cl / 2, 0],
+                  [cw / 2, cl / 2, 0],
+                  [-cw / 2, cl / 2, 0],
+                  [-cw / 2, -cl / 2, 0],
+                ]}
+                color="#f43f5e"
+                lineWidth={1.8}
+              />
+            )}
+            <Html position={[0, 0.2, 0]} center>
+              <div className="px-1.5 py-0.5 rounded bg-rose-950/90 text-rose-300 font-mono font-bold text-[8px] border border-rose-500/40 select-none pointer-events-none">
+                ✂️ {c.type === 'rect' ? 'Havuz' : c.type === 'circle' ? 'Dairesel' : 'Slot'} ({c.depth}mm)
+              </div>
+            </Html>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
 
 // ─── INTERACTIVE 2D SKETCH CANVAS LAYER ON 3D PLANE ───
 function InteractiveSketchPlane() {
@@ -1460,6 +1494,52 @@ function SculptBrushCursor() {
   );
 }
 
+// ─── 3D CUTTING PLANE VISUALIZER LAYER ───
+function SectionPlaneVisualizerLayer() {
+  const sectionAxis = useDesignStore((s) => s.sectionAxis);
+  const sectionOffset = useDesignStore((s) => s.sectionOffset);
+  const sectionInvert = useDesignStore((s) => s.sectionInvert);
+
+  const pos: [number, number, number] = useMemo(() => {
+    const d = (sectionInvert ? -1 : 1) * (sectionOffset / 10);
+    if (sectionAxis === 'X') return [d, 0, 0];
+    if (sectionAxis === 'Y') return [0, d, 0];
+    if (sectionAxis === 'Z') return [0, 0, d];
+    return [0, 0, 0];
+  }, [sectionAxis, sectionOffset, sectionInvert]);
+
+  const rot: [number, number, number] = useMemo(() => {
+    if (sectionAxis === 'X') return [0, Math.PI / 2, 0];
+    if (sectionAxis === 'Y') return [Math.PI / 2, 0, 0];
+    return [0, 0, 0];
+  }, [sectionAxis]);
+
+  if (sectionAxis === 'NONE') return null;
+
+  return (
+    <group position={pos} rotation={rot}>
+      {/* Translucent Cutting Grid Plane */}
+      <mesh>
+        <planeGeometry args={[18, 18]} />
+        <meshBasicMaterial color="#f43f5e" transparent opacity={0.07} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+      <Line
+        points={[
+          [-9, -9, 0],
+          [9, -9, 0],
+          [9, 9, 0],
+          [-9, 9, 0],
+          [-9, -9, 0],
+        ]}
+        color="#f43f5e"
+        lineWidth={2}
+        transparent
+        opacity={0.6}
+      />
+    </group>
+  );
+}
+
 export function DesignViewport() {
   const parts = useDesignStore((s) => s.parts);
   const selectedId = useDesignStore((s) => s.selectedId);
@@ -1472,6 +1552,11 @@ export function DesignViewport() {
   const sectionAxis = useDesignStore((s) => s.sectionAxis);
   const sectionOffset = useDesignStore((s) => s.sectionOffset);
   const sectionInvert = useDesignStore((s) => s.sectionInvert);
+  const sectionSolidCap = useDesignStore((s) => s.sectionSolidCap);
+  const setSectionSolidCap = useDesignStore((s) => s.setSectionSolidCap);
+  const setSectionOffset = useDesignStore((s) => s.setSectionOffset);
+  const setSectionInvert = useDesignStore((s) => s.setSectionInvert);
+  const setSectionAxis = useDesignStore((s) => s.setSectionAxis);
   const select = useDesignStore((s) => s.select);
   const updateSelectedTransform = useDesignStore((s) => s.updateSelectedTransform);
   const incrementSculptVersion = useDesignStore((s) => s.incrementSculptVersion);
@@ -1527,25 +1612,28 @@ export function DesignViewport() {
     >
       <Canvas
         shadows
-        camera={{ position: isSketchMode ? [0, 22, 0.001] : [12, 10, 14], fov: 40 }}
-        gl={{ localClippingEnabled: true }}
+        camera={{ position: isSketchMode ? [0, 22, 0.001] : [12, 10, 14], fov: 40, near: 0.1, far: 8000 }}
+        gl={{ localClippingEnabled: true, stencil: true }}
         onPointerMissed={() => !isSketchMode && !isSculptMode && select(null)}
         style={{ width: '100%', height: '100%', background: bgMap[bg] || '#070b10' }}
       >
-        <ambientLight intensity={lightIntensity * 0.5} />
-        <directionalLight position={[10, 15, 8]} intensity={lightIntensity} castShadow />
-        <directionalLight position={[-10, -5, -8]} intensity={lightIntensity * 0.3} />
-        <hemisphereLight args={['#9bbdff', '#1a1f2a', 0.35]} />
+        <ambientLight intensity={lightIntensity * 0.7} />
+        <directionalLight position={[30, 45, 25]} intensity={lightIntensity} castShadow shadow-camera-left={-150} shadow-camera-right={150} shadow-camera-top={150} shadow-camera-bottom={-150} shadow-camera-far={3000} />
+        <directionalLight position={[-30, -15, -25]} intensity={lightIntensity * 0.4} />
+        <hemisphereLight args={['#9bbdff', '#1a1f2a', 0.45]} />
 
-        {/* Grid Floor */}
+        {/* Expansive Infinite CAD Grid Floor */}
         {showGrid && (
           <Grid
             infiniteGrid
-            fadeDistance={50}
+            fadeDistance={800}
+            fadeStrength={1.2}
             cellSize={0.5}
             sectionSize={2.5}
             sectionColor="#00e5ff"
             cellColor="#1e293b"
+            sectionThickness={1.2}
+            cellThickness={0.6}
             position={[0, -0.01, 0]}
           />
         )}
@@ -1554,7 +1642,7 @@ export function DesignViewport() {
         <InteractiveSketchPlane />
 
         {/* 3D Meshes with Solid Backface Double-Sided Clipping & Real-Time Sculpt Engine */}
-        {parts.map((p) => (
+        {parts.map((p, index) => (
           <SolidMesh
             key={p.id}
             part={p}
@@ -1562,6 +1650,8 @@ export function DesignViewport() {
             clippingPlanes={clippingPlanes}
             isSculptMode={isSculptMode}
             onSculptStroke={incrementSculptVersion}
+            partIndex={index}
+            totalParts={parts.length}
           />
         ))}
 
@@ -1571,11 +1661,21 @@ export function DesignViewport() {
         {/* 3D Center of Gravity Plumb Line & Target Layer */}
         <CenterOfGravityLayer />
 
+        {/* 3D Section Cutting Plane Visualizer Layer */}
+        <SectionPlaneVisualizerLayer />
+
         {/* 3D Fastener Holes & Collision Visualization Layer */}
         <FastenerHolesLayer />
 
+        {/* 3D Active Face Guide & Origin Layer */}
+        <ActiveFaceGuideLayer />
+
+        {/* 3D Surface Cuts Outline Preview Layer */}
+        <SurfaceCutsPreviewLayer />
+
         {/* 3D Sculpt Brush Ring Indicator */}
         <SculptBrushCursor />
+
 
         {/* Interactive Transform Gizmo for Move / Rotate / Scale */}
         {selectedPart && !isSketchMode && !isSculptMode && (tool === 'move' || tool === 'rotate' || tool === 'scale') && (
@@ -1612,8 +1712,77 @@ export function DesignViewport() {
           />
         )}
 
-        <OrbitControls makeDefault enableDamping dampingFactor={0.05} enabled={!isSketchMode} />
+        <OrbitControls makeDefault enableDamping dampingFactor={0.05} enabled={!isSketchMode} minDistance={0.1} maxDistance={3500} />
       </Canvas>
+
+      {/* ─── ON-SCREEN FLOATING SECTION VIEW CONTROLLER PILL ─── */}
+      {sectionAxis !== 'NONE' && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-wrap items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-rose-500/50 bg-slate-950/95 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 font-mono text-xs text-white select-none">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-300 font-black text-[11px] border border-rose-500/30">
+            <span>✂️ {sectionAxis} KESİTİ</span>
+          </div>
+
+          {/* Precision Offset Slider */}
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-slate-400 font-bold">Konum:</span>
+            <input
+              type="range"
+              min={-150}
+              max={150}
+              step={1}
+              value={sectionOffset}
+              onChange={(e) => setSectionOffset(Number(e.target.value))}
+              className="w-28 sm:w-44 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            />
+            <span className="text-[11px] text-rose-300 font-black min-w-[50px] text-right">{sectionOffset} mm</span>
+          </div>
+
+          {/* Quick 0 mm Center Button */}
+          <button
+            type="button"
+            onClick={() => setSectionOffset(0)}
+            className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-[10px] transition"
+            title="Merkeze Sıfırla (0 mm)"
+          >
+            0 mm
+          </button>
+
+          {/* Invert Direction */}
+          <button
+            type="button"
+            onClick={() => setSectionInvert(!sectionInvert)}
+            className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-[10px] transition flex items-center gap-1"
+            title="Kesim Yönünü Ters Çevir"
+          >
+            <span>⇄</span>
+            <span>{sectionInvert ? 'Ters' : 'Düz'}</span>
+          </button>
+
+          {/* Solid Section Cap Toggle */}
+          <button
+            type="button"
+            onClick={() => setSectionSolidCap(!sectionSolidCap)}
+            className={`px-2.5 py-1 rounded-lg font-bold text-[10px] transition border ${
+              sectionSolidCap
+                ? 'bg-emerald-500/25 border-emerald-500/50 text-emerald-300 shadow-sm'
+                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+            }`}
+            title="Kesit içi katı dolgu kapağı (Solid Section Cap)"
+          >
+            🧱 {sectionSolidCap ? 'Katı Kesit' : 'İçi Boş'}
+          </button>
+
+          {/* Close Section View Button */}
+          <button
+            type="button"
+            onClick={() => setSectionAxis('NONE')}
+            className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition flex items-center justify-center font-bold text-[11px] ml-1"
+            title="Kesit Görünümünü Kapat"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

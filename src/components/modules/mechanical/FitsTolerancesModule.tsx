@@ -411,7 +411,8 @@ function PremiumFitsSVG({ holeMax, holeMin, shaftMax, shaftMin, nominal, fitColo
             <defs>
                 <filter id="fitGlow"><feGaussianBlur stdDeviation="2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
             </defs>
-            <line x1="50" y1={zeroY} x2="450" y2={zeroY} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="6,4" />
+            <line x1="50" y1={zeroY} x2="450" y2={zeroY} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="6,4" className="solver-dash" />
+            <line x1="70" y1={40} x2="70" y2={260} stroke="#00e5ff" strokeWidth="1" opacity="0.35" className="solver-scan" />
             <text x="30" y={zeroY + 4} textAnchor="end" fill="rgba(255,255,255,0.3)" fontSize="10" fontFamily="monospace">0</text>
 
             {/* Hole zone */}

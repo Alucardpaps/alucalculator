@@ -211,7 +211,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
 
                         {/* Mail Feedback Button */}
                         <a
-                            href="mailto:abdulsametyildirim95@gmail.com?subject=Feedback"
+                            href="mailto:contact@alucalculator.com?subject=Feedback"
                             className={`p-2 transition-colors ${scrolled ? 'text-slate-400 hover:text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
                             title="Send Feedback"
                         >

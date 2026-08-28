@@ -1,7 +1,13 @@
 'use client';
 
 import { create } from 'zustand';
-import { type HoleItem } from './holeStandards';
+import * as THREE from 'three';
+import { type HoleItem, type SurfaceFace, type SurfaceCutItem } from './holeStandards';
+import { calculateAssemblyMassProperties } from './materialsEngine';
+
+
+// Global singleton map to keep Three.js BufferGeometry instances safe from state cloning / serialization
+export const customCADGeometries = new Map<string, THREE.BufferGeometry>();
 
 export type DesignKind =
   | 'box' | 'cylinder' | 'tube' | 'cone' | 'sphere' | 'torus' | 'pyramid' | 'wedge'
@@ -28,14 +34,34 @@ export interface Point3D {
   z: number;
 }
 
+export interface ActiveMeasurePoint {
+  x: number;
+  y: number;
+  z: number;
+  nx?: number;
+  ny?: number;
+  nz?: number;
+}
+
 export interface Measurement {
   id: string;
+  type?: 'distance' | 'diameter';
   p1: Point3D;
   p2: Point3D;
   distance: number;
   dx: number;
   dy: number;
   dz: number;
+  normal1?: Point3D;
+  normal2?: Point3D;
+  perpendicularDist?: number;
+  isParallelSurfaces?: boolean;
+  angleDeg?: number;
+  perpPoint?: Point3D;
+  diameter?: number;
+  radius?: number;
+  center?: Point3D;
+  axis?: Point3D;
 }
 
 export interface DesignPart {
@@ -49,14 +75,16 @@ export interface DesignPart {
   position: { x: number; y: number; z: number };
   rotation: { x: number; y: number; z: number };
   scale: { x: number; y: number; z: number };
-  params: Record<string, number>;
+  params: Record<string, any>;
   outer?: Point2D[];
   solidOp?: 'extrude' | 'revolve' | 'loft' | 'cut';
   modelUrl?: string;
   customGeometry?: any;
   materialId?: string;
   holes?: HoleItem[];
+  cuts?: SurfaceCutItem[];
 }
+
 
 export const PART_COLORS = ['#6b9fff', '#34d399', '#fbbf24', '#f97316', '#c084fc', '#f43f5e', '#22d3ee', '#a3e635'];
 
@@ -138,6 +166,7 @@ interface DesignState {
   sectionAxis: SectionAxis;
   sectionOffset: number;
   sectionInvert: boolean;
+  sectionSolidCap: boolean;
   gridSnap: number;
   showGrid: boolean;
   lightingPreset: string;
@@ -146,17 +175,33 @@ interface DesignState {
 
   // Assembly Inspection & Exploded View State
   explodeFactor: number;
+  explodeDirection: 'radial' | 'axial-y' | 'axial-x' | 'axial-z' | 'linear-sequence';
   isolatedPartId: string | null;
   ghostIsolated: boolean;
   measurements: Measurement[];
-  activeMeasureStart: Point3D | null;
+  activeMeasureStart: ActiveMeasurePoint | null;
+  measureMode: 'auto' | 'distance' | 'diameter';
 
-  // Engineering Materials & Mass Properties State
+  // Engineering Materials, Holes & Surface Cuts State
   selectedMaterialId: string;
   showCenterOfGravity: boolean;
   showTechnicalDrawingModal: boolean;
   showMaterialsModal: boolean;
+  activeFace: SurfaceFace;
+  facePickMode: boolean;
+  clickToPlaceHole: boolean;
   holes: HoleItem[];
+  cuts: SurfaceCutItem[];
+  setActiveFace: (activeFace: SurfaceFace) => void;
+  setFacePickMode: (facePickMode: boolean) => void;
+  setClickToPlaceHole: (clickToPlaceHole: boolean) => void;
+  addHole: (hole: HoleItem) => void;
+  removeHole: (id: string) => void;
+  clearHoles: () => void;
+  addCut: (cut: SurfaceCutItem) => void;
+  removeCut: (id: string) => void;
+  clearCuts: () => void;
+
 
   // Custom Geometries Cache for Imported STL / OBJ / GLTF models
   customGeometries: Record<string, any>;
@@ -197,9 +242,10 @@ interface DesignState {
   setSectionAxis: (axis: SectionAxis) => void;
   setSectionOffset: (offset: number) => void;
   setSectionInvert: (invert: boolean) => void;
+  setSectionSolidCap: (solidCap: boolean) => void;
   deleteSelected: () => void;
   duplicateSelected: () => void;
-  updateSelectedParams: (patch: Record<string, number>) => void;
+  updateSelectedParams: (patch: Record<string, any>) => void;
   updateSelectedTransform: (patch: { position?: Partial<Point3D>; rotation?: Partial<Point3D>; scale?: Partial<Point3D> }) => void;
   setSelectedColor: (color: string) => void;
   setSelectedName: (name: string) => void;
@@ -210,30 +256,32 @@ interface DesignState {
   setShowGrid: (v: boolean) => void;
   setLightingPreset: (v: string) => void;
   setBackgroundPreset: (v: string) => void;
-  setProjectName: (v: string) => void;
+  setProjectName: (projectName: string) => void;
   getSelected: () => DesignPart | null;
+  updatePart: (id: string, patch: Partial<DesignPart>) => void;
 
   // Engineering Materials & Mass Properties Actions
   setSelectedMaterialId: (id: string) => void;
   setShowCenterOfGravity: (show: boolean) => void;
   setShowTechnicalDrawingModal: (show: boolean) => void;
   setShowMaterialsModal: (show: boolean) => void;
-  addHole: (hole: HoleItem) => void;
-  removeHole: (id: string) => void;
-  clearHoles: () => void;
+
 
   // Inspection & Assembly Actions
   setExplodeFactor: (f: number) => void;
+  setExplodeDirection: (dir: 'radial' | 'axial-y' | 'axial-x' | 'axial-z' | 'linear-sequence') => void;
   setIsolatedPartId: (id: string | null) => void;
   setGhostIsolated: (v: boolean) => void;
   showAllParts: () => void;
   hideAllParts: () => void;
   toggleIsolateSelected: () => void;
-  setActiveMeasureStart: (pt: Point3D | null) => void;
-  addMeasurement: (p1: Point3D, p2: Point3D) => void;
+  setMeasureMode: (mode: 'auto' | 'distance' | 'diameter') => void;
+  setActiveMeasureStart: (pt: ActiveMeasurePoint | null) => void;
+  addMeasurement: (p1: ActiveMeasurePoint, p2: ActiveMeasurePoint) => void;
+  addDiameterMeasurement: (center: Point3D, diameter: number, normal?: Point3D, hitPoint?: Point3D) => void;
   removeMeasurement: (id: string) => void;
   clearMeasurements: () => void;
-  importCADModel: (name: string, geom: any, position?: Point3D, color?: string) => string;
+  importCADModel: (name: string, geom: any, position?: Point3D, color?: string, initialParams?: Record<string, number>) => string;
 
   // Sculpt actions
   setSculptBrush: (brush: SculptBrush) => void;
@@ -273,6 +321,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   sectionAxis: 'NONE',
   sectionOffset: 0,
   sectionInvert: false,
+  sectionSolidCap: true,
   gridSnap: 5,
   showGrid: true,
   lightingPreset: 'studio',
@@ -281,10 +330,12 @@ export const useDesignStore = create<DesignState>((set, get) => ({
 
   // Inspection & Assembly State
   explodeFactor: 0,
+  explodeDirection: 'radial' as const,
   isolatedPartId: null,
   ghostIsolated: true,
   measurements: [],
   activeMeasureStart: null,
+  measureMode: 'auto',
   customGeometries: {},
 
   // Materials & Analysis State
@@ -292,10 +343,12 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   showCenterOfGravity: false,
   showTechnicalDrawingModal: false,
   showMaterialsModal: false,
-  holes: [
-    { id: 'h1', size: 'M6', x: -20, y: 0, type: 'counterbore' },
-    { id: 'h2', size: 'M6', x: 20, y: 0, type: 'counterbore' },
-  ],
+  activeFace: 'top' as SurfaceFace,
+  facePickMode: false,
+  clickToPlaceHole: false,
+  holes: [],
+  cuts: [],
+
 
   // Sculpt State
   sculptBrush: 'clay',
@@ -324,31 +377,61 @@ export const useDesignStore = create<DesignState>((set, get) => ({
 
   pushHistory: () => {
     const { parts, historyPast } = get();
-    const nextPast = [...historyPast.slice(-19), JSON.parse(JSON.stringify(parts))];
+    // Exclude customGeometry instances from JSON serialization to avoid corrupting BufferGeometry instances
+    const cleanParts = parts.map((p) => {
+      if (p.customGeometry) {
+        const { customGeometry, ...rest } = p;
+        return rest;
+      }
+      return p;
+    });
+    const nextPast = [...historyPast.slice(-19), JSON.parse(JSON.stringify(cleanParts))];
     set({ historyPast: nextPast, historyFuture: [] });
   },
 
   undo: () => {
-    const { parts, historyPast, historyFuture } = get();
+    const { parts, historyPast, historyFuture, customGeometries } = get();
     if (historyPast.length === 0) return;
     const prev = historyPast[historyPast.length - 1];
     const newPast = historyPast.slice(0, -1);
+    const restored = prev.map((p) => ({
+      ...p,
+      customGeometry: p.kind === 'imported-model' ? (customCADGeometries.get(p.id) || customGeometries[p.id] || p.customGeometry) : p.customGeometry,
+    }));
+    const cleanCurrent = parts.map((p) => {
+      if (p.customGeometry) {
+        const { customGeometry, ...rest } = p;
+        return rest;
+      }
+      return p;
+    });
     set({
-      parts: prev,
+      parts: restored,
       historyPast: newPast,
-      historyFuture: [JSON.parse(JSON.stringify(parts)), ...historyFuture],
+      historyFuture: [JSON.parse(JSON.stringify(cleanCurrent)), ...historyFuture],
       selectedId: prev.some(p => p.id === get().selectedId) ? get().selectedId : null,
     });
   },
 
   redo: () => {
-    const { parts, historyPast, historyFuture } = get();
+    const { parts, historyPast, historyFuture, customGeometries } = get();
     if (historyFuture.length === 0) return;
     const next = historyFuture[0];
     const newFuture = historyFuture.slice(1);
+    const restored = next.map((p) => ({
+      ...p,
+      customGeometry: p.kind === 'imported-model' ? (customCADGeometries.get(p.id) || customGeometries[p.id] || p.customGeometry) : p.customGeometry,
+    }));
+    const cleanCurrent = parts.map((p) => {
+      if (p.customGeometry) {
+        const { customGeometry, ...rest } = p;
+        return rest;
+      }
+      return p;
+    });
     set({
-      parts: next,
-      historyPast: [...historyPast, JSON.parse(JSON.stringify(parts))],
+      parts: restored,
+      historyPast: [...historyPast, JSON.parse(JSON.stringify(cleanCurrent))],
       historyFuture: newFuture,
       selectedId: next.some(p => p.id === get().selectedId) ? get().selectedId : null,
     });
@@ -374,14 +457,23 @@ export const useDesignStore = create<DesignState>((set, get) => ({
     set((s) => ({ parts: [...s.parts, part], selectedId: id }));
     return id;
   },
-  select: (id) => set({ selectedId: id }),
+  select: (id) => {
+    const part = get().parts.find((p) => p.id === id);
+    set({
+      selectedId: id,
+      holes: part?.holes || [],
+      cuts: part?.cuts || [],
+    });
+  },
+
   setTool: (tool) => set({ tool }),
   setPlaceKind: (kind) => set({ placeKind: kind }),
   setRenderMode: (renderMode) => set({ renderMode }),
   setStudioMode: (studioMode) => set({ studioMode }),
-  setSectionAxis: (sectionAxis) => set({ sectionAxis }),
+  setSectionAxis: (axis) => set({ sectionAxis: axis }),
   setSectionOffset: (sectionOffset) => set({ sectionOffset }),
   setSectionInvert: (sectionInvert) => set({ sectionInvert }),
+  setSectionSolidCap: (sectionSolidCap) => set({ sectionSolidCap }),
   deleteSelected: () => {
     const id = get().selectedId;
     if (!id) return;
@@ -429,25 +521,98 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   },
   toggleVisible: (id) => set((s) => ({ parts: s.parts.map((p) => (p.id === id ? { ...p, visible: !p.visible } : p)) })),
   toggleLocked: (id) => set((s) => ({ parts: s.parts.map((p) => (p.id === id ? { ...p, locked: !p.locked } : p)) })),
-  clearScene: () => set({ parts: [], selectedId: null, measurements: [], isolatedPartId: null }),
+  clearScene: () => set({ parts: [], selectedId: null, measurements: [], isolatedPartId: null, holes: [] }),
   setGridSnap: (n) => set({ gridSnap: n }),
   setShowGrid: (v) => set({ showGrid: v }),
   setLightingPreset: (v) => set({ lightingPreset: v }),
   setBackgroundPreset: (v) => set({ backgroundPreset: v }),
-  setProjectName: (v) => set({ projectName: v }),
+  setProjectName: (projectName) => set({ projectName }),
   getSelected: () => get().parts.find((p) => p.id === get().selectedId) || null,
+  updatePart: (id, patch) => set((s) => ({ parts: s.parts.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
 
-  // Materials, Analysis & Drawing Actions
+  // Materials, Analysis, Holes & Surface Cuts Actions
   setSelectedMaterialId: (selectedMaterialId) => set({ selectedMaterialId }),
   setShowCenterOfGravity: (showCenterOfGravity) => set({ showCenterOfGravity }),
   setShowTechnicalDrawingModal: (showTechnicalDrawingModal) => set({ showTechnicalDrawingModal }),
   setShowMaterialsModal: (showMaterialsModal) => set({ showMaterialsModal }),
-  addHole: (hole) => set((s) => ({ holes: [...s.holes, hole] })),
-  removeHole: (id) => set((s) => ({ holes: s.holes.filter((h) => h.id !== id) })),
-  clearHoles: () => set({ holes: [] }),
+  setActiveFace: (activeFace) => set({ activeFace }),
+  setFacePickMode: (facePickMode) => set({ facePickMode }),
+  setClickToPlaceHole: (clickToPlaceHole) => set({ clickToPlaceHole }),
+  addHole: (hole) => {
+    const { selectedId, parts, holes } = get();
+    const newHoles = [...holes, hole];
+    if (selectedId) {
+      set({
+        holes: newHoles,
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, holes: newHoles } : p)),
+      });
+    } else {
+      set({ holes: newHoles });
+    }
+  },
+  removeHole: (id) => {
+    const { selectedId, parts, holes } = get();
+    const newHoles = holes.filter((h) => h.id !== id);
+    if (selectedId) {
+      set({
+        holes: newHoles,
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, holes: newHoles } : p)),
+      });
+    } else {
+      set({ holes: newHoles });
+    }
+  },
+  clearHoles: () => {
+    const { selectedId, parts } = get();
+    if (selectedId) {
+      set({
+        holes: [],
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, holes: [] } : p)),
+      });
+    } else {
+      set({ holes: [] });
+    }
+  },
+  addCut: (cut) => {
+    const { selectedId, parts, cuts } = get();
+    const newCuts = [...cuts, cut];
+    if (selectedId) {
+      set({
+        cuts: newCuts,
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, cuts: newCuts } : p)),
+      });
+    } else {
+      set({ cuts: newCuts });
+    }
+  },
+  removeCut: (id) => {
+    const { selectedId, parts, cuts } = get();
+    const newCuts = cuts.filter((c) => c.id !== id);
+    if (selectedId) {
+      set({
+        cuts: newCuts,
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, cuts: newCuts } : p)),
+      });
+    } else {
+      set({ cuts: newCuts });
+    }
+  },
+  clearCuts: () => {
+    const { selectedId, parts } = get();
+    if (selectedId) {
+      set({
+        cuts: [],
+        parts: parts.map((p) => (p.id === selectedId ? { ...p, cuts: [] } : p)),
+      });
+    } else {
+      set({ cuts: [] });
+    }
+  },
+
 
   // Assembly Inspection Actions
   setExplodeFactor: (explodeFactor) => set({ explodeFactor }),
+  setExplodeDirection: (explodeDirection) => set({ explodeDirection }),
   setIsolatedPartId: (isolatedPartId) => set({ isolatedPartId }),
   setGhostIsolated: (ghostIsolated) => set({ ghostIsolated }),
   showAllParts: () => set((s) => ({ parts: s.parts.map((p) => ({ ...p, visible: true })), isolatedPartId: null })),
@@ -463,13 +628,102 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   },
   setActiveMeasureStart: (activeMeasureStart) => set({ activeMeasureStart }),
   addMeasurement: (p1, p2) => {
-    const dx = Math.round(Math.abs(p2.x - p1.x));
-    const dy = Math.round(Math.abs(p2.y - p1.y));
-    const dz = Math.round(Math.abs(p2.z - p1.z));
-    const distance = Math.round(Math.hypot(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z));
+    const dx = Math.round(Math.abs(p2.x - p1.x) * 10) / 10;
+    const dy = Math.round(Math.abs(p2.y - p1.y) * 10) / 10;
+    const dz = Math.round(Math.abs(p2.z - p1.z) * 10) / 10;
+    const distance = Math.round(Math.hypot(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z) * 10) / 10;
+
+    let perpendicularDist: number | undefined = undefined;
+    let isParallelSurfaces: boolean | undefined = undefined;
+    let angleDeg: number | undefined = undefined;
+    let perpPoint: Point3D | undefined = undefined;
+
+    const normal1 = (p1.nx !== undefined && p1.ny !== undefined && p1.nz !== undefined)
+      ? { x: p1.nx, y: p1.ny, z: p1.nz }
+      : undefined;
+
+    const normal2 = (p2.nx !== undefined && p2.ny !== undefined && p2.nz !== undefined)
+      ? { x: p2.nx, y: p2.ny, z: p2.nz }
+      : undefined;
+
+    if (normal1) {
+      // Vector from p1 to p2 in mm
+      const vx = p2.x - p1.x;
+      const vy = p2.y - p1.y;
+      const vz = p2.z - p1.z;
+
+      // Project onto normal1 to get perpendicular distance to Face 1
+      const dot1 = vx * normal1.x + vy * normal1.y + vz * normal1.z;
+      const perpDistVal = Math.round(Math.abs(dot1) * 10) / 10;
+      perpendicularDist = perpDistVal;
+
+      // Perpendicular projection point on plane 2
+      perpPoint = {
+        x: Math.round((p1.x + normal1.x * dot1) * 10) / 10,
+        y: Math.round((p1.y + normal1.y * dot1) * 10) / 10,
+        z: Math.round((p1.z + normal1.z * dot1) * 10) / 10,
+      };
+
+      if (normal2) {
+        // Angle between normals
+        const nDot = normal1.x * normal2.x + normal1.y * normal2.y + normal1.z * normal2.z;
+        const absDot = Math.min(1.0, Math.abs(nDot));
+        const angle = Math.round((Math.acos(absDot) * 180) / Math.PI * 10) / 10;
+        angleDeg = angle;
+        // Parallel if within 15 degrees
+        isParallelSurfaces = absDot >= 0.96;
+      }
+    }
+
     const id = `measure-${Date.now().toString(36)}-${++seq}`;
     set((s) => ({
-      measurements: [...s.measurements, { id, p1, p2, distance, dx, dy, dz }],
+      measurements: [
+        ...s.measurements,
+        {
+          id,
+          p1: { x: p1.x, y: p1.y, z: p1.z },
+          p2: { x: p2.x, y: p2.y, z: p2.z },
+          distance,
+          dx,
+          dy,
+          dz,
+          normal1,
+          normal2,
+          perpendicularDist,
+          isParallelSurfaces,
+          angleDeg,
+          perpPoint,
+        },
+      ],
+      activeMeasureStart: null,
+    }));
+  },
+  setMeasureMode: (measureMode) => set({ measureMode }),
+  addDiameterMeasurement: (center, diameter, normal, hitPoint) => {
+    const id = `measure-dia-${Date.now().toString(36)}-${++seq}`;
+    const radius = Math.round((diameter / 2) * 100) / 100;
+    const roundedDia = Math.round(diameter * 100) / 100;
+    const p1 = hitPoint || { x: center.x + radius, y: center.y, z: center.z };
+    const p2 = { x: center.x - (p1.x - center.x), y: center.y - (p1.y - center.y), z: center.z - (p1.z - center.z) };
+
+    set((s) => ({
+      measurements: [
+        ...s.measurements,
+        {
+          id,
+          type: 'diameter',
+          p1,
+          p2,
+          center,
+          diameter: roundedDia,
+          radius,
+          normal1: normal,
+          distance: roundedDia,
+          dx: Math.round(Math.abs(p2.x - p1.x)),
+          dy: Math.round(Math.abs(p2.y - p1.y)),
+          dz: Math.round(Math.abs(p2.z - p1.z)),
+        },
+      ],
       activeMeasureStart: null,
     }));
   },
@@ -477,8 +731,13 @@ export const useDesignStore = create<DesignState>((set, get) => ({
   clearMeasurements: () => set({ measurements: [], activeMeasureStart: null }),
 
   // CAD Import Model Action
-  importCADModel: (name, geom, position = { x: 0, y: 0, z: 0 }, color = '#60a5fa') => {
+  importCADModel: (name, geom, position = { x: 0, y: 0, z: 0 }, color = '#60a5fa', initialParams?: Record<string, number>) => {
+    get().pushHistory();
     const id = `cad-${Date.now().toString(36)}-${++seq}`;
+    const params = initialParams || { width: 50, height: 50, depth: 50 };
+    if (geom) {
+      customCADGeometries.set(id, geom);
+    }
     const part: DesignPart = {
       id,
       kind: 'imported-model',
@@ -490,7 +749,7 @@ export const useDesignStore = create<DesignState>((set, get) => ({
       position,
       rotation: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
-      params: { width: 50, height: 50, depth: 50 },
+      params,
       customGeometry: geom,
     };
     set((s) => ({

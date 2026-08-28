@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import { usePartStore, ProfileType } from '@/store/usePartStore';
 import { ENGINEERING_MATERIALS } from '@/lib/parametric/materials';
-import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js';
 import { useOSStore } from '@/store/osStore';
+import { useLicenseStore } from '@/store/licenseStore';
+import { generateStepBox, generateStepPlateWithHole, downloadStepFile } from '@/engines/cad/StepBRepExporter';
 
 // UI icons
 const IconBox = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>;
@@ -26,10 +27,12 @@ export function PartControls() {
     } = usePartStore();
 
     const [isExporting2D, setIsExporting2D] = useState(false);
-    const [isExporting3D, setIsExporting3D] = useState(false);
     const [exportTrigger, setExportTrigger] = useState<number | 'stl'>(0);
 
     const handleExport2D = async () => {
+        const allowed = useLicenseStore.getState().guardFeature('dxf');
+        if (!allowed) return;
+
         setIsExporting2D(true);
         try {
             const bodyPayload = profileType === 'flat'
@@ -61,36 +64,28 @@ export function PartControls() {
         }
     };
 
-    const handleExport3D = async () => {
-        setIsExporting3D(true);
-        try {
-            const body = profileType === 'flat'
-                ? { profileType, width, height, thickness, holeRadius }
-                : { profileType, webHeight, flangeWidth, webThickness, flangeThickness, length };
+    const handleExportSTEP = () => {
+        const allowed = useLicenseStore.getState().guardFeature('step');
+        if (!allowed) return;
 
-            const response = await fetch('/api/export-step', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+        let stepStr = '';
+        if (profileType === 'flat' && holeRadius > 0) {
+            stepStr = generateStepPlateWithHole({
+                width: width,
+                height: height,
+                thickness: thickness,
+                holeRadius: holeRadius,
+                name: `AluCalc_Plate_${width}x${height}`,
             });
-
-            if (!response.ok) throw new Error('Failed to generate STEP exported file.');
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = profileType === 'flat' ? `AluCalc_Plate_${width}x${height}x${thickness}.step` : `AluCalc_${profileType}_${flangeWidth}x${webHeight}x${length}.step`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (err) {
-            console.error('STEP Export Error:', err);
-            alert('STEP Export failed. Is CadQuery installed on the server?');
-        } finally {
-            setIsExporting3D(false);
+        } else {
+            stepStr = generateStepBox({
+                width: width,
+                height: height,
+                thickness: thickness,
+                name: `AluCalc_${profileType}_${width}x${height}`,
+            });
         }
+        downloadStepFile(stepStr, `AluCalc_${profileType}_${width}x${height}.step`);
     };
 
     const handleExportSTL = () => {
@@ -406,37 +401,37 @@ export function PartControls() {
             </div>
 
             <div className="flex flex-col gap-3 pt-2">
-                {/* Export 2D DXF Button */}
-                <button
-                    onClick={handleExport2D}
-                    disabled={isExporting2D || isExporting3D}
-                    className="group relative w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] overflow-hidden"
-                >
-                    <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
-                    <span className={isExporting2D ? "animate-bounce" : ""}><IconDownload /></span>
-                    <span>{isExporting2D ? 'Generating Profile...' : 'Export 2D DXF Cross-Section'}</span>
-                </button>
-
-                {/* Export 3D STEP Button */}
-                <button
-                    onClick={handleExport3D}
-                    disabled={isExporting2D || isExporting3D}
-                    className="group relative w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-sm tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(147,51,234,0.2)] hover:shadow-[0_0_25px_rgba(147,51,234,0.4)] overflow-hidden"
-                >
-                    <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
-                    <span className={isExporting3D ? "animate-bounce" : ""}><IconDownload /></span>
-                    <span>{isExporting3D ? 'Running CadQuery...' : 'Export 3D STEP Solid'}</span>
-                </button>
-
-                {/* Export 3D STL Button (Mod 4) */}
+                {/* Export 3D STL Button (STABLE Binary) */}
                 <button
                     onClick={handleExportSTL}
-                    disabled={isExporting2D || isExporting3D || !meshRef}
-                    className="group relative w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(249,115,22,0.2)] hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] overflow-hidden"
+                    disabled={isExporting2D || !meshRef}
+                    className="group relative w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
                     <span><IconDownload /></span>
-                    <span>Instant STL Export (3D Print)</span>
+                    <span>Download 3D STL (Binary STABLE)</span>
+                </button>
+
+                {/* Export 3D STEP Button (ISO 10303-21 B-Rep) */}
+                <button
+                    onClick={handleExportSTEP}
+                    disabled={isExporting2D}
+                    className="group relative w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold text-xs tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
+                    <span><IconDownload /></span>
+                    <span>Download 3D B-Rep STEP (ISO 10303)</span>
+                </button>
+
+                {/* Export 2D DXF Button (STABLE Layered) */}
+                <button
+                    onClick={handleExport2D}
+                    disabled={isExporting2D}
+                    className="group relative w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs tracking-widest uppercase rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
+                    <span className={isExporting2D ? "animate-bounce" : ""}><IconDownload /></span>
+                    <span>{isExporting2D ? 'Generating DXF...' : 'Export 2D DXF (1:1 mm)'}</span>
                 </button>
             </div>
             </div>

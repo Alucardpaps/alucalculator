@@ -34,6 +34,7 @@ function PulleyGraphic({
     const dur = actualRpm > 0 ? (60 / actualRpm) * 12 : 0;
     const animStyle = dur > 0 ? {
         transformOrigin: `${cx}px ${cy}px`,
+        transformBox: 'view-box' as const,
         animation: `pulleySpin ${dur}s linear infinite`
     } : {};
 

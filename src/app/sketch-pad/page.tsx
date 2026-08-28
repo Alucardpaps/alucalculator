@@ -1,34 +1,22 @@
-'use client';
+import { Metadata } from 'next';
+import { SketchPadClient } from './SketchPadClient';
 
-/**
- * Dedicated Technical Sketch Pad
- * Route: /sketch-pad
- */
+export const metadata: Metadata = {
+  title: 'Technical Engineering Sketch Pad | AluCalc OS',
+  description:
+    'Freeform engineering sketch pad with vector shapes, dimensioning annotations, hand-drawn schematics, and SVG/PNG export.',
+  alternates: {
+    canonical: 'https://www.alucalculator.com/sketch-pad/',
+  },
+  openGraph: {
+    title: 'Technical Engineering Sketch Pad | AluCalc OS',
+    description:
+      'Freeform engineering sketch pad with vector shapes, dimensioning annotations, and export.',
+    url: 'https://www.alucalculator.com/sketch-pad/',
+    type: 'website',
+  },
+};
 
-import React from 'react';
-import dynamic from 'next/dynamic';
-
-const ExcalidrawModule = dynamic(
-  () => import('@/components/modules/sketch/ExcalidrawModule').then((m) => m.default),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-[#05080c]">
-        <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-t-cyan-400 border-white/10 rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-mono text-cyan-400/70 uppercase tracking-widest">
-            Loading Engineering Sketch Pad...
-          </p>
-        </div>
-      </div>
-    ),
-  }
-);
-
-export default function SketchPadRootPage() {
-  return (
-    <div className="w-full h-[calc(100vh-3.5rem)] overflow-hidden bg-[#05080c] select-none">
-      <ExcalidrawModule />
-    </div>
-  );
+export default function SketchPadPage() {
+  return <SketchPadClient />;
 }

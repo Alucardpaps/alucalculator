@@ -27,6 +27,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateDXF } from '../dxf/DxfGenerator';
 import { generatePDF } from '../export/PdfGenerator';
+import { useLicenseStore } from '@/store/licenseStore';
 
 // Dynamic import to avoid Paper.js SSR issues
 const CadCanvas = dynamic(() => import('./CadCanvas').then((mod) => mod.CadCanvas), {
@@ -119,6 +120,8 @@ export function AluCAD({ className = '' }: AluCADProps) {
   };
 
   const handleExportDXF = () => {
+    const allowed = useLicenseStore.getState().guardFeature('dxf');
+    if (!allowed) return;
     const { entities, layers } = useCadStore.getState();
     const dxfStr = generateDXF(entities, layers);
     const blob = new Blob([dxfStr], { type: 'text/plain' });

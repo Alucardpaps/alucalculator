@@ -51,14 +51,33 @@ export const ISO_METRIC_HOLES: MetricHoleStandard[] = [
   { size: 'M100', nominalDiameter: 100.0, coarsePitch: 6.00, tapDrillDiameter: 94.00, clearanceClose: 104.0, clearanceMedium: 107.0, clearanceFree: 112.0, counterboreDiameter: 145.0, counterboreDepth: 100.0, countersinkDiameter: 165.0 },
 ];
 
+export type SurfaceFace = 'top' | 'bottom' | 'front' | 'back' | 'left' | 'right';
+
 export interface HoleItem {
   id: string;
   size: string; // e.g. "M6"
-  x: number; // mm
-  y: number; // mm
+  x: number; // mm in local face coordinate
+  y: number; // mm in local face coordinate
+  face?: SurfaceFace; // 'top' | 'bottom' | 'front' | 'back' | 'left' | 'right' (default 'top')
   type: 'tap' | 'clearance' | 'counterbore' | 'countersink';
   depth?: number; // mm
+  isThroughAll?: boolean;
 }
+
+export interface SurfaceCutItem {
+  id: string;
+  type: 'rect' | 'circle' | 'slot';
+  face: SurfaceFace;
+  x: number; // mm on face
+  y: number; // mm on face
+  width?: number; // mm
+  length?: number; // mm
+  diameter?: number; // mm
+  depth: number; // mm
+  isThroughAll?: boolean;
+  angle?: number;
+}
+
 
 export type HoleIssueSeverity = 'CRITICAL' | 'WARNING' | 'NOTICE';
 

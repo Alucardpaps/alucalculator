@@ -9,7 +9,14 @@
     "handbook": "Manuale Ingnere",
     "library": "Libreria Moduli",
     "available": "Moduli Disponibili",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "Meccanica",
+    "civil": "Civile",
+    "electrical": "Elettrica",
+    "science": "Scienza",
+    "finance": "Finanza",
+    "software": "Software",
+    "other": "Altro"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "Manuale",
       "desc": "Tabelle cuscinetti, ISO, G-Code."
+    },
+    "thermalExpansion": {
+      "title": "Dilatazione termica",
+      "desc": "Analisi di stabilità dimensionale"
+    },
+    "manufacturingSandbox": {
+      "title": "Sandbox di produzione",
+      "desc": "Linea di produzione virtuale"
+    },
+    "simulationFea": {
+      "title": "Simulazione FEA",
+      "desc": "Sforzo e deformazione"
+    },
+    "analytics": {
+      "title": "Cruscotto analitico",
+      "desc": "Dati di prestazione del sistema"
+    },
+    "fileExplorer": {
+      "title": "Esplora file",
+      "desc": "File system OS"
+    },
+    "terminal": {
+      "title": "Terminale",
+      "desc": "Interfaccia a riga di comando"
+    },
+    "settings": {
+      "title": "Impostazioni",
+      "desc": "Configurazione di sistema"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "Rapporto",
       "pitchDiameter": "Diametro Primitivo",
       "forcesAndStress": "Forze & Sforzi"
+    },
+    "outputs": {
+      "tipDia": "Diametro di testa",
+      "rootDia": "Diametro di piede"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "Spessore lama",
     "trimStart": "Taglio inizio",
     "trimEnd": "Taglio fine"
+  },
+  "beam-deflection": {
+    "title": "Deflessione della trave",
+    "desc": "Calcola deflessione e sforzo"
+  },
+  "concrete-reinforcement": {
+    "title": "Armatura del calcestruzzo",
+    "desc": "Area di armatura"
+  },
+  "ohms-law": {
+    "title": "Legge di Ohm",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "Caduta di tensione",
+    "desc": "Dimensionamento cavi"
+  },
+  "periodic-table": {
+    "title": "Tavola periodica",
+    "desc": "Elementi chimici"
+  },
+  "calculator": {
+    "title": "Calcolatrice scientifica",
+    "desc": "Matematica avanzata"
+  },
+  "vat-calculator": {
+    "title": "Calcolatore IVA",
+    "desc": "Calcolo fiscale"
+  },
+  "excel-helper": {
+    "title": "Helper Excel",
+    "desc": "Generatore di formule"
+  },
+  "json-formatter": {
+    "title": "Formattatore JSON",
+    "desc": "Abbellire JSON"
+  },
+  "regex-tester": {
+    "title": "Tester Regex",
+    "desc": "Testare pattern"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "desc": "Inviateci i vostri commenti"
+  },
+  "thermal": {
+    "initialLength": "Lunghezza iniziale",
+    "tempDelta": "Delta di temperatura",
+    "finalLength": "Lunghezza finale",
+    "expansion": "Entità della dilatazione",
+    "strain": "Deformazione unitaria"
   }
 }

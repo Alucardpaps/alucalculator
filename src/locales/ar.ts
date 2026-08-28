@@ -1,9 +1,6 @@
 export default {
-    // OS Core
     osName: "AluCalc OS",
     version: "v5.0",
-
-    // Welcome Modal
     welcomeTitle: "اختر مساحة",
     welcomeHighlight: "عملك",
     welcomeDesc: "حدد واجهتك الأساسية. يمكنك التبديل في أي وقت.",
@@ -18,8 +15,6 @@ export default {
     nodeTypeNote: "ملاحظة",
     nodeTypeMedia: "وسائط",
     nodeTypeNode: "عقدة",
-
-    // Modals & Windows
     flowTitle: "محرك التدفق (Flow)",
     flowDesc: "لوحة لانهائية للحسابات الهندسية. ربط العقد، وإنشاء تدفقات البيانات، وتسلسل الصيغ.",
     cadTitle: "استوديو CAD",
@@ -27,8 +22,6 @@ export default {
     deskTitle: "المكتب الإبداعي",
     deskDesc: "لوحة بيضاء حرة للعصف الذهني. ارسم، واسحب الملفات، ونظم الأفكار بصريًا.",
     feaTitle: "نظام FEA",
-
-    // Project Management
     projects: {
         title: "المشاريع",
         newProject: "مشروع جديد",
@@ -46,9 +39,6 @@ export default {
         updatedAt: "تم التحديث",
         workspacesCount: "مساحة (مساحات) عمل"
     },
-
-    // View Switcher
-    // Welding
     welding: {
         title: "حاسبة اللحام",
         subtitle: "مدخلات الحرارة • قوة الوصلة • AWS D1.1",
@@ -102,18 +92,37 @@ export default {
         materialBrass: "نحاس أصفر",
         heatFormulaDesc: "الطاقة المنقولة لكل وحدة طول من اللحام. تتحكم في معدل التبريد والخصائص المعدنية.",
         carbonEquivalentDesc: "يتنبأ بالقابلية للتصلد والحساسية للتشقق البارد. CE > 0.40% يتطلب عادة تسخيناً مسبقاً.",
+        processes: {
+            mma: "لحام قوس معدني (SMAW)",
+            mig: "MIG (GMAW)",
+            mag: "MAG (GMAW)",
+            tig: "TIG (GTAW)",
+            fcaw: "سلك قلوب (FCAW)",
+            saw: "لحام تحت الخبث (SAW)"
+        },
+        joints: {
+            fillet: "لحام زاوية",
+            doubleFillet: "زاوية مزدوجة",
+            butt: "لحام تناكبي (مربع)",
+            vGroove: "أخدود V",
+            uGroove: "أخدود U",
+            jGroove: "أخدود J",
+            lap: "وصلة تراكب",
+            tee: "وصلة T",
+            corner: "وصلة زاوية"
+        },
+        power: "القدرة",
+        geometry: "الهندسة",
+        simulationLabel: "محاكاة وصلة اللحام",
+        setup: "إعداد العملية"
     },
     viewCad: "CAD",
     viewFea: "FEA",
     viewDesk: "المكتب",
-
-    // Start Menu
     startMenu: "قائمة ابدأ",
     allApps: "모든 الأجهزة التطبيقات",
     searchApps: "البحث في التطبيقات...",
     pinned: "الوحدات المثبتة",
-
-    // Settings
     settings: "الإعدادات",
     appearance: "المظهر",
     language: "اللغة",
@@ -154,75 +163,324 @@ export default {
     languageJa: "اليابانية (Japanese)",
     languageKo: "الكورية (Korean)",
     languageAr: "العربية (Arabic)",
-
-    // Modules & Tools
     modules: {
-        'calculator': { title: "حاسبة علمية" },
-        'unit-converter': { title: "محول الوحدات" },
-        'ai-copilot': { title: "Aegis AI" },
-        'file-explorer': { title: "مستكشف الملفات" },
-        'settings': { title: "الإعدادات" },
-        'handbook': { title: "كتيب الهندسة" },
-        'terminal': { title: "محطة الأوامر" },
-        'profile-weight': { title: "وزن البروفايل" },
-        'gears-bearings': { title: "حاسبة التروس" },
-        'welding': { title: "حاسبة اللحام" },
-        'fasteners': { title: "عزم الدوران" },
-        'materials-db': { title: "قاعدة بيانات المواد" },
-        'cutting-optimizer': { title: "محسن القطع" },
-        'music-player': { title: "مشغل الموسيقى" },
-        'belt-drive': { title: "محرك الحزام" },
-        'beam-deflection': { title: "حساب انحراف الشعاع" },
-        'bearings': { title: "عمر المحمل (L10)" },
-        'bolt-stress': { title: "إجهاد شد البراغي" },
-        'column-buckling': { title: "انبعاج الأعمدة (Euler)" },
-        'fits-tolerances': { title: "التوافق والتفاوتات (ISO 286)" },
-        'fluid-flow': { title: "فقدان ضغط الأنابيب" },
-        'gear-spur': { title: "حاسبة التروس الأسطوانية" },
-        'hydraulic-cylinder': { title: "أسطوانة هيدروليكية" },
-        'ohms-law': { title: "قانون أوم" },
-        'pumps': { title: "مضخة طرد مركزي" },
-        'sheet-metal': { title: "حساب ثني الصاج" },
-        'spring-compression': { title: "حاسبة زنبرك الضغط" },
-        'strength-analysis': { title: "تحليل القوة" },
-        'thread-geometry': { title: "هندسة اللولب" },
-        'torsion-shaft': { title: "الالتواء (عمود)" },
-        'vat-calculator': { title: "حاسبة ضريبة القيمة المضافة" },
-        'voltage-drop': { title: "هبوط الجهد" },
-        'welding-fillet': { title: "قوة اللحام الزاوي" },
-        'welding-heat': { title: "دخل حرارة اللحام" },
-        'analytics-dashboard': { title: "التحليلات" },
-        'engineering-notes': { title: "ملاحظات هندسية" },
-    } as Record<string, { title: string }>,
-
-    // Hints
+        calculator: {
+            title: "حاسبة علمية"
+        },
+        "unit-converter": {
+            title: "محول الوحدات"
+        },
+        "ai-copilot": {
+            title: "Aegis AI"
+        },
+        "file-explorer": {
+            title: "مستكشف الملفات"
+        },
+        settings: {
+            title: "الإعدادات"
+        },
+        handbook: {
+            title: "كتيب الهندسة"
+        },
+        terminal: {
+            title: "محطة الأوامر"
+        },
+        "profile-weight": {
+            title: "وزن البروفايل"
+        },
+        "gears-bearings": {
+            title: "حاسبة التروس"
+        },
+        welding: {
+            title: "حاسبة اللحام"
+        },
+        fasteners: {
+            title: "عزم الدوران"
+        },
+        "materials-db": {
+            title: "قاعدة بيانات المواد"
+        },
+        "cutting-optimizer": {
+            title: "محسن القطع"
+        },
+        "music-player": {
+            title: "مشغل الموسيقى"
+        },
+        "belt-drive": {
+            title: "محرك الحزام"
+        },
+        "beam-deflection": {
+            title: "حساب انحراف الشعاع"
+        },
+        bearings: {
+            title: "عمر المحمل (L10)"
+        },
+        "bolt-stress": {
+            title: "إجهاد شد البراغي"
+        },
+        "column-buckling": {
+            title: "انبعاج الأعمدة (Euler)"
+        },
+        "fits-tolerances": {
+            title: "التوافق والتفاوتات (ISO 286)"
+        },
+        "fluid-flow": {
+            title: "فقدان ضغط الأنابيب"
+        },
+        "gear-spur": {
+            title: "حاسبة التروس الأسطوانية"
+        },
+        "hydraulic-cylinder": {
+            title: "أسطوانة هيدروليكية"
+        },
+        "ohms-law": {
+            title: "قانون أوم"
+        },
+        pumps: {
+            title: "مضخة طرد مركزي"
+        },
+        "sheet-metal": {
+            title: "حساب ثني الصاج"
+        },
+        "spring-compression": {
+            title: "حاسبة زنبرك الضغط"
+        },
+        "strength-analysis": {
+            title: "تحليل القوة"
+        },
+        "thread-geometry": {
+            title: "هندسة اللولب"
+        },
+        "torsion-shaft": {
+            title: "الالتواء (عمود)"
+        },
+        "vat-calculator": {
+            title: "حاسبة ضريبة القيمة المضافة"
+        },
+        "voltage-drop": {
+            title: "هبوط الجهد"
+        },
+        "welding-fillet": {
+            title: "قوة اللحام الزاوي"
+        },
+        "welding-heat": {
+            title: "دخل حرارة اللحام"
+        },
+        "analytics-dashboard": {
+            title: "التحليلات"
+        },
+        "engineering-notes": {
+            title: "ملاحظات هندسية"
+        },
+        "cad-editor": {
+            title: "محرر CAD"
+        },
+        "sketch-pad": {
+            title: "لوحة الرسم"
+        },
+        "periodic-table": {
+            title: "الجدول الدوري"
+        },
+        "simulation-fea": {
+            title: "محاكاة العناصر المحدودة"
+        },
+        "manufacturing-sandbox": {
+            title: "Mfg. Sandbox"
+        },
+        "engineering-selection": {
+            title: "Engineering Selection"
+        },
+        "thermal-expansion": {
+            title: "التمدد الحراري"
+        },
+        "project-manager": {
+            title: "قائمة مواد المشروع"
+        },
+        "cost-estimator": {
+            title: "محرك التكلفة"
+        },
+        "manufacturing-readiness": {
+            title: "Mfg Readiness Analyzer"
+        },
+        "topology-optimization": {
+            title: "التصميم التوليدي"
+        },
+        "machine-assembly": {
+            title: "تجميع الآلة"
+        },
+        "failure-prediction": {
+            title: "Failure Predictor"
+        },
+        "fluid-dynamics": {
+            title: "ديناميكا الموائع"
+        },
+        "bolt-torque": {
+            title: "Bolt Torque & Preload"
+        },
+        "chain-drive": {
+            title: "Roller Chain Drive"
+        },
+        "physics-kinematics": {
+            title: "Physics & Kinematics"
+        },
+        "chemistry-reactions": {
+            title: "Chemistry Lab"
+        },
+        "biology-genetics": {
+            title: "Biology & Genetics"
+        },
+        "cs-algorithms": {
+            title: "CS & Algorithms"
+        },
+        "aerospace-dynamics": {
+            title: "Aerospace Dynamics"
+        },
+        "naval-hydrostatics": {
+            title: "Naval Architecture"
+        },
+        "three-phase-power": {
+            title: "3-Phase Power Analytics"
+        },
+        "digital-logic": {
+            title: "Digital Logic Lab"
+        },
+        "filter-design": {
+            title: "Electronic Filter Design"
+        },
+        "failure-diagnosis": {
+            title: "Failure Analysis Tool"
+        },
+        "fatigue-advanced": {
+            title: "Fatigue Life (Advanced)"
+        },
+        "planetary-gearbox": {
+            title: "Planetary Gearbox Solver"
+        },
+        "material-selector-ai": {
+            title: "Material Selector AI"
+        },
+        "materials-explorer": {
+            title: "Materials Intelligence"
+        },
+        "physics-solver": {
+            title: "Physics CAS Solver"
+        },
+        "gearbox-design": {
+            title: "Gearbox Design Engine"
+        },
+        "motor-selection-std": {
+            title: "Motor Selection Engine"
+        },
+        "worm-gear": {
+            title: "Worm Gear Design"
+        },
+        "planetary-gear": {
+            title: "Planetary Gear Train"
+        },
+        "cam-follower": {
+            title: "Cam & Follower Design"
+        },
+        "flywheel-design": {
+            title: "Flywheel Energy Storage"
+        },
+        "concrete-beam-design": {
+            title: "Concrete Beam (ACI 318)"
+        },
+        "foundation-bearing": {
+            title: "Foundation Bearing Capacity"
+        },
+        "transformer-design": {
+            title: "Transformer Design"
+        },
+        "motor-efficiency": {
+            title: "Motor Efficiency & Load"
+        },
+        "heat-exchanger": {
+            title: "Heat Exchanger Sizing"
+        },
+        "sound-meter": {
+            title: "Sound Decibel Meter"
+        },
+        clinometer: {
+            title: "Clinometer / Height Finder"
+        },
+        "gps-surveyor": {
+            title: "GPS Surveyor & Compass"
+        },
+        "hardness-converter": {
+            title: "Hardness & Strength Converter"
+        }
+    },
     moduleHints: {
-        'calculator': "حسابات رياضية متقدمة",
-        'unit-converter': "تحويل الوحدات الهندسية",
-        'ai-copilot': "Aegis AI",
-        'file-explorer': "إدارة ملفات النظام",
-        'settings': "تفضيلات النظام",
-        'handbook': "صيغ وبيانات مرجعية",
-        'terminal': "واجهة سطر الأوامر",
-        'profile-weight': "حساب وزن بروفيلات الألومنيوم",
-        'gears-bearings': "نسب التروس وعمر المحامل",
-        'welding': "قوة اللحام وحجمه",
-        'fasteners': "عزم البراغي والشد المسبق",
-        'materials-db': "خصائص المواد",
-        'cutting-optimizer': "تحسين كفاءة قطع المواد",
-        'music-player': "صوتيات محلية وعبر الإنترنت",
-        'belt-drive': "حساب البكرة وطول الحزام",
-    } as Record<string, string>,
-
-    // Categories
+        calculator: "حسابات رياضية متقدمة",
+        "unit-converter": "تحويل الوحدات الهندسية",
+        "ai-copilot": "Aegis AI",
+        "file-explorer": "إدارة ملفات النظام",
+        settings: "تفضيلات النظام",
+        handbook: "صيغ وبيانات مرجعية",
+        terminal: "واجهة سطر الأوامر",
+        "profile-weight": "حساب وزن بروفيلات الألومنيوم",
+        "gears-bearings": "نسب التروس وعمر المحامل",
+        welding: "قوة اللحام وحجمه",
+        fasteners: "عزم البراغي والشد المسبق",
+        "materials-db": "خصائص المواد",
+        "cutting-optimizer": "تحسين كفاءة قطع المواد",
+        "music-player": "صوتيات محلية وعبر الإنترنت",
+        "belt-drive": "حساب البكرة وطول الحزام",
+        "thermal-expansion": "التمدد الحراري والتغير البعدي",
+        "cost-estimator": "Predict manufacturing costs in real-time",
+        "manufacturing-readiness": "Analyze part for CNC & 3D print readiness",
+        "topology-optimization": "AI-driven generative geometry reduction",
+        "machine-assembly": "Pre-built mechanical system libraries",
+        "failure-prediction": "Stress and fatigue failure AI simulation",
+        "fluid-dynamics": "Pipe flow, pressure drop & Reynolds number",
+        "bolt-torque": "ISO standard fastening torque & preload calculator",
+        "chain-drive": "ISO 606 roller chain sprocket ratio, length & tension",
+        "physics-kinematics": "Projectile motion and rigid body dynamics",
+        "chemistry-reactions": "Reaction balancing and chemical computing",
+        "biology-genetics": "DNA sequencing and bioinformatics assistant",
+        "cs-algorithms": "Algorithm visualization",
+        "aerospace-dynamics": "Flight envelope and aerodynamic modeling",
+        "naval-hydrostatics": "Ship stability and hydrostatic curves",
+        "three-phase-power": "Industrial 3-phase system analysis and vector diagrams",
+        "digital-logic": "Logic gate simulation and truth tables",
+        "filter-design": "Active and passive RC filter frequency response (Bode)",
+        "failure-diagnosis": "Probabilistic failure analysis and root cause diagnosis",
+        "fatigue-advanced": "High-cycle fatigue and mean stress correction (Haigh)",
+        "planetary-gearbox": "Multi-stage planetary gear kinematics and Willis equation",
+        "material-selector-ai": "AI-driven material selection engine",
+        "materials-explorer": "Curation of material informatics and properties",
+        "analytics-dashboard": "Project metrics and usage analytics",
+        "engineering-notes": "Field notes and engineering records",
+        "physics-solver": "Symbolic CAS physics engine for dynamic equations",
+        "gearbox-design": "Complete gear train design and analysis suite",
+        "motor-selection-std": "Standard motor curves and torque-speed matching",
+        "worm-gear": "Worm gear geometry, efficiency & sliding speed",
+        "planetary-gear": "Planetary gear ratios, torque & assembly validation",
+        "cam-follower": "Cam displacement, velocity & acceleration analysis",
+        "flywheel-design": "Flywheel energy storage, size & centrifugal stress",
+        "concrete-beam-design": "Reinforced concrete beam bending capacity (ACI 318)",
+        "foundation-bearing": "Ultimate & allowable bearing capacity of soils",
+        "transformer-design": "Transformer core area, windings & turns ratio",
+        "motor-efficiency": "3-phase motor load factor, efficiency & CO2 footprint",
+        "heat-exchanger": "Heat exchanger LMTD, thermal power & surface area",
+        "hydraulic-cylinder": "Hydraulic cylinder bore, rod buckling & volume",
+        "sound-meter": "Real-time decibel meter & frequency analyzer",
+        clinometer: "Trigonometric slope & height analyzer using gyroscope",
+        "gps-surveyor": "Real-time GPS coordinates, elevation tracking & digital compass",
+        "hardness-converter": "Metal hardness scales (HB, HRC, HRB, HV) and tensile strength conversions"
+    },
     categories: {
-        'mechanical': 'ميكانيكي',
-        'structural': 'إنشائي',
-        'utilities': 'أدوات المساعدة',
-        'reference': 'مرجع'
-    } as Record<string, string>,
-
-    // Ribbon Bar
+        mechanical: "ميكانيكي",
+        structural: "إنشائي",
+        utilities: "أدوات المساعدة",
+        reference: "مرجع",
+        science: "علوم",
+        software: "برمجيات",
+        civil: "مدني",
+        finance: "مالية",
+        other: "أخرى"
+    },
     ribbon: {
         theme: "المظهر",
         guide: "دليل",
@@ -271,9 +529,55 @@ export default {
         groupPaint: "رسم",
         groupContent: "محتوى",
         labelWorkstation: "محطة الهندسة",
+        groupCanvas: "اللوحة",
+        groupJob: "التحكم بالمهمة",
+        groupOutput: "المخرجات",
+        labelCreativeDesk: "المكتب الإبداعي",
+        labelMfgCam: "مساحة التصنيع / CAM",
+        labelFeaSim: "محرك FEA / المحاكاة",
+        labelPen: "قلم",
+        labelMarker: "قلم تحديد",
+        labelEraser: "ممحاة",
+        labelArrow: "سهم",
+        labelRect: "مستطيل",
+        labelCircle: "دائرة",
+        labelClear: "مسح",
+        labelNote: "ملاحظة",
+        labelVideo: "فيديو",
+        labelMusic: "موسيقى",
+        labelImage: "صورة",
+        labelExcel: "Excel",
+        labelWord: "Word",
+        labelPpt: "PPT",
+        labelPdf: "PDF",
+        labelStartNesting: "بدء التداخل",
+        labelResetJob: "إعادة تعيين المهمة",
+        labelFullReport: "تقرير كامل",
+        labelExportNc: "تصدير NC",
+        labelSolverReady: "الحلّال جاهز",
+        labelMatrixSparse: "مصفوفة: متفرقة",
+        labelStrokeColor: "لون الخط",
+        defaultNote: "📌 ملاحظة جديدة",
+        promptYoutubeUrl: "أدخل رابط YouTube:",
+        confirmClearSketches: "مسح كل المخططات؟",
+        confirmClearFlow: "هل تريد مسح مساحة Flow بالكامل؟ لا يمكن التراجع عن هذا.",
+        confirmDeleteWindow: "إغلاق هذه النافذة؟",
+        alertSelect2: "حدد كيانين على الأقل (نقاط أو خطوط) للتقييد.",
+        exportFailed: "فشل التصدير",
+        dxfExportFailed: "فشل تصدير DXF",
+        stepExportFailed: "فشل تصدير STEP",
+        noGeometry: "لا توجد هندسة للتصدير. ارسم أولاً.",
+        noExportableGeometry: "لا توجد هندسة قابلة للتصدير (خطوط ودوائر فقط).",
+        stepExportComplete: "اكتمل تصدير STEP: تم تصدير {count} كيان.",
+        importedEntities: "تم استيراد {count} كيان.",
+        labelNewNote: "ملاحظة جديدة",
+        comingSoon: "قريباً...",
+        handbookPdf: "دليل-المهندس.pdf",
+        newsFeedTitle: "تغذية أخبار الهندسة",
+        newsItem1: "أسعار الألمنيوم +2%",
+        newsItem2: "صدرت مواصفة ISO 898-1 الجديدة",
+        newsItem3: "تم إطلاق AluCalc V2"
     },
-
-    // Node Palette Categories
     palette: {
         categories: {
             input: "الإدخال والثوابت",
@@ -285,41 +589,126 @@ export default {
         },
         searchPlaceholder: "بحث عن العقد..."
     },
-
-    // Engine & Calculator Generic Terms
     calcCommon: {
-        length: { label: "الطول (L)" },
-        width: { label: "العرض (w)" },
-        height: { label: "الارتفاع (h)" },
-        thickness: { label: "السمك (t)" },
-        radius: { label: "نصف القطر (R)", desc: "نصف قطر الثني الداخلي" },
-        angle: { label: "الزاوية (θ)" },
-        force: { label: "القوة (F)" },
-        torque: { label: "عزم الدوران (T)" },
-        pressure: { label: "الضغط (P)" },
-        velocity: { label: "السرعة (v)" },
-        diameter: { label: "القطر (d)" },
-        density: { label: "الكثافة (ρ)" },
-        mass: { label: "الكتلة (m)" },
-        volume: { label: "الحجم (V)" },
-        area: { label: "المساحة (A)" },
-        material: { label: "نوع المادة" },
-        yieldStrength: { label: "إجهاد الخضوع (Sy)" },
-        Sy: { label: "إجهاد الخضوع (Sy)" },
-        safetyFactor: { label: "معامل الأمان" },
-        SF: { label: "معامل الأمان (SF)" },
-        deflection: { label: "الانحراف" },
-        bendingStress: { label: "إجهاد الانحناء" },
-        sigmaBending: { label: "إجهاد الانحناء (σb)" },
-        m: { label: "الموديول (m)", desc: "حجم موديول الترس" },
-        z1: { label: "عدد أسنان الترس الصغير (z₁)" },
-        z2: { label: "عدد أسنان الترس الكبير (z₂)" },
-        alpha: { label: "زاوية الضغط (α)" },
-        b: { label: "عرض الوجه (b)" },
-        T: { label: "عزم الدوران (T)" }
-    } as Record<string, { label?: string, desc?: string }>,
-
-    // General
+        length: {
+            label: "الطول (L)"
+        },
+        width: {
+            label: "العرض (w)"
+        },
+        height: {
+            label: "الارتفاع (h)"
+        },
+        thickness: {
+            label: "السمك (t)"
+        },
+        radius: {
+            label: "نصف القطر (R)",
+            desc: "نصف قطر الثني الداخلي"
+        },
+        angle: {
+            label: "الزاوية (θ)"
+        },
+        force: {
+            label: "القوة (F)"
+        },
+        torque: {
+            label: "عزم الدوران (T)"
+        },
+        pressure: {
+            label: "الضغط (P)"
+        },
+        velocity: {
+            label: "السرعة (v)"
+        },
+        diameter: {
+            label: "القطر (d)"
+        },
+        density: {
+            label: "الكثافة (ρ)"
+        },
+        mass: {
+            label: "الكتلة (m)"
+        },
+        volume: {
+            label: "الحجم (V)"
+        },
+        area: {
+            label: "المساحة (A)"
+        },
+        material: {
+            label: "نوع المادة"
+        },
+        yieldStrength: {
+            label: "إجهاد الخضوع (Sy)"
+        },
+        Sy: {
+            label: "إجهاد الخضوع (Sy)"
+        },
+        safetyFactor: {
+            label: "معامل الأمان"
+        },
+        SF: {
+            label: "معامل الأمان (SF)"
+        },
+        deflection: {
+            label: "الانحراف"
+        },
+        bendingStress: {
+            label: "إجهاد الانحناء"
+        },
+        sigmaBending: {
+            label: "إجهاد الانحناء (σb)"
+        },
+        m: {
+            label: "الموديول (m)",
+            desc: "حجم موديول الترس"
+        },
+        z1: {
+            label: "عدد أسنان الترس الصغير (z₁)"
+        },
+        z2: {
+            label: "عدد أسنان الترس الكبير (z₂)"
+        },
+        alpha: {
+            label: "زاوية الضغط (α)"
+        },
+        b: {
+            label: "عرض الوجه (b)"
+        },
+        T: {
+            label: "عزم الدوران (T)"
+        },
+        d: {
+            label: "القطر (d)"
+        },
+        p: {
+            label: "الخطوة (p)"
+        },
+        k: {
+            label: "ارتفاع الرأس (k)"
+        },
+        s: {
+            label: "عرض السداسي (s)"
+        },
+        drill: {
+            label: "قطر المثقاب"
+        },
+        dh: {
+            label: "قطر الثقب (dh)"
+        },
+        ix: {
+            label: "القصور Ix",
+            desc: "عزم القصور حول المحور X"
+        },
+        iy: {
+            label: "القصور Iy",
+            desc: "عزم القصور حول المحور Y"
+        },
+        slot: {
+            label: "حجم الأخدود"
+        }
+    },
     close: "إغلاق",
     minimize: "تصغير",
     maximize: "تكبير",
@@ -328,8 +717,6 @@ export default {
     apply: "تطبيق",
     ok: "تم",
     error: "خطأ",
-
-    // Engineering Handbook
     handbook: {
         title: "مكتبة الهندسة",
         searchPlaceholder: "البحث في المكتبة...",
@@ -358,8 +745,6 @@ export default {
             roughnessDesc: "قيم Ra والمعالجة"
         }
     },
-
-    // Project Variables
     variables: {
         title: "متغيرات المشروع",
         addVariable: "إضافة متغير",
@@ -371,9 +756,49 @@ export default {
         placeholderDesc: "وصف اختياري...",
         noVariables: "لا توجد متغيرات عامة محددة. انقر فوق \"إضافة متغير\" لإنشاء واحد."
     },
-
-    // Terminal
     termPlaceholder: "اكتب أمراً... (جرب 'help')",
-    termPrefix: "AluCalc ❯"
-
+    termPrefix: "AluCalc ❯",
+    viewFlow: "FLOW",
+    searchResults: "نتائج البحث",
+    categoryOther: "أخرى",
+    userPro: "AluCalc Professional",
+    shutDown: "إيقاف التشغيل",
+    noModulesFound: "لا توجد وحدات",
+    noModulesHint: "جرّب تعديل عبارة البحث.",
+    disciplinesLabel: "التخصصات",
+    languageFr: "الفرنسية",
+    languageIt: "الإيطالية",
+    languagePt: "البرتغالية",
+    languageRu: "الروسية",
+    featureTree: "شجرة السمات",
+    sketches: "المخططات",
+    bodies: "الأجسام",
+    constraints: "القيود",
+    parameters: "المعلمات",
+    noBodies: "لا توجد أجسام بعد",
+    dofLabel: "درجات الحرية",
+    fullyConstrained: "مقيّد بالكامل",
+    overConstrained: "مقيّد زيادة",
+    underConstrained: "ناقص التقييد",
+    addBody: "إضافة جسم",
+    parametersTitle: "المعلمات",
+    resultsTitle: "النتائج",
+    fixInputs: "تثبيت المدخلات",
+    switch2D: "التبديل إلى 2D",
+    switch3D: "التبديل إلى 3D",
+    quickSelect: "اختيار سريع",
+    varLabel: "VAR",
+    dbLabel: "قاعدة",
+    selectStandard: "اختر المواصفة...",
+    closeAll: "إغلاق كل التطبيقات",
+    feedbackTitle: "التواصل والملاحظات",
+    costTitle: "مقدّر التكلفة",
+    costDesc: "تفصيل تكلفة التصنيع",
+    costBom: "قائمة المواد",
+    costOps: "العمليات",
+    costOverhead: "التكاليف غير المباشرة %",
+    costMargin: "الهامش %",
+    costBatch: "حجم الدفعة",
+    costTotal: "التكلفة الإجمالية",
+    costUnit: "سعر الوحدة"
 } as const;

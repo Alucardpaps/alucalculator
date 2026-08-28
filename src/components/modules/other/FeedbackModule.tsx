@@ -13,7 +13,7 @@ export default function FeedbackModule() {
 
         const subject = `[AluCalc Feedback] ${type.toUpperCase()}`;
         const body = `Type: ${type}\n\nMessage:\n${message}`;
-        const mailtoUrl = `mailto:abdulsametyildiri95@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = `mailto:contact@alucalculator.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
         window.location.href = mailtoUrl;
 

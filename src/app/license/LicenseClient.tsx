@@ -3,9 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLicenseStore } from '@/store/licenseStore';
+import { useI18nStore } from '@/store/i18nStore';
+import { getAppPages } from '@/locales/appPagesTranslations';
 
 export function LicenseClient() {
   const { plan, licenseKey, usage, activate, clearLicense, limits } = useLicenseStore();
+  const language = useI18nStore((s) => s.language);
+  const t = getAppPages(language).license;
   const [draft, setDraft] = useState(licenseKey);
   const [message, setMessage] = useState('');
   const caps = limits();
@@ -26,14 +30,14 @@ export function LicenseClient() {
 
   return (
     <main className="work-shell max-w-xl mx-auto px-4 sm:px-6 py-10">
-      <p className="work-kicker">License</p>
-      <h1 className="work-title">Activate License</h1>
-      <p className="work-lead">Activate your AluCalc Pro, Team, or Enterprise license key.</p>
+      <p className="work-kicker">{t.kicker}</p>
+      <h1 className="work-title">{t.title}</h1>
+      <p className="work-lead">{t.lead}</p>
 
       <div className="work-card mb-4">
-        <p className="hud-label">Active plan</p>
+        <p className="hud-label">{t.activePlan}</p>
         <p className="text-xl font-black text-white capitalize mb-4">{plan}</p>
-        <label className="hud-label" htmlFor="license-key">License key</label>
+        <label className="hud-label" htmlFor="license-key">{t.licenseKey}</label>
         <input
           id="license-key"
           value={draft}
@@ -43,11 +47,11 @@ export function LicenseClient() {
         />
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={onActivate} className="work-btn-primary">
-            Activate
+            {t.activate}
           </button>
           {plan !== 'free' && (
             <button type="button" onClick={clearLicense} className="work-btn">
-              Clear
+              {t.clear}
             </button>
           )}
         </div>
@@ -55,18 +59,17 @@ export function LicenseClient() {
       </div>
 
       <div className="work-card mb-6">
-        <h2 className="text-sm font-bold text-white mb-3">Today&apos;s usage (free limits)</h2>
+        <h2 className="text-sm font-bold text-white mb-3">{t.usage}</h2>
         <ul className="space-y-2">
           {row('PDF', usage.pdf, caps.pdf)}
           {row('DXF', usage.dxf, caps.dxf)}
-          {row('STEP', usage.step, caps.step)}
           {row('AI', usage.ai, caps.ai)}
         </ul>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link href="/pricing/" className="work-btn-primary">View plans →</Link>
-        <Link href="/sales/" className="work-btn">Sales / invoice</Link>
+        <Link href="/pricing/" className="work-btn-primary">{t.viewPlans}</Link>
+        <Link href="/sales/" className="work-btn">{t.salesInvoice}</Link>
         <Link href="/developers/" className="work-btn">API</Link>
       </div>
     </main>

@@ -180,8 +180,8 @@ const SceneContent = () => {
         dampingFactor={0.05}
         minPolarAngle={0.2}
         maxPolarAngle={Math.PI / 2.1}
-        minDistance={1}
-        maxDistance={20}
+        minDistance={0.5}
+        maxDistance={300}
         touches={{
           ONE: THREE.TOUCH.ROTATE,
           TWO: THREE.TOUCH.DOLLY_PAN
@@ -208,7 +208,7 @@ export const AssemblyScene = () => {
       <Canvas
         dpr={[1, 1.5]}
         shadows
-        camera={{ position: [3, 3, 3], fov: 50, near: 0.01, far: 100 }}
+        camera={{ position: [3, 3, 3], fov: 50, near: 0.01, far: 2000 }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
         onCreated={({ gl }) => {
           gl.setClearColor('#080c12');
@@ -219,3 +219,4 @@ export const AssemblyScene = () => {
     </div>
   );
 };
+

@@ -1,9 +1,6 @@
 export default {
-    // OS Core
     osName: "AluCalc OS",
     version: "v5.0",
-
-    // Welcome Modal
     welcomeTitle: "Choisissez votre",
     welcomeHighlight: "Espace de travail",
     welcomeDesc: "Sélectionnez votre interface principale. Vous pouvez changer à tout moment.",
@@ -18,8 +15,6 @@ export default {
     nodeTypeNote: "Note",
     nodeTypeMedia: "Média",
     nodeTypeNode: "Nœud",
-
-    // Modals & Windows
     flowTitle: "Flow Engine",
     flowDesc: "Canvas infini pour calculs d’ingénierie. Connectez des nœuds, créez des flux et enchaînez des formules.",
     cadTitle: "Studio CAD",
@@ -27,8 +22,6 @@ export default {
     deskTitle: "Bureau créatif",
     deskDesc: "Tableau blanc libre pour brainstorm. Esquissez, glissez des fichiers et organisez visuellement.",
     feaTitle: "Système FEA",
-
-    // Project Management
     projects: {
         title: "Projets",
         newProject: "Nouveau projet",
@@ -46,10 +39,7 @@ export default {
         updatedAt: "Mis à jour",
         workspacesCount: "espace(s) de travail"
     },
-
-    // View Switcher
     viewFlow: "FLOW",
-    // Welding
     welding: {
         title: "Calculateur de soudage",
         subtitle: "Apport thermique • Résistance du joint • AWS D1.1",
@@ -62,7 +52,9 @@ export default {
             tig: "TIG (GTAW)",
             smaw: "Baguette (SMAW)",
             fcaw: "Fil fourré (FCAW)",
-            saw: "Submerged Arc (SAW)"
+            saw: "Submerged Arc (SAW)",
+            mma: "Électrode enrobée (SMAW)",
+            mag: "MAG (GMAW)"
         },
         joints: {
             fillet: "Cordons d’angle",
@@ -129,8 +121,6 @@ export default {
     viewCad: "CAD",
     viewFea: "FEA",
     viewDesk: "DESK",
-
-    // Start Menu
     startMenu: "Menu Démarrer",
     allApps: "Toutes les applications",
     searchApps: "Rechercher des applications…",
@@ -139,8 +129,6 @@ export default {
     categoryOther: "Autre",
     userPro: "AluCalc Professionnel",
     toggleDevMode: "Basculer le mode développeur",
-
-    // Settings
     settings: "Paramètres",
     appearance: "Apparence",
     language: "Langue",
@@ -180,61 +168,272 @@ export default {
     languageJa: "Japonais",
     languageKo: "Coréen",
     languageAr: "Arabe",
-
-    // Modules & Tools
     modules: {
-        'calculator': { title: "Calculatrice scientifique" },
-        'unit-converter': { title: "Convertisseur d’unités" },
-        'ai-copilot': { title: "Aegis AI" },
-        'file-explorer': { title: "Explorateur de fichiers" },
-        'settings': { title: "Paramètres" },
-        'handbook': { title: "Manuel d’ingénierie" },
-        'browser': { title: "Navigateur web" },
-        'paint': { title: "CAD Paint" },
-        'terminal': { title: "Terminal" },
-        'flow-editor': { title: "Éditeur de flow" },
-        'parametric-cad': { title: "CAD paramétrique" },
-        'cad-editor': { title: "Éditeur CAD" },
-        'sketch-pad': { title: "Bloc d’esquisse" },
-        'sheet-metal': { title: "Tôle" },
-        'periodic-table': { title: "Table périodique" },
-        'simulation-fea': { title: "Simulation FEA" },
-
-        'profile-weight': { title: "Poids de profil" },
-        'gears-bearings': { title: "Calculateur d’engrenages" },
-        'welding': { title: "Calculateur de soudure" },
-        'fasteners': { title: "Couple de fixation" },
-        'materials-db': { title: "Base matériaux" },
-        'cutting-optimizer': { title: "Optimiseur de coupe" },
-        'music-player': { title: "Lecteur audio" },
-        'belt-drive': { title: "Transmission par courroie" },
-        // Expanded V2 Schema Modules
-        'beam-deflection': { title: "Flèche de poutre" },
-        'bearings': { title: "Durée de vie roulement (L10)" },
-        'bolt-stress': { title: "Contrainte boulon" },
-        'column-buckling': { title: "Flambage colonne (Euler)" },
-        'fits-tolerances': { title: "Ajustements & tolérances (ISO 286)" },
-        'fluid-flow': { title: "Perte de charge tuyauterie" },
-        'gear-spur': { title: "Engrenage droit" },
-        'hydraulic-cylinder': { title: "Vérin hydraulique" },
-        'ohms-law': { title: "Loi d’Ohm" },
-        'pumps': { title: "Pompe centrifuge" },
-        'sheet-metal-v2': { title: "Pliage tôle" },
-        'spring-compression': { title: "Ressort compression" },
-
-        'strength-analysis': { title: "Analyse de résistance" },
-        'thread-geometry': { title: "Géométrie de filetage" },
-        'torsion-shaft': { title: "Torsion (arbre)" },
-        'vat-calculator': { title: "Calcul TVA" },
-        'voltage-drop': { title: "Chute de tension" },
-        'welding-fillet': { title: "Résistance cordon d’angle" },
-        'welding-heat': { title: "Apport thermique soudage" },
-        'nesting': { title: "Nesting" },
-        'analytics-dashboard': { title: "Analytique" },
-        'engineering-notes': { title: "Notes d'ingénierie" },
-    } as Record<string, { title: string }>,
-
-    // Node Palette Categories
+        calculator: {
+            title: "Calculatrice scientifique"
+        },
+        "unit-converter": {
+            title: "Convertisseur d’unités"
+        },
+        "ai-copilot": {
+            title: "Aegis AI"
+        },
+        "file-explorer": {
+            title: "Explorateur de fichiers"
+        },
+        settings: {
+            title: "Paramètres"
+        },
+        handbook: {
+            title: "Manuel d’ingénierie"
+        },
+        browser: {
+            title: "Navigateur web"
+        },
+        paint: {
+            title: "CAD Paint"
+        },
+        terminal: {
+            title: "Terminal"
+        },
+        "flow-editor": {
+            title: "Éditeur de flow"
+        },
+        "parametric-cad": {
+            title: "CAD paramétrique"
+        },
+        "cad-editor": {
+            title: "Éditeur CAD"
+        },
+        "sketch-pad": {
+            title: "Bloc d’esquisse"
+        },
+        "sheet-metal": {
+            title: "Tôle"
+        },
+        "periodic-table": {
+            title: "Table périodique"
+        },
+        "simulation-fea": {
+            title: "Simulation FEA"
+        },
+        "profile-weight": {
+            title: "Poids de profil"
+        },
+        "gears-bearings": {
+            title: "Calculateur d’engrenages"
+        },
+        welding: {
+            title: "Calculateur de soudure"
+        },
+        fasteners: {
+            title: "Couple de fixation"
+        },
+        "materials-db": {
+            title: "Base matériaux"
+        },
+        "cutting-optimizer": {
+            title: "Optimiseur de coupe"
+        },
+        "music-player": {
+            title: "Lecteur audio"
+        },
+        "belt-drive": {
+            title: "Transmission par courroie"
+        },
+        "beam-deflection": {
+            title: "Flèche de poutre"
+        },
+        bearings: {
+            title: "Durée de vie roulement (L10)"
+        },
+        "bolt-stress": {
+            title: "Contrainte boulon"
+        },
+        "column-buckling": {
+            title: "Flambage colonne (Euler)"
+        },
+        "fits-tolerances": {
+            title: "Ajustements & tolérances (ISO 286)"
+        },
+        "fluid-flow": {
+            title: "Perte de charge tuyauterie"
+        },
+        "gear-spur": {
+            title: "Engrenage droit"
+        },
+        "hydraulic-cylinder": {
+            title: "Vérin hydraulique"
+        },
+        "ohms-law": {
+            title: "Loi d’Ohm"
+        },
+        pumps: {
+            title: "Pompe centrifuge"
+        },
+        "sheet-metal-v2": {
+            title: "Pliage tôle"
+        },
+        "spring-compression": {
+            title: "Ressort compression"
+        },
+        "strength-analysis": {
+            title: "Analyse de résistance"
+        },
+        "thread-geometry": {
+            title: "Géométrie de filetage"
+        },
+        "torsion-shaft": {
+            title: "Torsion (arbre)"
+        },
+        "vat-calculator": {
+            title: "Calcul TVA"
+        },
+        "voltage-drop": {
+            title: "Chute de tension"
+        },
+        "welding-fillet": {
+            title: "Résistance cordon d’angle"
+        },
+        "welding-heat": {
+            title: "Apport thermique soudage"
+        },
+        nesting: {
+            title: "Nesting"
+        },
+        "analytics-dashboard": {
+            title: "Analytique"
+        },
+        "engineering-notes": {
+            title: "Notes d'ingénierie"
+        },
+        "manufacturing-sandbox": {
+            title: "Mfg. Sandbox"
+        },
+        "engineering-selection": {
+            title: "Engineering Selection"
+        },
+        "thermal-expansion": {
+            title: "Dilatation thermique"
+        },
+        "project-manager": {
+            title: "Nomenclature projet"
+        },
+        "cost-estimator": {
+            title: "Moteur de coûts"
+        },
+        "manufacturing-readiness": {
+            title: "Mfg Readiness Analyzer"
+        },
+        "topology-optimization": {
+            title: "Conception générative"
+        },
+        "machine-assembly": {
+            title: "Assemblage machine"
+        },
+        "failure-prediction": {
+            title: "Failure Predictor"
+        },
+        "fluid-dynamics": {
+            title: "Dynamique des fluides"
+        },
+        "bolt-torque": {
+            title: "Bolt Torque & Preload"
+        },
+        "chain-drive": {
+            title: "Roller Chain Drive"
+        },
+        "physics-kinematics": {
+            title: "Physics & Kinematics"
+        },
+        "chemistry-reactions": {
+            title: "Chemistry Lab"
+        },
+        "biology-genetics": {
+            title: "Biology & Genetics"
+        },
+        "cs-algorithms": {
+            title: "CS & Algorithms"
+        },
+        "aerospace-dynamics": {
+            title: "Aerospace Dynamics"
+        },
+        "naval-hydrostatics": {
+            title: "Naval Architecture"
+        },
+        "three-phase-power": {
+            title: "3-Phase Power Analytics"
+        },
+        "digital-logic": {
+            title: "Digital Logic Lab"
+        },
+        "filter-design": {
+            title: "Electronic Filter Design"
+        },
+        "failure-diagnosis": {
+            title: "Failure Analysis Tool"
+        },
+        "fatigue-advanced": {
+            title: "Fatigue Life (Advanced)"
+        },
+        "planetary-gearbox": {
+            title: "Planetary Gearbox Solver"
+        },
+        "material-selector-ai": {
+            title: "Material Selector AI"
+        },
+        "materials-explorer": {
+            title: "Materials Intelligence"
+        },
+        "physics-solver": {
+            title: "Physics CAS Solver"
+        },
+        "gearbox-design": {
+            title: "Gearbox Design Engine"
+        },
+        "motor-selection-std": {
+            title: "Motor Selection Engine"
+        },
+        "worm-gear": {
+            title: "Worm Gear Design"
+        },
+        "planetary-gear": {
+            title: "Planetary Gear Train"
+        },
+        "cam-follower": {
+            title: "Cam & Follower Design"
+        },
+        "flywheel-design": {
+            title: "Flywheel Energy Storage"
+        },
+        "concrete-beam-design": {
+            title: "Concrete Beam (ACI 318)"
+        },
+        "foundation-bearing": {
+            title: "Foundation Bearing Capacity"
+        },
+        "transformer-design": {
+            title: "Transformer Design"
+        },
+        "motor-efficiency": {
+            title: "Motor Efficiency & Load"
+        },
+        "heat-exchanger": {
+            title: "Heat Exchanger Sizing"
+        },
+        "sound-meter": {
+            title: "Sound Decibel Meter"
+        },
+        clinometer: {
+            title: "Clinometer / Height Finder"
+        },
+        "gps-surveyor": {
+            title: "GPS Surveyor & Compass"
+        },
+        "hardness-converter": {
+            title: "Hardness & Strength Converter"
+        }
+    },
     palette: {
         categories: {
             input: "Entrées & constantes",
@@ -246,40 +445,80 @@ export default {
         },
         searchPlaceholder: "Rechercher des nœuds…"
     },
-
-    // Hints
     moduleHints: {
-        'calculator': 'Calculs mathématiques avancés',
-        'unit-converter': 'Unités d’ingénierie',
-        'ai-copilot': 'Aegis AI',
-        'file-explorer': 'Fichiers système',
-        'settings': 'Préférences système',
-        'handbook': 'Formules & données de référence',
-        'terminal': 'Interface ligne de commande',
-        'profile-weight': 'Poids d’extrusion aluminium',
-        'gears-bearings': 'Rapports d’engrenage & durée de vie roulement',
-        'welding': 'Gorge et résistance des soudures',
-        'fasteners': 'Couple et précharge des boulons',
-        'materials-db': 'Propriétés des matériaux',
-        'cutting-optimizer': 'Efficacité de coupe',
-        'music-player': 'Audio local & streaming',
-        'belt-drive': 'Calcul de poulies & courroies',
-    } as Record<string, string>,
-
-    // Categories
+        calculator: "Calculs mathématiques avancés",
+        "unit-converter": "Unités d’ingénierie",
+        "ai-copilot": "Aegis AI",
+        "file-explorer": "Fichiers système",
+        settings: "Préférences système",
+        handbook: "Formules & données de référence",
+        terminal: "Interface ligne de commande",
+        "profile-weight": "Poids d’extrusion aluminium",
+        "gears-bearings": "Rapports d’engrenage & durée de vie roulement",
+        welding: "Gorge et résistance des soudures",
+        fasteners: "Couple et précharge des boulons",
+        "materials-db": "Propriétés des matériaux",
+        "cutting-optimizer": "Efficacité de coupe",
+        "music-player": "Audio local & streaming",
+        "belt-drive": "Calcul de poulies & courroies",
+        "thermal-expansion": "Dilatation thermique et variation dimensionnelle",
+        "cost-estimator": "Predict manufacturing costs in real-time",
+        "manufacturing-readiness": "Analyze part for CNC & 3D print readiness",
+        "topology-optimization": "AI-driven generative geometry reduction",
+        "machine-assembly": "Pre-built mechanical system libraries",
+        "failure-prediction": "Stress and fatigue failure AI simulation",
+        "fluid-dynamics": "Pipe flow, pressure drop & Reynolds number",
+        "bolt-torque": "ISO standard fastening torque & preload calculator",
+        "chain-drive": "ISO 606 roller chain sprocket ratio, length & tension",
+        "physics-kinematics": "Projectile motion and rigid body dynamics",
+        "chemistry-reactions": "Reaction balancing and chemical computing",
+        "biology-genetics": "DNA sequencing and bioinformatics assistant",
+        "cs-algorithms": "Algorithm visualization",
+        "aerospace-dynamics": "Flight envelope and aerodynamic modeling",
+        "naval-hydrostatics": "Ship stability and hydrostatic curves",
+        "three-phase-power": "Industrial 3-phase system analysis and vector diagrams",
+        "digital-logic": "Logic gate simulation and truth tables",
+        "filter-design": "Active and passive RC filter frequency response (Bode)",
+        "failure-diagnosis": "Probabilistic failure analysis and root cause diagnosis",
+        "fatigue-advanced": "High-cycle fatigue and mean stress correction (Haigh)",
+        "planetary-gearbox": "Multi-stage planetary gear kinematics and Willis equation",
+        "material-selector-ai": "AI-driven material selection engine",
+        "materials-explorer": "Curation of material informatics and properties",
+        "analytics-dashboard": "Project metrics and usage analytics",
+        "engineering-notes": "Field notes and engineering records",
+        "physics-solver": "Symbolic CAS physics engine for dynamic equations",
+        "gearbox-design": "Complete gear train design and analysis suite",
+        "motor-selection-std": "Standard motor curves and torque-speed matching",
+        "worm-gear": "Worm gear geometry, efficiency & sliding speed",
+        "planetary-gear": "Planetary gear ratios, torque & assembly validation",
+        "cam-follower": "Cam displacement, velocity & acceleration analysis",
+        "flywheel-design": "Flywheel energy storage, size & centrifugal stress",
+        "concrete-beam-design": "Reinforced concrete beam bending capacity (ACI 318)",
+        "foundation-bearing": "Ultimate & allowable bearing capacity of soils",
+        "transformer-design": "Transformer core area, windings & turns ratio",
+        "motor-efficiency": "3-phase motor load factor, efficiency & CO2 footprint",
+        "heat-exchanger": "Heat exchanger LMTD, thermal power & surface area",
+        "hydraulic-cylinder": "Hydraulic cylinder bore, rod buckling & volume",
+        "sound-meter": "Real-time decibel meter & frequency analyzer",
+        clinometer: "Trigonometric slope & height analyzer using gyroscope",
+        "gps-surveyor": "Real-time GPS coordinates, elevation tracking & digital compass",
+        "hardness-converter": "Metal hardness scales (HB, HRC, HRB, HV) and tensile strength conversions"
+    },
     categories: {
-        'mechanical': 'Mécanique',
-        'structural': 'Structurel',
-        'utilities': 'Utilitaires',
-        'reference': 'Référence'
-    } as Record<string, string>,
-
-    // Ribbon Bar
+        mechanical: "Mécanique",
+        structural: "Structurel",
+        utilities: "Utilitaires",
+        reference: "Référence",
+        science: "Sciences",
+        software: "Logiciel",
+        civil: "Génie civil",
+        finance: "Finance",
+        other: "Autre"
+    },
     ribbon: {
         theme: "Thème",
         guide: "Guide",
         variables: "Variables",
-        // CAD Tools
         select: "Sélectionner",
         pan: "Déplacer",
         line: "Ligne (L)",
@@ -296,7 +535,6 @@ export default {
         smartDim: "Cote intelligente",
         linear: "Linéaire",
         text: "Texte",
-        // Constraints
         coincident: "Coïncident",
         horizontal: "Horizontal",
         vertical: "Vertical",
@@ -306,7 +544,6 @@ export default {
         equal: "Égal",
         angle: "Angle",
         dist: "Distance",
-        // Actions
         undo: "Annuler",
         redo: "Rétablir",
         zoomIn: "Zoom +",
@@ -318,7 +555,6 @@ export default {
         exportDxf: "DXF 2D",
         exportStep: "STEP 3D",
         clearAll: "Tout effacer",
-        // ToolGroups
         groupDraw: "Dessiner",
         groupModify: "Modifier",
         groupDim: "Coter",
@@ -329,7 +565,6 @@ export default {
         groupCanvas: "Canvas",
         groupJob: "Pilotage",
         groupOutput: "Sortie",
-        // Labels
         labelCreativeDesk: "BUREAU CRÉATIF",
         labelMfgCam: "ESPACE MFG / CAM",
         labelFeaSim: "MOTEUR FEA / SIMULATION",
@@ -358,12 +593,10 @@ export default {
         labelStrokeColor: "Couleur du trait",
         defaultNote: "📌 Nouvelle note",
         promptYoutubeUrl: "Entrez l’URL YouTube :",
-        // Alerts & Status
         confirmClearSketches: "Effacer tous les croquis ?",
         confirmClearFlow: "Voulez-vous vraiment vider tout le flow ? Cette action est irréversible.",
         confirmDeleteWindow: "Fermer cette fenêtre ?",
         alertSelect2: "Sélectionnez au moins 2 entités (points ou lignes) à contraindre.",
-
         exportFailed: "Échec export",
         dxfExportFailed: "Échec export DXF",
         stepExportFailed: "Échec export STEP",
@@ -377,10 +610,8 @@ export default {
         newsFeedTitle: "Fil d’actualité ingénierie",
         newsItem1: "Prix de l’aluminium +2 %",
         newsItem2: "Nouvelle norme ISO 898-1 publiée",
-        newsItem3: "AluCalc V2 lancé",
+        newsItem3: "AluCalc V2 lancé"
     },
-
-    // CAD UI
     featureTree: "Arbre des fonctions",
     sketches: "Esquisses",
     bodies: "Corps",
@@ -392,8 +623,6 @@ export default {
     overConstrained: "Surcontraint",
     underConstrained: "Sous-contraint",
     addBody: "Ajouter un corps",
-
-    // UI Labels
     parametersTitle: "PARAMÈTRES",
     resultsTitle: "RÉSULTATS",
     fixInputs: "CORRIGER LES ENTRÉES",
@@ -403,50 +632,126 @@ export default {
     varLabel: "VAR",
     dbLabel: "DB",
     selectStandard: "Sélectionner un standard…",
-
-    // Engine & Calculator Generic Terms
     calcCommon: {
-        length: { label: "Longueur (L)" },
-        width: { label: "Largeur (w)" },
-        height: { label: "Hauteur (h)" },
-        thickness: { label: "Épaisseur (t)" },
-        radius: { label: "Rayon (R)", desc: "Rayon intérieur de pliage" },
-        angle: { label: "Angle (θ)" },
-        force: { label: "Force (F)" },
-        torque: { label: "Couple (T)" },
-        pressure: { label: "Pression (P)" },
-        velocity: { label: "Vitesse (v)" },
-        diameter: { label: "Diamètre (d)" },
-        density: { label: "Densité (ρ)" },
-        mass: { label: "Masse (m)" },
-        volume: { label: "Volume (V)" },
-        area: { label: "Surface (A)" },
-        material: { label: "Type de matériau" },
-        yieldStrength: { label: "Limite élastique (Sy)" },
-        Sy: { label: "Limite élastique (Sy)" },
-        safetyFactor: { label: "Coefficient de sécurité" },
-        SF: { label: "Coefficient de sécurité (SF)" },
-        deflection: { label: "Flèche" },
-        bendingStress: { label: "Contrainte de flexion" },
-        sigmaBending: { label: "Contrainte de flexion (σb)" },
-        m: { label: "Module (m)", desc: "Module d’engrenage" },
-        z1: { label: "Dents pignon (z₁)" },
-        z2: { label: "Dents roue (z₂)" },
-        alpha: { label: "Angle de pression (α)" },
-        b: { label: "Largeur de denture (b)" },
-        T: { label: "Couple (T)" },
-        d: { label: "Diamètre (d)" },
-        p: { label: "Pas (p)" },
-        k: { label: "Hauteur de tête (k)" },
-        s: { label: "Largeur six pans (s)" },
-        drill: { label: "Ø perçage" },
-        dh: { label: "Ø trou (dh)" },
-        ix: { label: "Inertie Ix", desc: "Moment d’inertie axe X" },
-        iy: { label: "Inertie Iy", desc: "Moment d’inertie axe Y" },
-        slot: { label: "Taille de fente" }
-    } as Record<string, { label?: string, desc?: string }>,
-
-    // Engineering Handbook
+        length: {
+            label: "Longueur (L)"
+        },
+        width: {
+            label: "Largeur (w)"
+        },
+        height: {
+            label: "Hauteur (h)"
+        },
+        thickness: {
+            label: "Épaisseur (t)"
+        },
+        radius: {
+            label: "Rayon (R)",
+            desc: "Rayon intérieur de pliage"
+        },
+        angle: {
+            label: "Angle (θ)"
+        },
+        force: {
+            label: "Force (F)"
+        },
+        torque: {
+            label: "Couple (T)"
+        },
+        pressure: {
+            label: "Pression (P)"
+        },
+        velocity: {
+            label: "Vitesse (v)"
+        },
+        diameter: {
+            label: "Diamètre (d)"
+        },
+        density: {
+            label: "Densité (ρ)"
+        },
+        mass: {
+            label: "Masse (m)"
+        },
+        volume: {
+            label: "Volume (V)"
+        },
+        area: {
+            label: "Surface (A)"
+        },
+        material: {
+            label: "Type de matériau"
+        },
+        yieldStrength: {
+            label: "Limite élastique (Sy)"
+        },
+        Sy: {
+            label: "Limite élastique (Sy)"
+        },
+        safetyFactor: {
+            label: "Coefficient de sécurité"
+        },
+        SF: {
+            label: "Coefficient de sécurité (SF)"
+        },
+        deflection: {
+            label: "Flèche"
+        },
+        bendingStress: {
+            label: "Contrainte de flexion"
+        },
+        sigmaBending: {
+            label: "Contrainte de flexion (σb)"
+        },
+        m: {
+            label: "Module (m)",
+            desc: "Module d’engrenage"
+        },
+        z1: {
+            label: "Dents pignon (z₁)"
+        },
+        z2: {
+            label: "Dents roue (z₂)"
+        },
+        alpha: {
+            label: "Angle de pression (α)"
+        },
+        b: {
+            label: "Largeur de denture (b)"
+        },
+        T: {
+            label: "Couple (T)"
+        },
+        d: {
+            label: "Diamètre (d)"
+        },
+        p: {
+            label: "Pas (p)"
+        },
+        k: {
+            label: "Hauteur de tête (k)"
+        },
+        s: {
+            label: "Largeur six pans (s)"
+        },
+        drill: {
+            label: "Ø perçage"
+        },
+        dh: {
+            label: "Ø trou (dh)"
+        },
+        ix: {
+            label: "Inertie Ix",
+            desc: "Moment d’inertie axe X"
+        },
+        iy: {
+            label: "Inertie Iy",
+            desc: "Moment d’inertie axe Y"
+        },
+        slot: {
+            label: "Taille de fente"
+        }
+    },
     handbook: {
         title: "Bibliothèque d’ingénierie",
         searchPlaceholder: "Rechercher dans la bibliothèque…",
@@ -475,8 +780,6 @@ export default {
             roughnessDesc: "Valeurs Ra & usinage"
         }
     },
-
-    // Project Variables
     variables: {
         title: "VARIABLES PROJET",
         addVariable: "Ajouter une variable",
@@ -488,8 +791,6 @@ export default {
         placeholderDesc: "Description optionnelle…",
         noVariables: "Aucune variable globale définie. Cliquez sur « Ajouter une variable »."
     },
-
-    // General
     close: "Fermer",
     minimize: "Réduire",
     maximize: "Agrandir",
@@ -499,8 +800,6 @@ export default {
     ok: "OK",
     error: "Erreur",
     feedbackTitle: "Contact & feedback",
-
-    // Cost Estimator
     costTitle: "Estimateur de coût",
     costDesc: "Détail des coûts de fabrication",
     costBom: "Nomenclature matière",
@@ -510,9 +809,15 @@ export default {
     costBatch: "Taille de lot",
     costTotal: "Coût total",
     costUnit: "Prix unitaire",
-
-    // Terminal
     termPlaceholder: "Saisir une commande… (essayez « help »)",
-    termPrefix: "AluCalc ❯"
-
+    termPrefix: "AluCalc ❯",
+    shutDown: "Arrêter",
+    noModulesFound: "Aucun module trouvé",
+    noModulesHint: "Modifiez votre recherche.",
+    disciplinesLabel: "Disciplines",
+    languageFr: "Français",
+    languageIt: "Italien",
+    languagePt: "Portugais",
+    languageRu: "Russe",
+    closeAll: "Fermer toutes les apps"
 } as const;

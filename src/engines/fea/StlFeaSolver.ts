@@ -13,6 +13,7 @@ export interface FeaMaterial {
   name: string;
   category: 'aluminum' | 'steel' | 'titanium' | 'plastic';
   elasticModulus: number; // GPa (e.g. 70 for Al6061)
+  youngsModulus?: number; // GPa (alias for elasticModulus)
   poissonsRatio: number;  // unitless (e.g. 0.33)
   yieldStrength: number;  // MPa (e.g. 276 for Al6061-T6)
   ultimateStrength: number; // MPa

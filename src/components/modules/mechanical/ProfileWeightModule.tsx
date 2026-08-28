@@ -421,7 +421,7 @@ function PremiumShapePreview({ shape, w, h, t, d, wt, fW, wH, fT, wT }: any) {
             <defs>
                 <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
             </defs>
-            <g transform="translate(150, 100)" filter="url(#glow)">
+            <g transform="translate(150, 100)" filter="url(#glow)" className="solver-bob" style={{ transformOrigin: '0px 0px', transformBox: 'view-box' }}>
                 {shape === 'plate' && <>
                     <rect x={-60} y={-8} width={120} height={16} fill={fill} stroke={stroke} strokeWidth="2" rx="1" />
                     <line x1={-60} y1={18} x2={60} y2={18} stroke={dimLine} strokeWidth="0.5" />

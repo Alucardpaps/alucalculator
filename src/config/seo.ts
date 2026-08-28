@@ -27,23 +27,23 @@ export const SEO_REGISTRY: SeoRegistryMap = {
       canonicalSlug: '/workspace',
     },
     'design-studio': {
-      title: '3D Parametric CAD Design Studio',
-      description: 'Browser-based 3D parametric CAD modeling and STL assembly studio. Real-time constraints, component mating, and engineering bill of materials (BOM).',
+      title: 'Parametric Part Configurator & 3D Preview',
+      description: 'Instant browser-based 3D parametric preview, section inspection, and binary STL export for mechanical components.',
       canonicalSlug: '/design-studio',
     },
     fea: {
-      title: 'Finite Element Analysis (FEA) Stress Simulator',
-      description: 'Interactive linear-elastic FEA stress analysis in WebGL. Calculate von Mises stress, nodal displacement fields, and structural safety factor contours.',
+      title: 'FEA Linear Static v1 — Validated Structural Templates',
+      description: 'Validated 3-template linear-elastic FEA stress analysis in WebGL. Real-time analytical benchmarks (< 8% error) for cantilever beams, plates with holes, and L-brackets.',
       canonicalSlug: '/fea',
     },
     pricing: {
       title: 'Pricing & Licensing Plans',
-      description: 'Deterministic engineering tools remain free. Upgrade to Pro or Team for unlimited DXF/STEP exports, unwatermarked client reports, and bulk API access.',
+      description: 'Deterministic engineering tools remain free. Upgrade to Pro or Team for unlimited DXF/STL exports, unwatermarked client reports, and bulk API access.',
       canonicalSlug: '/pricing',
     },
     academy: {
       title: 'Engineering Academy & Technical Learning',
-      description: 'Master core engineering principles with 113 interactive units. Bolt torque theory (VDI 2230), bearing life derivations (ISO 281), and beam deflection formulas.',
+      description: 'Master core engineering principles with 15 verified interactive units. Bolt torque (VDI 2230), bearing life (ISO 281), gear strength (ISO 6336), FEA static analysis, and verified PDF certifications.',
       canonicalSlug: '/academy',
     },
     calculators: {
@@ -65,6 +65,11 @@ export const SEO_REGISTRY: SeoRegistryMap = {
       title: 'Shaft Sizing & Bearing Reaction Calculator',
       description: 'Calculate shaft bearing reaction forces, shear-moment diagrams, combined torsion-bending equivalent stresses, and minimum shaft diameters per ASME standards.',
       canonicalSlug: '/shafts',
+    },
+    verify: {
+      title: 'Certificate & Technical Report Verification Ledger',
+      description: 'Verify official AluCalc Academy Technical Mastery Certificates and certified engineering calculation reports with cryptographic checksums.',
+      canonicalSlug: '/verify',
     }
   },
 

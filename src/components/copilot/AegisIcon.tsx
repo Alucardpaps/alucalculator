@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 
 interface AegisIconProps {
   size?: number;
@@ -12,6 +12,7 @@ interface AegisIconProps {
 }
 
 export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: AegisIconProps) {
+  const uid = useId().replace(/:/g, '');
   const s = size;
   const cx = 100;
   const cy = 100;
@@ -57,12 +58,12 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
   } else if (mode === 'active') {
     // Happy, large round eyes
     leftEye = (
-      <circle key="eye-l" cx="81" cy="92" r="6.5" fill="#00e5ff" filter="url(#aegis-glow-inner)">
+      <circle key="eye-l" cx="81" cy="92" r="6.5" fill="#00e5ff" filter={`url(#${uid}-glow)`}>
         <animate attributeName="r" values="6.5;6.5;1;6.5;6.5" dur="3s" repeatCount="indefinite" />
       </circle>
     );
     rightEye = (
-      <circle key="eye-r" cx="119" cy="92" r="6.5" fill="#00e5ff" filter="url(#aegis-glow-inner)">
+      <circle key="eye-r" cx="119" cy="92" r="6.5" fill="#00e5ff" filter={`url(#${uid}-glow)`}>
         <animate attributeName="r" values="6.5;6.5;1;6.5;6.5" dur="3s" repeatCount="indefinite" />
       </circle>
     );
@@ -80,10 +81,10 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
   } else if (mode === 'tracking') {
     // Focused eyes
     leftEye = (
-      <ellipse key="eye-l" cx="81" cy="92" rx="5.5" ry="5.5" fill="#00e5ff" filter="url(#aegis-glow-inner)" />
+      <ellipse key="eye-l" cx="81" cy="92" rx="5.5" ry="5.5" fill="#00e5ff" filter={`url(#${uid}-glow)`} />
     );
     rightEye = (
-      <ellipse key="eye-r" cx="119" cy="92" rx="5.5" ry="5.5" fill="#00e5ff" filter="url(#aegis-glow-inner)" />
+      <ellipse key="eye-r" cx="119" cy="92" rx="5.5" ry="5.5" fill="#00e5ff" filter={`url(#${uid}-glow)`} />
     );
     // Focused eyebrows
     eyebrows = (
@@ -267,7 +268,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
     >
       <defs>
         {/* Core glow filter */}
-        <filter id="aegis-glow-inner" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={`${uid}-glow`} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -276,21 +277,21 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
         </filter>
 
         {/* Core radial gradient */}
-        <radialGradient id="aegis-core-grad" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`${uid}-core`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.9" />
           <stop offset="60%" stopColor="#3b82f6" stopOpacity="0.6" />
           <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
         </radialGradient>
 
         {/* Thruster Flame Gradient */}
-        <linearGradient id="thruster-flame" x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id={`${uid}-flame`} x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#00e5ff" stopOpacity="1" />
           <stop offset="40%" stopColor="#3b82f6" stopOpacity="0.8" />
           <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
         </linearGradient>
 
         {/* Orbit gradient */}
-        <linearGradient id="aegis-orbit-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id={`${uid}-orbit`} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#00e5ff" stopOpacity="0" />
           <stop offset="50%" stopColor="#00e5ff" stopOpacity="0.9" />
           <stop offset="100%" stopColor="#00e5ff" stopOpacity="0" />
@@ -376,7 +377,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
             {/* Metal nozzle */}
             <path d="M 92 162 L 108 162 L 100 168 Z" fill="#1e293b" stroke="#334155" strokeWidth="1" />
             {/* Pulsing flame */}
-            <ellipse cx="100" cy={166 + flameBaseRy} rx={flameBaseRx} ry={flameBaseRy} fill="url(#thruster-flame)" filter="url(#aegis-glow-inner)">
+            <ellipse cx="100" cy={166 + flameBaseRy} rx={flameBaseRx} ry={flameBaseRy} fill={`url(#${uid}-flame)`} filter={`url(#${uid}-glow)`}>
               <animate attributeName="ry" values={flameRyValues} dur={flameDur} repeatCount="indefinite" />
               <animate attributeName="rx" values={flameRxValues} dur={flameDur} repeatCount="indefinite" />
             </ellipse>
@@ -433,7 +434,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
           stroke="#00e5ff" 
           strokeWidth="3" 
           strokeOpacity="0.75" 
-          filter="url(#aegis-glow-inner)"
+          filter={`url(#${uid}-glow)`}
         />
 
         {/* ── Inner Hex Screen ── */}
@@ -457,7 +458,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
 
         {/* ── Spinning Orbit Arc ── */}
         <circle cx={cx} cy={cy} r={r * 0.52}
-          fill="none" stroke="url(#aegis-orbit-grad)"
+          fill="none" stroke={`url(#${uid}-orbit)`}
           strokeWidth="2.5" strokeLinecap="round"
           strokeDasharray="25 60">
           <animateTransform attributeName="transform" type="rotate"
@@ -467,7 +468,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
 
         {/* ── Core Glow Pulse ── */}
         <circle cx={cx} cy={cy} r={r * 0.28}
-          fill="url(#aegis-core-grad)" opacity={glowOpacity}>
+          fill={`url(#${uid}-core)`} opacity={glowOpacity}>
           <animate attributeName="r" values="14;20;14"
             dur={pulseDur} repeatCount="indefinite" />
           <animate attributeName="opacity"
@@ -476,7 +477,7 @@ export function AegisIcon({ size = 32, className = '', mode = 'idle', pure }: Ae
         </circle>
 
         {/* ── Center Dot Core ── */}
-        <circle cx={cx} cy={cy} r="4" fill="#00e5ff" filter="url(#aegis-glow-inner)" />
+        <circle cx={cx} cy={cy} r="4" fill="#00e5ff" filter={`url(#${uid}-glow)`} />
 
         {/* ── Robotic Face Features ── */}
         <g id="aegis-face">

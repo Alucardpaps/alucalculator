@@ -63,6 +63,7 @@ export function WeldingVisualization({
                 width="100%"
                 height="auto"
                 style={{ maxHeight: '250px' }}
+                className="solver-weld"
             >
                 <defs>
                     {/* Weld metal gradient */}
@@ -80,7 +81,7 @@ export function WeldingVisualization({
 
                     {/* HAZ gradient */}
                     <radialGradient id="hazGradient" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="rgba(239, 68, 68, 0.4)" />
+                        <stop offset="0%" stopColor="rgba(239, 68, 68, 0.4)" className="solver-haz" />
                         <stop offset="100%" stopColor="rgba(239, 68, 68, 0)" />
                     </radialGradient>
                 </defs>

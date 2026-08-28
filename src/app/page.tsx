@@ -4,8 +4,8 @@ import { HomePageContent } from '@/components/home/HomePageContent';
 import { HomeFooterSection } from '@/components/home/HomeFooterSection';
 
 export const metadata: Metadata = {
-  title: 'AluCalc OS | Engineering Intelligence & CAD Platform',
-  description: 'Deterministic engineering calculators (VDI 2230, ISO 281, ISO 6336), 3D Assembly CAD Studio, and verified engineering tools.',
+  title: 'Engineering Intelligence & CAD Platform',
+  description: 'Deterministic engineering calculators (VDI 2230, ISO 281, ISO 6336), 3D Parametric Part Configurator, 2D AluCAD drafting, and verified engineering tools.',
   applicationName: 'AluCalc OS',
   authors: [{ name: 'AluCalc', url: 'https://www.alucalculator.com' }],
   keywords: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'AluCalc OS | Engineering Intelligence & CAD Platform',
-    description: 'Deterministic engineering calculators (VDI 2230, ISO 281, ISO 6336), 3D Assembly CAD Studio, and verified engineering tools.',
+    description: 'Deterministic engineering calculators (VDI 2230, ISO 281, ISO 6336), 3D Parametric Part Configurator, 2D AluCAD drafting, and verified engineering tools.',
     url: 'https://www.alucalculator.com/',
     type: 'website',
     images: [

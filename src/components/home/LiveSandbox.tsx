@@ -4,10 +4,11 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Activity, ArrowRight, Zap, Scale, Layers, Copy, Check, Sparkles } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { getSandbox } from '@/locales/chromeTranslations';
 
 export function LiveSandbox() {
   const { language } = useI18nStore();
-  const isTr = language === 'tr';
+  const s = getSandbox(language);
 
   const [activeTab, setActiveTab] = useState<'bolt' | 'alloy' | 'beam'>('bolt');
 
@@ -124,11 +125,11 @@ export function LiveSandbox() {
               <Activity size={15} />
             </span>
             <h2 className="text-base sm:text-xl font-black text-white">
-              {isTr ? 'İnteraktif Canlı Mühendislik Sandbox' : 'Interactive Live Engineering Sandbox'}
+              {s.title}
             </h2>
           </div>
           <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1">
-            {isTr ? 'Doğrudan tarayıcınızda canlı hesaplama yapın' : 'Try real-time calculations directly in the browser'}
+            {s.subtitle}
           </p>
         </div>
 
@@ -141,7 +142,7 @@ export function LiveSandbox() {
               activeTab === 'bolt' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Bolt Torque (VDI 2230)
+            {s.tabBolt}
           </button>
           <button
             type="button"
@@ -150,7 +151,7 @@ export function LiveSandbox() {
               activeTab === 'alloy' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Alloy Mass Truth
+            {s.tabAlloy}
           </button>
           <button
             type="button"
@@ -159,7 +160,7 @@ export function LiveSandbox() {
               activeTab === 'beam' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Beam Deflection
+            {s.tabBeam}
           </button>
         </div>
       </div>
@@ -170,7 +171,7 @@ export function LiveSandbox() {
           <div className="md:col-span-7 space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono text-slate-300">
-                <span>{isTr ? 'Cıvata Çapı:' : 'Bolt Size:'}</span>
+                <span>{s.boltSize}</span>
                 <span className="text-[#6b9fff] font-bold">M{boltSize}</span>
               </div>
               <input
@@ -187,7 +188,7 @@ export function LiveSandbox() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-slate-300 block">
-                  {isTr ? 'Mukavemet Sınıfı:' : 'Strength Class:'}
+                  {s.strengthClass}
                 </label>
                 <div className="flex gap-1.5 sm:gap-2">
                   {(['8.8', '10.9', '12.9'] as const).map((cls) => (
@@ -209,7 +210,7 @@ export function LiveSandbox() {
 
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-mono text-slate-300">
-                  <span>{isTr ? 'Sürtünme Katsayısı (μ):' : 'Friction (μ):'}</span>
+                  <span>{s.friction}</span>
                   <span className="text-[#6b9fff] font-bold">{friction.toFixed(2)}</span>
                 </div>
                 <input
@@ -228,7 +229,7 @@ export function LiveSandbox() {
           <div className="md:col-span-5 rounded-xl sm:rounded-2xl border border-white/15 bg-black/60 p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#6b9fff] font-bold">
-                {isTr ? 'VDI 2230 HESAPLAMA SONUCU' : 'VDI 2230 RESULT'}
+                {s.result}
               </span>
               <button
                 type="button"
@@ -236,7 +237,7 @@ export function LiveSandbox() {
                 className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white transition-colors bg-white/5 px-2 py-1 rounded-md"
               >
                 {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-                <span>{copied ? (isTr ? 'Kopyalandı' : 'Copied') : (isTr ? 'Kopyala' : 'Copy')}</span>
+                <span>{copied ? s.copied : s.copy}</span>
               </button>
             </div>
 
@@ -244,13 +245,13 @@ export function LiveSandbox() {
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-emerald-400">{boltResults.torque}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'N·m Sıkma Torku (MA)' : 'N·m Torque (MA)'}
+                  {s.torque}
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{boltResults.preload}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'kN Ön Yük (FM)' : 'kN Preload (FM)'}
+                  {s.preload}
                 </p>
               </div>
             </div>
@@ -259,7 +260,7 @@ export function LiveSandbox() {
               href="/bolt-torque/"
               className="w-full py-2.5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#6b9fff] to-[#4b86e8] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-[#6b9fff]/20"
             >
-              <span>{isTr ? 'Tam Hesaplayıcıyı Aç' : 'Open Full Solver'}</span>
+              <span>{s.openSolver}</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -272,7 +273,7 @@ export function LiveSandbox() {
           <div className="md:col-span-7 space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 block">
-                {isTr ? 'Malzeme / Alaşım:' : 'Material / Alloy:'}
+                {s.material}
               </label>
               <select
                 value={selectedAlloy}
@@ -290,7 +291,7 @@ export function LiveSandbox() {
 
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <div className="space-y-1">
-                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{isTr ? 'Uzunluk (L):' : 'Length (L):'}</span>
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{s.length}</span>
                 <input
                   type="number"
                   value={length}
@@ -299,7 +300,7 @@ export function LiveSandbox() {
                 />
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{isTr ? 'Genişlik (W):' : 'Width (W):'}</span>
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{s.width}</span>
                 <input
                   type="number"
                   value={width}
@@ -308,7 +309,7 @@ export function LiveSandbox() {
                 />
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{isTr ? 'Kalınlık (T):' : 'Thickness (T):'}</span>
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400">{s.thickness}</span>
                 <input
                   type="number"
                   value={thickness}
@@ -321,20 +322,20 @@ export function LiveSandbox() {
 
           <div className="md:col-span-5 rounded-xl sm:rounded-2xl border border-white/15 bg-black/60 p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-xl">
             <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold block">
-              {isTr ? 'HACİM & KÜTLE DOĞRULAMA' : 'VOLUME & MASS METRICS'}
+              {s.massMetrics}
             </span>
 
             <div className="grid grid-cols-2 gap-2.5 sm:gap-3 text-center">
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-amber-400">{alloyResults.massKg}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'kg Net Kütle' : 'kg Total Mass'}
+                  {s.mass}
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{alloyResults.volumeCm3}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'cm³ Hacim' : 'cm³ Volume'}
+                  {s.volume}
                 </p>
               </div>
             </div>
@@ -343,7 +344,7 @@ export function LiveSandbox() {
               href="/handbook/"
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-amber-400/20"
             >
-              <span>{isTr ? 'Alaşım Kütüphanesini Aç' : 'Explore Alloy Database'}</span>
+              <span>{s.openAlloys}</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -356,7 +357,7 @@ export function LiveSandbox() {
           <div className="md:col-span-7 space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 block">
-                {isTr ? 'Bağlantı Şekli:' : 'Support Condition:'}
+                {s.support}
               </label>
               <div className="flex gap-2">
                 <button
@@ -368,7 +369,7 @@ export function LiveSandbox() {
                       : 'border-white/10 bg-black/40 text-slate-400 hover:text-white'
                   }`}
                 >
-                  {isTr ? 'Basit Mesnetli' : 'Simply Supported'}
+                  {s.simply}
                 </button>
                 <button
                   type="button"
@@ -379,7 +380,7 @@ export function LiveSandbox() {
                       : 'border-white/10 bg-black/40 text-slate-400 hover:text-white'
                   }`}
                 >
-                  {isTr ? 'Konsol Kiriş' : 'Cantilever'}
+                  {s.cantilever}
                 </button>
               </div>
             </div>
@@ -387,7 +388,7 @@ export function LiveSandbox() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-mono text-slate-300">
-                  <span>{isTr ? 'Açıklık (L):' : 'Span Length (L):'}</span>
+                  <span>{s.span}</span>
                   <span className="text-cyan-400 font-bold">{spanLength} mm</span>
                 </div>
                 <input
@@ -403,7 +404,7 @@ export function LiveSandbox() {
 
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-mono text-slate-300">
-                  <span>{isTr ? 'Uygulanan Yük (F):' : 'Applied Load (F):'}</span>
+                  <span>{s.load}</span>
                   <span className="text-cyan-400 font-bold">{(appliedForce / 1000).toFixed(1)} kN</span>
                 </div>
                 <input
@@ -421,20 +422,20 @@ export function LiveSandbox() {
 
           <div className="md:col-span-5 rounded-xl sm:rounded-2xl border border-white/15 bg-black/60 p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-xl">
             <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-bold block">
-              {isTr ? 'SEHİM & GERİLME HESAPLAMA' : 'DEFLECTION & STRESS'}
+              {s.defStress}
             </span>
 
             <div className="grid grid-cols-2 gap-2.5 sm:gap-3 text-center">
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-cyan-400">{beamResults.deflection}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'mm Max Sehim (δ)' : 'mm Max Deflection'}
+                  {s.deflection}
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
                 <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{beamResults.stress}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
-                  {isTr ? 'MPa Eğilme Gerilmesi' : 'MPa Bending Stress'}
+                  {s.stress}
                 </p>
               </div>
             </div>
@@ -443,7 +444,7 @@ export function LiveSandbox() {
               href="/beam-deflection/"
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-[#6b9fff] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-cyan-400/20"
             >
-              <span>{isTr ? 'Tam Kiriş Çözücüyü Aç' : 'Open Full Beam Solver'}</span>
+              <span>{s.openBeam}</span>
               <ArrowRight size={14} />
             </Link>
           </div>

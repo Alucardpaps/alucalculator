@@ -15,26 +15,29 @@ export default function MotorSelection() {
     const [efficiency, setEfficiency] = useState(0.9);
     
     // Logic - Professional Powertrain Kernel
+    const IEC_KW = [0.37, 0.55, 0.75, 1.1, 1.5, 2.2, 3, 4, 5.5, 7.5, 11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90, 110, 132, 160, 200];
+
     const stats = useMemo(() => {
+        const ratio = Math.max(0.05, gearRatio);
+        const eta = Math.min(1, Math.max(0.3, efficiency));
         const omega_rad_s = (targetSpeed * 2 * Math.PI) / 60;
-        const shaftPower = targetTorque * omega_rad_s; // Watts
-        
-        // Motor side requirements
-        const motorTorque = targetTorque / (gearRatio * efficiency);
-        const motorSpeed = targetSpeed * gearRatio;
-        const motorPower = shaftPower / efficiency;
-        
-        // Thermal stress estimation (Mock based on current vs limit)
-        const thermalLoad = Math.min(100, (motorPower / 7.5) * 10); // Standard 7.5kW motor base
-        const isSafe = thermalLoad < 85;
-        
-        return { 
-            shaftPower: shaftPower / 1000, 
-            motorTorque, 
-            motorSpeed, 
-            motorPower: motorPower / 1000,
-            thermalLoad,
-            isSafe
+        const shaftPower = targetTorque * omega_rad_s; // W
+        const motorTorque = targetTorque / (ratio * eta);
+        const motorSpeed = targetSpeed * ratio;
+        const motorPowerW = shaftPower / eta;
+        const motorPowerKw = motorPowerW / 1000;
+        const iecKw = IEC_KW.find((p) => p >= motorPowerKw) ?? IEC_KW[IEC_KW.length - 1];
+        const utilization = iecKw > 0 ? (motorPowerKw / iecKw) * 100 : 100;
+        const isSafe = motorPowerKw <= iecKw && utilization <= 95;
+
+        return {
+            shaftPower: shaftPower / 1000,
+            motorTorque,
+            motorSpeed,
+            motorPower: motorPowerKw,
+            iecKw,
+            thermalLoad: utilization,
+            isSafe,
         };
     }, [targetTorque, targetSpeed, gearRatio, efficiency]);
 
@@ -88,15 +91,15 @@ export default function MotorSelection() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                     <ValueCard label="Motor Power" value={stats.motorPower.toFixed(2)} unit="kW" sub={(stats.motorPower * 1.341).toFixed(2) + ' HP'} color="#22d3ee" />
-                    <ValueCard label="Motor Torque" value={stats.motorTorque.toFixed(1)} unit="Nm" sub="INPUT_SIDE" color="#8b5cf6" />
-                    <ValueCard label="Motor Speed" value={stats.motorSpeed.toFixed(0)} unit="RPM" sub="N_MAX" color="#10b981" />
+                    <ValueCard label="IEC next size" value={stats.iecKw.toFixed(2)} unit="kW" sub="IEC 60034 catalog" color="#8b5cf6" />
+                    <ValueCard label="Motor Speed" value={stats.motorSpeed.toFixed(0)} unit="RPM" sub={`${stats.motorTorque.toFixed(1)} N·m at motor`} color="#10b981" />
                 </div>
 
                 {/* Torque-Speed Dynamic Analysis */}
                 <div className="flex-1 min-h-[440px] bg-black/60 border border-white/10 rounded-[3rem] p-12 flex flex-col relative overflow-hidden backdrop-blur-xl shadow-2xl">
                     <div className="absolute top-0 right-0 p-8 flex gap-4">
                         <div className={`px-4 py-2 border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${stats.isSafe ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-red-500/10 border-red-500/20 text-red-400 animate-pulse'}`}>
-                           {stats.isSafe ? 'Optimal Operating State' : 'Critical Power Limit'}
+                           {stats.isSafe ? `Select IEC ${stats.iecKw} kW` : 'Above catalog — increase ratio or motor size'}
                         </div>
                     </div>
 
@@ -160,10 +163,10 @@ export default function MotorSelection() {
                     <div className="mt-12 flex justify-between items-end border-t border-white/5 pt-8">
                         <div className="flex gap-10">
                              <div>
-                                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest flex items-center gap-1.5"><Thermometer size={10}/> Thermal Stress</span>
+                                 <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest flex items-center gap-1.5"><Thermometer size={10}/> IEC load factor</span>
                                  <div className="flex items-center gap-3 mt-1">
                                     <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div animate={{ width: `${stats.thermalLoad}%` }} className={`h-full transition-colors ${stats.thermalLoad > 80 ? 'bg-red-500' : 'bg-cyan-500'}`} />
+                                        <motion.div animate={{ width: `${Math.min(100, stats.thermalLoad)}%` }} className={`h-full transition-colors ${stats.thermalLoad > 95 ? 'bg-red-500' : 'bg-cyan-500'}`} />
                                     </div>
                                     <span className="text-xl font-black text-white">{stats.thermalLoad.toFixed(0)}%</span>
                                  </div>

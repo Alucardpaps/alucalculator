@@ -11,6 +11,7 @@
 import { jsPDF } from 'jspdf';
 import type { CalculationResult } from '@/types/engineering';
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
+import { useLicenseStore } from '@/store/licenseStore';
 
 // ============================================
 // PDF REPORT GENERATOR
@@ -230,6 +231,26 @@ export function generatePDFReport(
         { align: 'center' }
     );
 
+    // Watermark for free tier
+    try {
+        const plan = useLicenseStore.getState().plan;
+        if (plan === 'free') {
+            const pageCount = doc.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor(215, 220, 228);
+                doc.setFontSize(22);
+                doc.setFont('helvetica', 'bold');
+                doc.text('ALUCALC OS — FREE TIER (WATERMARKED)', pageWidth / 2, 150, {
+                    align: 'center',
+                    angle: 45
+                });
+            }
+        }
+    } catch {
+        // Ignore
+    }
+
     // Save
     const filename = `${schema.id}_report_${Date.now()}.pdf`;
     doc.save(filename);
@@ -371,6 +392,9 @@ export interface ExportButtonsProps {
 
 export function ExportButtons({ schema, result, inputs, gearData }: ExportButtonsProps) {
     const handlePDFExport = () => {
+        const allowed = useLicenseStore.getState().guardFeature('pdf');
+        if (!allowed) return;
+
         generatePDFReport(schema, result, inputs, {
             includeFormulas: true,
             includeAssumptions: true,
@@ -382,6 +406,9 @@ export function ExportButtons({ schema, result, inputs, gearData }: ExportButton
             alert('DXF export requires geometry data');
             return;
         }
+
+        const allowed = useLicenseStore.getState().guardFeature('dxf');
+        if (!allowed) return;
 
         const dxf = generateGearDXF(
             gearData.pitchDiameter,

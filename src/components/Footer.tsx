@@ -47,7 +47,7 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
                                 <Linkedin size={18} />
                             </a>
                             <a
-                                href="mailto:abdulsametyildirim95@gmail.com"
+                                href="mailto:contact@alucalculator.com"
                                 className="p-2 bg-slate-800 hover:bg-red-500 text-white rounded-lg transition-colors"
                             >
                                 <Mail size={18} />
@@ -70,9 +70,12 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
 
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600">
+                <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 gap-2">
                     <p>&copy; 2026 AluCalculator. All rights reserved.</p>
-                    <p>Designed with Intentional Minimalism.</p>
+                    <div className="flex items-center gap-4">
+                        <a href="/privacy" className="text-slate-500 hover:text-cyan-400 transition-colors">Privacy & KVKK</a>
+                        <p>Designed with Intentional Minimalism.</p>
+                    </div>
                 </div>
             </div>
         </footer>

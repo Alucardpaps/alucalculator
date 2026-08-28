@@ -1,9 +1,6 @@
 export default {
-    // OS Core
     osName: "AluCalc OS",
     version: "v5.0",
-
-    // Welcome Modal
     welcomeTitle: "ワークスペースを",
     welcomeHighlight: "選択",
     welcomeDesc: "主要なインターフェースを選択してください。いつでも切り替え可能です。",
@@ -18,8 +15,6 @@ export default {
     nodeTypeNote: "ノート",
     nodeTypeMedia: "メディア",
     nodeTypeNode: "ノード",
-
-    // Modals & Windows
     flowTitle: "フローエンジン (Flow)",
     flowDesc: "エンジニアリング計算のための無限のキャンバス。ノードを接続し、データフローを作成し、数式を連鎖させます。",
     cadTitle: "CAD スタジオ",
@@ -27,8 +22,6 @@ export default {
     deskTitle: "クリエイティブデスク",
     deskDesc: "ブレインストーミング用のフリーフォームホワイトボード。スケッチ、ファイルのドラッグ、アイデアの視覚的な整理が可能です。",
     feaTitle: "FEA システム",
-
-    // Project Management
     projects: {
         title: "プロジェクト",
         newProject: "新規プロジェクト",
@@ -46,9 +39,6 @@ export default {
         updatedAt: "更新日",
         workspacesCount: "個のワークスペース"
     },
-
-    // View Switcher
-    // Welding
     welding: {
         title: "溶接計算機",
         subtitle: "入熱 • 接合強度 • AWS D1.1",
@@ -107,7 +97,9 @@ export default {
             tig: "TIG (GTAW)",
             smaw: "被覆アーク溶接 (SMAW)",
             fcaw: "フラックス入りワイヤ溶接 (FCAW)",
-            saw: "サブマージアーク溶接 (SAW)"
+            saw: "サブマージアーク溶接 (SAW)",
+            mma: "被覆アーク (SMAW)",
+            mag: "MAG (GMAW)"
         },
         joints: {
             fillet: "すみ肉溶接",
@@ -120,18 +112,18 @@ export default {
             tee: "T形継手",
             corner: "角継手"
         },
+        power: "動力",
+        geometry: "幾何",
+        simulationLabel: "溶接継手シミュレーション",
+        setup: "プロセス設定"
     },
     viewCad: "CAD",
     viewFea: "FEA",
     viewDesk: "デスク",
-
-    // Start Menu
     startMenu: "スタートメニュー",
     allApps: "すべてのアプリケーション",
     searchApps: "アプリケーションを検索...",
     pinned: "固定プログラム",
-
-    // Settings
     settings: "設定",
     appearance: "外観",
     language: "言語",
@@ -172,75 +164,324 @@ export default {
     languageJa: "日本語 (Japanese)",
     languageKo: "韓国語 (Korean)",
     languageAr: "アラビア語 (Arabic)",
-
-    // Modules & Tools
     modules: {
-        'calculator': { title: "科学計算機" },
-        'unit-converter': { title: "単位変換器" },
-        'ai-copilot': { title: "Aegis AI" },
-        'file-explorer': { title: "ファイルエクスプローラー" },
-        'settings': { title: "設定" },
-        'handbook': { title: "エンジニアリングハンドブック" },
-        'terminal': { title: "ターミナル" },
-        'profile-weight': { title: "プロファイル重量" },
-        'gears-bearings': { title: "ギア計算機" },
-        'welding': { title: "溶接計算機" },
-        'fasteners': { title: "締結トルク" },
-        'materials-db': { title: "材料データベース" },
-        'cutting-optimizer': { title: "切断オプティマイザー" },
-        'music-player': { title: "音楽プレーヤー" },
-        'belt-drive': { title: "ベルトドライブ" },
-        'beam-deflection': { title: "梁のたわみ計算" },
-        'bearings': { title: "軸承寿命 (L10)" },
-        'bolt-stress': { title: "ボルト引張応力" },
-        'column-buckling': { title: "柱の座屈 (オイラー)" },
-        'fits-tolerances': { title: "はめあいと公差 (ISO 286)" },
-        'fluid-flow': { title: "配管圧力損失" },
-        'gear-spur': { title: "平歯車計算機" },
-        'hydraulic-cylinder': { title: "油圧シリンダ" },
-        'ohms-law': { title: "オームの法則" },
-        'pumps': { title: "遠心ポンプ" },
-        'sheet-metal': { title: "板金曲げ計算" },
-        'spring-compression': { title: "圧縮ばね計算" },
-        'strength-analysis': { title: "強度解析" },
-        'thread-geometry': { title: "ねじ幾何" },
-        'torsion-shaft': { title: "ねじり (軸)" },
-        'vat-calculator': { title: "付加価値税計算機" },
-        'voltage-drop': { title: "電圧降下" },
-        'welding-fillet': { title: "すみ肉溶接強度" },
-        'welding-heat': { title: "溶接入熱" },
-        'analytics-dashboard': { title: "分析" },
-        'engineering-notes': { title: "エンジニアリングノート" },
-    } as Record<string, { title: string }>,
-
-    // Hints
+        calculator: {
+            title: "科学計算機"
+        },
+        "unit-converter": {
+            title: "単位変換器"
+        },
+        "ai-copilot": {
+            title: "Aegis AI"
+        },
+        "file-explorer": {
+            title: "ファイルエクスプローラー"
+        },
+        settings: {
+            title: "設定"
+        },
+        handbook: {
+            title: "エンジニアリングハンドブック"
+        },
+        terminal: {
+            title: "ターミナル"
+        },
+        "profile-weight": {
+            title: "プロファイル重量"
+        },
+        "gears-bearings": {
+            title: "ギア計算機"
+        },
+        welding: {
+            title: "溶接計算機"
+        },
+        fasteners: {
+            title: "締結トルク"
+        },
+        "materials-db": {
+            title: "材料データベース"
+        },
+        "cutting-optimizer": {
+            title: "切断オプティマイザー"
+        },
+        "music-player": {
+            title: "音楽プレーヤー"
+        },
+        "belt-drive": {
+            title: "ベルトドライブ"
+        },
+        "beam-deflection": {
+            title: "梁のたわみ計算"
+        },
+        bearings: {
+            title: "軸承寿命 (L10)"
+        },
+        "bolt-stress": {
+            title: "ボルト引張応力"
+        },
+        "column-buckling": {
+            title: "柱の座屈 (オイラー)"
+        },
+        "fits-tolerances": {
+            title: "はめあいと公差 (ISO 286)"
+        },
+        "fluid-flow": {
+            title: "配管圧力損失"
+        },
+        "gear-spur": {
+            title: "平歯車計算機"
+        },
+        "hydraulic-cylinder": {
+            title: "油圧シリンダ"
+        },
+        "ohms-law": {
+            title: "オームの法則"
+        },
+        pumps: {
+            title: "遠心ポンプ"
+        },
+        "sheet-metal": {
+            title: "板金曲げ計算"
+        },
+        "spring-compression": {
+            title: "圧縮ばね計算"
+        },
+        "strength-analysis": {
+            title: "強度解析"
+        },
+        "thread-geometry": {
+            title: "ねじ幾何"
+        },
+        "torsion-shaft": {
+            title: "ねじり (軸)"
+        },
+        "vat-calculator": {
+            title: "付加価値税計算機"
+        },
+        "voltage-drop": {
+            title: "電圧降下"
+        },
+        "welding-fillet": {
+            title: "すみ肉溶接強度"
+        },
+        "welding-heat": {
+            title: "溶接入熱"
+        },
+        "analytics-dashboard": {
+            title: "分析"
+        },
+        "engineering-notes": {
+            title: "エンジニアリングノート"
+        },
+        "cad-editor": {
+            title: "CADエディタ"
+        },
+        "sketch-pad": {
+            title: "スケッチパッド"
+        },
+        "periodic-table": {
+            title: "周期表"
+        },
+        "simulation-fea": {
+            title: "FEAシミュレーション"
+        },
+        "manufacturing-sandbox": {
+            title: "Mfg. Sandbox"
+        },
+        "engineering-selection": {
+            title: "Engineering Selection"
+        },
+        "thermal-expansion": {
+            title: "熱膨張"
+        },
+        "project-manager": {
+            title: "プロジェクトBOM"
+        },
+        "cost-estimator": {
+            title: "コストエンジン"
+        },
+        "manufacturing-readiness": {
+            title: "Mfg Readiness Analyzer"
+        },
+        "topology-optimization": {
+            title: "ジェネレーティブデザイン"
+        },
+        "machine-assembly": {
+            title: "機械組立"
+        },
+        "failure-prediction": {
+            title: "Failure Predictor"
+        },
+        "fluid-dynamics": {
+            title: "流体力学"
+        },
+        "bolt-torque": {
+            title: "Bolt Torque & Preload"
+        },
+        "chain-drive": {
+            title: "Roller Chain Drive"
+        },
+        "physics-kinematics": {
+            title: "Physics & Kinematics"
+        },
+        "chemistry-reactions": {
+            title: "Chemistry Lab"
+        },
+        "biology-genetics": {
+            title: "Biology & Genetics"
+        },
+        "cs-algorithms": {
+            title: "CS & Algorithms"
+        },
+        "aerospace-dynamics": {
+            title: "Aerospace Dynamics"
+        },
+        "naval-hydrostatics": {
+            title: "Naval Architecture"
+        },
+        "three-phase-power": {
+            title: "3-Phase Power Analytics"
+        },
+        "digital-logic": {
+            title: "Digital Logic Lab"
+        },
+        "filter-design": {
+            title: "Electronic Filter Design"
+        },
+        "failure-diagnosis": {
+            title: "Failure Analysis Tool"
+        },
+        "fatigue-advanced": {
+            title: "Fatigue Life (Advanced)"
+        },
+        "planetary-gearbox": {
+            title: "Planetary Gearbox Solver"
+        },
+        "material-selector-ai": {
+            title: "Material Selector AI"
+        },
+        "materials-explorer": {
+            title: "Materials Intelligence"
+        },
+        "physics-solver": {
+            title: "Physics CAS Solver"
+        },
+        "gearbox-design": {
+            title: "Gearbox Design Engine"
+        },
+        "motor-selection-std": {
+            title: "Motor Selection Engine"
+        },
+        "worm-gear": {
+            title: "Worm Gear Design"
+        },
+        "planetary-gear": {
+            title: "Planetary Gear Train"
+        },
+        "cam-follower": {
+            title: "Cam & Follower Design"
+        },
+        "flywheel-design": {
+            title: "Flywheel Energy Storage"
+        },
+        "concrete-beam-design": {
+            title: "Concrete Beam (ACI 318)"
+        },
+        "foundation-bearing": {
+            title: "Foundation Bearing Capacity"
+        },
+        "transformer-design": {
+            title: "Transformer Design"
+        },
+        "motor-efficiency": {
+            title: "Motor Efficiency & Load"
+        },
+        "heat-exchanger": {
+            title: "Heat Exchanger Sizing"
+        },
+        "sound-meter": {
+            title: "Sound Decibel Meter"
+        },
+        clinometer: {
+            title: "Clinometer / Height Finder"
+        },
+        "gps-surveyor": {
+            title: "GPS Surveyor & Compass"
+        },
+        "hardness-converter": {
+            title: "Hardness & Strength Converter"
+        }
+    },
     moduleHints: {
-        'calculator': '高度な数学計算',
-        'unit-converter': 'エンジニアリング単位換算',
-        'ai-copilot': 'Aegis AI',
-        'file-explorer': 'システムファイル管理',
-        'settings': 'システム設定',
-        'handbook': '参考公式とデータ',
-        'terminal': 'コマンドラインインターフェース',
-        'profile-weight': 'アルミ押し出し型材の重量計算',
-        'gears-bearings': 'ギア比と軸受寿命',
-        'welding': '溶接のど厚と強度',
-        'fasteners': 'ボルトのトルクと初期引張力',
-        'materials-db': '材料特性の照会',
-        'cutting-optimizer': '材料切断効率の最適化',
-        'music-player': 'ローカルおよびストリーミングオーディオ',
-        'belt-drive': 'プーリとベルト長の計算',
-    } as Record<string, string>,
-
-    // Categories
+        calculator: "高度な数学計算",
+        "unit-converter": "エンジニアリング単位換算",
+        "ai-copilot": "Aegis AI",
+        "file-explorer": "システムファイル管理",
+        settings: "システム設定",
+        handbook: "参考公式とデータ",
+        terminal: "コマンドラインインターフェース",
+        "profile-weight": "アルミ押し出し型材の重量計算",
+        "gears-bearings": "ギア比と軸受寿命",
+        welding: "溶接のど厚と強度",
+        fasteners: "ボルトのトルクと初期引張力",
+        "materials-db": "材料特性の照会",
+        "cutting-optimizer": "材料切断効率の最適化",
+        "music-player": "ローカルおよびストリーミングオーディオ",
+        "belt-drive": "プーリとベルト長の計算",
+        "thermal-expansion": "熱膨張と寸法変化",
+        "cost-estimator": "Predict manufacturing costs in real-time",
+        "manufacturing-readiness": "Analyze part for CNC & 3D print readiness",
+        "topology-optimization": "AI-driven generative geometry reduction",
+        "machine-assembly": "Pre-built mechanical system libraries",
+        "failure-prediction": "Stress and fatigue failure AI simulation",
+        "fluid-dynamics": "Pipe flow, pressure drop & Reynolds number",
+        "bolt-torque": "ISO standard fastening torque & preload calculator",
+        "chain-drive": "ISO 606 roller chain sprocket ratio, length & tension",
+        "physics-kinematics": "Projectile motion and rigid body dynamics",
+        "chemistry-reactions": "Reaction balancing and chemical computing",
+        "biology-genetics": "DNA sequencing and bioinformatics assistant",
+        "cs-algorithms": "Algorithm visualization",
+        "aerospace-dynamics": "Flight envelope and aerodynamic modeling",
+        "naval-hydrostatics": "Ship stability and hydrostatic curves",
+        "three-phase-power": "Industrial 3-phase system analysis and vector diagrams",
+        "digital-logic": "Logic gate simulation and truth tables",
+        "filter-design": "Active and passive RC filter frequency response (Bode)",
+        "failure-diagnosis": "Probabilistic failure analysis and root cause diagnosis",
+        "fatigue-advanced": "High-cycle fatigue and mean stress correction (Haigh)",
+        "planetary-gearbox": "Multi-stage planetary gear kinematics and Willis equation",
+        "material-selector-ai": "AI-driven material selection engine",
+        "materials-explorer": "Curation of material informatics and properties",
+        "analytics-dashboard": "Project metrics and usage analytics",
+        "engineering-notes": "Field notes and engineering records",
+        "physics-solver": "Symbolic CAS physics engine for dynamic equations",
+        "gearbox-design": "Complete gear train design and analysis suite",
+        "motor-selection-std": "Standard motor curves and torque-speed matching",
+        "worm-gear": "Worm gear geometry, efficiency & sliding speed",
+        "planetary-gear": "Planetary gear ratios, torque & assembly validation",
+        "cam-follower": "Cam displacement, velocity & acceleration analysis",
+        "flywheel-design": "Flywheel energy storage, size & centrifugal stress",
+        "concrete-beam-design": "Reinforced concrete beam bending capacity (ACI 318)",
+        "foundation-bearing": "Ultimate & allowable bearing capacity of soils",
+        "transformer-design": "Transformer core area, windings & turns ratio",
+        "motor-efficiency": "3-phase motor load factor, efficiency & CO2 footprint",
+        "heat-exchanger": "Heat exchanger LMTD, thermal power & surface area",
+        "hydraulic-cylinder": "Hydraulic cylinder bore, rod buckling & volume",
+        "sound-meter": "Real-time decibel meter & frequency analyzer",
+        clinometer: "Trigonometric slope & height analyzer using gyroscope",
+        "gps-surveyor": "Real-time GPS coordinates, elevation tracking & digital compass",
+        "hardness-converter": "Metal hardness scales (HB, HRC, HRB, HV) and tensile strength conversions"
+    },
     categories: {
-        'mechanical': '機械',
-        'structural': '構造',
-        'utilities': 'ユーティリティ',
-        'reference': 'リファレンス'
-    } as Record<string, string>,
-
-    // Ribbon Bar
+        mechanical: "機械",
+        structural: "構造",
+        utilities: "ユーティリティ",
+        reference: "リファレンス",
+        science: "科学",
+        software: "ソフトウェア",
+        civil: "土木",
+        finance: "金融",
+        other: "その他"
+    },
     ribbon: {
         theme: "テーマ",
         guide: "ガイド",
@@ -289,9 +530,55 @@ export default {
         groupPaint: "ペイント",
         groupContent: "コンテンツ",
         labelWorkstation: "エンジニアリングワークステーション",
+        groupCanvas: "キャンバス",
+        groupJob: "ジョブ制御",
+        groupOutput: "出力",
+        labelCreativeDesk: "クリエイティブデスク",
+        labelMfgCam: "製造 / CAM ワークスペース",
+        labelFeaSim: "FEA / シミュレーション",
+        labelPen: "ペン",
+        labelMarker: "マーカー",
+        labelEraser: "消しゴム",
+        labelArrow: "矢印",
+        labelRect: "矩形",
+        labelCircle: "円",
+        labelClear: "クリア",
+        labelNote: "メモ",
+        labelVideo: "動画",
+        labelMusic: "音楽",
+        labelImage: "画像",
+        labelExcel: "Excel",
+        labelWord: "Word",
+        labelPpt: "PPT",
+        labelPdf: "PDF",
+        labelStartNesting: "ネスティング開始",
+        labelResetJob: "ジョブをリセット",
+        labelFullReport: "完全レポート",
+        labelExportNc: "NCエクスポート",
+        labelSolverReady: "ソルバー準備完了",
+        labelMatrixSparse: "行列: 疎",
+        labelStrokeColor: "線の色",
+        defaultNote: "📌 新しいメモ",
+        promptYoutubeUrl: "YouTube URLを入力:",
+        confirmClearSketches: "すべてのスケッチを消去しますか？",
+        confirmClearFlow: "フロー作業領域をすべて消去しますか？この操作は元に戻せません。",
+        confirmDeleteWindow: "このウィンドウを閉じますか？",
+        alertSelect2: "拘束するには点または線を2つ以上選択してください。",
+        exportFailed: "エクスポート失敗",
+        dxfExportFailed: "DXFエクスポート失敗",
+        stepExportFailed: "STEPエクスポート失敗",
+        noGeometry: "エクスポートする幾何がありません。先に描画してください。",
+        noExportableGeometry: "エクスポート可能な幾何がありません（線と円のみ）。",
+        stepExportComplete: "STEPエクスポート完了: {count} 個の要素を出力。",
+        importedEntities: "{count} 個の要素を読み込みました。",
+        labelNewNote: "新しいメモ",
+        comingSoon: "近日公開...",
+        handbookPdf: "技術便覧.pdf",
+        newsFeedTitle: "エンジニアリングニュース",
+        newsItem1: "アルミ価格 2%上昇",
+        newsItem2: "新規格 ISO 898-1 発行",
+        newsItem3: "AluCalc V2 公開"
     },
-
-    // Node Palette Categories
     palette: {
         categories: {
             input: "入力と定数",
@@ -303,41 +590,126 @@ export default {
         },
         searchPlaceholder: "ノードを検索..."
     },
-
-    // Engine & Calculator Generic Terms
     calcCommon: {
-        length: { label: "長さ (L)" },
-        width: { label: "幅 (w)" },
-        height: { label: "高さ (h)" },
-        thickness: { label: "厚さ (t)" },
-        radius: { label: "半径 (R)", desc: "内側曲げ半径" },
-        angle: { label: "角度 (θ)" },
-        force: { label: "力 (F)" },
-        torque: { label: "トルク (T)" },
-        pressure: { label: "圧力 (P)" },
-        velocity: { label: "速度 (v)" },
-        diameter: { label: "直径 (d)" },
-        density: { label: "密度 (ρ)" },
-        mass: { label: "質量 (m)" },
-        volume: { label: "体積 (V)" },
-        area: { label: "面積 (A)" },
-        material: { label: "材料の種類" },
-        yieldStrength: { label: "降伏強度 (Sy)" },
-        Sy: { label: "降伏強度 (Sy)" },
-        safetyFactor: { label: "安全率" },
-        SF: { label: "安全率 (SF)" },
-        deflection: { label: "たわみ" },
-        bendingStress: { label: "曲げ応力" },
-        sigmaBending: { label: "曲げ応力 (σb)" },
-        m: { label: "モジュール (m)", desc: "歯車のモジュール" },
-        z1: { label: "小歯車の歯数 (z₁)" },
-        z2: { label: "大歯車の歯数 (z₂)" },
-        alpha: { label: "圧力角 (α)" },
-        b: { label: "歯幅 (b)" },
-        T: { label: "トルク (T)" }
-    } as Record<string, { label?: string, desc?: string }>,
-
-    // General
+        length: {
+            label: "長さ (L)"
+        },
+        width: {
+            label: "幅 (w)"
+        },
+        height: {
+            label: "高さ (h)"
+        },
+        thickness: {
+            label: "厚さ (t)"
+        },
+        radius: {
+            label: "半径 (R)",
+            desc: "内側曲げ半径"
+        },
+        angle: {
+            label: "角度 (θ)"
+        },
+        force: {
+            label: "力 (F)"
+        },
+        torque: {
+            label: "トルク (T)"
+        },
+        pressure: {
+            label: "圧力 (P)"
+        },
+        velocity: {
+            label: "速度 (v)"
+        },
+        diameter: {
+            label: "直径 (d)"
+        },
+        density: {
+            label: "密度 (ρ)"
+        },
+        mass: {
+            label: "質量 (m)"
+        },
+        volume: {
+            label: "体積 (V)"
+        },
+        area: {
+            label: "面積 (A)"
+        },
+        material: {
+            label: "材料の種類"
+        },
+        yieldStrength: {
+            label: "降伏強度 (Sy)"
+        },
+        Sy: {
+            label: "降伏強度 (Sy)"
+        },
+        safetyFactor: {
+            label: "安全率"
+        },
+        SF: {
+            label: "安全率 (SF)"
+        },
+        deflection: {
+            label: "たわみ"
+        },
+        bendingStress: {
+            label: "曲げ応力"
+        },
+        sigmaBending: {
+            label: "曲げ応力 (σb)"
+        },
+        m: {
+            label: "モジュール (m)",
+            desc: "歯車のモジュール"
+        },
+        z1: {
+            label: "小歯車の歯数 (z₁)"
+        },
+        z2: {
+            label: "大歯車の歯数 (z₂)"
+        },
+        alpha: {
+            label: "圧力角 (α)"
+        },
+        b: {
+            label: "歯幅 (b)"
+        },
+        T: {
+            label: "トルク (T)"
+        },
+        d: {
+            label: "直径 (d)"
+        },
+        p: {
+            label: "ピッチ (p)"
+        },
+        k: {
+            label: "頭高さ (k)"
+        },
+        s: {
+            label: "二面幅 (s)"
+        },
+        drill: {
+            label: "ドリル径"
+        },
+        dh: {
+            label: "穴径 (dh)"
+        },
+        ix: {
+            label: "慣性 Ix",
+            desc: "X軸まわりの断面二次モーメント"
+        },
+        iy: {
+            label: "慣性 Iy",
+            desc: "Y軸まわりの断面二次モーメント"
+        },
+        slot: {
+            label: "溝サイズ"
+        }
+    },
     close: "閉じる",
     minimize: "最小化",
     maximize: "最大化",
@@ -346,8 +718,6 @@ export default {
     apply: "適用",
     ok: "OK",
     error: "エラー",
-
-    // Engineering Handbook
     handbook: {
         title: "エンジニアリング知識ベース",
         searchPlaceholder: "知識ベースを検索...",
@@ -376,8 +746,6 @@ export default {
             roughnessDesc: "Ra 値と加工"
         }
     },
-
-    // Project Variables
     variables: {
         title: "プロジェクト変数",
         addVariable: "変数を追加",
@@ -389,9 +757,49 @@ export default {
         placeholderDesc: "オプションの説明...",
         noVariables: "グローバル変数が定義されていません。「変数を追加」をクリックして作成してください。"
     },
-
-    // Terminal
     termPlaceholder: "コマンドを入力... ('help' でヘルプ表示)",
-    termPrefix: "AluCalc ❯"
-
+    termPrefix: "AluCalc ❯",
+    viewFlow: "FLOW",
+    searchResults: "検索結果",
+    categoryOther: "その他",
+    userPro: "AluCalc Professional",
+    shutDown: "シャットダウン",
+    noModulesFound: "モジュールが見つかりません",
+    noModulesHint: "検索語を変更してください。",
+    disciplinesLabel: "分野",
+    languageFr: "フランス語",
+    languageIt: "イタリア語",
+    languagePt: "ポルトガル語",
+    languageRu: "ロシア語",
+    featureTree: "フィーチャツリー",
+    sketches: "スケッチ",
+    bodies: "ボディ",
+    constraints: "拘束",
+    parameters: "パラメータ",
+    noBodies: "ボディはまだありません",
+    dofLabel: "自由度",
+    fullyConstrained: "完全拘束",
+    overConstrained: "過剰拘束",
+    underConstrained: "不足拘束",
+    addBody: "ボディを追加",
+    parametersTitle: "パラメータ",
+    resultsTitle: "結果",
+    fixInputs: "入力を固定",
+    switch2D: "2Dに切替",
+    switch3D: "3Dに切替",
+    quickSelect: "クイック選択",
+    varLabel: "VAR",
+    dbLabel: "DB",
+    selectStandard: "規格を選択...",
+    closeAll: "すべてのアプリを閉じる",
+    feedbackTitle: "連絡とフィードバック",
+    costTitle: "コスト見積",
+    costDesc: "製造コスト内訳",
+    costBom: "材料BOM",
+    costOps: "工程",
+    costOverhead: "間接費 %",
+    costMargin: "利益率 %",
+    costBatch: "ロットサイズ",
+    costTotal: "総コスト",
+    costUnit: "単価"
 } as const;

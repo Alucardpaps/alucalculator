@@ -8,6 +8,8 @@ import { ModuleType } from '@/config/modules';
 import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { ModulePageSeoShell } from '@/components/seo/ModulePageSeoShell';
+import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
+import { RETIRED_MODULE_REDIRECTS } from '@/config/retiredModules';
 
 
 /**
@@ -320,6 +322,22 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
   if (moduleSlug === 'tolerance-stackup') {
     redirect('/fits');
   }
+  if (moduleSlug === '3-phase-power') {
+    redirect('/three-phase-power');
+  }
+  if (moduleSlug === 'simulation-fea') {
+    redirect('/fea');
+  }
+  if (moduleSlug === 'calculators') {
+    redirect('/lite');
+  }
+  if (moduleSlug === 'machine-assembly') {
+    redirect('/workspace');
+  }
+  const retiredTarget = RETIRED_MODULE_REDIRECTS[moduleSlug];
+  if (retiredTarget) {
+    redirect(retiredTarget);
+  }
   const type: ModuleType | null = SLUG_TO_MODULE[moduleSlug] ?? (moduleSlug as ModuleType);
 
   if (!type) return notFound();
@@ -333,6 +351,7 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
       <div className="module-page-frame__body workstation-container-bg-cleanse">
         <WindowContent type={type} />
       </div>
+      <SolverTransparencyDrawer solverId={moduleSlug} />
       <section className="shrink-0 border-t border-white/[0.06] bg-[#0a0c12]" aria-label="Calculation methodology">
         <details className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-white/30 hover:text-white/50 [&::-webkit-details-marker]:hidden">

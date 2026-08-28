@@ -210,7 +210,20 @@ export function FastenerInteractiveSchematic({
                     </defs>
 
                     {/* Background grid */}
-                    <line x1={0} y1={g.cy} x2={490} y2={g.cy} stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" strokeDasharray="5,5" />
+                    <line x1={0} y1={g.cy} x2={490} y2={g.cy} stroke="rgba(255,255,255,0.05)" strokeWidth="0.8" strokeDasharray="5,5" className="solver-dash" />
+                    <g
+                      className="solver-torque"
+                      style={{ transformOrigin: `${g.x0 + g.dk / 2}px ${g.cy}px`, transformBox: 'view-box' }}
+                    >
+                      <path
+                        d={`M ${g.x0 + g.dk + 6} ${g.cy - g.dk * 0.55} A ${g.dk * 0.85} ${g.dk * 0.85} 0 0 1 ${g.x0 + g.dk + 8} ${g.cy + g.dk * 0.2}`}
+                        fill="none"
+                        stroke={heat}
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        opacity="0.85"
+                      />
+                    </g>
 
                     {/* CLAMPED PLATES (INTERACTIVE) */}
                     <g 

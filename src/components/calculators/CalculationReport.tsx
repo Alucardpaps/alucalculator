@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { PDFReportEngine } from '@/lib/pdfReportEngine';
+import { useLicenseStore } from '@/store/licenseStore';
 
 // Lazy load MathJax for performance
 const MathJaxNode: React.ComponentType<any> = dynamic(() => import('react-mathjax2').then(mod => (mod as any).default.Node || (mod as any).Node), { 
@@ -41,6 +42,9 @@ export const CalculationReport: React.FC<CalculationReportProps> = ({
     };
 
     const handleDownloadPDF = async () => {
+        const canProceed = useLicenseStore.getState().guardFeature('pdf');
+        if (!canProceed) return;
+
         const meta = {
             title: schema.metadata.title,
             preparedBy: "AluCalc OS Engineer",

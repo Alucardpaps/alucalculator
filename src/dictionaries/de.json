@@ -9,7 +9,14 @@
     "handbook": "Ingenieur-Handbuch",
     "library": "Modulbibliothek",
     "available": "Module verfügbar",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "Mechanik",
+    "civil": "Bauwesen",
+    "electrical": "Elektrotechnik",
+    "science": "Naturwissenschaft",
+    "finance": "Finanzen",
+    "software": "Software",
+    "other": "Sonstiges"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "Handbuch",
       "desc": "Lagertabellen, ISO-Toleranzen, G-Code."
+    },
+    "thermalExpansion": {
+      "title": "Wärmedehnung",
+      "desc": "Dimensionsstabilitätsanalyse"
+    },
+    "manufacturingSandbox": {
+      "title": "Fertigungssimulator",
+      "desc": "Virtuelle Fertigungslinie"
+    },
+    "simulationFea": {
+      "title": "FEA-Simulation",
+      "desc": "Spannung & Verformung"
+    },
+    "analytics": {
+      "title": "Analyse-Dashboard",
+      "desc": "Systemleistungsdaten"
+    },
+    "fileExplorer": {
+      "title": "Datei-Explorer",
+      "desc": "OS-Dateisystem"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "desc": "Befehlszeilenschnittstelle"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "desc": "Systemkonfiguration"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "Übersetzung",
       "pitchDiameter": "Teilkreisdurchmesser",
       "forcesAndStress": "Kräfte & Spannung"
+    },
+    "outputs": {
+      "tipDia": "Kopfkreisdurchmesser",
+      "rootDia": "Fußkreisdurchmesser"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "Schnittbreite",
     "trimStart": "Anschnitt",
     "trimEnd": "Abschnitt"
+  },
+  "beam-deflection": {
+    "title": "Balkendurchbiegung",
+    "desc": "Durchbiegung und Spannung berechnen"
+  },
+  "concrete-reinforcement": {
+    "title": "Betonbewehrung",
+    "desc": "Bewehrungsquerschnitt"
+  },
+  "ohms-law": {
+    "title": "Ohmsches Gesetz",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "Spannungsabfall",
+    "desc": "Kabeldimensionierung"
+  },
+  "periodic-table": {
+    "title": "Periodensystem",
+    "desc": "Chemische Elemente"
+  },
+  "calculator": {
+    "title": "Wissenschaftlicher Rechner",
+    "desc": "Höhere Mathematik"
+  },
+  "vat-calculator": {
+    "title": "MwSt-Rechner",
+    "desc": "Steuerberechnung"
+  },
+  "excel-helper": {
+    "title": "Excel-Helfer",
+    "desc": "Formelerzeuger"
+  },
+  "json-formatter": {
+    "title": "JSON-Formatierer",
+    "desc": "JSON verschönern"
+  },
+  "regex-tester": {
+    "title": "Regex-Tester",
+    "desc": "Muster testen"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "desc": "Senden Sie uns Ihre Meinung"
+  },
+  "thermal": {
+    "initialLength": "Ausgangslänge",
+    "tempDelta": "Temperaturdifferenz",
+    "finalLength": "Endlänge",
+    "expansion": "Dehnungsbetrag",
+    "strain": "Dehnung"
   }
 }

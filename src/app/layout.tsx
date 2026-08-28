@@ -6,7 +6,6 @@ import { GoogleAnalytics } from "@/components/os/GoogleAnalytics";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { AICopilotOverlay } from "@/components/copilot/AICopilotOverlay";
-import { AegisFloatingWidget } from "@/components/copilot/AegisFloatingWidget";
 import { AmbientBackground } from "@/components/ui/AmbientBackground";
 import { ThemeSettingsProvider } from "@/components/os/ThemeSettingsProvider";
 import { SiteChrome } from "@/components/layout/SiteChrome";
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
     },
     description: "AluCalc OS is a deterministic engineering engine for mechanical designers. Design, calculate, and build inside a single browser environment. Featuring 3D assembly workspace, 100+ engineering calculators, and real-time BOM generation.",
     applicationName: "AluCalc OS",
-    authors: [{ name: "Alucard", url: "https://www.alucalculator.com" }],
+    authors: [{ name: "AluCalc OS", url: "https://www.alucalculator.com" }],
     keywords: [
         "engineering calculator", "mechanical analysis", "aluminum profile",
         "3D assembly", "bill of materials", "BOM generator",
@@ -73,6 +72,9 @@ export const metadata: Metadata = {
     },
 };
 
+import { UpgradeModal } from "@/components/license/UpgradeModal";
+import { AluShareIntegration } from "@/share/components/AluShareIntegration";
+
 export default function RootLayout({
     children,
 }: {
@@ -95,14 +97,15 @@ export default function RootLayout({
                     </ErrorBoundary>
                 </AuthProvider>
 
-                {/* Omnipresent Agentic Copilot Overlay & Floating Mascot */}
-                <AICopilotOverlay />
-                <AegisFloatingWidget />
+                {/* AluShare v1 URL Hash Listener & Feedback Engine */}
+                <AluShareIntegration />
 
-                {/* System Version Badge */}
-                <div className="hidden sm:block fixed bottom-2 right-2 z-[9999] bg-black/60 text-white/50 px-2 py-1 text-[10px] font-mono rounded pointer-events-none select-none backdrop-blur-sm border border-white/5">
-                    v5.0.0 — BUILD {process.env.NEXT_PUBLIC_BUILD_TIMESTAMP?.split('T')[0] || 'DEV'}
-                </div>
+                {/* Omnipresent Agentic Copilot Overlay */}
+                <AICopilotOverlay />
+
+                {/* Global License Upgrade Guard Modal */}
+                <UpgradeModal />
+
             </body>
         </html>
     );

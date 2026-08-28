@@ -9,7 +9,14 @@
     "handbook": "技術便覧",
     "library": "モジュールライブラリ",
     "available": "利用可能モジュール",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "機械",
+    "civil": "土木",
+    "electrical": "電気",
+    "science": "科学",
+    "finance": "金融",
+    "software": "ソフトウェア",
+    "other": "その他"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "便覧",
       "desc": "軸受表、公差、Gコード他"
+    },
+    "thermalExpansion": {
+      "title": "熱膨張",
+      "desc": "寸法安定性解析"
+    },
+    "manufacturingSandbox": {
+      "title": "製造サンドボックス",
+      "desc": "仮想生産ライン"
+    },
+    "simulationFea": {
+      "title": "FEAシミュレーション",
+      "desc": "応力と変形"
+    },
+    "analytics": {
+      "title": "分析ダッシュボード",
+      "desc": "システム性能データ"
+    },
+    "fileExplorer": {
+      "title": "ファイルエクスプローラー",
+      "desc": "OSファイルシステム"
+    },
+    "terminal": {
+      "title": "ターミナル",
+      "desc": "コマンドラインインターフェイス"
+    },
+    "settings": {
+      "title": "設定",
+      "desc": "システム設定"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "減速比",
       "pitchDiameter": "基準円直径",
       "forcesAndStress": "荷重と応力"
+    },
+    "outputs": {
+      "tipDia": "歯先円直径",
+      "rootDia": "歯底円直径"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "切り幅",
     "trimStart": "端切り（始）",
     "trimEnd": "端切り（終）"
+  },
+  "beam-deflection": {
+    "title": "梁のたわみ",
+    "desc": "たわみと応力を計算"
+  },
+  "concrete-reinforcement": {
+    "title": "コンクリート鉄筋",
+    "desc": "鉄筋断面積"
+  },
+  "ohms-law": {
+    "title": "オームの法則",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "電圧降下",
+    "desc": "ケーブルサイジング"
+  },
+  "periodic-table": {
+    "title": "周期表",
+    "desc": "化学元素"
+  },
+  "calculator": {
+    "title": "関数電卓",
+    "desc": "高度な数学"
+  },
+  "vat-calculator": {
+    "title": "消費税計算機",
+    "desc": "税額計算"
+  },
+  "excel-helper": {
+    "title": "Excelヘルパー",
+    "desc": "数式ジェネレーター"
+  },
+  "json-formatter": {
+    "title": "JSONフォーマッター",
+    "desc": "JSONを整形"
+  },
+  "regex-tester": {
+    "title": "正規表現テスター",
+    "desc": "パターンをテスト"
+  },
+  "feedback": {
+    "title": "フィードバック",
+    "desc": "ご意見をお送りください"
+  },
+  "thermal": {
+    "initialLength": "初期長さ",
+    "tempDelta": "温度差",
+    "finalLength": "最終長さ",
+    "expansion": "膨張量",
+    "strain": "ひずみ"
   }
 }

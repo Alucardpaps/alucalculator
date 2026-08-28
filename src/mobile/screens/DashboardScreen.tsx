@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Star, History, Zap, CircleDot, Layers, Ruler } from 'lucide-react';
-import { MODULE_REGISTRY, ModuleType, getModuleIcon } from '@/config/modules';
+import { ChevronRight, Star, History } from 'lucide-react';
+import { MODULE_REGISTRY, ModuleType } from '@/config/modules';
+import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
 import type { MobileStrings } from '@/locales/mobileTranslations';
 import { SkeletonGrid } from '@/mobile/components/SkeletonLoader';
 import { getAllCalcHistories, listenCalcHistoryUpdates } from '@/mobile/services/calcHistoryService';
 import type { UnifiedCalcEntry } from '@/mobile/services/calcHistoryService';
 
-const POPULAR = [
-  { slug: 'bolt-torque' as ModuleType, icon: Zap, color: 'bg-orange-500/10 border-orange-500/20 text-orange-400' },
-  { slug: 'bearings' as ModuleType, icon: CircleDot, color: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
-  { slug: 'beam-deflection' as ModuleType, icon: Layers, color: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' },
-  { slug: 'profile-weight' as ModuleType, icon: Ruler, color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
+const POPULAR: { slug: ModuleType; color: string }[] = [
+  { slug: 'bolt-torque', color: 'border-amber-500/30 bg-amber-950/20 text-amber-300' },
+  { slug: 'bearings', color: 'border-cyan-500/30 bg-cyan-950/20 text-cyan-300' },
+  { slug: 'beam-deflection', color: 'border-indigo-500/30 bg-indigo-950/20 text-indigo-300' },
+  { slug: 'profile-weight', color: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300' },
 ];
 
 type Props = {
@@ -42,6 +43,7 @@ export function DashboardScreen({
   isLoading,
 }: Props) {
   const [calcHistories, setCalcHistories] = useState<UnifiedCalcEntry[]>([]);
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   useEffect(() => {
     const refresh = () => setCalcHistories(getAllCalcHistories().slice(0, 5));
@@ -83,18 +85,24 @@ export function DashboardScreen({
       </div>
 
       <div>
-        <h3 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3">{m.quickActions}</h3>
+        <h3 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3">{m.quickActions || 'QUICK ACTIONS'}</h3>
         <div className="grid grid-cols-2 gap-3">
           {POPULAR.map((pop) => {
-            const DynamicIcon = pop.icon;
+            const isHovered = hoveredSlug === pop.slug;
             return (
               <button
                 key={pop.slug}
                 onClick={() => onLaunch(pop.slug)}
-                className={`flex items-center gap-3 p-4 rounded-xl border bg-slate-900/30 text-left transition-all active:scale-95 ${pop.color}`}
+                onMouseEnter={() => setHoveredSlug(pop.slug)}
+                onMouseLeave={() => setHoveredSlug(null)}
+                className={`flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-all active:scale-95 ${pop.color}`}
               >
-                <div className="p-2 rounded-lg bg-black/40">
-                  <DynamicIcon size={18} />
+                <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                  <SidebarAnimatedIcon
+                    id={pop.slug}
+                    size={22}
+                    isHovered={isHovered}
+                  />
                 </div>
                 <span className="font-bold text-xs leading-snug">{getModuleTitle(pop.slug)}</span>
               </button>
@@ -106,24 +114,30 @@ export function DashboardScreen({
       {favoriteModules.length > 0 && (
         <div>
           <h3 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
-            <Star size={12} className="text-amber-400" /> {m.favorites}
+            <Star size={12} className="text-amber-400" /> {m.favorites || 'FAVORITES'}
           </h3>
           <div className="space-y-2">
             {favoriteModules.slice(0, 6).map((slug) => {
               const mod = MODULE_REGISTRY[slug];
               if (!mod) return null;
-              const IconNode = getModuleIcon(mod.iconName);
+              const isHovered = hoveredSlug === slug;
               return (
                 <button
                   key={slug}
                   onClick={() => onLaunch(slug)}
-                  className="w-full flex items-center justify-between p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl"
+                  onMouseEnter={() => setHoveredSlug(slug)}
+                  onMouseLeave={() => setHoveredSlug(null)}
+                  className="w-full flex items-center justify-between p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl active:scale-98 transition-transform"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-                      <IconNode size={16} />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                      <SidebarAnimatedIcon
+                        id={slug}
+                        size={20}
+                        isHovered={isHovered}
+                      />
                     </div>
-                    <span className="font-bold text-xs text-slate-200">{getModuleTitle(slug)}</span>
+                    <span className="font-bold text-xs text-slate-200 truncate">{getModuleTitle(slug)}</span>
                   </div>
                   <ChevronRight size={14} className="text-slate-600" />
                 </button>
@@ -142,18 +156,24 @@ export function DashboardScreen({
             recentModules.map((slug) => {
               const mod = MODULE_REGISTRY[slug];
               if (!mod) return null;
-              const IconNode = getModuleIcon(mod.iconName);
+              const isHovered = hoveredSlug === slug;
               return (
                 <button
                   key={slug}
                   onClick={() => onLaunch(slug)}
-                  className="w-full flex items-center justify-between p-3 bg-slate-950/20 border border-white/5 rounded-xl hover:border-cyan-500/30"
+                  onMouseEnter={() => setHoveredSlug(slug)}
+                  onMouseLeave={() => setHoveredSlug(null)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-950/30 border border-white/5 rounded-xl hover:border-cyan-500/30 active:scale-98 transition-transform"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
-                      <IconNode size={16} />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                      <SidebarAnimatedIcon
+                        id={slug}
+                        size={20}
+                        isHovered={isHovered}
+                      />
                     </div>
-                    <span className="font-bold text-xs text-slate-200">{getModuleTitle(slug)}</span>
+                    <span className="font-bold text-xs text-slate-200 truncate">{getModuleTitle(slug)}</span>
                   </div>
                   <ChevronRight size={14} className="text-slate-600" />
                 </button>
@@ -166,32 +186,26 @@ export function DashboardScreen({
       {calcHistories.length > 0 && (
         <div>
           <h3 className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
-            <History size={12} /> {m.calcHistory}
+            <History size={12} className="text-cyan-400" /> {m.recentSolvers}
           </h3>
           <div className="space-y-2">
-            {calcHistories.map((entry, i) => (
-              <button
-                key={`${entry.calcId}-${entry.timestamp}-${i}`}
-                onClick={() => {
-                  const mod = Object.values(MODULE_REGISTRY).find(
-                    (m) => m.type === entry.calcId || m.type.includes(entry.calcId),
-                  );
-                  if (mod) onLaunch(mod.type);
-                }}
-                className="w-full p-3 bg-slate-950/20 border border-white/5 rounded-xl text-left"
+            {calcHistories.map((entry, idx) => (
+              <div
+                key={`${entry.calcId}-${entry.timestamp}-${idx}`}
+                className="p-3 bg-slate-950/20 border border-white/5 rounded-xl flex items-center justify-between text-xs"
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-xs text-slate-200">{entry.calcId}</span>
-                  <span className="text-[9px] font-mono text-slate-600">
+                <div className="min-w-0">
+                  <span className="font-bold text-white block truncate">{getModuleTitle(entry.calcId)}</span>
+                  <span className="text-[10px] text-slate-500 font-mono">
                     {new Date(entry.timestamp).toLocaleDateString()}
                   </span>
                 </div>
-                {entry.result != null && (
-                  <span className="text-[10px] text-cyan-400 font-mono mt-1 block truncate">
-                    {m.reopenCalc}: {String(entry.result)}
+                {Boolean(entry.result && typeof entry.result === 'object' && 'status' in (entry.result as Record<string, unknown>)) && (
+                  <span className="font-mono text-cyan-300 font-bold ml-2 shrink-0">
+                    {String((entry.result as Record<string, unknown>).status)}
                   </span>
                 )}
-              </button>
+              </div>
             ))}
           </div>
         </div>
@@ -199,3 +213,5 @@ export function DashboardScreen({
     </motion.div>
   );
 }
+
+export default DashboardScreen;

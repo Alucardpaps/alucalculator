@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Trash2, Download, Calculator, BarChart3, Scissors, Save, Layers } from 'lucide-react';
 import { calculateNesting, NestingResult, CutItem } from '@/utils/nestingAlgorithm';
 import { MetalShape } from '@/hooks/useWeightCalculator';
+import { useLicenseStore } from '@/store/licenseStore';
 
 interface ProjectItem {
     id: string;
@@ -65,6 +66,9 @@ export const ProjectManager = ({ items, setItems, unitPrice, currency, lang, dic
     };
 
     const exportPDF = async () => {
+        const allowed = useLicenseStore.getState().guardFeature('pdf');
+        if (!allowed) return;
+
         const jsPDF = (await import('jspdf')).default;
         const autoTable = (await import('jspdf-autotable')).default;
         const doc = new jsPDF();

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Check, Minus } from 'lucide-react';
 import { useLicenseStore } from '@/store/licenseStore';
 import { TOTAL_CALCULATORS_LABEL } from '@/config/modules';
+import { useI18nStore } from '@/store/i18nStore';
+import { getAppPages } from '@/locales/appPagesTranslations';
 
 const PLANS = [
   {
@@ -30,7 +32,7 @@ const PLANS = [
     cta: 'Upgrade to Pro',
     featured: true,
     items: [
-      'Unlimited DXF / STEP / PDF',
+      'Unlimited STEP / DXF / STL / PDF',
       'Unwatermarked client PDFs',
       'Unlimited nesting & cut optimizer',
       'Local project BOM + priority support',
@@ -72,8 +74,9 @@ const MATRIX: { feature: string; free: boolean; pro: boolean; team: boolean; ent
   { feature: 'Alloy-true density & materials DB', free: true, pro: true, team: true, enterprise: true },
   { feature: 'PDF engineering reports', free: true, pro: true, team: true, enterprise: true },
   { feature: 'Unwatermarked client-ready PDFs', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'DXF manufacturing export', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'STEP 3D CAD export', free: false, pro: true, team: true, enterprise: true },
+  { feature: 'DXF manufacturing export (1:1 mm)', free: false, pro: true, team: true, enterprise: true },
+  { feature: 'STL 3D mesh export (High-res binary)', free: false, pro: true, team: true, enterprise: true },
+  { feature: 'STEP 3D B-Rep export (STABLE ISO 10303)', free: false, pro: true, team: true, enterprise: true },
   { feature: 'Unlimited nesting & cutting optimizer', free: false, pro: true, team: true, enterprise: true },
   { feature: 'AI engineering copilot (daily quota)', free: true, pro: true, team: true, enterprise: true },
   { feature: 'Higher AI quota (Pro+)', free: false, pro: true, team: true, enterprise: true },
@@ -83,29 +86,29 @@ const MATRIX: { feature: string; free: boolean; pro: boolean; team: boolean; ent
   { feature: 'Priority email support', free: false, pro: true, team: true, enterprise: true },
 ];
 
-function Cell({ ok }: { ok: boolean }) {
+function Cell({ ok, available, notAvailable }: { ok: boolean; available: string; notAvailable: string }) {
   return ok ? (
     <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold">
-      <Check size={13} /> Available
+      <Check size={13} /> {available}
     </span>
   ) : (
     <span className="inline-flex items-center gap-1 text-slate-500 text-xs">
-      <Minus size={13} /> Not available
+      <Minus size={13} /> {notAvailable}
     </span>
   );
 }
 
 export function PricingClient() {
   const plan = useLicenseStore((s) => s.plan);
+  const language = useI18nStore((s) => s.language);
+  const t = getAppPages(language).pricing;
 
   return (
     <main className="work-shell max-w-6xl mx-auto px-4 sm:px-6 py-10">
       <header className="mb-10 max-w-2xl">
-        <p className="work-kicker">Pricing</p>
-        <h1 className="work-title">Free, Pro, Team, Enterprise</h1>
-        <p className="work-lead">
-          Core engineering math stays free. Manufacturing exports, unwatermarked PDFs, and bulk API unlock on paid plans.
-        </p>
+        <p className="work-kicker">{t.kicker}</p>
+        <h1 className="work-title">{t.title}</h1>
+        <p className="work-lead">{t.lead}</p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-12">
@@ -118,7 +121,7 @@ export function PricingClient() {
               <h2 className="text-lg font-black text-white">{p.name}</h2>
               {p.featured && (
                 <span className="text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#6b9fff] text-black px-2 py-0.5">
-                  Most popular
+                  {t.mostPopular}
                 </span>
               )}
             </div>
@@ -140,8 +143,13 @@ export function PricingClient() {
               href={p.id === 'free' ? '/license/' : '/sales/'}
               className={p.featured ? 'work-btn-primary text-center' : 'work-btn text-center'}
             >
-              {plan === p.id ? 'Current plan' : p.cta}
+              {plan === p.id ? t.currentPlan : p.cta}
             </Link>
+            {p.id === 'pro' && plan === 'free' && (
+              <Link href="/license/" className="text-[11px] text-center text-slate-400 hover:text-cyan-300 mt-2 font-mono">
+                {t.haveKey}
+              </Link>
+            )}
           </article>
         ))}
       </div>
@@ -150,7 +158,7 @@ export function PricingClient() {
         <table className="w-full text-left text-[12px]">
           <thead>
             <tr className="text-slate-400 border-b border-white/10">
-              <th className="py-2 pr-3 font-semibold">Feature</th>
+              <th className="py-2 pr-3 font-semibold">{t.feature}</th>
               <th className="py-2 px-2">Free</th>
               <th className="py-2 px-2">Pro</th>
               <th className="py-2 px-2">Team</th>
@@ -161,10 +169,10 @@ export function PricingClient() {
             {MATRIX.map((row) => (
               <tr key={row.feature} className="border-b border-white/5">
                 <td className="py-2.5 pr-3 text-slate-200">{row.feature}</td>
-                <td className="py-2.5 px-2"><Cell ok={row.free} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.pro} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.team} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.enterprise} /></td>
+                <td className="py-2.5 px-2"><Cell ok={row.free} available={t.available} notAvailable={t.notAvailable} /></td>
+                <td className="py-2.5 px-2"><Cell ok={row.pro} available={t.available} notAvailable={t.notAvailable} /></td>
+                <td className="py-2.5 px-2"><Cell ok={row.team} available={t.available} notAvailable={t.notAvailable} /></td>
+                <td className="py-2.5 px-2"><Cell ok={row.enterprise} available={t.available} notAvailable={t.notAvailable} /></td>
               </tr>
             ))}
           </tbody>
@@ -173,16 +181,16 @@ export function PricingClient() {
 
       <section className="grid gap-4 md:grid-cols-2 mb-8">
         <div className="work-card">
-          <h2 className="text-sm font-bold text-white mb-2">Static-export safe licensing</h2>
+          <h2 className="text-sm font-bold text-white mb-2">{t.licensingTitle}</h2>
           <p className="text-[13px] text-slate-400 leading-relaxed">
-            Pay via Stripe / Lemon Squeezy / invoice. License keys verify on-device — works offline on the shop floor.{' '}
-            Activate at <Link href="/license/" className="text-[#9bbdff] underline">/license</Link>.
+            {t.licensingBody}{' '}
+            <Link href="/license/" className="text-[#9bbdff] underline">/license</Link>.
           </p>
         </div>
         <div className="work-card">
-          <h2 className="text-sm font-bold text-white mb-2">Enterprise & API</h2>
+          <h2 className="text-sm font-bold text-white mb-2">{t.enterpriseTitle}</h2>
           <p className="text-[13px] text-slate-400 leading-relaxed mb-3">
-            OEMs, factories, universities: Bulk API, multi-seat keys, and contracted support. SSO/SLA are not self-serve — planned with sales.
+            {t.enterpriseBody}
           </p>
           <a className="work-btn-primary inline-flex" href="mailto:sales@alucalculator.com?subject=AluCalc%20Enterprise">
             sales@alucalculator.com →
@@ -191,8 +199,7 @@ export function PricingClient() {
       </section>
 
       <p className="text-[11px] text-slate-500 leading-relaxed">
-        Prices may exclude VAT. Annual billing recommended. 14-day satisfaction guarantee on digital licenses.
-        Engineering results are decision-support tools. Always verify critical designs against applicable codes and professional judgment.
+        {t.legal}
       </p>
     </main>
   );

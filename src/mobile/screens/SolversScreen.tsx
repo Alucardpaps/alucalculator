@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { MODULE_REGISTRY, ModuleType, getModuleIcon } from '@/config/modules';
+import { MODULE_REGISTRY, ModuleType } from '@/config/modules';
+import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
 import type { MobileStrings } from '@/locales/mobileTranslations';
 import { getLitePage, type LiteCategoryKey } from '@/locales/liteTranslations';
 import type { Language } from '@/store/i18nStore';
@@ -42,6 +43,7 @@ export function SolversScreen({
   isLoading,
 }: Props) {
   const tLite = getLitePage(language);
+  const [hoveredType, setHoveredType] = useState<string | null>(null);
 
   const filteredModules = useMemo(() => {
     const list = Object.values(MODULE_REGISTRY).filter((mod) => !EXCLUDED.has(mod.type));
@@ -68,19 +70,23 @@ export function SolversScreen({
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 space-y-6">
       <div className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-900/60" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-500/60" />
           <input
             type="text"
             placeholder={m.searchSolvers}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-slate-950/40 border border-cyan-900/30 rounded-xl pl-10 pr-4 py-3 text-sm font-medium outline-none focus:border-cyan-500/70 text-white placeholder:text-cyan-900/50"
+            className="w-full bg-slate-950/40 border border-cyan-900/30 rounded-xl pl-10 pr-4 py-3 text-sm font-medium outline-none focus:border-cyan-500/70 text-white placeholder:text-slate-500"
           />
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar -mx-4 px-4">
           <button
             onClick={() => onCategoryChange('all')}
-            className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase border shrink-0 ${selectedCategory === 'all' ? 'bg-cyan-50 border-cyan-500 text-black' : 'bg-slate-950/40 border-cyan-950/30 text-cyan-50/50'}`}
+            className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase border shrink-0 transition-all ${
+              selectedCategory === 'all'
+                ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                : 'bg-slate-950/40 border-white/5 text-slate-400 hover:text-white'
+            }`}
           >
             {m.allCategories}
           </button>
@@ -88,7 +94,11 @@ export function SolversScreen({
             <button
               key={cat}
               onClick={() => onCategoryChange(cat)}
-              className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase border shrink-0 ${selectedCategory === cat ? 'bg-cyan-50 border-cyan-500 text-black' : 'bg-slate-950/40 border-cyan-950/30 text-cyan-50/50'}`}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase border shrink-0 transition-all ${
+                selectedCategory === cat
+                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                  : 'bg-slate-950/40 border-white/5 text-slate-400 hover:text-white'
+              }`}
             >
               {tLite.categories[cat] || cat}
             </button>
@@ -97,21 +107,30 @@ export function SolversScreen({
       </div>
       <div className="grid grid-cols-2 gap-3 pb-8">
         {filteredModules.length === 0 ? (
-          <div className="col-span-2 text-center py-20 text-slate-500 text-xs">{tLite.emptyState}</div>
+          <div className="col-span-2 text-center py-20 text-slate-500 text-xs font-mono">{tLite.emptyState}</div>
         ) : (
           filteredModules.map((mod) => {
-            const IconNode = getModuleIcon(mod.iconName);
+            const isHovered = hoveredType === mod.type;
             return (
               <button
                 key={mod.type}
                 onClick={() => onLaunch(mod.type)}
-                className="flex flex-col items-start p-4 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 text-left active:bg-slate-900/40"
+                onMouseEnter={() => setHoveredType(mod.type)}
+                onMouseLeave={() => setHoveredType(null)}
+                className="flex flex-col items-start p-3.5 bg-slate-950/40 border border-white/10 rounded-2xl hover:border-cyan-500/40 text-left active:scale-98 transition-all group"
               >
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/5 text-cyan-400 flex items-center justify-center border border-cyan-500/10 mb-3">
-                  <IconNode size={16} />
+                <div className="w-8 h-8 flex items-center justify-center mb-2.5">
+                  <SidebarAnimatedIcon
+                    id={mod.type}
+                    size={24}
+                    isHovered={isHovered}
+                  />
                 </div>
-                <span className="font-bold text-xs text-white line-clamp-2 leading-tight">
+                <span className="font-bold text-xs text-white line-clamp-2 leading-tight group-hover:text-cyan-300 transition-colors">
                   {getModuleTitle(mod.type)}
+                </span>
+                <span className="text-[9px] font-mono text-slate-500 uppercase mt-1">
+                  {mod.category}
                 </span>
               </button>
             );
@@ -121,3 +140,5 @@ export function SolversScreen({
     </motion.div>
   );
 }
+
+export default SolversScreen;

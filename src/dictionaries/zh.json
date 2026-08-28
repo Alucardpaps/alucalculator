@@ -9,7 +9,14 @@
     "handbook": "工程师手册",
     "library": "模块库",
     "available": "可用模块",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "机械",
+    "civil": "土木",
+    "electrical": "电气",
+    "science": "科学",
+    "finance": "金融",
+    "software": "软件",
+    "other": "其他"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "工程师手册",
       "desc": "轴承表、公差、G代码。"
+    },
+    "thermalExpansion": {
+      "title": "热膨胀",
+      "desc": "尺寸稳定性分析"
+    },
+    "manufacturingSandbox": {
+      "title": "制造沙盒",
+      "desc": "虚拟产线"
+    },
+    "simulationFea": {
+      "title": "FEA 仿真",
+      "desc": "应力与变形"
+    },
+    "analytics": {
+      "title": "分析仪表板",
+      "desc": "系统性能数据"
+    },
+    "fileExplorer": {
+      "title": "文件资源管理器",
+      "desc": "操作系统文件系统"
+    },
+    "terminal": {
+      "title": "终端",
+      "desc": "命令行界面"
+    },
+    "settings": {
+      "title": "设置",
+      "desc": "系统配置"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "传动比",
       "pitchDiameter": "分度圆直径",
       "forcesAndStress": "受力与应力"
+    },
+    "outputs": {
+      "tipDia": "齿顶圆直径",
+      "rootDia": "齿根圆直径"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "锯缝宽度",
     "trimStart": "端头切除",
     "trimEnd": "端尾切除"
+  },
+  "beam-deflection": {
+    "title": "梁挠度",
+    "desc": "计算挠度与应力"
+  },
+  "concrete-reinforcement": {
+    "title": "混凝土配筋",
+    "desc": "配筋面积"
+  },
+  "ohms-law": {
+    "title": "欧姆定律",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "电压降",
+    "desc": "电缆选型"
+  },
+  "periodic-table": {
+    "title": "元素周期表",
+    "desc": "化学元素"
+  },
+  "calculator": {
+    "title": "科学计算器",
+    "desc": "高等数学"
+  },
+  "vat-calculator": {
+    "title": "增值税计算器",
+    "desc": "税额计算"
+  },
+  "excel-helper": {
+    "title": "Excel 助手",
+    "desc": "公式生成器"
+  },
+  "json-formatter": {
+    "title": "JSON 格式化",
+    "desc": "美化 JSON"
+  },
+  "regex-tester": {
+    "title": "正则测试器",
+    "desc": "测试模式"
+  },
+  "feedback": {
+    "title": "反馈",
+    "desc": "把您的想法发给我们"
+  },
+  "thermal": {
+    "initialLength": "初始长度",
+    "tempDelta": "温差",
+    "finalLength": "最终长度",
+    "expansion": "膨胀量",
+    "strain": "应变率"
   }
 }

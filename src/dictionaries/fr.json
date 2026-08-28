@@ -9,7 +9,14 @@
     "handbook": "Manuel de l'Ingnieur",
     "library": "Bibliothque Modules",
     "available": "Modules Disponibles",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "Mécanique",
+    "civil": "Génie civil",
+    "electrical": "Électrique",
+    "science": "Sciences",
+    "finance": "Finance",
+    "software": "Logiciel",
+    "other": "Autre"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "Manuel",
       "desc": "Roulements, Tolrances, G-Code."
+    },
+    "thermalExpansion": {
+      "title": "Dilatation thermique",
+      "desc": "Analyse de stabilité dimensionnelle"
+    },
+    "manufacturingSandbox": {
+      "title": "Bac à sable fabrication",
+      "desc": "Ligne de production virtuelle"
+    },
+    "simulationFea": {
+      "title": "Simulation EF",
+      "desc": "Contrainte et déformation"
+    },
+    "analytics": {
+      "title": "Tableau de bord analytique",
+      "desc": "Données de performance système"
+    },
+    "fileExplorer": {
+      "title": "Explorateur de fichiers",
+      "desc": "Système de fichiers OS"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "desc": "Interface en ligne de commande"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "desc": "Configuration système"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "Rapport",
       "pitchDiameter": "Diamtre Primitif",
       "forcesAndStress": "Forces & Contraintes"
+    },
+    "outputs": {
+      "tipDia": "Diamètre de tête",
+      "rootDia": "Diamètre de pied"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "Trait de scie",
     "trimStart": "Coupe dbut",
     "trimEnd": "Coupe fin"
+  },
+  "beam-deflection": {
+    "title": "Flèche de poutre",
+    "desc": "Calculer flèche et contrainte"
+  },
+  "concrete-reinforcement": {
+    "title": "Armature béton",
+    "desc": "Section d’armature"
+  },
+  "ohms-law": {
+    "title": "Loi d’Ohm",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "Chute de tension",
+    "desc": "Dimensionnement des câbles"
+  },
+  "periodic-table": {
+    "title": "Tableau périodique",
+    "desc": "Éléments chimiques"
+  },
+  "calculator": {
+    "title": "Calculatrice scientifique",
+    "desc": "Mathématiques avancées"
+  },
+  "vat-calculator": {
+    "title": "Calculateur de TVA",
+    "desc": "Calcul fiscal"
+  },
+  "excel-helper": {
+    "title": "Assistant Excel",
+    "desc": "Générateur de formules"
+  },
+  "json-formatter": {
+    "title": "Formateur JSON",
+    "desc": "Embellir JSON"
+  },
+  "regex-tester": {
+    "title": "Testeur Regex",
+    "desc": "Tester des motifs"
+  },
+  "feedback": {
+    "title": "Retour",
+    "desc": "Envoyez-nous vos impressions"
+  },
+  "thermal": {
+    "initialLength": "Longueur initiale",
+    "tempDelta": "Écart de température",
+    "finalLength": "Longueur finale",
+    "expansion": "Grandeur de dilatation",
+    "strain": "Déformation unitaire"
   }
 }

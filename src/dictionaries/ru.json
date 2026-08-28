@@ -9,7 +9,14 @@
     "handbook": "Справочник",
     "library": "Библиотека Модулей",
     "available": "Доступно Модулей",
-    "news": "Industry News"
+    "news": "Industry News",
+    "mechanical": "Механика",
+    "civil": "Строительство",
+    "electrical": "Электротехника",
+    "science": "Наука",
+    "finance": "Финансы",
+    "software": "ПО",
+    "other": "Прочее"
   },
   "modules": {
     "aluminum": {
@@ -55,6 +62,34 @@
     "handbook": {
       "title": "Справочник",
       "desc": "Таблицы, Допуски, G-Kод."
+    },
+    "thermalExpansion": {
+      "title": "Тепловое расширение",
+      "desc": "Анализ размерной стабильности"
+    },
+    "manufacturingSandbox": {
+      "title": "Производственный симулятор",
+      "desc": "Виртуальная производственная линия"
+    },
+    "simulationFea": {
+      "title": "FEA-моделирование",
+      "desc": "Напряжения и деформации"
+    },
+    "analytics": {
+      "title": "Аналитическая панель",
+      "desc": "Данные производительности системы"
+    },
+    "fileExplorer": {
+      "title": "Проводник",
+      "desc": "Файловая система ОС"
+    },
+    "terminal": {
+      "title": "Терминал",
+      "desc": "Интерфейс командной строки"
+    },
+    "settings": {
+      "title": "Настройки",
+      "desc": "Конфигурация системы"
     }
   },
   "common": {
@@ -295,6 +330,10 @@
       "transmissionRatio": "Передаточное число",
       "pitchDiameter": "Делительный диаметр",
       "forcesAndStress": "Силы и Напряжения"
+    },
+    "outputs": {
+      "tipDia": "Диаметр вершин",
+      "rootDia": "Диаметр впадин"
     }
   },
   "strength": {
@@ -602,5 +641,56 @@
     "bladeKerf": "Ширина пропила",
     "trimStart": "Обрезка начала",
     "trimEnd": "Обрезка конца"
+  },
+  "beam-deflection": {
+    "title": "Прогиб балки",
+    "desc": "Расчёт прогиба и напряжения"
+  },
+  "concrete-reinforcement": {
+    "title": "Армирование бетона",
+    "desc": "Площадь арматуры"
+  },
+  "ohms-law": {
+    "title": "Закон Ома",
+    "desc": "V = I × R"
+  },
+  "voltage-drop": {
+    "title": "Падение напряжения",
+    "desc": "Подбор сечения кабеля"
+  },
+  "periodic-table": {
+    "title": "Периодическая таблица",
+    "desc": "Химические элементы"
+  },
+  "calculator": {
+    "title": "Научный калькулятор",
+    "desc": "Высшая математика"
+  },
+  "vat-calculator": {
+    "title": "Калькулятор НДС",
+    "desc": "Расчёт налога"
+  },
+  "excel-helper": {
+    "title": "Помощник Excel",
+    "desc": "Генератор формул"
+  },
+  "json-formatter": {
+    "title": "Форматтер JSON",
+    "desc": "Форматирование JSON"
+  },
+  "regex-tester": {
+    "title": "Тестер Regex",
+    "desc": "Проверка шаблонов"
+  },
+  "feedback": {
+    "title": "Обратная связь",
+    "desc": "Пришлите нам ваши мысли"
+  },
+  "thermal": {
+    "initialLength": "Начальная длина",
+    "tempDelta": "Перепад температуры",
+    "finalLength": "Конечная длина",
+    "expansion": "Величина расширения",
+    "strain": "Относительная деформация"
   }
 }

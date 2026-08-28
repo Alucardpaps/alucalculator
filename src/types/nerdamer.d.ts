@@ -2,3 +2,4 @@ declare module 'nerdamer/Algebra';
 declare module 'nerdamer/Calculus';
 declare module 'nerdamer/Solve';
 declare module 'nerdamer/Extra';
+declare module 'occt-import-js';

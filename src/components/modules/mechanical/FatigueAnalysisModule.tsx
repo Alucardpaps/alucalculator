@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity, ShieldAlert, Zap, Layers, Info
 } from 'lucide-react';
-import { HeadlessEngine } from '@/headless-engine/engine';
 import { useI18nStore } from '@/store/i18nStore';
 import { getFatigueModuleStrings } from '@/locales/fatigueModuleTranslations';
 
@@ -23,27 +22,18 @@ export default function FatigueAnalysisModule() {
         k_c: 1.0       // Load factor
     });
 
-    const engine = useMemo(() => new HeadlessEngine(), []);
-    
-    // Evaluate via Headless Engine
     const results = useMemo(() => {
-        const res = engine.execute('fatigue_analysis', inputs);
-        
-        let S_e = 0;
-        let n_goodman = 0;
-        let n_yield = 0;
-        
-        if (res.success) {
-             S_e = res.result['S_e'];
-             n_goodman = res.result['n_Goodman'];
-             n_yield = res.result['n_Yield'];
-        }
-
+        const S_e_prime = 0.5 * inputs.S_ut;
+        const S_e = inputs.k_a * inputs.k_b * inputs.k_c * S_e_prime;
+        const denG = (inputs.sigma_a / Math.max(S_e, 1e-9)) + (inputs.sigma_m / Math.max(inputs.S_ut, 1e-9));
+        const n_goodman = denG > 0 ? 1 / denG : Infinity;
+        const n_yield = (inputs.sigma_a + inputs.sigma_m) > 0
+            ? inputs.S_y / (inputs.sigma_a + inputs.sigma_m)
+            : Infinity;
         const isSafe = n_goodman >= 1.0 && n_yield >= 1.0;
         const criticalVal = Math.min(n_goodman, n_yield);
-
         return { S_e, n_goodman, n_yield, isSafe, criticalVal };
-    }, [inputs, engine]);
+    }, [inputs]);
 
     const activeColor = results.isSafe ? '#10b981' : '#ef4444'; // Emerald for safe, Red for unsafe
 

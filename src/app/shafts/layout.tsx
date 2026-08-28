@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Shaft Analysis & Bearing Reaction Calculator — AluCalc OS',
+  title: 'Shaft Sizing & Bearing Reactions',
   description: 'Calculate shaft bearing reactions, bending moments, and support forces for simply supported shafts under point loads. Includes assembly data-bus linking for multi-module projects.',
   alternates: {
     canonical: 'https://www.alucalculator.com/shafts',

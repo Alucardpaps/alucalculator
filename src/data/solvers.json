@@ -1,0 +1,382 @@
+[
+  {
+    "id": "bolt-torque",
+    "name": "Bolt Torque & Preload",
+    "nameTr": "Cıvata Torku & Ön Yük",
+    "standard": "VDI 2230 / ISO 898-1",
+    "category": "mechanical",
+    "formula": "T = K * Fm * d = ((P / (2*Math.PI)) + (mu_th * d2 / (2 * cos(alpha/2))) + (mu_b * Db / 2)) * Fm",
+    "assumptions": [
+      "Elastik deformasyon bölgesi (%90 Akma sınırı hedeflenir)",
+      "Homojen diş ve oturma yüzeyi sürtünme katsayıları",
+      "Doğrusal sıcaklık ve oturma kaybı kompanzasyonu"
+    ],
+    "limitations": [
+      "Plastik deformasyon ötesi tork-açı sıkmada deneysel kalibrasyon gerekir",
+      "M39 üzeri cıvatalar için özel katsayı tabloları uygulanmalıdır"
+    ],
+    "status": "stable",
+    "route": "/bolt-torque"
+  },
+  {
+    "id": "bearings",
+    "name": "Bearing Life Rating",
+    "nameTr": "Rulman Ömrü Hesabı",
+    "standard": "ISO 281:2007 / ISO 76",
+    "category": "mechanical",
+    "formula": "L10 = (C / P)^p * 10^6 rev, P = X*Fr + Y*Fa",
+    "assumptions": [
+      "Bilyalı rulmanlar için p = 3, makaralı rulmanlar için p = 10/3",
+      "Elastohidrodinamik yağ filmi ve kappa viskozite oranı sağlanır",
+      "İç bilezik dönen, dış bilezik sabit standart çalışma koşulu"
+    ],
+    "limitations": [
+      "Aşırı şok yüklerde ISO 76 statik emniyet (S0) önceliklidir",
+      "Kirlilik faktörü eC ve aISO katsayısı gelişmiş analiz gerektirir"
+    ],
+    "status": "stable",
+    "route": "/bearings"
+  },
+  {
+    "id": "gears",
+    "name": "Cylindrical Gear Strength",
+    "nameTr": "Silindirik Dişli Mukavemeti",
+    "standard": "ISO 6336:2006 (Method B) / DIN 3990",
+    "category": "mechanical",
+    "formula": "sigma_H = ZH * ZE * Zeps * sqrt((Ft/(d1*b)) * ((u+1)/u) * KA * KV * KH)",
+    "assumptions": [
+      "20° standart kavrama açılı evolvent diş profili",
+      "Yeterli yağlama ile aşınma ve yenme (scuffing) önlenmiştir",
+      "Yüzey temas emniyeti SH >= 1.0, dip kırılma emniyeti SF >= 1.4"
+    ],
+    "limitations": [
+      "Helis açısı beta > 30° olan aşırı helis dişliler için özel düzeltme gerekir",
+      "İç dişli mekanizmalarında profil kaydırma katsayısı (x) kavitasyon kontrolü ister"
+    ],
+    "status": "stable",
+    "route": "/gears"
+  },
+  {
+    "id": "planetary-gearbox",
+    "name": "Planetary Gearbox Solver",
+    "nameTr": "Planet Redüktör Kinematiği",
+    "standard": "ISO 6336 / AGMA 6123-B06",
+    "category": "mechanical",
+    "formula": "i = 1 + (z_ring / z_sun)",
+    "assumptions": [
+      "Montajlanabilirlik şartı: (z_sun + z_ring) / N_planets = Tam Sayı",
+      "Yüzen güneş/taşıyıcı geometrisi ile gezegenler arası eşit yük paylaşımı",
+      "Kademe mekanik verimi eta ≈ %97-98"
+    ],
+    "limitations": [
+      "3ten fazla gezegen dişlide yük paylaşım katsayısı (Kgamma) artış gösterir",
+      "Kompakt gövde içi termal ısı dağılımı kontrol edilmelidir"
+    ],
+    "status": "stable",
+    "route": "/planetary-gearbox"
+  },
+  {
+    "id": "chain-drive",
+    "name": "Roller Chain Drive",
+    "nameTr": "Makaralı Zincir Mekanizması",
+    "standard": "ISO 606:2015 / DIN 8187",
+    "category": "mechanical",
+    "formula": "dp = p / sin(180 / z), Lp = 2*Cp + ((z1 + z2)/2) + ((z2 - z1)^2 / (4 * pi^2 * Cp))",
+    "assumptions": [
+      "Tahrik dişlisi diş sayısı z1 >= 17",
+      "Eksenler arası mesafe C ≈ (30-50) * p",
+      "Zincir sarkması %1-2 nominal aralıkta tutulur"
+    ],
+    "limitations": [
+      "Çok yüksek devirlerde (v > 15 m/s) cebri yağlama zorunludur",
+      "Dikey eksenli tahriklerde gergili kızak kullanımı gereklidir"
+    ],
+    "status": "stable",
+    "route": "/chain-drive"
+  },
+  {
+    "id": "belt-drive",
+    "name": "V-Belt & Pulley Drive",
+    "nameTr": "V-Kayış & Kasnak Sistemi",
+    "standard": "ISO 5291 / DIN 2215 / DIN 7753",
+    "category": "mechanical",
+    "formula": "P_corr = P_rated * c1 * c3, Lp = 2*C + 1.57*(d2 + d1) + ((d2 - d1)^2 / (4*C))",
+    "assumptions": [
+      "Küçük kasnak çapı d1 normdaki minimum bükülme limitini aşar",
+      "Sarım açısı theta1 >= 120°",
+      "İlk montaj ön gerilimi statik kaymayı önleyecek seviyededir"
+    ],
+    "limitations": [
+      "Yağlı ve ıslak ortamlarda sürtünme katsayısı düzeltmesi gerekir",
+      "Senkron zamanlama gerektiren yerlerde triger kayış kullanılmalıdır"
+    ],
+    "status": "stable",
+    "route": "/belt-drive"
+  },
+  {
+    "id": "sheet-metal",
+    "name": "Sheet Metal Bend & Flat Pattern",
+    "nameTr": "Sac Büküm & Açınım Hesabı",
+    "standard": "DIN 6935 / ISO 7438",
+    "category": "mechanical",
+    "formula": "BA = (pi/180) * rb * alpha + (pi/180) * K * t * alpha",
+    "assumptions": [
+      "Tarafsız eksen katsayısı K-Factor malzeme ve r/t oranına göre belirlenir",
+      "Hadde yönü büküm eksenine 90° dik varsayılır",
+      "Sabit sac kalınlığı t toleransı norm sınırları içindedir"
+    ],
+    "limitations": [
+      "Hava bükümü ile kalıpta büküm arasında K farkı oluşur",
+      "Çok dar büküm yarıçaplarında (r < 0.5t) çatlama riski kontrol edilmelidir"
+    ],
+    "status": "stable",
+    "route": "/sheet-metal"
+  },
+  {
+    "id": "spring-design",
+    "name": "Helical Compression Spring",
+    "nameTr": "Helisel Basma Yayı Tasarımı",
+    "standard": "DIN 2089 / EN 13906-1",
+    "category": "mechanical",
+    "formula": "k = (G * d^4) / (8 * Dm^3 * na), tau = kw * (8 * F * Dm) / (pi * d^3)",
+    "assumptions": [
+      "Wahl eğrilik gerilme faktörü kw kavisli tel gerilmesini düzeltir",
+      "Aktif sarım sayısı na ve taşlanmış uçlar",
+      "Yay indeksi C = Dm/d ideal aralıkta: 4 <= C <= 12"
+    ],
+    "limitations": [
+      "Serbest boy L0 > 4 Dm durumlarında kılavuz pim olmadan burkulabilir",
+      "Dinamik yorulma uygulamalarında Goodman diyagramı incelenmelidir"
+    ],
+    "status": "stable",
+    "route": "/advanced-spring"
+  },
+  {
+    "id": "shafts",
+    "name": "Shaft Sizing & Reactions",
+    "nameTr": "Mil Boyutlandırma & Burulma-Eğilme",
+    "standard": "DIN 743 / ASME B106.1M",
+    "category": "mechanical",
+    "formula": "sigma_eq = sqrt((32*Mb / (pi*d^3))^2 + 3*(16*T / (pi*d^3))^2) <= Re / SF",
+    "assumptions": [
+      "von Mises eşdeğer gerilme hipotezi",
+      "Kama kanalı ve kademe geçişleri için çentik faktörü Kf uygulanır",
+      "Rijit yatak mesnet tepkileri statik denge denklemleriyle çözülür"
+    ],
+    "limitations": [
+      "Kritik devir hızında modal titreşim analizi şarttır",
+      "İçi boş millerde et kalınlığı oranı din/dout < 0.8 kontrol edilmelidir"
+    ],
+    "status": "stable",
+    "route": "/shafts"
+  },
+  {
+    "id": "beam-deflection",
+    "name": "Beam Deflection & Bending",
+    "nameTr": "Kiriş Sehim & Moment Analizi",
+    "standard": "Euler-Bernoulli Beam Theory / AISC 360",
+    "category": "mechanical",
+    "formula": "v_max = (5 * q * L^4) / (384 * E * I)",
+    "assumptions": [
+      "Euler-Bernoulli ince kiriş kabulü",
+      "Küçük sehim teorisi (v << L)",
+      "Doğrusal elastik, homojen ve izotropik malzeme"
+    ],
+    "limitations": [
+      "Kısa ve yüksek kirişlerde (L/h < 5) Timoshenko kayma etkisi hesaba katılmalıdır",
+      "Büyük sehimlerde geometrik nonlineerite oluşur"
+    ],
+    "status": "stable",
+    "route": "/beam-deflection"
+  },
+  {
+    "id": "fits-tolerances",
+    "name": "ISO Fits & Tolerances",
+    "nameTr": "Toleranslar & Geçmeler",
+    "standard": "ISO 286-1 / ISO 286-2 / DIN 7154",
+    "category": "mechanical",
+    "formula": "i = 0.45 * D^(1/3) + 0.001 * D (um), ITn = 10^((n-1)/5) * i",
+    "assumptions": [
+      "Standart 20°C referans sıcaklığı",
+      "Temel delik (H) veya temel mil (h) sistemi",
+      "Norm çap kademeleri geometrik ortalama D üzerinden hesaplanır"
+    ],
+    "limitations": [
+      "Plastik ve kompozit parçalarda termal genleşme farkı toleransı bozabilir",
+      "Pres geçmelerde montaj kuvveti ve yüzey pürüzlülüğü (Rz) dikkate alınmalıdır"
+    ],
+    "status": "stable",
+    "route": "/fits-tolerances"
+  },
+  {
+    "id": "welding",
+    "name": "Welding & Joint Stress",
+    "nameTr": "Kaynak Mukavemeti & Dikiş Boyutlandırma",
+    "standard": "AWS D1.1 / EN 1993-1-8 (Eurocode 3)",
+    "category": "mechanical",
+    "formula": "sigma_w = sqrt(sigma_perp^2 + 3*(tau_perp^2 + tau_par^2)) <= fu / (beta_w * gamma_M2)",
+    "assumptions": [
+      "Kaynak dikiş boğaz kalınlığı a = 0.707 * bacak boyu s",
+      "Homojen gerilme dağılımı ve dolgu metalinin ana metalle uyumu",
+      "Korelasyon katsayısı beta_w çelik kalitesine göre seçilir"
+    ],
+    "limitations": [
+      "Dinamik yorulma yüklerinde kaynak kökü çentik etkisi incelenmelidir",
+      "Isıdan etkilenen bölgedeki (ITAB/HAZ) sertleşme kontrol edilmelidir"
+    ],
+    "status": "stable",
+    "route": "/welding"
+  },
+  {
+    "id": "profile-weight",
+    "name": "Profile Weight & Mass Sizing",
+    "nameTr": "Profil Ağırlık & Metraj Hesabı",
+    "standard": "EN 573-3 / EN 755 / ASTM B221",
+    "category": "mechanical",
+    "formula": "M = A * L * rho * 1e-6 (kg)",
+    "assumptions": [
+      "Alaşım-doğru yoğunluk (Al 6061 = 2.70 g/cm3, Al 7075 = 2.81 g/cm3, Çelik = 7.85 g/cm3)",
+      "Nominal kesit toleransları EN 755 normuna uygundur",
+      "Düzgün eksenel ekstrüzyon geometrisi"
+    ],
+    "limitations": [
+      "Ekstrüzyon toleranslarından kaynaklanan +-%2-5 kütle varyasyonu olabilir",
+      "Kaplama/eloksal kalınlığı kütleye ihmal edilebilir katkı yapar"
+    ],
+    "status": "stable",
+    "route": "/profile-weight"
+  },
+  {
+    "id": "fluid-dynamics",
+    "name": "Fluid Dynamics & Pipe Friction",
+    "nameTr": "Boru Sürtünme & Hidrolik Kayıplar",
+    "standard": "Darcy-Weisbach / Colebrook-White / ISO 5167",
+    "category": "fluids",
+    "formula": "hf = f * (L/D) * (v^2 / (2*g))",
+    "assumptions": [
+      "Sıkıştırılamaz, sürekli ve tek fazlı akış",
+      "Tam gelişmiş profil (Re kritik = 2300)",
+      "Sabit akışkan viskozitesi ve yoğunluğu"
+    ],
+    "limitations": [
+      "İki fazlı akışlarda ek formülasyon gereklidir",
+      "Aşırı kavitasyon veya su darbesi durumları dinamik analiz ister"
+    ],
+    "status": "stable",
+    "route": "/pipe-friction"
+  },
+  {
+    "id": "pressure-vessel",
+    "name": "ASME Pressure Vessel Shell",
+    "nameTr": "Basınçlı Kap Et Kalınlığı",
+    "standard": "ASME BPVC Section VIII Div 1",
+    "category": "fluids",
+    "formula": "t = (P * R) / (S * E - 0.6 * P) + CA",
+    "assumptions": [
+      "İnce cidarlı kap kabulü: t <= 0.5 R",
+      "Kaynak bağlantı verimi E katsayısı radyografi düzeyine bağlıdır",
+      "Korozyon payı CA et kalınlığına eklenir"
+    ],
+    "limitations": [
+      "Dış basınç altında elastik burkulma için ASME Fig. G tabloları kullanılmalıdır",
+      "Nozül takviye alanları ayrıca hesaplanmalıdır"
+    ],
+    "status": "stable",
+    "route": "/pressure-vessel"
+  },
+  {
+    "id": "heat-sink",
+    "name": "Heat Sink Thermal Resistance",
+    "nameTr": "Soğutucu Termal Direnç Hesabı",
+    "standard": "IEEE / JEDEC Standard 51",
+    "category": "fluids",
+    "formula": "Rth = (Tj - Ta)/Q - Rth_jc - Rth_cs",
+    "assumptions": [
+      "1D doğrusal ısı iletimi ve homojen ısı akısı",
+      "Sabit konveksiyon ısı transfer katsayısı h",
+      "Kanatçık verimi analitik yaklaşımla modellenir"
+    ],
+    "limitations": [
+      "Aşırı dar kanat aralıklarında sınır tabaka çakışması ısı transferini düşürür",
+      "Yüksek ışıma transferi için yüzey eloksal emisyonu (eps ≈ 0.85) doğrulanmalıdır"
+    ],
+    "status": "stable",
+    "route": "/heat-sink"
+  },
+  {
+    "id": "three-phase-power",
+    "name": "3-Phase Electrical Power Workstation",
+    "nameTr": "3 Faz Güç & Akım Hesabı",
+    "standard": "IEC 60038 / IEEE 141",
+    "category": "electrical",
+    "formula": "P = sqrt(3) * VL * IL * cos(phi) * eta",
+    "assumptions": [
+      "Dengeli 3 fazlı yük ve simetrik sinüzoidal gerilim",
+      "Güç faktörü cos(phi) ve motor verimi eta nominal değerlerindedir",
+      "Hat dirençleri fazlar arası eşittir"
+    ],
+    "limitations": [
+      "Harmonik distorsiyon (THD > %5) içeren inverter beslemelerinde düzeltme gerekir",
+      "Dengesiz faz yüklerinde nötr akımı ayrı hesaplanmalıdır"
+    ],
+    "status": "stable",
+    "route": "/three-phase-power"
+  },
+  {
+    "id": "voltage-drop",
+    "name": "Cable Sizing & Voltage Drop",
+    "nameTr": "Kablo Kesiti & Gerilim Düşümü",
+    "standard": "IEC 60364-5-52 / DIN VDE 0298-4",
+    "category": "electrical",
+    "formula": "Delta_U = (b * (rho * (L/S)*cos(phi) + x*L*sin(phi)) * I / Vn) * 100 <= %3",
+    "assumptions": [
+      "İletken özdirenci rho sıcaklığa bağlıdır (Bakır 70°Cde rho = 0.0225 ohm.mm2/m)",
+      "Kablo döşeme tipi katsayıları norm tablolarından alınır",
+      "Maksimum izin verilen gerilim düşümü aydınlatmada <= %3, güçte <= %5"
+    ],
+    "limitations": [
+      "Kısa devre termal dayanımı ayrı bir emniyet kriteridir",
+      "Yüksek akımlı tek damarlı kablolarda endüktif reaktans x hesaba katılmalıdır"
+    ],
+    "status": "stable",
+    "route": "/voltage-drop"
+  },
+  {
+    "id": "concrete-reinforcement",
+    "name": "RC Beam Concrete Reinforcement",
+    "nameTr": "Betonarme Kiriş Donatı Hesabı",
+    "standard": "ACI 318-19 / Eurocode 2 (EN 1992-1-1)",
+    "category": "civil_materials",
+    "formula": "Mn = As * fy * (d - a/2), a = (As * fy) / (0.85 * fc * b)",
+    "assumptions": [
+      "Beton çekme mukavemeti çatlama sonrası ihmal edilir",
+      "Düzlem kesitler deformasyon sonrasında da düzlem kalır",
+      "Çelik akma gerilmesi fy ve beton basınç blok derinliği eşdeğer dikdörtgen kabul edilir"
+    ],
+    "limitations": [
+      "Aşırı donatılı kesitlerde sünek olmayan kırılma riskini önlemek için rho <= rhomax şartı aranır",
+      "Sehim ve çatlak genişliği servis edilebilirlik kontrolü gerektirir"
+    ],
+    "status": "stable",
+    "route": "/concrete-reinforcement"
+  },
+  {
+    "id": "fatigue-analysis",
+    "name": "High Cycle Fatigue Life (Goodman)",
+    "nameTr": "Yorulma Ömrü Analizi (Goodman / S-N)",
+    "standard": "DIN 743 / ASME Boiler Code / Basquin",
+    "category": "mechanical",
+    "formula": "(sigma_a / Se) + (sigma_m / Sut) = 1 / nf",
+    "assumptions": [
+      "Goodman doğrusal ortalama gerilme düzeltmesi",
+      "Marin modifikasyon faktörleri",
+      "Yüksek çevrimli yorulma rejimi (N > 10^4 döngü)"
+    ],
+    "limitations": [
+      "Düşük çevrimli yorulmada Manson-Coffin plastik gerinim modeli gereklidir",
+      "Kümülatif değişken genlikli yüklemelerde Palmgren-Miner kuralı uygulanmalıdır"
+    ],
+    "status": "stable",
+    "route": "/fatigue-analysis"
+  }
+]

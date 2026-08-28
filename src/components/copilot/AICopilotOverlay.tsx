@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, X, Send, Bot, User, ChevronLeft, ChevronRight, Layers, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Sparkles, X, Send, User, ChevronLeft, ChevronRight, Layers, AlertTriangle, CheckCircle } from 'lucide-react';
 import { EngineeringCopilot, CopilotIntent } from '@/engine/copilot/copilot';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
@@ -9,7 +9,9 @@ import { useCopilotStore } from '@/store/copilotStore';
 
 import { getCopilotStrings, getCopilotEngineLocale, getCopilotResponseLanguage } from '@/locales/copilotTranslations';
 import { getCopilotGameStrings, getTriviaQuestions } from '@/locales/copilotGameTranslations';
+import { AegisMascot } from './AegisMascot';
 import { AegisIcon } from './AegisIcon';
+import { AegisAura } from './AegisAura';
 
 interface GameOption {
   label: string;
@@ -522,11 +524,12 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
   }, [embedded, isOpen, setIsOpen]);
 
   if (!mounted) return null;
-  if (!embedded && isMobile) return null;
 
   const panelClass = embedded
     ? 'relative w-full h-full z-0 glass-hud-panel border-0 shadow-none flex flex-col rounded-none'
-    : `fixed right-6 bottom-[140px] w-[380px] max-w-[90vw] h-[520px] z-[9991] glass-hud-panel border border-[#00e5ff]/30 shadow-2xl flex flex-col rounded-2xl transition-all duration-400 ease-out transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`;
+    : `fixed inset-x-3 bottom-20 top-16 sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-[100px] sm:w-[400px] sm:h-[540px] z-[9991] glass-hud-panel bg-[#070c16]/98 backdrop-blur-2xl border border-[#00e5ff]/40 shadow-2xl flex flex-col rounded-2xl transition-all duration-300 ease-out transform ${
+        isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'
+      }`;
 
   const chatPanel = (
     <div
@@ -534,12 +537,12 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       className={panelClass}
     >
       {!embedded && (
-        <div className="absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
+        <div className="hidden sm:block absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
       )}
 
       <div className={`flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/40 ${embedded ? '' : 'rounded-t-2xl'}`}>
         <div className="flex items-center gap-2.5">
-          <AegisIcon size={34} mode="active" />
+          <AegisMascot size={34} variant="face" pose={isTyping ? 'calculation' : 'auto'} />
           <div>
             <h3 className="text-xs font-mono font-black text-white tracking-[0.15em] uppercase">{strings.title}</h3>
             <p className="text-[9px] text-[#00e5ff]/60 font-mono tracking-widest">{strings.subtitle}</p>
@@ -612,8 +615,8 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
             className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ai' && (
-              <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5">
-                <Bot size={12} />
+              <div className="w-7 h-7 rounded-lg bg-[#00e5ff]/10 border border-[#00e5ff]/30 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 overflow-hidden">
+                <AegisMascot size={22} variant="face" pose="auto" interactive={false} />
               </div>
             )}
             <div
@@ -681,8 +684,8 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
 
         {isTyping && (
           <div className="flex gap-3 justify-start items-start">
-            <div className="w-6 h-6 rounded-md bg-[#00e5ff]/10 border border-[#00e5ff]/20 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 animate-pulse">
-              <Sparkles size={12} />
+            <div className="w-7 h-7 rounded-lg bg-[#00e5ff]/10 border border-[#00e5ff]/30 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 overflow-hidden">
+              <AegisMascot size={22} variant="face" pose="calculation" interactive={false} />
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[10px] font-mono text-[#00e5ff]/70 max-w-[85%] rounded-tl-none space-y-1.5 flex flex-col shadow-lg">
               <div className="flex items-center gap-1.5 text-xs text-white">
@@ -750,7 +753,7 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       {/* ═══ CLICK-OUTSIDE BACKDROP TO DISPERSE ═══ */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9990] bg-black/20 backdrop-blur-[2px] cursor-default"
+          className="fixed inset-0 z-[9990] bg-black/70 sm:bg-black/20 backdrop-blur-sm sm:backdrop-blur-[2px] cursor-default"
           aria-hidden="true"
           onPointerDown={() => setIsOpen(false)}
         />

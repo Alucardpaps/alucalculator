@@ -1,9 +1,6 @@
 export default {
-    // OS Core
     osName: "AluCalc OS",
     version: "v5.0",
-
-    // Welcome Modal
     welcomeTitle: "选择您的",
     welcomeHighlight: "工作区",
     welcomeDesc: "选择您的主要界面。您可以随时切换。",
@@ -18,8 +15,6 @@ export default {
     nodeTypeNote: "笔记",
     nodeTypeMedia: "媒体",
     nodeTypeNode: "节点",
-
-    // Modals & Windows
     flowTitle: "流程引擎 (Flow)",
     flowDesc: "工程计算的无限画布。连接节点、创建数据流并链接公式。",
     cadTitle: "CAD 开发室",
@@ -27,8 +22,6 @@ export default {
     deskTitle: "创意桌面",
     deskDesc: "头脑风暴的自由白板。绘图、拖动文件并以视觉方式组织想法。",
     feaTitle: "FEA 系统",
-
-    // Project Management
     projects: {
         title: "项目",
         newProject: "新建项目",
@@ -46,9 +39,6 @@ export default {
         updatedAt: "更新于",
         workspacesCount: "个工作区"
     },
-
-    // View Switcher
-    // Welding
     welding: {
         title: "焊接计算器",
         subtitle: "热输入 • 接头强度 • AWS D1.1",
@@ -107,7 +97,9 @@ export default {
             tig: "钨极氩弧焊 (TIG)",
             smaw: "手工电弧焊 (SMAW)",
             fcaw: "药芯焊丝电弧焊 (FCAW)",
-            saw: "埋弧焊 (SAW)"
+            saw: "埋弧焊 (SAW)",
+            mma: "焊条电弧焊 (SMAW)",
+            mag: "MAG (GMAW)"
         },
         joints: {
             fillet: "角焊缝",
@@ -120,18 +112,18 @@ export default {
             tee: "T型接头",
             corner: "角接接头"
         },
+        power: "功率",
+        geometry: "几何",
+        simulationLabel: "焊缝仿真",
+        setup: "工艺设置"
     },
     viewCad: "CAD",
     viewFea: "FEA",
     viewDesk: "桌面",
-
-    // Start Menu
     startMenu: "开始菜单",
     allApps: "所有应用程序",
     searchApps: "搜索应用程序...",
     pinned: "固定模块",
-
-    // Settings
     settings: "设置",
     appearance: "外观",
     language: "语言",
@@ -172,75 +164,324 @@ export default {
     languageJa: "日语 (Japanese)",
     languageKo: "韩语 (Korean)",
     languageAr: "阿拉伯语 (Arabic)",
-
-    // Modules & Tools
     modules: {
-        'calculator': { title: "科学计算器" },
-        'unit-converter': { title: "单位换算器" },
-        'ai-copilot': { title: "Aegis AI" },
-        'file-explorer': { title: "文件管理器" },
-        'settings': { title: "设置" },
-        'handbook': { title: "工程手册" },
-        'terminal': { title: "终端" },
-        'profile-weight': { title: "型材重量" },
-        'gears-bearings': { title: "齿轮计算器" },
-        'welding': { title: "焊接计算器" },
-        'fasteners': { title: "紧固件扭矩" },
-        'materials-db': { title: "材料数据库" },
-        'cutting-optimizer': { title: "切割优化器" },
-        'music-player': { title: "音乐播放器" },
-        'belt-drive': { title: "带传动" },
-        'beam-deflection': { title: "梁挠度计算" },
-        'bearings': { title: "轴承寿命 (L10)" },
-        'bolt-stress': { title: "螺栓拉应力" },
-        'column-buckling': { title: "压杆稳定 (欧拉)" },
-        'fits-tolerances': { title: "配合与公差 (ISO 286)" },
-        'fluid-flow': { title: "管道压力降" },
-        'gear-spur': { title: "直齿轮计算器" },
-        'hydraulic-cylinder': { title: "液压缸" },
-        'ohms-law': { title: "欧姆定律" },
-        'pumps': { title: "离心泵" },
-        'sheet-metal': { title: "钣金折弯计算" },
-        'spring-compression': { title: "压缩弹簧计算" },
-        'strength-analysis': { title: "强度分析" },
-        'thread-geometry': { title: "螺纹几何" },
-        'torsion-shaft': { title: "扭转 (轴)" },
-        'vat-calculator': { title: "增值税计算器" },
-        'voltage-drop': { title: "电压降" },
-        'welding-fillet': { title: "角焊缝强度" },
-        'welding-heat': { title: "焊接热输入" },
-        'analytics-dashboard': { title: "分析" },
-        'engineering-notes': { title: "工程笔记" },
-    } as Record<string, { title: string }>,
-
-    // Hints
+        calculator: {
+            title: "科学计算器"
+        },
+        "unit-converter": {
+            title: "单位换算器"
+        },
+        "ai-copilot": {
+            title: "Aegis AI"
+        },
+        "file-explorer": {
+            title: "文件管理器"
+        },
+        settings: {
+            title: "设置"
+        },
+        handbook: {
+            title: "工程手册"
+        },
+        terminal: {
+            title: "终端"
+        },
+        "profile-weight": {
+            title: "型材重量"
+        },
+        "gears-bearings": {
+            title: "齿轮计算器"
+        },
+        welding: {
+            title: "焊接计算器"
+        },
+        fasteners: {
+            title: "紧固件扭矩"
+        },
+        "materials-db": {
+            title: "材料数据库"
+        },
+        "cutting-optimizer": {
+            title: "切割优化器"
+        },
+        "music-player": {
+            title: "音乐播放器"
+        },
+        "belt-drive": {
+            title: "带传动"
+        },
+        "beam-deflection": {
+            title: "梁挠度计算"
+        },
+        bearings: {
+            title: "轴承寿命 (L10)"
+        },
+        "bolt-stress": {
+            title: "螺栓拉应力"
+        },
+        "column-buckling": {
+            title: "压杆稳定 (欧拉)"
+        },
+        "fits-tolerances": {
+            title: "配合与公差 (ISO 286)"
+        },
+        "fluid-flow": {
+            title: "管道压力降"
+        },
+        "gear-spur": {
+            title: "直齿轮计算器"
+        },
+        "hydraulic-cylinder": {
+            title: "液压缸"
+        },
+        "ohms-law": {
+            title: "欧姆定律"
+        },
+        pumps: {
+            title: "离心泵"
+        },
+        "sheet-metal": {
+            title: "钣金折弯计算"
+        },
+        "spring-compression": {
+            title: "压缩弹簧计算"
+        },
+        "strength-analysis": {
+            title: "强度分析"
+        },
+        "thread-geometry": {
+            title: "螺纹几何"
+        },
+        "torsion-shaft": {
+            title: "扭转 (轴)"
+        },
+        "vat-calculator": {
+            title: "增值税计算器"
+        },
+        "voltage-drop": {
+            title: "电压降"
+        },
+        "welding-fillet": {
+            title: "角焊缝强度"
+        },
+        "welding-heat": {
+            title: "焊接热输入"
+        },
+        "analytics-dashboard": {
+            title: "分析"
+        },
+        "engineering-notes": {
+            title: "工程笔记"
+        },
+        "cad-editor": {
+            title: "CAD 编辑器"
+        },
+        "sketch-pad": {
+            title: "草图板"
+        },
+        "periodic-table": {
+            title: "元素周期表"
+        },
+        "simulation-fea": {
+            title: "FEA 仿真"
+        },
+        "manufacturing-sandbox": {
+            title: "Mfg. Sandbox"
+        },
+        "engineering-selection": {
+            title: "Engineering Selection"
+        },
+        "thermal-expansion": {
+            title: "热膨胀"
+        },
+        "project-manager": {
+            title: "项目物料清单"
+        },
+        "cost-estimator": {
+            title: "成本引擎"
+        },
+        "manufacturing-readiness": {
+            title: "Mfg Readiness Analyzer"
+        },
+        "topology-optimization": {
+            title: "生成式设计"
+        },
+        "machine-assembly": {
+            title: "机器装配"
+        },
+        "failure-prediction": {
+            title: "Failure Predictor"
+        },
+        "fluid-dynamics": {
+            title: "流体力学"
+        },
+        "bolt-torque": {
+            title: "Bolt Torque & Preload"
+        },
+        "chain-drive": {
+            title: "Roller Chain Drive"
+        },
+        "physics-kinematics": {
+            title: "Physics & Kinematics"
+        },
+        "chemistry-reactions": {
+            title: "Chemistry Lab"
+        },
+        "biology-genetics": {
+            title: "Biology & Genetics"
+        },
+        "cs-algorithms": {
+            title: "CS & Algorithms"
+        },
+        "aerospace-dynamics": {
+            title: "Aerospace Dynamics"
+        },
+        "naval-hydrostatics": {
+            title: "Naval Architecture"
+        },
+        "three-phase-power": {
+            title: "3-Phase Power Analytics"
+        },
+        "digital-logic": {
+            title: "Digital Logic Lab"
+        },
+        "filter-design": {
+            title: "Electronic Filter Design"
+        },
+        "failure-diagnosis": {
+            title: "Failure Analysis Tool"
+        },
+        "fatigue-advanced": {
+            title: "Fatigue Life (Advanced)"
+        },
+        "planetary-gearbox": {
+            title: "Planetary Gearbox Solver"
+        },
+        "material-selector-ai": {
+            title: "Material Selector AI"
+        },
+        "materials-explorer": {
+            title: "Materials Intelligence"
+        },
+        "physics-solver": {
+            title: "Physics CAS Solver"
+        },
+        "gearbox-design": {
+            title: "Gearbox Design Engine"
+        },
+        "motor-selection-std": {
+            title: "Motor Selection Engine"
+        },
+        "worm-gear": {
+            title: "Worm Gear Design"
+        },
+        "planetary-gear": {
+            title: "Planetary Gear Train"
+        },
+        "cam-follower": {
+            title: "Cam & Follower Design"
+        },
+        "flywheel-design": {
+            title: "Flywheel Energy Storage"
+        },
+        "concrete-beam-design": {
+            title: "Concrete Beam (ACI 318)"
+        },
+        "foundation-bearing": {
+            title: "Foundation Bearing Capacity"
+        },
+        "transformer-design": {
+            title: "Transformer Design"
+        },
+        "motor-efficiency": {
+            title: "Motor Efficiency & Load"
+        },
+        "heat-exchanger": {
+            title: "Heat Exchanger Sizing"
+        },
+        "sound-meter": {
+            title: "Sound Decibel Meter"
+        },
+        clinometer: {
+            title: "Clinometer / Height Finder"
+        },
+        "gps-surveyor": {
+            title: "GPS Surveyor & Compass"
+        },
+        "hardness-converter": {
+            title: "Hardness & Strength Converter"
+        }
+    },
     moduleHints: {
-        'calculator': '高级数学计算',
-        'unit-converter': '工程单位换算',
-        'ai-copilot': 'Aegis AI',
-        'file-explorer': '系统文件管理',
-        'settings': '系统偏好设置',
-        'handbook': '参考公式与数据',
-        'terminal': '命令行界面',
-        'profile-weight': '铝型材重量计算',
-        'gears-bearings': '齿轮比与轴承寿命',
-        'welding': '焊喉与强度',
-        'fasteners': '螺栓扭矩与预紧力',
-        'materials-db': '材料属性查询',
-        'cutting-optimizer': '材料切割效率优化',
-        'music-player': '本地与在线音频',
-        'belt-drive': '皮带轮与皮带长度',
-    } as Record<string, string>,
-
-    // Categories
+        calculator: "高级数学计算",
+        "unit-converter": "工程单位换算",
+        "ai-copilot": "Aegis AI",
+        "file-explorer": "系统文件管理",
+        settings: "系统偏好设置",
+        handbook: "参考公式与数据",
+        terminal: "命令行界面",
+        "profile-weight": "铝型材重量计算",
+        "gears-bearings": "齿轮比与轴承寿命",
+        welding: "焊喉与强度",
+        fasteners: "螺栓扭矩与预紧力",
+        "materials-db": "材料属性查询",
+        "cutting-optimizer": "材料切割效率优化",
+        "music-player": "本地与在线音频",
+        "belt-drive": "皮带轮与皮带长度",
+        "thermal-expansion": "热膨胀与尺寸变化",
+        "cost-estimator": "Predict manufacturing costs in real-time",
+        "manufacturing-readiness": "Analyze part for CNC & 3D print readiness",
+        "topology-optimization": "AI-driven generative geometry reduction",
+        "machine-assembly": "Pre-built mechanical system libraries",
+        "failure-prediction": "Stress and fatigue failure AI simulation",
+        "fluid-dynamics": "Pipe flow, pressure drop & Reynolds number",
+        "bolt-torque": "ISO standard fastening torque & preload calculator",
+        "chain-drive": "ISO 606 roller chain sprocket ratio, length & tension",
+        "physics-kinematics": "Projectile motion and rigid body dynamics",
+        "chemistry-reactions": "Reaction balancing and chemical computing",
+        "biology-genetics": "DNA sequencing and bioinformatics assistant",
+        "cs-algorithms": "Algorithm visualization",
+        "aerospace-dynamics": "Flight envelope and aerodynamic modeling",
+        "naval-hydrostatics": "Ship stability and hydrostatic curves",
+        "three-phase-power": "Industrial 3-phase system analysis and vector diagrams",
+        "digital-logic": "Logic gate simulation and truth tables",
+        "filter-design": "Active and passive RC filter frequency response (Bode)",
+        "failure-diagnosis": "Probabilistic failure analysis and root cause diagnosis",
+        "fatigue-advanced": "High-cycle fatigue and mean stress correction (Haigh)",
+        "planetary-gearbox": "Multi-stage planetary gear kinematics and Willis equation",
+        "material-selector-ai": "AI-driven material selection engine",
+        "materials-explorer": "Curation of material informatics and properties",
+        "analytics-dashboard": "Project metrics and usage analytics",
+        "engineering-notes": "Field notes and engineering records",
+        "physics-solver": "Symbolic CAS physics engine for dynamic equations",
+        "gearbox-design": "Complete gear train design and analysis suite",
+        "motor-selection-std": "Standard motor curves and torque-speed matching",
+        "worm-gear": "Worm gear geometry, efficiency & sliding speed",
+        "planetary-gear": "Planetary gear ratios, torque & assembly validation",
+        "cam-follower": "Cam displacement, velocity & acceleration analysis",
+        "flywheel-design": "Flywheel energy storage, size & centrifugal stress",
+        "concrete-beam-design": "Reinforced concrete beam bending capacity (ACI 318)",
+        "foundation-bearing": "Ultimate & allowable bearing capacity of soils",
+        "transformer-design": "Transformer core area, windings & turns ratio",
+        "motor-efficiency": "3-phase motor load factor, efficiency & CO2 footprint",
+        "heat-exchanger": "Heat exchanger LMTD, thermal power & surface area",
+        "hydraulic-cylinder": "Hydraulic cylinder bore, rod buckling & volume",
+        "sound-meter": "Real-time decibel meter & frequency analyzer",
+        clinometer: "Trigonometric slope & height analyzer using gyroscope",
+        "gps-surveyor": "Real-time GPS coordinates, elevation tracking & digital compass",
+        "hardness-converter": "Metal hardness scales (HB, HRC, HRB, HV) and tensile strength conversions"
+    },
     categories: {
-        'mechanical': '机械',
-        'structural': '结构',
-        'utilities': '实用工具',
-        'reference': '参考资料'
-    } as Record<string, string>,
-
-    // Ribbon Bar
+        mechanical: "机械",
+        structural: "结构",
+        utilities: "实用工具",
+        reference: "参考资料",
+        science: "科学",
+        software: "软件",
+        civil: "土木",
+        finance: "金融",
+        other: "其他"
+    },
     ribbon: {
         theme: "主题",
         guide: "指南",
@@ -289,9 +530,55 @@ export default {
         groupPaint: "绘制",
         groupContent: "内容",
         labelWorkstation: "工程工作站",
+        groupCanvas: "画布",
+        groupJob: "作业控制",
+        groupOutput: "输出",
+        labelCreativeDesk: "创意桌面",
+        labelMfgCam: "制造 / CAM 工作区",
+        labelFeaSim: "FEA / 仿真引擎",
+        labelPen: "笔",
+        labelMarker: "马克笔",
+        labelEraser: "橡皮",
+        labelArrow: "箭头",
+        labelRect: "矩形",
+        labelCircle: "圆",
+        labelClear: "清除",
+        labelNote: "便笺",
+        labelVideo: "视频",
+        labelMusic: "音乐",
+        labelImage: "图像",
+        labelExcel: "Excel",
+        labelWord: "Word",
+        labelPpt: "PPT",
+        labelPdf: "PDF",
+        labelStartNesting: "开始排料",
+        labelResetJob: "重置作业",
+        labelFullReport: "完整报告",
+        labelExportNc: "导出 NC",
+        labelSolverReady: "求解器就绪",
+        labelMatrixSparse: "矩阵：稀疏",
+        labelStrokeColor: "描边颜色",
+        defaultNote: "📌 新建便笺",
+        promptYoutubeUrl: "输入 YouTube 链接：",
+        confirmClearSketches: "清除全部草图？",
+        confirmClearFlow: "确定清空整个 Flow 工作区吗？此操作无法撤销。",
+        confirmDeleteWindow: "关闭此窗口？",
+        alertSelect2: "请至少选择 2 个实体（点或线）以添加约束。",
+        exportFailed: "导出失败",
+        dxfExportFailed: "DXF 导出失败",
+        stepExportFailed: "STEP 导出失败",
+        noGeometry: "没有可导出的几何。请先绘制。",
+        noExportableGeometry: "未找到可导出几何（仅直线和圆）。",
+        stepExportComplete: "STEP 导出完成：已导出 {count} 个实体。",
+        importedEntities: "已导入 {count} 个实体。",
+        labelNewNote: "新建便笺",
+        comingSoon: "即将推出...",
+        handbookPdf: "工程师手册.pdf",
+        newsFeedTitle: "工程新闻源",
+        newsItem1: "铝价上涨 2%",
+        newsItem2: "新标准 ISO 898-1 发布",
+        newsItem3: "AluCalc V2 发布"
     },
-
-    // Node Palette Categories
     palette: {
         categories: {
             input: "输入与常量",
@@ -303,41 +590,126 @@ export default {
         },
         searchPlaceholder: "搜索节点..."
     },
-
-    // Engine & Calculator Generic Terms
     calcCommon: {
-        length: { label: "长度 (L)" },
-        width: { label: "宽度 (w)" },
-        height: { label: "高度 (h)" },
-        thickness: { label: "厚度 (t)" },
-        radius: { label: "半径 (R)", desc: "内部折弯半径" },
-        angle: { label: "角度 (θ)" },
-        force: { label: "力 (F)" },
-        torque: { label: "扭矩 (T)" },
-        pressure: { label: "压力 (P)" },
-        velocity: { label: "速度 (v)" },
-        diameter: { label: "直径 (d)" },
-        density: { label: "密度 (ρ)" },
-        mass: { label: "质量 (m)" },
-        volume: { label: "体积 (V)" },
-        area: { label: "面积 (A)" },
-        material: { label: "材料类型" },
-        yieldStrength: { label: "屈服强度 (Sy)" },
-        Sy: { label: "屈服强度 (Sy)" },
-        safetyFactor: { label: "安全系数" },
-        SF: { label: "安全系数 (SF)" },
-        deflection: { label: "挠度" },
-        bendingStress: { label: "弯曲应力" },
-        sigmaBending: { label: "弯曲应力 (σb)" },
-        m: { label: "模数 (m)", desc: "齿轮模数" },
-        z1: { label: "小齿轮齿数 (z₁)" },
-        z2: { label: "大齿轮齿数 (z₂)" },
-        alpha: { label: "压力角 (α)" },
-        b: { label: "齿宽 (b)" },
-        T: { label: "扭矩 (T)" }
-    } as Record<string, { label?: string, desc?: string }>,
-
-    // General
+        length: {
+            label: "长度 (L)"
+        },
+        width: {
+            label: "宽度 (w)"
+        },
+        height: {
+            label: "高度 (h)"
+        },
+        thickness: {
+            label: "厚度 (t)"
+        },
+        radius: {
+            label: "半径 (R)",
+            desc: "内部折弯半径"
+        },
+        angle: {
+            label: "角度 (θ)"
+        },
+        force: {
+            label: "力 (F)"
+        },
+        torque: {
+            label: "扭矩 (T)"
+        },
+        pressure: {
+            label: "压力 (P)"
+        },
+        velocity: {
+            label: "速度 (v)"
+        },
+        diameter: {
+            label: "直径 (d)"
+        },
+        density: {
+            label: "密度 (ρ)"
+        },
+        mass: {
+            label: "质量 (m)"
+        },
+        volume: {
+            label: "体积 (V)"
+        },
+        area: {
+            label: "面积 (A)"
+        },
+        material: {
+            label: "材料类型"
+        },
+        yieldStrength: {
+            label: "屈服强度 (Sy)"
+        },
+        Sy: {
+            label: "屈服强度 (Sy)"
+        },
+        safetyFactor: {
+            label: "安全系数"
+        },
+        SF: {
+            label: "安全系数 (SF)"
+        },
+        deflection: {
+            label: "挠度"
+        },
+        bendingStress: {
+            label: "弯曲应力"
+        },
+        sigmaBending: {
+            label: "弯曲应力 (σb)"
+        },
+        m: {
+            label: "模数 (m)",
+            desc: "齿轮模数"
+        },
+        z1: {
+            label: "小齿轮齿数 (z₁)"
+        },
+        z2: {
+            label: "大齿轮齿数 (z₂)"
+        },
+        alpha: {
+            label: "压力角 (α)"
+        },
+        b: {
+            label: "齿宽 (b)"
+        },
+        T: {
+            label: "扭矩 (T)"
+        },
+        d: {
+            label: "直径 (d)"
+        },
+        p: {
+            label: "螺距 (p)"
+        },
+        k: {
+            label: "头高 (k)"
+        },
+        s: {
+            label: "对边宽度 (s)"
+        },
+        drill: {
+            label: "钻头直径"
+        },
+        dh: {
+            label: "孔径 (dh)"
+        },
+        ix: {
+            label: "惯性矩 Ix",
+            desc: "关于 X 轴的惯性矩"
+        },
+        iy: {
+            label: "惯性矩 Iy",
+            desc: "关于 Y 轴的惯性矩"
+        },
+        slot: {
+            label: "槽尺寸"
+        }
+    },
     close: "关闭",
     minimize: "最小化",
     maximize: "最大化",
@@ -346,8 +718,6 @@ export default {
     apply: "应用",
     ok: "确定",
     error: "错误",
-
-    // Engineering Handbook
     handbook: {
         title: "工程知识库",
         searchPlaceholder: "在知识库中搜索...",
@@ -376,8 +746,6 @@ export default {
             roughnessDesc: "Ra 值与加工"
         }
     },
-
-    // Project Variables
     variables: {
         title: "项目变量",
         addVariable: "添加变量",
@@ -389,9 +757,49 @@ export default {
         placeholderDesc: "可选描述...",
         noVariables: "未定义全局变量。点击“添加变量”创建一个。"
     },
-
-    // Terminal
     termPlaceholder: "输入命令... (输入 'help' 获取帮助)",
-    termPrefix: "AluCalc ❯"
-
+    termPrefix: "AluCalc ❯",
+    viewFlow: "FLOW",
+    searchResults: "搜索结果",
+    categoryOther: "其他",
+    userPro: "AluCalc Professional",
+    shutDown: "关机",
+    noModulesFound: "未找到模块",
+    noModulesHint: "请调整搜索词。",
+    disciplinesLabel: "学科",
+    languageFr: "法语",
+    languageIt: "意大利语",
+    languagePt: "葡萄牙语",
+    languageRu: "俄语",
+    featureTree: "特征树",
+    sketches: "草图",
+    bodies: "实体",
+    constraints: "约束",
+    parameters: "参数",
+    noBodies: "暂无实体",
+    dofLabel: "自由度",
+    fullyConstrained: "完全约束",
+    overConstrained: "过约束",
+    underConstrained: "欠约束",
+    addBody: "添加实体",
+    parametersTitle: "参数",
+    resultsTitle: "结果",
+    fixInputs: "固定输入",
+    switch2D: "切换到 2D",
+    switch3D: "切换到 3D",
+    quickSelect: "快速选择",
+    varLabel: "VAR",
+    dbLabel: "DB",
+    selectStandard: "选择标准...",
+    closeAll: "关闭全部应用",
+    feedbackTitle: "联系与反馈",
+    costTitle: "成本估算",
+    costDesc: "制造成本分解",
+    costBom: "物料清单",
+    costOps: "工序",
+    costOverhead: "间接费率 %",
+    costMargin: "利润率 %",
+    costBatch: "批量",
+    costTotal: "总成本",
+    costUnit: "单价"
 } as const;

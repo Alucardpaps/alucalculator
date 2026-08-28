@@ -11,9 +11,13 @@ import { SaveButton } from "@/components/calculation/SaveButton";
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 import { getGearsModuleStrings } from '@/locales/gearsModuleTranslations';
+import { useI18nStore } from '@/store/i18nStore';
+import { AluShareButton } from '@/share/components/AluShareButton';
 
-export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
-    const s = getGearsModuleStrings(lang);
+export function GearsModule({ lang, dict: dictProp }: { lang?: string, dict?: any } = {}) {
+    const dict = dictProp ?? {};
+    const { language } = useI18nStore();
+    const s = getGearsModuleStrings(lang || language);
     const {
         selectedPower, setSelectedPower,
         selectedPoles, setSelectedPoles,
@@ -98,11 +102,38 @@ export function GearsModule({ lang, dict }: { lang: string, dict: any }) {
                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{dict.gear?.subtitle || s.isoSubtitle}</p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
+                        <AluShareButton
+                            module="gear"
+                            moduleTitle="ISO 6336 Gear Design & Strength"
+                            getPackageData={() => ({
+                                inputs: {
+                                    module: gearModule,
+                                    teethPinion: z1,
+                                    teethGear: z2,
+                                    faceWidth,
+                                    helixAngle,
+                                    pressureAngle,
+                                    power: selectedPower,
+                                },
+                                outputs: {
+                                    pitchDiameterPinion: results.d1,
+                                    pitchDiameterGear: results.d2,
+                                    centerDistance: results.a,
+                                    transmissionRatio: results.ratio,
+                                    bendingStressPinion: results.SF_bending ? (430 / Math.max(0.1, results.SF_bending)) : 0,
+                                    contactStress: results.SF_contact ? (1200 / Math.max(0.1, results.SF_contact)) : 0,
+                                    safetyBendingPinion: results.SF_bending,
+                                    safetyContact: results.SF_contact,
+                                },
+                                name: `Gear Stage m=${gearModule} z1=${z1} z2=${z2}`,
+                                unit_system: 'metric',
+                            })}
+                        />
                         <button 
                             onClick={exportToPDF}
                             disabled={isExporting}
-                            className={`px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-black border border-cyan-500/20 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-black border border-cyan-500/20 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 cursor-pointer ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isExporting ? <RotateCcw size={14} className="animate-spin" /> : <Download size={14} />} 
                             PDF
@@ -557,6 +588,7 @@ function GearShape2D({ cx, cy, rRef, teeth, m, color, strokeWidth, opacity, isPr
     const animDuration = rpm > 0 ? (60 / rpm) * 15 : 0; // Speed scaling
     const animStyle = rpm > 0 && !isPrint ? {
         transformOrigin: `${cx}px ${cy}px`,
+        transformBox: 'view-box' as const,
         animation: `${rotateDir === 'cw' ? 'spin-cw' : 'spin-ccw'} ${animDuration}s linear infinite`
     } : {};
 
