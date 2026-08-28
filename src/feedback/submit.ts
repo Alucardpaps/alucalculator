@@ -67,9 +67,15 @@ export async function submitFeedback(
       body: JSON.stringify(payload),
     });
 
-    const result = await res.json();
+    const responseText = await res.text();
+    let result: any = null;
+    try {
+      result = JSON.parse(responseText);
+    } catch {
+      result = null;
+    }
 
-    if (res.ok && result.success) {
+    if (res.ok && result?.success) {
       if (data.screenshot?.byteLength) {
         recordScreenshotQuotaUsage(data.screenshot.byteLength);
       }
@@ -80,9 +86,30 @@ export async function submitFeedback(
       };
     }
 
+    if (result?.error) {
+      return {
+        success: false,
+        error: result.error,
+      };
+    }
+
+    // Fallback if server returned non-JSON HTML (404/503/405)
+    if (!res.ok) {
+      if (res.status === 503) {
+        return {
+          success: false,
+          error: 'E-posta servisi yapılandırılmamış (FEEDBACK_TO eksik).',
+        };
+      }
+      return {
+        success: false,
+        error: `Sunucu yanıt vermedi (${res.status}). Lütfen mesajınızı doğrudan destek@alucalculator.com adresine e-posta ile iletin.`,
+      };
+    }
+
     return {
       success: false,
-      error: result.error || 'Geri bildirim gönderilemedi.',
+      error: 'Geri bildirim gönderilemedi. Lütfen doğrudan e-posta gönderin.',
     };
   } catch (err: unknown) {
     return {

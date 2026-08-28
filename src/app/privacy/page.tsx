@@ -48,8 +48,15 @@ export default function PrivacyPage() {
         }),
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
+
+      if (res.ok && data?.success) {
         setStatus({
           type: 'success',
           message: 'Talebiniz başarıyla alındı. İlgili kayıtlar incelenerek tarafınıza bilgi verilecektir.',
@@ -59,7 +66,7 @@ export default function PrivacyPage() {
       } else {
         setStatus({
           type: 'error',
-          message: data.error || 'Talep iletilemedi. Lütfen privacy@alucalculator.com adresine doğrudan e-posta gönderin.',
+          message: (data && data.error) || 'Talep iletilemedi. Lütfen privacy@alucalculator.com adresine doğrudan e-posta gönderin.',
         });
       }
     } catch {
