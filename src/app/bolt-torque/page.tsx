@@ -5,6 +5,7 @@ import { ModulePageSeoShell } from '@/components/seo/ModulePageSeoShell';
 import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
+import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -31,11 +32,11 @@ export default function BoltTorquePage() {
       <SolverTransparencyDrawer solverId="bolt-torque" />
 
       <section className="shrink-0 border-t border-[var(--line)] bg-[var(--bg-1)]" aria-label="Calculation methodology">
-        <details className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
+        <details open className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-[var(--alu-dim)]/50 hover:text-[var(--alu-dim)] [&::-webkit-details-marker]:hidden font-mono">
             <span className="inline-flex items-center gap-2">
               <span className="text-[var(--alu-dim)]/40">▸</span>
-              Formula · assumptions · example
+              Formula · assumptions · worked example
               <span className="font-mono font-normal normal-case tracking-normal text-[var(--alu-dim)]/50">
                 ({method.standards.slice(0, 3).join(' · ')})
               </span>
@@ -60,12 +61,8 @@ export default function BoltTorquePage() {
                 </Link>
               )}
             </div>
-            <div className="work-panel rounded-[var(--radius-s)] p-3 sm:col-span-2 lg:col-span-1 bg-[var(--bg-2)] border border-[var(--line)]">
-              <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--warn)]">Worked example</h2>
-              <p className="text-[11px] text-[var(--alu-dim)] font-sans">{method.workedExample?.title || `Worked example — ${seo.title.split('|')[0].trim()}`}</p>
-              <p className="mt-1 font-mono text-[12px] text-[var(--ink)]">
-                {method.workedExample?.result || 'Open the workbench to run the live solver with the same engine used in production.'}
-              </p>
+            <div className="work-panel rounded-[var(--radius-s)] p-3.5 sm:col-span-2 lg:col-span-3 bg-[var(--bg-2)] border border-[var(--line)]">
+              <StaticWorkedExample method={method} defaultTitle={seo.title.split('|')[0].trim()} />
             </div>
           </div>
         </details>

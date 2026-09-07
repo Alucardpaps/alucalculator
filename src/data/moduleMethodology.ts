@@ -1,3 +1,40 @@
+export interface WorkedExampleInput {
+  label: string;
+  value: string;
+  unit: string;
+}
+
+export interface WorkedExampleRelation {
+  name: string;
+  formula: string;
+  clause: string;
+}
+
+export interface WorkedExampleIntermediate {
+  label: string;
+  value: string;
+  unit: string;
+  note?: string;
+}
+
+export interface WorkedExampleResult {
+  label: string;
+  value: string;
+  limit: string;
+  status: 'PASS' | 'FAIL';
+  margin?: string;
+}
+
+export interface WorkedExampleBlock {
+  title: string;
+  standard: string;
+  summary: string;
+  inputs: WorkedExampleInput[];
+  relations: WorkedExampleRelation[];
+  intermediates: WorkedExampleIntermediate[];
+  result: WorkedExampleResult;
+}
+
 export interface ModuleMethod {
   formula: string;
   formulaNote: string;
@@ -5,30 +42,70 @@ export interface ModuleMethod {
   assumptions: string[];
   academyHref?: string;
   academyLabel?: string;
-  workedExample?: { title: string; result: string };
+  workedExample?: {
+    title: string;
+    result: string;
+    block?: WorkedExampleBlock;
+  };
 }
 
 const CARDS: Record<string, ModuleMethod> = {
   'bolt-torque': {
-    formula: 'T = K \\times F_m \\times d',
-    formulaNote: 'Tightening torque calculation per VDI 2230 nut factor method (K ≈ K1+K2+K3). Fm is target preload, d is nominal bolt diameter.',
-    standards: ['VDI 2230 Part 1', 'ISO 898-1', 'ISO 4017 / ISO 4762 geometry'],
+    formula: 'M_A = F_M \\left( 0.16 \\cdot P + 0.58 \\cdot \\mu_G \\cdot d_2 + 0.50 \\cdot \\mu_K \\cdot d_w \\right)',
+    formulaNote: 'Tightening torque calculation per VDI 2230-1 nut factor and multi-zone friction method. FM is target preload, P is pitch, d2 is pitch diameter, and dw is bearing face diameter.',
+    standards: ['VDI 2230 Part 1:2015', 'DIN EN ISO 898-1', 'ISO 68-1 / ISO 273'],
     assumptions: [
-      'Friction coefficients (thread & bearing face) dominate K — verify lubrication state',
-      'Target preload Fm engineered to utilize 90% of bolt material yield strength',
-      'Account for embedment losses and thermal expansion differential in critical joints',
+      'Friction coefficients (thread μG & bearing face μK) dominate torque split — verify lubrication state',
+      'Target preload FM engineered to utilize 90% of fastener material yield strength (Rp0.2)',
+      'Account for embedment relaxation losses and thermal expansion differential in critical joint stacks',
     ],
     academyHref: '/academy/how-to-calculate-bolt-torque/',
     academyLabel: 'Bolt torque guide',
     workedExample: {
-      title: 'Worked example — M12 × 8.8 (Dry assembly)',
-      result: 'Engine calculates nut factor K = 0.20, target preload Fm = 38.5 kN, and tightening torque MA = 92.4 N·m. Live breakdown shows thread torque vs bearing face torque split.',
+      title: 'Worked example — M12 × 8.8 (VDI 2230 Live Joint)',
+      result: 'Calculates target clamp force FM = 35.4 kN and calibrated tightening torque MA = 83.1 N·m (Axial stress σz = 420.0 MPa, Torsional stress τ = 153.0 MPa). Combined von Mises equivalent stress σeq = 497.0 MPa ≤ 640.0 MPa (Yield safety FoS = 1.29 ≥ 1.05, PASS).',
+      block: {
+        title: 'Metric Bolt Joint Tightening Verification (M12 × 8.8)',
+        standard: 'VDI 2230-1:2015 / ISO 898-1 / ISO 68-1',
+        summary: 'Calibrated tightening torque and preload clamp force analysis under standard friction lubrication (μ = 0.14) with proof stress utilization.',
+        inputs: [
+          { label: 'Nominal diameter d', value: '12.00', unit: 'mm' },
+          { label: 'Thread pitch P', value: '1.75', unit: 'mm' },
+          { label: 'Property class', value: 'Grade 8.8', unit: 'ISO 898-1' },
+          { label: 'Yield strength Sy', value: '640.0', unit: 'MPa' },
+          { label: 'Proof strength Sp', value: '600.0', unit: 'MPa' },
+          { label: 'Tensile stress area As', value: '84.3', unit: 'mm²' },
+          { label: 'Core diameter d3', value: '10.11', unit: 'mm' },
+          { label: 'Thread friction μG', value: '0.140', unit: '[-]' },
+          { label: 'Bearing face friction μK', value: '0.140', unit: '[-]' },
+          { label: 'Target yield util. ν', value: '0.700', unit: '(70% Sp)' },
+        ],
+        relations: [
+          { name: 'Target Preload FM', formula: 'FM = ν · Sp · As', clause: 'VDI 2230 / ISO 898-1' },
+          { name: 'Tightening Torque MA', formula: 'MA = (K1 + K2 + K3) · FM · d', clause: 'VDI 2230 Torque Engine' },
+          { name: 'Torsional Shear Stress τ', formula: 'τ = (M2 · 1000) / Wp  [Wp = (π · d3³) / 16]', clause: 'VDI 2230 Clause 5.5' },
+          { name: 'von Mises Equivalent Stress', formula: 'σeq = √(σz² + 3 · τ²) ≤ Sy', clause: 'VDI 2230 / DIN EN ISO 898-1' },
+        ],
+        intermediates: [
+          { label: 'Axial tensile stress σz', value: '420.0', unit: 'MPa', note: 'σz = FM / As = 35400 / 84.3' },
+          { label: 'Torsional shear stress τ', value: '153.0', unit: 'MPa', note: 'Polar modulus Wp = 346.4 mm³' },
+          { label: 'Preload clamp force FM', value: '35.4', unit: 'kN', note: 'FM = 0.70 · 600 · 84.3 · 10⁻³' },
+          { label: 'Tightening torque MA', value: '83.1', unit: 'N·m', note: 'Nut factor K = 0.196' },
+        ],
+        result: {
+          label: 'Equivalent von Mises Stress & Tightening Torque',
+          value: 'σeq = 497.0 MPa | MA = 83.1 N·m | FM = 35.4 kN',
+          limit: 'σeq ≤ 640.0 MPa (Sy) | FoS = 1.29 ≥ 1.05',
+          status: 'PASS',
+          margin: '+28.9% yield reserve (FoS = 1.29)',
+        },
+      },
     },
   },
   bearings: {
     formula: 'L_{10} = \\left(\\frac{C}{P}\\right)^p \\times 10^6 \\text{ rev}, \\quad L_{10h} = \\frac{L_{10} \\times 10^6}{60 \\cdot n}',
-    formulaNote: 'p = 3 (ball bearings) or 10/3 (roller bearings). ISO 281 basic rating life with radial/axial equivalent dynamic load P.',
-    standards: ['ISO 281:2007', 'ISO 76 (Static rating)', 'DIN 622'],
+    formulaNote: 'p = 3 (ball bearings) or 10/3 (roller bearings). ISO 281 basic rating life with radial/axial equivalent dynamic load P = X·Fr + Y·Fa.',
+    standards: ['ISO 281:2007', 'ISO 76:2006 (Static rating)'],
     assumptions: [
       'Equivalent dynamic load P = X·Fr + Y·Fa computed per ISO 281 radial/axial factors',
       'Operating temperature and lubricant viscosity ratio κ (kappa) maintain elastohydrodynamic film',
@@ -38,21 +115,91 @@ const CARDS: Record<string, ModuleMethod> = {
     academyLabel: 'Bearing life guide',
     workedExample: {
       title: 'Worked example — 6208 Deep Groove Ball Bearing (Fr = 6 kN, Fa = 1.8 kN, n = 1500 rpm)',
-      result: 'Calculates equivalent load P = 6.84 kN. With C = 32.5 kN, L10 = 107.5 million revs (1,194 operating hours at 1500 rpm).',
+      result: 'Calculates equivalent dynamic load P = 6.15 kN. With dynamic rating C = 32.5 kN, basic rating life is L10 = 147.6 million revs (1,640 operating hours at 1500 rpm). Static safety S0 = 3.17 ≥ 1.50 (PASS).',
+      block: {
+        title: 'Deep Groove Ball Bearing L10 Rating Life (SKF 6208)',
+        standard: 'ISO 281:2007 / ISO 76:2006',
+        summary: 'Dynamic equivalent load and basic rating life (L10 revolutions and L10h hours) under combined radial and thrust loading at 1500 rpm.',
+        inputs: [
+          { label: 'Bearing designation', value: 'SKF 6208 (40×80×18)', unit: 'ISO 15' },
+          { label: 'Dynamic load capacity C', value: '32.50', unit: 'kN' },
+          { label: 'Static load capacity C0', value: '19.00', unit: 'kN' },
+          { label: 'Radial force Fr', value: '6.00', unit: 'kN' },
+          { label: 'Axial force Fa', value: '1.80', unit: 'kN' },
+          { label: 'Rotational speed n', value: '1500', unit: 'rpm' },
+          { label: 'Life exponent p', value: '3.00', unit: '(Ball)' },
+          { label: 'Operating temperature T', value: '65.0', unit: '°C' },
+        ],
+        relations: [
+          { name: 'Equivalent Dynamic Load P', formula: 'P = X·Fr + Y·Fa  (X=0.56, Y=1.55 when Fa/Fr > e)', clause: 'ISO 281:2007 Clause 5.2.2' },
+          { name: 'Rating Life (Revolutions)', formula: 'L10 = (C / P)^p  [10^6 rev]', clause: 'ISO 281:2007 Clause 5.1' },
+          { name: 'Rating Life (Hours)', formula: 'L10h = (10^6 · L10) / (60 · n)  [h]', clause: 'ISO 281:2007 Clause 5.1' },
+          { name: 'Static Safety Factor S0', formula: 'S0 = C0 / P0  (P0 = max(Fr, 0.6·Fr + 0.5·Fa))', clause: 'ISO 76:2006 Clause 5' },
+        ],
+        intermediates: [
+          { label: 'Axial load ratio Fa/C0', value: '0.0947', unit: '[-]', note: 'Limiting thrust factor e = 0.28 (Fa/Fr = 0.30 > e)' },
+          { label: 'Equivalent dynamic load P', value: '6.15', unit: 'kN', note: 'P = 0.56·(6.0) + 1.55·(1.80)' },
+          { label: 'Static safety factor S0', value: '3.17', unit: '[-]', note: 'P0 = max(6.0, 0.6·6 + 0.5·1.8) = 6.00 kN' },
+          { label: 'Rating life revolutions L10', value: '147.6', unit: 'million rev', note: '(32.50 / 6.15)^3.0' },
+        ],
+        result: {
+          label: 'Rating Life L10h & Static Safety S0',
+          value: 'L10h = 1,640 hrs (L10 = 147.6M rev)',
+          limit: 'L10h ≥ 1,500 hrs target | S0 = 3.17 ≥ 1.50',
+          status: 'PASS',
+          margin: '+9.3% life reserve, S0 2.1x over required',
+        },
+      },
     },
   },
   gears: {
     formula: '\\sigma_H = Z_H Z_E \\sqrt{\\frac{F_t}{d_1 b} \\frac{u+1}{u} K_A K_V K_H}, \\quad \\sigma_F = \\frac{F_t}{b \\cdot m_n} Y_F Y_S K_A K_V K_F',
     formulaNote: 'ISO 6336 Method B contact stress (pitting σH) and tooth root bending stress (σF) with Lewis form factor YF, stress correction YS, and safety factors SH, SF.',
-    standards: ['ISO 6336-1/2/3', 'DIN 3960 / DIN 3990', 'AGMA 2001-D04'],
+    standards: ['ISO 6336-1/2/3:2019', 'DIN 3960 / DIN 3990', 'AGMA 2001-D04'],
     assumptions: [
       'Standard 20° pressure angle involute gear profile with standard addendum/dedendum coefficients',
       'Tooth contact pattern and elastohydrodynamic oil film prevent micro-pitting and scuffing',
-      'Required safety factor margins: SH ≥ 1.0 against pitting, SF ≥ 1.4 against root bending fatigue',
+      'Required safety factor margins: SH ≥ 1.20 against pitting, SF ≥ 1.40 against root bending fatigue',
     ],
     workedExample: {
-      title: 'Worked example — Spur Gear Pinion (m = 3 mm, z1 = 20, z2 = 60, b = 30 mm, Torque = 120 N·m)',
-      result: 'Calculates tangential load Ft = 4,000 N, contact stress σH = 685 MPa (SH = 1.35), and root bending stress σF = 184 MPa (SF = 2.10 against 16MnCr5 alloy).',
+      title: 'Worked example — Spur Gear Pinion (m = 3 mm, z1 = 20, z2 = 60, b = 40 mm, T1 = 120 N·m)',
+      result: 'Calculates tangential load Ft = 4,000 N, contact stress σH = 685.0 MPa (SH = 1.35 ≥ 1.20), and root bending stress σF = 184.0 MPa (SF = 2.10 ≥ 1.40 against 16MnCr5 alloy, PASS).',
+      block: {
+        title: 'Cylindrical Spur Gear Contact & Bending Verification (16MnCr5)',
+        standard: 'ISO 6336-1/2/3:2019 / DIN 3990 Method B',
+        summary: 'Design verification of case-hardened steel pinion driving 60-tooth gear with contact stress (pitting) and root bending fatigue evaluation.',
+        inputs: [
+          { label: 'Normal module mn', value: '3.00', unit: 'mm' },
+          { label: 'Pinion tooth count z1', value: '20', unit: '[-]' },
+          { label: 'Wheel tooth count z2', value: '60', unit: '[-]' },
+          { label: 'Face width b', value: '40.0', unit: 'mm' },
+          { label: 'Pinion input torque T1', value: '120.0', unit: 'N·m' },
+          { label: 'Pinion speed n1', value: '1450', unit: 'rpm' },
+          { label: 'Pinion material', value: '16MnCr5 Case-hardened', unit: 'ISO 683-3' },
+          { label: 'Contact fatigue limit σHlim', value: '1500.0', unit: 'MPa' },
+          { label: 'Bending fatigue limit σFlim', value: '430.0', unit: 'MPa' },
+          { label: 'Application factor KA', value: '1.25', unit: '[-]' },
+        ],
+        relations: [
+          { name: 'Tangential Load Ft', formula: 'Ft = (2000 · T1) / d1', clause: 'ISO 6336-1:2019 Clause 4' },
+          { name: 'Contact Stress (Pitting) σH', formula: 'σH = ZH · ZE · √( (Ft · KA · KV · 1.5) / (d1 · b) )', clause: 'ISO 6336-2:2019 Clause 5' },
+          { name: 'Tooth Root Bending σF', formula: 'σF = (Ft · KA · KV · YF · YS) / (b · mn)', clause: 'ISO 6336-3:2019 Clause 5' },
+          { name: 'Safety Factor Bounds', formula: 'SH = σHP / σH ≥ 1.20,  SF = σFP / σF ≥ 1.40', clause: 'DIN 3990 / ISO 6336' },
+        ],
+        intermediates: [
+          { label: 'Pitch diameter d1', value: '60.0', unit: 'mm', note: 'd1 = z1 · mn' },
+          { label: 'Tangential driving load Ft', value: '4000.0', unit: 'N', note: 'Ft = 2000·120 / 60' },
+          { label: 'Contact stress (pitting) σH', value: '685.0', unit: 'MPa', note: 'Allowable limit σHP = 925.0 MPa' },
+          { label: 'Root bending stress σF', value: '184.0', unit: 'MPa', note: 'Allowable limit σFP = 386.4 MPa' },
+        ],
+        result: {
+          label: 'Pitting & Root Fatigue Safety',
+          value: 'σH = 685.0 MPa (SH = 1.35) | σF = 184.0 MPa (SF = 2.10)',
+          limit: 'SH ≥ 1.20 (Pitting) & SF ≥ 1.40 (Bending)',
+          status: 'PASS',
+          margin: 'SH = 1.35 ≥ 1.20 | SF = 2.10 ≥ 1.40',
+        },
+      },
     },
   },
   'planetary-gearbox': {
@@ -142,17 +289,54 @@ const CARDS: Record<string, ModuleMethod> = {
     },
   },
   shafts: {
-    formula: 'd = \\left( \\frac{16}{\\pi \\tau_{\\text{allow}}} \\sqrt{(K_b M)^2 + (K_t T)^2} \\right)^{1/3}',
-    formulaNote: 'ASME / Shigley combined bending and torsional shaft sizing with shock and fatigue factors Kb and Kt.',
-    standards: ['ASME B106.1M', 'DIN 743 (Fatigue limits)', 'ISO 286 (Fits)'],
+    formula: 'M_{\\max} = \\frac{F \\cdot a \\cdot (L - a)}{L}, \\quad \\sigma_{vm} = \\sqrt{\\sigma_b^2 + 3\\tau^2}, \\quad \\text{FoS} = \\frac{S_y}{\\sigma_{vm}}',
+    formulaNote: 'Simply supported transmission shaft under point load F and driving torque T. Calculates bearing reactions RA/RB, max bending moment, von Mises equivalent stress, and safety factor.',
+    standards: ['DIN 743-1/2:2012', 'ASME B106.1M', 'Euler-Bernoulli Statics'],
     assumptions: [
-      'Combined dynamic bending moment M and steady/reversing torsional moment T applied concurrently',
-      'Stress concentration notches (keyways, shoulders, retaining ring grooves) reduce allowable shear limit',
-      'Shaft deflection and slope at bearing seats verified to protect rolling element life',
+      'Simply supported boundary condition with ideal rigid knife-edge or self-aligning bearing supports',
+      'Uniform circular shaft cross-section with elastic stress distribution below yield limit Sy',
+      'Minimum required design factor of safety nreq ≥ 2.00 under nominal operating conditions',
     ],
     workedExample: {
-      title: 'Worked example — Drive Shaft (M = 250 N·m, T = 400 N·m, τ_allow = 50 MPa, Kb = 1.5, Kt = 1.0)',
-      result: 'Calculates equivalent torque Teq = 548.3 N·m, yielding minimum required solid shaft diameter d = 38.2 mm (standard nominal 40 mm selected).',
+      title: 'Worked example — Stepped Transmission Shaft (C45 / AISI 1045, L = 500 mm, d = 30 mm)',
+      result: 'Mid-span point load F = 2000 N and driving torque T = 80 N·m yield bearing reactions RA = RB = 1000 N and max bending moment M = 250 N·m. Combined von Mises stress σvm = 97.87 MPa delivers FoS = 4.39 ≥ 2.00 and required diameter dreq = 23.36 mm ≤ 30.00 mm (PASS).',
+      block: {
+        title: 'Stepped Drive Shaft Bearing Reactions & Combined Stress Analysis',
+        standard: 'DIN 743-1/2:2012 / ASME B106.1M / FKM-Guideline',
+        summary: 'Simply supported transmission shaft under transverse point load and steady torque with bearing reactions, maximum bending moment, von Mises stress, and diameter verification.',
+        inputs: [
+          { label: 'Shaft total length L', value: '500.0', unit: 'mm' },
+          { label: 'Load position a', value: '250.0', unit: 'mm' },
+          { label: 'Transverse load F', value: '2000.0', unit: 'N' },
+          { label: 'Driving torque T', value: '80.0', unit: 'N·m' },
+          { label: 'Nominal diameter d', value: '30.0', unit: 'mm' },
+          { label: 'Shaft material', value: 'C45 / AISI 1045 Medium Carbon', unit: 'EN 10083-2' },
+          { label: 'Yield strength Sy', value: '430.0', unit: 'MPa' },
+          { label: 'Tensile strength Sut', value: '650.0', unit: 'MPa' },
+          { label: 'Design safety target nreq', value: '2.00', unit: '[-]' },
+        ],
+        relations: [
+          { name: 'Bearing Support Reactions', formula: 'RA = F · (L - a) / L,  RB = F · a / L', clause: 'DIN 743-1:2012 / ASME B106.1M' },
+          { name: 'Maximum Bending Moment', formula: 'Mmax = (F · a · (L - a)) / L', clause: 'Euler-Bernoulli Beam Statics' },
+          { name: 'Bending & Torsional Stresses', formula: 'σb = (32 · Mmax) / (π · d³),  τ = (16 · T) / (π · d³)', clause: 'DIN 743-1 Clause 4' },
+          { name: 'von Mises Equivalent Stress', formula: 'σvm = √(σb² + 3 · τ²)', clause: 'Distortion Energy Theory' },
+          { name: 'Minimum Required Diameter', formula: 'dreq = [ (32 · nreq / (π · Sy)) · √(Mmax² + 0.75 · T²) ]^(1/3)', clause: 'ASME B106.1M Design Eq.' },
+        ],
+        intermediates: [
+          { label: 'Support reaction forces RA, RB', value: '1000.0', unit: 'N', note: 'Symmetric load distribution at mid-span' },
+          { label: 'Peak bending moment Mmax', value: '250.0', unit: 'N·m', note: 'Maximum at load point x = 250 mm' },
+          { label: 'Normal bending stress σb', value: '94.31', unit: 'MPa', note: 'Outer fiber peak tensile/compressive stress' },
+          { label: 'Torsional shear stress τ', value: '15.09', unit: 'MPa', note: 'Outer surface shear stress' },
+          { label: 'Combined von Mises stress σvm', value: '97.87', unit: 'MPa', note: 'Equivalent multi-axial stress' },
+        ],
+        result: {
+          label: 'Yield Safety Factor FoS & Minimum Diameter dreq',
+          value: 'FoS = 4.39 | dreq = 23.36 mm',
+          limit: 'FoS ≥ 2.00 | d = 30.00 mm ≥ 23.36 mm',
+          status: 'PASS',
+          margin: '+119.5% safety margin above required FoS',
+        },
+      },
     },
   },
   'welding': {
@@ -379,14 +563,100 @@ const CARDS: Record<string, ModuleMethod> = {
     ],
   },
   aluminum: {
-    formula: 'm = \\rho \\cdot V = \\rho \\cdot (A \\cdot L)',
-    formulaNote: 'Extruded aluminum profile weight and mass computation from cross-sectional area and certified alloy density.',
-    standards: ['EN 755-2 / EN 573-3 (Chemical composition & mechanical properties)', 'ASTM B221'],
+    formula: 'm\' = \\frac{A \\cdot \\rho}{1000} \\quad [\\text{kg/m}], \\quad M = m\' \\cdot \\frac{L}{1000} \\quad [\\text{kg}]',
+    formulaNote: 'EN 755-9 linear mass per meter and cut bar mass based on solid cross-section area A (mm²), certified alloy density ρ (g/cm³), and cut length L (mm).',
+    standards: ['EN 755-9:2016', 'EN 12020-2:2016', 'ISO 209:2007', 'EN 573-3'],
     assumptions: [
-      'Uniform cross-sectional profile geometry along total length L',
-      'Alloy density selected from certified metallurgical ledger (e.g. 6060: 2.70 g/cm³, 6082: 2.71 g/cm³, 7075: 2.81 g/cm³)',
-      'Nominal dimensions calculated at standard ambient temperature (20 °C)',
+      'Alloy density certified per ISO 209 / EN 573-3 chemical composition limits',
+      'Dimensional extrusion tolerances conform to EN 12020-2 precision standard',
+      'Permissible mass deviation restricted to ±5.0% Class A tolerance per EN 755-9',
     ],
+    workedExample: {
+      title: 'Worked example — Extruded T-Slot 40×40 Profile (EN AW-6063-T6, L = 2500 mm)',
+      result: 'Solid cross-section area A = 648.5 mm² with alloy density ρ = 2.70 g/cm³ yields linear mass m\' = 1.751 kg/m and total bar mass M = 4.378 kg. Nominal wall thickness t = 2.20 mm complies with minimum limit 1.95 mm (PASS).',
+      block: {
+        title: 'Structural Aluminum T-Slot Profile Mass & Tolerance (40×40 Heavy)',
+        standard: 'EN 755-9:2016 / EN 12020-2:2016 / ISO 209',
+        summary: 'Cross-sectional solid area, linear mass per meter, cut bar mass, and precision dimensional tolerance verification for EN AW-6063-T6 architectural alloy.',
+        inputs: [
+          { label: 'Profile geometry', value: '40×40 Modular Heavy', unit: 'EN 12020-2' },
+          { label: 'Solid cross-section area A', value: '648.5', unit: 'mm²' },
+          { label: 'Alloy designation', value: 'EN AW-6063-T6 (AlMg0.7Si)', unit: 'EN 573-3' },
+          { label: 'Certified alloy density ρ', value: '2.700', unit: 'g/cm³' },
+          { label: 'Cut bar length L', value: '2500.0', unit: 'mm' },
+          { label: 'Nominal wall thickness t', value: '2.20', unit: 'mm' },
+          { label: 'Wall tolerance class', value: 'EN 12020-2 Precision (±0.25 mm)', unit: 'Tab. 3' },
+          { label: 'Mass tolerance class', value: 'Class A (±5.0%)', unit: 'EN 755-9' },
+        ],
+        relations: [
+          { name: 'Linear Mass per Meter', formula: 'm\' = (A · ρ) / 1000  [kg/m]', clause: 'EN 755-9:2016 Clause 4.2' },
+          { name: 'Total Bar Mass', formula: 'M = m\' · (L / 1000)  [kg]', clause: 'EN 755-1 / ISO 209' },
+          { name: 'Wall Thickness Bound', formula: 'tmin = tnom - Δt ≤ tactual', clause: 'EN 12020-2:2016 Table 3' },
+          { name: 'Linear Weight Window', formula: 'm\'min ≤ m\' ≤ m\'max  (m\' ± 5.0%)', clause: 'EN 755-9:2016 Clause 4.3' },
+        ],
+        intermediates: [
+          { label: 'Net piece volume V', value: '1.621×10^6', unit: 'mm³', note: 'V = A · L = 648.5 · 2500' },
+          { label: 'Minimum allowable wall tmin', value: '1.95', unit: 'mm', note: '2.20 mm - 0.25 mm tolerance' },
+          { label: 'Section moment of inertia Ix', value: '9.24', unit: 'cm⁴', note: 'Biaxial symmetry in 40×40 core' },
+          { label: 'Allowable linear weight band', value: '1.663 – 1.838', unit: 'kg/m', note: '±5% tolerance window per EN 755-9' },
+        ],
+        result: {
+          label: 'Extrusion Linear Mass m\' & Cut Bar Mass M',
+          value: 'm\' = 1.751 kg/m | M = 4.378 kg',
+          limit: 'm\' ∈ [1.663, 1.838] kg/m (EN 755-9 ±5% mass band)',
+          status: 'PASS',
+          margin: 'Nominal m\' = 1.751 kg/m within ±5% tolerance band',
+        },
+      },
+    },
+  },
+  'profile-weight': {
+    formula: 'm\' = \\frac{A \\cdot \\rho}{1000} \\quad [\\text{kg/m}], \\quad M = m\' \\cdot \\frac{L}{1000} \\quad [\\text{kg}]',
+    formulaNote: 'EN 755-9 linear mass per meter and cut bar mass based on solid cross-section area A (mm²), certified alloy density ρ (g/cm³), and cut length L (mm).',
+    standards: ['EN 755-9:2016', 'EN 12020-2:2016', 'ISO 209:2007', 'EN 573-3'],
+    assumptions: [
+      'Alloy density certified per ISO 209 / EN 573-3 chemical composition limits',
+      'Dimensional extrusion tolerances conform to EN 12020-2 precision standard',
+      'Permissible mass deviation restricted to ±5.0% Class A tolerance per EN 755-9',
+    ],
+    workedExample: {
+      title: 'Worked example — Extruded T-Slot 40×40 Profile (EN AW-6063-T6, L = 2500 mm)',
+      result: 'Solid cross-section area A = 648.5 mm² with alloy density ρ = 2.70 g/cm³ yields linear mass m\' = 1.751 kg/m and total bar mass M = 4.378 kg for L = 2500 mm. Complies with EN 755-9 linear mass tolerance band [1.663, 1.838] kg/m (PASS).',
+      block: {
+        title: 'Structural Aluminum T-Slot Profile Mass & Tolerance (40×40 Heavy)',
+        standard: 'EN 755-9:2016 / EN 12020-2:2016 / ISO 209',
+        summary: 'Cross-sectional solid area, linear mass per meter, cut bar mass, and mass tolerance verification for EN AW-6063-T6 architectural alloy.',
+        inputs: [
+          { label: 'Profile geometry', value: '40×40 Modular Heavy', unit: 'EN 12020-2' },
+          { label: 'Solid cross-section area A', value: '648.5', unit: 'mm²' },
+          { label: 'Alloy designation', value: 'EN AW-6063-T6 (AlMg0.7Si)', unit: 'EN 573-3' },
+          { label: 'Certified alloy density ρ', value: '2.700', unit: 'g/cm³' },
+          { label: 'Cut bar length L', value: '2500.0', unit: 'mm' },
+          { label: 'Nominal wall thickness t', value: '2.20', unit: 'mm' },
+          { label: 'Wall tolerance class', value: 'EN 12020-2 Precision (±0.25 mm)', unit: 'Tab. 3' },
+          { label: 'Mass tolerance class', value: 'Class A (±5.0%)', unit: 'EN 755-9' },
+        ],
+        relations: [
+          { name: 'Linear Mass per Meter', formula: 'm\' = (A · ρ) / 1000  [kg/m]', clause: 'EN 755-9:2016 Clause 4.2' },
+          { name: 'Total Bar Mass', formula: 'M = m\' · (L / 1000)  [kg]', clause: 'EN 755-1 / ISO 209' },
+          { name: 'Wall Thickness Bound', formula: 'tmin = tnom - Δt ≤ tactual', clause: 'EN 12020-2:2016 Table 3' },
+          { name: 'Linear Weight Window', formula: 'm\'min ≤ m\' ≤ m\'max  (m\' ± 5.0%)', clause: 'EN 755-9:2016 Clause 4.3' },
+        ],
+        intermediates: [
+          { label: 'Net piece volume V', value: '1.621×10^6', unit: 'mm³', note: 'V = A · L = 648.5 · 2500' },
+          { label: 'Minimum allowable wall tmin', value: '1.95', unit: 'mm', note: '2.20 mm - 0.25 mm tolerance' },
+          { label: 'Section moment of inertia Ix', value: '9.24', unit: 'cm⁴', note: 'Biaxial symmetry in 40×40 core' },
+          { label: 'Allowable linear weight band', value: '1.663 – 1.838', unit: 'kg/m', note: '±5% tolerance window per EN 755-9' },
+        ],
+        result: {
+          label: 'Extrusion Linear Mass m\' & Cut Bar Mass M',
+          value: 'm\' = 1.751 kg/m | M = 4.378 kg',
+          limit: 'm\' ∈ [1.663, 1.838] kg/m (EN 755-9 ±5% mass band)',
+          status: 'PASS',
+          margin: 'Nominal m\' = 1.751 kg/m within ±5% tolerance band',
+        },
+      },
+    },
   },
   'periodic-table': {
     formula: '\\text{Molar Mass} = \\sum_{i} n_i M_i, \\quad \\rho = \\frac{m}{V}, \\quad \\text{Valence Electron Shells}',
@@ -611,6 +881,7 @@ const ALIAS: Record<string, string> = {
   fits: 'fits-tolerances',
   'beam-deflection': 'beam-deflection',
   shafts: 'shafts',
+  shaft: 'shafts',
   welding: 'welding',
   'welding-fillet': 'welding',
   'nesting-2d': 'nesting-2d',
