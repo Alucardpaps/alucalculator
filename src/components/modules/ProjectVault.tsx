@@ -15,12 +15,12 @@ export default function ProjectVault() {
   ]);
 
   return (
-    <div className="flex h-full bg-[#05070a] text-slate-300 font-sans overflow-hidden">
+    <div className="flex h-full bg-[var(--bg-0)] text-slate-300 font-sans overflow-hidden">
       {/* Sidebar: Branches & Remotes */}
       <div className="w-64 bg-slate-900/20 border-r border-white/5 flex flex-col shrink-0">
         <div className="p-6">
             <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center ">
                     <Shield size={16} className="text-white" />
                 </div>
                 <span className="font-black text-sm uppercase tracking-tighter text-white">Project Vault</span>
@@ -79,7 +79,7 @@ export default function ProjectVault() {
                         className="bg-white/5 border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-xs focus:border-blue-500/50 outline-none w-48 transition-all"
                     />
                 </div>
-                <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20">
+                <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors shadow-lg ">
                     <Plus size={16} />
                 </button>
             </div>
@@ -127,7 +127,7 @@ export default function ProjectVault() {
             <button className="flex items-center gap-2 px-6 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-700 transition-all border border-white/5">
                 <GitCommit size={14} /> STAGE ALL
             </button>
-            <button className="flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:bg-blue-500 transition-all active:scale-95">
+            <button className="flex items-center gap-2 px-8 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-500 transition-all active:scale-95">
                 COMMIT CHANGES
             </button>
         </div>

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Meteors } from './magicui/Meteors';
 import BlurFade from './magicui/BlurFade';
+import { APP_VERSION, APP_MODULE_COUNT } from '@/config/app';
 
 export const Hero = ({ lang }: { lang?: string }) => {
     const [query, setQuery] = useState('');
@@ -17,7 +18,7 @@ export const Hero = ({ lang }: { lang?: string }) => {
         const q = query.toLowerCase();
 
         let path = '';
-        if (q.includes('bolt') || q.includes('fastener') || q.includes('civata') || q.includes('vida')) path = 'fasteners';
+        if (q.includes('bolt') || q.includes('fastener') || q.includes('civata') || q.includes('vida') || q.includes('tork')) path = 'bolt-torque';
         else if (q.includes('gear') || q.includes('disli') || q.includes('dişli')) path = 'gears';
         else if (q.includes('pump') || q.includes('pompa')) path = 'pumps';
         else if (q.includes('weld') || q.includes('kaynak')) path = 'welding';
@@ -27,9 +28,9 @@ export const Hero = ({ lang }: { lang?: string }) => {
         else if (q.includes('conv') || q.includes('cevir') || q.includes('çevir')) path = 'converter';
         else if (q.includes('sheet') || q.includes('sac') || q.includes('metal')) path = 'sheet-metal';
         else if (q.includes('fit') || q.includes('tol')) path = 'fits';
-        else return; // Shake animation or toast could go here
+        else return;
 
-        router.push(`/${currentLang}/${path}`);
+        router.push(`/${path}`);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -46,42 +47,41 @@ export const Hero = ({ lang }: { lang?: string }) => {
 
             <div className="relative z-10 max-w-3xl mx-auto space-y-6">
                 <BlurFade delay={0.1} yOffset={10}>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-slate-800 border border-blue-100 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wider uppercase">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                        v4.0.0 Stable
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[var(--radius-s)] bg-[var(--bg-1)] border border-[var(--cyan)]/30 text-[var(--cyan)] text-xs font-mono font-bold tracking-wider uppercase">
+                        <span className="w-2 h-2 rounded-full bg-[var(--ok)] animate-pulse"></span>
+                        v{APP_VERSION} Stable · {APP_MODULE_COUNT} Solvers
                     </div>
                 </BlurFade>
 
                 <BlurFade delay={0.25} yOffset={20}>
-                    <h1 className="text-4xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
+                    <h1 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
                         ENGINEERING <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">INTELLIGENCE</span>
+                        <span className="text-[var(--cyan)]">INTELLIGENCE</span>
                     </h1>
                 </BlurFade>
 
                 <BlurFade delay={0.4} yOffset={30}>
-                    <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
-                        The advanced toolkit for mechanical engineers. Compute weight, fits, gears, and thermodynamics with precision.
+                    <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
+                        Deterministic ISO / DIN / VDI mechanical engineering solvers and 3D parametric CAD.
                     </p>
                 </BlurFade>
 
                 {/* Search Bar Visual */}
                 <BlurFade delay={0.55} yOffset={40}>
                     <div className="relative max-w-md mx-auto w-full group">
-                        <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                        <div className="relative flex items-center bg-white dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-xl rounded-full p-2 pl-6 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-                            <Search className="text-slate-400 mr-3" size={20} />
+                        <div className="relative flex items-center bg-[var(--bg-2)] border border-[var(--line-strong)] shadow-xl rounded-[var(--radius-m)] p-2 pl-4 focus-within:ring-1 focus-within:ring-[var(--cyan)] transition-all">
+                            <Search className="text-[var(--muted)] mr-3" size={18} />
                             <input
                                 type="text"
-                                placeholder="Search calculator (e.g. 'Bolt', 'Gear')..."
-                                className="bg-transparent w-full outline-none text-slate-700 dark:text-slate-100 font-medium placeholder:text-slate-400"
+                                placeholder="Search calculator (e.g. 'Bolt', 'Gear', 'Beam')..."
+                                className="bg-transparent w-full outline-none text-[var(--ink)] font-mono text-sm placeholder:text-[var(--muted)]"
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 onKeyDown={handleKeyDown}
                             />
                             <button
                                 onClick={handleSearch}
-                                className="bg-slate-900 dark:bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors active:scale-95 transform"
+                                className="bg-[var(--cyan)] text-[var(--bg-0)] px-5 py-2 rounded-[var(--radius-s)] font-bold text-xs tracking-wider uppercase hover:bg-[var(--cyan)] transition-colors active:scale-95 transform"
                             >
                                 GO
                             </button>

@@ -303,15 +303,6 @@ export const CALCULATOR_REGISTRY_V2: MixedCalculatorRegistry = {
         },
     },
 
-    'failure-analysis': {
-        loader: () => import('./schemas-v2/failure-analysis'),
-        metadata: {
-            title: 'Failure Analysis & Safety',
-            description: 'Yield, fatigue, and overload failure mode analysis (ASME B15.1)',
-            category: 'mechanical',
-            icon: 'AlertTriangle',
-        },
-    },
 
     'fatigue-life-sn': {
         loader: () => import('./schemas-v2/fatigue-life-sn'),

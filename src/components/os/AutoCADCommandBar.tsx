@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronRight, Terminal, Zap, Hash, MousePointer2 } from 'lucide-react';
 import { useOSStore } from '@/store/osStore';
+import { APP_RELEASE_NAME } from '@/config/app';
 
 /**
  * AutoCAD-Style Command Bar
@@ -16,7 +17,7 @@ import { useOSStore } from '@/store/osStore';
  */
 export const AutoCADCommandBar: React.FC = () => {
     const [command, setCommand] = useState('');
-    const [history, setHistory] = useState<string[]>(['Welcome to AluCalc OS v5.0 Command Engine.', 'Type HELP for a list of available commands.']);
+    const [history, setHistory] = useState<string[]>([`Welcome to ${APP_RELEASE_NAME} Command Engine.`, 'Type HELP for a list of available commands.']);
     const [coords, setCoords] = useState({ x: 0, y: 0 });
     const inputRef = useRef<HTMLInputElement>(null);
     const { openWindow } = useOSStore();
@@ -51,8 +52,8 @@ export const AutoCADCommandBar: React.FC = () => {
                 setHistory([]);
                 break;
             case 'MAT':
-                openWindow('material-selector-ai');
-                setHistory(prev => [...prev, `Invoking Material AI for: ${args.join(' ')}`]);
+                openWindow('handbook');
+                setHistory(prev => [...prev, `Opening Engineering Handbook & Materials: ${args.join(' ')}`]);
                 break;
             default:
                 setHistory(prev => [...prev, `Unknown command: ${action}`]);
@@ -67,7 +68,7 @@ export const AutoCADCommandBar: React.FC = () => {
     };
 
     return (
-        <div className="absolute bottom-0 left-0 right-0 z-[100] bg-[#0c111a] border-t border-cyan-500/20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] font-mono">
+        <div className="absolute bottom-0 left-0 right-0 z-[100] bg-[var(--bg-1)] border-t border-cyan-500/20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] font-mono">
             {/* Status Line */}
             <div className="flex items-center justify-between px-4 py-1 bg-black/40 border-b border-cyan-900/10 text-[9px] text-cyan-900/60 font-bold uppercase tracking-widest">
                 <div className="flex gap-4">

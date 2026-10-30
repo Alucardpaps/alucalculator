@@ -70,12 +70,12 @@ const modules = [
         path: '/pumps'
     },
     {
-        id: 'fasteners',
-        label: 'Fasteners',
-        desc: 'ISO Metric Threads',
+        id: 'bolt-torque',
+        label: 'Bolt Torque',
+        desc: 'VDI 2230 & Fasteners',
         icon: Settings,
         color: 'bg-slate-600',
-        path: '/fasteners'
+        path: '/bolt-torque'
     },
     {
         id: 'converter',
@@ -162,12 +162,12 @@ export const ModuleGrid = ({ lang, dict }: { lang: string, dict: any }) => {
             path: '/pumps'
         },
         {
-            id: 'fasteners',
-            label: dict.modules.fasteners.title,
-            desc: dict.modules.fasteners.desc,
+            id: 'bolt-torque',
+            label: dict.modules.fasteners?.title || 'Bolt Torque',
+            desc: dict.modules.fasteners?.desc || 'VDI 2230 & Fasteners',
             icon: Settings,
             color: 'bg-slate-600',
-            path: '/fasteners'
+            path: '/bolt-torque'
         },
         {
             id: 'converter',
@@ -220,7 +220,7 @@ export const ModuleGrid = ({ lang, dict }: { lang: string, dict: any }) => {
                         prefetch={false}
                         key={m.id}
                         href={`/${lang}${m.path}`}
-                        className="group relative overflow-hidden bg-white dark:bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                        className="group relative overflow-hidden bg-white dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     >
                         {/* Hover Gradient Background */}
                         <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 ${m.color} transition-opacity`}></div>

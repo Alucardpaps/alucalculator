@@ -6,6 +6,7 @@ import { Wind, Activity, Maximize2, Settings2, Box, Plane, Car } from 'lucide-re
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, useGLTF, Float, Instance, Instances } from '@react-three/drei';
 import * as THREE from 'three';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 // Aerodynamic logic
 export function calculateAerodynamics(velocityMs: number, area: number, cd: number, density: number) {
@@ -23,6 +24,7 @@ const SHAPES = [
 ];
 
 export default function AerodynamicsModule() {
+    const precision = useGlobalPrecision();
     const [velocity, setVelocity] = useState(120); // km/h
     const [density, setDensity] = useState(1.225); // kg/m^3 (Air at sea level)
     const [selectedShape, setSelectedShape] = useState(SHAPES[3]); // Car default
@@ -39,9 +41,9 @@ export default function AerodynamicsModule() {
     const results = useMemo(() => calculateAerodynamics(velMs, area, cd, density), [velMs, area, cd, density]);
 
     return (
-        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[var(--bg-0)] text-white overflow-hidden">
             {/* LEFT PANEL - Controls */}
-            <div className="w-full lg:w-[350px] shrink-0 flex flex-col h-auto lg:h-full bg-[#080d14]/80 border-r border-white/5 overflow-y-auto">
+            <div className="w-full lg:w-[350px] shrink-0 flex flex-col h-auto lg:h-full bg-[var(--bg-1)]/80 border-r border-white/5 overflow-y-auto">
                 <div className="p-6 border-b border-white/5">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-400">
@@ -61,19 +63,19 @@ export default function AerodynamicsModule() {
                             <Activity size={12} /> Environmental
                         </label>
                         <div className="space-y-4">
-                            <div className="bg-[#0e1622] border border-white/5 rounded-xl p-3">
+                            <div className="bg-[var(--bg-2)] border border-white/5 rounded-xl p-3">
                                 <div className="flex justify-between mb-1">
                                     <span className="text-xs text-gray-400">Wind Velocity</span>
                                     <span className="text-xs font-mono text-white">{velocity} km/h</span>
                                 </div>
-                                <input type="range" min={0} max={300} step={1} value={velocity} onChange={e => setVelocity(Number(e.target.value))} className="w-full accent-blue-500" />
+                                <input type="range" min={0} max={300} step={1} value={velocity} onChange={e => setVelocity(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
                             </div>
-                            <div className="bg-[#0e1622] border border-white/5 rounded-xl p-3">
+                            <div className="bg-[var(--bg-2)] border border-white/5 rounded-xl p-3">
                                 <div className="flex justify-between mb-1">
                                     <span className="text-xs text-gray-400">Air Density (kg/m³)</span>
                                     <span className="text-xs font-mono text-white">{density}</span>
                                 </div>
-                                <input type="range" min={0.5} max={1.5} step={0.005} value={density} onChange={e => setDensity(Number(e.target.value))} className="w-full accent-blue-500" />
+                                <input type="range" min={0.5} max={1.5} step={0.005} value={density} onChange={e => setDensity(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
                             </div>
                         </div>
                     </div>
@@ -86,14 +88,14 @@ export default function AerodynamicsModule() {
                         <div className="grid grid-cols-2 gap-2 mb-3">
                             {SHAPES.map(s => (
                                 <button key={s.id} onClick={() => { setSelectedShape(s); setUseCustom(false); }}
-                                    className={`py-2 px-3 rounded-lg text-left text-xs transition-all border ${selectedShape.id === s.id && !useCustom ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-[#0e1622] border-white/5 text-gray-400 hover:bg-white/5'}`}>
+                                    className={`py-2 px-3 rounded-lg text-left text-xs transition-all border ${selectedShape.id === s.id && !useCustom ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 'bg-[var(--bg-2)] border-white/5 text-gray-400 hover:bg-white/5'}`}>
                                     {s.name}
                                 </button>
                             ))}
                         </div>
                         
                         <div className="flex items-center gap-2 mb-3">
-                            <input type="checkbox" id="useCustom" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} className="accent-amber-500" />
+                            <input type="checkbox" id="useCustom" checked={useCustom} onChange={(e) => setUseCustom(e.target.checked)} className="accent-[var(--cyan)]" />
                             <label htmlFor="useCustom" className="text-xs text-gray-400 cursor-pointer">Custom Parameters</label>
                         </div>
 
@@ -103,11 +105,11 @@ export default function AerodynamicsModule() {
                                     <div className="flex gap-2">
                                         <div className="flex-1">
                                             <span className="text-[10px] text-gray-500">Drag Coeff (Cd)</span>
-                                            <input type="number" step={0.01} value={customCd} onChange={e => setCustomCd(Number(e.target.value))} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 text-white mt-1 outline-none" />
+                                            <input type="number" step={0.01} value={customCd} onChange={e => setCustomCd(Number(e.target.value))} className="w-full bg-[var(--bg-3)] border border-white/10 rounded text-sm p-2 text-white mt-1 outline-none" />
                                         </div>
                                         <div className="flex-1">
                                             <span className="text-[10px] text-gray-500">Ref Area (m²)</span>
-                                            <input type="number" step={0.1} value={customArea} onChange={e => setCustomArea(Number(e.target.value))} className="w-full bg-[#1a2230] border border-white/10 rounded text-sm p-2 text-white mt-1 outline-none" />
+                                            <input type="number" step={0.1} value={customArea} onChange={e => setCustomArea(Number(e.target.value))} className="w-full bg-[var(--bg-3)] border border-white/10 rounded text-sm p-2 text-white mt-1 outline-none" />
                                         </div>
                                     </div>
                                 </motion.div>
@@ -120,7 +122,7 @@ export default function AerodynamicsModule() {
             {/* RIGHT PANEL - 3D View & Results */}
             <div className="flex-1 flex flex-col min-w-0 relative">
                 {/* 3D Scene */}
-                <div className="flex-1 bg-gradient-to-b from-[#050a14] to-[#020408] relative">
+                <div className="flex-1 bg-gradient-to-b from-[var(--bg-0)] to-[var(--bg-0)] relative">
                     <Canvas camera={{ position: [4, 2, 5], fov: 45 }}>
                         <ambientLight intensity={0.5} />
                         <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
@@ -150,9 +152,9 @@ export default function AerodynamicsModule() {
 
                     {/* Overlay Stats */}
                     <div className="absolute top-6 right-6 flex flex-col gap-3">
-                        <StatCard label="Drag Force" value={results.dragForce >= 1000 ? (results.dragForce / 1000).toFixed(2) + ' kN' : results.dragForce.toFixed(1) + ' N'} color="#ef4444" />
-                        <StatCard label="Required Power" value={(results.powerRequired / 1000).toFixed(1) + ' kW'} color="#f59e0b" />
-                        <StatCard label="Dynamic Pressure" value={results.dynamicPressure.toFixed(1) + ' Pa'} color="#3b82f6" />
+                        <StatCard label="Drag Force" value={results.dragForce >= 1000 ? formatEngineeringValue((results.dragForce / 1000), precision, false) + ' kN' : formatEngineeringValue(results.dragForce, precision, false) + ' N'} color="#ef4444" />
+                        <StatCard label="Required Power" value={formatEngineeringValue((results.powerRequired / 1000), precision, false) + ' kW'} color="#f59e0b" />
+                        <StatCard label="Dynamic Pressure" value={formatEngineeringValue(results.dynamicPressure, precision, false) + ' Pa'} color="#3b82f6" />
                     </div>
                 </div>
             </div>
@@ -162,7 +164,7 @@ export default function AerodynamicsModule() {
 
 function StatCard({ label, value, color }: { label: string, value: string, color: string }) {
     return (
-        <div className="bg-[#080d14]/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-xl min-w-[160px]">
+        <div className="bg-[var(--bg-1)]/80 border border-white/10 rounded-xl p-4 shadow-xl min-w-[160px]">
             <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{label}</div>
             <div className="text-2xl font-mono font-black" style={{ color }}>{value}</div>
         </div>

@@ -96,10 +96,10 @@ export const CamWindow: React.FC = () => {
     if (!isVisible) return null;
 
     return (
-        <div className="absolute top-20 right-4 z-[100] w-80 bg-[#0f1419]/95 backdrop-blur-md border border-[#2a3a4a] rounded-xl shadow-2xl flex flex-col overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-20 right-4 z-[100] w-80 bg-[var(--bg-1)]/95 border border-[var(--line-strong)] rounded-xl shadow-2xl flex flex-col overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="flex items-center justify-between p-3 border-b border-[#2a3a4a] bg-[#1a2332]/50">
-                <div className="flex items-center gap-2 text-[#00e5ff] font-bold tracking-wider">
+            <div className="flex items-center justify-between p-3 border-b border-[var(--line-strong)] bg-[var(--bg-3)]/50">
+                <div className="flex items-center gap-2 text-[var(--cyan)] font-bold tracking-wider">
                     <LayoutGrid size={14} />
                     <span>CAM OPS CONTROLLER</span>
                 </div>
@@ -109,16 +109,16 @@ export const CamWindow: React.FC = () => {
             </div>
 
             {/* Mode Switcher */}
-            <div className="grid grid-cols-2 gap-1 p-2 bg-[#0a0e14]">
+            <div className="grid grid-cols-2 gap-1 p-2 bg-[var(--bg-1)]">
                 <button
                     onClick={() => setMode('laser')}
-                    className={`flex items-center justify-center gap-2 py-2 rounded transition-colors ${mode === 'laser' ? 'bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/50' : 'bg-[#1a2332] text-gray-400 hover:text-white'}`}
+                    className={`flex items-center justify-center gap-2 py-2 rounded transition-colors ${mode === 'laser' ? 'bg-[var(--cyan)]/20 text-[var(--cyan)] border border-[var(--cyan)]/50' : 'bg-[var(--bg-3)] text-gray-400 hover:text-white'}`}
                 >
                     <Zap size={14} /> LASER
                 </button>
                 <button
                     onClick={() => setMode('punch')}
-                    className={`flex items-center justify-center gap-2 py-2 rounded transition-colors ${mode === 'punch' ? 'bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/50' : 'bg-[#1a2332] text-gray-400 hover:text-white'}`}
+                    className={`flex items-center justify-center gap-2 py-2 rounded transition-colors ${mode === 'punch' ? 'bg-[var(--warn)]/20 text-[var(--warn)] border border-[var(--warn)]/50' : 'bg-[var(--bg-3)] text-gray-400 hover:text-white'}`}
                 >
                     <MonitorPlay size={14} /> PUNCH
                 </button>
@@ -128,7 +128,7 @@ export const CamWindow: React.FC = () => {
             <div className="p-4 flex flex-col gap-4">
 
                 {/* Primary Metric: Time */}
-                <div className="flex items-center justify-between bg-[#131b26] p-3 rounded border border-[#2a3a4a]">
+                <div className="flex items-center justify-between bg-[var(--bg-2)] p-3 rounded border border-[var(--line-strong)]">
                     <span className="text-gray-400 flex items-center gap-2">
                         <Clock size={14} /> Est. Time
                     </span>
@@ -140,25 +140,25 @@ export const CamWindow: React.FC = () => {
 
                 {/* Secondary Metrics */}
                 <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-[#131b26] p-2 rounded border border-[#2a3a4a]">
+                    <div className="bg-[var(--bg-2)] p-2 rounded border border-[var(--line-strong)]">
                         <div className="text-[10px] text-gray-500 uppercase mb-1">Total Length</div>
                         <div className="text-white font-bold">{(metrics.totalLength / 1000).toFixed(2)} m</div>
                     </div>
                     {mode === 'punch' ? (
-                        <div className="bg-[#131b26] p-2 rounded border border-[#2a3a4a]">
+                        <div className="bg-[var(--bg-2)] p-2 rounded border border-[var(--line-strong)]">
                             <div className="text-[10px] text-gray-500 uppercase mb-1">Total Hits</div>
-                            <div className="text-[#f59e0b] font-bold">{metrics.totalHits}</div>
+                            <div className="text-[var(--warn)] font-bold">{metrics.totalHits}</div>
                         </div>
                     ) : (
-                        <div className="bg-[#131b26] p-2 rounded border border-[#2a3a4a]">
+                        <div className="bg-[var(--bg-2)] p-2 rounded border border-[var(--line-strong)]">
                             <div className="text-[10px] text-gray-500 uppercase mb-1">Pierces</div>
-                            <div className="text-[#00e5ff] font-bold">{metrics.entityCount}</div>
+                            <div className="text-[var(--cyan)] font-bold">{metrics.entityCount}</div>
                         </div>
                     )}
                 </div>
 
                 {/* Settings Inputs */}
-                <div className="border-t border-[#2a3a4a] pt-4 mt-2">
+                <div className="border-t border-[var(--line-strong)] pt-4 mt-2">
                     <div className="flex items-center gap-2 text-gray-400 mb-3 text-[10px] uppercase font-bold">
                         <Settings size={10} /> Machine Parameters
                     </div>
@@ -204,7 +204,7 @@ const LabelInput = ({ label, value, onChange }: { label: string, value: number, 
         <span className="text-gray-500">{label}</span>
         <input
             type="number"
-            className="w-16 bg-[#0a0e14] border border-[#2a3a4a] rounded px-2 py-1 text-right text-white focus:border-[#00e5ff] focus:outline-none transition-colors"
+            className="w-16 bg-[var(--bg-1)] border border-[var(--line-strong)] rounded px-2 py-1 text-right text-white focus:border-[var(--cyan)] focus:outline-none transition-colors"
             value={value}
             onChange={e => onChange(e.target.value)}
         />

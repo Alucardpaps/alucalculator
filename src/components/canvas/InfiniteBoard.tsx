@@ -19,12 +19,23 @@ import CoPilotNode from '../nodes/ai/CoPilotNode';
 const gridSize = 20;
 const proOptions = { hideAttribution: true };
 
+if (typeof window !== 'undefined') {
+    const originalWarn = console.warn;
+    console.warn = (...args: any[]) => {
+        if (typeof args[0] === 'string' && args[0].includes('nodeTypes or edgeTypes')) {
+            return;
+        }
+        originalWarn.apply(console, args);
+    };
+}
+
 // Node Types Registry
 const nodeTypes = {
     profileNode: ProfileNode,
     costNode: CostNode,
     aiNode: CoPilotNode
 };
+const edgeTypes = {};
 
 import RibbonBar from '@/components/ui/RibbonBar';
 import Dock from '@/components/ui/Dock';
@@ -45,6 +56,11 @@ function Board() {
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                onError={(code, message) => {
+                    if (code === '002') return;
+                    console.warn(`[React Flow]: ${message}`);
+                }}
                 proOptions={proOptions}
                 fitView
                 className="engineering-grid"
@@ -52,14 +68,14 @@ function Board() {
                 {/* Layer 0: Technical Grid */}
                 <Background color="#333" gap={gridSize} size={1} />
 
-                <Controls className="bg-[#2d2d30] border-none fill-white text-white" />
+                <Controls className="bg-[var(--line-strong)] border-none fill-white text-white" />
                 <MiniMap
                     nodeColor="#00e5ff"
                     maskColor="rgba(30, 30, 30, 0.7)"
-                    className="bg-[#252526] border border-[#333]"
+                    className="bg-[var(--bg-3)] border border-[var(--line)]"
                 />
 
-                <Panel position="top-right" className="bg-[#252526] p-2 rounded border border-[#333] text-xs text-gray-400 font-mono">
+                <Panel position="top-right" className="bg-[var(--bg-3)] p-2 rounded border border-[var(--line)] text-xs text-gray-400 font-mono">
                     ALUCALC WORKBENCH AI v1.0 • SYSTEM ACTIVE
                 </Panel>
             </ReactFlow>

@@ -39,17 +39,28 @@ export function ServiceWorkerRegistration() {
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[PWA] New version installed, prompting immediate activation...');
+                                // Tell new worker to skip waiting and activate immediately
+                                newWorker.postMessage({ type: 'SKIP_WAITING' });
                                 setUpdateAvailable(true);
-                                console.log('[PWA] New version available');
                             }
                         });
                     }
                 });
 
+                // Check for server updates whenever the user returns to or focuses the tab
+                window.addEventListener('focus', () => {
+                    void registration.update().catch((e) => console.debug('[PWA] Update check failed:', e));
+                });
+
                 // Handle controller change (new SW activated)
+                let refreshing = false;
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    console.log('[PWA] Controller changed, reloading...');
-                    window.location.reload();
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('[PWA] Controller changed to new version, reloading...');
+                        window.location.reload();
+                    }
                 });
 
             } catch (error) {

@@ -5,9 +5,10 @@
  */
 
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { SheetMetalInput, SheetMetalResult } from './engine';
 import { EngineMetadata } from '@/engine/project/ProjectSchema';
+import { drawApprovalBlock, drawBrandedFooters, drawBrandedHeader, pdfSafe } from '@/lib/report/pdfBranding';
 
 export const generateSheetMetalPDF = async (
     input: SheetMetalInput,
@@ -16,39 +17,34 @@ export const generateSheetMetalPDF = async (
 ) => {
     const doc = new jsPDF();
 
-    // Header
-    doc.setFontSize(22);
-    doc.text('AluCalc Engineering Report', 14, 22);
-
-    doc.setFontSize(14);
-    doc.setTextColor(100);
-    doc.text('Sheet Metal Bending Analysis', 14, 30);
+    // Header — company logo/name from Settings → Reports
+    const y0 = drawBrandedHeader(doc, 'Sheet Metal Bending Analysis', new Date().toLocaleString());
 
     // Metadata block
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text(`Report Date: ${new Date().toLocaleString()}`, 14, 45);
-    doc.text(`Engine Version: ${metadata.engineVersion}`, 14, 50);
-    doc.text(`Status: ${metadata.validationStatus.toUpperCase()}`, 14, 55);
-    doc.text(`Calculation ID: ${metadata.calculationId}`, 14, 60);
+    doc.text(`Report Date: ${new Date().toLocaleString()}`, 14, y0);
+    doc.text(`Engine Version: ${metadata.engineVersion}`, 14, y0 + 5);
+    doc.text(`Status: ${metadata.validationStatus.toUpperCase()}`, 14, y0 + 10);
+    doc.text(`Calculation ID: ${metadata.calculationId}`, 14, y0 + 15);
 
     // Inputs Table
-    (doc as any).autoTable({
-        startY: 70,
+    autoTable(doc, {
+        startY: y0 + 24,
         head: [['Parameter', 'Value', 'Unit']],
         body: [
-            ['Material', input.material, '-'],
+            ['Material', pdfSafe(String(input.material)), '-'],
             ['Thickness', input.thickness.toString(), 'mm'],
             ['Bend Angle', input.bendAngle.toString(), 'deg'],
             ['Inner Radius', input.innerRadius.toString(), 'mm'],
             ['K-Factor', input.kFactor.toString(), '-'],
         ],
         theme: 'striped',
-        headStyles: { fillColor: [41, 128, 185] }
+        headStyles: { fillColor: [60, 64, 72] }
     });
 
     // Results Table
-    (doc as any).autoTable({
+    autoTable(doc, {
         startY: (doc as any).lastAutoTable.finalY + 15,
         head: [['Result', 'Value', 'Unit']],
         body: [
@@ -57,7 +53,7 @@ export const generateSheetMetalPDF = async (
             ['Outside Setback (OSSB)', result.outsideSetback.toString(), 'mm'],
         ],
         theme: 'grid',
-        headStyles: { fillColor: [39, 174, 96] }
+        headStyles: { fillColor: [24, 110, 140] }
     });
 
     // Hash & Footer
@@ -70,9 +66,13 @@ export const generateSheetMetalPDF = async (
         doc.setTextColor(200, 0, 0);
         doc.text('Warnings:', 14, finalY + 10);
         metadata.warnings.forEach((w, i) => {
-            doc.text(`- ${w}`, 14, finalY + 15 + (i * 5));
+            doc.text(`- ${pdfSafe(w)}`, 14, finalY + 15 + (i * 5));
         });
     }
+
+    const warnH = metadata.warnings?.length ? 15 + metadata.warnings.length * 5 : 0;
+    drawApprovalBlock(doc, finalY + 6 + warnH, typeof document !== 'undefined' ? document.documentElement.lang : 'en');
+    drawBrandedFooters(doc);
 
     doc.save(`SheetMetal_Report_${metadata.calculationId}.pdf`);
 };

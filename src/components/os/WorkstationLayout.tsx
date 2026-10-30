@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { UserMenu } from '@/components/auth/UserMenu';
-import { Settings, ChevronLeft } from 'lucide-react';
+import { Settings, ChevronLeft, ShieldCheck, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useI18nStore } from '@/store/i18nStore';
 import { getWorkstationPage } from '@/locales/workstationPageTranslations';
@@ -18,76 +18,117 @@ interface WorkstationLayoutProps {
 }
 
 /**
- * Global Workstation Layout (OS Standard)
- * Unifies all engineering modules under a single premium architecture.
+ * 🛠️ Global Workstation Layout (AluCalc Instrument OS Standard)
+ * Unifies all engineering modules under an industrial CNC control panel / Fluke meter aesthetic.
  */
-export const WorkstationLayout = ({ children, title, id, status, onCalculate, onSave, isSaving }: WorkstationLayoutProps) => {
+export const WorkstationLayout = ({
+    children,
+    title,
+    id,
+    status,
+    onCalculate,
+    onSave,
+    isSaving
+}: WorkstationLayoutProps) => {
     const { language } = useI18nStore();
     const t = getWorkstationPage(language).layout;
     const statusLabel = status === 'stable' ? t.statusStable : status === 'error' ? t.statusError : t.statusIdle;
 
     return (
-        <div className="min-h-screen bg-[#020408] text-slate-200 selection:bg-blue-500/30">
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-emerald-600/5 blur-[100px] rounded-full"></div>
+        <div className="min-h-screen bg-[var(--bg-0)] text-[var(--ink)] selection:bg-[var(--cyan)]/20 font-sans">
+            {/* Corner Registration Crosshairs (+) */}
+            <div className="pointer-events-none fixed top-16 left-3 font-mono text-[10px] text-[var(--line-strong)] select-none">
+                +
+            </div>
+            <div className="pointer-events-none fixed top-16 right-3 font-mono text-[10px] text-[var(--line-strong)] select-none">
+                +
             </div>
 
-            <div className="relative max-w-7xl mx-auto px-6 py-8 lg:px-12 space-y-12">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-slate-900 pb-10">
-                    <div className="space-y-4">
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:px-8 space-y-8">
+                {/* ─── WORKSTATION TOP INSTRUMENT CONSOLE ─── */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--line)] pb-5">
+                    <div className="space-y-2">
                         <Link
                             href="/dashboard"
-                            className="flex items-center gap-2 text-[10px] font-bold text-slate-500 hover:text-blue-500 transition-colors uppercase tracking-[0.2em] group"
+                            className="inline-flex items-center gap-1.5 text-[10px] font-mono font-semibold text-[var(--alu-dim)] hover:text-[var(--cyan)] transition-colors uppercase tracking-wider group"
                         >
-                            <ChevronLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
+                            <ChevronLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
                             {t.returnToCommandCenter}
                         </Link>
+                        
                         <div className="space-y-1">
-                            <h1 className="text-4xl font-black tracking-tight text-white flex items-baseline gap-4">
-                                {title}
-                                <span className="text-[10px] font-mono text-slate-600 font-medium bg-slate-900/50 px-2 py-1 rounded border border-slate-800 tracking-widest">
+                            <h1 className="text-2xl sm:text-3xl font-bold font-tech tracking-tight text-[var(--ink)] flex items-center gap-3">
+                                <span>{title}</span>
+                                <span className="text-[10px] font-mono font-bold text-[var(--std)] bg-[var(--bg-2)] px-2 py-0.5 rounded-[var(--radius-s)] border border-[var(--std)]/30 tracking-widest uppercase">
                                     {id}
                                 </span>
                             </h1>
-                            <div className="flex items-center gap-2 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
-                                <span className={status === 'stable' ? 'text-emerald-500' : 'text-amber-500'}>●</span>
-                                {t.status}: {statusLabel}
+
+                            <div className="flex items-center gap-3 text-[10px] font-mono text-[var(--alu-dim)] uppercase tracking-wider">
+                                <span className="flex items-center gap-1.5">
+                                    <span 
+                                        className={`w-2 h-2 rounded-full ${
+                                            status === 'stable' 
+                                                ? 'bg-[var(--ok)] ' 
+                                                : status === 'error' 
+                                                ? 'bg-[var(--bad)] ' 
+                                                : 'bg-[var(--warn)]'
+                                        }`} 
+                                    />
+                                    <span>{t.status}: <span className="text-[var(--ink)] font-bold">{statusLabel}</span></span>
+                                </span>
+                                <span className="text-[var(--line-strong)]">|</span>
+                                <span className="flex items-center gap-1 text-[var(--alu-dim)]">
+                                    <ShieldCheck size={12} className="text-[var(--cyan)]" />
+                                    <span>64-bit IEEE 754 Deterministic</span>
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3 bg-slate-900/30 p-2 rounded-2xl border border-slate-800/50 backdrop-blur-sm">
-                            <button
-                                type="button"
-                                onClick={onCalculate}
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-                            >
-                                {t.executeAnalysis}
-                            </button>
+                    {/* ─── INSTRUMENT ACTION WELL ─── */}
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 bg-[var(--bg-1)] p-1.5 rounded-[var(--radius-m)] border border-[var(--line)]">
+                            {onCalculate && (
+                                <button
+                                    type="button"
+                                    onClick={onCalculate}
+                                    className="px-4 py-2 bg-[var(--cyan)] hover:bg-[var(--cyan)] text-slate-950 text-[11px] font-mono font-bold uppercase tracking-wider rounded-[var(--radius-s)] transition-all active:scale-98 cursor-pointer flex items-center gap-1.5"
+                                >
+                                    <Activity size={13} className="text-slate-950" />
+                                    <span>{t.executeAnalysis}</span>
+                                </button>
+                            )}
                             {onSave && (
                                 <button
                                     type="button"
                                     onClick={onSave}
-                                    className="px-6 py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-emerald-600/20 active:scale-95"
+                                    disabled={isSaving}
+                                    className="px-4 py-2 bg-[var(--bg-2)] hover:bg-[var(--bg-3)] text-[var(--ok)] text-[11px] font-mono font-semibold uppercase tracking-wider rounded-[var(--radius-s)] transition-all border border-[var(--ok)]/30 active:scale-98 disabled:opacity-50 cursor-pointer"
                                 >
-                                    {t.saveToWorkspace}
+                                    {isSaving ? '...' : t.saveToWorkspace}
                                 </button>
                             )}
-                            <div className="h-8 w-[1px] bg-slate-800 mx-1"></div>
-                            <button type="button" className="p-2 rounded-lg hover:bg-slate-800 transition-all text-slate-500 hover:text-slate-300">
-                                <Settings size={18} />
+                            <div className="h-6 w-px bg-[var(--line)] mx-1" />
+                            <button 
+                                type="button" 
+                                className="p-2 rounded-[var(--radius-s)] hover:bg-[var(--bg-2)] transition-colors text-[var(--alu-dim)] hover:text-[var(--ink)]"
+                                aria-label="Settings"
+                            >
+                                <Settings size={15} />
                             </button>
                         </div>
                         <UserMenu />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                {/* ─── WORKSTATION GRID ─── */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {children}
                 </div>
             </div>
         </div>
     );
 };
+
+export default WorkstationLayout;

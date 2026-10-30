@@ -23,8 +23,10 @@ import {
 import { CalculationReport } from '@/components/calculators/CalculationReport';
 import { CALCULATOR_REGISTRY_V2 } from '@/calculators/registry-v2';
 import { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export default function ProjectManagerModule() {
+  const precision = useGlobalPrecision();
     const { items, removeItem, clearProject, getTotalWeight, getTotalCost, updateItem } = useProjectStore();
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedCalc, setSelectedCalc] = useState<{item: any, schema: CalculatorSchemaV2} | null>(null);
@@ -46,7 +48,7 @@ export default function ProjectManagerModule() {
             i.type.toUpperCase(),
             i.type === 'calculation' ? i.snapshot?.title : i.category, 
             i.quantity,
-            i.weightPerUnit.toFixed(3), 
+formatEngineeringValue(i.weightPerUnit, precision, false), 
             i.status || 'SUCCESS',
             new Date(i.timestamp).toLocaleString()
         ]);
@@ -56,7 +58,7 @@ export default function ProjectManagerModule() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `AluCalc_Project_BOM_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.download = `AluCAD_Project_BOM_${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
     };
 
@@ -78,8 +80,8 @@ export default function ProjectManagerModule() {
 
         yPos = engine.addKPIs([
             { label: "Total Line Items", value: items.length.toString() },
-            { label: "Project Weight", value: `${getTotalWeight().toFixed(3)} kg` },
-            { label: "Total Valuation", value: `$${getTotalCost().toFixed(2)}` }
+            { label: "Project Weight", value: `${formatEngineeringValue(getTotalWeight(), precision, false)} kg` },
+            { label: "Total Valuation", value: `$${formatEngineeringValue(getTotalCost(), precision, false)}` }
         ], yPos);
 
         yPos = engine.addSectionTitle("Bill of Materials (BOM)", yPos);
@@ -87,8 +89,8 @@ export default function ProjectManagerModule() {
         const tableColumn = ["Name", "Category", "Material", "Qty", "Unit Wt (kg)", "Unit Cost ($)", "Total Wt (kg)", "Total Cost ($)"];
         const tableRows = items.map(i => [
             i.name, i.category || '', i.material || '', i.quantity.toString(),
-            i.weightPerUnit.toFixed(3), i.costPerUnit.toFixed(2),
-            i.totalWeight.toFixed(3), i.totalCost.toFixed(2)
+formatEngineeringValue(i.weightPerUnit, precision, false),formatEngineeringValue(i.costPerUnit, precision, false),
+formatEngineeringValue(i.totalWeight, precision, false),formatEngineeringValue(i.totalCost, precision, false)
         ]);
 
         engine.addTable({
@@ -110,7 +112,7 @@ export default function ProjectManagerModule() {
         yPos = engine.addKPIs([
             { label: "Total Line Items", value: items.length.toString() },
             { label: "Engineering Analysis", value: items.filter(i => i.type === 'calculation').length.toString() },
-            { label: "Project Weight", value: `${getTotalWeight().toFixed(2)} kg` }
+            { label: "Project Weight", value: `${formatEngineeringValue(getTotalWeight(), precision, false)} kg` }
         ], yPos);
 
         yPos = engine.addSectionTitle("Project Master BOM", yPos);
@@ -152,25 +154,25 @@ export default function ProjectManagerModule() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-[#0a0e14] overflow-hidden">
+        <div className="flex flex-col h-full bg-[var(--bg-1)] overflow-hidden">
             {/* KPI Summary */}
-            <div className="grid grid-cols-2 gap-4 p-5 border-b border-white/5 bg-gradient-to-b from-[#0f1419] to-[#0a0e14]">
-                <div className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 backdrop-blur-md transition-all hover:bg-cyan-500/10">
+            <div className="grid grid-cols-2 gap-4 p-5 border-b border-white/5 bg-gradient-to-b from-[var(--bg-1)] to-[var(--bg-1)]">
+                <div className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 transition-all hover:bg-cyan-500/10">
                     <div className="flex items-center gap-2 mb-2 text-cyan-400">
                         <Scale size={14} />
                         <span className="text-[9px] font-black uppercase tracking-widest">Project Weight</span>
                     </div>
                     <div className="text-2xl font-black text-white font-mono tracking-tight">
-                        {getTotalWeight().toFixed(3)} <span className="text-xs text-slate-500">kg</span>
+                        {formatEngineeringValue(getTotalWeight(), precision, false)} <span className="text-xs text-slate-500">kg</span>
                     </div>
                 </div>
-                <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-md transition-all hover:bg-emerald-500/10">
+                <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 transition-all hover:bg-emerald-500/10">
                     <div className="flex items-center gap-2 mb-2 text-emerald-400">
                         <DollarSign size={14} />
                         <span className="text-[9px] font-black uppercase tracking-widest">Total Valuation</span>
                     </div>
                     <div className="text-2xl font-black text-white font-mono tracking-tight">
-                        ${getTotalCost().toFixed(2)}
+                        ${formatEngineeringValue(getTotalCost(), precision, false)}
                     </div>
                 </div>
             </div>
@@ -183,7 +185,7 @@ export default function ProjectManagerModule() {
                 </div>
 
                 {sortedItems.map((item) => (
-                    <div key={item.id} className="group relative bg-[#0f1419]/80 border border-white/5 hover:border-white/10 rounded-xl p-4 transition-all">
+                    <div key={item.id} className="group relative bg-[var(--bg-1)]/80 border border-white/5 hover:border-white/10 rounded-xl p-4 transition-all">
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
@@ -238,7 +240,7 @@ export default function ProjectManagerModule() {
                                     <span className="block text-[8px] font-bold text-slate-600 uppercase mb-1">Key Result</span>
                                     <div className="flex items-center justify-end gap-2 text-blue-400 font-mono font-black text-xs">
                                         {Object.entries(item.snapshot?.outputs || {}).slice(0, 1).map(([k, v]: any) => (
-                                            <span key={k}>{typeof v === 'number' ? v.toFixed(2) : v}</span>
+                                            <span key={k}>{typeof v === 'number' ?formatEngineeringValue(v, precision, false) : v}</span>
                                         ))}
                                         <ChevronRight size={10} className="text-slate-700" />
                                     </div>
@@ -256,15 +258,15 @@ export default function ProjectManagerModule() {
                                 </div>
                                 <div>
                                     <span className="block text-[8px] font-bold text-slate-600 uppercase mb-2">Unit Cost</span>
-                                    <span className="text-[11px] font-bold text-slate-400 font-mono">${(item.costPerUnit).toFixed(2)}</span>
+                                    <span className="text-[11px] font-bold text-slate-400 font-mono">${formatEngineeringValue((item.costPerUnit), precision, false)}</span>
                                 </div>
                                 <div>
                                     <span className="block text-[8px] font-bold text-slate-600 uppercase mb-2">Line Wt</span>
-                                    <span className="text-[11px] font-black text-white font-mono">{item.totalWeight.toFixed(2)}kg</span>
+                                    <span className="text-[11px] font-black text-white font-mono">{formatEngineeringValue(item.totalWeight, precision, false)}kg</span>
                                 </div>
                                 <div className="text-right">
                                     <span className="block text-[8px] font-bold text-slate-600 uppercase mb-2">Line Cost</span>
-                                    <span className="text-[11px] font-black text-emerald-400 font-mono">${item.totalCost.toFixed(2)}</span>
+                                    <span className="text-[11px] font-black text-emerald-400 font-mono">${formatEngineeringValue(item.totalCost, precision, false)}</span>
                                 </div>
                             </div>
                         )}
@@ -282,7 +284,7 @@ export default function ProjectManagerModule() {
             )}
 
             {/* Action Bar */}
-            <div className="p-4 border-t border-white/5 bg-[#0a0e14] flex gap-2">
+            <div className="p-4 border-t border-white/5 bg-[var(--bg-1)] flex gap-2">
                 <button
                     onClick={exportCSV}
                     className="flex-1 py-3 px-4 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border border-white/5 shadow-md active:scale-[0.98]"

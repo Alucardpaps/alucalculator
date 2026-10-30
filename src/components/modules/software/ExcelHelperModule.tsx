@@ -98,7 +98,7 @@ Titanium Grade 5\t4430\t880`;
     };
 
     return (
-        <div className="flex flex-col w-full h-full bg-[#05080f] text-white overflow-hidden relative selection:bg-emerald-500/30">
+        <div className="flex flex-col w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative ">
             {/* Visual Grid Layer */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.1),transparent_50%)] pointer-events-none" />
 
@@ -107,7 +107,7 @@ Titanium Grade 5\t4430\t880`;
                 {/* Header */}
                 <header className="flex items-center justify-between shrink-0 mb-2">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] ">
                             <FileSpreadsheet size={24} />
                         </div>
                         <div>
@@ -123,12 +123,12 @@ Titanium Grade 5\t4430\t880`;
                                 type="checkbox" 
                                 checked={hasHeader} 
                                 onChange={e => setHasHeader(e.target.checked)}
-                                className="accent-emerald-500 w-4 h-4 rounded" 
+                                className="accent-[var(--cyan)] w-4 h-4 rounded" 
                             />
                             First Row is Header
                         </label>
 
-                        <div className="flex bg-[#03060a] border border-white/10 rounded-xl p-1">
+                        <div className="flex bg-[var(--bg-0)] border border-white/10 rounded-xl p-1">
                             {[
                                 { id: 'json-objects', label: 'JSON Objects' },
                                 { id: 'json-arrays', label: 'JSON Arrays' },
@@ -139,7 +139,7 @@ Titanium Grade 5\t4430\t880`;
                                     onClick={() => setOutputFormat(fmt.id as any)}
                                     className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all
                                         ${outputFormat === fmt.id 
-                                            ? 'bg-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)] border border-emerald-500/30' 
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
                                             : 'text-slate-500 hover:text-white border border-transparent'}`}
                                 >
                                     {fmt.label}
@@ -162,7 +162,7 @@ Titanium Grade 5\t4430\t880`;
                                 <button onClick={() => setInputData('')} className="text-[10px] font-bold text-slate-500 hover:text-red-400 px-2 py-1"><Trash2 size={12}/></button>
                             </div>
                         </div>
-                        <div className="flex-1 rounded-[2rem] border border-emerald-500/20 bg-[#020408]/80 backdrop-blur-xl p-1 overflow-hidden group focus-within:border-emerald-500/50 focus-within:shadow-[0_0_30px_rgba(16,185,129,0.1)] transition-all relative">
+                        <div className="flex-1 rounded-xl border border-emerald-500/20 bg-[var(--bg-0)]/80 p-1 overflow-hidden group focus-within:border-emerald-500/50 transition-all relative">
                              <textarea 
                                 value={inputData}
                                 onChange={e => setInputData(e.target.value)}
@@ -175,7 +175,7 @@ Titanium Grade 5\t4430\t880`;
 
                     {/* CONVERSION ARROW */}
                     <div className="hidden lg:flex flex-col items-center justify-center relative -mx-2 z-20">
-                        <div className="w-12 h-12 bg-[#05080f] border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                        <div className="w-12 h-12 bg-[var(--bg-0)] border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-500 ">
                             <ArrowRightLeft size={20} />
                         </div>
                     </div>
@@ -195,7 +195,7 @@ Titanium Grade 5\t4430\t880`;
                                 {copySuccess ? 'Copied!' : 'Copy Code'}
                             </button>
                         </div>
-                        <div className="flex-1 rounded-[2rem] border border-white/10 bg-[#020408]/80 backdrop-blur-xl p-1 overflow-hidden relative">
+                        <div className="flex-1 rounded-xl border border-white/10 bg-[var(--bg-0)]/80 p-1 overflow-hidden relative">
                              <textarea 
                                 value={parsedData}
                                 readOnly

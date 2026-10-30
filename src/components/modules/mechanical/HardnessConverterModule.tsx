@@ -5,6 +5,7 @@ import { Layers, RefreshCw } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { getFieldToolsStrings } from '@/locales/fieldToolsTranslations';
 import { playClickSound } from '@/mobile/services/audioSynth';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 type ScaleKey = 'hb' | 'hrc' | 'hrb' | 'hv' | 'mpa';
 
@@ -66,6 +67,7 @@ function convertHardness(val: number, from: ScaleKey, to: ScaleKey): number {
 }
 
 export default function HardnessConverterModule() {
+  const precision = useGlobalPrecision();
     const { language } = useI18nStore();
     const ft = getFieldToolsStrings(language);
 
@@ -100,13 +102,13 @@ export default function HardnessConverterModule() {
     const ksiVal = mpaVal / 6.89476;
 
     return (
-        <div className="flex flex-col h-full bg-[#05090e] p-6 text-white overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] p-6 text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
             {/* Header */}
             <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-10">
                 <div>
-                    <h2 className="text-lg font-black italic tracking-wider uppercase flex items-center gap-2 text-white">
+                    <h2 className="text-lg font-black tracking-wider uppercase flex items-center gap-2 text-white">
                         <Layers className="text-cyan-400 animate-pulse" size={20} />
                         {ft.hardnessConverter || 'Hardness & Strength Converter'}
                     </h2>
@@ -126,7 +128,7 @@ export default function HardnessConverterModule() {
                                 <button
                                     key={scale}
                                     onClick={() => handleScaleChange(scale)}
-                                    className={`py-2 text-[10px] font-bold font-mono uppercase rounded-lg transition-all ${inputScale === scale ? 'bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.2)]' : 'text-slate-400 hover:text-white'}`}
+                                    className={`py-2 text-[10px] font-bold font-mono uppercase rounded-lg transition-all ${inputScale === scale ? 'bg-[var(--cyan)] text-[var(--accent-ink)] ' : 'text-slate-400 hover:text-white'}`}
                                 >
                                     {scale}
                                 </button>
@@ -151,7 +153,7 @@ export default function HardnessConverterModule() {
                                 setInputValue(Number(e.target.value));
                                 if (Math.floor(inputValue) % 5 === 0) playClickSound();
                             }}
-                            className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                            className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                         />
                     </div>
 
@@ -171,7 +173,7 @@ export default function HardnessConverterModule() {
                         {inputScale !== 'hrc' && (
                             <div className="p-4 bg-slate-950/20 border border-white/5 rounded-2xl text-center space-y-1">
                                 <span className="text-[9px] font-mono text-slate-500 block uppercase">Rockwell C (HRC)</span>
-                                <span className="text-2xl font-black font-mono text-slate-300">{hrcVal.toFixed(1)}</span>
+                                <span className="text-2xl font-black font-mono text-slate-300">{formatEngineeringValue(hrcVal, precision, false)}</span>
                             </div>
                         )}
                         {inputScale !== 'hb' && (
@@ -183,7 +185,7 @@ export default function HardnessConverterModule() {
                         {inputScale !== 'hrb' && (
                             <div className="p-4 bg-slate-950/20 border border-white/5 rounded-2xl text-center space-y-1">
                                 <span className="text-[9px] font-mono text-slate-500 block uppercase">Rockwell B (HRB)</span>
-                                <span className="text-2xl font-black font-mono text-slate-300">{hrbVal.toFixed(1)}</span>
+                                <span className="text-2xl font-black font-mono text-slate-300">{formatEngineeringValue(hrbVal, precision, false)}</span>
                             </div>
                         )}
                         {inputScale !== 'hv' && (
@@ -196,7 +198,7 @@ export default function HardnessConverterModule() {
 
                     {inputScale !== 'mpa' && (
                         <div className="mt-4 p-5 bg-slate-950/40 border border-cyan-500/10 rounded-2xl text-center space-y-2 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 pointer-events-none" />
                             <span className="text-[9px] font-mono text-slate-500 block uppercase tracking-widest">Calculated Tensile Strength (Çekme Dayanımı)</span>
                             <div className="flex items-baseline justify-center gap-6">
                                 <span className="text-3xl font-black font-mono text-cyan-400">{Math.round(mpaVal)} <span className="text-sm font-normal text-slate-400">MPa</span></span>

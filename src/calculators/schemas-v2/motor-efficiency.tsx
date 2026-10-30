@@ -9,7 +9,7 @@ export const motorEfficiencySchema: CalculatorSchemaV2 = {
         description: 'Electrical input power, real-time operating efficiency, load factor, and annual energy/CO2 metrics for induction motors.',
         category: 'electrical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['induction motor', 'efficiency', 'load factor', 'electrical power', 'co2 savings', 'electrical engineering'],
         verifiedStandards: ['IEC 60034-30-1', 'IEEE Std 112']
@@ -111,7 +111,7 @@ export const motorEfficiencySchema: CalculatorSchemaV2 = {
             const angle = Math.min(LF * 180, 220) - 90;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Dial SVG representing load factor */}
                     <div className="relative w-[180px] h-[180px]">
                         <svg viewBox="0 0 160 160" width="100%" height="100%" className="overflow-visible">
@@ -141,24 +141,24 @@ export const motorEfficiencySchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Load Factor</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {(LF * 100).toFixed(0)}%
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Operating η</div>
                             <div className="text-xl font-bold font-mono text-emerald-400">
                                 {((out.eta?.value as number) || 0).toFixed(1)}%
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Annual Cost</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 ${((out.Cost?.value as number) || 0).toFixed(0)}
                             </div>
                         </div>

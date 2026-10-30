@@ -3,24 +3,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Maximize2, Send, ChevronRight, RotateCcw, Bot, User, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { AegisMascot } from './AegisMascot';
+import { AegisMascot, playMascotChirp } from './AegisMascot';
 import { useCopilotStore } from '@/store/copilotStore';
 import { useI18nStore, type Language } from '@/store/i18nStore';
-import { EngineeringCopilot, type CopilotIntent } from '@/engine/copilot/copilot';
-import { getCopilotEngineLocale } from '@/locales/copilotTranslations';
+import { useRouter } from 'next/navigation';
+import { useAegisStore, type AegisMessage } from '@/store/aegisStore';
+import { getCopilotStrings } from '@/locales/copilotTranslations';
+import { t12 } from '@/locales/t12';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AegisSidebarBubbleProps {
   collapsed?: boolean;
 }
 
-interface ChatMessage {
-  id: string;
-  sender: 'ai' | 'user';
-  text: string;
-  timestamp: string;
-  intent?: CopilotIntent;
-}
+type ChatMessage = AegisMessage;
 
 const BUBBLE_TEXTS: Record<Language, {
   title: string;
@@ -36,9 +32,9 @@ const BUBBLE_TEXTS: Record<Language, {
   actions: Array<{ label: string; prompt: string }>;
 }> = {
   tr: {
-    title: 'AeGiS Copilot',
-    subtitle: 'Mühendislik Asistanı',
-    greeting: 'Merhaba Mühendis! Hangi formül, malzeme veya CAD işleminde yardımcı olabilirim?',
+    title: 'AeGiS · Baş Araştırma Mühendisi',
+    subtitle: 'Bilim Danışmanı & Çözüm Ortağı',
+    greeting: 'Merhaba Mühendis! AluCAD OS Laboratuvarına hoş geldiniz. Hangi formül, malzeme veya CAD tasarımını analiz etmemi istersiniz?',
     quickActions: 'Hızlı Mühendislik Konuları:',
     askPlaceholder: 'Soru veya formül yazın...',
     askBtn: 'Sor',
@@ -54,9 +50,9 @@ const BUBBLE_TEXTS: Record<Language, {
     ],
   },
   en: {
-    title: 'AeGiS Copilot',
-    subtitle: 'Engineering Assistant',
-    greeting: 'Hello Engineer! Which formula, material, or 3D CAD modeling task can I assist with?',
+    title: 'AeGiS · Chief Research Engineer',
+    subtitle: 'Scientific Advisor & Copilot',
+    greeting: 'Hello Engineer! Welcome to the AluCAD OS Lab. Which formula, material property, or 3D CAD design should we analyze today?',
     quickActions: 'Quick Engineering Topics:',
     askPlaceholder: 'Ask a formula or question...',
     askBtn: 'Ask',
@@ -255,49 +251,39 @@ const BUBBLE_TEXTS: Record<Language, {
 
 export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProps) {
   const { language } = useI18nStore();
-  const { setIsOpen } = useCopilotStore();
+  const { setIsOpen, isOpen: mainPanelOpen } = useCopilotStore();
+  const router = useRouter();
   const [isOpenLocal, setIsOpenLocal] = useState(false);
   const [inputVal, setInputVal] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
+  const [lookAt, setLookAt] = useState<{ x: number; y: number } | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const copilotEngine = useRef<EngineeringCopilot>(new EngineeringCopilot());
+  // Same conversation + engine as the main AeGiS panel.
+  const stored = useAegisStore((s) => s.messages);
+  const isThinking = useAegisStore((s) => s.isThinking);
+  const sendToAegis = useAegisStore((s) => s.send);
+  const resetAegis = useAegisStore((s) => s.reset);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const t = BUBBLE_TEXTS[language] || BUBBLE_TEXTS.en;
 
-  const [messages, setMessages] = useState<ChatMessage[]>(() => [
-    {
-      id: 'init-1',
-      sender: 'ai',
-      text: t.greeting,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const messages: ChatMessage[] = stored.length
+    ? stored
+    : [{ id: 'init-1', sender: 'ai', text: t.greeting, timestamp: '' }];
 
-  // Sync initial greeting when language changes
+  // Only one AeGiS surface open at a time: the main panel takes over the thread.
   useEffect(() => {
-    setMessages((prev) => {
-      if (prev.length === 1 && prev[0].id === 'init-1') {
-        return [
-          {
-            id: 'init-1',
-            sender: 'ai',
-            text: t.greeting,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-        ];
-      }
-      return prev;
-    });
-  }, [language, t.greeting]);
+    if (mainPanelOpen) setIsOpenLocal(false);
+  }, [mainPanelOpen]);
 
   // Auto-scroll inside chat messages
   useEffect(() => {
     if (isOpenLocal) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isThinking, isOpenLocal]);
+  }, [messages.length, isThinking, isOpenLocal]);
 
   // Handle clicking outside to close
   useEffect(() => {
@@ -316,73 +302,85 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
 
   const handleSendMessage = (userText: string) => {
     if (!userText.trim()) return;
-
-    const userMsg: ChatMessage = {
-      id: `usr-${Date.now()}`,
-      sender: 'user',
-      text: userText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    playMascotChirp();
     setInputVal('');
-    setIsThinking(true);
-
-    setTimeout(() => {
-      try {
-        const intent = copilotEngine.current.parseAndAssume(
-          userText,
-          typeof window !== 'undefined' ? window.location.pathname : '/',
-          getCopilotEngineLocale(language),
-        );
-
-        let replyText = intent.replyOverride || '';
-        if (!replyText) {
-          replyText = `Mühendislik hesaplama parametreleri analiz edildi.`;
-          if (intent.assumptionsMade && intent.assumptionsMade.length > 0) {
-            replyText += `\n\n📌 **Uygulanan Varsayımlar:**\n` + intent.assumptionsMade.map((a) => `• ${a}`).join('\n');
-          }
-        }
-
-        const aiMsg: ChatMessage = {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          text: replyText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          intent,
-        };
-
-        setMessages((prev) => [...prev, aiMsg]);
-      } catch (err) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `ai-err-${Date.now()}`,
-            sender: 'ai',
-            text: 'Hesaplama analizi sırasında bir hata oluştu.',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          },
-        ]);
-      } finally {
-        setIsThinking(false);
-      }
-    }, 450);
+    void sendToAegis(userText, {
+      language,
+      pathname: typeof window !== 'undefined' ? window.location.pathname : '/',
+      thinkingSteps: getCopilotStrings(language).thinkingSteps,
+      navigate: (href) => {
+        setIsOpenLocal(false);
+        router.push(href);
+      },
+    });
   };
 
   const handleResetChat = () => {
-    copilotEngine.current.resetState();
-    setMessages([
-      {
-        id: `init-${Date.now()}`,
-        sender: 'ai',
-        text: t.greeting,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ]);
+    playMascotChirp();
+    resetAegis();
+  };
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const r = containerRef.current.getBoundingClientRect();
+    const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+    const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+    setLookAt({ x: nx, y: ny });
   };
 
   return (
-    <div className="relative w-full" ref={containerRef}>
+    <div
+      className="relative w-full"
+      ref={containerRef}
+      onMouseMove={onMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setLookAt(null);
+      }}
+    >
+      {/* ─── HOVER SPEECH BALLOON (Active when closed) ─── */}
+      <AnimatePresence>
+        {!isOpenLocal && isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
+            transition={{ duration: 0.16 }}
+            className="absolute bottom-full mb-2 left-0 right-0 rounded-[var(--radius-m)] bg-[var(--bg-1)] border border-[var(--line)] p-2.5 z-50 pointer-events-auto"
+          >
+            <div className="flex items-center justify-between gap-1 mb-1.5 border-b border-[var(--line)] pb-1">
+              <span className="text-[9px] font-mono font-semibold text-[var(--cyan)] truncate">AeGiS Copilot</span>
+              <span className="text-[8px] font-mono text-[var(--alu-dim)] shrink-0">ISO / DIN / VDI</span>
+            </div>
+
+            <p className="text-[10px] text-[var(--alu)] leading-snug mb-2">
+              {t12(language, 'Ask a standard, formula, or solver.', 'Standart, formül veya solver için tıklayın.')}
+            </p>
+
+            {/* Quick Prompt Chips */}
+            <div className="flex flex-col gap-1 font-mono">
+              {t.actions.slice(0, 3).map((act, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playMascotChirp();
+                    setIsOpenLocal(true);
+                    handleSendMessage(act.prompt);
+                  }}
+                  className="flex items-center justify-between w-full px-2 py-1 rounded bg-[var(--bg-2)] hover:bg-cyan-500/20 border border-[var(--line)] hover:border-cyan-400/50 text-left text-[9px] text-[var(--alu)] hover:text-[var(--cyan)] transition-colors group cursor-pointer"
+                >
+                  <span className="truncate">{act.label}</span>
+                  <ChevronRight size={10} className="text-[var(--muted)] group-hover:text-[var(--cyan)] group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── UNIFIED GROWING & ELONGATING CARD CONTAINER ─── */}
       <motion.div
         layout
@@ -392,28 +390,37 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
           damping: 27,
           mass: 0.8,
         }}
-        className={`w-full rounded-2xl border transition-colors overflow-hidden ${
+        className={`w-full rounded-[var(--radius-m)] border transition-colors overflow-hidden ${
           isOpenLocal
-            ? 'bg-[#090e18]/98 border-cyan-400 shadow-[0_0_35px_rgba(0,229,255,0.25)] ring-1 ring-cyan-400/40'
-            : 'bg-gradient-to-r from-cyan-950/40 to-blue-950/30 border-cyan-500/30 hover:border-cyan-400 hover:from-cyan-950/60'
+            ? 'bg-[var(--bg-1)] border-[var(--cyan-dim)]'
+            : 'bg-[var(--bg-1)] border-[var(--line)] hover:border-[var(--cyan-dim)]'
         }`}
       >
         {/* ─── HEADER BAR (Slides up smoothly when expanding) ─── */}
         <div
-          onClick={() => !isOpenLocal && setIsOpenLocal(true)}
+          onClick={() => {
+            if (!isOpenLocal) {
+              playMascotChirp();
+              setIsOpenLocal(true);
+            }
+          }}
           className={`flex items-center justify-between p-2.5 transition-all select-none ${
-            !isOpenLocal ? 'cursor-pointer' : 'border-b border-white/10 bg-[#060a12]'
+            !isOpenLocal ? 'cursor-pointer' : 'border-b border-[var(--line)] bg-[var(--bg-0)]'
           }`}
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <AegisMascot size={isOpenLocal ? 30 : 34} variant="face" pose={isThinking ? 'thinking' : 'auto'} />
+            <AegisMascot
+              size={32}
+              variant="face"
+              pose={isThinking ? 'thinking' : 'idle'}
+              isHovered={isHovered}
+              lookAt={lookAt}
+            />
             <div className="min-w-0 truncate">
-              <div className="text-[10px] font-black uppercase tracking-wider text-cyan-300 flex items-center gap-1.5 truncate">
-                <span>{t.title}</span>
-                <Sparkles size={11} className="text-cyan-400 animate-pulse shrink-0" />
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-ping" />
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--cyan)] truncate">
+                AeGiS
               </div>
-              <div className="text-[8.5px] font-mono text-slate-400 truncate">
+              <div className="text-[8.5px] font-mono text-[var(--alu-dim)] truncate">
                 {t.subtitle}
               </div>
             </div>
@@ -428,7 +435,7 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                     e.stopPropagation();
                     handleResetChat();
                   }}
-                  className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                  className="p-1 rounded-lg bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
                   title={t.resetTooltip}
                 >
                   <RotateCcw size={12} />
@@ -440,7 +447,7 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                     setIsOpenLocal(false);
                     setIsOpen(true);
                   }}
-                  className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-400 hover:text-white transition-colors"
+                  className="p-1 rounded-lg bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--cyan)] hover:text-[var(--ink)] transition-colors"
                   title={t.expandTooltip}
                 >
                   <Maximize2 size={12} />
@@ -451,14 +458,14 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                     e.stopPropagation();
                     setIsOpenLocal(false);
                   }}
-                  className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                  className="p-1 rounded-lg bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
                   title={t.closeTooltip}
                 >
                   <X size={12} />
                 </button>
               </>
             ) : (
-              <div className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 group-hover:bg-cyan-500/20">
+              <div className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-[var(--cyan)] bg-cyan-500/10 border border-cyan-500/20 group-hover:bg-cyan-500/20">
                 ASK
               </div>
             )}
@@ -488,27 +495,28 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                     <div
                       className={`max-w-[92%] rounded-xl p-2.5 text-[11px] leading-relaxed shadow-sm ${
                         msg.sender === 'user'
-                          ? 'bg-cyan-600 text-slate-950 font-bold rounded-br-xs'
-                          : 'bg-[#0f1726] border border-cyan-500/20 text-slate-200 rounded-bl-xs'
+                          ? 'bg-[var(--cyan)] text-[var(--accent-ink)] font-bold rounded-br-xs'
+                          : 'bg-[var(--bg-2)] border border-cyan-500/20 text-[var(--ink)] rounded-bl-xs'
                       }`}
                     >
                       <div className="whitespace-pre-wrap">{msg.text}</div>
 
                       {/* Action Link (if any detected intent has solver URL) */}
                       {msg.intent?.actionUrl && (
-                        <div className="mt-2 pt-1.5 border-t border-white/10">
+                        <div className="mt-2 pt-1.5 border-t border-[var(--line)]">
                           <Link
                             href={msg.intent.actionUrl}
                             onClick={() => setIsOpenLocal(false)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[10px] font-bold hover:bg-cyan-500/30 transition-colors"
+                            prefetch={false}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-[var(--cyan)] text-[10px] font-bold hover:bg-cyan-500/30 transition-colors"
                           >
-                            <span>{msg.intent.actionLabel || 'Modüle Git'}</span>
+                            <span>{msg.intent.actionLabel || (language === 'tr' ? 'Modüle git' : 'Open module')}</span>
                             <ArrowUpRight size={11} />
                           </Link>
                         </div>
                       )}
                     </div>
-                    <span className="text-[8px] text-slate-500 px-1">
+                    <span className="text-[8px] text-[var(--muted)] px-1">
                       {msg.timestamp}
                     </span>
                   </div>
@@ -516,7 +524,7 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
 
                 {/* Thinking Indicator */}
                 {isThinking && (
-                  <div className="flex items-center gap-2 text-cyan-400 text-[10.5px] p-2 bg-cyan-950/30 rounded-xl border border-cyan-500/20 animate-pulse">
+                  <div className="flex items-center gap-2 text-[var(--cyan)] text-[10.5px] p-2 bg-[var(--cyan)]/10 rounded-xl border border-cyan-500/20 animate-pulse">
                     <Sparkles size={13} className="animate-spin" />
                     <span>{t.thinking}</span>
                   </div>
@@ -526,8 +534,8 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
 
               {/* Quick Topics Pill Bar (when conversation is fresh) */}
               {messages.length <= 2 && (
-                <div className="px-3 pb-2 pt-1 border-t border-white/5 space-y-1">
-                  <p className="text-[8.5px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                <div className="px-3 pb-2 pt-1 border-t border-[var(--line)] space-y-1">
+                  <p className="text-[8.5px] font-mono font-bold uppercase tracking-wider text-[var(--muted)]">
                     {t.quickActions}
                   </p>
                   <div className="grid grid-cols-1 gap-1">
@@ -536,15 +544,34 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                         key={i}
                         type="button"
                         onClick={() => handleSendMessage(act.prompt)}
-                        className="flex items-center justify-between w-full px-2 py-1 rounded-lg bg-white/[0.02] hover:bg-cyan-500/15 border border-white/5 hover:border-cyan-500/30 text-slate-300 hover:text-cyan-200 text-[9.5px] font-mono transition-all text-left group min-w-0"
+                        className="flex items-center justify-between w-full px-2 py-1 rounded-lg bg-[var(--bg-2)] hover:bg-cyan-500/15 border border-[var(--line)] hover:border-cyan-500/30 text-[var(--alu)] hover:text-[var(--cyan)] text-[9.5px] font-mono transition-all text-left group min-w-0"
                       >
                         <span className="truncate flex-1 min-w-0">{act.label}</span>
-                        <ChevronRight size={10} className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                        <ChevronRight size={10} className="text-[var(--muted)] group-hover:text-[var(--cyan)] group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                       </button>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Text-to-CAD shortcuts — routed to the 3D / 2D / Flow generators */}
+              <div className="flex items-center gap-1 px-2.5 pt-2 border-t border-[var(--line)]">
+                {([
+                  ['/3d ', '🧊 3D'],
+                  ['/2d ', '📐 2D'],
+                  ['/flow ', '🔀 Flow'],
+                ] as const).map(([cmd, label]) => (
+                  <button
+                    key={cmd}
+                    type="button"
+                    onClick={() => setInputVal((v) => (v.startsWith('/') ? cmd + v.replace(/^\/\S*\s*/, '') : cmd + v))}
+                    title={language === 'tr' ? `"${cmd.trim()} …" ile yaz: AeGiS Text-to-CAD motoruna gönderir` : `Type "${cmd.trim()} …" to send it to the Text-to-CAD generator`}
+                    className="flex-1 rounded-[var(--radius-s)] border border-[var(--cyan)]/30 bg-[var(--cyan)]/10 px-1.5 py-1 text-[9px] font-mono text-[var(--cyan)] hover:bg-[var(--cyan)]/20 transition-colors"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
 
               {/* Input Form at Bottom of Expanded Card */}
               <form
@@ -552,19 +579,19 @@ export function AegisSidebarBubble({ collapsed = false }: AegisSidebarBubbleProp
                   e.preventDefault();
                   handleSendMessage(inputVal);
                 }}
-                className="flex items-center gap-1.5 p-2.5 border-t border-white/10 bg-[#060a12]"
+                className="flex items-center gap-1.5 p-2.5 border-t border-[var(--line)] bg-[var(--bg-0)]"
               >
                 <input
                   type="text"
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
-                  placeholder={t.askPlaceholder}
-                  className="min-w-0 flex-1 rounded-xl bg-black/70 border border-white/15 px-2.5 py-1.5 text-[10.5px] text-white placeholder-slate-500 font-mono outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all truncate"
+                  placeholder={language === 'tr' ? 'Soru ya da “/2d DN50 flanş”…' : language === 'en' ? 'Ask, or “/2d DN50 flange”…' : t.askPlaceholder}
+                  className="min-w-0 flex-1 rounded-xl bg-[var(--bg-2)] border border-[var(--line)] px-2.5 py-1.5 text-[10.5px] text-[var(--ink)] placeholder-[var(--muted)] font-mono outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all truncate"
                 />
                 <button
                   type="submit"
                   disabled={!inputVal.trim() || isThinking}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black font-mono text-[9.5px] uppercase hover:opacity-90 active:scale-95 transition-all shadow-md shadow-cyan-500/20 shrink-0 disabled:opacity-40"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[var(--cyan)] text-[var(--accent-ink)] font-black font-mono text-[9.5px] uppercase hover:opacity-90 active:scale-95 transition-all shadow-md shrink-0 disabled:opacity-40"
                 >
                   <Send size={10} className="stroke-[2.5]" />
                   <span>{t.askBtn}</span>

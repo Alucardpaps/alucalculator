@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Pipe Fluid Flow Calculator Schema
+ * AluCAD OS — Pipe Fluid Flow Calculator Schema
  * 
  * ENGINEERING DOMAIN: Fluid Mechanics
  * STANDARDS: Darcy-Weisbach, Colebrook-White, ASHRAE
@@ -39,7 +39,7 @@ export const fluidFlowSchema: CalculatorSchema = {
     metadata: {
         title: 'Pipe Pressure Drop Calculator',
         description: 'Calculate pressure drop for incompressible flow in circular pipes using Darcy-Weisbach equation with Swamee-Jain friction factor.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-07',
         tags: ['fluid', 'pipe', 'pressure drop', 'Darcy-Weisbach', 'friction', 'Reynolds', 'hydraulics']
     },

@@ -169,7 +169,7 @@ function getMockNews(lang: string): NewsItem[] {
             link: 'https://news.google.com/search?q=industry+5.0',
             date: formatDate(0),
             source: 'Tech Engineering',
-            image: '/images/news/industry.png',
+            image: '/images/news/industry.webp',
             isBreaking: true
         },
         {
@@ -179,7 +179,7 @@ function getMockNews(lang: string): NewsItem[] {
             link: 'https://news.google.com/search?q=composite+materials',
             date: formatDate(1),
             source: 'Material Science',
-            image: '/images/news/materials.png'
+            image: '/images/news/materials.webp'
         },
         {
             id: 'news-3',
@@ -188,7 +188,7 @@ function getMockNews(lang: string): NewsItem[] {
             link: 'https://news.google.com/search?q=green+manufacturing',
             date: formatDate(2),
             source: 'Energy Tech',
-            image: '/images/news/energy.png'
+            image: '/images/news/energy.webp'
         },
         {
             id: 'news-4',

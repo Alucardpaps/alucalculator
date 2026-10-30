@@ -18,11 +18,11 @@ export const FinanceHUD = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="pointer-events-none select-none bg-black/70 backdrop-blur-md border border-emerald-500/30 p-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.15)] flex flex-col gap-3 min-w-[200px]"
+        className="pointer-events-none select-none bg-black/70 border border-emerald-500/30 p-4 rounded-xl flex flex-col gap-3 min-w-[200px]"
         style={{ transform: 'translate3d(0,0,0)' }}
       >
         <div className="flex items-center gap-2 border-b border-emerald-500/20 pb-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse " />
           <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">Live Finance</span>
         </div>
 

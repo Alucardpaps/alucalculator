@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Safe Formula Parser
+ * AluCAD OS — Safe Formula Parser
  * AST-based expression evaluator - NO eval()
  * 
  * Supports: +, -, *, /, ^, sqrt, sin, cos, tan, log, ln, abs, PI, E

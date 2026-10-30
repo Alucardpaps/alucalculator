@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, Center, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
+import '@/lib/three-cleanup';
 import { usePartStore, ProfileType } from '@/store/usePartStore';
 
 export function Viewer3D() {
@@ -92,10 +93,10 @@ export function Viewer3D() {
     const baseZ = profileType === 'flat' ? thickness : length;
 
     return (
-        <div className="w-full h-full min-h-[500px] bg-[#050505] rounded-xl overflow-hidden relative border border-white/5 shadow-2xl">
+        <div className="w-full h-full min-h-[500px] bg-[var(--bg-0)] rounded-xl overflow-hidden relative border border-white/5 shadow-2xl">
             <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRlZnM+PHBhdHRlcm4gaWQ9ImciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVybkVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgNDBoNDBNNDAgMEwwIDQwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg==')" }} />
 
-            <Canvas shadows camera={{ position: [200, 200, 300], fov: 45 }}>
+            <Canvas shadows={{ type: THREE.PCFShadowMap }} camera={{ position: [200, 200, 300], fov: 45 }}>
                 <ambientLight intensity={0.6} />
                 <directionalLight position={[100, 100, 100]} castShadow intensity={1.5} shadow-mapSize={2048} />
                 <directionalLight position={[-100, -100, -50]} intensity={0.5} color="#00e5ff" />
@@ -119,7 +120,7 @@ export function Viewer3D() {
                 <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 1.5} />
             </Canvas>
 
-            <div className="absolute top-4 left-4 text-[10px] font-mono text-cyan-500 bg-black/50 px-3 py-1.5 rounded backdrop-blur-md border border-cyan-500/20 tracking-widest uppercase">
+            <div className="absolute top-4 left-4 text-[10px] font-mono text-cyan-500 bg-black/50 px-3 py-1.5 rounded border border-cyan-500/20 tracking-widest uppercase">
                 <span className="w-2 h-2 rounded-full bg-cyan-500 inline-block mr-2 animate-pulse" />
                 {profileType} Profile Render
             </div>

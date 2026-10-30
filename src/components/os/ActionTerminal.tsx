@@ -18,7 +18,7 @@ interface CommandLog {
 export function ActionTerminal({ className }: ActionTerminalProps) {
   const [input, setInput] = useState('');
   const [logs, setLogs] = useState<CommandLog[]>([
-    { type: 'sys', text: 'ALUCALC OS ENGINE KERNEL v4.0.0', timestamp: new Date().toLocaleTimeString() },
+    { type: 'sys', text: 'ALUCAD OS ENGINE KERNEL v4.0.0', timestamp: new Date().toLocaleTimeString() },
     { type: 'sys', text: 'MCP ECOSYSTEM: ONLINE - [MATERIALS, PHYS, FIGMA, GIT]', timestamp: new Date().toLocaleTimeString() },
     { type: 'sys', text: 'READY FOR ENGINEERING OPERATIONS...', timestamp: new Date().toLocaleTimeString() },
   ]);
@@ -96,7 +96,7 @@ export function ActionTerminal({ className }: ActionTerminalProps) {
 
   return (
     <div className={cn(
-      "w-full h-full bg-black/80 backdrop-blur-xl border border-cyan-500/30 rounded-lg shadow-[0_0_30px_rgba(0,229,255,0.1)] flex flex-col font-mono overflow-hidden relative",
+      "w-full h-full bg-black/80 backdrop-blur-xl border border-cyan-500/30 rounded-lg flex flex-col font-mono overflow-hidden relative",
       className
     )}>
       {/* Header */}

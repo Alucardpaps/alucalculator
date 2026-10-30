@@ -3,15 +3,15 @@ import { Metadata } from 'next';
 import DownloadClientPage from './DownloadClientPage';
 
 export const metadata: Metadata = {
-  title: 'AluCalc OS Apps | Download Android & Wear OS APK',
-  description: 'Download the official AluCalc OS Android APK and Wear OS Smartwatch APK for offline engineering calculation, 2D AluCAD, and 3D design workstation.',
+  title: 'Download Apps',
+  description: 'Download the official AluCAD OS Android APK and Wear OS Smartwatch APK. Installs the web app; listed solvers work offline once precached.',
   alternates: {
-    canonical: 'https://www.alucalculator.com/download',
+    canonical: 'https://www.alucalculator.com/download/',
   },
   openGraph: {
-    title: 'Download AluCalc OS Android & Wear OS APK',
+    title: 'Download Apps',
     description: 'Official APK downloads for Android Phones, Tablets, and Wear OS Smartwatches.',
-    url: 'https://www.alucalculator.com/download',
+    url: 'https://www.alucalculator.com/download/',
     type: 'website',
   },
 };

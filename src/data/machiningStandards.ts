@@ -203,6 +203,30 @@ export const DIN_471: CirclipRow[] = [
     { d1: 120, d2: 116.0, m: 4.15, s: 4.0 },
     { d1: 125, d2: 121.0, m: 4.15, s: 4.0 },
     { d1: 130, d2: 126.0, m: 4.15, s: 4.0 },
+    { d1: 135, d2: 131.0, m: 4.15, s: 4.0 },
+    { d1: 140, d2: 136.0, m: 4.15, s: 4.0 },
+    { d1: 145, d2: 141.0, m: 4.15, s: 4.0 },
+    { d1: 150, d2: 146.0, m: 4.15, s: 4.0 },
+    { d1: 155, d2: 151.0, m: 4.15, s: 4.0 },
+    { d1: 160, d2: 156.0, m: 4.15, s: 4.0 },
+    { d1: 165, d2: 161.0, m: 4.15, s: 4.0 },
+    { d1: 170, d2: 166.0, m: 4.15, s: 4.0 },
+    { d1: 175, d2: 171.0, m: 4.15, s: 4.0 },
+    { d1: 180, d2: 175.0, m: 4.15, s: 4.0 },
+    { d1: 185, d2: 180.0, m: 4.15, s: 4.0 },
+    { d1: 190, d2: 185.0, m: 4.15, s: 4.0 },
+    { d1: 195, d2: 190.0, m: 4.15, s: 4.0 },
+    { d1: 200, d2: 195.0, m: 4.15, s: 4.0 },
+    { d1: 210, d2: 204.0, m: 5.15, s: 5.0 },
+    { d1: 220, d2: 214.0, m: 5.15, s: 5.0 },
+    { d1: 230, d2: 224.0, m: 5.15, s: 5.0 },
+    { d1: 240, d2: 234.0, m: 5.15, s: 5.0 },
+    { d1: 250, d2: 244.0, m: 5.15, s: 5.0 },
+    { d1: 260, d2: 254.0, m: 5.15, s: 5.0 },
+    { d1: 270, d2: 264.0, m: 5.15, s: 5.0 },
+    { d1: 280, d2: 274.0, m: 5.15, s: 5.0 },
+    { d1: 290, d2: 284.0, m: 5.15, s: 5.0 },
+    { d1: 300, d2: 294.0, m: 5.15, s: 5.0 },
 ];
 
 /** DIN 472 bore circlips - verified hc-maschinentechnik.de */
@@ -286,22 +310,55 @@ export const DIN_472: CirclipRow[] = [
     { d1: 120, d2: 123.5, m: 4.15, s: 4.0 },
     { d1: 125, d2: 128.5, m: 4.15, s: 4.0 },
     { d1: 130, d2: 133.5, m: 4.15, s: 4.0 },
+    { d1: 135, d2: 138.5, m: 4.15, s: 4.0 },
+    { d1: 140, d2: 143.5, m: 4.15, s: 4.0 },
+    { d1: 145, d2: 148.5, m: 4.15, s: 4.0 },
+    { d1: 150, d2: 153.5, m: 4.15, s: 4.0 },
+    { d1: 155, d2: 158.5, m: 4.15, s: 4.0 },
+    { d1: 160, d2: 163.5, m: 4.15, s: 4.0 },
+    { d1: 165, d2: 168.5, m: 4.15, s: 4.0 },
+    { d1: 170, d2: 173.5, m: 4.15, s: 4.0 },
+    { d1: 175, d2: 178.5, m: 4.15, s: 4.0 },
+    { d1: 180, d2: 185.0, m: 4.15, s: 4.0 },
+    { d1: 185, d2: 190.0, m: 4.15, s: 4.0 },
+    { d1: 190, d2: 195.0, m: 4.15, s: 4.0 },
+    { d1: 195, d2: 200.0, m: 4.15, s: 4.0 },
+    { d1: 200, d2: 205.0, m: 4.15, s: 4.0 },
+    { d1: 210, d2: 216.0, m: 5.15, s: 5.0 },
+    { d1: 220, d2: 226.0, m: 5.15, s: 5.0 },
+    { d1: 230, d2: 236.0, m: 5.15, s: 5.0 },
+    { d1: 240, d2: 246.0, m: 5.15, s: 5.0 },
+    { d1: 250, d2: 256.0, m: 5.15, s: 5.0 },
+    { d1: 260, d2: 266.0, m: 5.15, s: 5.0 },
+    { d1: 270, d2: 276.0, m: 5.15, s: 5.0 },
+    { d1: 280, d2: 286.0, m: 5.15, s: 5.0 },
+    { d1: 290, d2: 296.0, m: 5.15, s: 5.0 },
+    { d1: 300, d2: 306.0, m: 5.15, s: 5.0 },
 ];
 
-/** ISO 273 clearance holes (mm) */
+/** ISO 273 (ISO 20273:2017) clearance holes — fine / medium ("normal") / coarse series. */
 export const ISO_273_CLEARANCE: ClearanceHoleRow[] = [
-    { size: 'M3', d: 3, fine: 3.4, normal: 3.6, coarse: 4.0 },
-    { size: 'M4', d: 4, fine: 4.5, normal: 4.8, coarse: 5.3 },
-    { size: 'M5', d: 5, fine: 5.5, normal: 5.8, coarse: 6.4 },
-    { size: 'M6', d: 6, fine: 6.6, normal: 7.0, coarse: 7.7 },
-    { size: 'M8', d: 8, fine: 9.0, normal: 9.5, coarse: 10.5 },
-    { size: 'M10', d: 10, fine: 11.0, normal: 11.5, coarse: 12.5 },
-    { size: 'M12', d: 12, fine: 13.5, normal: 14.0, coarse: 15.5 },
-    { size: 'M14', d: 14, fine: 15.5, normal: 16.0, coarse: 17.5 },
-    { size: 'M16', d: 16, fine: 17.5, normal: 18.0, coarse: 20.0 },
-    { size: 'M20', d: 20, fine: 22.0, normal: 22.5, coarse: 24.5 },
-    { size: 'M24', d: 24, fine: 26.0, normal: 26.5, coarse: 28.5 },
-    { size: 'M30', d: 30, fine: 33.0, normal: 34.0, coarse: 37.0 },
+    { size: 'M1.6', d: 1.6, fine: 1.7, normal: 1.8, coarse: 2.0 },
+    { size: 'M2', d: 2, fine: 2.2, normal: 2.4, coarse: 2.6 },
+    { size: 'M2.5', d: 2.5, fine: 2.7, normal: 2.9, coarse: 3.1 },
+    { size: 'M3', d: 3, fine: 3.2, normal: 3.4, coarse: 3.6 },
+    { size: 'M4', d: 4, fine: 4.3, normal: 4.5, coarse: 4.8 },
+    { size: 'M5', d: 5, fine: 5.3, normal: 5.5, coarse: 5.8 },
+    { size: 'M6', d: 6, fine: 6.4, normal: 6.6, coarse: 7.0 },
+    { size: 'M8', d: 8, fine: 8.4, normal: 9.0, coarse: 10.0 },
+    { size: 'M10', d: 10, fine: 10.5, normal: 11.0, coarse: 12.0 },
+    { size: 'M12', d: 12, fine: 13.0, normal: 13.5, coarse: 14.5 },
+    { size: 'M14', d: 14, fine: 15.0, normal: 15.5, coarse: 16.5 },
+    { size: 'M16', d: 16, fine: 17.0, normal: 17.5, coarse: 18.5 },
+    { size: 'M18', d: 18, fine: 19.0, normal: 20.0, coarse: 21.0 },
+    { size: 'M20', d: 20, fine: 21.0, normal: 22.0, coarse: 24.0 },
+    { size: 'M22', d: 22, fine: 23.0, normal: 24.0, coarse: 26.0 },
+    { size: 'M24', d: 24, fine: 25.0, normal: 26.0, coarse: 28.0 },
+    { size: 'M27', d: 27, fine: 28.0, normal: 30.0, coarse: 32.0 },
+    { size: 'M30', d: 30, fine: 31.0, normal: 33.0, coarse: 35.0 },
+    { size: 'M33', d: 33, fine: 34.0, normal: 36.0, coarse: 38.0 },
+    { size: 'M36', d: 36, fine: 37.0, normal: 39.0, coarse: 42.0 },
+    { size: 'M39', d: 39, fine: 40.0, normal: 42.0, coarse: 45.0 },
 ];
 
 export const DIN_912: ImbusRow[] = [
@@ -317,15 +374,56 @@ export const DIN_912: ImbusRow[] = [
     { size: 'M24', d: 24, dk: 36, k: 24, D: 40, T: 24.8 },
 ];
 
-export const DIN_332 = [
-    { type: 'A 1.0x2.12', d1: 1.0, d2: 2.12, t: 1.5 },
-    { type: 'A 1.6x3.36', d1: 1.6, d2: 3.36, t: 2.0 },
-    { type: 'A 2.0x4.25', d1: 2.0, d2: 4.25, t: 2.5 },
-    { type: 'A 2.5x5.3', d1: 2.5, d2: 5.3, t: 3.1 },
-    { type: 'A 3.15x6.7', d1: 3.15, d2: 6.7, t: 3.9 },
-    { type: 'A 4.0x8.5', d1: 4.0, d2: 8.5, t: 5.0 },
-    { type: 'A 5.0x10.6', d1: 5.0, d2: 10.6, t: 6.3 },
-    { type: 'A 6.3x13.2', d1: 6.3, d2: 13.2, t: 8.0 },
+export interface CenterDrillRow {
+    type: string;
+    form: 'A' | 'B' | 'R';
+    d1: number;
+    d2: number;
+    d3?: number; // Çift havşa dış çapı (Form B)
+    r?: number;  // Radyus (Form R)
+    t: number;   // Toplam derinlik
+    t1?: number; // 60° ana koni derinliği (Form B)
+}
+
+export const DIN_332: CenterDrillRow[] = [
+    // ── Form A: Düz 60° Punta Deliği ──
+    { type: 'A 0.5x1.06', form: 'A', d1: 0.5, d2: 1.06, t: 0.8 },
+    { type: 'A 0.8x1.7', form: 'A', d1: 0.8, d2: 1.70, t: 1.2 },
+    { type: 'A 1.0x2.12', form: 'A', d1: 1.0, d2: 2.12, t: 1.5 },
+    { type: 'A 1.25x2.65', form: 'A', d1: 1.25, d2: 2.65, t: 1.9 },
+    { type: 'A 1.6x3.35', form: 'A', d1: 1.6, d2: 3.35, t: 2.4 },
+    { type: 'A 2.0x4.25', form: 'A', d1: 2.0, d2: 4.25, t: 3.0 },
+    { type: 'A 2.5x5.3', form: 'A', d1: 2.5, d2: 5.30, t: 3.8 },
+    { type: 'A 3.15x6.7', form: 'A', d1: 3.15, d2: 6.70, t: 4.7 },
+    { type: 'A 4.0x8.5', form: 'A', d1: 4.0, d2: 8.50, t: 5.9 },
+    { type: 'A 5.0x10.6', form: 'A', d1: 5.0, d2: 10.60, t: 7.5 },
+    { type: 'A 6.3x13.2', form: 'A', d1: 6.3, d2: 13.20, t: 9.4 },
+    { type: 'A 8.0x17.0', form: 'A', d1: 8.0, d2: 17.00, t: 12.0 },
+    { type: 'A 10.0x21.2', form: 'A', d1: 10.0, d2: 21.20, t: 15.0 },
+
+    // ── Form B: Çift / Koruyucu Havşalı (60° + 120°) Punta Deliği ──
+    { type: 'B 1.0x2.12', form: 'B', d1: 1.0, d2: 2.12, d3: 3.15, t: 1.9, t1: 1.5 },
+    { type: 'B 1.25x2.65', form: 'B', d1: 1.25, d2: 2.65, d3: 4.00, t: 2.3, t1: 1.9 },
+    { type: 'B 1.6x3.35', form: 'B', d1: 1.6, d2: 3.35, d3: 5.00, t: 2.9, t1: 2.4 },
+    { type: 'B 2.0x4.25', form: 'B', d1: 2.0, d2: 4.25, d3: 6.30, t: 3.6, t1: 3.0 },
+    { type: 'B 2.5x5.3', form: 'B', d1: 2.5, d2: 5.30, d3: 8.00, t: 4.6, t1: 3.8 },
+    { type: 'B 3.15x6.7', form: 'B', d1: 3.15, d2: 6.70, d3: 10.00, t: 5.7, t1: 4.7 },
+    { type: 'B 4.0x8.5', form: 'B', d1: 4.0, d2: 8.50, d3: 12.50, t: 7.1, t1: 5.9 },
+    { type: 'B 5.0x10.6', form: 'B', d1: 5.0, d2: 10.60, d3: 16.00, t: 9.0, t1: 7.5 },
+    { type: 'B 6.3x13.2', form: 'B', d1: 6.3, d2: 13.20, d3: 20.00, t: 11.3, t1: 9.4 },
+    { type: 'B 8.0x17.0', form: 'B', d1: 8.0, d2: 17.00, d3: 25.00, t: 14.3, t1: 12.0 },
+    { type: 'B 10.0x21.2', form: 'B', d1: 10.0, d2: 21.20, d3: 31.50, t: 18.0, t1: 15.0 },
+
+    // ── Form R: Radyuslu Punta Deliği ──
+    { type: 'R 1.0x2.12', form: 'R', d1: 1.0, d2: 2.12, r: 2.5, t: 1.6 },
+    { type: 'R 1.25x2.65', form: 'R', d1: 1.25, d2: 2.65, r: 3.15, t: 2.0 },
+    { type: 'R 1.6x3.35', form: 'R', d1: 1.6, d2: 3.35, r: 4.0, t: 2.4 },
+    { type: 'R 2.0x4.25', form: 'R', d1: 2.0, d2: 4.25, r: 5.0, t: 3.0 },
+    { type: 'R 2.5x5.3', form: 'R', d1: 2.5, d2: 5.30, r: 6.3, t: 3.8 },
+    { type: 'R 3.15x6.7', form: 'R', d1: 3.15, d2: 6.70, r: 8.0, t: 4.7 },
+    { type: 'R 4.0x8.5', form: 'R', d1: 4.0, d2: 8.50, r: 10.0, t: 5.9 },
+    { type: 'R 5.0x10.6', form: 'R', d1: 5.0, d2: 10.60, r: 12.5, t: 7.5 },
+    { type: 'R 6.3x13.2', form: 'R', d1: 6.3, d2: 13.20, r: 16.0, t: 9.4 },
 ];
 
 export const DIN_7991 = [
@@ -340,14 +438,66 @@ export const DIN_7991 = [
     { size: 'M20', d: 20, d1: 22.0, d2: 40.0, t: 9.0, alpha: 90 },
 ];
 
-export const DIN_509 = [
-    { min: 6, max: 10, r: 0.4, t: 0.1 },
-    { min: 10, max: 18, r: 0.6, t: 0.1 },
-    { min: 18, max: 30, r: 1.0, t: 0.1 },
-    { min: 30, max: 50, r: 1.6, t: 0.1 },
-    { min: 50, max: 80, r: 2.0, t: 0.1 },
-    { min: 80, max: 120, r: 3.0, t: 0.1 },
+export interface UndercutRow {
+    min: number;
+    max: number;
+    form: 'E' | 'F' | 'G' | 'H';
+    r: number;
+    t1: number;
+    t2?: number;
+    f?: number;
+    g?: number;
+    z1?: number;
+    z2?: number;
+    angleFace?: number;
+    angleCylinder?: number;
+}
+
+export const DIN_509_E: UndercutRow[] = [
+    { min: 1.6, max: 3, form: 'E', r: 0.4, t1: 0.2, f: 2.0, angleCylinder: 15 },
+    { min: 3, max: 10, form: 'E', r: 0.6, t1: 0.2, f: 2.5, angleCylinder: 15 },
+    { min: 10, max: 18, form: 'E', r: 0.6, t1: 0.3, f: 2.5, angleCylinder: 15 },
+    { min: 18, max: 50, form: 'E', r: 1.0, t1: 0.2, f: 2.5, angleCylinder: 15 },
+    { min: 50, max: 80, form: 'E', r: 1.2, t1: 0.2, f: 4.0, angleCylinder: 15 },
+    { min: 80, max: 125, form: 'E', r: 1.6, t1: 0.3, f: 4.0, angleCylinder: 15 },
+    { min: 125, max: 250, form: 'E', r: 2.5, t1: 0.4, f: 5.0, angleCylinder: 15 },
+    { min: 250, max: 500, form: 'E', r: 4.0, t1: 0.5, f: 7.0, angleCylinder: 15 },
 ];
+
+export const DIN_509_F: UndercutRow[] = [
+    { min: 1.6, max: 3, form: 'F', r: 0.4, t1: 0.2, t2: 0.1, f: 2.0, g: 0.7, z1: 0.9, z2: 1.4, angleFace: 8, angleCylinder: 15 },
+    { min: 3, max: 10, form: 'F', r: 0.6, t1: 0.2, t2: 0.1, f: 2.5, g: 1.0, z1: 1.1, z2: 1.8, angleFace: 8, angleCylinder: 15 },
+    { min: 10, max: 18, form: 'F', r: 0.6, t1: 0.3, t2: 0.2, f: 2.5, g: 1.4, z1: 1.4, z2: 2.1, angleFace: 8, angleCylinder: 15 },
+    { min: 18, max: 50, form: 'F', r: 1.0, t1: 0.2, t2: 0.1, f: 2.5, g: 1.4, z1: 2.0, z2: 3.0, angleFace: 8, angleCylinder: 15 },
+    { min: 50, max: 80, form: 'F', r: 1.2, t1: 0.4, t2: 0.2, f: 4.0, g: 2.0, z1: 2.5, z2: 4.0, angleFace: 8, angleCylinder: 15 },
+    { min: 80, max: 125, form: 'F', r: 1.6, t1: 0.3, t2: 0.2, f: 4.0, g: 2.5, z1: 2.5, z2: 4.0, angleFace: 8, angleCylinder: 15 },
+    { min: 125, max: 250, form: 'F', r: 2.5, t1: 0.4, t2: 0.3, f: 5.0, g: 3.5, z1: 4.0, z2: 6.0, angleFace: 8, angleCylinder: 15 },
+    { min: 250, max: 500, form: 'F', r: 4.0, t1: 0.5, t2: 0.3, f: 7.0, g: 5.0, z1: 5.0, z2: 7.0, angleFace: 8, angleCylinder: 15 },
+];
+
+export const DIN_509_G: UndercutRow[] = [
+    { min: 1.6, max: 3, form: 'G', r: 0.4, t1: 0.2, t2: 0.1, f: 2.0, g: 0.7, angleFace: 55, angleCylinder: 17.5 },
+    { min: 3, max: 10, form: 'G', r: 0.6, t1: 0.2, t2: 0.1, f: 2.5, g: 1.0, angleFace: 55, angleCylinder: 17.5 },
+    { min: 10, max: 18, form: 'G', r: 0.6, t1: 0.3, t2: 0.2, f: 2.5, g: 1.4, angleFace: 55, angleCylinder: 17.5 },
+    { min: 18, max: 50, form: 'G', r: 1.0, t1: 0.2, t2: 0.1, f: 2.5, g: 1.4, angleFace: 55, angleCylinder: 17.5 },
+    { min: 50, max: 80, form: 'G', r: 1.2, t1: 0.4, t2: 0.2, f: 4.0, g: 2.0, angleFace: 55, angleCylinder: 17.5 },
+    { min: 80, max: 125, form: 'G', r: 1.6, t1: 0.3, t2: 0.2, f: 4.0, g: 2.5, angleFace: 55, angleCylinder: 17.5 },
+    { min: 125, max: 250, form: 'G', r: 2.5, t1: 0.4, t2: 0.3, f: 5.0, g: 3.5, angleFace: 55, angleCylinder: 17.5 },
+    { min: 250, max: 500, form: 'G', r: 4.0, t1: 0.5, t2: 0.3, f: 7.0, g: 5.0, angleFace: 55, angleCylinder: 17.5 },
+];
+
+export const DIN_509_H: UndercutRow[] = [
+    { min: 1.6, max: 3, form: 'H', r: 0.4, t1: 0.2, t2: 0.1, f: 2.0, g: 0.7, angleFace: 60, angleCylinder: 15 },
+    { min: 3, max: 10, form: 'H', r: 0.6, t1: 0.2, t2: 0.1, f: 2.5, g: 1.0, angleFace: 60, angleCylinder: 15 },
+    { min: 10, max: 18, form: 'H', r: 0.6, t1: 0.3, t2: 0.2, f: 2.5, g: 1.4, angleFace: 60, angleCylinder: 15 },
+    { min: 18, max: 50, form: 'H', r: 1.0, t1: 0.2, t2: 0.1, f: 2.5, g: 1.4, angleFace: 60, angleCylinder: 15 },
+    { min: 50, max: 80, form: 'H', r: 1.2, t1: 0.4, t2: 0.2, f: 4.0, g: 2.0, angleFace: 60, angleCylinder: 15 },
+    { min: 80, max: 125, form: 'H', r: 1.6, t1: 0.3, t2: 0.2, f: 4.0, g: 2.5, angleFace: 60, angleCylinder: 15 },
+    { min: 125, max: 250, form: 'H', r: 2.5, t1: 0.4, t2: 0.3, f: 5.0, g: 3.5, angleFace: 60, angleCylinder: 15 },
+    { min: 250, max: 500, form: 'H', r: 4.0, t1: 0.5, t2: 0.3, f: 7.0, g: 5.0, angleFace: 60, angleCylinder: 15 },
+];
+
+export const DIN_509 = DIN_509_E;
 
 export const STANDARD_SOURCES = {
     keyway: 'DIN 6885-1 (fasten.it / Beuth)',
@@ -427,8 +577,12 @@ export function getCirclipData(d: number, isShaft: boolean): CirclipResult | nul
     };
 }
 
-export function getUndercutData(dSmall: number) {
-    return DIN_509.find(u => dSmall >= u.min && dSmall < u.max) || DIN_509[DIN_509.length - 1];
+export function getUndercutData(dSmall: number, form: 'E' | 'F' | 'G' | 'H' = 'E'): UndercutRow {
+    let table = DIN_509_E;
+    if (form === 'F') table = DIN_509_F;
+    else if (form === 'G') table = DIN_509_G;
+    else if (form === 'H') table = DIN_509_H;
+    return table.find(u => dSmall >= u.min && dSmall < u.max) || table[table.length - 1];
 }
 
 export function getClearanceHole(size: string, series: 'fine' | 'normal' | 'coarse' = 'normal') {

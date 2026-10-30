@@ -115,15 +115,15 @@ export function MatrixScreensaverModule() {
     }, [isRunning, colorMode, fontSize, density, colorPalette]);
 
     return (
-        <div className="relative w-full h-full bg-[#030609] overflow-hidden flex flex-col font-mono select-none">
+        <div className="relative w-full h-full bg-[var(--bg-0)] overflow-hidden flex flex-col font-mono select-none">
             <div className="relative flex-1 w-full h-full overflow-hidden">
                 <canvas ref={canvasRef} className="w-full h-full block cursor-crosshair" />
 
                 {/* HUD */}
-                <div className="absolute top-4 left-4 z-10 flex items-center gap-3 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 text-xs text-slate-300 shadow-xl">
+                <div className="absolute top-4 left-4 z-10 flex items-center gap-3 bg-black/60 px-3.5 py-2 rounded-xl border border-white/10 text-xs text-slate-300 shadow-xl">
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-                        <span className="font-bold tracking-widest uppercase text-[10px] text-white">ALUCALC OS // MATRIX ENGINE</span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse " />
+                        <span className="font-bold tracking-widest uppercase text-[10px] text-white">ALUCAD OS // MATRIX ENGINE</span>
                     </div>
                     <div className="h-3 w-[1px] bg-white/20" />
                     <div className="text-[10px] font-mono text-emerald-400">
@@ -132,7 +132,7 @@ export function MatrixScreensaverModule() {
                 </div>
 
                 {/* Controls */}
-                <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/70 backdrop-blur-lg p-2 rounded-2xl border border-white/10 shadow-2xl">
+                <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 bg-black/70 p-2 rounded-2xl border border-white/10 shadow-2xl">
                     <button
                         onClick={() => setIsRunning(!isRunning)}
                         className={`p-2 rounded-xl border transition-all ${
@@ -149,25 +149,25 @@ export function MatrixScreensaverModule() {
                         <button
                             onClick={() => setColorMode('emerald')}
                             className={`w-5 h-5 rounded-lg transition-all ${colorMode === 'emerald' ? 'ring-2 ring-emerald-400 scale-110' : 'opacity-60 hover:opacity-100'}`}
-                            style={{ backgroundColor: '#10b981' }}
+                            style={{ backgroundColor: 'var(--ok)' }}
                             title="Matrix Green"
                         />
                         <button
                             onClick={() => setColorMode('cyan')}
                             className={`w-5 h-5 rounded-lg transition-all ${colorMode === 'cyan' ? 'ring-2 ring-cyan-400 scale-110' : 'opacity-60 hover:opacity-100'}`}
-                            style={{ backgroundColor: '#06b6d4' }}
+                            style={{ backgroundColor: 'var(--cyan)' }}
                             title="Cyber Cyan"
                         />
                         <button
                             onClick={() => setColorMode('amber')}
                             className={`w-5 h-5 rounded-lg transition-all ${colorMode === 'amber' ? 'ring-2 ring-amber-400 scale-110' : 'opacity-60 hover:opacity-100'}`}
-                            style={{ backgroundColor: '#f59e0b' }}
+                            style={{ backgroundColor: 'var(--warn)' }}
                             title="Amber Phosphor"
                         />
                         <button
                             onClick={() => setColorMode('crimson')}
                             className={`w-5 h-5 rounded-lg transition-all ${colorMode === 'crimson' ? 'ring-2 ring-rose-400 scale-110' : 'opacity-60 hover:opacity-100'}`}
-                            style={{ backgroundColor: '#f43f5e' }}
+                            style={{ backgroundColor: 'var(--bad)' }}
                             title="Crimson Alert"
                         />
                     </div>

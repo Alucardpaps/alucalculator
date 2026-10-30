@@ -1,143 +1,262 @@
-import { Node, Edge } from 'reactflow';
-import { getExecutionOrder } from './Graph';
-import { EngineeringNodeSchema, ValidationResult } from '@/flow/types/core';
-import { useFlowStore } from '@/store/flowStore'; // We'll need store access eventually
+import type { EngineeringNodeSchema, FlowGraphEdge, FlowGraphNode, NodeRunStatus } from '@/flow/types/core';
+import { NODE_DATA_META_KEYS } from '@/flow/types/core';
+import { collectDownstream, getExecutionOrder } from './Graph';
+import { stableHash } from '../core/hash';
+import { validateGraphPorts } from '../core/ports';
 
 /**
- * 🧠 AluCalculator OS - Execution Engine
- * 
- * The Brain of the system.
- * 1. Validates Graph Topology
- * 2. Determines Execution Order
- * 3. Iterates Nodes & Computes Deterministically
- * 4. Propagates Data (Port to Port)
+ * AluCalculator OS — Execution Engine
+ *
+ * 1. Validate graph topology (cycles)
+ * 2. Validate port types (exact match, no implicit cast)
+ * 3. Topologically sort (deterministic)
+ * 4. Apply schema defaults, gather wired inputs
+ * 5. Validate → compute (hard-stop downstream on failure)
+ * 6. Cache by input hash; recompute dirty subtree only
+ *
+ * Layer: flow/engine. No React, no DOM, no UI store.
  */
 
 export interface ExecutionResult {
     success: boolean;
-    nodeResults: Map<string, any>; // NodeID -> OutputData
-    errors: Map<string, string[]>; // NodeID -> ErrorList
+    nodeResults: Map<string, any>;
+    errors: Map<string, string[]>;
+    warnings: Map<string, string[]>;
+    nodeStatus: Map<string, NodeRunStatus>;
     executionTimeMs: number;
 }
 
-export class FlowEngine {
-    private nodes: Node[];
-    private edges: Edge[];
-    private registry: Map<string, EngineeringNodeSchema>;
+export interface ExecuteOptions {
+    /** Force every node, ignoring dirty set (hash cache still applies). */
+    full?: boolean;
+    globalVariables?: Record<string, number>;
+}
 
-    constructor(nodes: Node[], edges: Edge[], registry: Map<string, EngineeringNodeSchema>) {
+const nowMs = (): number => {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        return performance.now();
+    }
+    return Date.now();
+};
+
+export class FlowEngine {
+    private nodes: FlowGraphNode[];
+    private edges: FlowGraphEdge[];
+    private registry: Map<string, EngineeringNodeSchema>;
+    private resultCache = new Map<string, { hash: string; output: any }>();
+    private dirty = new Set<string>();
+
+    constructor(
+        nodes: FlowGraphNode[],
+        edges: FlowGraphEdge[],
+        registry: Map<string, EngineeringNodeSchema>
+    ) {
         this.nodes = nodes;
         this.edges = edges;
         this.registry = registry;
     }
 
-    private resultCache = new Map<string, { hash: string, output: any }>();
+    public setGraph(nodes: FlowGraphNode[], edges: FlowGraphEdge[]): void {
+        this.nodes = nodes;
+        this.edges = edges;
+    }
 
-    /**
-     * Run the full graph execution.
-     */
-    public execute(globalVariables: Record<string, number> = {}): ExecutionResult {
-        const startTime = performance.now();
+    public markDirty(nodeId: string): void {
+        this.dirty.add(nodeId);
+        collectDownstream(nodeId, this.edges).forEach((id) => this.dirty.add(id));
+    }
+
+    public clearCache(nodeId?: string): void {
+        if (nodeId) {
+            this.resultCache.delete(nodeId);
+            this.markDirty(nodeId);
+            return;
+        }
+        this.resultCache.clear();
+        this.dirty.clear();
+    }
+
+    public execute(globalVariablesOrOptions: Record<string, number> | ExecuteOptions = {}): ExecutionResult {
+        const options: ExecuteOptions =
+            globalVariablesOrOptions && ('full' in globalVariablesOrOptions || 'globalVariables' in globalVariablesOrOptions)
+                ? (globalVariablesOrOptions as ExecuteOptions)
+                : { globalVariables: globalVariablesOrOptions as Record<string, number> };
+
+        const globalVariables = options.globalVariables ?? {};
+        const startTime = nowMs();
         const results = new Map<string, any>();
         const errors = new Map<string, string[]>();
+        const warnings = new Map<string, string[]>();
+        const nodeStatus = new Map<string, NodeRunStatus>();
 
-        // 1. Topological Sort
         const order = getExecutionOrder(this.nodes, this.edges);
         if (!order.success) {
             return {
                 success: false,
                 nodeResults: results,
                 errors: new Map([['GRAPH', [order.error || 'Cycle detected']]]),
-                executionTimeMs: performance.now() - startTime
+                warnings,
+                nodeStatus,
+                executionTimeMs: nowMs() - startTime,
             };
         }
 
-        // 2. Execution Loop
+        const portCheck = validateGraphPorts(this.nodes, this.edges, this.registry);
+        if (!portCheck.valid) {
+            return {
+                success: false,
+                nodeResults: results,
+                errors: new Map([['GRAPH', portCheck.mismatches.map((m) => m.message)]]),
+                warnings,
+                nodeStatus,
+                executionTimeMs: nowMs() - startTime,
+            };
+        }
+
+        const nodeMap = new Map(this.nodes.map((n) => [n.id, n]));
+        const incomingByTarget = new Map<string, FlowGraphEdge[]>();
+        for (const edge of this.edges) {
+            const list = incomingByTarget.get(edge.target) ?? [];
+            list.push(edge);
+            incomingByTarget.set(edge.target, list);
+        }
+
+        const fullRun = options.full === true || this.dirty.size === 0;
+        const blocked = new Set<string>();
+        const recomputed = new Set<string>();
+
         for (const nodeId of order.sortedIds) {
-            const node = this.nodes.find(n => n.id === nodeId);
+            const node = nodeMap.get(nodeId);
             if (!node) continue;
 
-            const schema = this.registry.get(node.data?.schemaId || '');
+            const schemaId = typeof node.data?.schemaId === 'string' ? node.data.schemaId : '';
+            const schema = this.registry.get(schemaId);
 
-            // Skip if no schema (e.g. note nodes)
-            // But strict mode requires us to be careful. 
-            // For now, if no schema, we just skip computation.
-            if (!schema) continue;
+            if (!schema) {
+                nodeStatus.set(nodeId, 'skipped');
+                continue;
+            }
 
-            // 3. Input Gathering
-            // Pass globalVariables to resolve formulas
-            const inputs = this.gatherInputs(nodeId, results, node.data, globalVariables);
+            const incoming = incomingByTarget.get(nodeId) ?? [];
+            const upstreamFailed = incoming.some((e) => errors.has(e.source) || blocked.has(e.source));
+            if (upstreamFailed) {
+                blocked.add(nodeId);
+                nodeStatus.set(nodeId, 'blocked');
+                errors.set(nodeId, ['Blocked: upstream node failed validation or computation.']);
+                continue;
+            }
 
-            // 4. Input Hashing & Cache Check
-            // We must include globalVariables in the hash if they are used!
-            // Or simpler: disable cache if variables are used? 
-            // Better: Just hash the resolved inputs.
-            const inputHash = JSON.stringify(inputs); // Simple deterministic hash
+            const upstreamRecomputed = incoming.some((e) => recomputed.has(e.source) || this.dirty.has(e.source));
+            const isDirty = fullRun || this.dirty.has(nodeId) || upstreamRecomputed;
+
+            const inputs = this.gatherInputs(node, schema, results, globalVariables);
+
+            const requiredErrors = this.checkRequiredPorts(schema, inputs);
+            if (requiredErrors.length > 0) {
+                errors.set(nodeId, requiredErrors);
+                nodeStatus.set(nodeId, 'error');
+                continue;
+            }
+
+            const inputHash = stableHash(inputs);
             const cached = this.resultCache.get(nodeId);
 
-            if (cached && cached.hash === inputHash) {
-                // Cache Hit!
+            if (!isDirty && cached) {
                 results.set(nodeId, cached.output);
+                nodeStatus.set(nodeId, 'cached');
                 continue;
             }
 
-            // 5. Validation
+            if (cached && cached.hash === inputHash) {
+                results.set(nodeId, cached.output);
+                nodeStatus.set(nodeId, 'cached');
+                continue;
+            }
+
             const validation = schema.validate(inputs);
+            if (validation.warnings.length > 0) {
+                warnings.set(nodeId, validation.warnings);
+            }
+
             if (!validation.valid) {
-                errors.set(nodeId, validation.errors);
-                // In strict mode, we might stop here or propagate nulls.
-                // For now, we don't cache invalid results.
+                errors.set(nodeId, validation.errors.length ? validation.errors : ['Validation failed.']);
+                nodeStatus.set(nodeId, 'error');
                 continue;
             }
 
-            // 6. Computation
             try {
                 const output = schema.compute(inputs);
                 results.set(nodeId, output);
-
-                // Update Cache
                 this.resultCache.set(nodeId, { hash: inputHash, output });
-
+                recomputed.add(nodeId);
+                nodeStatus.set(nodeId, 'computed');
             } catch (e) {
                 errors.set(nodeId, [`Computation Error: ${e instanceof Error ? e.message : String(e)}`]);
+                nodeStatus.set(nodeId, 'error');
             }
         }
+
+        this.dirty.clear();
 
         return {
             success: errors.size === 0,
             nodeResults: results,
-            errors: errors,
-            executionTimeMs: performance.now() - startTime
+            errors,
+            warnings,
+            nodeStatus,
+            executionTimeMs: nowMs() - startTime,
         };
     }
 
-    private gatherInputs(nodeId: string, currentResults: Map<string, any>, nodeData: any, globalVariables: Record<string, number>): any {
-        const inputs: any = { ...nodeData }; // Start with manual overrides/config
+    private checkRequiredPorts(schema: EngineeringNodeSchema, inputs: Record<string, unknown>): string[] {
+        const missing: string[] = [];
+        for (const port of schema.inputs) {
+            if (!port.required) continue;
+            const value = inputs[port.id];
+            if (value === undefined || value === null || value === '') {
+                missing.push(`Required port '${port.id}' (${port.type}) is not set.`);
+            }
+        }
+        return missing;
+    }
 
-        // 0. Resolve Variables
-        for (const key in inputs) {
+    private gatherInputs(
+        node: FlowGraphNode,
+        schema: EngineeringNodeSchema,
+        currentResults: Map<string, any>,
+        globalVariables: Record<string, number>
+    ): Record<string, unknown> {
+        const inputs: Record<string, unknown> = {};
+
+        for (const port of schema.inputs) {
+            if (port.defaultValue !== undefined) {
+                inputs[port.id] = port.defaultValue;
+            }
+        }
+
+        const data = node.data ?? {};
+        for (const [key, value] of Object.entries(data)) {
+            if (NODE_DATA_META_KEYS.has(key)) continue;
+            inputs[key] = value;
+        }
+
+        for (const key of Object.keys(inputs)) {
             const val = inputs[key];
             if (typeof val === 'string' && val.startsWith('=')) {
                 const varName = val.substring(1).trim();
-                // If variable exists, use it. Otherwise keep the string (might be a legitimate string input)
                 if (globalVariables[varName] !== undefined) {
                     inputs[key] = globalVariables[varName];
                 }
             }
         }
 
-        // 1. Find edges connected to target handle (input)
-        const incomingEdges = this.edges.filter(e => e.target === nodeId);
-
-        incomingEdges.forEach(edge => {
-            const sourceNodeId = edge.source;
-            const sourceHandle = edge.sourceHandle; // Output port name
-            const targetHandle = edge.targetHandle; // Input port name
-
+        const incomingEdges = this.edges.filter((e) => e.target === node.id);
+        incomingEdges.forEach((edge) => {
+            const sourceHandle = edge.sourceHandle;
+            const targetHandle = edge.targetHandle;
             if (!sourceHandle || !targetHandle) return;
 
-            // Get value from source calculation
-            const sourceResult = currentResults.get(sourceNodeId);
+            const sourceResult = currentResults.get(edge.source);
             if (sourceResult && sourceResult[sourceHandle] !== undefined) {
                 inputs[targetHandle] = sourceResult[sourceHandle];
             }

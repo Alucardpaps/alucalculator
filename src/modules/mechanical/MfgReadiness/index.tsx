@@ -17,9 +17,9 @@ export default function MfgReadinessModule() {
     }, [input]);
 
     const getScoreColor = (score: number) => {
-        if (score >= 85) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.2)]';
-        if (score >= 60) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_30px_rgba(245,158,11,0.2)]';
-        return 'text-rose-400 border-rose-500/30 bg-rose-500/10 shadow-[0_0_30px_rgba(244,63,94,0.2)]';
+        if (score >= 85) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 ';
+        if (score >= 60) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 ';
+        return 'text-rose-400 border-rose-500/30 bg-rose-500/10 ';
     };
 
     const getScoreLabel = (score: number) => {
@@ -29,14 +29,14 @@ export default function MfgReadinessModule() {
     }
 
     return (
-        <div className="flex h-full bg-[#0a0f16] text-slate-200 p-4 gap-4 overflow-hidden">
+        <div className="flex h-full bg-[var(--bg-1)] text-slate-200 p-4 gap-4 overflow-hidden">
 
             {/* Left Panel: Configuration */}
             <div className="w-[320px] flex flex-col gap-4 overflow-y-auto no-scrollbar pr-1 pb-12">
 
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-2 px-1">
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--cyan-glow)] flex items-center justify-center border border-[var(--cyan)]/40">
                         <Microscope className="text-blue-400 w-5 h-5" />
                     </div>
                     <div>
@@ -66,7 +66,7 @@ export default function MfgReadinessModule() {
                 </div>
 
                 {/* Config Area */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 shadow-lg backdrop-blur text-sm flex-1">
+                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 shadow-lg text-sm flex-1">
 
                     {activeTab === 'geo' && (
                         <div className="space-y-5 animate-in fade-in slide-in-from-left-4 duration-300">
@@ -79,7 +79,7 @@ export default function MfgReadinessModule() {
                                     type="range" min="0" max="15" step="0.5"
                                     value={input.minInnerRadius}
                                     onChange={e => setInput({ minInnerRadius: Number(e.target.value) })}
-                                    className="w-full accent-blue-500 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full accent-[var(--cyan)] h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                                 />
                             </div>
 
@@ -92,7 +92,7 @@ export default function MfgReadinessModule() {
                                     type="range" min="0.1" max="10" step="0.1"
                                     value={input.wallThicknessMin}
                                     onChange={e => setInput({ wallThicknessMin: Number(e.target.value) })}
-                                    className="w-full accent-blue-500 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full accent-[var(--cyan)] h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                                 />
                             </div>
 
@@ -168,7 +168,7 @@ export default function MfgReadinessModule() {
 
                             {/* Score Circle Area */}
                             <div className="w-[200px] border-r border-slate-800/80 flex flex-col items-center justify-center py-8 relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-[#0a0f16] z-0"></div>
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-[var(--bg-1)] z-0"></div>
                                 <div className={`relative z-10 w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center bg-slate-950 transition-colors duration-500 ${getScoreColor(result.score)}`}>
                                     <div className="flex items-baseline">
                                         <span className="text-5xl font-black">{result.score}</span>
@@ -205,14 +205,14 @@ export default function MfgReadinessModule() {
                                         <div className="space-y-3">
                                             {result.criticalWarnings.map((w, i) => (
                                                 <div key={i} className="flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2" style={{ animationDelay: `${i * 100}ms` }}>
-                                                    <div className="mt-0.5 shadow-[0_0_10px_rgba(245,158,11,0.3)] bg-amber-500/20 text-amber-500 rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0 text-[10px] font-bold border border-amber-500/40">!</div>
+                                                    <div className="mt-0.5 bg-amber-500/20 text-amber-500 rounded-full w-4 h-4 flex items-center justify-center flex-shrink-0 text-[10px] font-bold border border-amber-500/40">!</div>
                                                     <div className="text-xs text-slate-300 leading-relaxed bg-slate-950/50 p-2.5 rounded border border-slate-800/50">{w}</div>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
                                         <div className="h-full flex flex-col items-center justify-center text-center opacity-70">
-                                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
+                                            <div className="w-12 h-12 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center mb-3">
                                                 <CheckCircle className="w-5 h-5 text-emerald-500" />
                                             </div>
                                             <div className="text-sm font-medium text-emerald-400/80">Clean Bill of Health</div>
@@ -253,7 +253,7 @@ export default function MfgReadinessModule() {
                     </>
                 ) : (
                     <div className="h-full w-full flex flex-col items-center justify-center border border-slate-800/50 rounded-2xl bg-slate-900/50 p-8">
-                        <Activity className="w-10 h-10 text-blue-500 animate-spin mb-4 shadow-[0_0_20px_rgba(59,130,246,0.5)] rounded-full" />
+                        <Activity className="w-10 h-10 text-blue-500 animate-spin mb-4 rounded-full" />
                         <div className="text-sm font-bold text-slate-200 mb-1 tracking-wide">ANALYZING TOPOLOGY</div>
                         <div className="text-xs font-mono text-slate-500">Calculating DFM heuristics...</div>
                     </div>

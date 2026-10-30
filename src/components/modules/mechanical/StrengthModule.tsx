@@ -36,10 +36,12 @@ import {
 
 import { StockCheck } from "../shared/StockCheck";
 import { PDFGenerator } from "../shared/PDFGenerator";
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 type AnalysisMode = 'principal' | 'vonMises' | 'fatigue' | 'buckling' | 'beam' | 'torsion' | 'pressure' | 'combined';
 
 export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: string, dict?: any }) {
+  const precision = useGlobalPrecision();
     const { language: storeLang } = useI18nStore();
     const { dictionary: storeDict } = useOSStore();
     const lang = propLang || storeLang;
@@ -162,9 +164,9 @@ export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: stri
     if (safetyFactor.status === 'failure') status = 'invalid';
 
     return (
-        <div className="flex flex-col h-full bg-[#1e1e1e] text-slate-200 select-none">
+        <div className="flex flex-col h-full bg-[var(--bg-3)] text-slate-200 select-none">
             {/* Header / Mode Select */}
-            <div className="flex overflow-x-auto gap-1 p-2 border-b border-[#333] shrink-0">
+            <div className="flex overflow-x-auto gap-1 p-2 border-b border-[var(--line)] shrink-0">
                 {ANALYSIS_MODES.map((m) => {
                     const Icon = m.icon;
                     return (
@@ -211,7 +213,7 @@ export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: stri
                     <div className="space-y-1">
                         <label className="text-[10px] font-bold text-slate-500 uppercase">{dict.common?.material || "Material"}</label>
                         <select
-                            className="w-full bg-[#2a2a2a] border border-[#333] rounded px-2 py-1 text-xs text-white"
+                            className="w-full bg-[var(--bg-3)] border border-[var(--line)] rounded px-2 py-1 text-xs text-white"
                             value={selectedMaterial.name}
                             onChange={(e) => {
                                 const mat = STRENGTH_MATERIALS.find(m => m.name === e.target.value);
@@ -316,18 +318,18 @@ export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: stri
                 </div>
 
                 {/* 3. Results */}
-                <div className="bg-[#252525] rounded-lg p-3 border border-[#333] space-y-2">
+                <div className="bg-[var(--bg-3)] rounded-lg p-3 border border-[var(--line)] space-y-2">
                     {/* ... results content ... */}
                     {(mode === 'principal' || mode === 'vonMises') && (
                         /* ... same ... */
                         <div className="space-y-2">
                             <div className="flex justify-between items-end">
                                 <div className="text-[10px] text-slate-500 uppercase">Von Mises</div>
-                                <div className="text-xl font-mono font-bold text-blue-400">{vonMisesStress.toFixed(1)} MPa</div>
+                                <div className="text-xl font-mono font-bold text-blue-400">{formatEngineeringValue(vonMisesStress, precision, false)} MPa</div>
                             </div>
                             <div className="flex justify-between items-end">
                                 <div className="text-[10px] text-slate-500 uppercase">Safety Factor</div>
-                                <div className={`text-xl font-mono font-bold ${safetyFactor.fos > 2 ? 'text-green-400' : 'text-amber-400'}`}>{safetyFactor.fos.toFixed(2)}</div>
+                                <div className={`text-xl font-mono font-bold ${safetyFactor.fos > 2 ? 'text-green-400' : 'text-amber-400'}`}>{formatEngineeringValue(safetyFactor.fos, precision, false)}</div>
                             </div>
                         </div>
                     )}
@@ -350,8 +352,8 @@ export function StrengthModule({ lang: propLang, dict: propDict }: { lang?: stri
                         title={`Strength Analysis: ${mode}`}
                         inputs={{ mode, material: selectedMaterial.name, sigmaX, sigmaY, tauXY }}
                         results={{
-                            vonMises: vonMisesStress.toFixed(2) + ' MPa',
-                            safetyFactor: safetyFactor.fos.toFixed(2),
+                            vonMises:formatEngineeringValue(vonMisesStress, precision, false) + ' MPa',
+                            safetyFactor:formatEngineeringValue(safetyFactor.fos, precision, false),
                             status: safetyFactor.status
                         }}
                         visualElementId="strength-viz-container"

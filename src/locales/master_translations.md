@@ -1,9 +1,9 @@
-# AluCalc OS - Master Translations
+# AluCAD OS - Master Translations
 
 | Key | English (EN) | Turkish (TR) | German (DE) | Spanish (ES) | Chinese (ZH) | Japanese (JA) | Korean (KO) | Arabic (AR) |
 |---|---|---|---|---|---|---|---|---|
 | **OS Core** | | | | | | | | |
-| `osName` | AluCalc OS | AluCalc OS | AluCalc OS | AluCalc OS | AluCalc OS | AluCalc OS | AluCalc OS | AluCalc OS |
+| `osName` | AluCAD OS | AluCAD OS | AluCAD OS | AluCAD OS | AluCAD OS | AluCAD OS | AluCAD OS | AluCAD OS |
 | `version` | v5.0 | v5.0 | v5.0 | v5.0 | v5.0 | v5.0 | v5.0 | v5.0 |
 | **Welcome Modal** | | | | | | | | |
 | `welcomeTitle` | Choose Your | Çalışma Alanınızı | Wählen Sie Ihre | Elija su | 选择您的 | ワークスペースを | あなたの | اختر |

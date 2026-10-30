@@ -1,4 +1,5 @@
 'use client';
+import '@/lib/three-cleanup';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Box } from '@react-three/drei';
 

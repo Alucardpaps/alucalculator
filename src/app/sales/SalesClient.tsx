@@ -26,7 +26,7 @@ export function SalesClient() {
       '',
       message,
     ].join('\n');
-    return `mailto:sales@alucalculator.com?subject=${encodeURIComponent('AluCalc Team / Enterprise')}&body=${encodeURIComponent(body)}`;
+    return `mailto:abdulsametyildirim95@gmail.com?subject=${encodeURIComponent('AluCAD Team / Enterprise')}&body=${encodeURIComponent(body)}`;
   }, [name, company, email, segment, seats, message]);
 
   return (
@@ -89,7 +89,7 @@ export function SalesClient() {
       </form>
 
       <div className="flex flex-wrap gap-2">
-        <a href="mailto:sales@alucalculator.com" className="work-btn">sales@alucalculator.com</a>
+        <a href="mailto:abdulsametyildirim95@gmail.com" className="work-btn">abdulsametyildirim95@gmail.com</a>
         <Link href="/pricing/" className="work-btn">{t.pricing}</Link>
         <Link href="/developers/" className="work-btn">{t.api}</Link>
         <Link href="/license/" className="work-btn">{t.license}</Link>

@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — Grid System
+ * AluCAD OS v5.0 — Grid System
  *
  * Grid-based snapping and axis constraint utilities.
  * Pure functions — no state, no React.

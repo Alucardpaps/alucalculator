@@ -73,25 +73,22 @@ export const ProjectManager = ({ items, setItems, unitPrice, currency, lang, dic
         const autoTable = (await import('jspdf-autotable')).default;
         const doc = new jsPDF();
 
-        // BRANDING
-        doc.setFillColor(10, 35, 66); // Brand Blue
-        doc.rect(0, 0, 210, 25, 'F');
-        doc.setFontSize(20);
-        doc.setTextColor(255, 255, 255);
-        doc.text("ALUCALCULATOR", 14, 16);
-        doc.setFontSize(10);
-        doc.text("Professional BOM & Cutting Plan", 195, 16, { align: 'right' });
+        // BRANDING — company logo/name from Settings → Reports
+        const { drawApprovalBlock, drawBrandedFooters, drawBrandedHeader, pdfSafe } = await import('@/lib/report/pdfBranding');
+        const y0 = drawBrandedHeader(doc, 'BOM & Cutting Plan', new Date().toLocaleString());
 
         // BOM TABLE
         doc.setTextColor(0, 0, 0);
-        doc.text("Bill of Materials", 14, 35);
+        doc.setFontSize(12);
+        doc.text("Bill of Materials", 14, y0);
 
         autoTable(doc, {
-            startY: 40,
+            startY: y0 + 4,
+            margin: { bottom: 18 },
             head: [['Description', 'Mat.', 'Qty', 'L (mm)', 'Unit Kg', 'Total Kg', 'Cost']],
             body: items.map(i => [
-                i.description,
-                i.material,
+                pdfSafe(String(i.description)),
+                pdfSafe(String(i.material)),
                 i.qty,
                 i.length,
                 i.weight.toFixed(2),
@@ -99,10 +96,11 @@ export const ProjectManager = ({ items, setItems, unitPrice, currency, lang, dic
                 (i.totalWeight * unitPrice).toFixed(2) + ' ' + currency
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [10, 35, 66] }
+            headStyles: { fillColor: [60, 64, 72] }
         });
 
         // NESTING REPORT
+        let endY = (doc as any).lastAutoTable.finalY + 8;
         if (nestingResult) {
             let y = (doc as any).lastAutoTable.finalY + 15;
             doc.setFontSize(14);
@@ -119,7 +117,7 @@ export const ProjectManager = ({ items, setItems, unitPrice, currency, lang, dic
             y += 10;
 
             nestingResult.patterns.forEach((pattern, idx) => {
-                if (y > 270) { doc.addPage(); y = 20; }
+                if (y > 262) { doc.addPage(); y = 20; }
 
                 doc.setDrawColor(200, 200, 200);
                 doc.setFillColor(245, 245, 245);
@@ -143,9 +141,12 @@ export const ProjectManager = ({ items, setItems, unitPrice, currency, lang, dic
                 doc.text(`Bar #${idx + 1} (${pattern.waste.toFixed(0)}mm rem)`, 14, y - 2);
                 y += 20;
             });
+            endY = y;
         }
 
-        doc.save('Project_Report.pdf');
+        drawApprovalBlock(doc, endY, document.documentElement.lang);
+        drawBrandedFooters(doc);
+        doc.save('AluCAD_OS_Project_Report.pdf');
     };
 
     return (

@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { PricingClient } from './PricingClient';
 
 export const metadata: Metadata = {
-  title: 'Pricing — Free, Pro, Team, Enterprise | AluCalc',
+  title: 'Pricing — Free, Pro, Team, Enterprise',
   description:
-    'AluCalc pricing: free engineering calculators, Pro for unlimited DXF/STL/PDF, Team for offices, Enterprise for factories and universities.',
+    'AluCAD OS pricing: free engineering calculators, Pro for unlimited DXF/STL/PDF, Team for offices, Enterprise for factories and universities.',
   alternates: { canonical: 'https://www.alucalculator.com/pricing/' },
 };
 

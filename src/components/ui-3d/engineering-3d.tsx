@@ -126,10 +126,10 @@ export const Engineering3D: React.FC<LoadVisualizerProps> = (props) => {
         />
       </Canvas>
       <div className="absolute top-4 left-4 flex flex-col gap-1">
-        <div className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">
+        <div className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded-full">
            Material: <span className="text-blue-400 capitalize">{props.materialType}</span>
         </div>
-        <div className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">
+        <div className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded-full">
            Profile: <span className="text-blue-400 capitalize">{props.profileType}</span>
         </div>
       </div>

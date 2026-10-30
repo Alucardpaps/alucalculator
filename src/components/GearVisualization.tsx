@@ -28,39 +28,9 @@ interface GearVisualizationProps {
     className?: string;
 }
 
-// Generate involute curve points
-function involute(baseRadius: number, t: number): { x: number; y: number } {
-    const x = baseRadius * (Math.cos(t) + t * Math.sin(t));
-    const y = baseRadius * (Math.sin(t) - t * Math.cos(t));
-    return { x, y };
-}
+import { generateExternalGearContour, pointsToSvgPath } from '@/engines/math/gear-involute-factory';
 
-// Generate tooth profile points
-function generateToothProfile(
-    pitchRadius: number,
-    baseRadius: number,
-    addendumRadius: number,
-    dedendumRadius: number,
-    toothAngle: number,
-    pressureAngleRad: number
-): string {
-    const points: string[] = [];
-    const steps = 20;
-
-    // Calculate involute range
-    const tMax = Math.sqrt((addendumRadius / baseRadius) ** 2 - 1);
-
-    // Right flank (involute curve)
-    for (let i = 0; i <= steps; i++) {
-        const t = (i / steps) * tMax;
-        const { x, y } = involute(baseRadius, t);
-        points.push(`${x.toFixed(3)},${y.toFixed(3)}`);
-    }
-
-    return points.join(' ');
-}
-
-// Generate complete gear SVG path
+// Generate complete gear SVG path (ISO 53 / DIN 3960 True Involute)
 function generateGearPath(
     module: number,
     teeth: number,
@@ -68,73 +38,14 @@ function generateGearPath(
     cx: number = 0,
     cy: number = 0
 ): string {
-    const pressureAngleRad = (pressureAngle * Math.PI) / 180;
-
-    // Gear geometry calculations
-    const pitchRadius = (module * teeth) / 2;
-    const addendum = module;
-    const dedendum = 1.25 * module;
-    const addendumRadius = pitchRadius + addendum;
-    const dedendumRadius = pitchRadius - dedendum;
-    const baseRadius = pitchRadius * Math.cos(pressureAngleRad);
-
-    // Tooth angular pitch
-    const toothAngle = (2 * Math.PI) / teeth;
-    const halfToothAngle = toothAngle / 2;
-
-    // Simplified tooth profile using arcs and lines
-    const pathParts: string[] = [];
-
-    for (let i = 0; i < teeth; i++) {
-        const angle = i * toothAngle;
-        const cos = Math.cos(angle);
-        const sin = Math.sin(angle);
-        const cosHalf = Math.cos(angle + halfToothAngle * 0.5);
-        const sinHalf = Math.sin(angle + halfToothAngle * 0.5);
-        const cosNext = Math.cos(angle + halfToothAngle);
-        const sinNext = Math.sin(angle + halfToothAngle);
-        const cosEnd = Math.cos(angle + toothAngle);
-        const sinEnd = Math.sin(angle + toothAngle);
-
-        // Root point
-        const rx = cx + dedendumRadius * cos;
-        const ry = cy + dedendumRadius * sin;
-
-        // Tip point (left side)
-        const txL = cx + addendumRadius * cosHalf;
-        const tyL = cy + addendumRadius * sinHalf;
-
-        // Tip point (right side)
-        const txR = cx + addendumRadius * cosNext;
-        const tyR = cy + addendumRadius * sinNext;
-
-        // Next root point
-        const rxNext = cx + dedendumRadius * cosEnd;
-        const ryNext = cy + dedendumRadius * sinEnd;
-
-        if (i === 0) {
-            pathParts.push(`M ${rx.toFixed(2)} ${ry.toFixed(2)}`);
-        }
-
-        // Rising flank
-        pathParts.push(`L ${txL.toFixed(2)} ${tyL.toFixed(2)}`);
-
-        // Tooth tip arc
-        pathParts.push(`A ${addendumRadius.toFixed(2)} ${addendumRadius.toFixed(2)} 0 0 1 ${txR.toFixed(2)} ${tyR.toFixed(2)}`);
-
-        // Falling flank
-        pathParts.push(`L ${rxNext.toFixed(2)} ${ryNext.toFixed(2)}`);
-
-        // Root arc to next tooth
-        if (i < teeth - 1) {
-            const nextRx = cx + dedendumRadius * Math.cos((i + 1) * toothAngle);
-            const nextRy = cy + dedendumRadius * Math.sin((i + 1) * toothAngle);
-            pathParts.push(`A ${dedendumRadius.toFixed(2)} ${dedendumRadius.toFixed(2)} 0 0 1 ${nextRx.toFixed(2)} ${nextRy.toFixed(2)}`);
-        }
-    }
-
-    pathParts.push('Z');
-    return pathParts.join(' ');
+    const points = generateExternalGearContour({
+        module,
+        teeth: Math.max(4, Math.round(teeth)),
+        pressureAngle,
+        center: { x: cx, y: cy },
+        pointsPerFlank: 10,
+    });
+    return pointsToSvgPath(points);
 }
 
 export function GearVisualization({

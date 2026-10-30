@@ -91,7 +91,7 @@ export async function submitFeedback(
       break;
     }
 
-    if (res.ok && result?.success) {
+    if (res && res.ok && result?.success) {
       if (data.screenshot?.byteLength) {
         recordScreenshotQuotaUsage(data.screenshot.byteLength);
       }
@@ -110,7 +110,7 @@ export async function submitFeedback(
     }
 
     // Fallback if server returned non-JSON HTML (404/503/405)
-    if (!res.ok) {
+    if (res && !res.ok) {
       if (res.status === 503) {
         return {
           success: false,
@@ -119,7 +119,7 @@ export async function submitFeedback(
       }
       return {
         success: false,
-        error: `Sunucu yanıt vermedi (${res.status}). Lütfen mesajınızı doğrudan destek@alucalculator.com adresine e-posta ile iletin.`,
+        error: `Sunucu yanıt vermedi (${res.status}). Lütfen mesajınızı doğrudan abdulsametyildirim95@gmail.com adresine e-posta ile iletin.`,
       };
     }
 

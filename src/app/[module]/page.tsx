@@ -9,7 +9,9 @@ import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { ModulePageSeoShell } from '@/components/seo/ModulePageSeoShell';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
+import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
 import { RETIRED_MODULE_REDIRECTS } from '@/config/retiredModules';
+import { MathFormula } from '@/components/ui/MathFormula';
 
 
 /**
@@ -27,8 +29,13 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   // — Unit Converter —
   'converter':              'unit-converter',
   'unit-converter':         'unit-converter',
-  // — Fasteners —
-  'fasteners':              'fasteners',
+  'hardness-converter':     'unit-converter',
+  // — Fasteners (Mapped to Bolt Torque Engine) —
+  'fasteners':              'bolt-torque',
+  'fasteners-calc':         'bolt-torque',
+  'bolt-torque':            'bolt-torque',
+  'thread-geometry':        'bolt-torque',
+  'thread-standards':       'bolt-torque',
   // — Gears & Bearings —
   'gears':                  'gears-bearings',
   'gears-bearings':         'gears-bearings',
@@ -49,6 +56,22 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   // — Fits & Tolerances —
   'fits':                   'fits-tolerances',
   'fits-tolerances':        'fits-tolerances',
+  // — Keyway Connection (DIN 6885) —
+  'keyway':                 'keyway-connection',
+  'keyway-connection':      'keyway-connection',
+  'kama':                   'keyway-connection',
+  'kama-hesabi':            'keyway-connection',
+  'parallel-key':           'keyway-connection',
+  // — Press Fit (DIN 7190) —
+  'press-fit':              'press-fit',
+  'shrink-fit':             'press-fit',
+  'interference-fit':       'press-fit',
+  'siki-gecme':             'press-fit',
+  // — O-Ring (ISO 3601) —
+  'o-ring':                 'o-ring',
+  'oring':                  'o-ring',
+  'o-ring-gland':           'o-ring',
+  'sizdirmazlik':           'o-ring',
   // — Beam Deflection —
   'beam-deflection':        'beam-deflection',
   // — Fatigue Analysis —
@@ -81,7 +104,7 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   // — Cutting Optimizer —
   'cutting-optimizer':      'cutting-optimizer',
   // — Materials DB —
-  'materials-db':           'materials-db',
+  'materials-db':           'handbook',
   // — Fatigue Advanced —
   'fatigue-advanced':       'fatigue-advanced',
   // — Motor Selection —
@@ -90,11 +113,9 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   // — Gearbox Design —
   'gearbox-design':         'gearbox-design',
   // — Materials Explorer —
-  'materials-explorer':     'materials-explorer',
+  'materials-explorer':     'handbook',
   // — Failure Prediction —
   'failure-prediction':     'failure-prediction',
-  // — Failure Diagnosis —
-  'failure-diagnosis':      'failure-diagnosis',
   // — Simulation FEA —
   'simulation-fea':         'simulation-fea',
   // — Calculator —
@@ -115,18 +136,14 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
   'biology-genetics':       'biology-genetics',
   // — CS Algorithms —
   'cs-algorithms':          'cs-algorithms',
-  // — Naval Hydrostatics —
-  'naval-hydrostatics':     'naval-hydrostatics',
   // — Physics Solver —
   'physics-solver':         'physics-solver',
-  // — Bolt Torque —
-  'bolt-torque':            'bolt-torque',
   // — Chain Drive —
   'chain-drive':            'chain-drive',
   // — Belt Drive —
   'belt-drive':             'belt-drive',
   // — Material Selector AI —
-  'material-selector-ai':   'material-selector-ai',
+  'material-selector-ai':   'handbook',
   // — Three-Phase Power —
   'three-phase-power':      'three-phase-power',
   // — Digital Logic —
@@ -183,21 +200,23 @@ const SLUG_TO_MODULE: Record<string, ModuleType> = {
  * Generate unique metadata for each module page.
  * Uses the Centralized SEO Registry (Master Parameter Table).
  */
-export async function generateMetadata({ params }: { params: Promise<{ module: string }> | { module: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ module: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const moduleSlug = resolvedParams.module;
   const seo = getModuleSeo(moduleSlug);
+  const rawSlug = seo.canonicalSlug || `/${moduleSlug}/`;
+  const canonicalSlug = rawSlug.endsWith('/') ? rawSlug : `${rawSlug}/`;
 
   return {
     title: seo.title,
     description: seo.description,
     alternates: {
-      canonical: `https://www.alucalculator.com${seo.canonicalSlug}`,
+      canonical: `https://www.alucalculator.com${canonicalSlug}`,
     },
     openGraph: {
       title: seo.title,
       description: seo.description,
-      url: `https://www.alucalculator.com${seo.canonicalSlug}`,
+      url: `https://www.alucalculator.com${canonicalSlug}`,
       type: 'website',
     },
   };
@@ -216,13 +235,12 @@ export async function generateStaticParams() {
     'sheet-metal',
     'strength', 'strength-analysis',
     'welding',
-    'nesting', 'nesting-2d',
+    'nesting',
     'fits', 'fits-tolerances',
     'sketch-pad',
     'cad-editor',
     'engineering-selection',
     'cutting-optimizer',
-    'materials-db',
     'simulation-fea',
     'calculator',
     'beam-deflection',
@@ -236,9 +254,7 @@ export async function generateStaticParams() {
     'fatigue-advanced',
     'motor-selection', 'motor-selection-std',
     'gearbox-design',
-    'materials-explorer',
     'failure-prediction',
-    'failure-diagnosis',
     'concrete-reinforcement',
     'ohms-law',
     'voltage-drop',
@@ -246,13 +262,11 @@ export async function generateStaticParams() {
     'chemistry-reactions',
     'biology-genetics',
     'cs-algorithms',
-    'naval-hydrostatics',
     'physics-solver',
     'reducer-lubrication',
     'bolt-torque',
     'chain-drive',
     'belt-drive',
-    'material-selector-ai',
     'settings',
     'digital-logic',
     'filter-design',
@@ -308,14 +322,16 @@ export async function generateStaticParams() {
     'pressure-vessel',
     'wind-tunnel',
   ];
-  const allSlugs = Array.from(new Set([...Object.keys(SLUG_TO_MODULE), ...modules]));
+  const retiredKeys = new Set(Object.keys(RETIRED_MODULE_REDIRECTS));
+  const allSlugs = Array.from(new Set([...Object.keys(SLUG_TO_MODULE), ...modules]))
+    .filter(slug => !retiredKeys.has(slug));
   
   return allSlugs.map((slug) => ({
     module: slug,
   }));
 }
 
-export default async function ModernModuleRouterPage({ params }: { params: Promise<{ module: string }> | { module: string } }) {
+export default async function ModernModuleRouterPage({ params }: { params: Promise<{ module: string }> }) {
   const resolvedParams = await params;
   const moduleSlug = resolvedParams.module.toLowerCase();
   
@@ -325,14 +341,20 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
   if (moduleSlug === '3-phase-power') {
     redirect('/three-phase-power');
   }
+  if (moduleSlug === 'nesting' || moduleSlug === 'nesting-2d') {
+    redirect('/nesting-2d');
+  }
   if (moduleSlug === 'simulation-fea') {
     redirect('/fea');
   }
   if (moduleSlug === 'calculators') {
-    redirect('/lite');
+    redirect('/calculators');
   }
   if (moduleSlug === 'machine-assembly') {
     redirect('/workspace');
+  }
+  if (moduleSlug === 'thread-geometry' || moduleSlug === 'thread-standards') {
+    redirect('/bolt-torque');
   }
   const retiredTarget = RETIRED_MODULE_REDIRECTS[moduleSlug];
   if (retiredTarget) {
@@ -366,7 +388,9 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
           <div className="mt-3 grid gap-3 border-t border-[var(--line)] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3">
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-[var(--ink)]">{method.formula}</p>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--alu-dim)]">{method.formulaNote}</p>
             </div>
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
@@ -382,12 +406,8 @@ export default async function ModernModuleRouterPage({ params }: { params: Promi
                 </Link>
               )}
             </div>
-            <div className="work-panel rounded-[var(--radius-s)] p-3 sm:col-span-2 lg:col-span-1 bg-[var(--bg-2)] border border-[var(--line)]">
-              <h2 className="work-label !mb-1.5">Worked example</h2>
-              <p className="text-[11px] text-[var(--alu-dim)]">{method.workedExample?.title || `Worked example — ${seo.title.split('|')[0].trim()}`}</p>
-              <p className="mt-1 font-mono text-[12px] text-[var(--ink)]">
-                {method.workedExample?.result || 'Open the workbench to run the live solver with the same engine used in production.'}
-              </p>
+            <div className="work-panel rounded-[var(--radius-s)] p-3.5 sm:col-span-2 lg:col-span-3 bg-[var(--bg-2)] border border-[var(--line)]">
+              <StaticWorkedExample method={method} defaultTitle={seo.title.split('|')[0].trim()} />
             </div>
           </div>
         </details>

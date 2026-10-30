@@ -2,7 +2,7 @@ import type { ModuleType } from '@/config/modules';
 
 export interface ExportPayload {
   exportedAt: string;
-  app: 'AluCalc OS';
+  app: 'AluCAD OS';
   version: string;
   moduleType: ModuleType | string;
   moduleTitle: string;
@@ -14,7 +14,7 @@ export interface ExportPayload {
 export async function exportResultsJson(payload: Omit<ExportPayload, 'exportedAt' | 'app' | 'version'>): Promise<void> {
   const data: ExportPayload = {
     exportedAt: new Date().toISOString(),
-    app: 'AluCalc OS',
+    app: 'AluCAD OS',
     version: '5.0.0',
     ...payload,
   };

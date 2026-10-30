@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Export Utilities
+ * AluCAD OS — Export Utilities
  * 
  * SVG and DXF export functions for parametric visualizations.
  * Supports download, clipboard copy, and format conversions.

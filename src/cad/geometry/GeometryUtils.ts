@@ -16,6 +16,8 @@ import {
     perpendicular
 } from '../kernel/GeometryKernel';
 import { screenToWorldDistance } from '../kernel/CoordinateSystem';
+import { distanceToPrimitives, geometryPrimitives, primitivesInBox } from '../kernel/primitives';
+import { isEntityEditable } from '../kernel/layers';
 
 // ═══════════════════════════════════════════════════════════════
 // SELECTION UTILS
@@ -33,7 +35,8 @@ export function findEntityAtPoint(
     let minDistance = tolerance;
 
     for (const entity of entities) {
-        if (!entity.isVisible) continue;
+        // hidden, frozen and locked layers cannot be picked
+        if (!isEntityEditable(entity)) continue;
 
         const d = distanceToEntity(point, entity);
         if (d <= minDistance) {
@@ -62,6 +65,25 @@ export function distanceToEntity(point: Point, entity: CadEntity): number {
             return distanceToLine(point, geom.start, geom.end);
         case 'CIRCLE':
             return Math.abs(distance(point, geom.center) - geom.radius);
+        case 'ARC': {
+            const dRad = Math.abs(distance(point, geom.center) - geom.radius);
+            let angle = Math.atan2(point.y - geom.center.y, point.x - geom.center.x);
+            if (angle < 0) angle += 2 * Math.PI;
+            let s = geom.startAngle;
+            let e = geom.endAngle;
+            while (s < 0) s += 2 * Math.PI;
+            while (e < 0) e += 2 * Math.PI;
+            let sweep = e - s;
+            if (sweep <= 0) sweep += 2 * Math.PI;
+            let rel = angle - s;
+            if (rel < 0) rel += 2 * Math.PI;
+            if (rel <= sweep + 0.05) {
+                return dRad;
+            }
+            const pStart = { x: geom.center.x + geom.radius * Math.cos(geom.startAngle), y: geom.center.y + geom.radius * Math.sin(geom.startAngle) };
+            const pEnd = { x: geom.center.x + geom.radius * Math.cos(geom.endAngle), y: geom.center.y + geom.radius * Math.sin(geom.endAngle) };
+            return Math.min(distance(point, pStart), distance(point, pEnd));
+        }
         case 'POLYLINE':
             // Min distance to any segment
             let minDist = Infinity;
@@ -75,57 +97,22 @@ export function distanceToEntity(point: Point, entity: CadEntity): number {
                 if (d < minDist) minDist = d;
             }
             return minDist;
-        case 'RECTANGLE': {
+        case 'DIMENSION': {
             const g = geom as any;
-            const hw = g.width / 2;
-            const hh = g.height / 2;
-            const cx = g.center.x;
-            const cy = g.center.y;
-            // Distance to 4 edges of the rectangle (ignoring rotation for simplicity)
-            const corners = [
-                { x: cx - hw, y: cy - hh },
-                { x: cx + hw, y: cy - hh },
-                { x: cx + hw, y: cy + hh },
-                { x: cx - hw, y: cy + hh },
-            ];
-            let dMin = Infinity;
-            for (let i = 0; i < 4; i++) {
-                const d = distanceToLine(point, corners[i], corners[(i + 1) % 4]);
-                if (d < dMin) dMin = d;
+            if (!g.start || !g.end) return Infinity;
+            const dLine = distanceToLine(point, g.start, g.end);
+            const dP1 = distance(point, g.start);
+            const dP2 = distance(point, g.end);
+            let dText = Infinity;
+            if (g.textPoint) {
+                dText = distance(point, g.textPoint);
             }
-            return dMin;
-        }
-        case 'HEXAGON': {
-            const g = geom as any;
-            const hexVertices: Point[] = [];
-            for (let i = 0; i < 6; i++) {
-                const angle = (Math.PI / 3) * i + (g.rotation || 0);
-                hexVertices.push({
-                    x: g.center.x + g.radius * Math.cos(angle),
-                    y: g.center.y + g.radius * Math.sin(angle),
-                });
-            }
-            let dMin = Infinity;
-            for (let i = 0; i < 6; i++) {
-                const d = distanceToLine(point, hexVertices[i], hexVertices[(i + 1) % 6]);
-                if (d < dMin) dMin = d;
-            }
-            return dMin;
-        }
-        case 'GEAR': {
-            const g = geom as any;
-            const rPitch = (g.module * g.teeth) / 2;
-            return Math.abs(distance(point, g.center) - rPitch);
-        }
-        case 'FASTENER': {
-            const g = geom as any;
-            const dHead = distanceToLine(point, g.origin, { x: g.origin.x, y: g.origin.y + 10 }); // Head ref
-            const dCenter = distance(point, g.origin);
-            return Math.min(dHead, dCenter);
+            return Math.min(dLine, dP1, dP2, dText);
         }
         default:
-            return Infinity;
-
+            // rectangles, polygons, ellipses, splines, text, leaders, hatches and the
+            // parametric machine elements: measured on exactly what the canvas draws
+            return distanceToPrimitives(point, geometryPrimitives(geom));
     }
 }
 
@@ -284,6 +271,51 @@ export function offsetEntity(
                 }
             };
         }
+        else if (geom.type === 'RECTANGLE') {
+            const g = geom as any;
+            const distToCenter = distance(sidePoint, g.center);
+            const diag = Math.hypot(g.width, g.height) / 2;
+            const isOutside = distToCenter > diag;
+            const sign = isOutside ? 1 : -1;
+            const newW = g.width + 2 * offsetDist * sign;
+            const newH = g.height + 2 * offsetDist * sign;
+            if (newW <= 0 || newH <= 0) return null;
+            return {
+                id: crypto.randomUUID(),
+                layerId: entity.layerId,
+                color: entity.color,
+                isVisible: true,
+                isSelected: false,
+                geometry: {
+                    type: 'RECTANGLE',
+                    center: g.center,
+                    width: newW,
+                    height: newH,
+                    rotation: g.rotation || 0,
+                }
+            };
+        }
+        else if (geom.type === 'HEXAGON') {
+            const g = geom as any;
+            const distToCenter = distance(sidePoint, g.center);
+            const isOutside = distToCenter > g.radius;
+            const sign = isOutside ? 1 : -1;
+            const newR = g.radius + offsetDist * sign;
+            if (newR <= 0) return null;
+            return {
+                id: crypto.randomUUID(),
+                layerId: entity.layerId,
+                color: entity.color,
+                isVisible: true,
+                isSelected: false,
+                geometry: {
+                    type: 'HEXAGON',
+                    center: g.center,
+                    radius: newR,
+                    rotation: g.rotation || 0,
+                }
+            };
+        }
     } catch (e) {
         console.error('Offset error', e);
         return null;
@@ -344,92 +376,12 @@ export interface BoundingBox {
     maxY: number;
 }
 
+/** Window selection: the whole entity lies inside the box. */
 export function isEntityInsideBox(entity: CadEntity, box: BoundingBox): boolean {
-    const geom = entity.geometry;
-    if (geom.type === 'POINT') {
-        return isPointInBox(geom, box);
-    } else if (geom.type === 'LINE') {
-        return isPointInBox(geom.start, box) && isPointInBox(geom.end, box);
-    } else if (geom.type === 'CIRCLE') {
-        // Simple bounding box check for circle
-        return (
-            geom.center.x - geom.radius >= box.minX &&
-            geom.center.x + geom.radius <= box.maxX &&
-            geom.center.y - geom.radius >= box.minY &&
-            geom.center.y + geom.radius <= box.maxY
-        );
-    } else if (geom.type === 'POLYLINE') {
-        return geom.vertices.every(v => isPointInBox(v, box));
-    }
-    return false;
+    return primitivesInBox(geometryPrimitives(entity.geometry), box, 'window');
 }
 
+/** Crossing selection: the entity lies inside or touches the box. */
 export function isEntityIntersectingBox(entity: CadEntity, box: BoundingBox): boolean {
-    // If inside, it intersects
-    if (isEntityInsideBox(entity, box)) return true;
-
-    const geom = entity.geometry;
-
-    if (geom.type === 'LINE') {
-        return lineIntersectsBox(geom.start, geom.end, box);
-    } else if (geom.type === 'CIRCLE') {
-        return circleIntersectsBox(geom.center, geom.radius, box);
-    } else if (geom.type === 'POLYLINE') {
-        const vertices = geom.vertices;
-        for (let i = 0; i < vertices.length - 1; i++) {
-            if (lineIntersectsBox(vertices[i], vertices[i + 1], box)) return true;
-        }
-        if (geom.closed) {
-            if (lineIntersectsBox(vertices[vertices.length - 1], vertices[0], box)) return true;
-        }
-        return false;
-    }
-    return false;
-}
-
-function isPointInBox(p: { x: number, y: number }, box: BoundingBox): boolean {
-    return p.x >= box.minX && p.x <= box.maxX && p.y >= box.minY && p.y <= box.maxY;
-}
-
-function lineIntersectsBox(p1: Point, p2: Point, box: BoundingBox): boolean {
-    // Cohen-Sutherland algorithm or simple line intersection with box edges
-
-    // Trivial accept/reject
-    if (isPointInBox(p1, box) || isPointInBox(p2, box)) return true;
-    if (Math.max(p1.x, p2.x) < box.minX || Math.min(p1.x, p2.x) > box.maxX) return false;
-    if (Math.max(p1.y, p2.y) < box.minY || Math.min(p1.y, p2.y) > box.maxY) return false;
-
-    // Check intersection with 4 edges
-    const edges = [
-        [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.minY }], // Top
-        [{ x: box.maxX, y: box.minY }, { x: box.maxX, y: box.maxY }], // Right
-        [{ x: box.maxX, y: box.maxY }, { x: box.minX, y: box.maxY }], // Bottom
-        [{ x: box.minX, y: box.maxY }, { x: box.minX, y: box.minY }]  // Left
-    ];
-
-    for (const [e1, e2] of edges) {
-        if (segmentsIntersect(p1, p2, e1, e2)) return true;
-    }
-    return false;
-}
-
-function circleIntersectsBox(center: Point, radius: number, box: BoundingBox): boolean {
-    // Find closest point on box to circle center
-    const closestX = Math.max(box.minX, Math.min(center.x, box.maxX));
-    const closestY = Math.max(box.minY, Math.min(center.y, box.maxY));
-
-    const dx = center.x - closestX;
-    const dy = center.y - closestY;
-
-    return (dx * dx + dy * dy) <= (radius * radius);
-}
-
-function segmentsIntersect(a: Point, b: Point, c: Point, d: Point): boolean {
-    const det = (b.x - a.x) * (d.y - c.y) - (d.x - c.x) * (b.y - a.y);
-    if (det === 0) return false;
-
-    const lambda = ((d.y - c.y) * (d.x - a.x) + (c.x - d.x) * (d.y - a.y)) / det;
-    const gamma = ((a.y - b.y) * (d.x - a.x) + (b.x - a.x) * (d.y - a.y)) / det;
-
-    return (0 <= lambda && lambda <= 1) && (0 <= gamma && gamma <= 1);
+    return primitivesInBox(geometryPrimitives(entity.geometry), box, 'crossing');
 }

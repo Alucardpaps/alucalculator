@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useAcademyGamificationStore } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import type { QuizQuestion } from '@/data/academyQuizzes';
 
 export interface InteractiveSlide {
@@ -44,7 +45,6 @@ interface Props {
 
 export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', questions = [], onClose, onComplete }: Props) {
   const { language } = useI18nStore();
-  const isTr = language === 'tr';
 
   const { hearts, loseHeart, refillHearts, completeLesson, soundEnabled } = useAcademyGamificationStore();
 
@@ -56,11 +56,9 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
     list.push({
       id: 'concept-1',
       type: 'concept',
-      title: isTr ? `Temel Mühendislik Prensibi: ${title}` : `Core Principle: ${title}`,
-      description: isTr 
-        ? `${title} konusundaki formülleri, sınır koşullarını ve güvenlik faktörlerini adım adım çözeceğiz.`
-        : `We will solve the governing equations, boundary conditions, and safety margins for ${title}.`,
-      explanation: isTr ? 'Hazırsanız başlayalım!' : 'Let\'s begin!',
+      title: t12(language, `Core Principle: ${title}`, `Temel Mühendislik Prensibi: ${title}`),
+      description: t12(language, `We will solve the governing equations, boundary conditions, and safety margins for ${title}.`, `${title} konusundaki formülleri, sınır koşullarını ve güvenlik faktörlerini adım adım çözeceğiz.`),
+      explanation: t12(language, 'Let\\\'s begin!', 'Hazırsanız başlayalım!'),
     });
 
     // 2. Map Quiz Questions
@@ -79,28 +77,28 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
     list.push({
       id: 'formula-builder-1',
       type: 'formula_builder',
-      title: isTr ? 'Mühendislik Formülünü Oluştur' : 'Construct the Engineering Equation',
-      description: isTr ? 'Aşağıdaki terimleri doğru sırayla dizerek temel bağıntıyı kurun:' : 'Arrange the tokens in order to complete the formula:',
+      title: t12(language, 'Construct the Engineering Equation', 'Mühendislik Formülünü Oluştur'),
+      description: t12(language, 'Arrange the tokens in order to complete the formula:', 'Aşağıdaki terimleri doğru sırayla dizerek temel bağıntıyı kurun:'),
       tokens: ['σ', '=', 'M', '/', 'W', '·', 'SF'],
       correctAnswer: ['σ', '=', 'M', '/', 'W'],
-      explanation: isTr ? 'Eğilme gerilmesi formülü: σ = M / W (Moment / Mukavemet Momenti)' : 'Bending stress formula: σ = M / W (Moment / Section Modulus)',
+      explanation: t12(language, 'Bending stress formula: σ = M / W (Moment / Section Modulus)', 'Eğilme gerilmesi formülü: σ = M / W (Moment / Mukavemet Momenti)'),
     });
 
     // 4. Match Pairs Slide (Units & Standards)
     list.push({
       id: 'match-pairs-1',
       type: 'match_pairs',
-      title: isTr ? 'Birimleri ve Standartları Eşleştir' : 'Match Units & Standards',
+      title: t12(language, 'Match Units & Standards', 'Birimleri ve Standartları Eşleştir'),
       pairs: [
         { left: 'Gerilme (Stress)', right: 'MPa (N/mm²)' },
         { left: 'Tork (Torque)', right: 'N·m' },
         { left: 'Atalet Momenti (Inertia)', right: 'mm⁴' },
       ],
-      explanation: isTr ? 'Tüm birimler SI mühendislik sistemine uygundur.' : 'All units conform to SI engineering standards.',
+      explanation: t12(language, 'All units conform to SI engineering standards.', 'Tüm birimler SI mühendislik sistemine uygundur.'),
     });
 
     return list;
-  }, [slug, title, questions, isTr]);
+  }, [slug, title, questions, language]);
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -162,7 +160,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#070a0f] flex flex-col justify-between select-none">
+    <div className="fixed inset-0 z-50 bg-[var(--bg-0)] flex flex-col justify-between select-none">
       {/* Top Header */}
       <div className="h-16 px-4 sm:px-8 border-b border-white/10 flex items-center justify-between gap-4 max-w-4xl w-full mx-auto">
         <button
@@ -194,7 +192,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
             {/* Slide Question / Title */}
             <div>
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
-                {department} · {isTr ? `Soru ${currentSlideIndex + 1} / ${slides.length}` : `Step ${currentSlideIndex + 1} / ${slides.length}`}
+                {department} · {t12(language, `Step ${currentSlideIndex + 1} / ${slides.length}`, `Soru ${currentSlideIndex + 1} / ${slides.length}`)}
               </span>
               <h2 className="text-lg sm:text-2xl font-black text-white mt-2 leading-snug">
                 {currentSlide.title}
@@ -213,9 +211,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                   <Sparkles size={32} />
                 </div>
                 <p className="text-sm text-slate-200 leading-relaxed">
-                  {isTr 
-                    ? 'Bu derste öğreneceğiniz bağıntılar, ISO ve DIN standartlarında emniyetli makine tasarımının temelini oluşturur.'
-                    : 'The governing formulas you will learn in this session form the core foundation of certified machine design.'}
+                  {t12(language, 'The governing formulas you will learn in this session form the core foundation of certified machine design.', 'Bu derste öğreneceğiniz bağıntılar, ISO ve DIN standartlarında emniyetli makine tasarımının temelini oluşturur.')}
                 </p>
               </div>
             )}
@@ -227,7 +223,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                   const isSelected = selectedOption === idx;
                   let btnCls = 'bg-white/[0.02] border-white/10 text-slate-200 hover:bg-white/[0.05] hover:border-emerald-500/30';
                   if (isSelected) {
-                    btnCls = 'bg-emerald-500/15 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]';
+                    btnCls = 'bg-emerald-500/15 border-emerald-500 text-emerald-300 ';
                   }
 
                   return (
@@ -255,7 +251,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                 <div className="min-h-16 p-4 rounded-2xl bg-black/40 border border-white/10 flex flex-wrap gap-2 items-center">
                   {builtTokens.length === 0 ? (
                     <span className="text-xs font-mono text-slate-500 italic">
-                      {isTr ? 'Tokenlara tıklayarak formülü buraya yerleştirin...' : 'Tap tokens below to assemble the formula here...'}
+                      {t12(language, 'Tap tokens below to assemble the formula here...', 'Tokenlara tıklayarak formülü buraya yerleştirin...')}
                     </span>
                   ) : (
                     builtTokens.map((tok, idx) => (
@@ -333,13 +329,13 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
           </div>
         ) : (
           /* Completion Screen */
-          <div className="w-full max-w-md rounded-3xl bg-[#0e141f] border border-white/10 p-8 text-center space-y-6 animate-in zoom-in-95 duration-200">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500 flex items-center justify-center mx-auto text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+          <div className="w-full max-w-md rounded-3xl bg-[var(--bg-2)] border border-white/10 p-8 text-center space-y-6 animate-in zoom-in-95 duration-200">
+            <div className="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500 flex items-center justify-center mx-auto text-emerald-400 ">
               <Trophy size={42} />
             </div>
 
             <div>
-              <h3 className="text-2xl font-black text-white">{isTr ? 'Ders Tamamlandı!' : 'Lesson Complete!'}</h3>
+              <h3 className="text-2xl font-black text-white">{t12(language, 'Lesson Complete!', 'Ders Tamamlandı!')}</h3>
               <p className="text-xs text-slate-400 mt-1">{title}</p>
             </div>
 
@@ -364,12 +360,12 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
               <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                 <Gem size={16} className="text-cyan-400 mx-auto" />
                 <p className="text-sm font-black text-white mt-1">+{finalResults?.gemsEarned || 15}</p>
-                <p className="text-[9px] uppercase tracking-widest text-slate-400">{isTr ? 'Elmas' : 'Gems'}</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-400">{t12(language, 'Gems', 'Elmas')}</p>
               </div>
               <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5">
                 <Flame size={16} className="text-amber-400 mx-auto" />
                 <p className="text-sm font-black text-white mt-1">+1</p>
-                <p className="text-[9px] uppercase tracking-widest text-slate-400">{isTr ? 'Seri' : 'Streak'}</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-400">{t12(language, 'Streak', 'Seri')}</p>
               </div>
             </div>
 
@@ -377,7 +373,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
               onClick={onClose}
               className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-sm uppercase tracking-wider transition-all shadow-lg active:scale-95"
             >
-              {isTr ? 'Tamamla ve Devam Et' : 'Finish and Continue'}
+              {t12(language, 'Finish and Continue', 'Tamamla ve Devam Et')}
             </button>
           </div>
         )}
@@ -390,7 +386,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
             ? isCorrect 
               ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' 
               : 'bg-rose-950/90 border-rose-500/40 text-rose-200' 
-            : 'bg-[#0a0e16]/90 border-white/10'
+            : 'bg-[var(--bg-1)]/90 border-white/10'
         }`}>
           <div className="max-w-2xl w-full mx-auto flex items-center justify-between gap-4">
             {isChecked ? (
@@ -402,7 +398,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                 )}
                 <div>
                   <p className="font-black text-sm sm:text-base">
-                    {isCorrect ? (isTr ? 'Harika İş! +15 XP' : 'Excellent Job! +15 XP') : (isTr ? 'Hatalı Çözüm' : 'Incorrect Solution')}
+                    {isCorrect ? (t12(language, 'Excellent Job! +15 XP', 'Harika İş! +15 XP')) : (t12(language, 'Incorrect Solution', 'Hatalı Çözüm'))}
                   </p>
                   <p className="text-xs opacity-80 mt-0.5">
                     {currentSlide.explanation}
@@ -411,7 +407,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
               </div>
             ) : (
               <div className="hidden sm:block text-xs font-mono text-slate-500">
-                {isTr ? 'Hazır olduğunuzda kontrol edin' : 'Check your work when ready'}
+                {t12(language, 'Check your work when ready', 'Hazır olduğunuzda kontrol edin')}
               </div>
             )}
 
@@ -421,7 +417,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                 onClick={handleCheckAnswer}
                 className="px-8 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs sm:text-sm uppercase tracking-widest transition-all shadow-lg active:scale-95 shrink-0 ml-auto"
               >
-                {isTr ? 'KONTROL ET' : 'CHECK'}
+                {t12(language, 'CHECK', 'KONTROL ET')}
               </button>
             ) : (
               <button
@@ -431,7 +427,7 @@ export function DuolingoLessonPlayer({ slug, title, department = 'Engineering', 
                   isCorrect ? 'bg-emerald-400 text-black hover:bg-emerald-300' : 'bg-rose-500 text-white hover:bg-rose-400'
                 }`}
               >
-                {isTr ? 'DEVAM ET' : 'CONTINUE'}
+                {t12(language, 'CONTINUE', 'DEVAM ET')}
               </button>
             )}
           </div>

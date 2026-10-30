@@ -6,10 +6,10 @@ export const foundationBearingSchema: CalculatorSchemaV2 = {
     id: 'foundation-bearing',
     metadata: {
         title: 'Foundation Bearing Capacity',
-        description: 'Meyerhof & Terzaghi geotechnical formulas for ultimate and allowable bearing capacity of shallow foundations.',
+        description: 'Eurocode 7 (EN 1997-1 Annex D) ultimate and allowable bearing capacity of shallow rectangular foundations.',
         category: 'civil',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['foundation', 'bearing capacity', 'meyerhof', 'terzaghi', 'geotechnical', 'civil engineering'],
         verifiedStandards: ['Eurocode 7', 'AASHTO LRFD']
@@ -37,7 +37,7 @@ export const foundationBearingSchema: CalculatorSchemaV2 = {
     outputs: [
         { key: 'Nc', label: 'Nc Cohesion Factor', unit: '-', description: 'Bearing capacity factor for soil cohesion', precision: 2, formulaLatex: 'N_c = (N_q - 1) \\cot \\phi' },
         { key: 'Nq', label: 'Nq Surcharge Factor', unit: '-', description: 'Bearing capacity factor for embedment depth', precision: 2, formulaLatex: 'N_q = e^{\\pi \\tan \\phi} \\tan^2(45 + \\phi/2)' },
-        { key: 'Ng', label: 'Nγ Unit Weight Factor', unit: '-', description: 'Bearing capacity factor for soil weight', precision: 2, formulaLatex: 'N_\\gamma = 2(N_q + 1)\\tan \\phi' },
+        { key: 'Ng', label: 'Nγ Unit Weight Factor', unit: '-', description: 'Bearing capacity factor for soil weight', precision: 2, formulaLatex: 'N_\\gamma = 2(N_q - 1)\\tan \\phi' },
         { key: 'q', label: 'Overburden Surcharge (q)', unit: 'kPa' as any, description: 'Effective stress at footing base level', precision: 1, formulaLatex: 'q = \\gamma \\cdot D_f' },
         { key: 'qult', label: 'Ultimate Bearing (qult)', unit: 'kPa' as any, description: 'Peak bearing stress causing shear failure in soil', precision: 1, formulaLatex: 'q_{ult} = c N_c s_c + q N_q s_q + 0.5 \\gamma B N_\\gamma s_\\gamma' },
         { key: 'qall', label: 'Allowable Bearing (qall)', unit: 'kPa' as any, description: 'Safe working bearing capacity with FS applied', precision: 1, formulaLatex: 'q_{all} = q_{ult} / FS' }
@@ -53,34 +53,28 @@ export const foundationBearingSchema: CalculatorSchemaV2 = {
 
         const phiRad = (phiDeg * Math.PI) / 180;
 
-        // 1. Calculate Nq
-        let Nq = 1.0;
-        let Nc = 5.14;
-        let Ng = 0.0;
+        // EN 1997-1 (Eurocode 7) Annex D — rectangular footing, vertical centric load, no inclination.
+        // The previous version mixed Vesic Nγ with Meyerhof shape factors and dropped Kp from sc.
+        const q = gamma * Df; // overburden at foundation level
+        const BL = L > 0 ? Math.min(B, L) / Math.max(B, L) : 0;
 
+        let Nq = 1.0;
+        let Nc = Math.PI + 2; // undrained (D.3)
+        let Ng = 0.0;
+        let qult: number;
         if (phiDeg > 0) {
+            // drained (D.4)
             Nq = Math.exp(Math.PI * Math.tan(phiRad)) * Math.pow(Math.tan(Math.PI / 4 + phiRad / 2), 2);
             Nc = (Nq - 1) / Math.tan(phiRad);
-            Ng = 2 * (Nq + 1) * Math.tan(phiRad); // Meyerhof version
+            Ng = 2 * (Nq - 1) * Math.tan(phiRad); // rough base, δ ≥ φ'/2
+            const sq = 1 + BL * Math.sin(phiRad);
+            const sg = 1 - 0.3 * BL;
+            const sc = (sq * Nq - 1) / (Nq - 1);
+            qult = c * Nc * sc + q * Nq * sq + 0.5 * gamma * B * Ng * sg;
+        } else {
+            const sc = 1 + 0.2 * BL;
+            qult = Nc * c * sc + q;
         }
-
-        // 2. Overburden pressure
-        const q = gamma * Df;
-
-        // 3. Shape Factors (Meyerhof)
-        let sc = 1.0;
-        let sq = 1.0;
-        let sg = 1.0;
-        if (L > 0 && B <= L) {
-            sc = 1 + 0.2 * (B / L);
-            if (phiDeg > 10) {
-                sq = 1 + 0.1 * (B / L) * Math.pow(Math.tan(Math.PI / 4 + phiRad / 2), 2);
-                sg = sq;
-            }
-        }
-
-        // 4. Ultimate Bearing Capacity
-        const qult = c * Nc * sc + q * Nq * sq + 0.5 * gamma * B * Ng * sg;
         const qall = qult / FS;
 
         const warnings: { field: string; message: string; severity: "info" | "warning" | "critical" }[] = [];
@@ -121,7 +115,7 @@ export const foundationBearingSchema: CalculatorSchemaV2 = {
             const qall = (out.qall?.value as number) || 150;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Geotechnical Section SVG */}
                     <div className="relative w-[180px] h-[200px]">
                         <svg viewBox="0 0 180 200" width="100%" height="100%" className="overflow-visible">
@@ -154,21 +148,21 @@ export const foundationBearingSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Allowable q</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 {qall.toFixed(0)} <span className="text-[10px] text-gray-500">kPa</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Ultimate q</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.qult?.value as number) || 0).toFixed(0)} <span className="text-[10px] text-gray-500">kPa</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Safety Factor</div>
                             <div className="text-sm font-bold font-mono text-emerald-400">

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame, Play, Pause, RotateCcw, Activity, ShieldAlert, Thermometer, Layers } from "lucide-react";
 import { ShapeType } from "@/utils/sectionProperties";
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export type WeldJointType2D = 'fillet' | 'butt' | 'vgroove' | 'tee' | 'lap' | 'corner';
 
@@ -45,6 +46,7 @@ export function WeldingVisualization2D({
     material1,
     material2,
 }: WeldingVisualization2DProps) {
+  const precision = useGlobalPrecision();
     const [activeTab, setActiveTab] = useState<'blueprint' | 'simulation'>('blueprint');
     
     // Simulation state
@@ -305,16 +307,16 @@ export function WeldingVisualization2D({
                         <path d={`M ${leftWeldX} ${cy} L ${leftWeldX - a} ${cy} Q ${leftWeldX - a * 0.1} ${cy - a * 0.9} ${leftWeldX} ${cy - a} Z`} fill="url(#weldGradient)" stroke="#d97706" strokeWidth="1" />
 
                         {/* Dimensions & Annotations */}
-                        <g className="opacity-80">
+                        <g className="opacity-90">
                             {/* Leg Size dimension right */}
-                            <line x1={rightWeldX} y1={cy + 15} x2={rightWeldX + a} y2={cy + 15} stroke="#00e5ff" strokeWidth="1" />
-                            <circle cx={rightWeldX} cy={cy + 15} r="1.5" fill="#00e5ff" />
-                            <circle cx={rightWeldX + a} cy={cy + 15} r="1.5" fill="#00e5ff" />
-                            <text x={rightWeldX + a/2} y={cy + 27} fill="#00e5ff" fontSize="9" textAnchor="middle" fontFamily="monospace">a={legSize}mm</text>
+                            <line x1={rightWeldX} y1={cy + 10} x2={rightWeldX + a} y2={cy + 10} stroke="#00e5ff" strokeWidth="1" />
+                            <circle cx={rightWeldX} cy={cy + 10} r="1.5" fill="#00e5ff" />
+                            <circle cx={rightWeldX + a} cy={cy + 10} r="1.5" fill="#00e5ff" />
+                            <text x={rightWeldX + a/2} y={cy + 22} fill="#00e5ff" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace">a = {legSize} mm</text>
 
                             {/* Throat depth line */}
                             <line x1={rightWeldX} y1={cy} x2={rightWeldX + a * 0.707} y2={cy - a * 0.707} stroke="#06b6d4" strokeWidth="1" strokeDasharray="2,2" />
-                            <text x={rightWeldX + a * 0.707 + 4} y={cy - a * 0.707} fill="#06b6d4" fontSize="8" textAnchor="start" fontFamily="monospace">t={(legSize * 0.707).toFixed(1)}</text>
+                            <text x={rightWeldX + a * 0.707 + 6} y={cy - a * 0.707 + 3} fill="#06b6d4" fontSize="8.5" fontWeight="bold" textAnchor="start" fontFamily="monospace">a·cos(45°) = {formatEngineeringValue((legSize * 0.707), precision, true)} mm</text>
                             
                             {/* Materials tags */}
                             <text x={cx - w1/2 + 10} y={cy + h1/2 + 4} fill="#a0aec0" fontSize="8" fontWeight="bold">{mat1.name}</text>
@@ -594,15 +596,15 @@ export function WeldingVisualization2D({
     };
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#020408] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="w-full h-full flex flex-col bg-[var(--bg-0)] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
             {/* Visualizer Tabs Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 bg-[#121b28] border-b border-white/5">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-[var(--bg-2)] border-b border-white/5">
                 <div className="flex items-center gap-2">
                     <Flame size={14} className="text-orange-400 animate-pulse" />
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Weld Visualizer</span>
                 </div>
                 
-                <div className="flex bg-[#080d14] rounded-lg p-0.5 border border-white/5">
+                <div className="flex bg-[var(--bg-1)] rounded-lg p-0.5 border border-white/5">
                     <button
                         onClick={() => setActiveTab('blueprint')}
                         className={`flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all ${
@@ -629,7 +631,7 @@ export function WeldingVisualization2D({
             </div>
 
             {/* SVG Visualizer Area */}
-            <div className="flex-1 relative bg-gradient-to-b from-[#080d14] to-[#03060a] min-h-[300px] flex items-center justify-center">
+            <div className="flex-1 relative bg-gradient-to-b from-[var(--bg-1)] to-[var(--bg-0)] min-h-[300px] flex items-center justify-center">
                 {/* Engineering Grid Overlay */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
                 
@@ -672,7 +674,7 @@ export function WeldingVisualization2D({
                 </svg>
 
                 {/* HUD Overlay for active weld parameter monitoring */}
-                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-white/10 px-3.5 py-2.5 rounded-xl pointer-events-none select-none font-mono text-[9px] text-gray-400 space-y-1 shadow-lg">
+                <div className="absolute top-4 left-4 bg-black/60 border border-white/10 px-3.5 py-2.5 rounded-xl pointer-events-none select-none font-mono text-[9px] text-gray-400 space-y-1 shadow-lg">
                     <div className="text-[10px] font-black uppercase text-orange-400 tracking-wider mb-1">Process Feed</div>
                     <div className="flex items-center gap-3 justify-between">
                         <span>JOINT TYPE:</span>
@@ -690,7 +692,7 @@ export function WeldingVisualization2D({
 
                 {/* Bottom Simulation Controller */}
                 {activeTab === 'simulation' && (
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#0d1520]/90 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-xl z-20">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[var(--bg-2)]/90 border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-4 shadow-xl z-20">
                         <button
                             onClick={() => setIsPlaying(!isPlaying)}
                             className="p-1.5 bg-orange-600 hover:bg-orange-500 rounded-lg text-white transition-colors"
@@ -721,10 +723,10 @@ export function WeldingVisualization2D({
             </div>
             
             {/* Visualizer Footer Info Card */}
-            <div className="px-5 py-3 bg-[#0c121c] border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 font-mono">
+            <div className="px-5 py-3 bg-[var(--bg-1)] border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 font-mono">
                 <div className="flex items-center gap-1.5">
                     <Thermometer size={11} className="text-amber-500" />
-                    <span>HAZ Boundary Estimated: <strong className="text-gray-300">{(legSize * 1.5).toFixed(1)} mm</strong></span>
+                    <span>HAZ Boundary Estimated: <strong className="text-gray-300">{formatEngineeringValue((legSize * 1.5), precision, true)} mm</strong></span>
                 </div>
                 <span>AWS D1.1 Code Standards</span>
             </div>

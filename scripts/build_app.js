@@ -4,11 +4,49 @@ const http = require('http');
 const child_process = require('child_process');
 
 const rootDir = path.join(__dirname, '..');
-const keytoolPath = 'C:\\Program Files\\Android\\Android Studio\\jbr\\bin\\keytool.exe';
+// Load .env / .env.local (gitignored) the same way Next.js does, so signing
+// credentials can live there instead of in source.
+try {
+  require('@next/env').loadEnvConfig(rootDir);
+} catch {
+  /* @next/env unavailable — rely on the shell environment */
+}
+function findKeytool() {
+  const possiblePaths = [
+    path.join(rootDir, 'jdk17', 'bin', 'keytool.exe'),
+    process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, 'bin', 'keytool.exe') : null,
+    'C:\\Program Files\\Android\\Android Studio\\jbr\\bin\\keytool.exe',
+    'C:\\Program Files\\Java\\jdk-17\\bin\\keytool.exe',
+    'C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.0-hotspot\\bin\\keytool.exe',
+  ].filter(Boolean);
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return 'keytool'; // Fallback to PATH
+}
+
+const keytoolPath = findKeytool();
 const keystorePath = path.join(rootDir, 'android', 'alucalc-release.keystore');
 const twaManifestPath = path.join(rootDir, 'android', 'twa-manifest.json');
-const storepass = 'alucalc123';
+// Signing credentials come from the environment only (see .env.example).
+// Never hardcode or log these values. keytool reads them via `-storepass:env`,
+// so the secret never appears in a command line, process list or error message.
+const STOREPASS_ENV = 'ALUCALC_KEYSTORE_PASSWORD';
+const KEYPASS_ENV = 'ALUCALC_KEY_PASSWORD';
+const storepass = process.env[STOREPASS_ENV] || '';
+const keypass = process.env[KEYPASS_ENV] || storepass;
+if (storepass && !process.env[KEYPASS_ENV]) process.env[KEYPASS_ENV] = storepass;
 const PORT = 8585;
+
+/** Strip any credential value from text before it is printed. */
+function redact(text) {
+  let out = String(text ?? '');
+  for (const secret of [storepass, keypass]) {
+    if (secret) out = out.split(secret).join('***');
+  }
+  return out;
+}
 
 function runCmd(cmd, options = {}) {
   console.log(`Running: ${cmd}`);
@@ -27,7 +65,7 @@ function runCmd(cmd, options = {}) {
 
     child.stdout.on('data', (data) => {
       const output = data.toString();
-      process.stdout.write(output);
+      process.stdout.write(redact(output));
       
       // Auto-respond to overwrite, proceed, or y/n prompts
       if (output.includes('?') || output.toLowerCase().includes('proceed') || output.toLowerCase().includes('overwrite')) {
@@ -35,15 +73,15 @@ function runCmd(cmd, options = {}) {
         child.stdin.write('y\n');
       }
       
-      // Auto-respond to password prompts if any
-      if (output.toLowerCase().includes('password')) {
-        console.log('\n[Auto-Responder] Detected password prompt, sending password');
-        child.stdin.write('alucalc123\n');
+      // Auto-respond to password prompts if any (value is never logged)
+      if (output.toLowerCase().includes('password') && storepass) {
+        console.log('\n[Auto-Responder] Detected password prompt, sending password from environment');
+        child.stdin.write(`${storepass}\n`);
       }
     });
 
     child.stderr.on('data', (data) => {
-      process.stderr.write(data.toString());
+      process.stderr.write(redact(data.toString()));
     });
 
     child.on('close', (code) => {
@@ -140,11 +178,18 @@ async function buildApp() {
     return;
   }
 
+  // 0. Signing credentials are required for a local Android build
+  if (!storepass) {
+    throw new Error(
+      `${STOREPASS_ENV} is not set. Add it to your shell or .env.local to build signed Android packages (see .env.example).`
+    );
+  }
+
   // 1. Keystore Generation (if missing)
   if (!fs.existsSync(keystorePath)) {
     console.log('Keystore not found. Generating new release keystore...');
     const dname = 'CN=AluCalc, OU=Engineering, O=AluCalc, L=Istanbul, S=Istanbul, C=TR';
-    const genKeyCmd = `"${keytoolPath}" -genkey -v -keystore "${keystorePath}" -alias alucalc -keyalg RSA -keysize 2048 -validity 10000 -storepass ${storepass} -keypass ${storepass} -dname "${dname}"`;
+    const genKeyCmd = `"${keytoolPath}" -genkey -v -keystore "${keystorePath}" -alias alucalc -keyalg RSA -keysize 2048 -validity 10000 -storepass:env ${STOREPASS_ENV} -keypass:env ${KEYPASS_ENV} -dname "${dname}"`;
     await runCmd(genKeyCmd);
     console.log('Keystore generated successfully!');
   } else {
@@ -153,8 +198,8 @@ async function buildApp() {
 
   // 2. Extract SHA-256 Fingerprint
   console.log('Extracting SHA-256 fingerprint from keystore...');
-  const listCmd = `"${keytoolPath}" -list -v -keystore "${keystorePath}" -storepass ${storepass} -alias alucalc`;
-  const listOutput = child_process.execSync(listCmd, { cwd: rootDir }).toString();
+  const listCmd = `"${keytoolPath}" -list -v -keystore "${keystorePath}" -storepass:env ${STOREPASS_ENV} -alias alucalc`;
+  const listOutput = child_process.execSync(listCmd, { cwd: rootDir, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] }).toString();
   
   const shaRegex = /SHA256:\s*([A-Fa-f0-9:]+)/;
   const match = listOutput.match(shaRegex);
@@ -226,7 +271,7 @@ async function buildApp() {
     
     // Inject credentials into environment variables for Bubblewrap
     process.env.BUBBLEWRAP_KEYSTORE_PASSWORD = storepass;
-    process.env.BUBBLEWRAP_KEY_PASSWORD = storepass;
+    process.env.BUBBLEWRAP_KEY_PASSWORD = keypass;
     
     // Initialize/Update Android project
     console.log('Updating Android project files...');
@@ -328,7 +373,7 @@ async function buildApp() {
 }
 
 buildApp().catch(err => {
-  console.warn('[Build App] Android compilation skipped or failed:', err.message);
+  console.warn('[Build App] Android compilation skipped or failed:', redact(err && err.message));
   console.log('[Build App] Falling back to exporting existing pre-built assets.');
   
   const publicAssetlinks = path.join(rootDir, 'public', '.well-known', 'assetlinks.json');

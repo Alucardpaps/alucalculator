@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Wrench, Settings, ArrowDownToLine, Triangle } from 'lucide-react';
+import { Wrench, Settings, ArrowDownToLine, Triangle, Box, PenTool } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+import { CrossModuleBridge } from '@/system/crossModuleBridge';
 
 // Common metric ISO bolts
 const BOLT_SIZES = [
@@ -34,7 +36,6 @@ const FRICTION_CONDITIONS = [
 
 const BoltTorqueModule: React.FC = () => {
     const { language } = useI18nStore();
-    const isTr = language === 'tr';
 
     const [sizeIndex, setSizeIndex] = useState(3); // M12 default
     const [gradeIndex, setGradeIndex] = useState(3); // 8.8 default
@@ -69,13 +70,13 @@ const BoltTorqueModule: React.FC = () => {
     }, [size, grade, friction, targetYieldPercent]);
 
     return (
-        <div className="flex w-full h-full bg-[#0a0a0c] text-white">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white">
             {/* Left Column: Inputs */}
             <div className="w-[350px] border-r border-white/10 p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
 
                 <h2 className="text-xl font-medium text-white/90 flex items-center gap-2">
                     <Wrench className="w-5 h-5 text-zinc-400" />
-                    {isTr ? 'Cıvata Tork Hesaplayıcı' : 'Bolt Torque Calculator'}
+                    {t12(language, 'Bolt Torque Calculator', 'Cıvata Tork Hesaplayıcı')}
                 </h2>
 
                 <div className="space-y-4">
@@ -84,12 +85,12 @@ const BoltTorqueModule: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'Metrik Diş (ISO)' : 'Metric Thread (ISO)'}
+                                {t12(language, 'Metric Thread (ISO)', 'Metrik Diş (ISO)')}
                             </label>
                             <select
                                 value={sizeIndex}
                                 onChange={(e) => setSizeIndex(parseInt(e.target.value))}
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                                className="w-full bg-[var(--bg-2)] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
                             >
                                 {BOLT_SIZES.map((b, i) => (
                                     <option key={b.nominal} value={i}>{b.nominal} (P={b.pitch})</option>
@@ -98,12 +99,12 @@ const BoltTorqueModule: React.FC = () => {
                         </div>
                         <div>
                             <label className="block text-xs font-medium text-white/50 mb-1">
-                                {isTr ? 'Dayanım Sınıfı' : 'Property Class'}
+                                {t12(language, 'Property Class', 'Dayanım Sınıfı')}
                             </label>
                             <select
                                 value={gradeIndex}
                                 onChange={(e) => setGradeIndex(parseInt(e.target.value))}
-                                className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                                className="w-full bg-[var(--bg-2)] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
                             >
                                 {BOLT_GRADES.map((g, i) => (
                                     <option key={g.class} value={i}>{g.class}</option>
@@ -120,15 +121,15 @@ const BoltTorqueModule: React.FC = () => {
                     {/* Friction */}
                     <div>
                         <label className="block text-xs font-medium text-white/50 mb-1">
-                            {isTr ? 'Sürtünme Durumu' : 'Friction Condition'}
+                            {t12(language, 'Friction Condition', 'Sürtünme Durumu')}
                         </label>
                         <select
                             value={frictionIndex}
                             onChange={(e) => setFrictionIndex(parseInt(e.target.value))}
-                            className="w-full bg-[#151518] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
+                            className="w-full bg-[var(--bg-2)] border border-white/10 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50"
                         >
                             {FRICTION_CONDITIONS.map((f, i) => (
-                                <option key={f.id} value={i}>{isTr ? f.name.tr : f.name.en} (K={f.k})</option>
+                                <option key={f.id} value={i}>{t12(language, f.name.en, f.name.tr)} (K={f.k})</option>
                             ))}
                         </select>
                     </div>
@@ -137,7 +138,7 @@ const BoltTorqueModule: React.FC = () => {
                     <div>
                         <div className="flex justify-between items-center mb-1">
                             <label className="block text-xs font-medium text-white/50">
-                                {isTr ? 'Hedef Sıkma Oranı (Akma Limiti %)' : 'Target Preload (% Yield)'}
+                                {t12(language, 'Target Preload (% Yield)', 'Hedef Sıkma Oranı (Akma Limiti %)')}
                             </label>
                             <span className="text-xs text-blue-400 font-mono">{targetYieldPercent}%</span>
                         </div>
@@ -149,25 +150,45 @@ const BoltTorqueModule: React.FC = () => {
                             className="w-full h-1 bg-white/10 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full cursor-pointer"
                         />
                         <p className="mt-1 text-[10px] text-white/40">
-                            {isTr ? 'Genellikle statik yükler için %75, dinamik yükler için %90 optimumdur.' : 'Typically 75% for static, 90% for dynamic loads.'}
+                            {t12(language, 'Typically 75% for static, 90% for dynamic loads.', 'Genellikle statik yükler için %75, dinamik yükler için %90 optimumdur.')}
                         </p>
+                    </div>
+
+                    {/* Cross-Module Export Buttons */}
+                    <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+                        <button
+                            type="button"
+                            onClick={() => CrossModuleBridge.exportBoltsTo3D({ size: size.nominal, length: 45, propertyClass: grade.class, switchWindow: true })}
+                            className="w-full py-2.5 px-3 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-xs font-mono font-bold flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
+                        >
+                            <Box size={14} />
+                            <span>{t12(language, 'Export to 3D CAD', '3D CAD’e Aktar (Cıvata+Somun)')}</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => CrossModuleBridge.exportTo2DCad('profile', null, true)}
+                            className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-mono font-medium flex items-center justify-center gap-2 transition cursor-pointer"
+                        >
+                            <PenTool size={13} />
+                            <span>{t12(language, 'Open in 2D CAD', '2D CAD’de Aç')}</span>
+                        </button>
                     </div>
 
                 </div>
             </div>
 
             {/* Right Column: Visualization & Results */}
-            <div className="flex-1 p-8 flex flex-col gap-8 bg-[#0a0a0c] relative">
+            <div className="flex-1 p-8 flex flex-col gap-8 bg-[var(--bg-0)] relative">
 
                 {/* Background Blueprint Grid pattern */}
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
                     style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
                 <div className="grid grid-cols-2 gap-6 z-10">
-                    <div className="bg-[#111115] border border-white/10 border-t-blue-500/50 rounded-xl p-6 relative">
+                    <div className="bg-[var(--bg-1)] border border-white/10 border-t-blue-500/50 rounded-xl p-6 relative">
                         <div className="flex items-center gap-2 text-white/50 mb-4">
                             <Settings className="w-5 h-5" />
-                            <h3 className="text-sm font-medium uppercase">{isTr ? 'Sıkma Torku' : 'Tightening Torque'}</h3>
+                            <h3 className="text-sm font-medium uppercase">{t12(language, 'Tightening Torque', 'Sıkma Torku')}</h3>
                         </div>
                         <div className="text-5xl font-light text-white mb-2 tracking-tight">
                             {results.torque} <span className="text-lg text-white/40 font-normal">N·m</span>
@@ -177,10 +198,10 @@ const BoltTorqueModule: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-[#111115] border border-white/10 border-t-emerald-500/50 rounded-xl p-6 relative">
+                    <div className="bg-[var(--bg-1)] border border-white/10 border-t-emerald-500/50 rounded-xl p-6 relative">
                         <div className="flex items-center gap-2 text-white/50 mb-4">
                             <ArrowDownToLine className="w-5 h-5" />
-                            <h3 className="text-sm font-medium uppercase">{isTr ? 'Kelepçe Gücü (Ön Yük)' : 'Clamp Load (Preload)'}</h3>
+                            <h3 className="text-sm font-medium uppercase">{t12(language, 'Clamp Load (Preload)', 'Kelepçe Gücü (Ön Yük)')}</h3>
                         </div>
                         <div className="text-5xl font-light text-white mb-2 tracking-tight">
                             {results.preloadForce} <span className="text-lg text-white/40 font-normal">kN</span>
@@ -199,7 +220,7 @@ const BoltTorqueModule: React.FC = () => {
                 </div>
 
                 {/* Diagram Area */}
-                <div className="flex-1 border border-white/5 rounded-xl bg-gradient-to-br from-[#111115] to-[#0a0a0c] flex items-center justify-center p-8 z-10 relative">
+                <div className="flex-1 border border-white/5 rounded-xl bg-gradient-to-br from-[var(--bg-1)] to-[var(--bg-0)] flex items-center justify-center p-8 z-10 relative">
                     {/* Simplified visual representation of a bolted joint clamping force */}
                     <div className="flex flex-col items-center gap-0 w-48 relative">
                         <div className="absolute top-[-40px] flex flex-col items-center text-blue-400">

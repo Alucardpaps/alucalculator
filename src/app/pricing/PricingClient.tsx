@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Check, Minus, Sparkles, Zap, ShieldCheck, ArrowRight, Building2, Users, UserCheck, FileText } from 'lucide-react';
 import { useLicenseStore } from '@/store/licenseStore';
-import { APP_MODULE_COUNT } from '@/config/app';
 import { useI18nStore } from '@/store/i18nStore';
 import { t12 } from '@/locales/t12';
 import { getAppPages } from '@/locales/appPagesTranslations';
@@ -14,7 +13,6 @@ export function PricingClient() {
   const plan = useLicenseStore((s) => s.plan);
   const language = useI18nStore((s) => s.language);
   const t = getAppPages(language).pricing;
-  const isTr = language === 'tr';
 
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
 
@@ -32,19 +30,12 @@ export function PricingClient() {
       cta: plan === 'free' ? (t12(language, 'Current Plan', 'Mevcut Planınız')) : (t12(language, 'Get Started', 'Başlayın')),
       featured: false,
       icon: UserCheck,
-      items: isTr
-        ? [
-            `${APP_MODULE_COUNT} mühendislik modülü`,
-            'Gerçek alaşım yoğunlukları ve malzeme kütüphanesi',
-            'Günde 3 PDF raporu (filigranlı) · Günde 1 DXF',
-            'İnternetsiz çalışan PWA atölye desteği',
-          ]
-        : [
-            `${APP_MODULE_COUNT} modules`,
-            'Alloy-true materials & density library',
-            '3 PDF reports / day (watermarked) · 1 DXF / day',
-            'Offline PWA ready for machine shop floor',
-          ],
+      items: [
+        t12(language, 'Full engineering solver suite', 'Tüm mühendislik modülleri'),
+        t12(language, 'Alloy-true materials & density library', 'Gerçek alaşım yoğunlukları ve malzeme kütüphanesi'),
+        t12(language, '3 PDF reports / day (watermarked) · 1 DXF / day', 'Günde 3 PDF raporu (filigranlı) · Günde 1 DXF'),
+        t12(language, 'Offline PWA ready for machine shop floor', 'İnternetsiz çalışan PWA atölye desteği'),
+      ],
     },
     {
       id: 'pro',
@@ -61,19 +52,12 @@ export function PricingClient() {
       cta: plan === 'pro' ? (t12(language, 'Current Plan', 'Mevcut Planınız')) : (t12(language, 'Upgrade to Pro', 'Pro’ya Yükselt')),
       featured: true,
       icon: Zap,
-      items: isTr
-        ? [
-            'Sınırsız STEP, DXF, STL ve PDF üretimi',
-            'Müşteriye hazır, filigransız temiz PDF raporları',
-            'Sınırsız 1D kesim ve 2D plaka yerleşim optimizasyonu',
-            'Yerel proje malzeme listesi (BOM) & öncelikli destek',
-          ]
-        : [
-            'Unlimited STEP, DXF, STL & PDF exports',
-            'Clean, unwatermarked client-ready PDFs',
-            'Unlimited 1D cut & 2D sheet nesting optimizer',
-            'Local project BOM & priority engineering support',
-          ],
+      items: [
+        t12(language, 'Unlimited STEP, DXF, STL & PDF exports', 'Sınırsız STEP, DXF, STL ve PDF üretimi'),
+        t12(language, 'Clean, unwatermarked client-ready PDFs', 'Müşteriye hazır, filigransız temiz PDF raporları'),
+        t12(language, 'Unlimited 1D cut & 2D sheet nesting optimizer', 'Sınırsız 1D kesim ve 2D plaka yerleşim optimizasyonu'),
+        t12(language, 'Local project BOM & priority engineering support', 'Yerel proje malzeme listesi (BOM) & öncelikli destek'),
+      ],
     },
     {
       id: 'team',
@@ -90,19 +74,12 @@ export function PricingClient() {
       cta: t12(language, 'Get Team Access', 'Ekip Erişimi Al'),
       featured: false,
       icon: Users,
-      items: isTr
-        ? [
-            '10 kullanıcıya kadar ortak lisans anahtarı',
-            'Toplu Hesaplama REST API’si (istek başına 500 satır)',
-            'Özel kurumsal rapor başlığı ve şirket logosu',
-            'Pro planındaki tüm özellikler dahil',
-          ]
-        : [
-            'Up to 10 shared user seats per license',
-            'Bulk Calculation REST API (500 rows/request)',
-            'Custom report company header & branding',
-            'Includes everything in Pro tier',
-          ],
+      items: [
+        t12(language, 'Up to 10 shared user seats per license', '10 kullanıcıya kadar ortak lisans anahtarı'),
+        t12(language, 'Bulk Calculation REST API (500 rows/request)', 'Toplu Hesaplama REST API’si (istek başına 500 satır)'),
+        t12(language, 'Custom report company header & branding', 'Özel kurumsal rapor başlığı ve şirket logosu'),
+        t12(language, 'Includes everything in Pro tier', 'Pro planındaki tüm özellikler dahil'),
+      ],
     },
     {
       id: 'enterprise',
@@ -116,26 +93,19 @@ export function PricingClient() {
       cta: t12(language, 'Contact Sales', 'Satış ile İletişime Geç'),
       featured: false,
       icon: Building2,
-      items: isTr
-        ? [
-            'Sınırsız koltuk sayısı ve limitsiz API işlem hacmi',
-            'Kurumsal SSO / SAML entegrasyonu ve sözleşmeli SLA',
-            'Özel endüstriyel norm ve standart paketleri',
-            'Yerinde veya uzaktan eğitim ve devreye alma',
-          ]
-        : [
-            'Unlimited seats & unrestricted API volume',
-            'Enterprise SSO / SAML integration & contractual SLA',
-            'Custom standards packs on request',
-            'On-site or remote engineering onboarding',
-          ],
+      items: [
+        t12(language, 'Unlimited seats & unrestricted API volume', 'Sınırsız koltuk sayısı ve limitsiz API işlem hacmi'),
+        t12(language, 'Enterprise SSO / SAML integration & contractual SLA', 'Kurumsal SSO / SAML entegrasyonu ve sözleşmeli SLA'),
+        t12(language, 'Custom standards packs on request', 'Özel endüstriyel norm ve standart paketleri'),
+        t12(language, 'On-site or remote engineering onboarding', 'Yerinde veya uzaktan eğitim ve devreye alma'),
+      ],
     },
   ];
 
   // Comprehensive Comparison Matrix
   const matrix = [
     {
-      feature: t12(language, `${APP_MODULE_COUNT} modules`, `${APP_MODULE_COUNT} mühendislik modülü`),
+      feature: t12(language, 'Full engineering solver suite', 'Tüm mühendislik modülleri'),
       free: true, pro: true, team: true, enterprise: true,
     },
     {
@@ -159,7 +129,7 @@ export function PricingClient() {
       free: false, pro: true, team: true, enterprise: true,
     },
     {
-      feature: t12(language, 'STEP 3D B-Rep export (STABLE ISO 10303)', 'STEP 3D B-Rep katı model ihracı (ISO 10303)'),
+      feature: t12(language, 'STEP 3D B-Rep export (AP214 / AP203)', 'STEP 3D B-Rep katı model ihracı (AP214 / AP203)'),
       free: false, pro: true, team: true, enterprise: true,
     },
     {
@@ -208,7 +178,7 @@ export function PricingClient() {
 
         {/* ─── BILLING CYCLE TOGGLE (MONTHLY / YEARLY) ─── */}
         <div className="pt-4 flex items-center justify-center">
-          <div className="inline-flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl shadow-lg">
+          <div className="inline-flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 shadow-lg">
             <button
               type="button"
               onClick={() => setBillingCycle('monthly')}
@@ -248,7 +218,7 @@ export function PricingClient() {
               key={p.id}
               className={`relative rounded-2xl border p-6 flex flex-col justify-between transition-all duration-300 ${
                 p.featured
-                  ? 'bg-gradient-to-b from-[#0e172a] to-[#040812] border-cyan-500/50 shadow-[0_0_35px_rgba(6,182,212,0.18)] scale-[1.02]'
+                  ? 'bg-gradient-to-b from-[var(--bg-2)] to-[var(--bg-0)] border-cyan-500/50 scale-[1.02]'
                   : 'bg-white/[0.02] border-white/[0.08] hover:border-white/20'
               }`}
             >
@@ -314,7 +284,7 @@ export function PricingClient() {
               <div className="pt-6">
                 {p.featured ? (
                   <Link href="/sales/" className="group w-full block">
-                    <div className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:via-sky-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.55)] active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                    <div className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:via-sky-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-200 cursor-pointer">
                       <span>{p.cta}</span>
                       <ArrowRight size={14} className="text-slate-950 group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
@@ -348,7 +318,7 @@ export function PricingClient() {
       </div>
 
       {/* ─── DETAILED FEATURE COMPARISON TABLE ─── */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md mb-12 overflow-hidden">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 mb-12 overflow-hidden">
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold font-tech text-white">
@@ -452,10 +422,10 @@ export function PricingClient() {
           </div>
 
           <a
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs uppercase tracking-wider transition-all w-fit shadow-md active:scale-[0.98]"
-            href="mailto:sales@alucalculator.com?subject=AluCalc%20Enterprise"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs tracking-wider transition-all w-fit shadow-md active:scale-[0.98]"
+            href="mailto:abdulsametyildirim95@gmail.com?subject=AluCalc%20Enterprise"
           >
-            <span>sales@alucalculator.com</span>
+            <span>abdulsametyildirim95@gmail.com</span>
             <ArrowRight size={13} />
           </a>
         </div>

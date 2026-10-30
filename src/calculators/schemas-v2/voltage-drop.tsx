@@ -9,7 +9,7 @@ const voltageDropSchema: CalculatorSchemaV2 = {
         description: 'Calculate voltage drop, percent drop, and wire size requirements.',
         category: 'electrical',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['voltage limit', 'awg', 'cable', 'nec'],
         verifiedStandards: ['NEC 2020', 'IEC 60364'],

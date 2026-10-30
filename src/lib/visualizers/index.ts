@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Visualizers Barrel Export
+ * AluCAD OS — Visualizers Barrel Export
  */
 
 export * from './bolt-visualizer';

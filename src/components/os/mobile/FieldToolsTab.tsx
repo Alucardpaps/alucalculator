@@ -17,6 +17,9 @@ import { SoundMeterModal } from './SoundMeterModal';
 import { ClinometerModal } from './ClinometerModal';
 import { GPSSurveyorModal } from './GPSSurveyorModal';
 import { HardnessConverterModal } from './HardnessConverterModal';
+import { BoltTorqueScreeningModal } from './BoltTorqueScreeningModal';
+import { ORingCaliperModal } from './ORingCaliperModal';
+import Link from 'next/link';
 
 interface FieldToolsTabProps {
     t: MobileStrings;
@@ -37,6 +40,8 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
     const [isClinometerOpen, setIsClinometerOpen] = useState(false);
     const [isGpsSurveyorOpen, setIsGpsSurveyorOpen] = useState(false);
     const [isHardnessConverterOpen, setIsHardnessConverterOpen] = useState(false);
+    const [isTorqueOpen, setIsTorqueOpen] = useState(false);
+    const [isOringOpen, setIsOringOpen] = useState(false);
     const [flashlightActive, setFlashlightActive] = useState(false);
     const [activeSection, setActiveSection] = useState<'hub' | 'voice' | 'vars'>('hub');
 
@@ -94,19 +99,19 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
             <div className="flex bg-slate-950/40 p-1 border border-white/5 rounded-xl">
                 <button
                     onClick={() => setActiveSection('hub')}
-                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'hub' ? 'bg-cyan-500 text-black shadow-lg font-black' : 'text-slate-400'}`}
+                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'hub' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg font-black' : 'text-slate-400'}`}
                 >
                     {ft.hardwareTools}
                 </button>
                 <button
                     onClick={() => setActiveSection('voice')}
-                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'voice' ? 'bg-cyan-500 text-black shadow-lg font-black' : 'text-slate-400'}`}
+                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'voice' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg font-black' : 'text-slate-400'}`}
                 >
                     {ft.voiceNotes}
                 </button>
                 <button
                     onClick={() => setActiveSection('vars')}
-                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'vars' ? 'bg-cyan-500 text-black shadow-lg font-black' : 'text-slate-400'}`}
+                    className={`flex-1 py-2 text-[10px] font-mono font-bold uppercase rounded-lg transition-all ${activeSection === 'vars' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg font-black' : 'text-slate-400'}`}
                 >
                     {ft.variables}
                 </button>
@@ -146,7 +151,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Camera size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -162,7 +167,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Smartphone size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -178,7 +183,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Activity size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -194,7 +199,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <FileText size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -210,7 +215,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Volume2 size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -226,7 +231,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Compass size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -242,7 +247,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Compass size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -258,7 +263,7 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                             }}
                             className="flex flex-col items-center justify-center p-5 bg-slate-950/30 border border-white/5 rounded-2xl hover:border-cyan-500/30 active:scale-95 transition-all text-center space-y-2.5"
                         >
-                            <div className="w-10 h-10 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                            <div className="w-10 h-10 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                 <Layers size={20} />
                             </div>
                             <div className="space-y-0.5">
@@ -268,24 +273,41 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
                         </button>
                     </div>
 
-                    <button
-                        onClick={handleToggleFlashlight}
-                        className={`flex flex-col items-center justify-center p-6 border rounded-2xl active:scale-95 transition-all text-center col-span-2 space-y-3 w-full ${flashlightActive ? 'bg-cyan-500 border-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)]' : 'bg-slate-950/30 border-white/5 text-white hover:border-cyan-500/30'}`}
-                    >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center border ${flashlightActive ? 'bg-black/20 border-black/10 text-black' : 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400'}`}>
-                            <Zap size={22} className={flashlightActive ? 'fill-black' : ''} />
-                        </div>
-                        <div className="space-y-0.5">
-                            <h4 className="font-bold text-xs">{ft.deviceFlashlight}</h4>
-                            <p className={`text-[8px] font-mono ${flashlightActive ? 'text-cyan-900 font-bold' : 'text-slate-500'}`}>
-                                {flashlightActive ? ft.torchActive : ft.torchInactive}
-                            </p>
-                        </div>
-                    </button>
-
-                    <div className="p-4 border border-dashed border-cyan-950/30 rounded-2xl bg-cyan-950/5 text-center text-[10px] text-slate-500 leading-relaxed font-mono">
-                        {ft.hardwareToolsFooter}
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            onClick={() => {
+                                if ('vibrate' in navigator) navigator.vibrate(55);
+                                setIsTorqueOpen(true);
+                            }}
+                            className="flex flex-col items-center justify-center min-h-[96px] p-4 bg-[var(--bg-1)] border border-[var(--line)] rounded-[var(--radius-m)] text-center space-y-2"
+                        >
+                            <Wrench size={20} className="text-[var(--cyan)]" />
+                            <div>
+                                <h4 className="font-semibold text-xs text-[var(--ink)]">ISO 898 torque</h4>
+                                <p className="text-[8px] text-[var(--alu-dim)] font-mono">4.8–12.9 screening</p>
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                if ('vibrate' in navigator) navigator.vibrate(55);
+                                setIsOringOpen(true);
+                            }}
+                            className="flex flex-col items-center justify-center min-h-[96px] p-4 bg-[var(--bg-1)] border border-[var(--line)] rounded-[var(--radius-m)] text-center space-y-2"
+                        >
+                            <Activity size={20} className="text-[var(--cyan)]" />
+                            <div>
+                                <h4 className="font-semibold text-xs text-[var(--ink)]">O-ring ISO 3601</h4>
+                                <p className="text-[8px] text-[var(--alu-dim)] font-mono">Cord × ID → gland</p>
+                            </div>
+                        </button>
                     </div>
+
+                    <Link
+                        href="/field/"
+                        className="block text-center py-3 rounded-[var(--radius-s)] border border-[var(--line)] text-[11px] font-mono text-[var(--cyan)]"
+                    >
+                        Full shop-floor suite →
+                    </Link>
                 </div>
             )}
 
@@ -368,6 +390,9 @@ export function FieldToolsTab({ t, ft, language, triggerToast }: FieldToolsTabPr
             <GPSSurveyorModal isOpen={isGpsSurveyorOpen} onClose={() => setIsGpsSurveyorOpen(false)} ft={ft} debugMode={debugMode} />
 
             <HardnessConverterModal isOpen={isHardnessConverterOpen} onClose={() => setIsHardnessConverterOpen(false)} ft={ft} debugMode={debugMode} />
+
+            <BoltTorqueScreeningModal isOpen={isTorqueOpen} onClose={() => setIsTorqueOpen(false)} />
+            <ORingCaliperModal isOpen={isOringOpen} onClose={() => setIsOringOpen(false)} />
         </div>
     );
 }

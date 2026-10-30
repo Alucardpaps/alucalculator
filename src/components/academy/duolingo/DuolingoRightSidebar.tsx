@@ -9,6 +9,7 @@ import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGa
 import { useI18nStore } from '@/store/i18nStore';
 import { DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
 import { DUOLINGO_UNITS } from './academyCurriculum';
+import { t12 } from '@/locales/t12';
 
 interface DuolingoRightSidebarProps {
   onOpenCertificates: () => void;
@@ -24,7 +25,6 @@ export function DuolingoRightSidebar({
   const { xp, gems, hearts, maxHearts, streak, buyHeartRefill, buyStreakFreeze, hasStreakFreeze, lessonScores } = useAcademyGamificationStore();
   const { language } = useI18nStore();
   const lang = (language in DUOLINGO_I18N.startLesson ? language : 'tr') as SupportedLanguage;
-  const tr = lang === 'tr';
   const leagueInfo = getLeagueInfo(xp);
 
   const totalLessons = 150;
@@ -34,7 +34,7 @@ export function DuolingoRightSidebar({
   // Simulated League Leaderboard
   const leaderboard = [
     { name: 'Prof. Dr. Klaus Richter', xp: Math.max(xp + 150, 1250), avatar: '👨‍🔬', rank: 1 },
-    { name: tr ? 'Siz (Başmühendis)' : 'You (Engineer)', xp: xp, avatar: '🤖', rank: 2, isUser: true },
+    { name: t12(language, 'You (Engineer)', 'Siz (Başmühendis)'), xp: xp, avatar: '🤖', rank: 2, isUser: true },
     { name: 'Elena V. (Aerospace)', xp: Math.max(xp - 40, 620), avatar: '👩‍💻', rank: 3 },
     { name: 'Murat K. (FEA Lead)', xp: Math.max(xp - 110, 430), avatar: '👷‍♂️', rank: 4 },
     { name: 'Dr. Thomas Weber', xp: Math.max(xp - 220, 260), avatar: '🧑‍🔧', rank: 5 },
@@ -44,30 +44,30 @@ export function DuolingoRightSidebar({
     <aside className="w-full lg:w-80 space-y-5 select-none font-mono text-xs">
       
       {/* ─── 1. GLOBAL 150-SECTION PROGRESS ─── */}
-      <div className="p-5 rounded-3xl bg-gradient-to-b from-[#080d1a] to-[#040711] border border-cyan-500/30 space-y-3 shadow-xl">
+      <div className="p-5 rounded-3xl bg-gradient-to-b from-[var(--bg-1)] to-[var(--bg-0)] border border-cyan-500/30 space-y-3 shadow-xl">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles size={14} className="text-cyan-400" />
-            <span>Müfredat İlerlemesi</span>
+            <span>{t12(language, 'Curriculum Progress', 'Müfredat İlerlemesi')}</span>
           </span>
-          <span className="text-xs font-bold text-white">%{progressPct}</span>
+          <span className="text-xs font-bold text-white">{progressPct}%</span>
         </div>
 
         <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-white/10 p-0.5">
           <div
-            className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(0,229,255,0.5)]"
+            className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 rounded-full transition-all duration-500 "
             style={{ width: `${progressPct}%` }}
           />
         </div>
 
         <div className="flex justify-between text-[10px] text-slate-400 pt-0.5">
-          <span>{completedCount} / 150 {tr ? 'Ders Tamamlandı' : 'Lessons Done'}</span>
-          <span>10 Ünite</span>
+          <span>{completedCount} / 150 {t12(language, 'Lessons Done', 'Ders Tamamlandı')}</span>
+          <span>10 {t12(language, 'Units', 'Ünite')}</span>
         </div>
       </div>
 
       {/* ─── 2. UNIT QUICK JUMP NAVIGATOR (1..10) ─── */}
-      <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3 shadow-xl">
+      <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3 shadow-xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
           <div className="flex items-center gap-2">
             <Navigation size={15} className="text-cyan-400" />
@@ -75,7 +75,7 @@ export function DuolingoRightSidebar({
               {DUOLINGO_I18N.jumpToUnit[lang]}
             </span>
           </div>
-          <span className="text-[10px] text-slate-500 font-sans">10 Ünite</span>
+          <span className="text-[10px] text-slate-500 font-sans">10 {t12(language, 'Units', 'Ünite')}</span>
         </div>
 
         <div className="grid grid-cols-5 gap-1.5">
@@ -89,7 +89,7 @@ export function DuolingoRightSidebar({
                 onClick={() => onSelectUnit(idx)}
                 className={`py-2 rounded-xl border text-center font-bold transition cursor-pointer text-xs ${
                   isCurrent
-                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 border-cyan-300 font-black shadow-md shadow-cyan-500/30'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 border-cyan-300 font-black shadow-md '
                     : isExtreme
                     ? 'bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/50 text-amber-300'
                     : 'bg-white/5 hover:bg-cyan-500/20 border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-white'
@@ -104,15 +104,15 @@ export function DuolingoRightSidebar({
       </div>
 
       {/* ─── 3. LEADERBOARD CARD ─── */}
-      <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3.5 shadow-xl">
+      <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3.5 shadow-xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
           <div className="flex items-center gap-2">
             <Trophy size={16} className="text-amber-400" />
             <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              {leagueInfo.current.label} Lig Tablosu
+              {leagueInfo.current.label} {t12(language, 'Leaderboard', 'Lig Tablosu')}
             </span>
           </div>
-          <span className="text-[10px] text-slate-500 font-sans">Haftalık</span>
+          <span className="text-[10px] text-slate-500 font-sans">{t12(language, 'Weekly', 'Haftalık')}</span>
         </div>
 
         <div className="space-y-1.5">
@@ -139,21 +139,21 @@ export function DuolingoRightSidebar({
       </div>
 
       {/* ─── 4. DAILY QUESTS CARD ─── */}
-      <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3.5 shadow-xl">
+      <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3.5 shadow-xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
           <div className="flex items-center gap-2">
             <Target size={16} className="text-cyan-400" />
             <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              Günlük Görevler
+              {t12(language, 'Daily Quests', 'Günlük Görevler')}
             </span>
           </div>
-          <span className="text-[10px] text-cyan-400 font-bold">3 Görev</span>
+          <span className="text-[10px] text-cyan-400 font-bold">3 {t12(language, 'Quests', 'Görev')}</span>
         </div>
 
         <div className="space-y-3">
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-slate-300">{tr ? 'Bugün 50 XP kazan' : 'Earn 50 XP today'}</span>
+              <span className="text-slate-300">{t12(language, 'Earn 50 XP today', 'Bugün 50 XP kazan')}</span>
               <span className="text-cyan-400 font-bold">{Math.min(xp, 50)} / 50</span>
             </div>
             <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
@@ -166,7 +166,7 @@ export function DuolingoRightSidebar({
 
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-slate-300">{tr ? '1 dersi hatasız bitir' : 'Complete 1 lesson perfectly'}</span>
+              <span className="text-slate-300">{t12(language, 'Complete 1 lesson perfectly', '1 dersi hatasız bitir')}</span>
               <span className="text-emerald-400 font-bold">1 / 1 (✓)</span>
             </div>
             <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
@@ -177,9 +177,9 @@ export function DuolingoRightSidebar({
       </div>
 
       {/* ─── 5. REFILL & SHOP ─── */}
-      <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3 shadow-xl">
+      <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3 shadow-xl">
         <span className="font-bold text-white uppercase tracking-wider text-[11px] block border-b border-white/10 pb-2">
-          Mühendis Mağazası
+          {t12(language, 'Engineer Shop', 'Mühendis Mağazası')}
         </span>
 
         <button
@@ -191,8 +191,8 @@ export function DuolingoRightSidebar({
           <div className="flex items-center gap-2">
             <Heart size={16} className="fill-rose-500 text-rose-500" />
             <div>
-              <span className="text-white font-bold block text-[11px]">Canları Doldur</span>
-              <span className="text-[10px] text-slate-500">{hearts}/{maxHearts} Can</span>
+              <span className="text-white font-bold block text-[11px]">{t12(language, 'Refill Hearts', 'Canları Doldur')}</span>
+              <span className="text-[10px] text-slate-500">{hearts}/{maxHearts} {t12(language, 'Hearts', 'Can')}</span>
             </div>
           </div>
           <span className="px-2 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20 text-[10px]">
@@ -209,8 +209,8 @@ export function DuolingoRightSidebar({
           <div className="flex items-center gap-2">
             <Flame size={16} className="text-blue-400" />
             <div>
-              <span className="text-white font-bold block text-[11px]">Seri Dondurucu</span>
-              <span className="text-[10px] text-slate-500">{hasStreakFreeze ? (tr ? 'Aktif' : 'Active') : (tr ? '1 Gün Korur' : 'Protect 1 Day')}</span>
+              <span className="text-white font-bold block text-[11px]">{t12(language, 'Streak Freeze', 'Seri Dondurucu')}</span>
+              <span className="text-[10px] text-slate-500">{hasStreakFreeze ? t12(language, 'Active', 'Aktif') : t12(language, 'Protect 1 Day', '1 Gün Korur')}</span>
             </div>
           </div>
           <span className="px-2 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20 text-[10px]">
@@ -226,7 +226,7 @@ export function DuolingoRightSidebar({
         className="w-full p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-500/20 hover:from-amber-500/30 hover:to-yellow-500/25 border border-amber-500/40 text-amber-300 font-bold flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
       >
         <Award size={18} className="text-yellow-400" />
-        <span>Sertifikalarım</span>
+        <span>{t12(language, 'My Certificates', 'Sertifikalarım')}</span>
       </button>
 
     </aside>

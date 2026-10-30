@@ -83,7 +83,7 @@ export const LinearEngineRenderer: React.FC<LinearEngineRendererProps> = ({ flow
 
     if (!flow || isLoading) {
         return (
-            <div className="flex items-center justify-center h-full bg-[#03060a]">
+            <div className="flex items-center justify-center h-full bg-[var(--bg-0)]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
                     <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest animate-pulse">Initializing Design Engine...</span>
@@ -93,9 +93,9 @@ export const LinearEngineRenderer: React.FC<LinearEngineRendererProps> = ({ flow
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#03060a] text-white">
+        <div className="w-full h-full flex flex-col bg-[var(--bg-0)] text-white">
             {/* STEP PROGRESS BAR */}
-            <div className="h-16 border-b border-white/5 bg-[#0b121d]/50 backdrop-blur-xl flex items-center px-8 relative overflow-hidden shrink-0">
+            <div className="h-16 border-b border-white/5 bg-[var(--bg-1)]/50 flex items-center px-8 relative overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px)] bg-[size:20px_1px] pointer-events-none" />
                 
                 <div className="flex items-center gap-1.5 mr-12 truncate max-w-[25%]">
@@ -113,7 +113,7 @@ export const LinearEngineRenderer: React.FC<LinearEngineRendererProps> = ({ flow
                                 onClick={() => setCurrentStepIndex(idx)}
                                 className={`flex items-center gap-2 transition-all duration-300 ${idx === currentStepIndex ? 'opacity-100 scale-105' : 'opacity-40 hover:opacity-70'}`}
                             >
-                                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black border ${idx === currentStepIndex ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-black/40 border-white/10 text-gray-500'}`}>
+                                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black border ${idx === currentStepIndex ? 'bg-blue-500/20 border-blue-500 text-blue-400 ' : 'bg-black/40 border-white/10 text-gray-500'}`}>
                                     {stepData[step.calcId] ? <CheckCircle2 size={12} className="text-blue-400" /> : idx + 1}
                                 </div>
                                 <span className={`text-[10px] font-black tracking-widest uppercase hidden lg:block ${idx === currentStepIndex ? 'text-blue-400' : 'text-gray-600'}`}>
@@ -127,7 +127,7 @@ export const LinearEngineRenderer: React.FC<LinearEngineRendererProps> = ({ flow
 
                 <div className="flex items-center gap-3 ml-12">
                     <button className="p-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-blue-500/10 hover:border-blue-500/30 transition-all text-gray-500 hover:text-blue-400"><Save size={16} /></button>
-                    <button className="p-2.5 bg-blue-500 text-white rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:scale-105 transition-all text-[11px] font-black uppercase tracking-widest flex items-center gap-2 px-5 group">
+                    <button className="p-2.5 bg-blue-500 text-white rounded-xl hover:scale-105 transition-all text-[11px] font-black uppercase tracking-widest flex items-center gap-2 px-5 group">
                         Commit <Zap size={14} className="group-hover:animate-pulse" />
                     </button>
                 </div>
@@ -153,7 +153,7 @@ export const LinearEngineRenderer: React.FC<LinearEngineRendererProps> = ({ flow
             </div>
 
             {/* NAVIGATION FOOTER */}
-            <div className="h-14 border-t border-white/5 bg-black/40 backdrop-blur-md flex items-center justify-between px-8 shrink-0">
+            <div className="h-14 border-t border-white/5 bg-black/40 flex items-center justify-between px-8 shrink-0">
                 <button 
                     onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
                     disabled={currentStepIndex === 0}

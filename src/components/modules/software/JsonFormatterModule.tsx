@@ -6,7 +6,7 @@ import { useState } from 'react';
  * JsonFormatterModule - JSON formatter and validator
  */
 export default function JsonFormatterModule() {
-    const [input, setInput] = useState('{"name":"AluCalc","version":1.0,"features":["weight","nesting","thermal"]}');
+    const [input, setInput] = useState('{"name":"AluCAD OS","version":1.0,"features":["weight","nesting","thermal"]}');
     const [indentSize, setIndentSize] = useState(2);
     const [error, setError] = useState<string | null>(null);
     const [formatted, setFormatted] = useState('');

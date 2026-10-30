@@ -6,10 +6,11 @@ import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
 import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
+import { MathFormula } from '@/components/ui/MathFormula';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Aluminum Profile Weight & Mass Calculator (EN 755 / EN 12020) | AluCalc OS',
+  title: 'Aluminum Profile Weight & Mass Calculator (EN 755 / EN 12020)',
   description:
     'Calculate extrusion linear mass, total bar weight, solid cross-section area, and alloy mass according to EN 755-9 and EN 12020-2 precision standards.',
   alternates: {
@@ -45,7 +46,9 @@ export default function AluminumPage() {
           <div className="mt-3 grid gap-3 border-t border-[var(--line)] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3 font-mono">
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--cyan)]">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-[var(--ink)]">{method.formula}</p>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--alu-dim)] font-sans">{method.formulaNote}</p>
             </div>
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">

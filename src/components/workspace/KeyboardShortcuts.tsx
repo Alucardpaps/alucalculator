@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Keyboard Shortcuts Manager
+ * AluCAD OS — Keyboard Shortcuts Manager
  * 
  * Global keyboard shortcuts for power users.
  * Shows help modal with all available shortcuts.
@@ -37,12 +37,12 @@ const styles = {
         bg-black/80 backdrop-blur-sm
     `,
     content: `
-        bg-[#0f1419] rounded-xl border border-[#2a3a4a] 
+        bg-[var(--bg-1)] rounded-xl border border-[var(--line-strong)] 
         w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden
     `,
     header: `
         flex items-center justify-between px-6 py-4 
-        bg-[#1a2332] border-b border-[#2a3a4a]
+        bg-[var(--bg-3)] border-b border-[var(--line-strong)]
     `,
     title: `
         flex items-center gap-2 text-lg font-bold text-white
@@ -61,7 +61,7 @@ const styles = {
     `,
     shortcutItem: `
         flex items-center justify-between p-3 
-        bg-[#0a0e14] rounded-lg border border-[#2a3a4a]
+        bg-[var(--bg-1)] rounded-lg border border-[var(--line-strong)]
     `,
     description: `
         text-sm text-gray-300
@@ -71,14 +71,14 @@ const styles = {
     `,
     key: `
         px-2 py-1 min-w-[28px] text-center
-        bg-[#1a2332] border border-[#3a4a5a] rounded
+        bg-[var(--bg-3)] border border-[var(--line-strong)] rounded
         text-xs text-white font-mono
     `,
     plus: `
         text-gray-500 text-xs
     `,
     footer: `
-        px-6 py-3 bg-[#1a2332] border-t border-[#2a3a4a]
+        px-6 py-3 bg-[var(--bg-3)] border-t border-[var(--line-strong)]
         text-xs text-gray-500 text-center
     `,
 };
@@ -143,7 +143,7 @@ export const ShortcutsHelpModal: React.FC<{
             <div className={styles.content} onClick={e => e.stopPropagation()}>
                 <div className={styles.header}>
                     <span className={styles.title}>
-                        <Keyboard size={20} className="text-[#00e5ff]" />
+                        <Keyboard size={20} className="text-[var(--cyan)]" />
                         Keyboard Shortcuts
                     </span>
                     <button

@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stage, PerspectiveCamera, OrthographicCamera, Center, Environment } from "@react-three/drei";
 import React, { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
+import '@/lib/three-cleanup';
 import { ShapeType } from "@/utils/sectionProperties";
 import ClientOnly from "@/components/ClientOnly";
 
@@ -438,7 +439,7 @@ export const WeldingVisualization3D = ({
     return (
         <ClientOnly fallback={<div className="w-full h-full min-h-[300px] bg-slate-100 rounded-2xl animate-pulse" />}>
             <div className={`w-full h-full min-h-[300px] cursor-move bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden relative group border border-slate-200 dark:border-slate-800`}>
-                <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
+                <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
                     {is2D ? (
                         <OrthographicCamera makeDefault position={[0, 0, 100]} zoom={3} />
                     ) : (
@@ -476,7 +477,7 @@ export const WeldingVisualization3D = ({
                 </Canvas>
 
                 {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur p-3 rounded-lg text-[10px] font-mono space-y-1 z-10 pointer-events-none select-none shadow-sm dark:bg-slate-800/90 dark:text-white">
+                <div className="absolute bottom-4 left-4 bg-white/90 p-3 rounded-lg text-[10px] font-mono space-y-1 z-10 pointer-events-none select-none shadow-sm dark:bg-slate-800/90 dark:text-white">
                     <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded" style={{ backgroundColor: mat1.color }}></span>
                         <span>{mat1.name} ({mat1.shape})</span>

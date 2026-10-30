@@ -9,7 +9,7 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
         description: 'Calculate Spindle RPM, Feed Rate, and Material Removal Rate (MRR).',
         category: 'fabrication',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['milling', 'cnc', 'machining', 'feeds', 'speeds', 'mrr'],
         verifiedStandards: ['Industry Standard']
@@ -105,10 +105,18 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
         },
         {
             key: 'spindlePower',
-            label: 'Spindle Power (Pc)',
+            label: 'Net Cutting Power (Pc)',
             unit: 'kW' as any,
             formulaLatex: 'P_c = \\frac{MRR \\cdot k_c}{60 \\times 10^3}',
-            description: 'Required machining power.',
+            description: 'Net cutting power at cutter-workpiece interface.',
+            precision: 2
+        },
+        {
+            key: 'motorPower',
+            label: 'Motor Input Power (Pmot)',
+            unit: 'kW' as any,
+            formulaLatex: 'P_{mot} = \\frac{P_c}{\\eta} \\quad (\\eta \\approx 0.85)',
+            description: 'Gross machine spindle drive motor power including 85% efficiency.',
             precision: 2
         },
         {
@@ -122,21 +130,49 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
     ],
 
     calculationEngine: (inputs) => {
-        const Vc = Number(inputs.cuttingSpeed.value);
-        const D = Number(inputs.diameter.value);
-        const Z = Number(inputs.teeth.value);
-        const fz = Number(inputs.feedPerTooth.value);
-        const ae = Number(inputs.radialDepth.value);
-        const ap = Number(inputs.axialDepth.value);
-        const kc = Number(inputs.specificCuttingForce.value);
+        const Vc = Number(inputs.cuttingSpeed?.value);
+        const D = Number(inputs.diameter?.value);
+        const Z = Number(inputs.teeth?.value);
+        const fz = Number(inputs.feedPerTooth?.value);
+        const ae = Number(inputs.radialDepth?.value);
+        const ap = Number(inputs.axialDepth?.value);
+        const kc = Number(inputs.specificCuttingForce?.value);
 
-        const N = Math.round((Vc * 1000) / (Math.PI * D));
-        const Vf = Math.round(fz * Z * N);
-        const MRR = (ae * ap * Vf) / 1000; // cm^3/min
+        const warnings: Array<{ field: string; message: string; severity: 'warning' | 'info' | 'critical' }> = [];
+
+        if (!Number.isFinite(Vc) || Vc <= 0) {
+            warnings.push({ field: 'cuttingSpeed', message: 'Cutting speed (Vc) must be strictly positive.', severity: 'critical' });
+        }
+        if (!Number.isFinite(D) || D <= 0) {
+            warnings.push({ field: 'diameter', message: 'Cutter diameter (D) must be strictly greater than zero.', severity: 'critical' });
+        }
+        if (!Number.isFinite(Z) || Z < 1 || !Number.isInteger(Z)) {
+            warnings.push({ field: 'teeth', message: 'Flute count (Z) must be an integer >= 1.', severity: 'critical' });
+        }
+        if (!Number.isFinite(fz) || fz <= 0) {
+            warnings.push({ field: 'feedPerTooth', message: 'Feed per tooth (fz) must be strictly positive.', severity: 'critical' });
+        }
+        if (!Number.isFinite(ae) || ae <= 0) {
+            warnings.push({ field: 'radialDepth', message: 'Radial depth of cut (ae) must be strictly positive.', severity: 'critical' });
+        }
+        if (!Number.isFinite(ap) || ap <= 0) {
+            warnings.push({ field: 'axialDepth', message: 'Axial depth of cut (ap) must be strictly positive.', severity: 'critical' });
+        }
+        if (!Number.isFinite(kc) || kc <= 0) {
+            warnings.push({ field: 'specificCuttingForce', message: 'Specific cutting force (kc) must be strictly positive.', severity: 'critical' });
+        }
+
+        const isInputValid = warnings.filter(w => w.severity === 'critical').length === 0;
+
+        const N = isInputValid && D > 0 ? Math.round((Vc * 1000) / (Math.PI * D)) : 0;
+        const Vf = isInputValid ? Math.round(fz * Z * N) : 0;
+        const MRR = isInputValid ? (ae * ap * Vf) / 1000 : 0; // cm^3/min
 
         // Pc in kW = (ap * ae * Vf * kc) / (60 * 10^6)
-        const Pc = (ap * ae * Vf * kc) / 60000000;
-        const Mc = N > 0 ? (Pc * 9550) / N : 0;
+        const Pc = isInputValid ? (ap * ae * Vf * kc) / 60000000 : 0;
+        const eta = 0.85; // Machine electro-mechanical drive efficiency
+        const Pmot = isInputValid ? Pc / eta : 0;
+        const Mc = isInputValid && N > 0 ? (Pc * 9550) / N : 0;
 
         return {
             outputs: {
@@ -144,10 +180,11 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
                 feedRate: createValidatedValue(Vf, 'mm/min' as any, 'derived'),
                 mrr: createValidatedValue(MRR, 'cm³/min' as any, 'derived'),
                 spindlePower: createValidatedValue(Pc, 'kW' as any, 'derived'),
+                motorPower: createValidatedValue(Pmot, 'kW' as any, 'derived'),
                 torque: createValidatedValue(Mc, 'Nm' as any, 'derived')
             },
-            verified: true,
-            warnings: [],
+            verified: isInputValid,
+            warnings,
             timestamp: Date.now()
         };
     },
@@ -164,7 +201,7 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
             const R = (D as number) * 3;
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[#0a0e14]">
+                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[var(--bg-1)]">
                     <svg viewBox="0 0 200 200" width="100%" height="100%">
                         <rect x="0" y="0" width="100" height="200" fill="#1e293b" />
                         <rect x="0" y="0" width="100" height="200" fill="url(#metalPattern)" opacity="0.3" />
@@ -188,14 +225,14 @@ const machiningMillingSchema: CalculatorSchemaV2 = {
                         </defs>
                     </svg>
                     <div className="absolute top-4 left-4 text-left">
-                        <div className="text-xl font-bold text-[#00e5ff] font-mono leading-none drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]">
+                        <div className="text-xl font-bold text-[var(--cyan)] font-mono leading-none drop-">
                             {N.toLocaleString()}
                         </div>
                         <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">RPM</div>
 
                         {result.outputs?.spindlePower && (
                             <div className="mt-4">
-                                <div className="text-lg font-bold text-[#f59e0b] font-mono leading-none drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+                                <div className="text-lg font-bold text-[var(--warn)] font-mono leading-none drop-">
                                     {Number(result.outputs.spindlePower.value).toFixed(2)}
                                 </div>
                                 <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">kW Power</div>

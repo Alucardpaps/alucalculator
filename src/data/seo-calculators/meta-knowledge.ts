@@ -36,16 +36,6 @@ export const META_KNOWLEDGE = {
     },
 
     // 🌊 NAVAL & FLUIDS
-    "naval-hydrostatics": {
-        domain: "Mechanical",
-        topic: "Naval Hydrostatics & Stability",
-        formula: "GM = KB + BM - KG",
-        variables: { "GM": "Metacentric height", "KB": "Center of buoyancy", "BM": "Metacentric radius", "KG": "Center of gravity" },
-        description: "Analysis of ship stability and buoyancy including transverse/longitudinal metacentric height calculations.",
-        standard: "IMO Code on Intact Stability",
-        checks: ["Check righting lever (GZ) curve", "Verify floodpoint height"],
-        pitfalls: ["Ignoring free surface effect of tanks"]
-    },
     "pumps": {
         domain: "Mechanical",
         topic: "Centrifugal Pump Performance",
@@ -68,15 +58,6 @@ export const META_KNOWLEDGE = {
         checks: ["Verify MTBF data quality", "Check vibration spectral trends"],
         pitfalls: ["Ignoring non-linear wear stages"]
     },
-    "failure-diagnosis": {
-        domain: "Manufacturing",
-        topic: "Engineering Failure Diagnosis",
-        formula: "P(A|B) = \\frac{P(B|A)P(A)}{P(B)}",
-        variables: { "P": "Probability of root cause given symptoms" },
-        description: "Probabilistic framework for diagnosing mechanical failures based on multi-sensor input and symptom telemetry.",
-        standard: "ISO 17359",
-        checks: ["Cross-validate acoustic vs thermal data", "Check oil debris count"]
-    },
     "simulation-fea": {
         domain: "Manufacturing",
         topic: "Finite Element Analysis (FEA)",
@@ -86,15 +67,6 @@ export const META_KNOWLEDGE = {
         standard: "ASME V&V 10",
         checks: ["Check mesh convergence", "Verify boundary condition constraints"],
         pitfalls: ["Using singular elements at stress concentrations"]
-    },
-    "topology-optimization": {
-        domain: "Manufacturing",
-        topic: "Generative Topology Optimization",
-        formula: "\\min C(\\rho) = \\int f(x) (\\rho(x))^p dx",
-        variables: { "C": "Compliance", "rho": "Material density distribution" },
-        description: "Mathematics of material distribution to optimize stiffness while minimizing mass for 3D printing and advanced casting.",
-        standard: "Advanced Design Optimization",
-        checks: ["Verify manufacturing constraints (Overhangs)", "Check minimum member size"]
     },
 
     // ⚡ ELECTRICAL

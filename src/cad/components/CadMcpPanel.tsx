@@ -108,7 +108,7 @@ export function CadMcpPanel() {
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                     className="absolute right-6 top-24 w-80 z-50 overflow-hidden"
                 >
-                    <div className="bg-[#05090f]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.1)] flex flex-col relative overflow-hidden">
+                    <div className="bg-[var(--bg-0)]/90 border border-white/10 rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.1)] flex flex-col relative overflow-hidden">
                         
                         {/* Glow and accents */}
                         <div className={`absolute top-0 left-0 right-0 h-1 bg-${config.color}-500/50`} />
@@ -168,7 +168,7 @@ export function CadMcpPanel() {
                                     "w-full py-3 mt-4 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-widest transition-all overflow-hidden relative group " +
                                     (isProcessing ? 
                                         "bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5" : 
-                                        `bg-${config.color}-600/20 text-${config.color}-400 border border-${config.color}-500/30 hover:bg-${config.color}-500 hover:text-white shadow-[0_0_15px_rgba(0,0,0,0.5)]`
+                                        `bg-${config.color}-600/20 text-${config.color}-400 border border-${config.color}-500/30 hover:bg-${config.color}-500 hover:text-white `
                                     )
                                 }
                             >

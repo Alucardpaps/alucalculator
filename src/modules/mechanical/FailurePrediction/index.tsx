@@ -33,19 +33,19 @@ export default function FailurePrediction() {
     }, [shape, scale, time, gamma]);
 
     return (
-        <div className="flex w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-amber-500/30">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative ">
             {/* Visual Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(245,158,11,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(245,158,11,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
             {/* LEFT PANEL */}
-            <div className="w-[340px] bg-[#05080f]/90 backdrop-blur-2xl border-r border-white/5 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar">
-                <div className="p-8 border-b border-white/5 bg-gradient-to-b from-amber-500/10 to-transparent">
+            <div className="w-[340px] bg-[var(--bg-0)]/90 border-r border-white/5 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar">
+                <div className="p-8 border-b border-white/5 ">
                     <div className="flex items-center gap-4 mb-2">
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] ">
                             <ShieldAlert size={24} />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">Reliability Node</h1>
+                            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Reliability Node</h1>
                             <p className="text-[10px] text-amber-500/60 font-mono tracking-widest uppercase mt-1">Stochastic Failure Engine</p>
                         </div>
                     </div>
@@ -90,7 +90,6 @@ export default function FailurePrediction() {
 
             {/* MAIN DASHBOARD */}
             <div className="flex-1 flex flex-col p-8 lg:p-12 gap-8 overflow-y-auto z-10">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
 
                 {/* KPI Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
@@ -100,7 +99,7 @@ export default function FailurePrediction() {
                 </div>
 
                 {/* Failure Visualization */}
-                <div className="flex-1 min-h-[440px] bg-black/40 border border-white/10 rounded-[3rem] p-12 flex flex-col relative overflow-hidden backdrop-blur-md shadow-2xl">
+                <div className="flex-1 min-h-[440px] bg-black/40 border border-white/10 rounded-xl p-12 flex flex-col relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 right-0 p-8 flex gap-4">
                         <div className="flex gap-2">
                             <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-emerald-400">
@@ -145,7 +144,7 @@ export default function FailurePrediction() {
                         })}
 
                         {/* Current Time Indicator Vertical Line */}
-                        <div className="absolute top-0 bottom-0 w-px bg-amber-500/50 shadow-[0_0_15px_#f59e0b] z-20" style={{ left: `${(time / (scale * 2)) * 100}%` }}>
+                        <div className="absolute top-0 bottom-0 w-px bg-amber-500/50 z-20" style={{ left: `${(time / (scale * 2)) * 100}%` }}>
                              <div className="absolute top-0 -translate-x-1/2 px-2 py-1 bg-amber-500 text-black text-[9px] font-black rounded uppercase">NOW</div>
                         </div>
                     </div>
@@ -154,7 +153,7 @@ export default function FailurePrediction() {
                         <div className="flex gap-10">
                              <div>
                                  <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Failure Mode</span>
-                                 <div className="text-xl font-black text-white italic">{shape < 1.0 ? 'Decreasing' : shape === 1.0 ? 'Constant' : 'Increasing'}</div>
+                                 <div className="text-xl font-black text-white">{shape < 1.0 ? 'Decreasing' : shape === 1.0 ? 'Constant' : 'Increasing'}</div>
                              </div>
                              <div>
                                  <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Cumulative Prob</span>
@@ -179,7 +178,7 @@ function ParameterInput({ label, value, min, max, step, onChange, icon }: any) {
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">{icon} {label}</span>
                 <span className="text-[10px] font-mono text-amber-400">{value}</span>
             </div>
-            <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-amber-500" />
+            <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
         </div>
     );
 }
@@ -193,7 +192,7 @@ function ValueCard({ label, value, unit, sub, color }: any) {
                 <div className="text-3xl font-black font-mono text-white leading-none tracking-tighter" style={{ color: color }}>{value}</div>
                 {unit && <span className="text-sm font-bold text-slate-600 uppercase italic leading-none">{unit}</span>}
             </div>
-            {sub && <div className="text-[9px] font-bold mt-2 uppercase tracking-widest text-[#64748b]">{sub}</div>}
+            {sub && <div className="text-[9px] font-bold mt-2 uppercase tracking-widest text-[var(--muted)]">{sub}</div>}
         </div>
     );
 }

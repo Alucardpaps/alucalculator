@@ -141,12 +141,27 @@ export function generateInvoluteCurve(
     const tStart = startRadius <= baseRadius ? 0 : Math.sqrt((startRadius / baseRadius) ** 2 - 1);
     const tEnd = Math.sqrt((endRadius / baseRadius) ** 2 - 1);
 
+    const last = Math.max(1, numPoints - 1);
     for (let i = 0; i < numPoints; i++) {
-        const t = tStart + (tEnd - tStart) * (i / (numPoints - 1));
+        const t = tStart + (tEnd - tStart) * (i / last);
         points.push(involutePoint(baseRadius, t));
     }
 
     return points;
+}
+
+/**
+ * Involute flank from base circle to tip, matching DIN 3960 parametric form.
+ * resolution is the number of steps (point count = resolution + 1).
+ */
+export function buildInvoluteFlank(
+    baseRadius: number,
+    tipRadius: number,
+    resolution: number = 12
+): Point2D[] {
+    if (!(baseRadius > 0)) return [];
+    if (!(tipRadius > baseRadius)) return [involutePoint(baseRadius, 0)];
+    return generateInvoluteCurve(baseRadius, baseRadius, tipRadius, resolution + 1);
 }
 
 // ============================================

@@ -3,7 +3,7 @@
  * Enables offline-first functionality for factory floor usage
  */
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v6.0.0';
 const STATIC_CACHE = `alucalc-static-${CACHE_VERSION}`;
 const DATA_CACHE = `alucalc-data-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `alucalc-runtime-${CACHE_VERSION}`;
@@ -22,26 +22,28 @@ const CACHE_ON_DEMAND = [
 ];
 
 /**
- * Install Event - Pre-cache static assets
+ * Install Event - Pre-cache static assets & Skip Waiting immediately
  */
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing Service Worker...');
+    console.log('[SW] Installing Service Worker v6.0.0...');
 
     event.waitUntil(
         caches.open(STATIC_CACHE)
             .then((cache) => {
                 console.log('[SW] Pre-caching static assets');
-                return cache.addAll(STATIC_ASSETS);
+                return cache.addAll(STATIC_ASSETS).catch(err => {
+                    console.warn('[SW] Non-fatal precache error:', err);
+                });
             })
             .then(() => self.skipWaiting())
     );
 });
 
 /**
- * Activate Event - Clean up old caches
+ * Activate Event - Clean up all old caches & claim clients immediately
  */
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating Service Worker...');
+    console.log('[SW] Activating Service Worker v6.0.0...');
 
     event.waitUntil(
         caches.keys()
@@ -49,10 +51,7 @@ self.addEventListener('activate', (event) => {
                 return Promise.all(
                     cacheNames
                         .filter((name) => {
-                            return name.startsWith('alucalc-') &&
-                                name !== STATIC_CACHE &&
-                                name !== DATA_CACHE &&
-                                name !== RUNTIME_CACHE;
+                            return !name.includes(CACHE_VERSION);
                         })
                         .map((name) => {
                             console.log('[SW] Deleting old cache:', name);
@@ -62,6 +61,13 @@ self.addEventListener('activate', (event) => {
             })
             .then(() => self.clients.claim())
     );
+});
+
+// Explicit message handler for immediate updates
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 /**
@@ -108,20 +114,32 @@ self.addEventListener('fetch', (event) => {
         }
     }
 
-    // Handle API routes - Network first, cache fallback
+    // 1. Navigation requests (HTML pages) - NETWORK FIRST so user always gets the latest deployed version on refresh!
+    if (request.mode === 'navigate') {
+        event.respondWith(networkFirst(request, STATIC_CACHE));
+        return;
+    }
+
+    // 2. Handle API routes - Network first, cache fallback
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(networkFirst(request, RUNTIME_CACHE));
         return;
     }
 
-    // Handle data files - Stale while revalidate
+    // 3. Handle data files - Stale while revalidate
     if (url.pathname.startsWith('/data/')) {
         event.respondWith(staleWhileRevalidate(request, DATA_CACHE));
         return;
     }
 
-    // Handle static assets - Cache first
-    event.respondWith(cacheFirst(request, STATIC_CACHE));
+    // 4. Immutable hashed Next.js static assets (_next/static/*) - Cache first
+    if (url.pathname.startsWith('/_next/static/')) {
+        event.respondWith(cacheFirst(request, STATIC_CACHE));
+        return;
+    }
+
+    // 5. All other assets - Stale while revalidate with background network update
+    event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
 });
 
 /**

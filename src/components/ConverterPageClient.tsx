@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRightLeft, Ruler, Weight, Gauge, Zap } from 'lucide-react';
 import { CalculatorInput } from "@/components/CalculatorInput";
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 const factors = {
     length: {
@@ -24,6 +25,7 @@ const factors = {
 };
 
 export default function ConverterPageClient({ dict }: { dict: any }) {
+  const precision = useGlobalPrecision();
     const [category, setCategory] = useState<keyof typeof factors>('length');
     const [inputValue, setInputValue] = useState(1);
     const [fromUnit, setFromUnit] = useState(Object.keys(factors.length.units)[0]);
@@ -65,7 +67,7 @@ export default function ConverterPageClient({ dict }: { dict: any }) {
                                 setFromUnit(Object.keys(factors[k as keyof typeof factors].units)[0]);
                                 setToUnit(Object.keys(factors[k as keyof typeof factors].units)[1]);
                             }}
-                            className={`px-4 py-2 rounded-lg font-bold capitalize flex items-center gap-2 transition-all ${category === k ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            className={`px-4 py-2 rounded-lg font-bold capitalize flex items-center gap-2 transition-all ${category === k ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                         >
                             {/* @ts-ignore */}
                             {dict?.converter?.categories?.[k] || k}
@@ -102,7 +104,7 @@ export default function ConverterPageClient({ dict }: { dict: any }) {
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">To</label>
                         <div className="flex gap-2 opacity-100">
                             <div className="w-full text-3xl font-black p-4 bg-indigo-50 text-indigo-900 rounded-xl border border-indigo-100 flex items-center">
-                                {result.toFixed(4).replace(/\.?0+$/, '')}
+                                {formatEngineeringValue(result, precision, false).replace(/\.?0+$/, '')}
                             </div>
                             <select
                                 value={toUnit}

@@ -1,3 +1,5 @@
+import { FASTENERS_DB, type Fastener, type FastenerStandardId } from '@/data/fastenersData';
+
 /**
  * AluCalculator V2 - Global Bolt & Nut Standards Database
  * 
@@ -47,10 +49,31 @@ export const BOLT_PROPERTY_CLASSES: BoltPropertyClass[] = [
     { class: 'A490', standard: 'ASTM', tensileStrengthMin: 1035, yieldStrengthMin: 895, elongationMin: 14, material: 'Alloy Steel, Q&T', notes: 'Heavy Structural', nominalTensionStress: 780, nominalShearStress_N: 469, nominalShearStress_X: 579 },
     { class: 'A307', standard: 'ASTM', tensileStrengthMin: 414, yieldStrengthMin: 0, elongationMin: 18, material: 'Low Carbon Steel', notes: 'Standard Bolting', nominalTensionStress: 310, nominalShearStress_N: 186, nominalShearStress_X: 186 },
 
-    // --- SAE (US J429) ---
+    // --- SAE (US J429) & ASTM (Inch Fasteners) ---
     { class: 'Grade 2', standard: 'SAE', tensileStrengthMin: 517, yieldStrengthMin: 393, elongationMin: 18, material: 'Low/Medium Carbon' },
     { class: 'Grade 5', standard: 'SAE', tensileStrengthMin: 827, yieldStrengthMin: 634, elongationMin: 14, material: 'Medium Carbon, Q&T' },
     { class: 'Grade 8', standard: 'SAE', tensileStrengthMin: 1034, yieldStrengthMin: 896, elongationMin: 12, material: 'Medium Carbon Alloy, Q&T' },
+    { class: 'A193 B7', standard: 'ASTM', tensileStrengthMin: 860, yieldStrengthMin: 725, elongationMin: 16, material: 'Alloy Steel AISI 4140 Q&T', notes: 'High-Temp Pressure Vessel Bolting' },
+
+    // --- Pipe Fittings & Flanges (NPT / BSPP / BSPT) ---
+    { class: 'ASTM A105', standard: 'ASTM', tensileStrengthMin: 485, yieldStrengthMin: 250, elongationMin: 22, material: 'Forged Carbon Steel', notes: 'Piping & Threaded Fittings' },
+    { class: 'A182 F316', standard: 'ASTM', tensileStrengthMin: 515, yieldStrengthMin: 205, elongationMin: 30, material: 'Forged Stainless Steel 316', notes: 'Corrosion Resistant Fittings' },
+    { class: 'A350 LF2', standard: 'ASTM', tensileStrengthMin: 485, yieldStrengthMin: 250, elongationMin: 22, material: 'Low-Temp Forged Carbon Steel' },
+    { class: 'Grade B', standard: 'ASTM', tensileStrengthMin: 415, yieldStrengthMin: 240, elongationMin: 30, material: 'Seamless Pipe ASTM A106/A53' },
+
+    // --- British Whitworth (BS 1083) ---
+    { class: 'Grade A', standard: 'BS', tensileStrengthMin: 430, yieldStrengthMin: 250, elongationMin: 17, material: 'Low Carbon Mild Steel' },
+    { class: 'Grade R', standard: 'BS', tensileStrengthMin: 700, yieldStrengthMin: 500, elongationMin: 18, material: 'Medium Carbon Steel Q&T' },
+    { class: 'Grade T', standard: 'BS', tensileStrengthMin: 850, yieldStrengthMin: 650, elongationMin: 15, material: 'Alloy Steel Q&T' },
+    { class: 'Grade V', standard: 'BS', tensileStrengthMin: 1000, yieldStrengthMin: 800, elongationMin: 12, material: 'High Tensile Alloy Steel' },
+
+    // --- Power Screws / Lead Screws & Bronze (DIN 103 / ASME B1.5) ---
+    { class: 'A2-70', standard: 'ISO', tensileStrengthMin: 700, yieldStrengthMin: 450, elongationMin: 40, material: 'Austenitic Stainless Steel 304' },
+    { class: 'A4-70', standard: 'ISO', tensileStrengthMin: 700, yieldStrengthMin: 450, elongationMin: 40, material: 'Austenitic Stainless Steel 316' },
+    { class: 'A2-80', standard: 'ISO', tensileStrengthMin: 800, yieldStrengthMin: 600, elongationMin: 30, material: 'Austenitic Stainless Steel 304, cold worked' },
+    { class: 'A4-80', standard: 'ISO', tensileStrengthMin: 800, yieldStrengthMin: 600, elongationMin: 30, material: 'Austenitic Stainless Steel 316, cold worked' },
+    { class: 'CuSn7', standard: 'DIN', tensileStrengthMin: 260, yieldStrengthMin: 120, elongationMin: 12, material: 'CuSn7Zn4Pb7-C (RG7 Lead Screw Bronze Nut)' },
+    { class: 'CuSn12', standard: 'DIN', tensileStrengthMin: 300, yieldStrengthMin: 150, elongationMin: 8, material: 'CuSn12-C (High-Load Bronze Nut)' },
 ];
 
 // ============================================
@@ -58,17 +81,23 @@ export const BOLT_PROPERTY_CLASSES: BoltPropertyClass[] = [
 // ============================================
 
 export interface ThreadStandard {
-    type: 'Metric Coarse' | 'Metric Fine' | 'UNC' | 'UNF' | 'Trapezoidal' | 'BSW' | 'Pipe';
+    type: 'Metric Coarse' | 'Metric Fine' | 'UNC' | 'UNF' | 'UNEF' | 'Trapezoidal' | 'BSW' | 'BSF' | 'ACME' | 'Buttress' | 'Square' | 'Round' | 'Pipe' | string;
     size: string;
     diameter: number; // Nominal d (mm)
     pitch?: number; // mm
     tpi?: number; // Threads per inch
     area_tensile: number; // mm^2 (A_s)
-    minorDiameter?: number; // d_3 (mm)
+    minorDiameter?: number; // d_3 / d_1 (mm)
+    pitchDiameter?: number; // d_2 (mm)
     tapDrill: number; // mm
+    threadAngle?: number; // 60, 55, 30, 29, 0, 80 etc.
+    tapered?: boolean;
+    taperRatio?: string; // e.g. '1:16', '3:25'
+    standard?: string; // e.g. 'ISO 261', 'ASME B1.1', etc.
+    profileShape?: 'triangular' | 'trapezoidal' | 'round' | 'square' | 'buttress';
 }
 
-export const THREAD_STANDARDS: ThreadStandard[] = [
+const THREAD_STANDARDS_BASE: ThreadStandard[] = [
     // --- Metric Coarse (ISO 262) ---
     { type: 'Metric Coarse', size: 'M2', diameter: 2, pitch: 0.4, area_tensile: 2.07, tapDrill: 1.6 },
     { type: 'Metric Coarse', size: 'M2.5', diameter: 2.5, pitch: 0.45, area_tensile: 3.39, tapDrill: 2.05 },
@@ -156,6 +185,89 @@ export const THREAD_STANDARDS: ThreadStandard[] = [
     { type: 'Pipe', size: 'NPT 2', diameter: 60.325, tpi: 11.5, area_tensile: 2280, tapDrill: 56.0 },
 ];
 
+const TORQUE_TYPE_FROM_GEOMETRY: Record<FastenerStandardId, ThreadStandard['type']> = {
+    'ISO Metric': 'Metric Coarse',
+    'ISO Metric Fine': 'Metric Fine',
+    UNC: 'UNC',
+    UNF: 'UNF',
+    UNEF: 'UNEF',
+    BSW: 'BSW',
+    BSF: 'BSF',
+    'BSPP (G)': 'BSPP (G)',
+    'BSPT (R)': 'BSPT (R)',
+    NPT: 'NPT',
+    NPTF: 'NPTF',
+    NPSM: 'NPSM',
+    'JIC 37°': 'JIC 37°',
+    ORFS: 'ORFS',
+    'Trapezoidal (Tr)': 'Trapezoidal',
+    ACME: 'ACME',
+    'Buttress (S)': 'Buttress',
+    Square: 'Square',
+    'Round (Rd)': 'Round',
+    'Panzergewinde (Pg)': 'Panzergewinde (Pg)',
+    'Edison (E)': 'Edison (E)',
+    'Valve (Vg)': 'Valve (Vg)',
+    'Gas Cylinder (W)': 'Gas Cylinder (W)',
+};
+
+const IMPERIAL_GEOMETRY = new Set<FastenerStandardId>([
+    'UNC', 'UNF', 'UNEF', 'BSW', 'BSF', 'BSPP (G)', 'BSPT (R)', 'NPT', 'NPTF', 'NPSM', 'JIC 37°', 'ORFS', 'ACME',
+]);
+
+function fastenerToThreadStandard(f: Fastener): ThreadStandard {
+    const imperial = IMPERIAL_GEOMETRY.has(f.standard);
+    const isWhitworth = ['BSW', 'BSF', 'BSPP (G)', 'BSPT (R)', 'Gas Cylinder (W)'].includes(f.standard);
+    const isTrapezoidal = f.standard === 'Trapezoidal (Tr)';
+    const isAcme = f.standard === 'ACME';
+    const isButtress = f.standard === 'Buttress (S)';
+    const isSquare = f.standard === 'Square';
+    const isRound = f.standard === 'Round (Rd)' || f.standard === 'Edison (E)';
+    const isPg = f.standard === 'Panzergewinde (Pg)';
+    const isTapered = ['BSPT (R)', 'NPT', 'NPTF', 'Gas Cylinder (W)'].includes(f.standard);
+
+    let angle = 60;
+    if (isWhitworth) angle = 55;
+    else if (isTrapezoidal) angle = 30;
+    else if (isAcme) angle = 29;
+    else if (isButtress) angle = 45;
+    else if (isSquare) angle = 0;
+    else if (isRound) angle = f.standard === 'Edison (E)' ? 0 : 30;
+    else if (isPg) angle = 80;
+
+    let shape: 'triangular' | 'trapezoidal' | 'round' | 'square' | 'buttress' = 'triangular';
+    if (isTrapezoidal || isAcme) shape = 'trapezoidal';
+    else if (isButtress) shape = 'buttress';
+    else if (isSquare) shape = 'square';
+    else if (isRound) shape = 'round';
+
+    return {
+        type: TORQUE_TYPE_FROM_GEOMETRY[f.standard],
+        size: f.size,
+        diameter: f.majorDia,
+        pitch: imperial ? undefined : f.pitch,
+        tpi: imperial ? f.pitch : undefined,
+        area_tensile: f.stressArea,
+        minorDiameter: f.minorDia,
+        pitchDiameter: f.pitchDia,
+        tapDrill: f.tapDrill,
+        threadAngle: angle,
+        tapered: isTapered,
+        taperRatio: isTapered ? (f.standard === 'Gas Cylinder (W)' ? '3:25' : '1:16') : undefined,
+        standard: f.standard,
+        profileShape: shape,
+    };
+}
+
+const BASE_KEYS = new Set(THREAD_STANDARDS_BASE.map((t) => `${t.type}|${t.size}`));
+
+export const THREAD_STANDARDS: ThreadStandard[] = [
+    ...THREAD_STANDARDS_BASE,
+    ...FASTENERS_DB
+        .map(fastenerToThreadStandard)
+        .filter((t) => !BASE_KEYS.has(`${t.type}|${t.size}`)),
+];
+
 // ============================================
 // NUT PROPERTY CLASSES
 // ============================================
@@ -187,46 +299,67 @@ export interface FastenerGeometry {
 }
 
 export const HEX_BOLT_GEOMETRY: FastenerGeometry[] = [
+    // ISO 4014 / ISO 4017 hex head (s, k nominal; e min). Matches HEX_BOLT_DATA and ISO 4032 nuts.
+    { size: 'M2', s: 4, k: 1.4, e: 4.32 },
+    { size: 'M2.5', s: 5, k: 1.7, e: 5.45 },
     { size: 'M3', s: 5.5, k: 2, e: 6.01 },
     { size: 'M4', s: 7, k: 2.8, e: 7.66 },
     { size: 'M5', s: 8, k: 3.5, e: 8.79 },
     { size: 'M6', s: 10, k: 4, e: 11.05 },
     { size: 'M8', s: 13, k: 5.3, e: 14.38 },
-    { size: 'M10', s: 17, k: 6.4, e: 18.48 },
-    { size: 'M12', s: 19, k: 7.5, e: 21.10 },
+    { size: 'M10', s: 16, k: 6.4, e: 17.77 },
+    { size: 'M12', s: 18, k: 7.5, e: 20.03 },
+    { size: 'M14', s: 21, k: 8.8, e: 23.36 },
     { size: 'M16', s: 24, k: 10, e: 26.75 },
+    { size: 'M18', s: 27, k: 11.5, e: 30.14 },
     { size: 'M20', s: 30, k: 12.5, e: 33.53 },
+    { size: 'M22', s: 34, k: 14, e: 37.72 },
     { size: 'M24', s: 36, k: 15, e: 39.98 },
-    { size: 'M30', s: 46, k: 18.7, e: 51.28 },
+    { size: 'M27', s: 41, k: 17, e: 45.2 },
+    { size: 'M30', s: 46, k: 18.7, e: 50.85 },
+    { size: 'M33', s: 50, k: 21, e: 55.37 },
+    { size: 'M36', s: 55, k: 22.5, e: 60.79 },
+    { size: 'M42', s: 65, k: 26, e: 71.3 },
+    { size: 'M48', s: 75, k: 30, e: 82.6 },
 ];
+
+function metricSizeKey(size: string): string | null {
+    const m = size.match(/^M(\d+(?:\.\d+)?)/i);
+    if (!m) return null;
+    const n = parseFloat(m[1]);
+    return `M${Number.isInteger(n) ? n : n}`;
+}
 
 export function getFastenerGeometry(size: string, overrideDiameter?: number): FastenerGeometry {
     const found = HEX_BOLT_GEOMETRY.find(g => g.size === size);
     if (found) return found;
+
+    const metricKey = metricSizeKey(size);
+    if (metricKey) {
+        const byPrefix = HEX_BOLT_GEOMETRY.find(g => g.size === metricKey);
+        if (byPrefix) return { ...byPrefix, size };
+    }
     
     // Heuristic scaling if not in DB
     let d = overrideDiameter;
     if (!d) {
-        // match the first set of contiguous digits/decimals, ignoring leading characters like M or 1/2 if formatted strangely.
         const match = size.match(/[\d.]+/);
         d = match ? parseFloat(match[0]) : 10;
         
-        // Very basic fraction parsing for sizes like "1/2" or "3/4"
         if (size.includes('1/2')) d = 12.7;
         else if (size.includes('1/4')) d = 6.35;
         else if (size.includes('3/8')) d = 9.53;
         else if (size.includes('5/8')) d = 15.88;
         else if (size.includes('3/4')) d = 19.05;
         
-        // If it's a pipe size, the nominal size string isn't the true outer diameter. Let THREAD_STANDARDS dictate diameter where possible, but if we fall back to this, let's just make it proportional to something reasonable.
         if (size.includes('G ') || size.includes('NPT')) d = d * 25.4 + 10; 
     }
     
     return {
         size,
-        s: d * 1.6,
-        k: d * 0.7,
-        e: d * 1.8
+        s: Math.round(d * 1.6 * 10) / 10,
+        k: Math.round(d * 0.7 * 10) / 10,
+        e: Math.round(d * 1.1547 * 1.6 * 100) / 100,
     };
 }
 
@@ -244,19 +377,17 @@ export interface BoltHeadDimension {
     headHeight: number;
 }
 
-export const BOLT_HEAD_DIMENSIONS: BoltHeadDimension[] = [
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M3', pitch: 0.5, headWidth: 5.5, headHeight: 2 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M4', pitch: 0.7, headWidth: 7, headHeight: 2.8 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M5', pitch: 0.8, headWidth: 8, headHeight: 3.5 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M6', pitch: 1.0, headWidth: 10, headHeight: 4 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M8', pitch: 1.25, headWidth: 13, headHeight: 5.3 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M10', pitch: 1.5, headWidth: 17, headHeight: 6.4 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M12', pitch: 1.75, headWidth: 19, headHeight: 7.5 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M16', pitch: 2.0, headWidth: 24, headHeight: 10 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M20', pitch: 2.5, headWidth: 30, headHeight: 12.5 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M24', pitch: 3.0, headWidth: 36, headHeight: 15 },
-    { type: 'Hex Bolt', standard: 'ISO 4017', size: 'M30', pitch: 3.5, headWidth: 46, headHeight: 18.7 },
-];
+export const BOLT_HEAD_DIMENSIONS: BoltHeadDimension[] = HEX_BOLT_GEOMETRY.map((g) => {
+    const row = THREAD_STANDARDS.find((t) => t.type === 'Metric Coarse' && t.size === g.size);
+    return {
+        type: 'Hex Bolt',
+        standard: 'ISO 4017',
+        size: g.size,
+        pitch: row?.pitch ?? 0,
+        headWidth: g.s,
+        headHeight: g.k,
+    };
+});
 
 export interface NutDimension {
     type: string;
@@ -269,13 +400,68 @@ export interface NutDimension {
 }
 
 export const NUT_DIMENSIONS: NutDimension[] = [
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M6', pitch: 1.0, width: 10, height: 5.2 },
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M8', pitch: 1.25, width: 13, height: 6.8 },
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M10', pitch: 1.5, width: 17, height: 8.4 },
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M12', pitch: 1.75, width: 19, height: 10.8 },
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M16', pitch: 2.0, width: 24, height: 14.8 },
-    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M20', pitch: 2.5, width: 30, height: 18 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M2', pitch: 0.4, width: 4, height: 1.6, widthCorners: 4.32 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M2.5', pitch: 0.45, width: 5, height: 2.0, widthCorners: 5.45 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M3', pitch: 0.5, width: 5.5, height: 2.4, widthCorners: 6.01 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M4', pitch: 0.7, width: 7, height: 3.2, widthCorners: 7.66 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M5', pitch: 0.8, width: 8, height: 4.7, widthCorners: 8.79 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M6', pitch: 1.0, width: 10, height: 5.2, widthCorners: 11.05 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M8', pitch: 1.25, width: 13, height: 6.8, widthCorners: 14.38 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M10', pitch: 1.5, width: 16, height: 8.4, widthCorners: 17.77 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M12', pitch: 1.75, width: 18, height: 10.8, widthCorners: 20.03 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M14', pitch: 2.0, width: 21, height: 12.8, widthCorners: 23.36 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M16', pitch: 2.0, width: 24, height: 14.8, widthCorners: 26.75 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M18', pitch: 2.5, width: 27, height: 15.8, widthCorners: 29.56 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M20', pitch: 2.5, width: 30, height: 18, widthCorners: 33.53 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M22', pitch: 2.5, width: 34, height: 19.4, widthCorners: 37.72 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M24', pitch: 3.0, width: 36, height: 21.5, widthCorners: 39.98 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M27', pitch: 3.0, width: 41, height: 23.8, widthCorners: 45.20 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M30', pitch: 3.5, width: 46, height: 25.6, widthCorners: 51.28 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M33', pitch: 3.5, width: 50, height: 28.7, widthCorners: 55.37 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M36', pitch: 4.0, width: 55, height: 31, widthCorners: 60.79 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M42', pitch: 4.5, width: 65, height: 34, widthCorners: 72.61 },
+    { type: 'Hex Nut', standard: 'ISO 4032', size: 'M48', pitch: 5.0, width: 75, height: 38, widthCorners: 82.60 },
 ];
+
+export function getNutDimension(size: string, pitch?: number, threadStandard?: string): NutDimension {
+    const found = NUT_DIMENSIONS.find((n) => n.size === size);
+    if (found && (!threadStandard || threadStandard.toLowerCase().includes('metric') || threadStandard.toLowerCase().includes('iso'))) return found;
+    const metricKey = metricSizeKey(size);
+    if (metricKey && (!threadStandard || threadStandard.toLowerCase().includes('metric') || threadStandard.toLowerCase().includes('iso'))) {
+        const byPrefix = NUT_DIMENSIONS.find((n) => n.size === metricKey);
+        if (byPrefix) return { ...byPrefix, size, pitch: pitch ?? byPrefix.pitch };
+    }
+    const geom = getFastenerGeometry(size);
+    const sizeUpper = (size || '').toUpperCase();
+    const stdLower = (threadStandard || '').toLowerCase();
+
+    let nutStandard = 'ISO 4032 (estimated)';
+    if (stdLower.includes('unc') || stdLower.includes('unf') || stdLower.includes('unef') || sizeUpper.includes('UNC') || sizeUpper.includes('UNF') || sizeUpper.includes('UNEF')) {
+        nutStandard = 'ASME B18.2.2';
+    } else if (stdLower.includes('npt') || sizeUpper.includes('NPT')) {
+        nutStandard = 'ASME B16.11 (Coupling / Port)';
+    } else if (stdLower.includes('bspp') || sizeUpper.startsWith('G ')) {
+        nutStandard = 'ISO 228-2 (Locknut)';
+    } else if (stdLower.includes('bspt') || sizeUpper.startsWith('R ')) {
+        nutStandard = 'ISO 7-1 (Rc Port)';
+    } else if (stdLower.includes('bsw') || stdLower.includes('bsf') || sizeUpper.includes('BSW') || sizeUpper.includes('BSF')) {
+        nutStandard = 'BS 1083 Nut';
+    } else if (stdLower.includes('acme') || sizeUpper.includes('ACME')) {
+        nutStandard = 'ASME B1.5 Acme Nut';
+    } else if (stdLower.includes('trapezoidal') || sizeUpper.startsWith('TR')) {
+        nutStandard = 'DIN 103-9 (Tr Nut)';
+    }
+
+    return {
+        type: 'Hex Nut',
+        standard: nutStandard,
+        size,
+        pitch: pitch ?? 0,
+        width: geom.s,
+        height: Math.round(geom.k * 1.44 * 10) / 10,
+        widthCorners: geom.e,
+    };
+}
 
 // ============================================
 // UTILITY FUNCTIONS

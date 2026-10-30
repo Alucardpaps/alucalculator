@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Profile Mesh
+ * AluCAD OS v5.0 — Profile Mesh
  *
  * Aluminum extrusion profile rendered as box geometry.
  * PURE RENDERING — receives all data via props, zero logic inside.

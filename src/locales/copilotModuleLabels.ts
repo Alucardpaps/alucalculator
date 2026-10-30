@@ -127,20 +127,6 @@ export const COPILOT_MODULE_LABELS: Record<string, Partial<Record<Language, stri
     "ko": "열기 FEA Simulation",
     "ar": "فتح FEA Simulation"
   },
-  "/topology-optimization/": {
-    "en": "Open Topology Optimization",
-    "tr": "Topoloji Optimizasyonunu Aç",
-    "de": "Öffnen Topology Optimization",
-    "es": "Abrir Topology Optimization",
-    "fr": "Ouvrir Topology Optimization",
-    "it": "Apri Topology Optimization",
-    "pt": "Abrir Topology Optimization",
-    "ru": "Открыть Topology Optimization",
-    "ja": "開く Topology Optimization",
-    "zh": "打开 Topology Optimization",
-    "ko": "열기 Topology Optimization",
-    "ar": "فتح Topology Optimization"
-  },
   "/cutting-optimizer/": {
     "en": "Open Cutting Optimizer",
     "tr": "Kesim Optimizasyonunu Aç",
@@ -252,20 +238,6 @@ export const COPILOT_MODULE_LABELS: Record<string, Partial<Record<Language, stri
     "zh": "打开 Failure Prediction",
     "ko": "열기 Failure Prediction",
     "ar": "فتح Failure Prediction"
-  },
-  "/failure-diagnosis/": {
-    "en": "Open Failure Diagnosis",
-    "tr": "Arıza Teşhisini Aç",
-    "de": "Öffnen Failure Diagnosis",
-    "es": "Abrir Failure Diagnosis",
-    "fr": "Ouvrir Failure Diagnosis",
-    "it": "Apri Failure Diagnosis",
-    "pt": "Abrir Failure Diagnosis",
-    "ru": "Открыть Failure Diagnosis",
-    "ja": "開く Failure Diagnosis",
-    "zh": "打开 Failure Diagnosis",
-    "ko": "열기 Failure Diagnosis",
-    "ar": "فتح Failure Diagnosis"
   },
   "/concrete-reinforcement/": {
     "en": "Open Concrete Module",
@@ -406,20 +378,6 @@ export const COPILOT_MODULE_LABELS: Record<string, Partial<Record<Language, stri
     "zh": "打开 CS Algorithms",
     "ko": "열기 CS Algorithms",
     "ar": "فتح CS Algorithms"
-  },
-  "/naval-hydrostatics/": {
-    "en": "Open Naval Hydrostatics",
-    "tr": "Gemi Hidrostatiğini Aç",
-    "de": "Öffnen Naval Hydrostatics",
-    "es": "Abrir Naval Hydrostatics",
-    "fr": "Ouvrir Naval Hydrostatics",
-    "it": "Apri Naval Hydrostatics",
-    "pt": "Abrir Naval Hydrostatics",
-    "ru": "Открыть Naval Hydrostatics",
-    "ja": "開く Naval Hydrostatics",
-    "zh": "打开 Naval Hydrostatics",
-    "ko": "열기 Naval Hydrostatics",
-    "ar": "فتح Naval Hydrostatics"
   },
   "/physics-solver/": {
     "en": "Open Physics Solver",

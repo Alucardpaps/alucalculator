@@ -1,184 +1,280 @@
 /**
- * ISO 286 Fits & Tolerances Engine
- * Provides calculation for any valid Hole/Shaft combination and IT Grade.
+ * ISO 286 Fits & Tolerances Engine — table driven (v6)
+ * ---------------------------------------------------------------------------
+ * Methodology tier: NORMATIVE — ISO 286-1:2010 (Tables 1–3) / ISO 286-2:2010.
+ *
+ * Why tables and not formulas: ISO 286-2 values are the *rounded* results of
+ * the ISO 286-1 formulae plus a set of exceptions. The previous formula engine
+ * deviated from the published tables by up to 9 µm (e.g. K7/N7/P7 holes lacked
+ * the Δ correction, m-shafts used a wrong formula, j-shafts had the wrong sign,
+ * t-shafts were copies of u, IT7 for ≤3 mm gave 8.5 µm instead of 10 µm).
+ * Every value below is the tabulated value; regression tests live in
+ * src/tests/iso286-tables.test.ts.
+ *
+ * Scope: nominal sizes 0 < D ≤ 500 mm, IT1–IT18, shafts a–z (+cd, ef, fg, js),
+ * holes A–Z (+CD, EF, FG, JS). Units: µm unless stated otherwise.
  */
 
-// IT Grades (01 to 18) for Nominal Sizes up to 500mm
-// Table holds values for size steps:
-// [0-3, 3-6, 6-10, 10-18, 18-30, 30-50, 50-80, 80-120, 120-180, 180-250, 250-315, 315-400, 400-500]
+// Main steps (upper bounds, mm) — used for IT grades and d…p deviations.
 export const ISO_STEPS = [3, 6, 10, 18, 30, 50, 80, 120, 180, 250, 315, 400, 500];
 
-// Returns the geometric mean diameter (D) for a given nominal size
-function getGeometricMean(nominal: number): number {
-    if (nominal <= 3) return Math.sqrt(1 * 3);
-    for (let i = 0; i < ISO_STEPS.length - 1; i++) {
-        if (nominal > ISO_STEPS[i] && nominal <= ISO_STEPS[i + 1]) {
-            return Math.sqrt(ISO_STEPS[i] * ISO_STEPS[i + 1]);
-        }
-    }
-    return Math.sqrt(400 * 500); // Max fallback
+// Sub-steps (upper bounds, mm) — used for a, b, c and r…z deviations.
+const SUB_STEPS = [3, 6, 10, 14, 18, 24, 30, 40, 50, 65, 80, 100, 120, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450, 500];
+// Main-step index for each sub-step.
+const SUB_TO_MAIN = [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 11, 11, 12, 12];
+
+// ISO 286-1 Table 1 — standard tolerance grades IT1…IT18 (µm) per main step.
+const IT_TABLE: Record<number, number[]> = {
+    1: [0.8, 1, 1, 1.2, 1.5, 1.5, 2, 2.5, 3.5, 4.5, 6, 7, 8],
+    2: [1.2, 1.5, 1.5, 2, 2.5, 2.5, 3, 4, 5, 7, 8, 9, 10],
+    3: [2, 2.5, 2.5, 3, 4, 4, 5, 6, 8, 10, 12, 13, 15],
+    4: [3, 4, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20],
+    5: [4, 5, 6, 8, 9, 11, 13, 15, 18, 20, 23, 25, 27],
+    6: [6, 8, 9, 11, 13, 16, 19, 22, 25, 29, 32, 36, 40],
+    7: [10, 12, 15, 18, 21, 25, 30, 35, 40, 46, 52, 57, 63],
+    8: [14, 18, 22, 27, 33, 39, 46, 54, 63, 72, 81, 89, 97],
+    9: [25, 30, 36, 43, 52, 62, 74, 87, 100, 115, 130, 140, 155],
+    10: [40, 48, 58, 70, 84, 100, 120, 140, 160, 185, 210, 230, 250],
+    11: [60, 75, 90, 110, 130, 160, 190, 220, 250, 290, 320, 360, 400],
+    12: [100, 120, 150, 180, 210, 250, 300, 350, 400, 460, 520, 570, 630],
+    13: [140, 180, 220, 270, 330, 390, 460, 540, 630, 720, 810, 890, 970],
+    14: [250, 300, 360, 430, 520, 620, 740, 870, 1000, 1150, 1300, 1400, 1550],
+    15: [400, 480, 580, 700, 840, 1000, 1200, 1400, 1600, 1850, 2100, 2300, 2500],
+    16: [600, 750, 900, 1100, 1300, 1600, 1900, 2200, 2500, 2900, 3200, 3600, 4000],
+    17: [1000, 1200, 1500, 1800, 2100, 2500, 3000, 3500, 4000, 4600, 5200, 5700, 6300],
+    18: [1400, 1800, 2200, 2700, 3300, 3900, 4600, 5400, 6300, 7200, 8100, 8900, 9700],
+};
+
+type Row = (number | null)[];
+const expand = (main: Row): Row => SUB_TO_MAIN.map((m) => main[m]);
+
+// ISO 286-1 Table 2 — upper deviations es of shafts a…h (µm).
+const SHAFT_ES: Record<string, Row> = {
+    a: [-270, -270, -280, -290, -290, -300, -300, -310, -320, -340, -360, -380, -410, -460, -520, -580, -660, -740, -820, -920, -1050, -1200, -1350, -1500, -1650],
+    b: [-140, -140, -150, -150, -150, -160, -160, -170, -180, -190, -200, -220, -240, -260, -280, -310, -340, -380, -420, -480, -540, -600, -680, -760, -840],
+    c: [-60, -70, -80, -95, -95, -110, -110, -120, -130, -140, -150, -170, -180, -200, -210, -230, -240, -260, -280, -300, -330, -360, -400, -440, -480],
+    cd: expand([-34, -46, -56, null, null, null, null, null, null, null, null, null, null]),
+    d: expand([-20, -30, -40, -50, -65, -80, -100, -120, -145, -170, -190, -210, -230]),
+    e: expand([-14, -20, -25, -32, -40, -50, -60, -72, -85, -100, -110, -125, -135]),
+    ef: expand([-10, -14, -18, null, null, null, null, null, null, null, null, null, null]),
+    f: expand([-6, -10, -13, -16, -20, -25, -30, -36, -43, -50, -56, -62, -68]),
+    fg: expand([-4, -6, -8, null, null, null, null, null, null, null, null, null, null]),
+    g: expand([-2, -4, -5, -6, -7, -9, -10, -12, -14, -15, -17, -18, -20]),
+    h: expand([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+};
+
+// j-shafts: lower deviation ei by grade (µm).
+const SHAFT_J_EI: Record<number, Row> = {
+    5: expand([-2, -2, -2, -3, -4, -5, -7, -9, -11, -13, -16, -18, -20]),
+    6: expand([-2, -2, -2, -3, -4, -5, -7, -9, -11, -13, -16, -18, -20]),
+    7: expand([-4, -4, -5, -6, -8, -10, -12, -15, -18, -21, -26, -28, -32]),
+    8: expand([-6, null, null, null, null, null, null, null, null, null, null, null, null]),
+};
+
+// ISO 286-1 Table 3 — lower deviations ei of shafts k…z (µm).
+const K_EI_IT4_7 = expand([0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5]);
+const SHAFT_EI: Record<string, Row> = {
+    m: expand([2, 4, 6, 7, 8, 9, 11, 13, 15, 17, 20, 21, 23]),
+    n: expand([4, 8, 10, 12, 15, 17, 20, 23, 27, 31, 34, 37, 40]),
+    p: expand([6, 12, 15, 18, 22, 26, 32, 37, 43, 50, 56, 62, 68]),
+    r: [10, 15, 19, 23, 23, 28, 28, 34, 34, 41, 43, 51, 54, 63, 65, 68, 77, 80, 84, 94, 98, 108, 114, 126, 132],
+    s: [14, 19, 23, 28, 28, 35, 35, 43, 43, 53, 59, 71, 79, 92, 100, 108, 122, 130, 140, 158, 170, 190, 208, 232, 252],
+    t: [null, null, null, null, null, null, 41, 48, 54, 66, 75, 91, 104, 122, 134, 146, 166, 180, 196, 218, 240, 268, 294, 330, 360],
+    u: [18, 23, 28, 33, 33, 41, 48, 60, 70, 87, 102, 124, 144, 170, 190, 210, 236, 258, 284, 315, 350, 390, 435, 490, 540],
+    v: [null, null, null, null, 39, 47, 55, 68, 81, 102, 120, 146, 172, 202, 228, 252, 284, 310, 340, 385, 425, 475, 530, 595, 660],
+    x: [20, 28, 34, 40, 45, 54, 64, 80, 97, 122, 146, 178, 210, 248, 280, 310, 350, 385, 425, 475, 525, 590, 660, 740, 820],
+    y: [null, null, null, null, null, 63, 75, 94, 114, 144, 174, 214, 254, 300, 340, 380, 425, 470, 520, 580, 650, 730, 820, 920, 1000],
+    z: [26, 35, 42, 50, 60, 73, 88, 112, 136, 172, 210, 258, 310, 365, 415, 465, 520, 575, 640, 710, 790, 900, 1000, 1100, 1250],
+};
+
+// J-holes: upper deviation ES by grade (µm).
+const HOLE_J_ES: Record<number, Row> = {
+    6: expand([2, 5, 5, 6, 8, 10, 13, 16, 18, 22, 25, 29, 33]),
+    7: expand([4, 6, 8, 10, 12, 14, 18, 22, 26, 30, 36, 39, 43]),
+    8: expand([6, 10, 12, 15, 20, 24, 28, 34, 41, 47, 55, 60, 66]),
+};
+
+export const ISO286_MAX_NOMINAL_MM = 500;
+
+function subIndex(nominal: number): number {
+    if (!(nominal > 0)) return 0;
+    for (let i = 0; i < SUB_STEPS.length; i++) if (nominal <= SUB_STEPS[i]) return i;
+    return SUB_STEPS.length - 1; // clamped; callers flag out-of-range
 }
 
-// IT Grade Calculation (Formula based on ISO 286-1)
-// Results are in micrometers (μm)
+function mainIndex(nominal: number): number {
+    return SUB_TO_MAIN[subIndex(nominal)];
+}
+
+/** Standard tolerance ITn in µm (ISO 286-1 Table 1). */
 export function calculateIT(nominal: number, grade: number): number {
-    const D = getGeometricMean(nominal);
-    let i = 0; // standard tolerance factor in μm
-
-    if (nominal <= 500) {
-        i = 0.45 * Math.pow(D, 1/3) + 0.001 * D;
-    } else {
-        i = 0.004 * D + 2.1;
-    }
-
-    // IT 5 to 18 scaling factors
-    const multipliers: Record<number, number> = {
-        5: 7, 6: 10, 7: 16, 8: 25, 9: 40, 10: 64,
-        11: 100, 12: 160, 13: 250, 14: 400, 15: 640,
-        16: 1000, 17: 1600, 18: 2500
-    };
-
-    if (multipliers[grade]) {
-        // Rounding per ISO 286 rules (simplified approximation)
-        const raw = i * multipliers[grade];
-        if (raw < 10) return Math.round(raw * 2) / 2;
-        if (raw < 100) return Math.round(raw);
-        return Math.round(raw / 10) * 10;
-    }
-
-    // Rough hardcoded for low grades IT01 to IT4 (approx)
-    if (grade === 1) return Math.round(0.8 + 0.02 * D);
-    if (grade === 2) return Math.round(1.2 + 0.028 * D);
-    if (grade === 3) return Math.round(2 + 0.04 * D);
-    if (grade === 4) return Math.round(3 + 0.05 * D);
-
-    return 10; // Fallback
+    const row = IT_TABLE[Math.round(grade)];
+    if (!row) return NaN;
+    return row[mainIndex(nominal)];
 }
 
-// Exact ISO 286-2 values for H hole deviations (ei=0, es=+IT)
-// and h shaft deviations (es=0, ei=-IT)
-export function getFundamentalDeviation(nominal: number, letter: string, grade: number, isHole: boolean): number {
-    const D = getGeometricMean(nominal);
+/** Δ = ITn − IT(n−1) for hole classes K…ZC (only for IT3…IT8 and D > 3 mm). */
+function delta(nominal: number, grade: number): number {
+    if (nominal <= 3 || grade < 3 || grade > 8) return 0;
+    return calculateIT(nominal, grade) - calculateIT(nominal, grade - 1);
+}
+
+export interface Deviation {
+    upper: number; // es / ES, µm
+    lower: number; // ei / EI, µm
+    supported: boolean;
+    note?: string;
+}
+
+const unsupported = (it: number, note: string): Deviation => ({ upper: it, lower: 0, supported: false, note });
+/** Normalise −0 to 0 so equality checks and "+0"/"-0" labels behave. */
+const nz = (v: number) => (v === 0 ? 0 : v);
+const dev = (upper: number, lower: number): Deviation => ({ upper: nz(upper), lower: nz(lower), supported: true });
+
+/** Shaft limit deviations es/ei (µm). */
+export function shaftDeviations(nominal: number, letter: string, grade: number): Deviation {
     const l = letter.toLowerCase();
-    
-    // Fundamental Deviation (in μm)
-    let dev = 0;
+    const it = calculateIT(nominal, grade);
+    const si = subIndex(nominal);
+    if (!Number.isFinite(it)) return unsupported(0, `IT${grade} is not a standard grade`);
 
-    // We implement the exact formulas from ISO 286 for common letters.
-    // For extreme accuracy across all 500mm and all letters, large tables are usually needed.
-    // We provide a robust programmatic approximation based on standard ISO math.
-
-    if (l === 'h') {
-        dev = 0;
-    } else if (l === 'a') {
-        dev = -(265 + 1.3 * D);
-    } else if (l === 'b') {
-        dev = -(140 + 0.85 * D);
-    } else if (l === 'c') {
-        dev = -(52 * Math.pow(D, 0.2));
-    } else if (l === 'd') {
-        dev = -(16 * Math.pow(D, 0.44));
-    } else if (l === 'e') {
-        dev = -(11 * Math.pow(D, 0.41));
-    } else if (l === 'f') {
-        dev = -(5.5 * Math.pow(D, 0.41));
-    } else if (l === 'g') {
-        dev = -(2.5 * Math.pow(D, 0.34));
-    } else if (l === 'k') {
-        dev = grade <= 3 ? 0 : grade <= 7 ? 0.6 * Math.pow(D, 1/3) : 0;
-    } else if (l === 'm') {
-        dev = (grade <= 8 ? 2.8 : 11) * Math.pow(D, 0.2); // approx
-    } else if (l === 'n') {
-        dev = 5 * Math.pow(D, 0.34);
-    } else if (l === 'p') {
-        dev = grade <= 7 ? (Math.pow(D, 1/3) + 0.1*D) * 1.5 : (Math.pow(D, 1/3) + 0.1*D) * 1.5; // simplified
-    } else if (l === 'r') {
-        dev = Math.pow(D, 0.6); // simplified
-    } else if (l === 's') {
-        dev = grade <= 8 ? (Math.pow(D, 0.6) * 1.2) : (Math.pow(D, 0.6) * 1.2);
-    } else {
-        // Fallback for missing exotic letters
-        dev = 0; 
+    if (l === 'js') return dev(it / 2, -it / 2);
+    if (SHAFT_ES[l]) {
+        const es = SHAFT_ES[l][si];
+        if (es == null) return unsupported(-it, `${l} is only defined up to 10 mm`);
+        return dev(es, es - it);
     }
-
-    // Convert Shaft deviation to Hole deviation
-    if (isHole) {
-        // General rule: Hole deviation = - Shaft deviation
-        // There are exceptions for K, M, N, but this handles 90%
-        dev = -dev;
+    if (l === 'j') {
+        const row = SHAFT_J_EI[grade];
+        const ei = row?.[si];
+        if (ei == null) return unsupported(it, `j${grade} is not tabulated in ISO 286-2`);
+        return dev(ei + it, ei);
     }
-
-    return dev;
+    if (l === 'k') {
+        const ei = grade >= 4 && grade <= 7 ? (K_EI_IT4_7[si] as number) : 0;
+        return dev(ei + it, ei);
+    }
+    if (SHAFT_EI[l]) {
+        const ei = SHAFT_EI[l][si];
+        if (ei == null) return unsupported(it, `${l} is not defined for Ø${nominal} mm (ISO 286-1 Table 3)`);
+        return dev(ei + it, ei);
+    }
+    return unsupported(it, `Unknown shaft class "${letter}"`);
 }
+
+/** Hole limit deviations ES/EI (µm). */
+export function holeDeviations(nominal: number, letter: string, grade: number): Deviation {
+    const L = letter.toUpperCase();
+    const l = L.toLowerCase();
+    const it = calculateIT(nominal, grade);
+    const si = subIndex(nominal);
+    if (!Number.isFinite(it)) return unsupported(0, `IT${grade} is not a standard grade`);
+
+    if (L === 'JS') return dev(it / 2, -it / 2);
+    // A…H: EI = −es (mirror of the shaft)
+    if (SHAFT_ES[l]) {
+        const es = SHAFT_ES[l][si];
+        if (es == null) return unsupported(it, `${L} is only defined up to 10 mm`);
+        const EI = -es;
+        return dev(EI + it, EI);
+    }
+    if (L === 'J') {
+        const ES = HOLE_J_ES[grade]?.[si];
+        if (ES == null) return unsupported(it, `J${grade} is not tabulated in ISO 286-2`);
+        return dev(ES, ES - it);
+    }
+    if (L === 'K') {
+        // ES = −ei(k) + Δ for ≤ IT8; ES = 0 above IT8 (and always 0 for ≤ 3 mm)
+        const ES = nominal <= 3 ? 0 : grade <= 8 ? -(K_EI_IT4_7[si] as number) + delta(nominal, grade) : 0;
+        return dev(ES, ES - it);
+    }
+    if (L === 'M') {
+        const ei = SHAFT_EI.m[si] as number;
+        const ES = grade <= 8 ? -ei + delta(nominal, grade) : -ei;
+        return dev(ES, ES - it);
+    }
+    if (L === 'N') {
+        const ei = SHAFT_EI.n[si] as number;
+        const ES = nominal <= 3 ? -ei : grade <= 8 ? -ei + delta(nominal, grade) : 0;
+        return dev(ES, ES - it);
+    }
+    if (SHAFT_EI[l]) {
+        // P…ZC: ES = −ei + Δ for ≤ IT7, ES = −ei above IT7
+        const ei = SHAFT_EI[l][si];
+        if (ei == null) return unsupported(it, `${L} is not defined for Ø${nominal} mm (ISO 286-1 Table 3)`);
+        const ES = -ei + (grade <= 7 ? delta(nominal, grade) : 0);
+        return dev(ES, ES - it);
+    }
+    return unsupported(it, `Unknown hole class "${letter}"`);
+}
+
+/**
+ * Fundamental deviation (µm): the limit deviation nearest to the zero line.
+ * Shafts a–h → es, j–z → ei; holes A–H → EI, J–Z → ES; js/JS → 0.
+ */
+export function getFundamentalDeviation(nominal: number, letter: string, grade: number, isHole: boolean): number {
+    const l = letter.toLowerCase();
+    if (l === 'js') return 0;
+    if (isHole) {
+        const d = holeDeviations(nominal, letter, grade);
+        return SHAFT_ES[l] ? d.lower : d.upper;
+    }
+    const d = shaftDeviations(nominal, letter, grade);
+    return SHAFT_ES[l] ? d.upper : d.lower;
+}
+
+export type FitType = 'Clearance' | 'Transition' | 'Interference';
 
 export function calculateFit(nominal: number, holeClass: string, holeGrade: number, shaftClass: string, shaftGrade: number) {
-    const hIT = calculateIT(nominal, holeGrade);
-    const sIT = calculateIT(nominal, shaftGrade);
+    const hole = holeDeviations(nominal, holeClass, holeGrade);
+    const shaft = shaftDeviations(nominal, shaftClass, shaftGrade);
+    const warnings: string[] = [];
+    if (nominal > ISO286_MAX_NOMINAL_MM) warnings.push(`ISO 286-2 tables in this engine cover 1–${ISO286_MAX_NOMINAL_MM} mm; Ø${nominal} mm was evaluated with the 450–500 mm step.`);
+    if (!hole.supported && hole.note) warnings.push(hole.note);
+    if (!shaft.supported && shaft.note) warnings.push(shaft.note);
 
-    // Hole
-    let holeEI = 0;
-    let holeES = 0;
-    
-    if (holeClass.toUpperCase() === 'JS') {
-        holeEI = -hIT / 2;
-        holeES = hIT / 2;
-    } else if (holeClass.toUpperCase() === 'H') {
-        holeEI = 0;
-        holeES = hIT;
-    } else {
-        // Approx based on deviation formula
-        const dev = getFundamentalDeviation(nominal, holeClass, holeGrade, true);
-        if (dev > 0) {
-            holeEI = dev;
-            holeES = holeEI + hIT;
-        } else {
-            holeES = dev;
-            holeEI = holeES - hIT;
-        }
-    }
+    const holeES = hole.upper;
+    const holeEI = hole.lower;
+    const shaft_es = shaft.upper;
+    const shaft_ei = shaft.lower;
 
-    // Shaft
-    let shaft_ei = 0;
-    let shaft_es = 0;
+    // Work in µm to avoid floating noise, then convert.
+    const maxClearanceUm = Math.round((holeES - shaft_ei) * 10) / 10;
+    const minClearanceUm = Math.round((holeEI - shaft_es) * 10) / 10;
 
-    if (shaftClass.toLowerCase() === 'js') {
-        shaft_ei = -sIT / 2;
-        shaft_es = sIT / 2;
-    } else if (shaftClass.toLowerCase() === 'h') {
-        shaft_es = 0;
-        shaft_ei = -sIT;
-    } else {
-        const dev = getFundamentalDeviation(nominal, shaftClass, shaftGrade, false);
-        // Shaft a-g (dev is negative, so dev = es)
-        // Shaft k-zc (dev is positive, so dev = ei)
-        if (dev < 0) {
-            shaft_es = dev;
-            shaft_ei = shaft_es - sIT;
-        } else {
-            shaft_ei = dev;
-            shaft_es = shaft_ei + sIT;
-        }
-    }
+    let fitType: FitType = 'Transition';
+    if (minClearanceUm >= 0) fitType = 'Clearance';
+    if (maxClearanceUm <= 0) fitType = 'Interference';
 
-    const holeMax = nominal + holeES / 1000;
-    const holeMin = nominal + holeEI / 1000;
-    const shaftMax = nominal + shaft_es / 1000;
-    const shaftMin = nominal + shaft_ei / 1000;
-
-    const maxClearance = holeMax - shaftMin;
-    const minClearance = holeMin - shaftMax;
-
-    let fitType = 'Transition';
-    if (minClearance >= 0) fitType = 'Clearance';
-    if (maxClearance <= 0) fitType = 'Interference';
+    const mm = (v: number) => Math.round(v * 1e6) / 1e6;
 
     return {
-        holeMax, holeMin,
-        shaftMax, shaftMin,
-        holeTol: hIT / 1000,
-        shaftTol: sIT / 1000,
-        maxClearance, minClearance,
+        nominalDia: nominal,
+        nominal,
+        holeMax: mm(nominal + holeES / 1000),
+        holeMin: mm(nominal + holeEI / 1000),
+        shaftMax: mm(nominal + shaft_es / 1000),
+        shaftMin: mm(nominal + shaft_ei / 1000),
+        holeTol: (holeES - holeEI) / 1000,
+        shaftTol: (shaft_es - shaft_ei) / 1000,
+        maxClearance: maxClearanceUm / 1000,
+        minClearance: minClearanceUm / 1000,
+        maxClearanceUm,
+        minClearanceUm,
         fitType,
-        holeES, holeEI, shaft_es, shaft_ei
+        holeES,
+        holeEI,
+        shaft_es,
+        shaft_ei,
+        isSupported: hole.supported && shaft.supported && nominal <= ISO286_MAX_NOMINAL_MM,
+        warnings,
+        standard: 'ISO 286-1:2010 / ISO 286-2:2010',
     };
+}
+
+/** Parse "H7/g6" → calculateFit. */
+export function calculateFitFromString(nominal: number, fit: string) {
+    const m = fit.replace(/\s+/g, '').match(/^([A-Za-z]{1,2})(\d{1,2})\/([A-Za-z]{1,2})(\d{1,2})$/);
+    if (!m) throw new Error(`Invalid fit designation "${fit}" (expected e.g. H7/g6)`);
+    return calculateFit(nominal, m[1], parseInt(m[2], 10), m[3], parseInt(m[4], 10));
 }

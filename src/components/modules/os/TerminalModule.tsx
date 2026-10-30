@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Terminal Module
+ * AluCAD OS — Terminal Module
  * Engineering CLI for rapid calculations
  * 
  * Ctrl+Shift+P to open | Supports calc, kerf, thermal, material commands
@@ -125,8 +125,8 @@ export default function TerminalModule() {
         <div
             className="flex flex-col h-full w-full font-mono text-sm select-text"
             style={{
-                backgroundColor: '#0a0e14',
-                color: '#b0bec5',
+                backgroundColor: 'var(--bg-1)',
+                color: 'var(--alu-dim)',
             }}
             onClick={() => inputRef.current?.focus()}
         >
@@ -144,8 +144,8 @@ export default function TerminalModule() {
                         {/* Input Line */}
                         {entry.input && (
                             <div className="flex items-start gap-2">
-                                <span style={{ color: '#00e5ff' }}>❯</span>
-                                <span style={{ color: '#e0e0e0' }}>{entry.input}</span>
+                                <span style={{ color: 'var(--cyan)' }}>❯</span>
+                                <span style={{ color: 'var(--alu)' }}>{entry.input}</span>
                             </div>
                         )}
                         {/* Output */}
@@ -166,13 +166,13 @@ export default function TerminalModule() {
                 onSubmit={handleSubmit}
                 className="flex items-center gap-2 px-4 py-3 border-t"
                 style={{
-                    borderColor: '#1e2734',
-                    backgroundColor: '#0d1117',
+                    borderColor: 'var(--line)',
+                    backgroundColor: 'var(--bg-1)',
                 }}
             >
                 <span
                     className="text-xs font-bold shrink-0"
-                    style={{ color: '#00e5ff' }}
+                    style={{ color: 'var(--cyan)' }}
                 >
                     {t.termPrefix}
                 </span>
@@ -183,7 +183,7 @@ export default function TerminalModule() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     className="flex-1 bg-transparent outline-none text-sm"
-                    style={{ color: '#e0e0e0', caretColor: '#00e5ff' }}
+                    style={{ color: 'var(--alu)', caretColor: '#00e5ff' }}
                     placeholder={t.termPlaceholder}
                     autoComplete="off"
                     spellCheck={false}

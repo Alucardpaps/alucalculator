@@ -250,24 +250,30 @@ export function computeEntityBBox(entity: CadEntity): BBox | null {
 
         case 'RECTANGLE': {
             // Simplified bounding box ignoring rotation for spatial index purposes (conservative)
-            const rw = g.width / 2;
-            const rh = g.height / 2;
+            const rw = (g.width || 0) / 2;
+            const rh = (g.height || 0) / 2;
+            const cx = g.center ? g.center.x : ((g as any).x ?? 0) + rw;
+            const cy = g.center ? g.center.y : ((g as any).y ?? 0) + rh;
             const maxR = Math.sqrt(rw * rw + rh * rh); 
             return {
-                minX: g.center.x - maxR,
-                minY: g.center.y - maxR,
-                maxX: g.center.x + maxR,
-                maxY: g.center.y + maxR,
+                minX: cx - maxR,
+                minY: cy - maxR,
+                maxX: cx + maxR,
+                maxY: cy + maxR,
             };
         }
 
-        case 'HEXAGON':
+        case 'HEXAGON': {
+            const cx = g.center ? g.center.x : ((g as any).x ?? 0);
+            const cy = g.center ? g.center.y : ((g as any).y ?? 0);
+            const r = g.radius || 10;
             return {
-                minX: g.center.x - g.radius,
-                minY: g.center.y - g.radius,
-                maxX: g.center.x + g.radius,
-                maxY: g.center.y + g.radius,
+                minX: cx - r,
+                minY: cy - r,
+                maxX: cx + r,
+                maxY: cy + r,
             };
+        }
 
         case 'GEAR': {
             const gAny = g as any;
@@ -285,13 +291,12 @@ export function computeEntityBBox(entity: CadEntity): BBox | null {
 
         case 'FASTENER': {
             const gFast = g as any;
-            const halfW = gFast.diameter * 2;
-            const halfH = (gFast.length || gFast.diameter) / 2 + gFast.diameter;
+            const reach = Math.max(gFast.diameter * 2.2, (gFast.length || gFast.diameter) + gFast.diameter * 1.5);
             return {
-                minX: gFast.origin.x - halfW,
-                minY: gFast.origin.y - halfH,
-                maxX: gFast.origin.x + halfW,
-                maxY: gFast.origin.y + halfH,
+                minX: gFast.origin.x - reach,
+                minY: gFast.origin.y - reach,
+                maxX: gFast.origin.x + reach,
+                maxY: gFast.origin.y + reach,
             };
         }
 
@@ -319,16 +324,90 @@ export function computeEntityBBox(entity: CadEntity): BBox | null {
             };
         }
 
+        case 'SPROCKET': {
+            const gSprocket = g as any;
+            if (!gSprocket.center) return null;
+            const z = Math.max(6, gSprocket.teeth || 19);
+            const p = Math.max(2, gSprocket.pitch || 12.7);
+            const pitchRadius = (p / Math.sin(Math.PI / z)) / 2;
+            const rOuter = pitchRadius + p * 0.6;
+            return {
+                minX: gSprocket.center.x - rOuter,
+                minY: gSprocket.center.y - rOuter,
+                maxX: gSprocket.center.x + rOuter,
+                maxY: gSprocket.center.y + rOuter,
+            };
+        }
+
         case 'TEXT': {
             const gText = g as any;
-            const fontSize = gText.fontSize || 12;
-            const textWidth = (gText.content?.length || 5) * fontSize * 0.6;
+            if (!gText.position) return null;
+            const fontSize = Math.max(12, gText.fontSize || 14);
+            const textLen = Math.max(8, (gText.content?.length || 8));
+            const span = Math.max(fontSize * textLen, 80);
             return {
-                minX: gText.position.x - 5,
-                minY: gText.position.y - fontSize - 5,
-                maxX: gText.position.x + textWidth + 5,
-                maxY: gText.position.y + 5,
+                minX: gText.position.x - span,
+                minY: gText.position.y - span,
+                maxX: gText.position.x + span,
+                maxY: gText.position.y + span,
             };
+        }
+
+        case 'LEADER': {
+            const gLead = g as any;
+            if (!gLead.start || !gLead.end) return null;
+            const minX = Math.min(gLead.start.x, gLead.end.x) - 50;
+            const minY = Math.min(gLead.start.y, gLead.end.y) - 50;
+            const maxX = Math.max(gLead.start.x, gLead.end.x) + 150;
+            const maxY = Math.max(gLead.start.y, gLead.end.y) + 50;
+            return { minX, minY, maxX, maxY };
+        }
+
+        case 'ELLIPSE': {
+            const gEl = g as any;
+            const maxR = Math.max(gEl.radiusX || 10, gEl.radiusY || 10);
+            return {
+                minX: gEl.center.x - maxR,
+                minY: gEl.center.y - maxR,
+                maxX: gEl.center.x + maxR,
+                maxY: gEl.center.y + maxR,
+            };
+        }
+
+        case 'SPLINE': {
+            const gSpl = g as any;
+            if (!gSpl.controlPoints || gSpl.controlPoints.length === 0) return null;
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            for (const p of gSpl.controlPoints) {
+                if (p.x < minX) minX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y > maxY) maxY = p.y;
+            }
+            return { minX: minX - 5, minY: minY - 5, maxX: maxX + 5, maxY: maxY + 5 };
+        }
+
+        case 'HATCH': {
+            const gHatch = g as any;
+            if (!gHatch.boundaryVertices || gHatch.boundaryVertices.length === 0) return null;
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            for (const p of gHatch.boundaryVertices) {
+                if (p.x < minX) minX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y > maxY) maxY = p.y;
+            }
+            return { minX, minY, maxX, maxY };
+        }
+
+        case 'DIMENSION': {
+            const gDim = g as any;
+            if (!gDim.start || !gDim.end) return null;
+            const minX = Math.min(gDim.start.x, gDim.end.x, gDim.textPoint?.x ?? gDim.start.x) - 40;
+            const minY = Math.min(gDim.start.y, gDim.end.y, gDim.textPoint?.y ?? gDim.start.y) - 40;
+            const maxX = Math.max(gDim.start.x, gDim.end.x, gDim.textPoint?.x ?? gDim.end.x) + 40;
+            const maxY = Math.max(gDim.start.y, gDim.end.y, gDim.textPoint?.y ?? gDim.end.y) + 40;
+            return { minX, minY, maxX, maxY };
         }
 
         default:

@@ -17,6 +17,7 @@ export {
     inverseInvolute,
     involutePoint,
     generateInvoluteCurve,
+    buildInvoluteFlank,
     calculateGearGeometry,
     validateGearParameters,
     simplifyPolyline,
@@ -38,3 +39,6 @@ export {
     requiredProfileShift,
     createStandardGearPair,
 } from './gear.geometry';
+
+// Drive Loop
+export * from './drive-loop-engine';

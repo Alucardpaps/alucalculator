@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import { toggleThemeKind } from '@/lib/theme/themeStore';
 import { useOSStore } from '@/store/osStore';
 import {
     Calculator, ArrowLeftRight, MessageSquare, Settings, Globe,
@@ -23,6 +24,7 @@ const DOCK_GROUPS = [
         items: [
             { id: 'parametric-cad', label: 'CAD 3D', icon: <Hexagon size={22} strokeWidth={1.5} />, color: 'indigo' },
             { id: 'cad-editor', label: 'Drafting', icon: <DraftingCompass size={22} strokeWidth={1.5} />, color: 'sky' },
+            { id: 'flow', label: 'Flow Engine', icon: <Network size={22} strokeWidth={1.5} />, color: 'cyan' },
             { id: 'sketch-pad', label: 'Sketch', icon: <Palette size={22} strokeWidth={1.5} />, color: 'pink' }
         ]
     },
@@ -67,10 +69,8 @@ const DOCK_GROUPS = [
         icon: <Activity size={22} strokeWidth={1.5} />,
         color: 'rose',
         items: [
-            { id: 'topology-optimization', label: 'Topology', icon: <Dna size={22} strokeWidth={1.5} />, color: 'rose' },
             { id: 'simulation-fea', label: 'FEA', icon: <Activity size={22} strokeWidth={1.5} />, color: 'red' },
-            { id: 'failure-diagnosis', label: 'Failure AI', icon: <ShieldCheck size={22} strokeWidth={1.5} />, color: 'rose' },
-            { id: 'material-selector-ai', label: 'Material AI', icon: <Database size={22} strokeWidth={1.5} />, color: 'purple' },
+            { id: 'handbook', label: 'Handbook', icon: <Database size={22} strokeWidth={1.5} />, color: 'purple' },
             { id: 'fluid-dynamics', label: 'Fluid Dyn.', icon: <Droplets size={22} strokeWidth={1.5} />, color: 'blue' }
         ]
     }
@@ -180,7 +180,7 @@ export function UnifiedDock() {
             <nav
                 role="navigation"
                 aria-label="Mobile Navigation"
-                className="fixed bottom-0 left-0 right-0 z-[99999] bg-[#0a0e14]/98 border-t border-white/10 backdrop-blur-xl safe-area-inset-bottom"
+                className="fixed bottom-0 left-0 right-0 z-[99999] bg-[var(--bg-1)]/98 border-t border-white/10 safe-area-inset-bottom"
             >
                 <div className="flex items-stretch justify-around h-16 px-1">
                     {DOCK_GROUPS.map((group) => {
@@ -209,7 +209,7 @@ export function UnifiedDock() {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 20 }}
                                             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                                            className="fixed bottom-[68px] left-2 right-2 p-4 rounded-2xl bg-[#0d1117]/98 border border-white/10 backdrop-blur-2xl shadow-2xl z-[100000] max-h-[60vh] overflow-y-auto"
+                                            className="fixed bottom-[68px] left-2 right-2 p-4 rounded-2xl bg-[var(--bg-1)]/98 border border-white/10 shadow-2xl z-[100000] max-h-[60vh] overflow-y-auto"
                                         >
                                             <div className="grid grid-cols-3 gap-3">
                                                 {group.items.map((item) => (
@@ -289,7 +289,7 @@ export function UnifiedDock() {
                         ref={dockRef}
                         role="navigation"
                         aria-label="Application Dock"
-                        className="relative flex items-start gap-1 p-3 rounded-[2rem] border border-[#2a3a4a]/40 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_80px_rgba(0,229,255,0.03)] backdrop-blur-3xl overflow-visible"
+                        className="relative flex items-start gap-1 p-3 rounded-xl border border-[var(--line-strong)]/40 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_80px_rgba(0,229,255,0.03)] overflow-visible"
                         style={{ backgroundColor: 'rgba(5, 9, 14, 0.92)', msOverflowStyle: 'none', scrollbarWidth: 'none' }}
                     >
                         <div className="flex items-start gap-2 pr-4 border-r border-white/10 shrink-0">
@@ -315,7 +315,7 @@ export function UnifiedDock() {
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                                    className="absolute bottom-[calc(100%+16px)] left-1/2 -translate-x-1/2 p-2 rounded-[2rem] border border-[#2a3a4a]/50 bg-[#0a1018]/98 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col-reverse items-center justify-end gap-2 w-max"
+                                                    className="absolute bottom-[calc(100%+16px)] left-1/2 -translate-x-1/2 p-2 rounded-xl border border-[var(--line-strong)]/50 bg-[var(--bg-1)]/98 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col-reverse items-center justify-end gap-2 w-max"
                                                     style={{ transformOrigin: "bottom center" }}
                                                 >
                                                     {group.items.map((item) => (
@@ -331,7 +331,7 @@ export function UnifiedDock() {
                                                             isActive={windows.some(w => w.type === item.id && w.id === activeWindowId)}
                                                         />
                                                     ))}
-                                                    <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-[#0a1018] border-b border-r border-[#2a3a4a]/50 rotate-45 pointer-events-none" />
+                                                    <div className="absolute -bottom-[7px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-[var(--bg-1)] border-b border-r border-[var(--line-strong)]/50 rotate-45 pointer-events-none" />
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
@@ -359,7 +359,7 @@ export function UnifiedDock() {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                            className="absolute bottom-[calc(100%+16px)] right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 p-3 rounded-[2rem] border border-[#2a3a4a]/50 bg-[#0a1018]/98 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] w-max max-w-[95vw] sm:max-w-none"
+                                            className="absolute bottom-[calc(100%+16px)] right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 p-3 rounded-xl border border-[var(--line-strong)]/50 bg-[var(--bg-1)]/98 shadow-[0_20px_50px_rgba(0,0,0,0.8)] w-max max-w-[95vw] sm:max-w-none"
                                             style={{ transformOrigin: "bottom center" }}
                                         >
                                             <div className="grid grid-cols-2 gap-2 justify-items-center">
@@ -429,7 +429,7 @@ export function UnifiedDock() {
                                                 <DockItem
                                                     label="Toggle Theme"
                                                     icon={<Settings size={20} strokeWidth={1.5} />}
-                                                    onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setActiveGroup(null); }}
+                                                    onClick={() => { toggleThemeKind(); setActiveGroup(null); }}
                                                     isActive={false} color="default"
                                                 />
                                                 <DockItem
@@ -445,7 +445,7 @@ export function UnifiedDock() {
                                                     isActive={false} color="rose"
                                                 />
                                             </div>
-                                            <div className="absolute -bottom-[7px] right-12 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 w-3.5 h-3.5 bg-[#0a1018] border-b border-r border-[#2a3a4a]/50 rotate-45 pointer-events-none" />
+                                            <div className="absolute -bottom-[7px] right-12 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 w-3.5 h-3.5 bg-[var(--bg-1)] border-b border-r border-[var(--line-strong)]/50 rotate-45 pointer-events-none" />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -455,9 +455,9 @@ export function UnifiedDock() {
 
                     <motion.button
                         onClick={toggleFeedback}
-                        className={`group flex shrink-0 items-center justify-center w-14 h-14 rounded-[1.5rem] border shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-300 active:scale-95 ${isFeedbackOpen
-                            ? 'bg-blue-500/20 border-blue-500/50 scale-110 shadow-[0_0_30px_rgba(59,130,246,0.3)]'
-                            : 'bg-[#05090e]/85 border-[#2a3a4a]/60 hover:bg-white/10 hover:scale-110 hover:border-blue-500/50'
+                        className={`group flex shrink-0 items-center justify-center w-14 h-14 rounded-xl border shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300 active:scale-95 ${isFeedbackOpen
+                            ? 'bg-blue-500/20 border-blue-500/50 scale-110 '
+                            : 'bg-[var(--bg-0)]/85 border-[var(--line-strong)]/60 hover:bg-white/10 hover:scale-110 hover:border-blue-500/50'
                             }`}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
@@ -516,23 +516,23 @@ function DockItem({ label, icon, onClick, isActive, hasIndicator, color }: DockI
     };
 
     const colorClasses: Record<string, string> = {
-        cyan: 'text-cyan-400 group-hover:bg-cyan-400/10 group-hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] group-hover:border-cyan-400/30',
-        green: 'text-green-400 group-hover:bg-green-400/10 group-hover:shadow-[0_0_20px_rgba(74,222,128,0.3)] group-hover:border-green-400/30',
-        amber: 'text-amber-400 group-hover:bg-amber-400/10 group-hover:shadow-[0_0_20px_rgba(251,191,36,0.3)] group-hover:border-amber-400/30',
-        purple: 'text-purple-400 group-hover:bg-purple-400/10 group-hover:shadow-[0_0_20px_rgba(192,132,252,0.3)] group-hover:border-purple-400/30',
-        pink: 'text-pink-400 group-hover:bg-pink-400/10 group-hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:border-pink-400/30',
-        indigo: 'text-indigo-400 group-hover:bg-indigo-400/10 group-hover:shadow-[0_0_20px_rgba(129,140,248,0.3)] group-hover:border-indigo-400/30',
-        rose: 'text-rose-400 group-hover:bg-rose-400/10 group-hover:shadow-[0_0_20px_rgba(251,113,133,0.3)] group-hover:border-rose-400/30',
-        teal: 'text-teal-400 group-hover:bg-teal-400/10 group-hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] group-hover:border-teal-400/30',
-        orange: 'text-orange-400 group-hover:bg-orange-400/10 group-hover:shadow-[0_0_20px_rgba(251,146,60,0.3)] group-hover:border-orange-400/30',
-        blue: 'text-blue-400 group-hover:bg-blue-400/10 group-hover:shadow-[0_0_20px_rgba(96,165,250,0.3)] group-hover:border-blue-400/30',
-        yellow: 'text-yellow-400 group-hover:bg-yellow-400/10 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] group-hover:border-yellow-400/30',
-        lime: 'text-lime-400 group-hover:bg-lime-400/10 group-hover:shadow-[0_0_20px_rgba(163,230,53,0.3)] group-hover:border-lime-400/30',
-        fuchsia: 'text-fuchsia-400 group-hover:bg-fuchsia-400/10 group-hover:shadow-[0_0_20px_rgba(232,121,249,0.3)] group-hover:border-fuchsia-400/30',
-        sky: 'text-sky-400 group-hover:bg-sky-400/10 group-hover:shadow-[0_0_20px_rgba(56,189,248,0.3)] group-hover:border-sky-400/30',
-        emerald: 'text-emerald-400 group-hover:bg-emerald-400/10 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] group-hover:border-emerald-400/30',
-        red: 'text-red-400 group-hover:bg-red-400/10 group-hover:shadow-[0_0_20px_rgba(248,113,113,0.3)] group-hover:border-red-400/30',
-        gray: 'text-gray-400 group-hover:bg-gray-400/10 group-hover:shadow-[0_0_20px_rgba(156,163,175,0.3)] group-hover:border-gray-400/30',
+        cyan: 'text-cyan-400 group-hover:bg-cyan-400/10 group-hover:border-cyan-400/30',
+        green: 'text-green-400 group-hover:bg-green-400/10 group-hover:border-green-400/30',
+        amber: 'text-amber-400 group-hover:bg-amber-400/10 group-hover:border-amber-400/30',
+        purple: 'text-purple-400 group-hover:bg-purple-400/10 group-hover:border-purple-400/30',
+        pink: 'text-pink-400 group-hover:bg-pink-400/10 group-hover:border-pink-400/30',
+        indigo: 'text-indigo-400 group-hover:bg-indigo-400/10 group-hover:border-indigo-400/30',
+        rose: 'text-rose-400 group-hover:bg-rose-400/10 group-hover:border-rose-400/30',
+        teal: 'text-teal-400 group-hover:bg-teal-400/10 group-hover:border-teal-400/30',
+        orange: 'text-orange-400 group-hover:bg-orange-400/10 group-hover:border-orange-400/30',
+        blue: 'text-blue-400 group-hover:bg-blue-400/10 group-hover:border-blue-400/30',
+        yellow: 'text-yellow-400 group-hover:bg-yellow-400/10 group-hover:border-yellow-400/30',
+        lime: 'text-lime-400 group-hover:bg-lime-400/10 group-hover:border-lime-400/30',
+        fuchsia: 'text-fuchsia-400 group-hover:bg-fuchsia-400/10 group-hover:border-fuchsia-400/30',
+        sky: 'text-sky-400 group-hover:bg-sky-400/10 group-hover:border-sky-400/30',
+        emerald: 'text-emerald-400 group-hover:bg-emerald-400/10 group-hover:border-emerald-400/30',
+        red: 'text-red-400 group-hover:bg-red-400/10 group-hover:border-red-400/30',
+        gray: 'text-gray-400 group-hover:bg-gray-400/10 group-hover:border-gray-400/30',
         default: 'text-gray-400 group-hover:bg-white/5 group-hover:text-white group-hover:border-white/20'
     };
 
@@ -548,7 +548,7 @@ function DockItem({ label, icon, onClick, isActive, hasIndicator, color }: DockI
                 aria-label={label}
                 className={`
                     relative w-12 h-12 flex items-center justify-center transition-all duration-[400ms] ease-out shrink-0 overflow-hidden
-                    ${isActive ? 'bg-white/5 text-white scale-[1.15] rounded-[1rem] border border-white/20' : 'rounded-[1.25rem] hover:scale-[1.25] hover:-translate-y-1 hover:z-50 hover:shadow-2xl bg-transparent border border-transparent'}
+                    ${isActive ? 'bg-white/5 text-white scale-[1.15] rounded-xl border border-white/20' : 'rounded-xl hover:scale-[1.25] hover:-translate-y-1 hover:z-50 hover:shadow-2xl bg-transparent border border-transparent'}
                     ${!isActive ? selectedColorClass : ''}
                 `}
                 style={isActive ? {

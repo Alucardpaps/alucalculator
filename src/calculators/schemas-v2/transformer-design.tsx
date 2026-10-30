@@ -9,7 +9,7 @@ export const transformerDesignSchema: CalculatorSchemaV2 = {
         description: 'Turns count, core area, currents, and winding specification for single-phase shell or core type transformers.',
         category: 'electrical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['transformer', 'turns count', 'core area', 'flux density', 'windings', 'electrical engineering'],
         verifiedStandards: ['IEC 60076', 'IEEE Std C57.12.00']
@@ -104,7 +104,7 @@ export const transformerDesignSchema: CalculatorSchemaV2 = {
             const N2 = (out.N2?.value as number) || 40;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Transformer Bobbin SVG */}
                     <div className="relative w-[180px] h-[180px]">
                         <svg viewBox="0 0 180 180" width="100%" height="100%" className="overflow-visible">
@@ -130,24 +130,24 @@ export const transformerDesignSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Primary Winding</div>
                             <div className="text-lg font-bold font-mono text-white">
                                 {Math.round(N1)} <span className="text-[10px] text-gray-500">turns</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Secondary Winding</div>
                             <div className="text-lg font-bold font-mono text-white">
                                 {Math.round(N2)} <span className="text-[10px] text-gray-500">turns</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Apparent S</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 {((out.S?.value as number) || 0).toFixed(0)} <span className="text-[10px] text-gray-500">VA</span>
                             </div>
                         </div>

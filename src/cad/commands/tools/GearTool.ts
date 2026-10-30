@@ -1,17 +1,18 @@
 /**
- * AluCAD — Involute Gear Tool (v4 — Robust Parametric)
+ * AluCAD — Involute Gear Tool (v5 — Direct Interactive Placement)
  * 
- * Generates a parametric gear entity.
- * Supports two workflows:
- *   1. CLI: Module → Teeth → Click to place
- *   2. Panel Apply: setParams() pre-configures → Click to place
+ * Standard: ISO 53 / DIN 867 / AGMA 2001
+ * Supports:
+ *   1. Direct 1-Click placement with live cursor ghost preview
+ *   2. ToolPropertyPanel instant configuration via setParams() and placeNow()
+ *   3. CLI parameter sequence fallback
  */
 
 import { Command } from '../types';
 import { Point, createGearEntity } from '../../kernel/types';
 import { useCadStore } from '../../store/cadStore';
 
-interface GearParams {
+export interface GearParams {
     module: number;
     teethCount: number;
     pressureAngle: number;
@@ -24,14 +25,27 @@ export class GearTool implements Command {
 
     private params: GearParams = { module: 2, teethCount: 20, pressureAngle: 20 };
     private centerPoint: Point | null = null;
-    private step: 'MODULE' | 'TEETH' | 'CENTER' = 'MODULE';
+    private step: 'MODULE' | 'TEETH' | 'CENTER' = 'CENTER';
 
     start(): void {
-        this.step = 'MODULE';
-        useCadStore.setState({
-            commandState: 'AWAITING_VALUE',
-            commandPrompt: `Gear Module (current: ${this.params.module}):`,
-        });
+        this.step = 'CENTER';
+        this.centerPoint = null;
+        this.updatePrompt();
+    }
+
+    public getParams(): GearParams {
+        return { ...this.params };
+    }
+
+    private updatePrompt(): void {
+        const newPrompt = `⚙️ Evolvent Dişli (m=${this.params.module}, z=${this.params.teethCount}) — Yerleştirmek için tıklayın (ESC ile çıkış):`;
+        const current = useCadStore.getState();
+        if (current.commandPrompt !== newPrompt || current.commandState !== 'AWAITING_POINT') {
+            useCadStore.setState({
+                commandState: 'AWAITING_POINT',
+                commandPrompt: newPrompt,
+            });
+        }
     }
 
     /**
@@ -43,18 +57,24 @@ export class GearTool implements Command {
         if (params.teethCount !== undefined && params.teethCount >= 6) this.params.teethCount = Math.round(params.teethCount);
         if (params.pressureAngle !== undefined) this.params.pressureAngle = params.pressureAngle;
 
-        // Jump directly to placement
         this.step = 'CENTER';
-        useCadStore.setState({
-            commandState: 'AWAITING_POINT',
-            commandPrompt: `m=${this.params.module}, z=${this.params.teethCount} — Click to place gear:`,
-        });
+        this.updatePrompt();
+    }
+
+    /**
+     * Place gear immediately at the current cursor location or viewport center.
+     */
+    public placeNow(): void {
+        const store = useCadStore.getState();
+        const pt = store.cursorWorld || { x: 0, y: 0 };
+        this.centerPoint = pt;
+        this.generateGear();
     }
 
     onValueInput(value: string): void {
         const num = parseFloat(value);
         if (isNaN(num) || num <= 0) {
-            useCadStore.setState({ commandPrompt: 'Invalid value. Enter a positive number:' });
+            useCadStore.setState({ commandPrompt: 'Geçersiz değer. Pozitif bir sayı girin:' });
             return;
         }
 
@@ -62,34 +82,33 @@ export class GearTool implements Command {
             this.params.module = num;
             this.step = 'TEETH';
             useCadStore.setState({
-                commandPrompt: `Number of teeth (current: ${this.params.teethCount}):`,
+                commandPrompt: `Diş Sayısı (z, mevcut: ${this.params.teethCount}):`,
             });
         } else if (this.step === 'TEETH') {
-            this.params.teethCount = Math.round(num);
+            this.params.teethCount = Math.max(6, Math.round(num));
             this.step = 'CENTER';
-            useCadStore.setState({
-                commandState: 'AWAITING_POINT',
-                commandPrompt: 'Click to place gear center:',
-            });
+            this.updatePrompt();
+        } else {
+            // In center mode, entering a number adjusts module
+            this.params.module = num;
+            this.updatePrompt();
         }
     }
 
     onPointInput(point: Point): void {
-        if (this.step === 'CENTER') {
-            this.centerPoint = point;
-            this.generateGear();
-        }
+        this.centerPoint = point;
+        this.generateGear();
     }
 
     onMouseMove(_point: Point): void {
-        // Live preview while in CENTER placement mode
         if (this.step !== 'CENTER') return;
         
         const cursor = useCadStore.getState().cursorWorld;
+        if (!cursor) return;
         const store = useCadStore.getState();
         const preview = createGearEntity(
             cursor, this.params.module, this.params.teethCount,
-            store.activeLayerId, 'rgba(0, 229, 255, 0.3)'
+            store.activeLayerId, 'rgba(0, 229, 255, 0.35)'
         );
         store.setPreviewEntity(preview);
     }
@@ -104,27 +123,30 @@ export class GearTool implements Command {
     }
 
     renderPreview(_ctx: CanvasRenderingContext2D, _transform: (p: Point) => Point): void {
-        // Preview handled via onMouseMove → setPreviewEntity
+        // Handled via onMouseMove → setPreviewEntity
     }
 
     private generateGear(): void {
         if (!this.centerPoint) return;
 
         const store = useCadStore.getState();
-        store.pushHistory('Gear');
+        store.pushHistory('Involute Gear');
+
+        const layer = store.layers.find(l => l.id === store.activeLayerId);
+        const color = layer?.color || '#ffffff';
 
         const entity = createGearEntity(
             this.centerPoint, 
             this.params.module, 
             this.params.teethCount, 
             store.activeLayerId, 
-            store.layers.find(l => l.id === store.activeLayerId)?.color || '#ffffff'
+            color
         );
 
         store.addEntity(entity);
 
         useCadStore.setState({
-            commandPrompt: `Gear m=${this.params.module}, z=${this.params.teethCount} placed. Click for next or ESC:`,
+            commandPrompt: `✅ Dişli (m=${this.params.module}, z=${this.params.teethCount}) yerleştirildi. Yeni dişli için tıklayın veya ESC:`,
             commandState: 'AWAITING_POINT',
             previewEntity: null
         });

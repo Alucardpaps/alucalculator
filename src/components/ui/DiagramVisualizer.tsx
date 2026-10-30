@@ -67,12 +67,12 @@ export function DiagramVisualizer({ data, x, title, unit, color, fillColor, heig
             >
                 {/* Max/Min Labels */}
                 {maxVal > 0 && (
-                    <div className="absolute right-2 top-1 text-[9px] font-mono text-white/50 bg-black/50 px-1 rounded backdrop-blur">
+                    <div className="absolute right-2 top-1 text-[9px] font-mono text-white/50 bg-black/50 px-1 rounded">
                         +{formatLabel(maxVal)}
                     </div>
                 )}
                 {minVal < 0 && (
-                    <div className="absolute right-2 bottom-1 text-[9px] font-mono text-white/50 bg-black/50 px-1 rounded backdrop-blur">
+                    <div className="absolute right-2 bottom-1 text-[9px] font-mono text-white/50 bg-black/50 px-1 rounded">
                         {formatLabel(minVal)}
                     </div>
                 )}

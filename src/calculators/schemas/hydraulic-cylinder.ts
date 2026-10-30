@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Hydraulic Cylinder Calculator Schema
+ * AluCAD OS — Hydraulic Cylinder Calculator Schema
  * 
  * ENGINEERING DOMAIN: Fluid Mechanics / Hydraulics
  * STANDARDS: ISO 6022, ISO 3320
@@ -18,7 +18,7 @@ export const hydraulicCylinderSchema: CalculatorSchema = {
     metadata: {
         title: 'Hydraulic Cylinder Calculator',
         description: 'Calculate piston force, rod force, oil volume, and cycle time for hydraulic cylinders per ISO 6022.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-14',
         tags: ['hydraulic', 'cylinder', 'piston', 'force', 'actuator', 'pressure', 'ISO 6022']
     },

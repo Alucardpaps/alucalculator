@@ -1,5 +1,16 @@
 import jsPDF from 'jspdf';
 import autoTable, { UserOptions } from 'jspdf-autotable';
+import { getReportBranding, nextDocumentNumber } from '@/lib/report/reportBranding';
+import { companyLines, drawApprovalBlock, drawLogo, pdfSafe } from '@/lib/report/pdfBranding';
+
+function currentLang(): string {
+    try {
+        const { useI18nStore } = require('@/store/i18nStore');
+        return useI18nStore.getState().language || 'en';
+    } catch {
+        return 'en';
+    }
+}
 
 export interface ReportMetadata {
     title: string;
@@ -15,6 +26,7 @@ export class PDFReportEngine {
     private metadata: ReportMetadata;
     private primaryColor: [number, number, number] = [220, 38, 38]; // Red-600
     private secondaryColor: [number, number, number] = [15, 20, 25]; // Dark slate
+    private approvalAdded = false;
 
     constructor(metadata: ReportMetadata) {
         this.doc = new jsPDF();
@@ -28,36 +40,47 @@ export class PDFReportEngine {
 
     private drawHeader() {
         const d = this.doc;
-        // Background strip
-        d.setFillColor(...this.secondaryColor);
-        d.rect(0, 0, 210, 40, 'F');
+        const br = getReportBranding();
+        const co = companyLines(br);
 
-        // Brand Line
+        // light header band so customer logos (usually dark-on-transparent) stay legible
+        d.setFillColor(255, 255, 255);
+        d.rect(0, 0, 210, 38, 'F');
         d.setFillColor(...this.primaryColor);
-        d.rect(0, 39, 210, 1, 'F');
+        d.rect(14, 35.5, 182, 0.8, 'F');
 
-        // Logo / Title
-        d.setTextColor(255, 255, 255);
-        d.setFontSize(24);
+        const logoW = drawLogo(d, 14, 8, 44, 22, br);
+        const tx = logoW > 0 ? 14 + logoW + 5 : 14;
+
+        d.setTextColor(...this.secondaryColor);
         d.setFont("helvetica", "bold");
-        d.text("AluCalc OS", 14, 20);
-
-        d.setFontSize(10);
+        const avail = 118 - (tx - 14);
+        const fit = (text: string, size: number, min: number) => {
+            let fs = size;
+            d.setFontSize(fs);
+            while (fs > min && d.getTextWidth(text) > avail) { fs -= 0.5; d.setFontSize(fs); }
+            let t = text;
+            while (t.length > 3 && d.getTextWidth(t) > avail) t = t.slice(0, -2);
+            return t === text ? t : `${t.trimEnd()}…`;
+        };
+        d.text(fit(co.name || "AluCAD OS", co.name ? 15 : 20, 9), tx, 18);
         d.setFont("helvetica", "normal");
-        d.setTextColor(200, 200, 200);
-        d.text("Advanced Engineering Division", 14, 28);
+        d.setTextColor(110, 110, 110);
+        d.text(fit(co.line || "Engineering calculation report", 9, 7), tx, 25);
 
         // Document Info
-        d.setFontSize(14);
+        d.setTextColor(...this.secondaryColor);
+        d.setFontSize(12);
         d.setFont("helvetica", "bold");
-        d.text(this.metadata.title.toUpperCase(), 196, 20, { align: "right" });
+        d.text(pdfSafe(this.metadata.title).toUpperCase(), 196, 16, { align: "right", maxWidth: 80 });
 
-        d.setFontSize(9);
+        d.setFontSize(8.5);
         d.setFont("helvetica", "normal");
+        d.setTextColor(90, 90, 90);
         const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-        d.text(`Date: ${dateStr}`, 196, 28, { align: "right" });
+        d.text(`Date: ${pdfSafe(dateStr)}`, 196, 24, { align: "right" });
         if (this.metadata.referenceNo) {
-            d.text(`Ref: ${this.metadata.referenceNo}`, 196, 33, { align: "right" });
+            d.text(`Ref: ${pdfSafe(this.metadata.referenceNo)}`, 196, 29, { align: "right" });
         }
     }
 
@@ -76,7 +99,8 @@ export class PDFReportEngine {
             d.setTextColor(100, 100, 100);
             d.setFont("helvetica", "normal");
 
-            d.text("AluCalc OS - Auto-Generated Engineering Report", 14, 290);
+            const co = companyLines();
+            d.text(co.name ? `${co.name} - generated with AluCAD OS (alucalculator.com)` : "AluCAD OS - engineering report (alucalculator.com)", 14, 290);
 
             d.text(`Page ${i} of ${pageCount}`, 196, 290, { align: "right" });
         }
@@ -91,8 +115,8 @@ export class PDFReportEngine {
 
         const m = this.metadata;
         const metadataMap: string[][] = [
-            ["Client", m.clientName || "N/A", "Prepared By", m.preparedBy || "AluCalc OS Engineer"],
-            ["Project", m.projectName || "Standard Protocol", "Document ID", m.referenceNo || `AC-${Date.now().toString().slice(-6)}`]
+            ["Client", pdfSafe(m.clientName || "N/A"), "Prepared By", pdfSafe(m.preparedBy || getReportBranding().designedBy || "-")],
+            ["Project", pdfSafe(m.projectName || "-"), "Document ID", pdfSafe(m.referenceNo || nextDocumentNumber())]
         ];
 
         autoTable(d, {
@@ -370,10 +394,22 @@ export class PDFReportEngine {
         d.line(14, currentY, 196, currentY);
         d.setFontSize(7);
         d.setTextColor(150, 150, 150);
-        d.text("ELECTRONICALLY VERIFIED AGAINST ISO/DIN STANDARDS VIA ALUCALC OS DETERMINISTIC ENGINE", 14, currentY + 5);
+        d.text("CALCULATED WITH THE ALUCAD OS DETERMINISTIC ENGINE - STANDARD-REFERENCED METHODOLOGY", 14, currentY + 5);
+    }
+
+    /** Designed / Checked / Approved block with the names from Settings → Reports. */
+    public addApprovalBlock(yPos: number): number {
+        this.approvalAdded = true;
+        return drawApprovalBlock(this.doc, yPos, currentLang());
     }
 
     public save(filename?: string) {
+        if (!this.approvalAdded && getReportBranding().showApprovalBlock) {
+            // @ts-ignore jspdf-autotable
+            const last = this.doc.lastAutoTable?.finalY;
+            this.addApprovalBlock((typeof last === 'number' ? last : 240) + 12);
+        }
+
         // Apply Free Tier Watermark across all pages if not on a paid plan
         try {
             const { useLicenseStore } = require('@/store/licenseStore');
@@ -385,7 +421,7 @@ export class PDFReportEngine {
                     this.doc.setTextColor(215, 220, 228);
                     this.doc.setFontSize(22);
                     this.doc.setFont("helvetica", "bold");
-                    this.doc.text("ALUCALC OS — FREE TIER (WATERMARKED)", 105, 160, {
+                    this.doc.text("ALUCAD OS - FREE TIER (WATERMARKED)", 105, 160, {
                         align: "center",
                         angle: 45
                     });
@@ -397,7 +433,7 @@ export class PDFReportEngine {
 
         // Redraw footer at the very end to ensure accurate page counts
         this.drawFooter();
-        const fname = filename || `AluCalc_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+        const fname = filename || `AluCAD_OS_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
         this.doc.save(fname);
     }
 }

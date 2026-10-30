@@ -50,72 +50,85 @@ export interface ModuleMethod {
 }
 
 const CARDS: Record<string, ModuleMethod> = {
+  'cylinders': {
+    formula: 'F_{push} = p \\cdot \\frac{\\pi D^2}{4} \\cdot \\eta, \\quad F_{k} = \\frac{\\pi^2 E I}{(\\nu \\cdot L_{ext})^2}',
+    formulaNote: 'ISO 6020-2 / DIN 2413 cylinder sizing and Euler / Rankine-Tetmajer rod buckling analysis. Thick-walled cylinder hoop stress evaluated via Lame formulation.',
+    standards: ['ISO 6020-2', 'ISO 3320', 'DIN 2413', 'ISO 3601-1..5', 'ISO 7425'],
+    assumptions: [
+      'Thick cylinder internal pressure sizing per DIN 2413 with minimum yield safety factor 1.5',
+      'Euler critical buckling load calculation for extended stroke length under specified end fixity (nu)',
+      'Sealing grooves and extrusion gaps sized per Kastaş hydraulic catalog and ISO 3601 standards',
+    ],
+  },
   'bolt-torque': {
-    formula: 'M_A = F_M \\left( 0.16 \\cdot P + 0.58 \\cdot \\mu_G \\cdot d_2 + 0.50 \\cdot \\mu_K \\cdot d_w \\right)',
-    formulaNote: 'Tightening torque calculation per VDI 2230-1 nut factor and multi-zone friction method. FM is target preload, P is pitch, d2 is pitch diameter, and dw is bearing face diameter.',
+    formula: 'M_A = F_M \\left( 0.16 \\cdot P + 0.58 \\cdot \\mu_G \\cdot d_2 + \\mu_K \\cdot \\frac{D_{Km}}{2} \\right), \\quad D_{Km} = \\frac{d_w + d_h}{2}',
+    formulaNote: 'VDI 2230-1:2015 Eq. (R13/1). FM = target assembly preload, P = pitch, d2 = pitch diameter, μG / μK = thread / bearing-face friction, DKm = effective bearing diameter from the head bearing face dw and the clearance hole dh (ISO 273).',
     standards: ['VDI 2230 Part 1:2015', 'DIN EN ISO 898-1', 'ISO 68-1 / ISO 273'],
     assumptions: [
-      'Friction coefficients (thread μG & bearing face μK) dominate torque split — verify lubrication state',
-      'Target preload FM engineered to utilize 90% of fastener material yield strength (Rp0.2)',
-      'Account for embedment relaxation losses and thermal expansion differential in critical joint stacks',
+      'Target preload FM = ν · Sp · As (ν = proof-load utilisation set by the user, 70 % by default); the assembly check is σred,M = √(σz² + 3τ²) ≤ Rp0.2',
+      'Friction coefficients μG and μK dominate the torque split (≈ 50 % goes into the bearing face) — use values for the actual surface/lubricant (VDI 2230 Table A5); the scatter band is shown as ±0.03',
+      'Bearing pressure is checked against pG from VDI 2230-1:2015 Table A9; embedding losses, thermal expansion and the working load FA are not part of this tightening calculation',
     ],
     academyHref: '/academy/how-to-calculate-bolt-torque/',
     academyLabel: 'Bolt torque guide',
     workedExample: {
-      title: 'Worked example — M12 × 8.8 (VDI 2230 Live Joint)',
-      result: 'Calculates target clamp force FM = 35.4 kN and calibrated tightening torque MA = 83.1 N·m (Axial stress σz = 420.0 MPa, Torsional stress τ = 153.0 MPa). Combined von Mises equivalent stress σeq = 497.0 MPa ≤ 640.0 MPa (Yield safety FoS = 1.29 ≥ 1.05, PASS).',
+      title: 'Worked example — M12 × 8.8 ISO 4014 on S235 (μ = 0.14, ν = 70 % Sp)',
+      result: 'Target preload FM = 34.2 kN needs MA = 75.7 N·m (nut factor K = 0.184). σz = 406.0 MPa, τ = 181.4 MPa → σred,M = 513.4 MPa ≤ Rp0.2 = 640 MPa (FoS 1.25, PASS). Bearing pressure pM = 462 MPa ≤ pG = 490 MPa (S235).',
       block: {
         title: 'Metric Bolt Joint Tightening Verification (M12 × 8.8)',
         standard: 'VDI 2230-1:2015 / ISO 898-1 / ISO 68-1',
-        summary: 'Calibrated tightening torque and preload clamp force analysis under standard friction lubrication (μ = 0.14) with proof stress utilization.',
+        summary: 'Tightening torque and assembly stress for a hexagon head bolt ISO 4014 with medium clearance hole, μG = μK = 0.14, preload at 70 % of the ISO 898-1 proof stress.',
         inputs: [
           { label: 'Nominal diameter d', value: '12.00', unit: 'mm' },
           { label: 'Thread pitch P', value: '1.75', unit: 'mm' },
           { label: 'Property class', value: 'Grade 8.8', unit: 'ISO 898-1' },
-          { label: 'Yield strength Sy', value: '640.0', unit: 'MPa' },
-          { label: 'Proof strength Sp', value: '600.0', unit: 'MPa' },
+          { label: 'Yield strength Rp0.2', value: '640.0', unit: 'MPa' },
+          { label: 'Proof stress Sp', value: '580.0', unit: 'MPa (d ≤ 16)' },
           { label: 'Tensile stress area As', value: '84.3', unit: 'mm²' },
-          { label: 'Core diameter d3', value: '10.11', unit: 'mm' },
+          { label: 'Pitch / root diameter d2 / d3', value: '10.863 / 9.853', unit: 'mm (ISO 68-1)' },
+          { label: 'Bearing face dw / hole dh', value: '16.63 / 13.5', unit: 'mm (ISO 4014 / ISO 273 medium)' },
           { label: 'Thread friction μG', value: '0.140', unit: '[-]' },
           { label: 'Bearing face friction μK', value: '0.140', unit: '[-]' },
-          { label: 'Target yield util. ν', value: '0.700', unit: '(70% Sp)' },
+          { label: 'Utilisation ν', value: '0.700', unit: '(70 % Sp)' },
         ],
         relations: [
-          { name: 'Target Preload FM', formula: 'FM = ν · Sp · As', clause: 'VDI 2230 / ISO 898-1' },
-          { name: 'Tightening Torque MA', formula: 'MA = (K1 + K2 + K3) · FM · d', clause: 'VDI 2230 Torque Engine' },
-          { name: 'Torsional Shear Stress τ', formula: 'τ = (M2 · 1000) / Wp  [Wp = (π · d3³) / 16]', clause: 'VDI 2230 Clause 5.5' },
-          { name: 'von Mises Equivalent Stress', formula: 'σeq = √(σz² + 3 · τ²) ≤ Sy', clause: 'VDI 2230 / DIN EN ISO 898-1' },
+          { name: 'Target Preload FM', formula: 'FM = ν · Sp · As', clause: 'ISO 898-1 / VDI 2230' },
+          { name: 'Tightening Torque MA', formula: 'MA = FM · (P/(2π) + 0.577 μG d2 + μK DKm/2)', clause: 'VDI 2230-1 Eq. R13/1' },
+          { name: 'Torsional Shear Stress τ', formula: 'τ = MG / Wp  [MG = FM·(P/(2π) + 0.577 μG d2), Wp = π dS³/16, dS = (d2 + d3)/2]', clause: 'VDI 2230-1 §5.5.1' },
+          { name: 'Equivalent Stress', formula: 'σred,M = √(σz² + 3 · τ²) ≤ Rp0.2', clause: 'VDI 2230-1 §5.5.1' },
+          { name: 'Surface Pressure', formula: 'pM = FM / (π/4 · (dw² − dh²)) ≤ pG', clause: 'VDI 2230-1 R10, Table A9' },
         ],
         intermediates: [
-          { label: 'Axial tensile stress σz', value: '420.0', unit: 'MPa', note: 'σz = FM / As = 35400 / 84.3' },
-          { label: 'Torsional shear stress τ', value: '153.0', unit: 'MPa', note: 'Polar modulus Wp = 346.4 mm³' },
-          { label: 'Preload clamp force FM', value: '35.4', unit: 'kN', note: 'FM = 0.70 · 600 · 84.3 · 10⁻³' },
-          { label: 'Tightening torque MA', value: '83.1', unit: 'N·m', note: 'Nut factor K = 0.196' },
+          { label: 'Preload FM', value: '34.2', unit: 'kN', note: 'FM = 0.70 · 580 · 84.3 · 10⁻³' },
+          { label: 'Tightening torque MA', value: '75.7', unit: 'N·m', note: 'K = MA / (FM · d) = 0.184, DKm = 15.07 mm' },
+          { label: 'Axial tensile stress σz', value: '406.0', unit: 'MPa', note: 'σz = 34 226 / 84.3' },
+          { label: 'Torsional shear stress τ', value: '181.4', unit: 'MPa', note: 'MG = 39.6 N·m, dS = 10.358 mm, Wp = 218.2 mm³' },
+          { label: 'Surface pressure pM', value: '462', unit: 'MPa', note: 'Ap = 74.1 mm², pG (S235) = 490 MPa' },
         ],
         result: {
-          label: 'Equivalent von Mises Stress & Tightening Torque',
-          value: 'σeq = 497.0 MPa | MA = 83.1 N·m | FM = 35.4 kN',
-          limit: 'σeq ≤ 640.0 MPa (Sy) | FoS = 1.29 ≥ 1.05',
+          label: 'Equivalent Stress & Tightening Torque',
+          value: 'σred,M = 513.4 MPa | MA = 75.7 N·m | FM = 34.2 kN',
+          limit: 'σred,M ≤ 640 MPa (Rp0.2) | pM ≤ 490 MPa (pG)',
           status: 'PASS',
-          margin: '+28.9% yield reserve (FoS = 1.29)',
+          margin: 'FoS = 1.25 on yield · 94 % of pG',
         },
       },
     },
   },
   bearings: {
-    formula: 'L_{10} = \\left(\\frac{C}{P}\\right)^p \\times 10^6 \\text{ rev}, \\quad L_{10h} = \\frac{L_{10} \\times 10^6}{60 \\cdot n}',
+    formula: 'L_{10} = \\left(\\frac{C}{P}\\right)^p \\text{ [10}^6\\text{ rev]}, \\quad L_{10h} = \\frac{10^6 \\cdot L_{10}}{60 \\cdot n}',
     formulaNote: 'p = 3 (ball bearings) or 10/3 (roller bearings). ISO 281 basic rating life with radial/axial equivalent dynamic load P = X·Fr + Y·Fa.',
     standards: ['ISO 281:2007', 'ISO 76:2006 (Static rating)'],
     assumptions: [
       'Equivalent dynamic load P = X·Fr + Y·Fa computed per ISO 281 radial/axial factors',
-      'Operating temperature and lubricant viscosity ratio κ (kappa) maintain elastohydrodynamic film',
+      'Modified life Lnm = a1·aISO·L10h with aISO(eC·Cu/P, κ) per ISO 281 §9.3 (κ = ν/ν1)',
       'Catalog dynamic capacity C and static capacity C0 sourced from verified bearing standards',
     ],
     academyHref: '/academy/bearing-life-calculation-explained/',
     academyLabel: 'Bearing life guide',
     workedExample: {
       title: 'Worked example — 6208 Deep Groove Ball Bearing (Fr = 6 kN, Fa = 1.8 kN, n = 1500 rpm)',
-      result: 'Calculates equivalent dynamic load P = 6.15 kN. With dynamic rating C = 32.5 kN, basic rating life is L10 = 147.6 million revs (1,640 operating hours at 1500 rpm). Static safety S0 = 3.17 ≥ 1.50 (PASS).',
+      result: 'f0·Fa/C0 = 1.326 → e = 0.297, Y = 1.465 (ISO 281 Table 3); Fa/Fr = 0.30 > e so P = 0.56·6.0 + 1.465·1.8 = 6.00 kN. With C = 32.5 kN, L10 = 159.1 million revs (1,768 h at 1500 rpm). Static safety S0 = 3.17 ≥ 1.50 (PASS).',
       block: {
         title: 'Deep Groove Ball Bearing L10 Rating Life (SKF 6208)',
         standard: 'ISO 281:2007 / ISO 76:2006',
@@ -131,31 +144,31 @@ const CARDS: Record<string, ModuleMethod> = {
           { label: 'Operating temperature T', value: '65.0', unit: '°C' },
         ],
         relations: [
-          { name: 'Equivalent Dynamic Load P', formula: 'P = X·Fr + Y·Fa  (X=0.56, Y=1.55 when Fa/Fr > e)', clause: 'ISO 281:2007 Clause 5.2.2' },
+          { name: 'Equivalent Dynamic Load P', formula: 'P = X·Fr + Y·Fa  (X = 0.56, e and Y from f0·Fa/C0 when Fa/Fr > e)', clause: 'ISO 281:2007 Table 3' },
           { name: 'Rating Life (Revolutions)', formula: 'L10 = (C / P)^p  [10^6 rev]', clause: 'ISO 281:2007 Clause 5.1' },
           { name: 'Rating Life (Hours)', formula: 'L10h = (10^6 · L10) / (60 · n)  [h]', clause: 'ISO 281:2007 Clause 5.1' },
           { name: 'Static Safety Factor S0', formula: 'S0 = C0 / P0  (P0 = max(Fr, 0.6·Fr + 0.5·Fa))', clause: 'ISO 76:2006 Clause 5' },
         ],
         intermediates: [
-          { label: 'Axial load ratio Fa/C0', value: '0.0947', unit: '[-]', note: 'Limiting thrust factor e = 0.28 (Fa/Fr = 0.30 > e)' },
-          { label: 'Equivalent dynamic load P', value: '6.15', unit: 'kN', note: 'P = 0.56·(6.0) + 1.55·(1.80)' },
+          { label: 'Relative axial load f0·Fa/C0', value: '1.326', unit: '[-]', note: 'f0 = 14 → e = 0.297, Y = 1.465 (Fa/Fr = 0.30 > e)' },
+          { label: 'Equivalent dynamic load P', value: '6.00', unit: 'kN', note: 'P = 0.56·(6.0) + 1.465·(1.80)' },
           { label: 'Static safety factor S0', value: '3.17', unit: '[-]', note: 'P0 = max(6.0, 0.6·6 + 0.5·1.8) = 6.00 kN' },
-          { label: 'Rating life revolutions L10', value: '147.6', unit: 'million rev', note: '(32.50 / 6.15)^3.0' },
+          { label: 'Rating life revolutions L10', value: '159.1', unit: 'million rev', note: '(32.50 / 6.00)^3.0' },
         ],
         result: {
           label: 'Rating Life L10h & Static Safety S0',
-          value: 'L10h = 1,640 hrs (L10 = 147.6M rev)',
+          value: 'L10h = 1,768 hrs (L10 = 159.1M rev)',
           limit: 'L10h ≥ 1,500 hrs target | S0 = 3.17 ≥ 1.50',
           status: 'PASS',
-          margin: '+9.3% life reserve, S0 2.1x over required',
+          margin: '+17.9% life reserve, S0 2.1x over required',
         },
       },
     },
   },
   gears: {
-    formula: '\\sigma_H = Z_H Z_E \\sqrt{\\frac{F_t}{d_1 b} \\frac{u+1}{u} K_A K_V K_H}, \\quad \\sigma_F = \\frac{F_t}{b \\cdot m_n} Y_F Y_S K_A K_V K_F',
-    formulaNote: 'ISO 6336 Method B contact stress (pitting σH) and tooth root bending stress (σF) with Lewis form factor YF, stress correction YS, and safety factors SH, SF.',
-    standards: ['ISO 6336-1/2/3:2019', 'DIN 3960 / DIN 3990', 'AGMA 2001-D04'],
+    formula: '\\sigma_H = Z_H Z_E Z_\\varepsilon Z_\\beta \\sqrt{\\frac{F_t}{d_1 b} \\frac{u+1}{u} K_A K_V K_{H\\beta} K_{H\\alpha}}, \\quad \\sigma_F = \\frac{F_t}{b \\cdot m_n} Y_F Y_S Y_\\beta K_A K_V K_{F\\beta} K_{F\\alpha}',
+    formulaNote: 'ISO 6336 Method B: surface durability (pitting) per ISO 6336-2:2019 and tooth root bending fatigue per ISO 6336-3:2019, with SH ≥ 1.20 and SF ≥ 1.40.',
+    standards: ['ISO 6336-2:2019 (Contact / Pitting)', 'ISO 6336-3:2019 (Root Bending)', 'DIN 3960 / DIN 3990', 'AGMA 2001-D04'],
     assumptions: [
       'Standard 20° pressure angle involute gear profile with standard addendum/dedendum coefficients',
       'Tooth contact pattern and elastohydrodynamic oil film prevent micro-pitting and scuffing',
@@ -163,10 +176,10 @@ const CARDS: Record<string, ModuleMethod> = {
     ],
     workedExample: {
       title: 'Worked example — Spur Gear Pinion (m = 3 mm, z1 = 20, z2 = 60, b = 40 mm, T1 = 120 N·m)',
-      result: 'Calculates tangential load Ft = 4,000 N, contact stress σH = 685.0 MPa (SH = 1.35 ≥ 1.20), and root bending stress σF = 184.0 MPa (SF = 2.10 ≥ 1.40 against 16MnCr5 alloy, PASS).',
+      result: 'Calculates tangential load Ft = 4,000 N, contact stress σH = 812.9 MPa (SH = 1.85 ≥ 1.20), and root bending stress σF = 265.4 MPa (SF = 1.62 ≥ 1.40 against 16MnCr5 alloy, PASS).',
       block: {
         title: 'Cylindrical Spur Gear Contact & Bending Verification (16MnCr5)',
-        standard: 'ISO 6336-1/2/3:2019 / DIN 3990 Method B',
+        standard: 'ISO 6336-2:2019 & ISO 6336-3:2019 (Method B)',
         summary: 'Design verification of case-hardened steel pinion driving 60-tooth gear with contact stress (pitting) and root bending fatigue evaluation.',
         inputs: [
           { label: 'Normal module mn', value: '3.00', unit: 'mm' },
@@ -182,22 +195,26 @@ const CARDS: Record<string, ModuleMethod> = {
         ],
         relations: [
           { name: 'Tangential Load Ft', formula: 'Ft = (2000 · T1) / d1', clause: 'ISO 6336-1:2019 Clause 4' },
-          { name: 'Contact Stress (Pitting) σH', formula: 'σH = ZH · ZE · √( (Ft · KA · KV · 1.5) / (d1 · b) )', clause: 'ISO 6336-2:2019 Clause 5' },
-          { name: 'Tooth Root Bending σF', formula: 'σF = (Ft · KA · KV · YF · YS) / (b · mn)', clause: 'ISO 6336-3:2019 Clause 5' },
+          { name: 'Contact Stress (Pitting) σH', formula: 'σH = ZH · ZE · Zε · Zβ · √( (Ft · KA · KV · KHβ · KHα) / (d1 · b) · (u + 1) / u )', clause: 'ISO 6336-2:2019 Clause 5' },
+          { name: 'Tooth Root Bending σF', formula: 'σF = (Ft · KA · KV · KFβ · KFα · YF · YS · Yβ) / (b · mn)', clause: 'ISO 6336-3:2019 Clause 5' },
           { name: 'Safety Factor Bounds', formula: 'SH = σHP / σH ≥ 1.20,  SF = σFP / σF ≥ 1.40', clause: 'DIN 3990 / ISO 6336' },
         ],
         intermediates: [
           { label: 'Pitch diameter d1', value: '60.0', unit: 'mm', note: 'd1 = z1 · mn' },
+          { label: 'Gear ratio u', value: '3.00', unit: '[-]', note: 'u = z2 / z1 = 60 / 20' },
+          { label: 'Curvature factor (u+1)/u', value: '1.333', unit: '[-]', note: '(3 + 1) / 3' },
+          { label: 'Dynamic factor Kv', value: '1.081', unit: '[-]', note: 'ISO 6336-1 Method C (Q=6, v=4.56 m/s)' },
+          { label: 'Face load factor KHβ', value: '1.188', unit: '[-]', note: 'ISO 6336-1 mesh load distribution across face b=40mm' },
           { label: 'Tangential driving load Ft', value: '4000.0', unit: 'N', note: 'Ft = 2000·120 / 60' },
-          { label: 'Contact stress (pitting) σH', value: '685.0', unit: 'MPa', note: 'Allowable limit σHP = 925.0 MPa' },
-          { label: 'Root bending stress σF', value: '184.0', unit: 'MPa', note: 'Allowable limit σFP = 386.4 MPa' },
+          { label: 'Contact stress (pitting) σH', value: '812.9', unit: 'MPa', note: 'Allowable limit σHP = 1500.0 MPa (SH = 1.85)' },
+          { label: 'Root bending stress σF', value: '265.4', unit: 'MPa', note: 'Allowable limit σFP = 430.0 MPa (SF = 1.62)' },
         ],
         result: {
           label: 'Pitting & Root Fatigue Safety',
-          value: 'σH = 685.0 MPa (SH = 1.35) | σF = 184.0 MPa (SF = 2.10)',
+          value: 'σH = 812.9 MPa (SH = 1.85) | σF = 265.4 MPa (SF = 1.62)',
           limit: 'SH ≥ 1.20 (Pitting) & SF ≥ 1.40 (Bending)',
           status: 'PASS',
-          margin: 'SH = 1.35 ≥ 1.20 | SF = 2.10 ≥ 1.40',
+          margin: 'SH = 1.85 ≥ 1.20 | SF = 1.62 ≥ 1.40',
         },
       },
     },
@@ -291,7 +308,7 @@ const CARDS: Record<string, ModuleMethod> = {
   shafts: {
     formula: 'M_{\\max} = \\frac{F \\cdot a \\cdot (L - a)}{L}, \\quad \\sigma_{vm} = \\sqrt{\\sigma_b^2 + 3\\tau^2}, \\quad \\text{FoS} = \\frac{S_y}{\\sigma_{vm}}',
     formulaNote: 'Simply supported transmission shaft under point load F and driving torque T. Calculates bearing reactions RA/RB, max bending moment, von Mises equivalent stress, and safety factor.',
-    standards: ['DIN 743-1/2:2012', 'ASME B106.1M', 'Euler-Bernoulli Statics'],
+    standards: ['DIN 743-1/2/3:2012', 'von Mises (distortion energy)', 'Euler-Bernoulli Statics'],
     assumptions: [
       'Simply supported boundary condition with ideal rigid knife-edge or self-aligning bearing supports',
       'Uniform circular shaft cross-section with elastic stress distribution below yield limit Sy',
@@ -299,7 +316,7 @@ const CARDS: Record<string, ModuleMethod> = {
     ],
     workedExample: {
       title: 'Worked example — Stepped Transmission Shaft (C45 / AISI 1045, L = 500 mm, d = 30 mm)',
-      result: 'Mid-span point load F = 2000 N and driving torque T = 80 N·m yield bearing reactions RA = RB = 1000 N and max bending moment M = 250 N·m. Combined von Mises stress σvm = 97.87 MPa delivers FoS = 4.39 ≥ 2.00 and required diameter dreq = 23.36 mm ≤ 30.00 mm (PASS).',
+      result: 'Mid-span point load F = 2000 N and driving torque T = 80 N·m yield bearing reactions RA = RB = 1000 N and max bending moment M = 250 N·m. Combined von Mises stress σvm = 97.87 MPa delivers FoS = 4.39 ≥ 2.00 and required diameter dreq = 23.08 mm ≤ 30.00 mm (PASS).',
       block: {
         title: 'Stepped Drive Shaft Bearing Reactions & Combined Stress Analysis',
         standard: 'DIN 743-1/2:2012 / ASME B106.1M / FKM-Guideline',
@@ -320,7 +337,7 @@ const CARDS: Record<string, ModuleMethod> = {
           { name: 'Maximum Bending Moment', formula: 'Mmax = (F · a · (L - a)) / L', clause: 'Euler-Bernoulli Beam Statics' },
           { name: 'Bending & Torsional Stresses', formula: 'σb = (32 · Mmax) / (π · d³),  τ = (16 · T) / (π · d³)', clause: 'DIN 743-1 Clause 4' },
           { name: 'von Mises Equivalent Stress', formula: 'σvm = √(σb² + 3 · τ²)', clause: 'Distortion Energy Theory' },
-          { name: 'Minimum Required Diameter', formula: 'dreq = [ (32 · nreq / (π · Sy)) · √(Mmax² + 0.75 · T²) ]^(1/3)', clause: 'ASME B106.1M Design Eq.' },
+          { name: 'Minimum Required Diameter', formula: 'dreq = [ (32 · nreq / (π · Sy)) · √(Mmax² + 0.75 · T²) ]^(1/3)', clause: 'Static distortion-energy sizing (fatigue: DIN 743 stepped mode)' },
         ],
         intermediates: [
           { label: 'Support reaction forces RA, RB', value: '1000.0', unit: 'N', note: 'Symmetric load distribution at mid-span' },
@@ -331,8 +348,8 @@ const CARDS: Record<string, ModuleMethod> = {
         ],
         result: {
           label: 'Yield Safety Factor FoS & Minimum Diameter dreq',
-          value: 'FoS = 4.39 | dreq = 23.36 mm',
-          limit: 'FoS ≥ 2.00 | d = 30.00 mm ≥ 23.36 mm',
+          value: 'FoS = 4.39 | dreq = 23.08 mm',
+          limit: 'FoS ≥ 2.00 | d = 30.00 mm ≥ 23.08 mm',
           status: 'PASS',
           margin: '+119.5% safety margin above required FoS',
         },
@@ -368,8 +385,8 @@ const CARDS: Record<string, ModuleMethod> = {
     },
   },
   'machining-details': {
-    formula: 'v_c = \\frac{\\pi \\cdot D \\cdot n}{1000}, \\quad v_f = n \\cdot z \\cdot f_z, \\quad Q = \\frac{v_c \\cdot a_p \\cdot a_e}{1000}, \\quad P_c = \\frac{Q \\cdot k_c}{60 \\cdot 10^3 \\cdot \\eta}',
-    formulaNote: 'ISO 3002 cutting speed vc (m/min), table feed vf (mm/min), metal removal rate Q (cm³/min), and spindle cutting power Pc (kW) via specific cutting force kc.',
+    formula: 'v_c = \\frac{\\pi \\cdot D \\cdot n}{1000}, \\quad v_f = n \\cdot z \\cdot f_z, \\quad Q = \\frac{v_f \\cdot a_p \\cdot a_e}{1000}, \\quad P_c = \\frac{Q \\cdot k_c}{60 \\cdot 10^3}, \\quad P_{\\text{mot}} = \\frac{P_c}{\\eta}',
+    formulaNote: 'ISO 3002 cutting speed vc (m/min), table feed vf (mm/min), metal removal rate Q (cm³/min via vf·ap·ae/1000), net cutting power Pc (kW), and gross motor drive power Pmot (kW) with efficiency η ≈ 85%.',
     standards: ['ISO 3002 (Cutting tool geometry)', 'Sandvik Coromant Technical Standard', 'DIN 6580'],
     assumptions: [
       'Specific cutting force kc adjusted for chip thickness hm and positive rake angle geometry',
@@ -378,7 +395,7 @@ const CARDS: Record<string, ModuleMethod> = {
     ],
     workedExample: {
       title: 'Worked example — Face Milling Al6082-T6 (D = 50 mm, z = 4, ap = 3 mm, ae = 40 mm, vc = 450 m/min, fz = 0.15 mm/tooth)',
-      result: 'Spindle speed n = 2865 rpm, table feed vf = 1719 mm/min, metal removal rate Q = 206.3 cm³/min, requiring spindle cutting power Pc = 2.82 kW (kc = 700 N/mm²).',
+      result: 'Spindle speed n = 2865 rpm, table feed vf = 1719 mm/min, metal removal rate Q = 206.3 cm³/min, net cutting power Pc = 2.41 kW (kc = 700 N/mm²), requiring motor drive input power Pmot = 2.83 kW (η = 85%).',
     },
   },
   'fatigue-analysis': {
@@ -468,11 +485,12 @@ const CARDS: Record<string, ModuleMethod> = {
   'pipe-friction': {
     formula: 'h_f = f \\frac{L}{D} \\frac{v^2}{2g}, \\quad \\frac{1}{\\sqrt{f}} = -2 \\log_{10}\\left(\\frac{\\varepsilon/D}{3.7} + \\frac{2.51}{\\text{Re}\\sqrt{f}}\\right)',
     formulaNote: 'Darcy-Weisbach head loss and Colebrook-White implicit friction factor equation for laminar and turbulent fluid flow in pipes.',
-    standards: ['ISO 5167', 'Hydraulic Institute Standards (HIS)', 'Moody Chart'],
+    standards: ['Darcy-Weisbach / Colebrook-White', 'Hydraulic Institute Standards (HIS)', 'Crane Technical Paper 410', 'Moody Chart'],
     assumptions: [
       'Steady-state, fully developed incompressible Newtonian fluid flow',
       'Surface roughness ε specified per pipe material (commercial steel, PVC, stainless)',
       'Minor fitting losses accounted for via equivalent length or resistance coefficients K',
+      'Transition regime (2300 < Re < 4000) represents indeterminate flow; friction factor is model-dependent',
     ],
     workedExample: {
       title: 'Worked example — Water Pipe (DN50, L = 100 m, Q = 5 L/s, ε = 0.045 mm)',
@@ -494,31 +512,65 @@ const CARDS: Record<string, ModuleMethod> = {
     },
   },
   'concrete-reinforcement': {
-    formula: 'M_u = \\phi A_s f_y \\left(d - \\frac{a}{2}\\right), \\quad a = \\frac{A_s f_y}{0.85 f\'_c b}',
-    formulaNote: 'ACI 318 / Eurocode 2 ultimate flexural moment capacity and Whitney equivalent compressive rectangular stress block for reinforced concrete.',
-    standards: ['ACI 318-19', 'Eurocode 2 (EN 1992-1-1)', 'TS 500'],
+    formula: 'M_{Rd} = A_s f_{yd} z \\quad (\\text{EC2}), \\qquad \\phi M_n = \\phi A_s f_y \\left(d - \\frac{a}{2}\\right) \\quad (\\text{ACI 318})',
+    formulaNote: 'Dual normative calculation engine: Eurocode 2 (EN 1992-1-1:2004+A1:2014) partial factor method (γc=1.5, γs=1.15) and ACI 318 (ACI 318-19 & ACI CODE-318-25) strength reduction factor (φ=0.90) with Whitney rectangular compressive block.',
+    standards: ['Eurocode 2 (EN 1992-1-1:2004+A1:2014)', 'ACI 318-19', 'ACI CODE-318-25', 'TS 500'],
     assumptions: [
       'Bernoulli plane section hypothesis: strain varies linearly through depth of member',
       'Concrete tensile strength neglected in ultimate flexural limit state design',
-      'Tension-controlled ductile section confirmed: tensile steel strain εt ≥ 0.005 (strength reduction factor φ = 0.90)',
+      'EC2: lever arm z = d[0.5 + √(0.25 - K/1.134)] with singly reinforced limit K ≤ 0.167',
+      'ACI 318: tension-controlled ductile section confirmed with c/d ≤ 0.375 (εt ≥ 0.005, strength reduction factor φ = 0.90)',
     ],
     workedExample: {
-      title: 'Worked example — RC Beam (b = 250 mm, d = 450 mm, 3×Φ20 Rebar As = 942 mm², f\'c = 30 MPa, fy = 420 MPa)',
-      result: 'Depth of stress block a = 62.1 mm. Ultimate flexural moment capacity Mu = 142.1 kN·m with ductile tension failure mode.',
+      title: 'Worked example — Singly Reinforced RC Beam (b = 300 mm, h = 600 mm, Med = 250 kN·m, C25/30, B500B)',
+      result: 'Calculates effective depth d = 540 mm. Under EC2: K = 0.119 ≤ 0.167 (singly reinforced), lever arm z = 478.4 mm, required As = 1,202 mm². Provided 4×Φ20 (As = 1,257 mm²), PASS (105% capacity reserve).',
+      block: {
+        title: 'RC Beam Flexural Design — Dual Code Verification (EC2 & ACI 318)',
+        standard: 'EN 1992-1-1:2004 & ACI 318-19 / CODE-318-25',
+        summary: 'Flexural reinforcement sizing for rectangular concrete beam comparing Eurocode 2 limit state with ACI 318 Whitney stress block.',
+        inputs: [
+          { label: 'Beam width b', value: '300.0', unit: 'mm' },
+          { label: 'Total depth h', value: '600.0', unit: 'mm' },
+          { label: 'Concrete cover cc', value: '35.0', unit: 'mm' },
+          { label: 'Characteristic strength fck / f\'c', value: '25.0', unit: 'MPa' },
+          { label: 'Steel yield strength fyk / fy', value: '500.0', unit: 'MPa' },
+          { label: 'Design factored moment Med / Mu', value: '250.0', unit: 'kN·m' },
+        ],
+        relations: [
+          { name: 'EC2 Normalized Moment K', formula: 'K = Med / (b · d² · fck)', clause: 'EN 1992-1-1 Clause 6.1' },
+          { name: 'EC2 Lever Arm z', formula: 'z = d · [0.5 + √(0.25 - K / 1.134)]', clause: 'EN 1992-1-1 Eq. (6.1)' },
+          { name: 'EC2 Required Steel Area As', formula: 'As,req = Med / (fyd · z)  where fyd = fyk / 1.15', clause: 'EN 1992-1-1 Clause 6.1' },
+          { name: 'ACI 318 Design Capacity φMn', formula: 'φMn = 0.90 · As · fy · (d - a/2)  where a = As·fy / (0.85·f\'c·b)', clause: 'ACI 318-19 Table 21.2.2' },
+        ],
+        intermediates: [
+          { label: 'Effective depth d', value: '540.0', unit: 'mm', note: 'd = h - cover - barDia/2 - 10' },
+          { label: 'EC2 normalized moment K', value: '0.119', unit: '[-]', note: 'K = 250e6 / (300 · 540² · 25) ≤ 0.167' },
+          { label: 'EC2 internal lever arm z', value: '478.4', unit: 'mm', note: 'z = 540 · [0.5 + √(0.25 - 0.119/1.134)]' },
+          { label: 'EC2 required reinforcement As,req', value: '1202', unit: 'mm²', note: 'As = 250e6 / (434.78 · 478.4)' },
+          { label: 'Provided reinforcement (4×Φ20)', value: '1257', unit: 'mm²', note: 'As,prov = 4 · π · 10² mm²' },
+        ],
+        result: {
+          label: 'Flexural Reinforcement Verification',
+          value: 'As,prov = 1,257 mm² ≥ As,req = 1,202 mm²',
+          limit: 'K = 0.119 ≤ 0.167 (Singly reinforced, no compression steel required)',
+          status: 'PASS',
+          margin: '+4.6% reinforcement reserve',
+        },
+      },
     },
   },
   'column-buckling': {
-    formula: 'P_{cr} = \\frac{\\pi^2 E I}{(K L)^2}, \\quad \\lambda = \\frac{K L}{r}, \\quad \\sigma_{cr} = \\frac{P_{cr}}{A}',
-    formulaNote: 'Euler critical buckling load for slender columns (λ ≥ λcrit) and Johnson parabolic transition equation for intermediate columns.',
-    standards: ['AISC 360-16', 'Eurocode 3 (EN 1993-1-1)', 'DIN 4114'],
+    formula: 'N_{cr} = \\frac{\\pi^2 E I}{(K L)^2}, \\quad \\bar\\lambda = \\frac{K L / i}{\\pi\\sqrt{E/f_y}}, \\quad \\chi = \\frac{1}{\\Phi + \\sqrt{\\Phi^2 - \\bar\\lambda^2}}, \\quad N_{b,Rd} = \\frac{\\chi A f_y}{\\gamma_{M1}}',
+    formulaNote: 'EN 1993-1-1 §6.3.1 flexural buckling resistance with Φ = 0.5[1 + α(λ̄ − 0.2) + λ̄²] (Table 6.1 α for curves a0…d, Table 6.2 curve selection), compared with AISC 360-16 E3, Euler, Tetmajer (steel) and Johnson.',
+    standards: ['EN 1993-1-1 §6.3.1', 'AISC 360-16 Chapter E', 'Euler / Tetmajer (Roloff/Matek)'],
     assumptions: [
-      'Concentric axial compressive load with zero initial curvature or lateral eccentricity',
-      'Effective length factor K determined by end boundary conditions (e.g. pinned-pinned K = 1.0, fixed-free K = 2.0)',
-      'Slenderness ratio λ compared against material critical slenderness to verify Euler vs inelastic buckling regime',
+      'Concentric axial load, flexural buckling about the weak axis of the gross section (class 1–3)',
+      'Effective length K·L from exact eigen-modes (0.5 / 0.699 / 1.0 / 2.0) or AISC recommended design values',
+      'λ1 = π√(E/fy) uses the entered E (equals 93.9ε for E = 210 GPa); aluminium is shown for comparison only (EN 1999-1-1 governs)',
     ],
     workedExample: {
-      title: 'Worked example — Circular Steel Column (OD = 60 mm, t = 4 mm, L = 3.0 m, Pinned-Pinned K = 1.0)',
-      result: 'Area A = 703.7 mm², moment of inertia I = 28.6 cm⁴, radius of gyration r = 20.2 mm. Slenderness λ = 148.5, yielding Euler buckling capacity Pcr = 65.8 kN.',
+      title: 'Worked example — CHS 60 × 4, S235, hot-finished (curve a), L = 3.0 m, pinned–pinned',
+      result: 'A = 703.7 mm², I = 27.73 cm⁴, i = 19.85 mm, λ = 151.1, λ̄ = 1.609, χ = 0.330 → Nb,Rd = 54.5 kN; Euler Ncr = 63.9 kN; AISC φcPn = 50.4 kN.',
     },
   },
   'fasteners': {
@@ -546,7 +598,7 @@ const CARDS: Record<string, ModuleMethod> = {
   'fluid-dynamics': {
     formula: 'Q = A \\cdot v, \\quad \\text{Re} = \\frac{\\rho v D}{\\mu}, \\quad \\Delta p = f \\frac{L}{D} \\frac{\\rho v^2}{2}',
     formulaNote: 'Continuity equation, Reynolds number regime classification, and Darcy-Weisbach dynamic pressure loss.',
-    standards: ['ISO 5167', 'Hydraulic Institute (HIS)', 'Crane Technical Paper 410'],
+    standards: ['Darcy-Weisbach', 'Hydraulic Institute (HIS)', 'Crane Technical Paper 410', 'Moody Chart'],
     assumptions: [
       'Incompressible fluid flow with constant physical properties (density ρ, dynamic viscosity μ)',
       'Laminar regime Re < 2300 (f = 64/Re), turbulent regime Re > 4000 (Colebrook/Haaland)',
@@ -561,6 +613,43 @@ const CARDS: Record<string, ModuleMethod> = {
       'Hole basis system (H) or shaft basis system (h) for standardized tooling economy',
       'Fit type classified deterministically: Clearance (Cmin ≥ 0), Interference (Cmax ≤ 0), or Transition',
     ],
+    workedExample: {
+      title: 'Worked example — ISO 286-1 Hole Basis Fit (Ø50 H7/h6)',
+      result: 'Nominal diameter D = 50.0 mm with Hole 50 H7 (ES = +0.025 mm, EI = 0.000 mm) and Shaft 50 h6 (es = 0.000 mm, ei = -0.016 mm) yields max clearance Cmax = +0.041 mm and min clearance Cmin = 0.000 mm. Fit classified as Clearance Fit (Locational Clearance, PASS).',
+      block: {
+        title: 'ISO 286 Standard Fit Verification (Ø50 H7/h6)',
+        standard: 'ISO 286-1:2010 / ISO 286-2 / DIN 7154',
+        summary: 'Standard hole-basis locational clearance fit calculation for cylindrical joint at reference temperature 20 °C.',
+        inputs: [
+          { label: 'Nominal diameter D', value: '50.0', unit: 'mm' },
+          { label: 'Hole tolerance class', value: 'H7', unit: 'ISO 286' },
+          { label: 'Shaft tolerance class', value: 'h6', unit: 'ISO 286' },
+          { label: 'Basis system', value: 'Hole basis (H)', unit: 'ISO 286-1' },
+          { label: 'Reference temperature T0', value: '20.0', unit: '°C' },
+          { label: 'Standard step range', value: '30 < D ≤ 50', unit: 'mm' },
+        ],
+        relations: [
+          { name: 'Standard Tolerance Factor', formula: 'i = 0.45 · D^(1/3) + 0.001 · D  [μm]', clause: 'ISO 286-1 Clause 5.2' },
+          { name: 'Hole Tolerance (IT7)', formula: 'TD = 16 · i = 25 μm = 0.025 mm', clause: 'ISO 286-1 Table 1' },
+          { name: 'Shaft Tolerance (IT6)', formula: 'Td = 10 · i = 16 μm = 0.016 mm', clause: 'ISO 286-1 Table 1' },
+          { name: 'Maximum Clearance', formula: 'Cmax = ES - ei = +0.025 - (-0.016) = +0.041 mm', clause: 'ISO 286-1 Clause 3.2' },
+          { name: 'Minimum Clearance', formula: 'Cmin = EI - es = 0.000 - 0.000 = 0.000 mm', clause: 'ISO 286-1 Clause 3.2' },
+        ],
+        intermediates: [
+          { label: 'Geometric mean diameter Dgm', value: '38.73', unit: 'mm', note: 'Dgm = sqrt(30 · 50)' },
+          { label: 'Tolerance factor i', value: '1.561', unit: 'μm', note: 'i = 0.45·(38.73)^(1/3) + 0.001·38.73' },
+          { label: 'Hole size limits [Dmin, Dmax]', value: '[50.000, 50.025]', unit: 'mm', note: 'ES = +0.025 mm, EI = 0.000 mm' },
+          { label: 'Shaft size limits [dmin, dmax]', value: '[49.984, 50.000]', unit: 'mm', note: 'es = 0.000 mm, ei = -0.016 mm' },
+        ],
+        result: {
+          label: 'Fit Classification & Clearance Band',
+          value: 'Clearance Fit (Cmin = 0.000 mm, Cmax = +0.041 mm)',
+          limit: 'Cmin ≥ 0.000 mm (Non-negative clearance threshold)',
+          status: 'PASS',
+          margin: 'Cmin = 0.000 mm, Cmax = 0.041 mm (h6/H7 locational clearance)',
+        },
+      },
+    },
   },
   aluminum: {
     formula: 'm\' = \\frac{A \\cdot \\rho}{1000} \\quad [\\text{kg/m}], \\quad M = m\' \\cdot \\frac{L}{1000} \\quad [\\text{kg}]',
@@ -723,20 +812,6 @@ const CARDS: Record<string, ModuleMethod> = {
       result: 'Temperature T = 223.25 K, speed of sound a = 299.5 m/s, Mach M = 0.801 (subsonic cruise), dynamic pressure q = 11.95 kPa.',
     },
   },
-  'naval-hydrostatics': {
-    formula: '\\Delta = \\rho_{\\text{sea}} \\cdot \\nabla, \\quad \\overline{GM} = \\overline{KB} + \\overline{BM} - \\overline{KG}, \\quad \\overline{BM} = \\frac{I_T}{\\nabla}',
-    formulaNote: 'Archimedes displacement buoyancy Δ, transverse metacentric height GM, waterplane second moment IT, and righting lever GZ stability.',
-    standards: ['IMO 2008 Intact Stability Code', 'ISO 12217 (Small craft stability)', 'DNV Rules for Ships'],
-    assumptions: [
-      'Seawater standard density ρ = 1025 kg/m³ (freshwater ρ = 1000 kg/m³)',
-      'Positive intact stability required: GM > 0.15 m for commercial vessels',
-      'Free surface effect of liquid cargo tanks subtracted from effective GM',
-    ],
-    workedExample: {
-      title: 'Worked example — Workboat Hull (Displacement ∇ = 45 m³, IT = 120 m⁴, KG = 1.80 m, KB = 0.95 m)',
-      result: 'Metacentric radius BM = 2.67 m. Metacentric height GM = 0.95 + 2.67 - 1.80 = 1.82 m (strongly stable transverse righting characteristics).',
-    },
-  },
   'cad-editor': {
     formula: '\\mathbf{P}(u) = \\sum_{i=0}^n B_{i,n}(u) \\mathbf{P}_i, \\quad \\mathbf{T}_{\\text{matrix}} = \\begin{bmatrix} \\mathbf{R}_{3\\times3} & \\mathbf{t}_{3\\times1} \\\\ \\mathbf{0} & 1 \\end{bmatrix}',
     formulaNote: 'Bézier / B-Spline parametric curve generation, 2D constraint solver (coincident, parallel, tangent), and homogeneous geometric transformation.',
@@ -779,20 +854,6 @@ const CARDS: Record<string, ModuleMethod> = {
       result: 'Heat generated = 880 W. Natural convection dissipation k_th = 18 W/m²K yields steady-state oil sump temperature Toil = 59.9 °C (well within ISO VG 220 limit).',
     },
   },
-  'topology-optimization': {
-    formula: '\\min_{\\rho_e} c(\\mathbf{u}) = \\mathbf{U}^T \\mathbf{K} \\mathbf{U} \\quad \\text{s.t.} \\quad \\frac{V(\\rho)}{V_0} \\le f, \\quad E_e(\\rho_e) = E_{\\min} + \\rho_e^p (E_0 - E_{\\min})',
-    formulaNote: 'SIMP (Solid Isotropic Material with Penalization) structural compliance minimization for generative lightweight design.',
-    standards: ['VDI 2221', 'AIAA Structural Optimization Guidelines'],
-    assumptions: [
-      'Penalization exponent p = 3 enforces distinct binary density distribution (ρe = 0 or 1)',
-      'Sensitivity filtering applied to prevent mesh dependency and checkerboard artifacts',
-      'Volume fraction limit f specifies target weight reduction percentage',
-    ],
-    workedExample: {
-      title: 'Worked example — Aerospace Support Bracket (Target Volume Fraction f = 0.35, Penalty p = 3)',
-      result: 'Iterates 42 FEA density loops, achieving 65% weight reduction while preserving 82% of original structural stiffness.',
-    },
-  },
   'chemistry-reactions': {
     formula: 'aA + bB \\rightarrow cC + dD, \\quad \\Delta H_{\\text{rxn}}^\\circ = \\sum n_p \\Delta H_f^\\circ(\\text{prod}) - \\sum n_r \\Delta H_f^\\circ(\\text{react})',
     formulaNote: 'Stoichiometric molar balance, limiting reagent determination, standard enthalpy of reaction, and Gibbs free energy ΔG = ΔH - TΔS.',
@@ -831,15 +892,83 @@ const CARDS: Record<string, ModuleMethod> = {
       'Setup and programming non-recurring engineering (NRE) amortized across production batch size N',
     ],
   },
-  'failure-diagnosis': {
-    formula: '\\eta = \\frac{S_e}{\\sigma_a + \\left(\\frac{S_e}{S_{ut}}\\right) \\sigma_m}, \\quad K_I \\le K_{Ic}',
-    formulaNote: 'Modified Goodman fatigue failure criteria, Marin endurance limit modification factors, and linear elastic fracture mechanics (LEFM).',
-    standards: ['ASTM E1820', 'Peterson Stress Concentration Factors', 'ASME FFS-1'],
+  'ohms-law': {
+    formula: 'V = I \\cdot R, \\quad P = V \\cdot I = I^2 \\cdot R = \\frac{V^2}{R}',
+    formulaNote: 'Fundamental physical relations (Ohm, 1827 / Joule, 1841) for DC and purely resistive AC circuits connecting potential difference (V), current (I), resistance (R), and dissipated power (P).',
+    standards: ['IEC 60027-1 (Letter symbols in electrical technology)', 'ISO 80000-6 (Electromagnetism)', 'SI Base Units (BIPM)'],
     assumptions: [
-      'Stress concentration factor Kt adjusted to fatigue notch factor Kf via material notch sensitivity q',
-      'Endurance limit Se modified by surface finish ka, size kb, reliability kc, and temperature kd factors',
-      'Fracture toughness KIc represents plane strain resistance against unstable brittle fracture',
+      'Ohmic linear conductor with constant electrical resistance at operating temperature',
+      'Temperature drift neglected (constant ambient temperature 20 °C)',
+      'Steady-state DC circuit or in-phase AC resistive circuit (power factor cos φ = 1.0)',
     ],
+    workedExample: {
+      title: 'Worked example — 24V DC Industrial Bus with 120 Ω Burden Resistor',
+      result: 'Calculates loop current I = 0.200 A (200 mA) and thermal power dissipation P = 4.80 W.',
+      block: {
+        title: 'Industrial 24V DC Control Loop Resistor Analysis',
+        standard: 'IEC 60027-1 / ISO 80000-6',
+        summary: 'Direct evaluation of circuit loop current and thermal power dissipation across a standard 120 Ω precision resistor under 24 V DC bus potential.',
+        inputs: [
+          { label: 'Supply voltage V', value: '24.00', unit: 'V' },
+          { label: 'Loop resistance R', value: '120.0', unit: 'Ω' },
+        ],
+        relations: [
+          { name: 'Current (Ohm’s Law)', formula: 'I = V / R', clause: 'Ohm 1827 / IEC 60027' },
+          { name: 'Dissipated Power', formula: 'P = V · I = V² / R', clause: 'Joule’s Law / ISO 80000-6' },
+        ],
+        intermediates: [
+          { label: 'Current in milliamperes', value: '200.0', unit: 'mA', note: 'I = 24 / 120 = 0.200 A' },
+          { label: 'Square of voltage V²', value: '576.0', unit: 'V²' },
+        ],
+        result: {
+          label: 'Electric power dissipation P',
+          value: '4.80 W',
+          limit: '≤ 10.0 W (resistor rating)',
+          status: 'PASS',
+          margin: '52% power margin',
+        },
+      },
+    },
+  },
+  'voltage-drop': {
+    formula: '\\Delta V = \\frac{2 \\cdot L \\cdot I \\cdot \\rho}{A} \\quad (\\text{Single-phase}), \\quad \\Delta V = \\frac{\\sqrt{3} \\cdot L \\cdot I \\cdot \\rho}{A} \\quad (\\text{Three-phase})',
+    formulaNote: 'Conductor line impedance and voltage drop analysis per IEC 60364-5-52 and NEC Article 210/215 recommendations.',
+    standards: ['IEC 60364-5-52', 'NFPA 70 / NEC 215.2(A)', 'DIN VDE 0100-520'],
+    assumptions: [
+      'Copper conductor resistivity evaluated at operating temperature (ρ = 0.0178 Ω·mm²/m @ 20°C)',
+      'Single-phase 2-wire loop or symmetrical balanced 3-phase system',
+      'Maximum allowable voltage drop typically ≤ 3% for branch circuits, ≤ 5% overall feeder+branch',
+    ],
+    workedExample: {
+      title: 'Worked example — 230V Single-Phase Line (25 m, 16 A, 2.5 mm² Cu)',
+      result: 'Calculates terminal voltage drop ΔV = 5.70 V (2.48% ≤ 3.00% limit, PASS).',
+      block: {
+        title: 'Single-Phase Branch Circuit Voltage Drop (230 V / 16 A)',
+        standard: 'IEC 60364-5-52 / DIN VDE 0100-520',
+        summary: 'Verification of terminal voltage drop across a 25-meter 2.5 mm² copper cable delivering 16 A at 230 V.',
+        inputs: [
+          { label: 'System voltage V_nom', value: '230.0', unit: 'V' },
+          { label: 'Line current I', value: '16.00', unit: 'A' },
+          { label: 'One-way cable length L', value: '25.0', unit: 'm' },
+          { label: 'Conductor cross-section A', value: '2.50', unit: 'mm²' },
+          { label: 'Copper resistivity ρ', value: '0.0178', unit: 'Ω·mm²/m' },
+        ],
+        relations: [
+          { name: 'Voltage drop ΔV', formula: 'ΔV = (2 · L · I · ρ) / A', clause: 'IEC 60364-5-52' },
+          { name: 'Percentage drop %ΔV', formula: '%ΔV = (ΔV / V_nom) · 100', clause: 'DIN VDE 0100-520' },
+        ],
+        intermediates: [
+          { label: 'Loop resistance R_loop', value: '0.356', unit: 'Ω', note: '2 · 25 · 0.0178 / 2.5' },
+        ],
+        result: {
+          label: 'Percentage voltage drop %ΔV',
+          value: '2.48 %',
+          limit: '≤ 3.00 %',
+          status: 'PASS',
+          margin: '0.52% margin to 3% limit',
+        },
+      },
+    },
   },
 };
 
@@ -872,7 +1001,6 @@ const ALIAS: Record<string, string> = {
   'advanced-spring': 'spring-design',
   'periodic-table': 'periodic-table',
   'cost-estimator': 'cost-estimator',
-  'failure-diagnosis': 'failure-diagnosis',
   'three-phase-power': 'three-phase-power',
   '3-phase-power': 'three-phase-power',
   fasteners: 'fasteners',
@@ -898,17 +1026,17 @@ const ALIAS: Record<string, string> = {
   'heat-sink': 'heat-sink',
   'hvac-load': 'hvac-load',
   'aerospace-dynamics': 'aerospace-dynamics',
-  'naval-hydrostatics': 'naval-hydrostatics',
   'cad-editor': 'cad-editor',
   'parametric-cad': 'cad-editor',
   'simulation-fea': 'simulation-fea',
   fea: 'simulation-fea',
   'reducer-lubrication': 'reducer-lubrication',
-  'topology-optimization': 'topology-optimization',
   'chemistry-reactions': 'chemistry-reactions',
   'unit-converter': 'unit-converter',
   converter: 'unit-converter',
   calculator: 'unit-converter',
+  'ohms-law': 'ohms-law',
+  'voltage-drop': 'voltage-drop',
 };
 
 export function getModuleMethod(slug: string): ModuleMethod {
@@ -916,13 +1044,13 @@ export function getModuleMethod(slug: string): ModuleMethod {
   return (
     CARDS[key] ||
     CARDS[slug] || {
-      formula: `${slug.replace(/-/g, ' ').toUpperCase()} — Deterministic Engineering Solver Engine`,
-      formulaNote: 'Interactive calculation parameters and physical relations are governed live by the AluCalc OS kernel.',
-      standards: ['SI Metric / ISO / ASME compliance', 'Material ledger validated'],
+      formula: `${slug.replace(/-/g, ' ').toUpperCase()} — Deterministic Engineering Relations`,
+      formulaNote: 'Interactive calculation parameters and mathematical relations are evaluated live in the browser workspace.',
+      standards: ['SI Metric System (ISO 80000-1)', 'Mathematical & Physical First Principles'],
       assumptions: [
-        'Governed by fundamental physical boundary conditions and standard engineering conventions',
-        'Material properties referenced from certified standard alloy database',
-        'Verify critical structural components against regional building codes and safety factors',
+        'Governed by fundamental physical definitions and recognized engineering equations',
+        'Purely deterministic floating-point evaluation without heuristic bias',
+        'Verify specific boundary conditions and application safety factors before physical production',
       ],
     }
   );
@@ -934,16 +1062,17 @@ export const RELATED_BY_CATEGORY: Record<string, { href: string; label: string }
     { href: '/bearings/', label: 'Bearings' },
     { href: '/gears/', label: 'Gears' },
     { href: '/shafts/', label: 'Shafts' },
+    { href: '/fits/', label: 'Fits' },
   ],
   structural: [
     { href: '/beam-deflection/', label: 'Beams' },
-    { href: '/aluminum/', label: 'Mass' },
+    { href: '/column-buckling/', label: 'Buckling' },
     { href: '/strength/', label: 'Strength' },
   ],
   manufacturing: [
-    { href: '/aluminum/', label: 'Mass' },
+    { href: '/cutting-optimizer/', label: 'Cutting' },
     { href: '/nesting-2d/', label: 'Nesting' },
-    { href: '/fits-tolerances/', label: 'Fits' },
+    { href: '/fits/', label: 'Fits' },
   ],
   electrical: [
     { href: '/three-phase-power/', label: '3-Phase' },

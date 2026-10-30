@@ -1,4 +1,5 @@
 import { ArrowRight, ArrowDownLeft, ArrowUpRight, X } from 'lucide-react';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 interface ComparisonData {
     weight: number;
@@ -15,6 +16,7 @@ interface ComparisonBarProps {
 }
 
 export const ComparisonBar = ({ baseline, current, unit, currency, onClear }: ComparisonBarProps) => {
+  const precision = useGlobalPrecision();
     if (!baseline) return null;
 
     const weightDiff = current.weight - baseline.weight;
@@ -43,7 +45,7 @@ export const ComparisonBar = ({ baseline, current, unit, currency, onClear }: Co
                     {/* BASELINE (A) */}
                     <div className="text-right opacity-60">
                         <div className="text-[10px] font-bold uppercase text-slate-400">Baseline (A)</div>
-                        <div className="font-mono font-bold text-slate-700">{baseline.weight.toFixed(3)} <span className="text-xs">{unit === 'metric' ? 'kg' : 'lbs'}</span></div>
+                        <div className="font-mono font-bold text-slate-700">{formatEngineeringValue(baseline.weight, precision, false)} <span className="text-xs">{unit === 'metric' ? 'kg' : 'lbs'}</span></div>
                         <div className="text-xs text-slate-500 truncate max-w-[120px] ml-auto">{baseline.description}</div>
                     </div>
 
@@ -51,7 +53,7 @@ export const ComparisonBar = ({ baseline, current, unit, currency, onClear }: Co
                     <div className="flex flex-col items-center justify-center">
                         <div className={`flex items-center gap-1 font-bold text-lg ${isLighter ? 'text-green-500' : 'text-red-500'}`}>
                             {isLighter ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
-                            {Math.abs(weightDiffPercent).toFixed(1)}%
+                            {formatEngineeringValue(Math.abs(weightDiffPercent), precision, false)}%
                         </div>
                         <div className={`text-[10px] uppercase font-bold ${isLighter ? 'text-green-600' : 'text-red-400'}`}>
                             {isLighter ? 'Weight Saving' : 'Heavier'}
@@ -61,9 +63,9 @@ export const ComparisonBar = ({ baseline, current, unit, currency, onClear }: Co
                     {/* CURRENT (B) */}
                     <div className="text-left">
                         <div className="text-[10px] font-bold uppercase text-brand-orange">Current (B)</div>
-                        <div className="font-mono font-bold text-slate-900 text-xl">{current.weight.toFixed(3)} <span className="text-sm text-slate-400">{unit === 'metric' ? 'kg' : 'lbs'}</span></div>
+                        <div className="font-mono font-bold text-slate-900 text-xl">{formatEngineeringValue(current.weight, precision, false)} <span className="text-sm text-slate-400">{unit === 'metric' ? 'kg' : 'lbs'}</span></div>
                         <div className="text-xs text-ind-orange font-bold">
-                            {currency}{current.cost.toFixed(2)}
+                            {currency}{formatEngineeringValue(current.cost, precision, false)}
                         </div>
                     </div>
                 </div>

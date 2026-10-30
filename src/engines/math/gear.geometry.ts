@@ -16,6 +16,7 @@ import {
     involuteFunction,
     DEFAULT_GEAR_PARAMS,
 } from './involute';
+import { calculateIso6336Mesh } from '@/lib/iso6336';
 
 // ============================================
 // TYPES
@@ -273,7 +274,7 @@ export function calculateVelocities(
 }
 
 // ============================================
-// STRENGTH CALCULATIONS (LEWIS / AGMA)
+// STRENGTH CALCULATIONS (ISO 6336 Method B)
 // ============================================
 
 export interface GearStrengthInput {
@@ -282,120 +283,72 @@ export interface GearStrengthInput {
     pinionRPM: number;
     materialYield: number; // MPa
     faceWidth: number; // mm
-    qualityGrade: number; // AGMA quality (6-12)
+    qualityGrade: number; // ISO 1328 / AGMA quality (5-12)
     reliabilityFactor?: number; // Kr (default 1.0)
-    safetFactor?: number; // default 2.0
+    safetFactor?: number; // default 1.4 (ISO industrial SF min)
 }
 
 export interface GearStrengthResult {
     tangentialForce: number; // N
     bendingStressPinion: number; // MPa
     bendingStressGear: number; // MPa
+    contactStress: number; // MPa
     allowableBendingStress: number; // MPa
     safetyFactorPinion: number;
     safetyFactorGear: number;
+    safetyContact: number;
     status: 'SAFE' | 'MARGINAL' | 'UNSAFE';
     warnings: string[];
 }
 
 /**
- * Lewis bending stress calculation (simplified)
- * For preliminary design - use AGMA 2001 for final verification
+ * ISO 6336 Method B screening of a meshing pair.
  */
 export function calculateBendingStrength(input: GearStrengthInput): GearStrengthResult {
     const warnings: string[] = [];
-
     const { mesh, power, pinionRPM, materialYield, faceWidth, qualityGrade } = input;
-    const SF = input.safetFactor || 2.0;
+    const targetSF = input.safetFactor || 1.4;
     const Kr = input.reliabilityFactor || 1.0;
 
-    const m = mesh.pinionGeometry.pitchRadius * 2 /
-        (mesh.pinionGeometry.pitchRadius / (mesh.pinionGeometry.pitchRadius / mesh.pinionGeometry.pitchRadius));
-
-    // Tangential force
-    // F_t = (P × 60000) / (π × d × n)
     const d1 = mesh.pinionGeometry.pitchRadius * 2;
-    const Ft = (power * 60000) / (Math.PI * d1 * pinionRPM);
+    const mn = Math.max(0.4, mesh.pinionGeometry.addendumRadius - mesh.pinionGeometry.pitchRadius);
+    const z1 = Math.max(8, Math.round(d1 / mn));
+    const z2 = Math.max(8, Math.round((mesh.gearGeometry.pitchRadius * 2) / mn));
+    const torqueNm = (power * 1000 * 60) / (2 * Math.PI * Math.max(1e-6, pinionRPM));
 
-    // Lewis form factor (approximate)
-    const Y1 = getLewisFormFactor(Math.round(d1 / (mesh.pinionGeometry.pitchRadius * 2 / mesh.pinionGeometry.pitchRadius)));
-    const Y2 = getLewisFormFactor(Math.round(mesh.gearGeometry.pitchRadius * 2 / (mesh.pinionGeometry.pitchRadius * 2 / mesh.pinionGeometry.pitchRadius)));
+    const iso = calculateIso6336Mesh({
+        mn,
+        z1,
+        z2,
+        b: faceWidth,
+        torqueNm,
+        rpmPinion: pinionRPM,
+        qualityGrade: Math.max(5, Math.min(12, qualityGrade)),
+        sigmaFlim1: 0.55 * materialYield * Kr,
+        sigmaFlim2: 0.55 * materialYield * Kr,
+        sigmaHlim: 1.3 * materialYield,
+    });
 
-    // Velocity factor (AGMA)
-    const v = calculateVelocities(mesh, pinionRPM).pitchLineVelocity;
-    const Kv = getVelocityFactor(v, qualityGrade);
+    const v = iso.pitchVelocity;
+    if (v > 25) warnings.push('High pitch line velocity — specify ISO 1328 grade 5 or better.');
+    if (iso.SF1 < targetSF) warnings.push(`Bending safety SF1=${iso.SF1.toFixed(2)} is below target ${targetSF}.`);
+    if (iso.SH < 1.0) warnings.push(`Pitting safety SH=${iso.SH.toFixed(2)} < 1.0.`);
 
-    // Lewis bending stress
-    // σ = (F_t × K_v) / (b × m × Y)
-    const gearModule = mesh.pinionGeometry.pitchRadius / (mesh.pinionGeometry.pitchRadius / mesh.pinionGeometry.pitchRadius);
-    const sigmaPinion = (Ft * Kv) / (faceWidth * 2 * Y1);
-    const sigmaGear = (Ft * Kv) / (faceWidth * 2 * Y2);
-
-    // Allowable stress
-    const allowable = (materialYield / SF) * Kr;
-
-    // Safety factors
-    const sfPinion = allowable / sigmaPinion;
-    const sfGear = allowable / sigmaGear;
-
-    // Status
-    let status: GearStrengthResult['status'];
-    const minSF = Math.min(sfPinion, sfGear);
-
-    if (minSF >= SF) {
-        status = 'SAFE';
-    } else if (minSF >= 1.5) {
-        status = 'MARGINAL';
-        warnings.push(`Safety factor ${minSF.toFixed(2)} is below target ${SF}`);
-    } else {
-        status = 'UNSAFE';
-        warnings.push(`CRITICAL: Safety factor ${minSF.toFixed(2)} is inadequate!`);
-    }
-
-    if (v > 25) {
-        warnings.push('High pitch line velocity — consider premium quality gears');
-    }
+    const status: GearStrengthResult['status'] =
+        iso.status === 'safe' ? 'SAFE' : iso.status === 'marginal' ? 'MARGINAL' : 'UNSAFE';
 
     return {
-        tangentialForce: Ft,
-        bendingStressPinion: sigmaPinion,
-        bendingStressGear: sigmaGear,
-        allowableBendingStress: allowable,
-        safetyFactorPinion: sfPinion,
-        safetyFactorGear: sfGear,
+        tangentialForce: iso.Ft,
+        bendingStressPinion: iso.sigmaF1,
+        bendingStressGear: iso.sigmaF2,
+        contactStress: iso.sigmaH,
+        allowableBendingStress: 0.55 * materialYield * Kr,
+        safetyFactorPinion: iso.SF1,
+        safetyFactorGear: iso.SF2,
+        safetyContact: iso.SH,
         status,
         warnings,
     };
-}
-
-/**
- * Lewis form factor (approximate values)
- */
-function getLewisFormFactor(z: number): number {
-    // Approximate Y values for 20° pressure angle
-    const factors: Record<number, number> = {
-        12: 0.245, 14: 0.277, 17: 0.303, 20: 0.322,
-        25: 0.340, 30: 0.359, 35: 0.374, 40: 0.389,
-        50: 0.408, 60: 0.422, 75: 0.435, 100: 0.447,
-        150: 0.460, 300: 0.472, 1000: 0.485,
-    };
-
-    // Find closest match
-    const keys = Object.keys(factors).map(Number).sort((a, b) => a - b);
-    for (const k of keys) {
-        if (z <= k) return factors[k];
-    }
-    return 0.485; // Rack
-}
-
-/**
- * AGMA velocity factor
- */
-function getVelocityFactor(v: number, qualityGrade: number): number {
-    // Simplified AGMA formula
-    const B = 0.25 * (12 - qualityGrade) ** (2 / 3);
-    const A = 50 + 56 * (1 - B);
-    return ((A + Math.sqrt(200 * v)) / A) ** B;
 }
 
 // ============================================

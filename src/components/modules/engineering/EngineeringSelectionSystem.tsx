@@ -23,6 +23,7 @@ import { FASTENERS_DB, Fastener } from '@/data/fastenersData';
 import { GEAR_MATERIALS, GearMaterial } from '@/data/gearsData';
 import { ELECTRODE_CATALOG } from '@/data/weldingData';
 import { MATERIALS_DB, FITS_DB } from '@/data/materialsData';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 const PUMP_CATALOG = [
     { model: 'CPP-32-160', type: 'Centrifugal', maxFlow: 25, maxHead: 35, efficiency: 72, power: 4 },
@@ -172,6 +173,7 @@ const GlobalStyles = React.memo(() => (
 ));
 
 export default function EngineeringSelectionSystem() {
+  const precision = useGlobalPrecision();
     const { t } = useI18nStore();
     const { openWindow } = useOSStore();
 
@@ -258,7 +260,7 @@ export default function EngineeringSelectionSystem() {
                                     </div>
                                 )}
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">{item.type.replace(/-/g, ' ')}</div>
-                                <div className="text-xl font-black italic text-white mb-4 group-hover:text-cyan-400 transition-colors">
+                                <div className="text-xl font-black text-white mb-4 group-hover:text-cyan-400 transition-colors">
                                     SKF {item.code}
                                 </div>
                                 <div className="space-y-3">
@@ -275,7 +277,7 @@ export default function EngineeringSelectionSystem() {
         if (selectedCategory === 'fasteners') {
             const data = FASTENERS_DB.slice(0, 50);
             return (
-                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md">
+                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-white/[0.02] border-b border-white/5 text-[9px] uppercase tracking-[0.2em] text-gray-500">
                             <tr>
@@ -295,10 +297,10 @@ export default function EngineeringSelectionSystem() {
                                             {isSelected && <CheckCircle2 size={14} className="inline mr-2 text-emerald-400" />}
                                             {f.standard}
                                         </td>
-                                        <td className="p-4 font-black text-white italic">{f.size}</td>
-                                        <td className="p-4 font-mono text-gray-300">{f.pitch.toFixed(2)}</td>
-                                        <td className="p-4 font-mono text-gray-300">{f.majorDia.toFixed(2)}</td>
-                                        <td className="p-4 font-mono text-amber-500">{f.tapDrill.toFixed(2)}</td>
+                                        <td className="p-4 font-black text-white">{f.size}</td>
+                                        <td className="p-4 font-mono text-gray-300">{formatEngineeringValue(f.pitch, precision, false)}</td>
+                                        <td className="p-4 font-mono text-gray-300">{formatEngineeringValue(f.majorDia, precision, false)}</td>
+                                        <td className="p-4 font-mono text-amber-500">{formatEngineeringValue(f.tapDrill, precision, false)}</td>
                                     </tr>
                                 );
                             })}
@@ -320,7 +322,7 @@ export default function EngineeringSelectionSystem() {
                                         <CheckCircle2 size={16} />
                                     </div>
                                 )}
-                                <h3 className="text-lg font-black text-white mb-4 group-hover:text-purple-400 transition-colors uppercase italic">{g.name}</h3>
+                                <h3 className="text-lg font-black text-white mb-4 group-hover:text-purple-400 transition-colors uppercase">{g.name}</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <div className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Pitting Res.</div>
@@ -340,7 +342,7 @@ export default function EngineeringSelectionSystem() {
 
         if (selectedCategory === 'welding') {
             return (
-                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md">
+                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-white/[0.02] border-b border-white/5 text-[9px] uppercase tracking-[0.2em] text-gray-500">
                             <tr>
@@ -359,7 +361,7 @@ export default function EngineeringSelectionSystem() {
                                             {isSelected && <CheckCircle2 size={14} className="inline mr-2 text-emerald-400" />}
                                             {e.code}
                                         </td>
-                                        <td className="p-4 font-black text-white italic">{e.name}</td>
+                                        <td className="p-4 font-black text-white">{e.name}</td>
                                         <td className="p-4 font-mono text-gray-300">{e.yieldStrength}</td>
                                         <td className="p-4 font-mono text-cyan-400">{e.current}</td>
                                     </tr>
@@ -383,7 +385,7 @@ export default function EngineeringSelectionSystem() {
                                         <CheckCircle2 size={16} />
                                     </div>
                                 )}
-                                <h3 className="text-lg font-black text-white mb-1 group-hover:text-blue-400 transition-colors uppercase italic">{p.model}</h3>
+                                <h3 className="text-lg font-black text-white mb-1 group-hover:text-blue-400 transition-colors uppercase">{p.model}</h3>
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">{p.type}</div>
                                 <div className="space-y-3">
                                     <StatBar value={p.maxFlow} max={250} color="#3b82f6" label="Max Flow" unit="m³/h" />
@@ -399,7 +401,7 @@ export default function EngineeringSelectionSystem() {
         if (selectedCategory === 'strength') {
             const steelData = MATERIALS_DB.filter(m => m.category === 'Steel');
             return (
-                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md">
+                <div className="bg-black/20 border border-white/5 rounded-3xl overflow-hidden">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-white/[0.02] border-b border-white/5 text-[9px] uppercase tracking-[0.2em] text-gray-500">
                             <tr>
@@ -415,7 +417,7 @@ export default function EngineeringSelectionSystem() {
                                 const isSelected = compareItems.includes(m.name);
                                 return (
                                     <tr key={i} onClick={() => toggleCompare(m.name)} className={`hover:bg-white/[0.02] transition-colors cursor-pointer group ${isSelected ? 'bg-white/10' : ''}`}>
-                                        <td className="p-4 pl-6 text-white font-black italic group-hover:text-pink-400">
+                                        <td className="p-4 pl-6 text-white font-black group-hover:text-pink-400">
                                             {isSelected && <CheckCircle2 size={14} className="inline mr-2 text-emerald-400" />}
                                             {m.name}
                                         </td>
@@ -444,7 +446,7 @@ export default function EngineeringSelectionSystem() {
                                         <CheckCircle2 size={16} />
                                     </div>
                                 )}
-                                <h3 className="text-3xl font-black text-white mb-2 group-hover:text-emerald-400 transition-colors uppercase italic">{f.grade}</h3>
+                                <h3 className="text-3xl font-black text-white mb-2 group-hover:text-emerald-400 transition-colors uppercase">{f.grade}</h3>
                                 <div className="text-xs text-emerald-500 font-bold uppercase tracking-widest mb-4">{f.desc}</div>
                                 <p className="text-xs text-gray-400">{f.application}</p>
                             </div>
@@ -467,7 +469,7 @@ export default function EngineeringSelectionSystem() {
                                         <CheckCircle2 size={16} />
                                     </div>
                                 )}
-                                <h3 className="text-3xl font-black text-white group-hover:text-teal-400 transition-colors italic mb-1">{s.toFixed(1)}</h3>
+                                <h3 className="text-3xl font-black text-white group-hover:text-teal-400 transition-colors mb-1">{formatEngineeringValue(s, precision, false)}</h3>
                                 <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">mm</div>
                             </div>
                         );
@@ -488,7 +490,7 @@ export default function EngineeringSelectionSystem() {
                                         <CheckCircle2 size={16} />
                                     </div>
                                 )}
-                                <h3 className="text-lg font-black text-white mb-1 group-hover:text-orange-400 transition-colors uppercase italic">{m.name}</h3>
+                                <h3 className="text-lg font-black text-white mb-1 group-hover:text-orange-400 transition-colors uppercase">{m.name}</h3>
                                 <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-4">{m.category}</div>
                                 <div className="space-y-3">
                                     <StatBar value={m.thermalExp || 0} max={100} color="#f97316" label="Alpha (α)" unit="μm/mK" />
@@ -664,18 +666,18 @@ export default function EngineeringSelectionSystem() {
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="text-4xl font-black text-white italic tracking-tight">{title}</h2>
+                        <h2 className="text-4xl font-black text-white tracking-tight">{title}</h2>
                         <p className="text-gray-500 text-sm">{subtitle}</p>
                     </div>
                 </div>
 
-                <div className="bg-[#0a0e12] border border-white/5 rounded-[40px] overflow-hidden shadow-2xl">
+                <div className="bg-[var(--bg-1)] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-white/5 bg-white/[0.02]">
                                 <th className="p-8 text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] w-1/3">Technical Specification</th>
-                                <th className="p-8 text-2xl font-black italic text-center text-cyan-400 w-1/3" style={{ color: currentCat.color }}>{c1Title}</th>
-                                <th className="p-8 text-2xl font-black italic text-center text-cyan-400 w-1/3" style={{ color: currentCat.color }}>{c2Title}</th>
+                                <th className="p-8 text-2xl font-black text-center text-cyan-400 w-1/3" style={{ color: currentCat.color }}>{c1Title}</th>
+                                <th className="p-8 text-2xl font-black text-center text-cyan-400 w-1/3" style={{ color: currentCat.color }}>{c2Title}</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm divide-y divide-white/[0.02]">
@@ -717,11 +719,11 @@ export default function EngineeringSelectionSystem() {
                                         </td>
                                         <td className={c1}>
                                             {n1.toLocaleString()}
-                                            {is1Better && pctDiff > 0 && <div className="text-[9px] text-emerald-400 mt-1 uppercase">+{pctDiff.toFixed(1)}%</div>}
+                                            {is1Better && pctDiff > 0 && <div className="text-[9px] text-emerald-400 mt-1 uppercase">+{formatEngineeringValue(pctDiff, precision, false)}%</div>}
                                         </td>
                                         <td className={c2}>
                                             {n2.toLocaleString()}
-                                            {is2Better && pctDiff > 0 && <div className="text-[9px] text-emerald-400 mt-1 uppercase">+{pctDiff.toFixed(1)}%</div>}
+                                            {is2Better && pctDiff > 0 && <div className="text-[9px] text-emerald-400 mt-1 uppercase">+{formatEngineeringValue(pctDiff, precision, false)}%</div>}
                                         </td>
                                     </tr>
                                 );
@@ -762,7 +764,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="1" max="50" step="0.5"
-                            className="w-full accent-cyan-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={wizardInputs.radialLoad}
                             onChange={(e) => setWizardInputs({ ...wizardInputs, radialLoad: Number(e.target.value) })}
                         />
@@ -774,7 +776,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="0" max="20" step="0.5"
-                            className="w-full accent-purple-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={wizardInputs.axialLoad}
                             onChange={(e) => setWizardInputs({ ...wizardInputs, axialLoad: Number(e.target.value) })}
                         />
@@ -786,7 +788,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="500" max="20000" step="100"
-                            className="w-full accent-amber-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={wizardInputs.speed}
                             onChange={(e) => setWizardInputs({ ...wizardInputs, speed: Number(e.target.value) })}
                         />
@@ -798,7 +800,7 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-7xl font-black text-white italic tracking-tighter mix-blend-plus-lighter">
+                            <h3 className="text-5xl font-black text-white tracking-tighter ">
                                 SKF {recommended.code}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.type.replace(/-/g, ' ')}</p>
@@ -809,7 +811,7 @@ export default function EngineeringSelectionSystem() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Gauge size={12} className="text-emerald-400" /> ISO 281 L10h
                             </div>
@@ -818,16 +820,16 @@ export default function EngineeringSelectionSystem() {
                                 <span className="text-xs text-gray-500 ml-1">hrs</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-cyan-400" /> Equivalent Load (P)
                             </div>
                             <div className="text-3xl font-black font-mono text-cyan-400">
-                                {lifeCalc.P.toFixed(1)}
+                                {formatEngineeringValue(lifeCalc.P, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">kN</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Zap size={12} className="text-amber-400" /> Dynamic Cap (C)
                             </div>
@@ -853,7 +855,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="1" max="250" step="5"
-                            className="w-full accent-red-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={fastenerWizardInputs.tensileLoad}
                             onChange={(e) => setFastenerWizardInputs({ ...fastenerWizardInputs, tensileLoad: Number(e.target.value) })}
                         />
@@ -861,11 +863,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Safety Factor (SF)</span>
-                            <span className="text-purple-400">{fastenerWizardInputs.safetyFactor.toFixed(1)}</span>
+                            <span className="text-purple-400">{formatEngineeringValue(fastenerWizardInputs.safetyFactor, precision, false)}</span>
                         </label>
                         <input
                             type="range" min="1.0" max="5.0" step="0.5"
-                            className="w-full accent-purple-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={fastenerWizardInputs.safetyFactor}
                             onChange={(e) => setFastenerWizardInputs({ ...fastenerWizardInputs, safetyFactor: Number(e.target.value) })}
                         />
@@ -877,7 +879,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="300" max="1200" step="50"
-                            className="w-full accent-amber-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={fastenerWizardInputs.yieldStrength}
                             onChange={(e) => setFastenerWizardInputs({ ...fastenerWizardInputs, yieldStrength: Number(e.target.value) })}
                         />
@@ -889,7 +891,7 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-7xl font-black text-white italic tracking-tighter mix-blend-plus-lighter">
+                            <h3 className="text-5xl font-black text-white tracking-tighter ">
                                 {recommended.size}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">ISO Metric Coarse Thread</p>
@@ -900,25 +902,25 @@ export default function EngineeringSelectionSystem() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-red-400" /> Required Area
                             </div>
                             <div className="text-3xl font-black font-mono text-red-400">
-                                {requiredArea.toFixed(1)}
+                                {formatEngineeringValue(requiredArea, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">mm²</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-emerald-400" /> Actual Area
                             </div>
                             <div className="text-3xl font-black font-mono text-emerald-400">
-                                {recommended.stressArea.toFixed(1)}
+                                {formatEngineeringValue(recommended.stressArea, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">mm²</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Settings size={12} className="text-cyan-400" /> Major Dia
                             </div>
@@ -957,7 +959,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="100" max="6000" step="100"
-                            className="w-full accent-purple-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={gearWizardInputs.speed}
                             onChange={(e) => setGearWizardInputs({ ...gearWizardInputs, speed: Number(e.target.value) })}
                         />
@@ -965,11 +967,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Application Factor (Ka)</span>
-                            <span className="text-amber-400">{gearWizardInputs.applicationFactor.toFixed(2)}</span>
+                            <span className="text-amber-400">{formatEngineeringValue(gearWizardInputs.applicationFactor, precision, false)}</span>
                         </label>
                         <input
                             type="range" min="1.0" max="2.25" step="0.25"
-                            className="w-full accent-amber-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={gearWizardInputs.applicationFactor}
                             onChange={(e) => setGearWizardInputs({ ...gearWizardInputs, applicationFactor: Number(e.target.value) })}
                         />
@@ -981,7 +983,7 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-5xl font-black text-white italic tracking-tighter mix-blend-plus-lighter w-3/4">
+                            <h3 className="text-5xl font-black text-white tracking-tighter w-3/4">
                                 {recommended.name.split('(')[0].trim()}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.name.split('(')[1]?.replace(')', '') || 'Gear Material'}</p>
@@ -992,16 +994,16 @@ export default function EngineeringSelectionSystem() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Zap size={12} className="text-[#8b5cf6]" /> Input Torque
                             </div>
                             <div className="text-3xl font-black font-mono text-[#8b5cf6]">
-                                {torque.toFixed(0)}
+                                {formatEngineeringValue(torque, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">Nm</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-emerald-400" /> Core Hardness
                             </div>
@@ -1009,7 +1011,7 @@ export default function EngineeringSelectionSystem() {
                                 {recommended.hardness}
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-cyan-400" /> Bending Str
                             </div>
@@ -1031,11 +1033,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Plate Thickness</span>
-                            <span className="text-[#f59e0b]">{weldingWizardInputs.thickness} mm</span>
+                            <span className="text-[var(--warn)]">{weldingWizardInputs.thickness} mm</span>
                         </label>
                         <input
                             type="range" min="1" max="50" step="1"
-                            className="w-full accent-[#f59e0b] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--warn)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={weldingWizardInputs.thickness}
                             onChange={(e) => setWeldingWizardInputs({ ...weldingWizardInputs, thickness: Number(e.target.value) })}
                         />
@@ -1047,7 +1049,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="300" max="800" step="10"
-                            className="w-full accent-red-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={weldingWizardInputs.tensileRequirement}
                             onChange={(e) => setWeldingWizardInputs({ ...weldingWizardInputs, tensileRequirement: Number(e.target.value) })}
                         />
@@ -1059,27 +1061,27 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-5xl font-black text-white italic tracking-tighter mix-blend-plus-lighter w-3/4">
+                            <h3 className="text-5xl font-black text-white tracking-tighter w-3/4">
                                 AWS {recommended.code}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.nameTr}</p>
                         </div>
                         <div className="hidden md:block opacity-20">
-                            <Zap size={100} className="animate-pulse text-[#f59e0b]" />
+                            <Zap size={100} className="animate-pulse text-[var(--warn)]" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <Scale size={12} className="text-[#f59e0b]" /> Min Leg Size
+                                <Scale size={12} className="text-[var(--warn)]" /> Min Leg Size
                             </div>
-                            <div className="text-3xl font-black font-mono text-[#f59e0b]">
+                            <div className="text-3xl font-black font-mono text-[var(--warn)]">
                                 {minWeldSize}
                                 <span className="text-xs text-gray-500 ml-1">mm</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-emerald-400" /> Max Yield
                             </div>
@@ -1088,7 +1090,7 @@ export default function EngineeringSelectionSystem() {
                                 <span className="text-xs text-gray-500 ml-1">MPa</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Zap size={12} className="text-cyan-400" /> Current
                             </div>
@@ -1111,11 +1113,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Target Flow Rate</span>
-                            <span className="text-[#3b82f6]">{pumpWizardInputs.flowRate} m³/h</span>
+                            <span className="text-[var(--std)]">{pumpWizardInputs.flowRate} m³/h</span>
                         </label>
                         <input
                             type="range" min="5" max="200" step="5"
-                            className="w-full accent-[#3b82f6] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--std)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={pumpWizardInputs.flowRate}
                             onChange={(e) => setPumpWizardInputs({ ...pumpWizardInputs, flowRate: Number(e.target.value) })}
                         />
@@ -1127,7 +1129,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="10" max="150" step="5"
-                            className="w-full accent-cyan-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={pumpWizardInputs.head}
                             onChange={(e) => setPumpWizardInputs({ ...pumpWizardInputs, head: Number(e.target.value) })}
                         />
@@ -1139,27 +1141,27 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-5xl font-black text-white italic tracking-tighter mix-blend-plus-lighter">
+                            <h3 className="text-5xl font-black text-white tracking-tighter ">
                                 {recommended.model}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.type} Pump</p>
                         </div>
                         <div className="hidden md:block opacity-20">
-                            <Droplets size={100} className="text-[#3b82f6] animate-pulse" />
+                            <Droplets size={100} className="text-[var(--std)] animate-pulse" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <Zap size={12} className="text-[#3b82f6]" /> Req Shaft Power
+                                <Zap size={12} className="text-[var(--std)]" /> Req Shaft Power
                             </div>
-                            <div className="text-3xl font-black font-mono text-[#3b82f6]">
-                                {reqPower.toFixed(1)}
+                            <div className="text-3xl font-black font-mono text-[var(--std)]">
+                                {formatEngineeringValue(reqPower, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">kW</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-emerald-400" /> Rated Motor
                             </div>
@@ -1168,7 +1170,7 @@ export default function EngineeringSelectionSystem() {
                                 <span className="text-xs text-gray-500 ml-1">kW</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-cyan-400" /> Peak Eff.
                             </div>
@@ -1192,11 +1194,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Applied Force</span>
-                            <span className="text-[#ec4899]">{strengthWizardInputs.force} kN</span>
+                            <span className="text-[var(--bad)]">{strengthWizardInputs.force} kN</span>
                         </label>
                         <input
                             type="range" min="10" max="1000" step="10"
-                            className="w-full accent-[#ec4899] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--bad)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={strengthWizardInputs.force}
                             onChange={(e) => setStrengthWizardInputs({ ...strengthWizardInputs, force: Number(e.target.value) })}
                         />
@@ -1204,11 +1206,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Safety Factor (SF)</span>
-                            <span className="text-purple-400">{strengthWizardInputs.safetyFactor.toFixed(1)}</span>
+                            <span className="text-purple-400">{formatEngineeringValue(strengthWizardInputs.safetyFactor, precision, false)}</span>
                         </label>
                         <input
                             type="range" min="1.0" max="5.0" step="0.5"
-                            className="w-full accent-purple-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={strengthWizardInputs.safetyFactor}
                             onChange={(e) => setStrengthWizardInputs({ ...strengthWizardInputs, safetyFactor: Number(e.target.value) })}
                         />
@@ -1216,11 +1218,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Cross Section</span>
-                            <span className="text-[#ec4899]">{strengthWizardInputs.crossSection} mm²</span>
+                            <span className="text-[var(--bad)]">{strengthWizardInputs.crossSection} mm²</span>
                         </label>
                         <input
                             type="range" min="50" max="2500" step="50"
-                            className="w-full accent-[#ec4899] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--bad)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={strengthWizardInputs.crossSection}
                             onChange={(e) => setStrengthWizardInputs({ ...strengthWizardInputs, crossSection: Number(e.target.value) })}
                         />
@@ -1232,27 +1234,27 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-5xl font-black text-white italic tracking-tighter mix-blend-plus-lighter w-3/4">
+                            <h3 className="text-5xl font-black text-white tracking-tighter w-3/4">
                                 {recommended.name}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.category} (Steel)</p>
                         </div>
                         <div className="hidden md:block opacity-20">
-                            <CircleSlash size={100} className="text-[#ec4899] animate-pulse" />
+                            <CircleSlash size={100} className="text-[var(--bad)] animate-pulse" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <Zap size={12} className="text-[#ec4899]" /> Required Stress
+                                <Zap size={12} className="text-[var(--bad)]" /> Required Stress
                             </div>
-                            <div className="text-3xl font-black font-mono text-[#ec4899]">
-                                {requiredStress.toFixed(1)}
+                            <div className="text-3xl font-black font-mono text-[var(--bad)]">
+                                {formatEngineeringValue(requiredStress, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">MPa</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-emerald-400" /> Actual Yield
                             </div>
@@ -1261,7 +1263,7 @@ export default function EngineeringSelectionSystem() {
                                 <span className="text-xs text-gray-500 ml-1">MPa</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-cyan-400" /> Density
                             </div>
@@ -1275,18 +1277,18 @@ export default function EngineeringSelectionSystem() {
             );
         } else if (selectedCategory === 'fit') {
             const recommended = FITS_DB[0]; // Sliding fit default
-            const typicalClearance = (10 + fitWizardInputs.nominalDiameter * 0.5).toFixed(1);
+            const typicalClearance =formatEngineeringValue((10 + fitWizardInputs.nominalDiameter * 0.5), precision, false);
 
             inputContent = (
                 <div className="space-y-6">
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Nominal Shaft Dia</span>
-                            <span className="text-[#10b981]">{fitWizardInputs.nominalDiameter} mm</span>
+                            <span className="text-[var(--ok)]">{fitWizardInputs.nominalDiameter} mm</span>
                         </label>
                         <input
                             type="range" min="5" max="200" step="1"
-                            className="w-full accent-[#10b981] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--ok)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={fitWizardInputs.nominalDiameter}
                             onChange={(e) => setFitWizardInputs({ ...fitWizardInputs, nominalDiameter: Number(e.target.value) })}
                         />
@@ -1298,26 +1300,26 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-7xl font-black text-white italic tracking-tighter mix-blend-plus-lighter w-3/4">
+                            <h3 className="text-5xl font-black text-white tracking-tighter w-3/4">
                                 {recommended.grade}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{recommended.desc}</p>
                         </div>
                         <div className="hidden md:block opacity-20">
-                            <Ruler size={100} className="text-[#10b981] animate-pulse" />
+                            <Ruler size={100} className="text-[var(--ok)] animate-pulse" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="col-span-2 bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="col-span-2 bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <CheckCircle2 size={12} className="text-[#10b981]" /> Application
+                                <CheckCircle2 size={12} className="text-[var(--ok)]" /> Application
                             </div>
                             <div className="text-sm font-medium text-white/80 mt-2">
                                 {recommended.application}
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-emerald-400" /> Typical Clearance
                             </div>
@@ -1344,11 +1346,11 @@ export default function EngineeringSelectionSystem() {
                     <div className="space-y-2 group">
                         <label className="text-[10px] font-black text-gray-500 uppercase flex justify-between">
                             <span>Central Load P</span>
-                            <span className="text-[#14b8a6]">{sheetWizardInputs.requiredLoad} kN</span>
+                            <span className="text-[var(--cyan)]">{sheetWizardInputs.requiredLoad} kN</span>
                         </label>
                         <input
                             type="range" min="1" max="500" step="5"
-                            className="w-full accent-[#14b8a6] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={sheetWizardInputs.requiredLoad}
                             onChange={(e) => setSheetWizardInputs({ ...sheetWizardInputs, requiredLoad: Number(e.target.value) })}
                         />
@@ -1360,7 +1362,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="100" max="2500" step="50"
-                            className="w-full accent-cyan-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={sheetWizardInputs.width}
                             onChange={(e) => setSheetWizardInputs({ ...sheetWizardInputs, width: Number(e.target.value) })}
                         />
@@ -1372,27 +1374,27 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-7xl font-black text-white italic tracking-tighter mix-blend-plus-lighter w-3/4">
+                            <h3 className="text-5xl font-black text-white tracking-tighter w-3/4">
                                 {recommendedThick}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">Standard Sheet (Sac) T (mm)</p>
                         </div>
                         <div className="hidden md:block opacity-20">
-                            <Layers size={100} className="text-[#14b8a6] animate-pulse" />
+                            <Layers size={100} className="text-[var(--cyan)] animate-pulse" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <Zap size={12} className="text-[#14b8a6]" /> Req Thickness
+                                <Zap size={12} className="text-[var(--cyan)]" /> Req Thickness
                             </div>
-                            <div className="text-3xl font-black font-mono text-[#14b8a6]">
-                                {reqThick.toFixed(2)}
+                            <div className="text-3xl font-black font-mono text-[var(--cyan)]">
+                                {formatEngineeringValue(reqThick, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">mm</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-emerald-400" /> K-Factor
                             </div>
@@ -1400,7 +1402,7 @@ export default function EngineeringSelectionSystem() {
                                 {kFactor}
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-cyan-400" /> Material
                             </div>
@@ -1437,7 +1439,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="-100" max="500" step="5"
-                            className="w-full accent-orange-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={thermalWizardInputs.tempDelta}
                             onChange={(e) => setThermalWizardInputs({ ...thermalWizardInputs, tempDelta: Number(e.target.value) })}
                         />
@@ -1449,7 +1451,7 @@ export default function EngineeringSelectionSystem() {
                         </label>
                         <input
                             type="range" min="1" max="50" step="0.1"
-                            className="w-full accent-yellow-400 h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
+                            className="w-full accent-[var(--cyan)] h-1 bg-white/10 rounded-full appearance-none cursor-ew-resize"
                             value={thermalWizardInputs.alpha}
                             onChange={(e) => setThermalWizardInputs({ ...thermalWizardInputs, alpha: Number(e.target.value) })}
                         />
@@ -1461,8 +1463,8 @@ export default function EngineeringSelectionSystem() {
                 <>
                     <div className="flex items-end justify-between mb-8">
                         <div>
-                            <h3 className="text-7xl font-black text-white italic tracking-tighter mix-blend-plus-lighter">
-                                {finalL.toFixed(3)}
+                            <h3 className="text-5xl font-black text-white tracking-tighter ">
+                                {formatEngineeringValue(finalL, precision, false)}
                             </h3>
                             <p className="text-gray-400 font-bold uppercase tracking-widest mt-2">{t.thermal?.finalLength || 'Final Length'} (mm)</p>
                         </div>
@@ -1472,25 +1474,25 @@ export default function EngineeringSelectionSystem() {
                     </div>
 
                     <div className="grid grid-cols-3 gap-6">
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Zap size={12} className="text-[#f97316]" /> {t.thermal?.expansion || 'Expansion ∆L'}
                             </div>
                             <div className="text-3xl font-black font-mono text-[#f97316]">
-                                {dL >= 0 ? "+" : ""}{dL.toFixed(4)}
+                                {dL >= 0 ? "+" : ""}{formatEngineeringValue(dL, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">mm</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <Scale size={12} className="text-emerald-400" /> {t.thermal?.strain || 'Strain ε'}
                             </div>
                             <div className="text-3xl mt-2 font-black font-mono text-emerald-400">
-                                {strain.toFixed(4)}
+                                {formatEngineeringValue(strain, precision, false)}
                                 <span className="text-xs text-gray-500 ml-1">%</span>
                             </div>
                         </div>
-                        <div className="bg-black/40 backdrop-blur-md border border-white/5 p-5 rounded-3xl">
+                        <div className="bg-black/40 border border-white/5 p-5 rounded-3xl">
                             <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <CheckCircle2 size={12} className="text-cyan-400" /> Material
                             </div>
@@ -1506,12 +1508,12 @@ export default function EngineeringSelectionSystem() {
         return (
             <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
                 <div className="text-center space-y-2 mb-12">
-                    <h2 className="text-5xl font-black text-white italic tracking-tighter">AI Selection Engine</h2>
+                    <h2 className="text-5xl font-black text-white tracking-tighter">AI Selection Engine</h2>
                     <p className="text-gray-500 text-sm font-medium tracking-wide">Enter operating conditions. OS identifies the optimal ISO component.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className="lg:col-span-4 bg-white/[0.02] border border-white/5 p-8 rounded-[40px] space-y-8 backdrop-blur-xl shadow-2xl">
+                    <div className="lg:col-span-4 bg-white/[0.02] border border-white/5 p-8 rounded-xl space-y-8 shadow-2xl">
                         <div className="flex items-center gap-3 mb-4" style={{ color: dynColor }}>
                             <Cpu size={20} />
                             <h4 className="text-[11px] font-black uppercase tracking-[0.2em]">Live Parameters</h4>
@@ -1519,7 +1521,7 @@ export default function EngineeringSelectionSystem() {
                         {inputContent}
                     </div>
 
-                    <div className="lg:col-span-8 p-10 rounded-[40px] relative overflow-hidden flex flex-col justify-between border" style={{ borderColor: `${dynColor}33`, background: `linear-gradient(to bottom right, ${dynColor}1A, transparent)` }}>
+                    <div className="lg:col-span-8 p-10 rounded-xl relative overflow-hidden flex flex-col justify-between border" style={{ borderColor: `${dynColor}33`, background: `linear-gradient(to bottom right, ${dynColor}1A, transparent)` }}>
                         <div className="absolute inset-0" style={{ background: `radial-gradient(circle at top right, ${dynColor}1A, transparent)` }} />
 
                         <div className="relative z-10">
@@ -1548,8 +1550,8 @@ export default function EngineeringSelectionSystem() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-[#030507] text-gray-200 overflow-hidden font-sans select-none selection:bg-cyan-500/30">
-            <header className="px-8 py-5 border-b border-white/[0.05] bg-[#05080a]/80 backdrop-blur-2xl z-50">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] text-gray-200 overflow-hidden font-sans select-none ">
+            <header className="px-8 py-5 border-b border-white/[0.05] bg-[var(--bg-0)]/80 z-50">
                 <div className="flex items-center justify-between gap-6 max-w-[1400px] mx-auto">
                     <div className="flex items-center gap-5">
                         <div className="relative">
@@ -1565,7 +1567,7 @@ export default function EngineeringSelectionSystem() {
                         </div>
                     </div>
 
-                    <div className="flex items-center bg-[#070b0e] p-1.5 rounded-2xl border border-white/[0.05] shadow-inner">
+                    <div className="flex items-center bg-[var(--bg-0)] p-1.5 rounded-2xl border border-white/[0.05] shadow-inner">
                         {(['browse', 'wizard', 'compare'] as ViewMode[]).map((mode) => {
                             if (mode === 'wizard' && !currentCat.hasWizard) return null;
                             const isActive = viewMode === mode;
@@ -1599,10 +1601,10 @@ export default function EngineeringSelectionSystem() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="absolute inset-0 z-50 bg-[#030507]/95 flex flex-col"
+                            className="absolute inset-0 z-50 bg-[var(--bg-0)]/95 flex flex-col"
                             style={{ willChange: 'opacity, transform' }}
                         >
-                            <div className="flex-1 overflow-hidden relative border border-white/10 rounded-[40px] shadow-2xl m-6 bg-[#0a0e14]">
+                            <div className="flex-1 overflow-hidden relative border border-white/10 rounded-xl shadow-2xl m-6 bg-[var(--bg-1)]">
                                 <button
                                     onClick={() => setActiveCalculator(null)}
                                     className="absolute top-6 right-6 z-50 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[10px] font-black tracking-[0.2em] uppercase text-white transition-all flex items-center gap-2 hover:-translate-x-1"
@@ -1620,7 +1622,7 @@ export default function EngineeringSelectionSystem() {
                                     {!['bearings', 'gears-bearings', 'fasteners', 'thermal-expansion'].includes(activeCalculator!) && (
                                         <div className="flex flex-col items-center justify-center h-full opacity-50 p-10 text-center">
                                             <Settings size={48} className="mb-4 text-cyan-500 animate-spin-slow" />
-                                            <h2 className="text-2xl font-black italic tracking-tighter">Initializing {activeCalculator} Calculator</h2>
+                                            <h2 className="text-2xl font-black tracking-tighter">Initializing {activeCalculator} Calculator</h2>
                                             <p className="text-sm font-bold tracking-widest uppercase mt-4">Module Upgrade in Progress</p>
                                         </div>
                                     )}
@@ -1630,7 +1632,7 @@ export default function EngineeringSelectionSystem() {
                     )}
                 </AnimatePresence>
 
-                <aside className="w-[300px] border-r border-white/[0.05] bg-[#050709] flex flex-col relative z-40">
+                <aside className="w-[300px] border-r border-white/[0.05] bg-[var(--bg-0)] flex flex-col relative z-40">
                     <div className="p-6">
                         <div className="relative group mb-6">
                             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -1639,7 +1641,7 @@ export default function EngineeringSelectionSystem() {
                             <input
                                 type="text"
                                 placeholder="Search DB..."
-                                className="w-full bg-[#0a0e14] border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold text-white outline-none focus:border-blue-500/30 transition-all placeholder:text-gray-700 placeholder:font-normal"
+                                className="w-full bg-[var(--bg-1)] border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold text-white outline-none focus:border-blue-500/30 transition-all placeholder:text-gray-700 placeholder:font-normal"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -1685,7 +1687,7 @@ export default function EngineeringSelectionSystem() {
                     </div>
                 </aside>
 
-                <section className="flex-1 overflow-y-auto p-10 relative bg-gradient-to-br from-[#0a0e14] to-black">
+                <section className="flex-1 overflow-y-auto p-10 relative bg-gradient-to-br from-[var(--bg-1)] to-black">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={selectedCategory + "-" + viewMode}

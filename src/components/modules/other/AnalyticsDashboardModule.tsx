@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Analytics Dashboard Module
+ * AluCAD OS — Analytics Dashboard Module
  * 
  * Real-time overview of workstation activity,
  * active modules, recent calculations, and system health.
@@ -22,7 +22,7 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
     color: string; trend?: { value: string; up: boolean };
 }) {
     return (
-        <div className="bg-[#0f1419] border border-white/5 rounded-xl p-4 flex flex-col gap-3 hover:border-white/10 transition-colors">
+        <div className="bg-[var(--bg-1)] border border-white/5 rounded-xl p-4 flex flex-col gap-3 hover:border-white/10 transition-colors">
             <div className="flex items-center justify-between">
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
                     <Icon size={18} style={{ color }} />
@@ -79,7 +79,7 @@ export default function AnalyticsDashboardModule() {
     );
 
     return (
-        <div className="w-full h-full bg-[#0a0e14] overflow-y-auto p-6">
+        <div className="w-full h-full bg-[var(--bg-1)] overflow-y-auto p-6">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/20 flex items-center justify-center">
@@ -102,7 +102,7 @@ export default function AnalyticsDashboardModule() {
             {/* Two-column layout */}
             <div className="grid grid-cols-2 gap-4">
                 {/* Domain Distribution */}
-                <div className="bg-[#0f1419] border border-white/5 rounded-xl p-4">
+                <div className="bg-[var(--bg-1)] border border-white/5 rounded-xl p-4">
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Module Distribution</h3>
                     <div className="space-y-2.5">
                         {domainMeta.map(([key, meta]) => (
@@ -118,7 +118,7 @@ export default function AnalyticsDashboardModule() {
                 </div>
 
                 {/* Active Session Breakdown */}
-                <div className="bg-[#0f1419] border border-white/5 rounded-xl p-4">
+                <div className="bg-[var(--bg-1)] border border-white/5 rounded-xl p-4">
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Active Session</h3>
                     <div className="space-y-3">
                         <div className="flex items-center justify-between py-2 border-b border-white/5">
@@ -147,7 +147,7 @@ export default function AnalyticsDashboardModule() {
             </div>
 
             {/* System Status */}
-            <div className="mt-4 bg-[#0f1419] border border-white/5 rounded-xl p-4">
+            <div className="mt-4 bg-[var(--bg-1)] border border-white/5 rounded-xl p-4">
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Kernel Status</h3>
                 <div className="grid grid-cols-3 gap-4">
                     <div className="flex items-center gap-3">

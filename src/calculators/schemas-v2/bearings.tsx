@@ -9,7 +9,7 @@ export const bearingsSchema: CalculatorSchemaV2 = {
         description: 'Static & dynamic load ratings for deep groove ball bearings (L10h life).',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['bearings', 'skf', 'life', 'l10', 'l10h', 'machine elements'],
         verifiedStandards: ['ISO 281:2007', 'SKF General Catalogue']
@@ -128,7 +128,7 @@ export const bearingsSchema: CalculatorSchemaV2 = {
             const color = isFailing ? '#ef4444' : (L10h > 10000 ? '#10b981' : '#eab308');
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[var(--bg-0)]">
                     {/* Bearing Icon */}
                     <div className="relative w-[150px] h-[150px] mb-8">
                         <svg viewBox="0 0 100 100" width="100%" height="100%" className="animate-[spin_4s_linear_infinite]">
@@ -168,7 +168,7 @@ export const bearingsSchema: CalculatorSchemaV2 = {
                                 {L10h >= 1000000 ? '>1M' : Math.round(L10h).toLocaleString()} <span className="text-xs text-gray-500">hrs</span>
                             </span>
                         </div>
-                        <div className="h-4 bg-[#1a1f26] rounded-full overflow-hidden relative">
+                        <div className="h-4 bg-[var(--bg-3)] rounded-full overflow-hidden relative">
                             <div
                                 className="absolute top-0 left-0 bottom-0 transition-all duration-1000 ease-out"
                                 style={{ width: `${fillWidth}%`, backgroundColor: color }}

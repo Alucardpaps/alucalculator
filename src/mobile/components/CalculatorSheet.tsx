@@ -40,9 +40,9 @@ export function CalculatorSheet({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-        className="fixed inset-0 z-50 bg-[#020408] flex flex-col"
+        className="fixed inset-0 z-50 bg-[var(--bg-0)] flex flex-col"
       >
-        <header className="flex-none h-14 border-b border-cyan-950/30 flex items-center justify-between px-4 bg-slate-950/80 backdrop-blur-md">
+        <header className="flex-none h-14 border-b border-cyan-950/30 flex items-center justify-between px-4 bg-slate-950/80">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => {
@@ -79,7 +79,7 @@ export function CalculatorSheet({
             </button>
           </div>
         </header>
-        <div className="flex-grow w-full relative overflow-y-auto px-4 py-6 pb-12 custom-scrollbar bg-[#020408]">
+        <div className="flex-grow w-full relative overflow-y-auto px-4 py-6 pb-12 custom-scrollbar bg-[var(--bg-0)]">
           <div className="min-h-full w-full relative select-text">
             <WindowContent type={activeModule} />
           </div>

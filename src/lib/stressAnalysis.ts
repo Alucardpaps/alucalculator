@@ -16,6 +16,7 @@
  */
 
 import { MATERIALS_DB, MaterialProp } from '@/data/materialsData';
+import { overlayStrengthMaterials } from '@/materials/canonical';
 
 // ==================== TYPES ====================
 
@@ -53,7 +54,8 @@ export interface PrincipalStresses {
 
 export interface MaterialStrength {
     name: string;
-    Sy: number;        // Yield strength (MPa)
+    Sy: number;        // Yield strength (MPa) — typical unless noted
+    Sy_min?: number;   // Minimum allowable yield (MPa)
     Su: number;        // Ultimate tensile strength (MPa)
     E: number;         // Young's modulus (GPa)
     Se?: number;       // Endurance limit (MPa) - for fatigue
@@ -64,15 +66,17 @@ export interface MaterialStrength {
 // ==================== MATERIAL DATABASE ====================
 
 // Map MATERIALS_DB to MaterialStrength for backward compatibility
-export const STRENGTH_MATERIALS = MATERIALS_DB.map(m => ({
-    name: m.name,
-    Sy: m.yield,
-    Su: m.tensile,
-    E: m.youngsModulus,
-    Se: m.enduranceLimit,
-    G: m.shearModulus,
-    v: m.poissonsRatio
-})) as MaterialStrength[];
+export const STRENGTH_MATERIALS = overlayStrengthMaterials(
+    MATERIALS_DB.map(m => ({
+        name: m.name,
+        Sy: m.yield,
+        Su: m.tensile,
+        E: m.youngsModulus,
+        Se: m.enduranceLimit,
+        G: m.shearModulus,
+        v: m.poissonsRatio
+    }))
+) as MaterialStrength[];
 
 // ==================== ANALYSIS FUNCTIONS ====================
 

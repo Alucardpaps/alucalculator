@@ -14,11 +14,12 @@ if ($LASTEXITCODE -eq 0) {
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     git commit -m "Auto-build update: $timestamp"
     
-    # Push to main
-    git push origin main
+    # Push current HEAD to main and master
+    git push origin HEAD:main
+    git push origin HEAD:master
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Changes successfully pushed to GitHub." -ForegroundColor Green
+        Write-Host "Changes successfully pushed to GitHub (main & master). Hostinger deploy triggered." -ForegroundColor Green
     } else {
         Write-Host "Push failed. Please check your network or git configuration." -ForegroundColor Red
     }

@@ -8,6 +8,7 @@ export interface FormatOptions {
     sigFigs?: number;
     unit?: string;
     space?: boolean; // Space between value and unit
+    trimTrailingZeros?: boolean;
 }
 
 /**
@@ -17,32 +18,30 @@ export interface FormatOptions {
  * 2. If extremely large/small, use scientific notation.
  * 3. Otherwise, use fixed decimals or significant figures.
  */
+import { getGlobalDecimalPrecision, formatEngineeringValue as kitFormat } from '@/components/calculator-kit/precisionUtils';
+
 export function formatEngineeringValue(value: number, options: FormatOptions = {}): string {
     const {
-        decimals = 2,
+        decimals,
         sigFigs,
         unit = '',
-        space = true
+        space = true,
+        trimTrailingZeros = false
     } = options;
 
     if (!Number.isFinite(value) || Number.isNaN(value)) return '-';
 
+    const effectiveDecimals = decimals !== undefined ? decimals : getGlobalDecimalPrecision();
+
     let formatted = '';
 
     if (Math.abs(value) < 1e-9) {
-        formatted = '0';
+        formatted = trimTrailingZeros ? '0' : (0).toFixed(effectiveDecimals);
     } else if (sigFigs) {
         formatted = value.toPrecision(sigFigs);
     } else {
-        // Default strategy: Smart rounding
-        // If value is integer-like, show no decimals?
-        // For now, respect explicit decimals.
-        formatted = value.toFixed(decimals);
+        formatted = kitFormat(value, effectiveDecimals, trimTrailingZeros);
     }
-
-    // Remove trailing zeros if they are decimals? No, engineering precision implies trailing zeros matter.
-    // But for UI "cleanliness", sometimes we want to trim.
-    // Let's stick to strict formatting for now.
 
     return `${formatted}${unit ? (space ? ' ' : '') + unit : ''}`;
 }

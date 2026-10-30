@@ -22,9 +22,9 @@ export const ACADEMY_CALCULATOR_ROUTES: Record<string, AcademyCalculatorRoute> =
     workspaceLabel: 'Fastener Preload Engine',
   },
   'thread-geometry-standards': {
-    href: '/fasteners',
-    engineId: 'fasteners',
-    workspaceLabel: 'Thread & Fastener Engine',
+    href: '/bolt-torque',
+    engineId: 'bolt-torque',
+    workspaceLabel: 'Bolt Torque & Fastener Engine',
   },
   'how-to-calculate-bolt-torque': {
     href: '/bolt-torque',

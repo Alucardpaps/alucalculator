@@ -50,7 +50,7 @@ export default function SandboxPage() {
                 min="0" max="10" step="0.1" 
                 value={load} 
                 onChange={(e) => setLoad(parseFloat(e.target.value))}
-                className="w-full accent-blue-500"
+                className="w-full accent-[var(--cyan)]"
               />
             </div>
           </section>

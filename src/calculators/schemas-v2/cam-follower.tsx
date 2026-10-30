@@ -9,7 +9,7 @@ export const camFollowerSchema: CalculatorSchemaV2 = {
         description: 'Kinematics (displacement, velocity, acceleration) and curvature check for disk cams with roller followers.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['cam follower', 'kinematics', 'cycloidal motion', 'harmonic motion', 'undercutting', 'machine elements'],
         verifiedStandards: ['Rothbart\'s Cam Design Handbook']
@@ -123,7 +123,7 @@ export const camFollowerSchema: CalculatorSchemaV2 = {
             const isSafe = (out.undercut?.value as number) === 1;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Cam SVG representation */}
                     <div className="relative w-[200px] h-[200px]">
                         <svg viewBox="0 0 200 200" width="100%" height="100%" className="overflow-visible animate-spin" style={{ animationDuration: '6s', animationTimingFunction: 'linear' }}>
@@ -152,21 +152,21 @@ export const camFollowerSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Max Accel</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.amax?.value as number) || 0).toFixed(1)} <span className="text-[10px] text-gray-500">g</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Max Speed</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 {((out.vmax?.value as number) || 0).toFixed(2)} <span className="text-[10px] text-gray-500">m/s</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Undercutting</div>
                             <div className={`text-xs font-bold font-mono ${isSafe ? 'text-emerald-400' : 'text-red-400'}`}>

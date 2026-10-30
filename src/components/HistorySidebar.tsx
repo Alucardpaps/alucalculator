@@ -100,7 +100,7 @@ export const HistorySidebar = ({ onSelect }: { onSelect?: (item: HistoryItem) =>
 
             {/* Backdrop */}
             {isOpen && (
-                <div className="fixed inset-0 bg-black/20 z-40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+                <div className="fixed inset-0 bg-black/20 z-40" onClick={() => setIsOpen(false)} />
             )}
         </>
     );

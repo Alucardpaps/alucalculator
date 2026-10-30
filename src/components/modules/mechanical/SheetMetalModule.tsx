@@ -6,17 +6,39 @@
  * Sol panel: input + sonuçlar. Sağ panel: büyük SVG çizim.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, Trash2, RotateCcw, AlertTriangle, CheckCircle2, Info, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, RotateCcw, AlertTriangle, CheckCircle2, Info, ChevronRight, Box, Download, ExternalLink, SplitSquareVertical } from 'lucide-react';
 import { useSheetMetalCalculator } from '@/hooks/useSheetMetalCalculator';
 import { useI18nStore } from '@/store/i18nStore';
 import { useOSStore } from '@/store/osStore';
 import { getSheetMetalModuleStrings } from '@/locales/sheetMetalModuleTranslations';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
+import {
+  SHEET_METAL_PRESETS,
+  SheetMetalSpec,
+  SheetMetalCutout,
+  analyzeAllCutoutsDeformation,
+  exportSheetMetalFlatPatternDXF,
+  savePendingSheetMetalForStudio,
+  consumePendingSheetMetalForCalculator,
+} from '@/design-studio/sheetMetalEngine';
 
-/* ─── Types ─────────────────────────────────────────────────────────────── */
+const SheetMetal3DPreview = dynamic(() => import('./SheetMetal3DPreview'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full min-h-[260px] flex items-center justify-center bg-[var(--bg-0)] text-xs font-mono text-cyan-400">
+      3B Sac Levha Motoru Yükleniyor...
+    </div>
+  ),
+});
+
 interface BendRow { id: string; angle: number; radius: number; flange: number; direction: 'up' | 'down'; }
 interface KTableRow { rtMin: number; rtMax: number; k: number; }
+
+const t12 = (lang: string, en: string, tr: string) => lang === 'tr' ? tr : en;
 
 /* ─── K-Factor Table (DIN 6935) ─────────────────────────────────────────── */
 const DEFAULT_K_TABLE: KTableRow[] = [
@@ -34,7 +56,10 @@ function calcBA(angle: number, R: number, k: number, t: number) {
   return (Math.PI / 180) * angle * (R + k * t);
 }
 function calcOSSB(angle: number, R: number, t: number) {
-  return (R + t) * Math.tan((angle * Math.PI / 180) / 2);
+  const isHemming = angle >= 179.5;
+  if (isHemming) return R + t;
+  const safeAngle = Math.min(179.5, Math.max(0.1, angle));
+  return (R + t) * Math.tan((safeAngle * Math.PI / 180) / 2);
 }
 function calcBD(angle: number, R: number, k: number, t: number) {
   return 2 * calcOSSB(angle, R, t) - calcBA(angle, R, k, t);
@@ -250,6 +275,7 @@ function MultiBendGeometrySVG({
   thickness: number;
   kTable: KTableRow[];
 }) {
+  const precision = useGlobalPrecision();
   const midlineSegments = useMemo(() => {
     return generateProfileSegments(firstFlange, bends, thickness, kTable, 'midline');
   }, [firstFlange, bends, thickness, kTable]);
@@ -286,18 +312,20 @@ function MultiBendGeometrySVG({
   }, [midlineSegments]);
   
   const W = 500, H = 400;
-  const padding = 50;
+  const paddingTop = 70;
+  const paddingBottom = 45;
+  const paddingX = 50;
   
   const boundsWidth = Math.max(bounds.maxX - bounds.minX, 1);
   const boundsHeight = Math.max(bounds.maxY - bounds.minY, 1);
   
   const scale = Math.min(
-    (W - 2 * padding) / boundsWidth,
-    (H - 2 * padding) / boundsHeight
+    (W - 2 * paddingX) / boundsWidth,
+    (H - paddingTop - paddingBottom) / boundsHeight
   );
   
-  const offsetX = padding + (W - 2 * padding - boundsWidth * scale) / 2 - bounds.minX * scale;
-  const offsetY = padding + (H - 2 * padding - boundsHeight * scale) / 2 + bounds.maxY * scale;
+  const offsetX = paddingX + (W - 2 * paddingX - boundsWidth * scale) / 2 - bounds.minX * scale;
+  const offsetY = paddingTop + (H - paddingTop - paddingBottom - boundsHeight * scale) / 2 + bounds.maxY * scale;
   
   const projectX = (x: number) => offsetX + x * scale;
   const projectY = (y: number) => offsetY - y * scale;
@@ -408,8 +436,8 @@ function MultiBendGeometrySVG({
             <line x1={sx - 8} y1={sy + thicknessPx / 2} x2={sx + 8} y2={sy + thicknessPx / 2} stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
             <line x1={sx} y1={sy - thicknessPx / 2 - 12} x2={sx} y2={sy - thicknessPx / 2} stroke="#38bdf8" strokeWidth="1" markerEnd="url(#dimArrow)" />
             <line x1={sx} y1={sy + thicknessPx / 2 + 12} x2={sx} y2={sy + thicknessPx / 2} stroke="#38bdf8" strokeWidth="1" markerEnd="url(#dimArrow)" />
-            <text x={sx - 12} y={sy + 3.5} fontSize="11" fill="#38bdf8" textAnchor="end" fontFamily="monospace" fontWeight="bold">
-              t = {thickness.toFixed(1)} mm
+            <text x={sx - 12} y={sy + 3.5} fontSize="11" fill="#38bdf8" textAnchor="end" fontFamily="monospace" fontWeight="bold" stroke="#030710" strokeWidth="4" paintOrder="stroke fill">
+              t = {formatEngineeringValue(thickness, precision, true)} mm
             </text>
           </g>
         );
@@ -499,7 +527,7 @@ function MultiBendGeometrySVG({
         );
       })}
       
-      <text x="14" y="20" fontSize="11" fill="rgba(255,255,255,0.2)" fontFamily="monospace" fontWeight="bold" letterSpacing="2">
+      <text x="14" y="20" fontSize="11" fill="#94a3b8" fontFamily="monospace" fontWeight="bold" letterSpacing="2">
         AEGIS — MULTI-BEND PROFILE FOLDING VIEW
       </text>
     </svg>
@@ -520,11 +548,14 @@ function FlatPatternSVG({
   firstFlange: number;
   unit: 'metric' | 'imperial';
 }) {
+  const precision = useGlobalPrecision();
+  const { language } = useI18nStore();
+
   if (bends.length === 0) return null;
 
   const isImp = unit === 'imperial';
-  const toImp = (mm: number) => +(mm / 25.4).toFixed(4);
-  const fmtVal = (mm: number) => isImp ? toImp(mm).toFixed(3) : mm.toFixed(2);
+  const toImp = (mm: number) => mm / 25.4;
+  const fmtVal = (mm: number) => formatEngineeringValue(isImp ? toImp(mm) : mm, precision, true);
 
   // Build segments
   interface FlatSegment {
@@ -542,22 +573,27 @@ function FlatPatternSVG({
 
   const segs: FlatSegment[] = [];
   let currentDist = 0;
+  const ossbs = bends.map(b => calcOSSB(b.angle, b.radius, thickness));
+  const f0Flat = Math.max(0.5, firstFlange - (ossbs.length > 0 ? ossbs[0] : 0));
 
   // F0 segment
   segs.push({
     label: 'F₀',
-    width: firstFlange,
+    width: f0Flat,
     start: 0,
-    end: firstFlange,
+    end: f0Flat,
     isBend: false,
     color: '#38bdf8'
   });
-  currentDist = firstFlange;
+  currentDist = f0Flat;
 
   bends.forEach((b, i) => {
     const rt = b.radius / thickness;
     const k = getK(rt, kTable);
     const ba = calcBA(b.angle, b.radius, k, thickness);
+    const startOssb = ossbs[i];
+    const endOssb = i + 1 < ossbs.length ? ossbs[i + 1] : 0;
+    const fiFlat = Math.max(0.5, b.flange - startOssb - endOssb);
 
     // Bend segment
     segs.push({
@@ -577,13 +613,13 @@ function FlatPatternSVG({
     // Flange segment
     segs.push({
       label: `F${i + 1}`,
-      width: b.flange,
+      width: fiFlat,
       start: currentDist,
-      end: currentDist + b.flange,
+      end: currentDist + fiFlat,
       isBend: false,
       color: '#38bdf8'
     });
-    currentDist += b.flange;
+    currentDist += fiFlat;
   });
 
   const totalFlat = currentDist;
@@ -739,7 +775,7 @@ function FlatPatternSVG({
               fontWeight="black"
               textAnchor="middle"
             >
-              {`${seg.label}:${fmtVal(seg.width)}`}
+              {`${seg.label}: ${fmtVal(seg.width)}`}
             </text>
           </g>
         );
@@ -853,7 +889,7 @@ function FlatPatternSVG({
           fill="rgba(255,255,255,0.35)"
           fontFamily="sans-serif"
         >
-          * Alt çizgideki ölçüler, sol kenardan büküm ekseni çizgilerine olan mesafeyi belirtir (büküm çizgileri).
+          {t12(language, '* Dimensions below denote distances from left edge to bend axis lines (bend lines).', '* Alt çizgideki ölçüler, sol kenardan büküm ekseni çizgilerine olan mesafeyi belirtir (büküm çizgileri).')}
         </text>
       </g>
     </svg>
@@ -876,19 +912,24 @@ function BendTable({
   unit: 'metric' | 'imperial';
   dict: any;
 }) {
+  const precision = useGlobalPrecision();
+  const { language } = useI18nStore();
   const isImp = unit === 'imperial';
-  const toImp = (mm: number) => +(mm / 25.4).toFixed(4);
-  const fmt = (mm: number, dec = 2) => isImp ? `${toImp(mm).toFixed(dec+1)} in` : `${mm.toFixed(dec)} mm`;
+  const toImp = (mm: number) => mm / 25.4;
+  const fmt = (mm: number, dec = 2) => isImp ? `${formatEngineeringValue(toImp(mm), precision, false)} in` : `${formatEngineeringValue(mm, precision, false)} mm`;
   
-  let accum = firstFlange;
+  const ossbs = bends.map(b => calcOSSB(b.angle, b.radius, thickness));
+  let accum = Math.max(0.5, firstFlange - (ossbs.length > 0 ? ossbs[0] : 0));
   const rows = bends.map((b, i) => {
     const rt = b.radius / thickness;
     const k = getK(rt, kTable);
     const ba = calcBA(b.angle, b.radius, k, thickness);
     const bd = calcBD(b.angle, b.radius, k, thickness);
-    const ossb = calcOSSB(b.angle, b.radius, thickness);
+    const ossb = ossbs[i];
+    const nextOssb = i + 1 < ossbs.length ? ossbs[i + 1] : 0;
+    const flatFlange = Math.max(0.5, b.flange - ossb - nextOssb);
     const bendLine = accum + ba / 2;
-    accum += ba + b.flange;
+    accum += ba + flatFlange;
     return {
       ...b,
       ba,
@@ -902,30 +943,30 @@ function BendTable({
   });
 
   return (
-    <div className="w-full mt-4 rounded-xl border border-white/5 bg-[#05090f]/80 overflow-hidden backdrop-blur-sm">
+    <div className="w-full mt-4 rounded-xl border border-white/5 bg-[var(--bg-0)] overflow-hidden">
       <div className="px-4 py-2.5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-          <span className="text-[12px] font-black uppercase tracking-wider text-slate-300">AEGIS — DETAYLI BÜKÜM TABLOSU (BEND TABLE)</span>
+          <span className="text-[12px] font-black uppercase tracking-wider text-slate-300">{t12(language, 'AEGIS — DETAILED BEND TABLE', 'AEGIS — DETAYLI BÜKÜM TABLOSU')}</span>
         </div>
-        <span className="text-[10px] font-mono text-slate-500">DIN 6935 Standardı</span>
+        <span className="text-[10px] font-mono text-slate-500">{t12(language, 'DIN 6935 Standard', 'DIN 6935 Standardı')}</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse font-mono text-[11px]">
+        <table className="w-full min-w-[760px] text-left border-collapse font-mono text-[11px]">
           <thead>
-            <tr className="border-b border-white/5 bg-[#080c14] text-slate-400 font-sans text-[10px] uppercase tracking-wider">
+            <tr className="border-b border-white/5 bg-[var(--bg-1)] text-slate-400 font-sans text-[10px] uppercase tracking-wider">
               <th className="py-2.5 px-3">No</th>
-              <th className="py-2.5 px-2">Yön</th>
-              <th className="py-2.5 px-2 text-right">Açı</th>
-              <th className="py-2.5 px-2 text-right">Yarıçap (R)</th>
-              <th className="py-2.5 px-2 text-right">Kanat (F)</th>
+              <th className="py-2.5 px-2">{t12(language, 'Dir', 'Yön')}</th>
+              <th className="py-2.5 px-2 text-right">{t12(language, 'Angle', 'Açı')}</th>
+              <th className="py-2.5 px-2 text-right">{t12(language, 'Radius (R)', 'Yarıçap (R)')}</th>
+              <th className="py-2.5 px-2 text-right">{t12(language, 'Flange (F)', 'Kanat (F)')}</th>
               <th className="py-2.5 px-2 text-right">R/t</th>
-              <th className="py-2.5 px-2 text-right">K-Faktörü</th>
-              <th className="py-2.5 px-2 text-right text-violet-400">BA (Büküm Payı)</th>
-              <th className="py-2.5 px-2 text-right text-sky-400">BD (Büküm Kaybı)</th>
+              <th className="py-2.5 px-2 text-right">{t12(language, 'K-Factor', 'K-Faktörü')}</th>
+              <th className="py-2.5 px-2 text-right text-violet-400">{t12(language, 'BA (Bend Allowance)', 'BA (Büküm Payı)')}</th>
+              <th className="py-2.5 px-2 text-right text-sky-400">{t12(language, 'BD (Bend Deduction)', 'BD (Büküm Kaybı)')}</th>
               <th className="py-2.5 px-2 text-right text-amber-400">Setback (OSSB)</th>
-              <th className="py-2.5 px-3 text-right text-emerald-400">Büküm Çizgisi (x_c)</th>
-              <th className="py-2.5 px-3 text-center">Durum</th>
+              <th className="py-2.5 px-3 text-right text-emerald-400">{t12(language, 'Bend Line (x_c)', 'Büküm Çizgisi (x_c)')}</th>
+              <th className="py-2.5 px-3 text-center">{t12(language, 'Status', 'Durum')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.03]">
@@ -944,17 +985,17 @@ function BendTable({
                 <td className="py-2 px-2 text-right font-black text-white">{row.angle}°</td>
                 <td className="py-2 px-2 text-right text-slate-300">{fmt(row.radius, 1)}</td>
                 <td className="py-2 px-2 text-right text-slate-300">{fmt(row.flange, 1)}</td>
-                <td className="py-2 px-2 text-right text-slate-400">{row.rt.toFixed(2)}</td>
-                <td className="py-2 px-2 text-right text-slate-300 font-bold">{row.k.toFixed(3)}</td>
+                <td className="py-2 px-2 text-right text-slate-400">{formatEngineeringValue(row.rt, precision, false)}</td>
+                <td className="py-2 px-2 text-right text-slate-300 font-bold">{formatEngineeringValue(row.k, precision, false)}</td>
                 <td className="py-2 px-2 text-right text-violet-300 font-black">{fmt(row.ba, 2)}</td>
                 <td className="py-2 px-2 text-right text-sky-300 font-black">{fmt(row.bd, 2)}</td>
                 <td className="py-2 px-2 text-right text-amber-300">{fmt(row.ossb, 2)}</td>
                 <td className="py-2 px-3 text-right text-emerald-300 font-black">{fmt(row.bendLine, 2)}</td>
                 <td className="py-2 px-3 text-center">
                   {row.isCracking ? (
-                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444]" title="Çatlama Riski var" />
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 " title={t12(language, 'Risk of cracking (R < t)', 'Çatlama Riski var (R < t)')} />
                   ) : (
-                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]" title="Güvenli büküm yarıçapı" />
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 " title={t12(language, 'Safe bend radius', 'Güvenli büküm yarıçapı')} />
                   )}
                 </td>
               </tr>
@@ -962,10 +1003,10 @@ function BendTable({
           </tbody>
         </table>
       </div>
-      <div className="px-4 py-2 border-t border-white/5 bg-[#030609]/60 text-[10px] text-slate-600 font-sans flex flex-wrap justify-between gap-2">
-        <span>* BA: Büküm payı. Düz plaka boyuna eklenir.</span>
-        <span>* BD: Büküm kaybı. L1 + L2 dış ölçü toplamından çıkarılır.</span>
-        <span>* x_c (Büküm Çizgisi): Plakanın sol kenarından büküm ekseni çizgisine olan mesafe.</span>
+      <div className="px-4 py-2 border-t border-white/5 bg-[var(--bg-0)]/60 text-[10px] text-slate-600 font-sans flex flex-wrap justify-between gap-2">
+        <span>{t12(language, '* BA: Bend Allowance. Added to flat blank length.', '* BA: Büküm payı. Düz plaka boyuna eklenir.')}</span>
+        <span>{t12(language, '* BD: Bend Deduction. Subtracted from outside flange sum (L1 + L2).', '* BD: Büküm kaybı. L1 + L2 dış ölçü toplamından çıkarılır.')}</span>
+        <span>{t12(language, '* x_c (Bend Line): Distance from left edge of flat blank to bend axis line.', '* x_c (Büküm Çizgisi): Plakanın sol kenarından büküm ekseni çizgisine olan mesafe.')}</span>
       </div>
     </div>
   );
@@ -973,6 +1014,8 @@ function BendTable({
 
 /* ─── Main Component ─────────────────────────────────────────────────────── */
 export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: string; dict?: any }) {
+  const router = useRouter();
+  const precision = useGlobalPrecision();
   const { language: storeLang } = useI18nStore();
   const { dictionary: storeDict } = useOSStore();
   const lang = propLang || storeLang;
@@ -981,21 +1024,119 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
   const { materialIdx, setMaterialIdx, thickness, setThickness, length, setLength, materials } = useSheetMetalCalculator();
 
   const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
-  const [activeTab, setActiveTab] = useState<'multi' | 'ktable'>('multi');
+  const [activeTab, setActiveTab] = useState<'multi' | 'cutouts' | 'ktable'>('multi');
+  const [viewMode, setViewMode] = useState<'split' | '3d' | '2d'>('split');
+  const [partName, setPartName] = useState<string>('Sac Z-Profil 40x50x30');
   const [firstFlange, setFirstFlange] = useState(40);
   const [kTable, setKTable] = useState<KTableRow[]>(DEFAULT_K_TABLE);
   const [bends, setBends] = useState<BendRow[]>([
     { id: 'b1', angle: 90, radius: 3, flange: 50, direction: 'down' },
     { id: 'b2', angle: 90, radius: 3, flange: 30, direction: 'up' },
   ]);
+  const [cutouts, setCutouts] = useState<SheetMetalCutout[]>([
+    { id: 'c1', name: 'Montaj Deliği Ø8.5', type: 'round_hole', flangeIndex: 0, posU: 20, posV: 60, diameter: 8.5 },
+    { id: 'c2', name: 'Slot Delik 10x24', type: 'slot', flangeIndex: 1, posU: 25, posV: 70, width: 10, length: 24 },
+  ]);
+
+  // Receive pending sheet metal spec sent back from /design-studio/
+  useEffect(() => {
+    const incoming = consumePendingSheetMetalForCalculator();
+    if (incoming) {
+      if (incoming.name) setPartName(incoming.name);
+      if (incoming.thickness > 0) setThickness(incoming.thickness);
+      if (incoming.length > 0) setLength(incoming.length);
+      if (incoming.firstFlange > 0) setFirstFlange(incoming.firstFlange);
+      if (Array.isArray(incoming.bends) && incoming.bends.length > 0) {
+        setBends(incoming.bends.map((b, idx) => ({
+          id: b.id || `b_${idx + 1}`,
+          angle: b.angle,
+          radius: b.radius,
+          flange: b.flange,
+          direction: b.direction,
+        })));
+      }
+      if (Array.isArray(incoming.cutouts)) {
+        setCutouts(incoming.cutouts);
+      }
+    }
+  }, [setThickness, setLength]);
 
   const isImp = unit === 'imperial';
-  const toImp = (mm: number) => +(mm / 25.4).toFixed(4);
+  const toImp = (mm: number) => mm / 25.4;
   const toMet = (inch: number) => inch * 25.4;
-  const dp = (mm: number, dec = 3) => isImp ? `${toImp(mm).toFixed(dec)} in` : `${mm.toFixed(dec)} mm`;
+  const dp = (mm: number, dec = 3) => isImp ? `${formatEngineeringValue(toImp(mm), precision, false)} in` : `${formatEngineeringValue(mm, precision, false)} mm`;
 
   const mat = materials[materialIdx];
   const Rm = Math.round((mat?.yield ?? 250) * 1.35);
+
+  const currentSpec: SheetMetalSpec = useMemo(() => ({
+    name: partName || 'Sac Levha Parçası',
+    materialName: mat?.name || 'EN AW-5052 H32',
+    yieldStrengthMpa: mat?.yield ?? 195,
+    densityGcm3: (mat as any)?.density ?? 2.68,
+    thickness,
+    length,
+    firstFlange,
+    bends,
+    cutouts,
+    kTable,
+    color: '#38bdf8',
+  }), [partName, mat, thickness, length, firstFlange, bends, cutouts, kTable]);
+
+  const applyPreset = (presetId: string) => {
+    const preset = SHEET_METAL_PRESETS.find(p => p.id === presetId);
+    if (!preset) return;
+    setPartName(preset.spec.name);
+    setThickness(preset.spec.thickness);
+    setLength(preset.spec.length);
+    setFirstFlange(preset.spec.firstFlange);
+    setBends(preset.spec.bends.map(b => ({ ...b })));
+    setCutouts(preset.spec.cutouts ? preset.spec.cutouts.map(c => ({ ...c })) : []);
+  };
+
+  const addCutout = (type: 'round_hole' | 'slot' | 'rect_cutout') => {
+    const id = `c_${Date.now()}`;
+    const newCutout: SheetMetalCutout = {
+      id,
+      name: type === 'round_hole' ? 'Delik Ø8' : type === 'slot' ? 'Slot 8x20' : 'Kesik 20x20',
+      type,
+      flangeIndex: 0,
+      posU: 20,
+      posV: Math.min(60, length / 2),
+      ...(type === 'round_hole' ? { diameter: 8 } : {}),
+      ...(type === 'slot' ? { width: 8, length: 20 } : {}),
+      ...(type === 'rect_cutout' ? { width: 20, length: 20 } : {}),
+    };
+    setCutouts((prev) => [...prev, newCutout]);
+  };
+
+  const removeCutout = (id: string) => {
+    setCutouts((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const updateCutout = (id: string, patch: Partial<SheetMetalCutout>) => {
+    setCutouts((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+  };
+
+  const cutoutDeformations = useMemo(() => {
+    return analyzeAllCutoutsDeformation(currentSpec);
+  }, [currentSpec]);
+
+  const handleSendTo3DStudio = () => {
+    savePendingSheetMetalForStudio(currentSpec);
+    router.push('/design-studio/?sheetMetal=import');
+  };
+
+  const handleDownloadFlatDXF = () => {
+    const dxfContent = exportSheetMetalFlatPatternDXF(currentSpec);
+    const blob = new Blob([dxfContent], { type: 'application/dxf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(partName || 'sheet_metal_flat').replace(/\s+/g, '_').toLowerCase()}_din6935_flat.dxf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Multi bend
   const multiBends = useMemo(() => {
@@ -1033,10 +1174,10 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
   const updateK = (i: number, k: number) => setKTable(p => p.map((r, idx) => idx === i ? { ...r, k } : r));
 
   return (
-    <div className="flex flex-col lg:flex-row h-full w-full bg-[#020609] text-white font-sans overflow-y-auto lg:overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full w-full bg-[var(--bg-0)] text-white font-sans overflow-y-auto lg:overflow-hidden">
 
       {/* ══════════════ LEFT PANEL ══════════════ */}
-      <div className="w-full lg:w-[320px] shrink-0 flex flex-col h-auto lg:h-full bg-[#05090f]/95 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
+      <div className="w-full lg:w-[340px] shrink-0 flex flex-col h-auto lg:h-full bg-[var(--bg-0)]/95 border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
 
         {/* Header */}
         <div className="flex-none px-4 pt-4 pb-3 border-b border-white/5">
@@ -1045,7 +1186,7 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
               <p className="text-[12px] font-black uppercase tracking-[0.25em] text-violet-400">{dict.sheetMetal?.title || 'Sheet Metal'}</p>
               <p className="text-[10px] font-mono text-slate-600 mt-0.5">{s.standardsSubtitle}</p>
             </div>
-            <div className="flex bg-[#080c14] p-0.5 rounded-lg border border-white/5">
+            <div className="flex bg-[var(--bg-1)] p-0.5 rounded-lg border border-white/5">
               {(['metric','imperial'] as const).map(u => (
                 <button key={u} onClick={() => setUnit(u)}
                   className={`px-2 py-1 text-[10px] font-black uppercase rounded-md transition-all ${unit===u ? 'bg-violet-500/25 text-violet-400' : 'text-slate-700'}`}>
@@ -1055,9 +1196,20 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
             </div>
           </div>
 
+          {/* Direct 3D CAD Studio Launch CTA */}
+          <button
+            type="button"
+            onClick={handleSendTo3DStudio}
+            className="w-full mb-2.5 py-2 px-3 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-200 text-[10.5px] font-mono font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all "
+          >
+            <Box size={13} className="text-cyan-400" />
+            {t12(lang, 'Open Part in 3D CAD Studio (/design-studio)', "3B Tasarım Stüdyosu'na Gönder (/design-studio)")}
+            <ExternalLink size={11} className="text-cyan-400" />
+          </button>
+
           {/* Tab switcher */}
-          <div className="grid grid-cols-2 gap-0.5 bg-[#060a12] rounded-xl p-0.5 border border-white/5">
-            {([['multi', s.bendingProfile], ['ktable', s.kTable]] as const).map(([t, label]) => (
+          <div className="grid grid-cols-3 gap-0.5 bg-[var(--bg-0)] rounded-xl p-0.5 border border-white/5">
+            {([['multi', s.bendingProfile], ['cutouts', t12(lang, 'Holes & Slots', 'Delik & Kesik')], ['ktable', s.kTable]] as const).map(([t, label]) => (
               <button key={t} onClick={() => setActiveTab(t)}
                 className={`py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${activeTab===t ? 'bg-violet-500/25 text-violet-300' : 'text-slate-600 hover:text-slate-400'}`}>
                 {label}
@@ -1068,12 +1220,38 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
 
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
 
+          {/* Quick Industrial Sheet Metal Templates */}
+          <Section title={t12(lang, '3D Sheet Metal Templates', 'Hazır 3B Sac Levha Kalıpları')}>
+            <div className="grid grid-cols-2 gap-1.5">
+              {SHEET_METAL_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => applyPreset(preset.id)}
+                  className="text-left px-2.5 py-1.5 rounded-lg bg-[var(--bg-1)] hover:bg-cyan-950/30 border border-white/8 hover:border-cyan-500/40 transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-black text-cyan-400 group-hover:text-cyan-300">
+                      {preset.badge}
+                    </span>
+                    <span className="text-[9px] font-mono text-slate-600">
+                      t={preset.spec.thickness}mm
+                    </span>
+                  </div>
+                  <div className="text-[10px] font-semibold text-slate-300 truncate mt-0.5">
+                    {lang === 'tr' ? preset.labelTr : preset.labelEn}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </Section>
+
           {/* Global params */}
           <Section title={s.materialGeneral}>
             <Field label={dict.sheetMetal?.inputs?.material || 'Material'}>
               <select value={materialIdx} onChange={e => setMaterialIdx(+e.target.value)}
-                className="w-full bg-[#080c14] border border-white/8 rounded-lg px-3 py-2 text-[11px] text-white font-mono outline-none focus:border-violet-500/40 appearance-none">
-                {materials.map((m, i) => <option key={i} value={i} className="bg-[#060a12]">{m.name}</option>)}
+                className="w-full bg-[var(--bg-1)] border border-white/8 rounded-lg px-3 py-2 text-[11px] text-white font-mono outline-none focus:border-violet-500/40 appearance-none">
+                {materials.map((m, i) => <option key={i} value={i} className="bg-[var(--bg-0)]">{m.name}</option>)}
               </select>
             </Field>
             <div className="flex gap-2 text-[11px] font-mono bg-violet-950/10 border border-violet-500/10 rounded-lg px-3 py-2">
@@ -1104,7 +1282,7 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
             {bends.map((b, i) => {
               const r = multiBends.rows[i];
               return (
-                <div key={b.id} className="rounded-xl border border-white/5 bg-[#080c14]/60 p-3">
+                <div key={b.id} className="rounded-xl border border-white/5 bg-[var(--bg-1)]/60 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-black text-violet-400 uppercase tracking-widest">{s.bend} {i + 1}</span>
                     <button onClick={() => removeBend(b.id)} className="text-slate-700 hover:text-red-400 transition-colors p-0.5">
@@ -1131,24 +1309,248 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
                   </div>
                   {r && (
                     <div className="grid grid-cols-3 gap-1 bg-black/20 rounded-lg p-2">
-                      <MiniKV label="BA" value={`${r.ba.toFixed(2)}mm`} color="#a78bfa" />
-                      <MiniKV label="BD" value={`${r.bd.toFixed(2)}mm`} color="#38bdf8" />
-                      <MiniKV label={`K=${r.k.toFixed(3)}`} value={`R/t=${r.rt.toFixed(1)}`} color="#f59e0b" />
+                      <MiniKV label="BA" value={`${formatEngineeringValue(r.ba, precision, false)}mm`} color="#a78bfa" />
+                      <MiniKV label="BD" value={`${formatEngineeringValue(r.bd, precision, false)}mm`} color="#38bdf8" />
+                      <MiniKV label={`K=${formatEngineeringValue(r.k, precision, false)}`} value={`R/t=${formatEngineeringValue(r.rt, precision, false)}`} color="#f59e0b" />
                     </div>
                   )}
                 </div>
               );
             })}
 
-            <div className="rounded-xl border border-violet-500/20 bg-gradient-to-r from-violet-950/20 to-transparent p-4">
+            <div className="rounded-xl border border-violet-500/20 p-4">
               <p className="text-[11.5px] font-black uppercase tracking-widest text-violet-400/50 mb-1">{s.totalFlatPattern}</p>
               <motion.p key={multiBends.total} initial={{opacity:0.5}} animate={{opacity:1}}
                 className="text-3xl font-black font-mono text-white">
-                {multiBends.total.toFixed(2)} <span className="text-sm text-slate-500">mm</span>
+                {formatEngineeringValue(multiBends.total, precision, false)} <span className="text-sm text-slate-500">mm</span>
               </motion.p>
               <p className="text-[10px] font-mono text-slate-700 mt-1">F₀ + Σ(BAᵢ + Fᵢ) — {s.dinStandard}</p>
             </div>
           </>)}
+
+          {/* CUTOUTS & HOLE DISTORTION ("SÜNME") TAB */}
+          {activeTab === 'cutouts' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-cyan-400">
+                    {t12(lang, 'Flange Holes & Cutouts', 'Flanş Delikleri & Kesikler')}
+                  </p>
+                  <p className="text-[9.5px] font-mono text-slate-500 mt-0.5">
+                    {t12(lang, 'With live plastic strain & hole distortion analysis', 'Canlı plastik sünme / çekme simülasyonlu')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Add cutout buttons */}
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => addCutout('round_hole')}
+                  className="py-1.5 px-2 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/30 text-cyan-300 text-[10px] font-mono font-bold flex items-center justify-center gap-1 transition-all"
+                >
+                  <Plus size={10} /> {t12(lang, '+ Round Hole', '+ Delik')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addCutout('slot')}
+                  className="py-1.5 px-2 rounded-lg bg-sky-950/40 hover:bg-sky-900/50 border border-sky-500/30 text-sky-300 text-[10px] font-mono font-bold flex items-center justify-center gap-1 transition-all"
+                >
+                  <Plus size={10} /> {t12(lang, '+ Slot', '+ Slot')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addCutout('rect_cutout')}
+                  className="py-1.5 px-2 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold flex items-center justify-center gap-1 transition-all"
+                >
+                  <Plus size={10} /> {t12(lang, '+ Rect', '+ Kesik')}
+                </button>
+              </div>
+
+              {cutouts.length === 0 ? (
+                <div className="py-6 text-center rounded-xl border border-dashed border-white/10 bg-[var(--bg-1)]/40">
+                  <p className="text-xs text-slate-500 font-mono">
+                    {t12(lang, 'No holes or cutouts defined yet.', 'Henüz delik veya kesik eklenmedi.')}
+                  </p>
+                  <p className="text-[10px] text-slate-600 font-mono mt-1">
+                    {t12(lang, 'Add a hole to test bend distortion ("sünme").', 'Büküm sünmesini test etmek için delik ekleyin.')}
+                  </p>
+                </div>
+              ) : (
+                cutouts.map((cutout, idx) => {
+                  const def = cutoutDeformations[idx];
+                  const isSevere = def && def.riskLevel === 'SEVERE_TEARING';
+                  const isModerate = def && def.riskLevel === 'MODERATE_DISTORTION';
+
+                  return (
+                    <div
+                      key={cutout.id}
+                      className={`rounded-xl border p-3 transition-all ${
+                        isSevere
+                          ? 'border-red-500/40 bg-red-950/20 '
+                          : isModerate
+                          ? 'border-amber-500/40 bg-amber-950/20'
+                          : 'border-white/8 bg-[var(--bg-1)]/70'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono font-black text-cyan-400">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            value={cutout.name}
+                            onChange={(e) => updateCutout(cutout.id, { name: e.target.value })}
+                            className="bg-transparent text-xs font-mono font-bold text-white outline-none border-b border-transparent focus:border-cyan-400/50"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeCutout(cutout.id)}
+                          className="text-slate-600 hover:text-red-400 p-0.5 transition-colors"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+
+                      {/* Controls */}
+                      <div className="grid grid-cols-2 gap-2 mb-2 text-[11px] font-mono">
+                        <div>
+                          <label className="text-[9.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                            {t12(lang, 'Flange', 'Flanş')}
+                          </label>
+                          <select
+                            value={cutout.flangeIndex}
+                            onChange={(e) => updateCutout(cutout.id, { flangeIndex: +e.target.value })}
+                            className="w-full bg-[var(--bg-0)] border border-white/10 rounded px-2 py-1 text-xs text-white outline-none"
+                          >
+                            <option value={0}>F0 (İlk Flanş: {firstFlange}mm)</option>
+                            {bends.map((b, bIdx) => (
+                              <option key={b.id} value={bIdx + 1}>
+                                F{bIdx + 1} (Büküm #{bIdx + 1}: {b.flange}mm)
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <NumInput
+                            label={t12(lang, 'U-Pos (mm)', 'U-Konum (mm)')}
+                            unit="mm"
+                            value={cutout.posU}
+                            onChange={(v) => updateCutout(cutout.id, { posU: v })}
+                          />
+                        </div>
+
+                        <div>
+                          <NumInput
+                            label={t12(lang, 'V-Pos (Width)', 'V-Genişlik (mm)')}
+                            unit="mm"
+                            value={cutout.posV}
+                            onChange={(v) => updateCutout(cutout.id, { posV: v })}
+                          />
+                        </div>
+
+                        {cutout.type === 'round_hole' && (
+                          <div>
+                            <NumInput
+                              label={t12(lang, 'Diameter Ø', 'Çap Ø')}
+                              unit="mm"
+                              value={cutout.diameter || 8}
+                              onChange={(v) => updateCutout(cutout.id, { diameter: v })}
+                            />
+                          </div>
+                        )}
+
+                        {cutout.type === 'slot' && (
+                          <>
+                            <div>
+                              <NumInput
+                                label={t12(lang, 'Slot Width', 'Slot Eni')}
+                                unit="mm"
+                                value={cutout.width || 8}
+                                onChange={(v) => updateCutout(cutout.id, { width: v })}
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <NumInput
+                                label={t12(lang, 'Slot Length', 'Slot Boyu')}
+                                unit="mm"
+                                value={cutout.length || 20}
+                                onChange={(v) => updateCutout(cutout.id, { length: v })}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {cutout.type === 'rect_cutout' && (
+                          <>
+                            <div>
+                              <NumInput
+                                label={t12(lang, 'Rect Width', 'Kesik Eni')}
+                                unit="mm"
+                                value={cutout.width || 20}
+                                onChange={(v) => updateCutout(cutout.id, { width: v })}
+                              />
+                            </div>
+                            <div>
+                              <NumInput
+                                label={t12(lang, 'Rect Length', 'Kesik Boyu')}
+                                unit="mm"
+                                value={cutout.length || 20}
+                                onChange={(v) => updateCutout(cutout.id, { length: v })}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Sünme (Hole Distortion) Analysis Card */}
+                      {def && (
+                        <div
+                          className={`mt-2 p-2 rounded-lg border text-[10px] font-mono ${
+                            isSevere
+                              ? 'bg-red-950/30 border-red-500/30 text-red-200'
+                              : isModerate
+                              ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
+                              : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span>
+                              {isSevere
+                                ? '🚨 KRİTİK SÜNME / YIRTILMA!'
+                                : isModerate
+                                ? '⚠️ SÜNME / OVALLEŞME RİSKİ'
+                                : '✅ GÜVENLİ (Sünme Yok)'}
+                            </span>
+                            <span className="font-mono">
+                              {def.distanceToNearestBendMm}mm büküme
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-1 text-[9.5px] opacity-90 mb-1">
+                            <span>Güvenli Sınır: <b>{def.safeDistanceMm}mm</b></span>
+                            <span>Uzama: <b>+%{def.elongationPercent}</b></span>
+                            {cutout.type === 'round_hole' && (
+                              <span className="col-span-2">
+                                Deforme: <b>{def.deformedMajorMm} x {def.deformedMinorMm} mm</b>
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-[9px] opacity-80 leading-relaxed font-sans">
+                            {lang === 'tr' ? def.dfmAdviceTr : def.dfmAdviceEn}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
 
           {/* K-TABLE TAB */}
           {activeTab === 'ktable' && (<>
@@ -1157,7 +1559,7 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
               <p className="text-[11px] text-amber-400/80 font-mono">{s.kFactorHint}</p>
             </div>
 
-            <div className="rounded-xl border border-white/5 overflow-hidden bg-[#080c14]/60">
+            <div className="rounded-xl border border-white/5 overflow-hidden bg-[var(--bg-1)]/60">
               <div className="grid grid-cols-3 px-3 py-2 border-b border-white/5">
                 {[s.rtMin, s.rtMax, 'K'].map(h => (
                   <span key={h} className="text-[10px] font-black uppercase tracking-widest text-slate-600">{h}</span>
@@ -1182,9 +1584,9 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
             <Section title={s.rtKPreview}>
               <div className="grid grid-cols-3 gap-2">
                 {[0.5, 1, 2, 3, 5, 8].map(rt => (
-                  <div key={rt} className="text-center bg-[#080c14] rounded-lg p-2 border border-white/5">
+                  <div key={rt} className="text-center bg-[var(--bg-1)] rounded-lg p-2 border border-white/5">
                     <div className="text-[10px] text-slate-600 font-mono mb-0.5">R/t = {rt}</div>
-                    <div className="text-[14px] font-black font-mono text-violet-400">{getK(rt, kTable).toFixed(3)}</div>
+                    <div className="text-[14px] font-black font-mono text-violet-400">{formatEngineeringValue(getK(rt, kTable), precision, false)}</div>
                   </div>
                 ))}
               </div>
@@ -1196,46 +1598,120 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
       {/* ══════════════ RIGHT PANEL ══════════════ */}
       <div className="flex-1 flex flex-col h-auto lg:h-full overflow-hidden">
 
-        {/* KPI Strip */}
-        <div className="flex-none flex items-center gap-6 px-6 py-3 border-b border-white/5 bg-[#030609]/80 flex-wrap">
+        {/* KPI & 3D Bridge Strip */}
+        <div className="flex-none flex items-center gap-4 px-5 py-2.5 border-b border-white/5 bg-[var(--bg-0)]/95 flex-wrap">
           <KPI label={s.totalFlatLength} value={dp(multiBends.total, 3)} color="#a78bfa" />
           <KPI label={s.totalDeduction} value={dp(totalBD, 3)} color="#38bdf8" />
           <KPI label={s.bendCount} value={bends.length.toString()} color="#f59e0b" />
-          <KPI label={s.maxTonnage} value={`${maxTon.toFixed(2)} ton`} color="#fb7185" />
-          <div className="ml-auto">
+          <KPI label={s.maxTonnage} value={`${formatEngineeringValue(maxTon, precision, false)} ton`} color="#fb7185" />
+
+          {/* View Mode Switcher (Split 2D+3D / 3D Only / 2D Only) */}
+          <div className="flex items-center gap-1 bg-[var(--bg-1)] p-1 rounded-lg border border-slate-800 ml-auto">
+            <button
+              type="button"
+              onClick={() => setViewMode('split')}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all ${
+                viewMode === 'split'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <SplitSquareVertical size={11} />
+              {t12(lang, '2D + 3D Split', '2B + 3B Birlikte')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('3d')}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all ${
+                viewMode === '3d'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Box size={11} />
+              {t12(lang, '3D Fold Simulator', '3B Katı & Açınım')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('2d')}
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+                viewMode === '2d'
+                  ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {t12(lang, '2D Blueprint', '2B Teknik Kesit')}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDownloadFlatDXF}
+            className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 text-[10px] font-mono font-black uppercase flex items-center gap-1.5 transition-all"
+          >
+            <Download size={12} />
+            {t12(lang, 'Flat DXF', 'Açınım DXF İndir')}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSendTo3DStudio}
+            className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 text-[10px] font-mono font-black uppercase flex items-center gap-1.5 transition-all"
+          >
+            <Box size={12} className="text-cyan-300" />
+            {t12(lang, 'Send to 3D Studio', "3B CAD Stüdyosu'na Aktar")}
+          </button>
+
+          <div>
             {hasCrackingRisk
               ? <Badge color="red" text={s.crackingRisk} />
               : <Badge color="green" text={s.safe} />}
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto 2xl:overflow-hidden bg-[#030710] flex flex-col 2xl:flex-row min-h-0">
+        <div className="flex-1 overflow-y-auto 2xl:overflow-hidden bg-[var(--bg-0)] flex flex-col 2xl:flex-row min-h-0">
 
-          {/* ─── BIG SVG VIEW ─── */}
-          <div className="relative h-[380px] 2xl:h-full flex-1 shrink-0 bg-[#030710] flex items-center justify-center border-b 2xl:border-b-0 2xl:border-r border-white/5 overflow-hidden p-4">
-            {/* subtle grid */}
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          {/* ─── LEFT/CENTER VISUALIZATION COLUMN (2D SVG + 3D INTERACTIVE VIEWPORT) ─── */}
+          <div className="relative flex-1 shrink-0 bg-[var(--bg-0)] flex flex-col border-b 2xl:border-b-0 2xl:border-r border-white/5 overflow-hidden p-3 gap-3 min-h-[460px]">
+            {/* 3D Interactive Fold/Unfold Simulator */}
+            {(viewMode === 'split' || viewMode === '3d') && (
+              <div className={viewMode === '3d' ? 'w-full h-full flex-1 min-h-[380px]' : 'w-full h-[300px] lg:h-[320px] shrink-0'}>
+                <SheetMetal3DPreview
+                  spec={currentSpec}
+                  lang={lang}
+                  onSendToStudio={handleSendTo3DStudio}
+                  onDownloadDXF={handleDownloadFlatDXF}
+                />
+              </div>
+            )}
 
-            <div className="relative w-full h-full max-w-2xl flex items-center justify-center">
-              <MultiBendGeometrySVG
-                firstFlange={firstFlange}
-                bends={bends}
-                thickness={thickness}
-                kTable={kTable}
-              />
-            </div>
+            {/* 2D Cross-Section Blueprint SVG */}
+            {(viewMode === 'split' || viewMode === '2d') && (
+              <div className="relative flex-1 min-h-[240px] rounded-lg border border-slate-800/80 bg-[var(--bg-0)] flex items-center justify-center overflow-hidden p-3">
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+                <div className="relative w-full h-full max-w-2xl flex items-center justify-center">
+                  <MultiBendGeometrySVG
+                    firstFlange={firstFlange}
+                    bends={bends}
+                    thickness={thickness}
+                    kTable={kTable}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ─── Right column (Flat Pattern, Bend Table, Formulas) ─── */}
           <div className="flex-1 flex flex-col 2xl:w-[650px] 2xl:shrink-0 2xl:h-full 2xl:overflow-y-auto">
             {/* ─── Flat Pattern strip (multi tab only) ─── */}
             {activeTab === 'multi' && bends.length > 0 && (
-              <div className="flex-none border-t border-white/5 bg-[#030609]/90 px-6 py-4">
+              <div className="flex-none border-t border-white/5 bg-[var(--bg-0)]/90 px-6 py-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Açılım (Flat Pattern Layout)</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{t12(lang, 'Flat Pattern Layout', 'Açılım (Sac Düz Boyu)')}</span>
                   <div className="flex-1 h-px bg-white/5" />
-                  <span className="text-[11.5px] font-mono text-violet-400 font-black">{dp(multiBends.total, 2)} toplam</span>
+                  <span className="text-[11.5px] font-mono text-violet-400 font-black">{dp(multiBends.total, 2)} {t12(lang, 'total', 'toplam')}</span>
                 </div>
                 <div className="w-full overflow-x-auto custom-scrollbar">
                   <div className="min-w-[600px]">
@@ -1247,13 +1723,13 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
 
             {/* ─── Bend Table (multi tab only) ─── */}
             {activeTab === 'multi' && bends.length > 0 && (
-              <div className="flex-none border-t border-white/5 bg-[#030609]/40 px-6 pb-6">
+              <div className="flex-none border-t border-white/5 bg-[var(--bg-0)]/40 px-6 pb-6 pt-3">
                 <BendTable bends={bends} thickness={thickness} kTable={kTable} firstFlange={firstFlange} unit={unit} dict={dict} />
               </div>
             )}
 
             {/* ─── Formula reference bar ─── */}
-            <div className="mt-auto flex-none border-t border-white/5 bg-[#020609]/95 px-6 py-3 flex gap-6 overflow-x-auto">
+            <div className="mt-auto flex-none border-t border-white/5 bg-[var(--bg-0)]/95 px-6 py-3 flex gap-6 overflow-x-auto">
               {[
                 { f: 'BA = (π·θ/180) × (R + K·t)', c: '#a78bfa' },
                 { f: 'BD = 2·OSSB − BA', c: '#38bdf8' },
@@ -1277,7 +1753,7 @@ export function SheetMetalModule({ lang: propLang, dict: propDict }: { lang?: st
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-[#07090f]/60 p-3 space-y-2">
+    <div className="rounded-xl border border-white/5 bg-[var(--bg-0)]/60 p-3 space-y-2">
       <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-600 mb-2">{title}</p>
       {children}
     </div>
@@ -1299,7 +1775,7 @@ function NumInput({ label, unit, value, onChange, min, max }: {
   return (
     <div className="group">
       <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-1 truncate">{label}</p>
-      <div className="flex items-center bg-[#07090f] border border-white/8 rounded-lg overflow-hidden focus-within:border-violet-500/40 transition-colors">
+      <div className="flex items-center bg-[var(--bg-0)] border border-white/8 rounded-lg overflow-hidden focus-within:border-violet-500/40 transition-colors">
         <input type="number" value={value} step="any" min={min} max={max}
           onChange={e => onChange(+e.target.value)}
           className="w-full bg-transparent text-[13px] font-black font-mono px-2.5 py-2 text-white outline-none appearance-none" />

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card.json",
+  "name": "alucad-os-mcp",
+  "displayName": "AluCalc OS Engineering MCP Server",
+  "version": "6.0.0",
+  "description": "Industrial-grade Engineering Operating System MCP server hosting 90+ deterministic ISO/DIN/VDI/ASME solvers, 3D CAD geometry tools, materials database, and beam/torque/bearing calculators.",
+  "homepage": "https://www.alucalculator.com",
+  "icon": "https://www.alucalculator.com/icon.svg",
+  "endpoint": "https://www.alucalculator.com/api/ai-agent",
+  "transport": "http-post",
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    }
+  },
+  "authentication": {
+    "type": "none"
+  },
+  "tools": [
+    {
+      "name": "calculate_bolt_torque",
+      "description": "Calculate bolt preload and tightening torque according to VDI 2230 and ISO 898-1.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "nominalDiameter": {
+            "type": "number",
+            "description": "Bolt thread nominal diameter in mm (e.g. 10 for M10)"
+          },
+          "pitch": {
+            "type": "number",
+            "description": "Thread pitch in mm (e.g. 1.5 for M10)"
+          },
+          "propertyClass": {
+            "type": "string",
+            "enum": ["8.8", "10.9", "12.9"],
+            "description": "Bolt property class grade"
+          },
+          "frictionCoefficient": {
+            "type": "number",
+            "description": "Total friction coefficient (default 0.14)"
+          }
+        },
+        "required": ["nominalDiameter", "propertyClass"]
+      }
+    },
+    {
+      "name": "calculate_beam_deflection",
+      "description": "Calculate deflection, maximum bending moment, and stress of a beam under point or distributed load.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lengthMm": {
+            "type": "number",
+            "description": "Span length in mm"
+          },
+          "loadN": {
+            "type": "number",
+            "description": "Applied force in Newtons"
+          },
+          "elasticModulusGpa": {
+            "type": "number",
+            "description": "Young's modulus in GPa (e.g. 70 for Aluminum, 210 for Steel)"
+          },
+          "momentOfInertiaMm4": {
+            "type": "number",
+            "description": "Area moment of inertia I in mm^4"
+          },
+          "supportType": {
+            "type": "string",
+            "enum": ["simply_supported", "cantilever", "fixed_both_ends"]
+          }
+        },
+        "required": ["lengthMm", "loadN", "elasticModulusGpa", "momentOfInertiaMm4"]
+      }
+    },
+    {
+      "name": "lookup_alloy_properties",
+      "description": "Query mechanical, physical, and thermal properties of standard aluminum alloys and structural steels (EN 573-3, EN 755-2, ISO 209).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "alloy": {
+            "type": "string",
+            "description": "Alloy designation, e.g. '6061-T6', '6082-T6', '7075-T6', '1018'"
+          }
+        },
+        "required": ["alloy"]
+      }
+    },
+    {
+      "name": "calculate_bearing_life",
+      "description": "Calculate ISO 281 L10 and L10h rating life for deep groove and roller bearings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dynamicCapacityC": {
+            "type": "number",
+            "description": "Basic dynamic load rating C in kN"
+          },
+          "radialLoadFr": {
+            "type": "number",
+            "description": "Radial load in kN"
+          },
+          "rpm": {
+            "type": "number",
+            "description": "Rotational speed in RPM"
+          },
+          "bearingType": {
+            "type": "string",
+            "enum": ["ball", "roller"]
+          }
+        },
+        "required": ["dynamicCapacityC", "radialLoadFr", "rpm"]
+      }
+    }
+  ]
+}

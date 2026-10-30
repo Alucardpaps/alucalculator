@@ -5,6 +5,7 @@ import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
 import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
+import { MathFormula } from '@/components/ui/MathFormula';
 import Link from 'next/link';
 
 export default function ShaftsPage() {
@@ -15,7 +16,7 @@ export default function ShaftsPage() {
     <div className="module-page-frame min-h-screen flex flex-col justify-between bg-[var(--bg-0)] text-[var(--ink)]">
       <ModulePageSeoShell slug="shafts" seo={seo} />
 
-      <div className="flex-1 w-full p-3 sm:p-4 lg:p-6">
+      <div className="flex-1 w-full min-h-0 overflow-hidden">
         <ShaftsModule />
       </div>
 
@@ -35,7 +36,9 @@ export default function ShaftsPage() {
           <div className="mt-3 grid gap-3 border-t border-[var(--line)] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3 font-mono">
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--cyan)]">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-[var(--ink)]">{method.formula}</p>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--alu-dim)] font-sans">{method.formulaNote}</p>
             </div>
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, Package, Clock, Wrench, TrendingUp, ChevronDown, Plus, Trash2, RotateCcw, Settings } from 'lucide-react';
 import { usePersistedState } from '@/hooks/useUserPreferences';
 import { useI18nStore } from '@/store/i18nStore';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 // ──── PRICE DATABASE ────
 const MATERIAL_PRICES: Record<string, { label: string; pricePerKg: number; density: number }> = {
@@ -47,6 +48,7 @@ interface OpLine {
 }
 
 export default function CostEstimatorModule({ lang, dict }: { lang: string; dict: any }) {
+  const precision = useGlobalPrecision();
     const { t } = useI18nStore();
 
     // Parts
@@ -187,7 +189,7 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
                                 className="bg-black/30 text-[9px] text-gray-300 border border-white/5 rounded px-1 py-0.5 outline-none cursor-pointer w-20 truncate"
                             >
                                 {Object.entries(MATERIAL_PRICES).map(([k, v]) => (
-                                    <option key={k} value={k} className="bg-[#0a0e14]">{v.label.split(' ')[0]}</option>
+                                    <option key={k} value={k} className="bg-[var(--bg-1)]">{v.label.split(' ')[0]}</option>
                                 ))}
                             </select>
                             <input type="number" value={p.massKg} onChange={e => updatePart(p.id, 'massKg', Number(e.target.value))} step="0.1"
@@ -199,7 +201,7 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
                             />
                             <span className="text-[8px] text-gray-600">×</span>
                             <span className="text-[10px] font-mono text-emerald-400 w-14 text-right">
-                                ${((MATERIAL_PRICES[p.material]?.pricePerKg || 0) * p.massKg * p.qty).toFixed(2)}
+                                ${formatEngineeringValue(((MATERIAL_PRICES[p.material]?.pricePerKg || 0) * p.massKg * p.qty), precision, false)}
                             </span>
                             <button onClick={() => removePart(p.id)} className="text-gray-600 hover:text-red-400 transition-colors p-0.5">
                                 <Trash2 size={10} />
@@ -226,7 +228,7 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
                                 className="flex-1 bg-black/30 text-[10px] text-gray-300 border border-white/5 rounded px-1.5 py-0.5 outline-none cursor-pointer min-w-0"
                             >
                                 {Object.entries(PROCESS_RATES).map(([k, v]) => (
-                                    <option key={k} value={k} className="bg-[#0a0e14]">{v.label}</option>
+                                    <option key={k} value={k} className="bg-[var(--bg-1)]">{v.label}</option>
                                 ))}
                             </select>
                             <input type="number" value={o.timeMin} onChange={e => updateOp(o.id, 'timeMin', Number(e.target.value))}
@@ -238,7 +240,7 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
                             />
                             <span className="text-[8px] text-gray-600">×</span>
                             <span className="text-[10px] font-mono text-amber-400 w-14 text-right">
-                                ${((PROCESS_RATES[o.process]?.ratePerHour || 0) / 60 * o.timeMin * o.qty).toFixed(2)}
+                                ${formatEngineeringValue(((PROCESS_RATES[o.process]?.ratePerHour || 0) / 60 * o.timeMin * o.qty), precision, false)}
                             </span>
                             <button onClick={() => removeOp(o.id)} className="text-gray-600 hover:text-red-400 transition-colors p-0.5">
                                 <Trash2 size={10} />
@@ -268,20 +270,20 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
                         <div>
                             <div className="text-[8px] font-bold uppercase tracking-widest text-emerald-400/60">{t.costUnit}</div>
                             <div className="text-2xl font-black font-mono text-emerald-400 leading-none mt-0.5">
-                                ${costs.unitPrice.toFixed(2)}
+                                ${formatEngineeringValue(costs.unitPrice, precision, false)}
                             </div>
                         </div>
                         {batchSize > 1 && (
                             <div className="text-right">
                                 <div className="text-[8px] font-bold uppercase tracking-widest text-gray-500">Batch ({batchSize}×)</div>
-                                <div className="text-sm font-bold font-mono text-white">${costs.batchTotal.toFixed(2)}</div>
+                                <div className="text-sm font-bold font-mono text-white">${formatEngineeringValue(costs.batchTotal, precision, false)}</div>
                             </div>
                         )}
                     </div>
                     <div className="flex gap-4 mt-2 pt-2 border-t border-emerald-500/10">
-                        <span className="text-[9px] text-gray-500">Mass: <span className="text-white font-mono">{costs.totalMass.toFixed(2)} kg</span></span>
+                        <span className="text-[9px] text-gray-500">Mass: <span className="text-white font-mono">{formatEngineeringValue(costs.totalMass, precision, false)} kg</span></span>
                         <span className="text-[9px] text-gray-500">Time: <span className="text-white font-mono">{costs.totalTime} min</span></span>
-                        <span className="text-[9px] text-gray-500">$/kg: <span className="text-white font-mono">${(costs.unitPrice / Math.max(0.01, costs.totalMass)).toFixed(2)}</span></span>
+                        <span className="text-[9px] text-gray-500">$/kg: <span className="text-white font-mono">${formatEngineeringValue((costs.unitPrice / Math.max(0.01, costs.totalMass)), precision, false)}</span></span>
                     </div>
                 </div>
             </div>
@@ -290,13 +292,14 @@ export default function CostEstimatorModule({ lang, dict }: { lang: string; dict
 }
 
 function CostRow({ label, value, icon, bold }: { label: string; value: number; icon?: React.ReactNode; bold?: boolean }) {
+    const precision = useGlobalPrecision();
     return (
         <div className="flex justify-between items-center">
             <span className={`flex items-center gap-1.5 text-[10px] ${bold ? 'text-white font-bold' : 'text-gray-400'}`}>
                 {icon} {label}
             </span>
             <span className={`font-mono text-[11px] ${bold ? 'text-white font-bold' : 'text-gray-300'}`}>
-                ${value.toFixed(2)}
+                ${formatEngineeringValue(value, precision, false)}
             </span>
         </div>
     );

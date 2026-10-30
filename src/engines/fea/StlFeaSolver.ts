@@ -7,6 +7,7 @@
  */
 
 import * as THREE from 'three';
+import { toFeaMaterial } from '@/materials/canonical';
 
 export interface FeaMaterial {
   id: string;
@@ -21,85 +22,19 @@ export interface FeaMaterial {
   colorHex: string;
 }
 
-export const FEA_MATERIALS: Record<string, FeaMaterial> = {
-  'al-6061-t6': {
-    id: 'al-6061-t6',
-    name: 'Aluminum 6061-T6',
-    category: 'aluminum',
-    elasticModulus: 68.9,
-    poissonsRatio: 0.33,
-    yieldStrength: 276,
-    ultimateStrength: 310,
-    density: 2.70,
-    colorHex: '#38bdf8',
-  },
-  'al-7075-t6': {
-    id: 'al-7075-t6',
-    name: 'Aluminum 7075-T6 (Aerospace)',
-    category: 'aluminum',
-    elasticModulus: 71.7,
-    poissonsRatio: 0.33,
-    yieldStrength: 503,
-    ultimateStrength: 572,
-    density: 2.81,
-    colorHex: '#0ea5e9',
-  },
-  'steel-s355': {
-    id: 'steel-s355',
-    name: 'Structural Steel S355 / A572',
-    category: 'steel',
-    elasticModulus: 210,
-    poissonsRatio: 0.30,
-    yieldStrength: 355,
-    ultimateStrength: 510,
-    density: 7.85,
-    colorHex: '#94a3b8',
-  },
-  'steel-4140': {
-    id: 'steel-4140',
-    name: 'Alloy Steel 4140 (Chromoly Q&T)',
-    category: 'steel',
-    elasticModulus: 205,
-    poissonsRatio: 0.29,
-    yieldStrength: 655,
-    ultimateStrength: 850,
-    density: 7.85,
-    colorHex: '#64748b',
-  },
-  'stainless-316l': {
-    id: 'stainless-316l',
-    name: 'Stainless Steel 316L (Marine)',
-    category: 'steel',
-    elasticModulus: 193,
-    poissonsRatio: 0.28,
-    yieldStrength: 290,
-    ultimateStrength: 580,
-    density: 8.00,
-    colorHex: '#cbd5e1',
-  },
-  'titanium-gr5': {
-    id: 'titanium-gr5',
-    name: 'Titanium Ti-6Al-4V (Grade 5)',
-    category: 'titanium',
-    elasticModulus: 114,
-    poissonsRatio: 0.34,
-    yieldStrength: 880,
-    ultimateStrength: 950,
-    density: 4.43,
-    colorHex: '#a855f7',
-  },
-  'pom-delrin': {
-    id: 'pom-delrin',
-    name: 'POM Acetal / Delrin (Engineering Plastic)',
-    category: 'plastic',
-    elasticModulus: 3.1,
-    poissonsRatio: 0.35,
-    yieldStrength: 65,
-    ultimateStrength: 72,
-    density: 1.42,
-    colorHex: '#f59e0b',
-  },
+const FEA_COLOR_HEX: Record<string, string> = {
+  'al-6061-t6': '#38bdf8',
+  'al-7075-t6': '#0ea5e9',
+  'steel-s355': '#94a3b8',
+  'steel-4140': '#64748b',
+  'stainless-316l': '#cbd5e1',
+  'titanium-gr5': '#a855f7',
+  'pom-delrin': '#f59e0b',
 };
+
+export const FEA_MATERIALS: Record<string, FeaMaterial> = Object.fromEntries(
+  Object.entries(FEA_COLOR_HEX).map(([id, colorHex]) => [id, toFeaMaterial(id, colorHex)])
+) as Record<string, FeaMaterial>;
 
 export type SupportPlane = 'min-x' | 'max-x' | 'min-y' | 'max-y' | 'min-z' | 'max-z';
 

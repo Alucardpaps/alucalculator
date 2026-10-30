@@ -368,12 +368,12 @@ export default function BeamCanvas() {
     };
 
     return (
-        <div className="w-full h-full relative font-mono bg-[#050505] overflow-hidden">
+        <div className="w-full h-full relative font-mono bg-[var(--bg-0)] overflow-hidden">
 
             {/* TOP BAR */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-2xl bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/10 shadow-2xl z-10">
-                <div className="text-[#00e5ff] font-bold text-sm tracking-wider flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${isPhysicsMode ? 'bg-[#ff0055] animate-ping' : 'bg-[#00e5ff]'}`} />
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-2xl bg-[var(--bg-2)]/60 border border-white/10 shadow-2xl z-10">
+                <div className="text-[var(--cyan)] font-bold text-sm tracking-wider flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${isPhysicsMode ? 'bg-[var(--bad)] animate-ping' : 'bg-[var(--cyan)]'}`} />
                     {isPhysicsMode ? 'SIMULATION MODE' : 'BEAM ENGINE'}
                 </div>
                 <div className="h-4 w-px bg-white/20 mx-2" />
@@ -381,7 +381,7 @@ export default function BeamCanvas() {
                 {!isPhysicsMode ? (
                     <button
                         onClick={togglePhysics}
-                        className="px-4 py-1.5 bg-[#00e5ff]/10 text-[#00e5ff] border border-[#00e5ff]/50 rounded hover:bg-[#00e5ff] hover:text-black transition-all text-xs font-bold tracking-widest flex items-center gap-2"
+                        className="px-4 py-1.5 bg-[var(--cyan)]/10 text-[var(--cyan)] border border-[var(--cyan)]/50 rounded hover:bg-[var(--cyan)] hover:text-black transition-all text-xs font-bold tracking-widest flex items-center gap-2"
                     >
                         <span>ENTER GAME MODE</span>
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -411,9 +411,9 @@ export default function BeamCanvas() {
             <div className="absolute top-24 left-6 w-80 flex flex-col gap-4 z-20 pointer-events-auto">
 
                 {/* MATERIAL PANEL */}
-                <div className="bg-[#0a0e14]/90 backdrop-blur-md border border-white/10 rounded-lg p-4 shadow-xl">
+                <div className="bg-[var(--bg-1)]/90 border border-white/10 rounded-lg p-4 shadow-xl">
                     <h3 className="text-white text-xs font-bold mb-4 flex items-center gap-2">
-                        <span className="w-1 h-3 bg-[#00e5ff] rounded-full" /> MATERIAL SCIENCE
+                        <span className="w-1 h-3 bg-[var(--cyan)] rounded-full" /> MATERIAL SCIENCE
                     </h3>
 
                     {/* Material Select */}
@@ -427,7 +427,7 @@ export default function BeamCanvas() {
                                 const newMat = MATERIALS.find(m => m.id === e.target.value);
                                 if (newMat) setSelectedTreatId(newMat.treatments[0].id);
                             }}
-                            className="w-full bg-black/50 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:border-[#00e5ff] outline-none appearance-none cursor-pointer"
+                            className="w-full bg-black/50 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:border-[var(--cyan)] outline-none appearance-none cursor-pointer"
                         >
                             {MATERIALS.map(m => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
@@ -444,7 +444,7 @@ export default function BeamCanvas() {
                                     key={t.id}
                                     onClick={() => setSelectedTreatId(t.id)}
                                     className={`text-left px-2 py-1.5 rounded border text-xs transition-all w-full mb-1 ${selectedTreatId === t.id
-                                        ? 'bg-[#00e5ff]/20 border-[#00e5ff] text-[#00e5ff]'
+                                        ? 'bg-[var(--cyan)]/20 border-[var(--cyan)] text-[var(--cyan)]'
                                         : 'bg-transparent border-transparent text-gray-400 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
@@ -467,9 +467,9 @@ export default function BeamCanvas() {
                 </div>
 
                 {/* PHYSICS LOADS PANEL */}
-                <div className="bg-[#0a0e14]/90 backdrop-blur-md border border-white/10 rounded-lg p-4 shadow-xl">
+                <div className="bg-[var(--bg-1)]/90 border border-white/10 rounded-lg p-4 shadow-xl">
                     <h3 className="text-white text-xs font-bold mb-4 flex items-center gap-2">
-                        <span className="w-1 h-3 bg-[#ff0055] rounded-full" /> LOADS & ENV
+                        <span className="w-1 h-3 bg-[var(--bad)] rounded-full" /> LOADS & ENV
                     </h3>
 
                     {/* Thermal Slider */}
@@ -484,7 +484,7 @@ export default function BeamCanvas() {
                             type="range" min="-100" max="100" step="1"
                             value={tempChange}
                             onChange={(e) => setTempChange(parseInt(e.target.value))}
-                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#ff0055]"
+                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--bad)]"
                         />
                     </div>
 
@@ -498,7 +498,7 @@ export default function BeamCanvas() {
                             type="range" min="-5000" max="5000" step="100"
                             value={loadValue}
                             onChange={(e) => setLoadValue(parseInt(e.target.value))}
-                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#ffaa00]"
+                            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--warn)]"
                         />
                     </div>
                 </div>
@@ -507,8 +507,8 @@ export default function BeamCanvas() {
 
             {/* RESULTS PANEL */}
             {results && (
-                <div className="absolute top-24 right-6 w-64 bg-[#0a0e14]/90 backdrop-blur-md border border-[#00e5ff]/30 rounded-lg p-4 shadow-[0_0_30px_rgba(0,229,255,0.1)]">
-                    <h3 className="text-[#00e5ff] text-xs font-bold mb-3 border-b border-[#00e5ff]/20 pb-2 flex justify-between">
+                <div className="absolute top-24 right-6 w-64 bg-[var(--bg-1)]/90 border border-[var(--cyan)]/30 rounded-lg p-4 ">
+                    <h3 className="text-[var(--cyan)] text-xs font-bold mb-3 border-b border-[var(--cyan)]/20 pb-2 flex justify-between">
                         <span>ANALYSIS RESULTS</span>
                         <span className={results.success ? "text-green-500" : "text-red-500"}>●</span>
                     </h3>
@@ -517,7 +517,7 @@ export default function BeamCanvas() {
                         <div className="space-y-3">
                             <div className="flex justify-between items-center text-xs">
                                 <span className="text-gray-400">Max Deflection</span>
-                                <span className="text-white font-mono bg-[#00e5ff]/10 px-2 py-0.5 rounded border border-[#00e5ff]/20">
+                                <span className="text-white font-mono bg-[var(--cyan)]/10 px-2 py-0.5 rounded border border-[var(--cyan)]/20">
                                     {Math.max(...Object.values(results.displacements).map((d: any) => Math.abs(d.v))).toFixed(3)} mm
                                 </span>
                             </div>

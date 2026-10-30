@@ -21,6 +21,7 @@ import { HistorySidebar } from "@/components/HistorySidebar";
 import { ComparisonBar } from "@/components/ComparisonBar";
 import { EngineeringWarnings } from "@/components/EngineeringWarnings";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
 
 interface ProjectItem {
     id: string;
@@ -35,6 +36,7 @@ interface ProjectItem {
 }
 
 export default function AluminumPageClient({ lang, dict }: { lang: string, dict: Record<string, any> }) {
+    const precision = useGlobalPrecision();
     const alu = getAluminumPageStrings(lang);
     // URL State Management
     const { getInitialState, updateUrl } = useUrlState();
@@ -204,7 +206,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                 const newItem = {
                     id: Date.now().toString(),
                     description: desc,
-                    weight: `${weight.toFixed(3)} ${unit === 'metric' ? 'kg' : 'lbs'}`,
+                    weight: `${formatEngineeringValue(weight, precision, false)} ${unit === 'metric' ? 'kg' : 'lbs'}`,
                     timestamp: Date.now()
                 };
 
@@ -270,7 +272,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
             <HistorySidebar />
 
             {/* Standardized Dashboard Header */}
-            <header className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center mb-8 bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-surface-200 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+            <header className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center mb-8 bg-white/90 p-6 rounded-2xl border border-surface-200 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
                 <div className="flex items-center gap-4 mb-4 lg:mb-0">
                     <div className="w-12 h-12 bg-tech-blue rounded-lg flex items-center justify-center text-white font-black text-2xl shadow-lg group">
                         Al
@@ -284,7 +286,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                 <div className="flex gap-3">
                     <div className="bg-surface-100 rounded-lg p-2 text-center min-w-[100px] hidden md:block">
                         <div className="field-label mb-0">{dict.market?.aluminum || 'Aluminum'}</div>
-                        <div className="text-lg font-bold text-surface-700">{unitPrice > 0 ? `${currency}${unitPrice.toFixed(2)}` : '---'}</div>
+                        <div className="text-lg font-bold text-surface-700">{unitPrice > 0 ? `${currency}${formatEngineeringValue(unitPrice, precision, false)}` : '---'}</div>
                     </div>
 
                     <button
@@ -371,7 +373,7 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                             <span>Density: {activeMaterial.density} g/cm³</span>
                                         )}
                                         <span className={useLivePrice ? "text-ind-orange font-bold animate-pulse" : ""}>
-                                            {unitPrice > 0 ? `${currency}${unitPrice.toFixed(2)} /kg` : 'No Price'}
+                                            {unitPrice > 0 ? `${currency}${formatEngineeringValue(unitPrice, precision, false)} /kg` : 'No Price'}
                                         </span>
                                     </div>
 
@@ -412,13 +414,13 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                     <div className="flex bg-white rounded-lg p-1 border border-slate-200">
                                         <button
                                             onClick={() => setUnit('metric')}
-                                            className={`flex-1 py-2 rounded-md text-xs font-bold uppercase transition-all ${unit === 'metric' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                                            className={`flex-1 py-2 rounded-md text-xs font-bold uppercase transition-all ${unit === 'metric' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                                         >
                                             Metric (mm)
                                         </button>
                                         <button
                                             onClick={() => setUnit('imperial')}
-                                            className={`flex-1 py-2 rounded-md text-xs font-bold uppercase transition-all ${unit === 'imperial' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                                            className={`flex-1 py-2 rounded-md text-xs font-bold uppercase transition-all ${unit === 'imperial' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                                         >
                                             Imperial (in)
                                         </button>
@@ -738,13 +740,13 @@ export default function AluminumPageClient({ lang, dict }: { lang: string, dict:
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="text-6xl font-mono font-bold tracking-tighter tabular-nums drop-shadow-md">
-                                    {weight > 0 ? weight.toFixed(3) : '0.000'}
+                                <div className="text-5xl font-mono font-bold tracking-tighter tabular-nums drop-shadow-md">
+                                    {weight > 0 ? formatEngineeringValue(weight, precision, false) : formatEngineeringValue(0, precision, false)}
                                 </div>
                                 <div className="text-blue-200 text-xl font-medium mt-2">{unit === 'metric' ? 'kg' : 'lbs'}</div>
                                 {unitPrice > 0 && (
                                     <div className="text-green-300 font-mono font-bold text-lg mt-2">
-                                        {dict.aluminum.costData.estimatedCost}: {currency} {(weight * unitPrice).toFixed(2)}
+                                        {dict.aluminum.costData.estimatedCost}: {currency} {formatEngineeringValue(weight * unitPrice, precision, false)}
                                     </div>
                                 )}
                             </div>

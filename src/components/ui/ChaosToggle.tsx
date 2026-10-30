@@ -12,7 +12,7 @@ export const ChaosToggle = () => {
             className={`
                 relative flex items-center justify-center p-3 rounded-none border-2 transition-all duration-300 overflow-hidden group
                 ${isChaosMode
-                    ? 'bg-rose-600/20 border-rose-500 text-rose-500 shadow-[0_0_30px_rgba(225,29,72,0.3)]'
+                    ? 'bg-rose-600/20 border-rose-500 text-rose-500 '
                     : 'bg-black/40 border-white/5 text-gray-600 hover:border-rose-500/50 hover:text-rose-400'}
             `}
             whileHover={{ scale: 1.05 }}

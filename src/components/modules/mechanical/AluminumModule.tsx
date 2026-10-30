@@ -70,12 +70,12 @@ export function AluminumModule({ lang, dict }: { lang: string, dict: any }) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#1e1e1e] text-slate-200 select-none">
+        <div className="flex flex-col h-full bg-[var(--bg-3)] text-slate-200 select-none">
             {/* Toolbar */}
             <div className="flex items-center gap-1 p-1 bg-slate-900 border-b border-slate-800">
                 <button
                     onClick={() => setActiveTab('inputs')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded flex items-center gap-2 ${activeTab === 'inputs' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1.5 text-xs font-bold rounded flex items-center gap-2 ${activeTab === 'inputs' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-slate-400 hover:text-white'}`}
                 >
                     <Settings size={14} /> Design
                 </button>
@@ -204,7 +204,7 @@ export function AluminumModule({ lang, dict }: { lang: string, dict: any }) {
                                 {formatEngineeringValue(weight, { decimals: 3, unit: unit === 'metric' ? 'kg' : 'lbs' })}
                             </div>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <div className="w-8 h-8 rounded-full bg-[var(--cyan-glow)] flex items-center justify-center text-[var(--cyan)]">
                             <Zap size={16} />
                         </div>
                     </div>

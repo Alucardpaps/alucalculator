@@ -175,6 +175,28 @@ export type FieldToolsStrings = {
     convertTo?: string;
     hardnessVal?: string;
     convertedVal?: string;
+
+    boltTorqueScreening?: string;
+    boltTorqueScreeningDesc?: string;
+    boltClass?: string;
+    threadStateDry?: string;
+    threadStateOiled?: string;
+    threadStateMoS2?: string;
+    screeningTorqueNm?: string;
+    fieldChecklist?: string;
+    oringCaliperMatcher?: string;
+    oringCaliperMatcherDesc?: string;
+    measuredCord?: string;
+    measuredId?: string;
+    closestStandardCord?: string;
+    recommendedGrooveDepth?: string;
+    recommendedGrooveWidth?: string;
+    cordDeviationWarning?: string;
+    fieldWorkOrderShare?: string;
+    copyEngineeringSummary?: string;
+    shareWhatsApp?: string;
+    shareEmail?: string;
+    summaryCopied?: string;
 };
 
 const EN: FieldToolsStrings = {
@@ -355,6 +377,28 @@ const EN: FieldToolsStrings = {
     convertTo: 'Convert To',
     hardnessVal: 'Hardness Value',
     convertedVal: 'Converted Value',
+
+    boltTorqueScreening: 'Bolt Torque Screening & Checklist',
+    boltTorqueScreeningDesc: 'Fast ISO 898-1 tightening screening (4.8 to 12.9) with shop floor checklist',
+    boltClass: 'Bolt Class',
+    threadStateDry: 'Dry (K=0.20)',
+    threadStateOiled: 'Lightly Oiled (K=0.16)',
+    threadStateMoS2: 'MoS2 Lubricated (K=0.13)',
+    screeningTorqueNm: 'Tightening Torque (Screening)',
+    fieldChecklist: 'Field Verification Checklist',
+    oringCaliperMatcher: 'O-Ring Caliper & Gland Matcher',
+    oringCaliperMatcherDesc: 'Measure cord d2 & ID d1 with calipers to match nearest ISO 3601 / AS568 standard gland',
+    measuredCord: 'Measured Cord d2 (mm)',
+    measuredId: 'Measured ID d1 (mm)',
+    closestStandardCord: 'Nearest Standard Cord',
+    recommendedGrooveDepth: 'Recommended Gland Depth t',
+    recommendedGrooveWidth: 'Recommended Gland Width b',
+    cordDeviationWarning: 'Warning: Measured cord deviates by >0.15mm from standard. Possible chemical swelling.',
+    fieldWorkOrderShare: 'Field Work Order Export',
+    copyEngineeringSummary: 'Copy Engineering Summary',
+    shareWhatsApp: 'Share via WhatsApp',
+    shareEmail: 'Share via Email',
+    summaryCopied: 'Engineering summary copied to clipboard!',
 };
 
 const TR: FieldToolsStrings = {
@@ -535,6 +579,28 @@ const TR: FieldToolsStrings = {
     convertTo: 'Şuna Çevir',
     hardnessVal: 'Sertlik Değeri',
     convertedVal: 'Çevrilen Değer',
+
+    boltTorqueScreening: 'Cıvata Sıkma Torku Saha Kontrolü',
+    boltTorqueScreeningDesc: 'ISO 898-1 hızlı tork taraması (4.8 - 12.9) ve atölye kontrol listesi',
+    boltClass: 'Cıvata Kalite Sınıfı',
+    threadStateDry: 'Kuru (K=0.20)',
+    threadStateOiled: 'Hafif Yağlı (K=0.16)',
+    threadStateMoS2: 'MoS2 Yağlı (K=0.13)',
+    screeningTorqueNm: 'Sıkma Torku (Ön Değerlendirme)',
+    fieldChecklist: 'Saha Montaj Kontrol Listesi',
+    oringCaliperMatcher: 'O-Ring Kumpas & Yuva Eşleştirici',
+    oringCaliperMatcherDesc: 'Kumpas ile kord d2 ve iç çap d1 ölçerek en yakın ISO 3601 / AS568 standardını bulun',
+    measuredCord: 'Ölçülen Kord d2 (mm)',
+    measuredId: 'Ölçülen İç Çap d1 (mm)',
+    closestStandardCord: 'En Yakın Standart Kord',
+    recommendedGrooveDepth: 'Önerilen Yuva Derinliği t',
+    recommendedGrooveWidth: 'Önerilen Yuva Genişliği b',
+    cordDeviationWarning: 'Dikkat: Ölçülen kord standarttan >0.15mm farklı. Kimyasal şişme veya aşınma olabilir.',
+    fieldWorkOrderShare: 'Saha İş Emri Raporu',
+    copyEngineeringSummary: 'Mühendislik Özetini Kopyala',
+    shareWhatsApp: 'WhatsApp ile Paylaş',
+    shareEmail: 'E-Posta ile Gönder',
+    summaryCopied: 'Mühendislik özeti panoya kopyalandı!',
 };
 
 const DE_FT: FieldToolsStrings = {
@@ -1823,7 +1889,9 @@ const BY_LOCALE: Record<Language, FieldToolsStrings> = {
 };
 
 export function getFieldToolsStrings(locale: string): FieldToolsStrings {
-  return BY_LOCALE[locale as Language] ?? EN;
+  const dict = BY_LOCALE[locale as Language] ?? EN;
+  if (dict === EN) return EN;
+  return { ...EN, ...dict };
 }
 
 export function formatFieldToolsTemplate(template: string, vars: Record<string, string | number>): string {

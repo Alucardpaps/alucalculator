@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Ohm's Law Calculator Schema
+ * AluCAD OS — Ohm's Law Calculator Schema
  * 
  * ENGINEERING DOMAIN: Electrical
  * STANDARDS: IEC 60038
@@ -20,7 +20,7 @@ export const ohmsLawSchema: CalculatorSchema = {
     metadata: {
         title: "Ohm's Law Calculator",
         description: 'Calculate voltage, current, resistance, and power using Ohm\'s Law.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['ohms law', 'voltage', 'current', 'resistance', 'power', 'electrical']
     },

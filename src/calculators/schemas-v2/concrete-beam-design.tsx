@@ -9,7 +9,7 @@ export const concreteBeamDesignSchema: CalculatorSchemaV2 = {
         description: 'Bending capacity, reinforcement ratios, compression block, and limit checks for reinforced concrete rectangular beams.',
         category: 'civil',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['concrete beam', 'rebar', 'reinforcement ratio', 'bending capacity', 'compression block', 'civil engineering'],
         verifiedStandards: ['ACI 318-19', 'TS 500']
@@ -117,7 +117,7 @@ export const concreteBeamDesignSchema: CalculatorSchemaV2 = {
             const isFailing = safety < 1.0;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Beam Cross Section SVG */}
                     <div className="relative w-[150px] h-[220px]">
                         <svg viewBox="0 0 120 180" width="100%" height="100%" className="overflow-visible">
@@ -140,21 +140,21 @@ export const concreteBeamDesignSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Capacity (φMn)</div>
                             <div className={`text-xl font-bold font-mono ${isFailing ? 'text-red-400' : 'text-emerald-400'}`}>
                                 {((out.phiMn?.value as number) || 0).toFixed(1)} <span className="text-[10px] text-gray-500">kNm</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Steel Ratio (ρ)</div>
                             <div className="text-sm font-bold font-mono text-white">
                                 {(((out.rho?.value as number) || 0) * 100).toFixed(2)}%
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Adequacy</div>
                             <div className={`text-xs font-bold font-mono ${isFailing ? 'text-red-400' : 'text-emerald-400'}`}>

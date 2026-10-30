@@ -123,9 +123,9 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/95 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/95 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-lg mx-auto bg-[#070b12] border-t md:border border-cyan-900/30 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
+                    <div className="w-full max-w-lg mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-900/30 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20 z-10">
                             <div>
@@ -166,7 +166,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                                         <div className="absolute bottom-0 left-4 right-4 h-0.5 border-t border-dashed border-cyan-400/40" />
                                         {/* Hypotenuse line representation */}
                                         <div 
-                                            className="absolute bottom-0 left-4 h-0.5 border-t-2 border-cyan-400 origin-left shadow-[0_0_8px_rgba(0,229,255,0.4)]"
+                                            className="absolute bottom-0 left-4 h-0.5 border-t-2 border-cyan-400 origin-left "
                                             style={{ 
                                                 width: `${100 / Math.cos(pitchRad)}px`,
                                                 transform: `rotate(${-activePitch}deg)`
@@ -183,7 +183,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                             {/* Sight Crosshair Overlay */}
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                                 <div className="w-10 h-10 border border-cyan-500/30 rounded-full flex items-center justify-center">
-                                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full shadow-[0_0_8px_#00e5ff]" />
+                                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full " />
                                 </div>
                                 <div className="absolute w-20 h-0.5 border-t border-cyan-500/20" />
                                 <div className="absolute h-20 w-0.5 border-l border-cyan-500/20" />
@@ -202,8 +202,8 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                         <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
                             
                             {/* Height Result card */}
-                            <div className="p-4 bg-slate-950/30 border border-cyan-500/20 rounded-2xl text-center space-y-1 relative overflow-hidden group shadow-[0_0_20px_rgba(6,182,212,0.05)]">
-                                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent pointer-events-none" />
+                            <div className="p-4 bg-slate-950/30 border border-cyan-500/20 rounded-2xl text-center space-y-1 relative overflow-hidden group ">
+                                <div className="absolute inset-0 pointer-events-none" />
                                 <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest block">{ft.calculatedHeight || 'Calculated Height'}</span>
                                 <span className="text-3xl font-black font-mono text-cyan-400 tracking-tighter block">
                                     {computedHeight.toFixed(2)} <span className="text-xs font-normal text-slate-400 font-sans">m</span>
@@ -229,7 +229,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                                         setDistance(Number(e.target.value));
                                         if (Math.floor(distance) % 5 === 0) playClickSound();
                                     }}
-                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                             </div>
 
@@ -249,7 +249,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                                         setEyeHeight(Number(e.target.value));
                                         if (Math.floor(eyeHeight * 10) % 2 === 0) playClickSound();
                                     }}
-                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                             </div>
 
@@ -278,7 +278,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                                                 setSimPitch(Number(e.target.value));
                                                 if (simPitch % 5 === 0) playClickSound();
                                             }}
-                                            className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                            className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                         />
                                     </div>
                                 </div>
@@ -291,7 +291,7 @@ export function ClinometerModal({ isOpen, onClose, ft: propFt, debugMode = false
                             {!isMeasuring ? (
                                 <button
                                     onClick={requestPermissionsAndStart}
-                                    className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer"
+                                    className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
                                     <Play size={14} className="fill-black" />
                                     {ft.enableGyroscope || 'Enable Gyroscope'}

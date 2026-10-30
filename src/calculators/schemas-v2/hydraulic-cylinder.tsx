@@ -9,7 +9,7 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
         description: 'Bore and rod diameter sizing, operating fluid volume, flow rate, and Euler buckling check for hydraulic cylinders.',
         category: 'fluid',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['hydraulic cylinder', 'bore diameter', 'rod size', 'buckling', 'oil volume', 'fluid power'],
         verifiedStandards: ['ISO 6020', 'ISO 6022']
@@ -45,11 +45,11 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
         { key: 'E', label: 'Young\'s Modulus (E)', unit: 'GPa', defaultValue: 210, description: 'Modulus of elasticity of the rod material', validation: { required: true, min: 70, max: 220 } }
     ],
     outputs: [
-        { key: 'Ap', label: 'Required Area (Ap)', unit: 'cm2', description: 'Minimum required piston cross-sectional area', precision: 2, formulaLatex: 'A_p = \\frac{F}{P} \\cdot 10' },
+        { key: 'Ap', label: 'Required Area (Ap)', unit: 'cm2', description: 'Minimum required piston cross-sectional area', precision: 2, formulaLatex: 'A_p = \\frac{F}{P} \\cdot 100' },
         { key: 'bore', label: 'Bore Diameter (D)', unit: 'mm', description: 'Calculated internal cylinder bore diameter', precision: 1, formulaLatex: 'D = \\sqrt{4 A_p / \\pi} \\cdot 10' },
         { key: 'boreStd', label: 'ISO Standard Bore', unit: 'mm', description: 'Nearest standard size in ISO 6020', precision: 0, formulaLatex: 'D_{std} \\in \\{40, 50, 63, 80, 100, 125, 160\\}' },
         { key: 'rodStd', label: 'ISO Standard Rod', unit: 'mm', description: 'Standard rod diameter corresponding to selected bore', precision: 0, formulaLatex: 'd_{std} \\in \\{22, 28, 36, 45, 56, 70, 90, 110\\}' },
-        { key: 'vol', label: 'Oil Volume', unit: 'L' as any, description: 'Required oil volume per full stroke extension', precision: 2, formulaLatex: 'V = A_{p,std} \\cdot L \\cdot 10^{-3}' },
+        { key: 'vol', label: 'Oil Volume', unit: 'L' as any, description: 'Required oil volume per full stroke extension', precision: 2, formulaLatex: 'V = A_{p,std} \\cdot L \\cdot 10^{-4}' },
         { key: 'Fcr', label: 'Critical Buckling (Fcr)', unit: 'kN', description: 'Euler critical linear buckling limit force', precision: 1, formulaLatex: 'F_{cr} = \\frac{\\pi^2 E I}{(K \\cdot L)^2}' },
         { key: 'SF', label: 'Buckling Safety Factor', unit: '-', description: 'Ratio of critical buckling force to push force', precision: 2, formulaLatex: 'SF = F_{cr} / F' }
     ],
@@ -63,8 +63,8 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
         const E_Pa = E_GPa * 1e9;
 
         // 1. Required piston area in cm²
-        // F(kN) = P(bar) * Ap(cm²) / 10  --> Ap = 10 * F / P
-        const Ap = (10 * F) / P;
+        // 1 bar = 10 N/cm²  →  F(kN) = P(bar) · Ap(cm²) / 100  →  Ap = 100 · F / P
+        const Ap = (100 * F) / P;
 
         // 2. Minimum bore diameter in mm
         const bore = Math.sqrt((4 * Ap) / Math.PI) * 10;
@@ -90,7 +90,7 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
 
         // 4. Actual area and volume
         const actualAp_cm2 = (Math.PI * Math.pow(boreStd / 10, 2)) / 4;
-        const vol_L = (actualAp_cm2 * stroke * 1e-4) * 10; // cm2 * mm to Liters
+        const vol_L = actualAp_cm2 * (stroke / 10) / 1000; // cm² · cm = cm³ → L
 
         // 5. Buckling calculation
         // I = pi * d^4 / 64 (mm4)
@@ -147,7 +147,7 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
             const isFailing = safety < 1.5;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Cylinder representation */}
                     <div className="relative w-[220px] h-[150px]">
                         <svg viewBox="0 0 220 150" width="100%" height="100%" className="overflow-visible">
@@ -175,21 +175,21 @@ export const hydraulicCylinderSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Standard Bore</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.boreStd?.value as number) || 0)} <span className="text-[10px] text-gray-500">mm</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Standard Rod</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.rodStd?.value as number) || 0)} <span className="text-[10px] text-gray-500">mm</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Buckling SF</div>
                             <div className={`text-xs font-bold font-mono ${isFailing ? 'text-red-400' : 'text-emerald-400'}`}>

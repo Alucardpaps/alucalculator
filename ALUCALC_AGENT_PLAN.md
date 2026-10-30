@@ -8,7 +8,7 @@
 
 ## 0. Mission
 
-AluCalc OS is a Next.js App Router engineering platform (100+ deterministic solvers, 3D parametric configurator, 2D AluCAD, FEA, Academy, PWA, thin Android/Wear Capacitor APK).
+AluCalc OS is a Next.js App Router engineering platform (48 deterministic solvers, 3D parametric configurator, 2D AluCAD, FEA, Academy, PWA, thin Android/Wear Capacitor APK).
 
 The homepage looks like a generic 2025 AI-SaaS dark dashboard (Inter + cyan + rounded cards + cute robot). That is the problem.
 
@@ -239,7 +239,7 @@ Keep:
 
 Change:
 1. Hero left: tighter type scale. Subcopy max 2 sentences. Drop repeated “deterministic” stacking if it appears twice.
-2. Hero right: product proof, not mascot. Prefer live miniature of configurator or last-opened solver readout (`NOMINAL` / `100+ SOLVERS ACTIVE` can stay as status HUD).
+2. Hero right: product proof, not mascot. Prefer live miniature of configurator or last-opened solver readout (`NOMINAL` / `48 SOLVERS ACTIVE` can stay as status HUD).
 3. Below fold “Comprehensive Engineering Ecosystem”: 3 modules max, then a dense standards strip (VDI 2230, ISO 281, ISO 6336, DIN 6935…) in mono — this is the brand.
 4. Kill duplicate marketing essays if they repeat the hero. One “how engineers use this” block is enough.
 5. Mobile: sidebar collapse already exists; ensure hero CTAs stack and banner does not cover them.

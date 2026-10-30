@@ -4,6 +4,7 @@ import React from 'react';
 import { Flame, Gem, Heart, Trophy, Volume2, VolumeX, Globe, ShieldAlert } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore, Language } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { DUOLINGO_I18N, SupportedLanguage } from './DuolingoCurriculumData';
 
 export function DuolingoTopBar() {
@@ -28,11 +29,11 @@ export function DuolingoTopBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#030712]/95 backdrop-blur-2xl border-b border-white/10 px-3 sm:px-6 py-2.5 flex items-center justify-between text-xs font-mono select-none shadow-2xl">
+    <header className="sticky top-0 z-40 w-full bg-[var(--bg-0)]/95 border-b border-white/10 px-3 sm:px-6 py-2.5 flex items-center justify-between text-xs font-mono select-none shadow-2xl">
       
       {/* Left: Brand Badge & Unit Count */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-cyan-500/25 text-base">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-slate-950 font-bold shadow-lg text-base">
           🦉
         </div>
         <div>
@@ -45,7 +46,7 @@ export function DuolingoTopBar() {
             </span>
           </div>
           <span className="text-[10px] text-slate-400 block -mt-0.5 font-sans">
-            ISO / DIN / VDI / ASME Mühendislik Akademisi
+            {t12(language, 'ISO / DIN / VDI / ASME Engineering Academy', 'ISO / DIN / VDI / ASME Mühendislik Akademisi')}
           </span>
         </div>
       </div>
@@ -56,7 +57,7 @@ export function DuolingoTopBar() {
         {/* Streak */}
         <div
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 font-bold"
-          title="Günlük Seri"
+          title={t12(language, 'Daily Streak', 'Günlük Seri')}
         >
           <Flame size={15} className="fill-orange-500 animate-pulse text-orange-500" />
           <span>{streak}</span>
@@ -65,7 +66,7 @@ export function DuolingoTopBar() {
         {/* Gems */}
         <div
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold"
-          title="Elmaslar"
+          title={t12(language, 'Gems', 'Elmaslar')}
         >
           <Gem size={14} className="text-cyan-400 fill-cyan-400/30" />
           <span>{gems}</span>
@@ -82,7 +83,7 @@ export function DuolingoTopBar() {
               ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
               : 'bg-rose-950 border border-rose-500 text-rose-300 animate-bounce'
           }`}
-          title="Canlar"
+          title={t12(language, 'Hearts (Lives)', 'Canlar')}
         >
           <Heart size={14} className={hearts > 0 ? 'fill-rose-500 text-rose-500' : 'text-rose-400'} />
           <span>{hearts}</span>
@@ -91,7 +92,7 @@ export function DuolingoTopBar() {
         {/* League */}
         <div
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
-          title="Lig"
+          title={t12(language, 'League', 'Lig')}
         >
           <Trophy size={14} className="text-amber-400" />
           <span className="capitalize">{leagueInfo.current.label}</span>
@@ -99,7 +100,7 @@ export function DuolingoTopBar() {
 
         {/* 12-Language Selector Dropdown */}
         <div className="relative flex items-center">
-          <div className="flex items-center gap-1 bg-[#080d1a] border border-white/10 rounded-xl px-2 py-1 text-slate-300 hover:border-cyan-500/50 transition">
+          <div className="flex items-center gap-1 bg-[var(--bg-1)] border border-white/10 rounded-xl px-2 py-1 text-slate-300 hover:border-cyan-500/50 transition">
             <Globe size={13} className="text-cyan-400" />
             <select
               value={language}

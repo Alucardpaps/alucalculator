@@ -1,6 +1,9 @@
 'use client';
 
 import React from 'react';
+import { generateSprocketContour } from '@/engines/math/sprocket-geometry-factory';
+import { generateTimingPulleyContour } from '@/engines/math/pulley-geometry-factory';
+import { pointsToSvgPath } from '@/engines/math/gear-involute-factory';
 
 export interface OpenDrivePath {
     d: string;
@@ -133,7 +136,7 @@ export function sampleOpenDrive(
     return [...top, ...arc2, ...bot, ...arc1];
 }
 
-/** ISO 606-style sprocket outline (roller seats + pointed teeth). */
+/** ISO 606 / DIN 8187 precision sprocket outline (true roller seat concave arcs + convex tooth flanks). */
 export function sprocketOutlinePath(
     cx: number,
     cy: number,
@@ -141,25 +144,14 @@ export function sprocketOutlinePath(
     pitchPx: number,
     phase = 0,
 ): string {
-    const zc = Math.max(8, Math.round(z));
-    const d = pitchPx / Math.sin(Math.PI / zc);
-    const rP = d / 2;
-    const rTip = rP + 0.28 * pitchPx;
-    const rRoot = Math.max(rP * 0.62, rP - 0.5 * pitchPx);
-    const step = (2 * Math.PI) / zc;
-    const parts: string[] = [];
-    for (let i = 0; i < zc; i++) {
-        const a = phase - Math.PI / 2 + step * i;
-        const aL = a - step * 0.22;
-        const aR = a + step * 0.22;
-        const aGap = a + step * 0.5;
-        const tip = `${(cx + rTip * Math.cos(a)).toFixed(2)} ${(cy + rTip * Math.sin(a)).toFixed(2)}`;
-        const fL = `${(cx + rP * Math.cos(aL)).toFixed(2)} ${(cy + rP * Math.sin(aL)).toFixed(2)}`;
-        const fR = `${(cx + rP * Math.cos(aR)).toFixed(2)} ${(cy + rP * Math.sin(aR)).toFixed(2)}`;
-        const gap = `${(cx + rRoot * Math.cos(aGap)).toFixed(2)} ${(cy + rRoot * Math.sin(aGap)).toFixed(2)}`;
-        parts.push(`${i === 0 ? 'M' : 'L'} ${fL} L ${tip} L ${fR} L ${gap}`);
-    }
-    return `${parts.join(' ')} Z`;
+    const points = generateSprocketContour({
+        teeth: z,
+        pitch: pitchPx,
+        center: { x: cx, y: cy },
+        rotationAngle: (phase * 180) / Math.PI,
+        pointsPerTooth: 16,
+    });
+    return pointsToSvgPath(points);
 }
 
 export function hubKeyway(
@@ -175,7 +167,7 @@ export function hubKeyway(
     };
 }
 
-/** Layout helper: scale mm geometry into SVG px with correct center distance. */
+/** Layout helper: scale mm geometry into SVG px with correct center distance and tip bounds. */
 export function openDriveLayout(
     d1Mm: number,
     d2Mm: number,
@@ -184,22 +176,42 @@ export function openDriveLayout(
     viewH: number,
     rightReserve = 48,
     verticalFraction = 0.38,
+    od1Mm?: number,
+    od2Mm?: number,
 ) {
     const r1 = Math.max(5, d1Mm / 2);
     const r2 = Math.max(5, d2Mm / 2);
-    const C = Math.max(centerMm, r1 + r2);
-    const cy = viewH / 2;
-    const scaleW = (viewW - rightReserve) / (r1 + C + r2);
-    const scaleH = (viewH * verticalFraction) / Math.max(r1, r2);
+    const rTip1 = od1Mm != null && od1Mm > 0 ? od1Mm / 2 : r1 * 1.15;
+    const rTip2 = od2Mm != null && od2Mm > 0 ? od2Mm / 2 : r2 * 1.15;
+    const C = Math.max(centerMm, rTip1 + rTip2);
+
+    // Margins to guarantee titles, toolbars, and dimensions never clip
+    const topMargin = 64;
+    const bottomMargin = 48;
+    const availableH = Math.max(100, viewH - topMargin - bottomMargin);
+    const cy = topMargin + availableH / 2;
+
+    const leftMargin = 44;
+    const rightMargin = Math.max(44, rightReserve);
+    const availableW = Math.max(100, viewW - leftMargin - rightMargin);
+
+    // Total horizontal span from leftmost tip to rightmost tip
+    const totalSpanMm = rTip1 + C + rTip2;
+    const scaleW = availableW / totalSpanMm;
+    const maxTipMm = Math.max(rTip1, rTip2);
+    const scaleH = (availableH * 0.88) / (2 * maxTipMm);
     const scale = Math.min(scaleW, scaleH);
+
     const sr1 = r1 * scale;
     const sr2 = r2 * scale;
     const gap = C * scale;
-    const drawW = sr1 + gap + sr2;
-    const startX = Math.max(24, (viewW - rightReserve - drawW) / 2);
-    const cx1 = startX + sr1;
+    const totalDrawW = totalSpanMm * scale;
+
+    const startX = leftMargin + Math.max(0, (availableW - totalDrawW) / 2);
+    const cx1 = startX + rTip1 * scale;
     const cx2 = cx1 + gap;
-    return { cx1, cx2, cy, sr1, sr2, scale, Cmm: C, r1mm: r1, r2mm: r2 };
+
+    return { cx1, cx2, cy, sr1, sr2, scale, Cmm: C, r1mm: r1, r2mm: r2, rTip1Mm: rTip1, rTip2Mm: rTip2 };
 }
 
 export function openBeltPitchLengthMm(dSmall: number, dLarge: number, centerDistMm: number): number {
@@ -281,7 +293,7 @@ export function snapTimingBeltCatalog(
     return { L_theoretical, beltTeeth, L_standard, C_actual };
 }
 
-/** SVG polygon path alternating tip/root radii (timing pulleys, sprockets). */
+/** ISO 13050 curvilinear timing pulley outline (true rounded U-pocket troughs + circular lands). */
 export function toothedWheelPath(
     cx: number,
     cy: number,
@@ -291,18 +303,17 @@ export function toothedWheelPath(
     phase = 0,
 ): string {
     const z = Math.max(6, Math.round(teeth));
-    const step = (2 * Math.PI) / z;
-    const parts: string[] = [];
-    for (let i = 0; i < z; i++) {
-        const aTip = phase + step * i - Math.PI / 2;
-        const aRoot = aTip + step / 2;
-        const xTip = cx + rTip * Math.cos(aTip);
-        const yTip = cy + rTip * Math.sin(aTip);
-        const xRoot = cx + rRoot * Math.cos(aRoot);
-        const yRoot = cy + rRoot * Math.sin(aRoot);
-        parts.push(`${i === 0 ? 'M' : 'L'} ${xTip.toFixed(2)} ${yTip.toFixed(2)} L ${xRoot.toFixed(2)} ${yRoot.toFixed(2)}`);
-    }
-    return `${parts.join(' ')} Z`;
+    const dpApprox = rTip * 2;
+    const pitchApprox = (dpApprox * Math.PI) / z;
+    const points = generateTimingPulleyContour({
+        teeth: z,
+        pitch: pitchApprox,
+        outsideDiameter: rTip * 2,
+        center: { x: cx, y: cy },
+        rotationAngle: (phase * 180) / Math.PI,
+        pointsPerTooth: 16,
+    });
+    return pointsToSvgPath(points);
 }
 
 export function useFrameIds(prefix: string) {
@@ -322,11 +333,12 @@ export function DimLine({
 }) {
     const mx = (x1 + x2) / 2;
     const my = (y1 + y2) / 2 + offset;
+    const badgeW = Math.max(48, label.length * 8 + 14);
     return (
-        <g stroke={color} fill="none" strokeWidth="0.9" opacity="0.85">
+        <g stroke={color} fill="none" strokeWidth="1" opacity="0.95">
             <line x1={x1} y1={y1} x2={x2} y2={y2} markerStart="url(#tf-arrow)" markerEnd="url(#tf-arrow)" />
-            <rect x={mx - label.length * 3.4 - 6} y={my - 10} width={label.length * 6.8 + 12} height={18} rx={4} fill="rgba(5,10,18,0.92)" stroke={color} strokeWidth="0.8" />
-            <text x={mx} y={my + 3} textAnchor="middle" fontSize="10" fontWeight="700" fill={color} fontFamily="ui-monospace, monospace">{label}</text>
+            <rect x={mx - badgeW / 2} y={my - 12} width={badgeW} height={22} rx={4} fill="var(--bg-1)" stroke={color} strokeWidth="1" />
+            <text x={mx} y={my + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill={color} stroke="none" fontFamily="ui-monospace, monospace">{label}</text>
         </g>
     );
 }
@@ -337,16 +349,22 @@ export function LegendPanel({
     x: number; y: number; title: string;
     rows: { label: string; value: string; highlight?: boolean }[];
 }) {
-    const h = 44 + rows.length * 34;
+    const isCompact = rows.length > 8;
+    const rowH = isCompact ? 28 : 34;
+    const startY = isCompact ? 42 : 48;
+    const h = startY + rows.length * rowH + (isCompact ? 8 : 12);
+    const valDy = isCompact ? 14 : 16;
+    const labelFontSize = isCompact ? "9.5" : "10.5";
+    const valFontSize = isCompact ? "12" : "13.5";
     return (
         <g transform={`translate(${x}, ${y})`}>
-            <rect width={200} height={h} rx={10} fill="rgba(8,14,22,0.95)" stroke="rgba(0,229,255,0.25)" strokeWidth="1" />
-            <text x={14} y={22} fontSize="9" fontWeight="700" fill="#64748b" fontFamily="ui-monospace, monospace" letterSpacing="0.14em">{title}</text>
-            <line x1={14} y1={30} x2={186} y2={30} stroke="rgba(255,255,255,0.08)" />
+            <rect width={210} height={h} rx={10} fill="var(--bg-1)" stroke="var(--line)" strokeWidth="1" />
+            <text x={14} y={isCompact ? 20 : 24} fontSize="11" fontWeight="700" fill="var(--alu-dim)" fontFamily="ui-monospace, monospace" letterSpacing="0.12em">{title}</text>
+            <line x1={14} y1={isCompact ? 28 : 34} x2={196} y2={isCompact ? 28 : 34} stroke="var(--line)" />
             {rows.map((row, i) => (
-                <g key={row.label} transform={`translate(14, ${44 + i * 34})`}>
-                    <text x={0} y={0} fontSize="9" fill="#64748b" fontFamily="ui-sans-serif, system-ui">{row.label}</text>
-                    <text x={0} y={16} fontSize="12" fontWeight="700" fill={row.highlight ? '#00e5ff' : '#e2e8f0'} fontFamily="ui-monospace, monospace">{row.value}</text>
+                <g key={row.label} transform={`translate(14, ${startY + i * rowH})`}>
+                    <text x={0} y={0} fontSize={labelFontSize} fill="var(--alu-dim)" fontFamily="ui-sans-serif, system-ui">{row.label}</text>
+                    <text x={0} y={valDy} fontSize={valFontSize} fontWeight="700" fill={row.highlight ? '#00e5ff' : 'var(--ink)'} fontFamily="ui-monospace, monospace">{row.value}</text>
                 </g>
             ))}
         </g>
@@ -359,15 +377,42 @@ export function FrameDefs({ ids }: { ids: ReturnType<typeof useFrameIds> }) {
             <pattern id={ids.grid} width="20" height="20" patternUnits="userSpaceOnUse">
                 <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,229,255,0.06)" strokeWidth="0.5" />
             </pattern>
-            <linearGradient id={ids.metal} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#64748b" />
-                <stop offset="45%" stopColor="#94a3b8" />
-                <stop offset="100%" stopColor="#334155" />
+            <linearGradient id={ids.metal} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#94a3b8" />
+                <stop offset="35%" stopColor="#475569" />
+                <stop offset="70%" stopColor="#1e293b" />
+                <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+            <linearGradient id={`${ids.metal}-gold`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f59e0b" />
+                <stop offset="50%" stopColor="#b45309" />
+                <stop offset="100%" stopColor="#78350f" />
+            </linearGradient>
+            <linearGradient id={`${ids.metal}-cyan`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#22d3ee" />
+                <stop offset="40%" stopColor="#0891b2" />
+                <stop offset="80%" stopColor="#164e63" />
+                <stop offset="100%" stopColor="#082f49" />
+            </linearGradient>
+            <linearGradient id={`${ids.metal}-dark`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#475569" />
+                <stop offset="40%" stopColor="#334155" />
+                <stop offset="80%" stopColor="#1e293b" />
+                <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+            <linearGradient id={`${ids.metal}-cyan-dark`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0891b2" />
+                <stop offset="40%" stopColor="#0e7490" />
+                <stop offset="80%" stopColor="#155e75" />
+                <stop offset="100%" stopColor="#082f49" />
             </linearGradient>
             <radialGradient id={ids.glow} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.12" />
+                <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.18" />
                 <stop offset="100%" stopColor="#00e5ff" stopOpacity="0" />
             </radialGradient>
+            <filter id={`${ids.glow}-shadow`} x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="2" dy="4" stdDeviation="4" floodColor="#000000" floodOpacity="0.75" />
+            </filter>
             <marker id="tf-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
             </marker>

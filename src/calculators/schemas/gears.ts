@@ -1,13 +1,12 @@
 /**
- * AluCalc OS — Spur Gear Calculator Schema
+ * AluCAD OS — Spur Gear Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: ISO 6336, DIN 3990
  * 
  * Calculates spur gear geometry and stress:
  * - Pitch/tip/root diameters
- * - Bending stress (Lewis formula)
- * - Contact stress (Hertz)
+ * - Bending / contact stress (ISO 6336 Method B via gear-spur v2 engine)
  */
 
 import type { CalculatorSchema } from '@/types/calculator-schema';
@@ -19,8 +18,8 @@ export const gearsSchema: CalculatorSchema = {
 
     metadata: {
         title: 'Spur Gear Calculator',
-        description: 'Calculate spur gear geometry, bending stress, and contact stress. Based on ISO 6336 and Lewis formula.',
-        author: 'AluCalc Engineering',
+        description: 'Calculate spur gear geometry, ISO 6336 bending and contact stress. Prefer the v2 gear-spur calculator for Method B screening.',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['gear', 'spur', 'bending', 'contact', 'stress', 'power transmission']
     },
@@ -241,9 +240,9 @@ export const gearsSchema: CalculatorSchema = {
         },
         {
             id: 'lewis-simplified',
-            text: 'Bending stress uses simplified Lewis formula without dynamic factors.',
+            text: 'This v1 schema is geometry-only. Use gear-spur v2 for ISO 6336 Method B σF/σH/SF/SH.',
             impact: 'medium',
-            source: 'Lewis 1892'
+            source: 'ISO 6336'
         },
         {
             id: 'standard-addendum',

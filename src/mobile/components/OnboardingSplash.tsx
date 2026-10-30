@@ -17,9 +17,9 @@ export function OnboardingSplash({ m, onComplete, onSkip }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[150] bg-[#020408] flex flex-col items-center justify-center p-8 select-none"
+      className="fixed inset-0 z-[150] bg-[var(--bg-0)] flex flex-col items-center justify-center p-8 select-none"
     >
-      <div className="mb-8 flex items-center justify-center filter drop-shadow-[0_0_30px_rgba(0,229,255,0.4)]">
+      <div className="mb-8 flex items-center justify-center filter drop-">
         <AluCalcLogo size={88} animate={true} />
       </div>
       <h1 className="text-2xl font-black text-white text-center tracking-tight">{m.onboardingTitle}</h1>
@@ -28,7 +28,7 @@ export function OnboardingSplash({ m, onComplete, onSkip }: Props) {
       <div className="mt-10 w-full max-w-xs space-y-3">
         <button
           onClick={onComplete}
-          className="w-full py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(0,229,255,0.4)] active:scale-95 transition-transform"
+          className="w-full py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
         >
           <Sparkles size={16} />
           {m.onboardingGetStarted}

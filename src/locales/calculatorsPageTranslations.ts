@@ -176,10 +176,10 @@ const EN_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Manufacturing',
   filterElectrical: 'Electrical',
   filterScience: 'Science',
-  platformBuild: 'Industrial Platform Build 5.25.x',
+  platformBuild: 'Industrial Platform Build 6.0.x',
   enterpriseStable: 'Enterprise // Stable',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Hyper-Deterministic Industrial Interface // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Hyper-Deterministic Industrial Interface // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. All rights reserved. Secure terminal session active.',
 };
 
@@ -2394,10 +2394,10 @@ const TR_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'İmalat',
   filterElectrical: 'Elektrik',
   filterScience: 'Bilim',
-  platformBuild: 'Endüstriyel Platform Sürüm 5.25.x',
+  platformBuild: 'Endüstriyel Platform Sürüm 6.0.x',
   enterpriseStable: 'Kurumsal // Kararlı',
-  footerTitle: 'AluCalc OS Sinir Merkezi',
-  footerSubtitle: 'Hiper-Deterministik Endüstriyel Arayüz // Sürüm 5.25.0',
+  footerTitle: 'AluCAD OS Sinir Merkezi',
+  footerSubtitle: 'Hiper-Deterministik Endüstriyel Arayüz // Sürüm 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Tüm hakları saklıdır. Güvenli terminal oturumu aktif.',
 };
 
@@ -2430,7 +2430,6 @@ export const CALC_MODULE_I18N_KEYS: Partial<Record<CalcModuleId, string>> = {
   weldCalculator: 'welding',
   mfgReadiness: 'manufacturing-readiness',
   mfgSandbox: 'manufacturing-sandbox',
-  topologyOpt: 'topology-optimization',
   machineAssembly: 'machine-assembly',
   simulationFEA: 'simulation-fea',
   engSelection: 'engineering-selection',
@@ -2440,7 +2439,6 @@ export const CALC_MODULE_I18N_KEYS: Partial<Record<CalcModuleId, string>> = {
   pumpSuite: 'pumps',
   fluidDynamics: 'fluid-dynamics',
   aerospaceDynamics: 'aerospace-dynamics',
-  navalHydro: 'naval-hydrostatics',
   kinematics: 'physics-kinematics',
   thermalExpansion: 'thermal-expansion',
   physicsSolver: 'physics-solver',
@@ -2448,7 +2446,6 @@ export const CALC_MODULE_I18N_KEYS: Partial<Record<CalcModuleId, string>> = {
   materialsIntelligence: 'materials-explorer',
   materialSelectorAI: 'material-selector-ai',
   failurePrediction: 'failure-prediction',
-  failureAnalysis: 'failure-diagnosis',
   chemistryLab: 'chemistry-reactions',
   biologyGenetics: 'biology-genetics',
   unitConverter: 'unit-converter',
@@ -2485,10 +2482,10 @@ const DE_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Fertigung',
   filterElectrical: 'Elektrik',
   filterScience: 'Wissenschaft',
-  platformBuild: 'Industrielle Plattform Build 5.25.x',
+  platformBuild: 'Industrielle Plattform Build 6.0.x',
   enterpriseStable: 'Enterprise // Stabil',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Hyper-deterministische Industrieoberfläche // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Hyper-deterministische Industrieoberfläche // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Alle Rechte vorbehalten.',
 };
 
@@ -2513,10 +2510,10 @@ const ES_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Manufactura',
   filterElectrical: 'Eléctrica',
   filterScience: 'Ciencia',
-  platformBuild: 'Plataforma industrial Build 5.25.x',
+  platformBuild: 'Plataforma industrial Build 6.0.x',
   enterpriseStable: 'Enterprise // Estable',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Interfaz industrial hiper-determinista // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Interfaz industrial hiper-determinista // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Todos los derechos reservados.',
 };
 
@@ -2541,10 +2538,10 @@ const FR_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Fabrication',
   filterElectrical: 'Électrique',
   filterScience: 'Science',
-  platformBuild: 'Plateforme industrielle Build 5.25.x',
+  platformBuild: 'Plateforme industrielle Build 6.0.x',
   enterpriseStable: 'Enterprise // Stable',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Interface industrielle hyper-déterministe // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Interface industrielle hyper-déterministe // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Tous droits réservés.',
 };
 
@@ -2569,10 +2566,10 @@ const IT_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Manifattura',
   filterElectrical: 'Elettrica',
   filterScience: 'Scienza',
-  platformBuild: 'Piattaforma industriale Build 5.25.x',
+  platformBuild: 'Piattaforma industriale Build 6.0.x',
   enterpriseStable: 'Enterprise // Stabile',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Interfaccia industriale iper-deterministica // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Interfaccia industriale iper-deterministica // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Tutti i diritti riservati.',
 };
 
@@ -2597,10 +2594,10 @@ const PT_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Manufatura',
   filterElectrical: 'Elétrica',
   filterScience: 'Ciência',
-  platformBuild: 'Plataforma industrial Build 5.25.x',
+  platformBuild: 'Plataforma industrial Build 6.0.x',
   enterpriseStable: 'Enterprise // Estável',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Interface industrial hiper-determinística // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Interface industrial hiper-determinística // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Todos os direitos reservados.',
 };
 
@@ -2625,10 +2622,10 @@ const RU_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'Производство',
   filterElectrical: 'Электрика',
   filterScience: 'Наука',
-  platformBuild: 'Промышленная платформа Build 5.25.x',
+  platformBuild: 'Промышленная платформа Build 6.0.x',
   enterpriseStable: 'Enterprise // Стабильно',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'Гипер-детерминированный промышленный интерфейс // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'Гипер-детерминированный промышленный интерфейс // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. Все права защищены.',
 };
 
@@ -2653,10 +2650,10 @@ const ZH_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: '制造',
   filterElectrical: '电气',
   filterScience: '科学',
-  platformBuild: '工业平台 Build 5.25.x',
+  platformBuild: '工业平台 Build 6.0.x',
   enterpriseStable: 'Enterprise // 稳定',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: '超确定性工业界面 // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: '超确定性工业界面 // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. 保留所有权利。',
 };
 
@@ -2681,10 +2678,10 @@ const JA_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: '製造',
   filterElectrical: '電気',
   filterScience: '科学',
-  platformBuild: '産業プラットフォーム Build 5.25.x',
+  platformBuild: '産業プラットフォーム Build 6.0.x',
   enterpriseStable: 'Enterprise // 安定',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'ハイパー決定論的産業インターフェース // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'ハイパー決定論的産業インターフェース // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. All rights reserved.',
 };
 
@@ -2709,10 +2706,10 @@ const KO_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: '제조',
   filterElectrical: '전기',
   filterScience: '과학',
-  platformBuild: '산업 플랫폼 Build 5.25.x',
+  platformBuild: '산업 플랫폼 Build 6.0.x',
   enterpriseStable: 'Enterprise // 안정',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: '초결정론적 산업 인터페이스 // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: '초결정론적 산업 인터페이스 // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. All rights reserved.',
 };
 
@@ -2737,10 +2734,10 @@ const AR_PAGE: Omit<PageLocale, 'modules'> = {
   filterManufacturing: 'تصنيع',
   filterElectrical: 'كهرباء',
   filterScience: 'علوم',
-  platformBuild: 'منصة صناعية Build 5.25.x',
+  platformBuild: 'منصة صناعية Build 6.0.x',
   enterpriseStable: 'Enterprise // مستقر',
-  footerTitle: 'AluCalc OS Neural Core',
-  footerSubtitle: 'واجهة صناعية حتمية فائقة // Build 5.25.0',
+  footerTitle: 'AluCAD OS Neural Core',
+  footerSubtitle: 'واجهة صناعية حتمية فائقة // Build 6.0.0',
   footerCopyright: '© 2026 AluCalc Intelligence Engineering. جميع الحقوق محفوظة.',
 };
 

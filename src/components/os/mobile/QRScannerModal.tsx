@@ -211,9 +211,9 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/90 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/90 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-lg mx-auto bg-[#070b12] border-t md:border border-cyan-900/30 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
+                    <div className="w-full max-w-lg mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-900/30 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20">
                             <div>
@@ -244,7 +244,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                     />
                                     {/* Scanning laser and bounds grid overlay */}
                                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                                        <div className="w-64 h-64 border-2 border-dashed border-cyan-500/50 rounded-2xl relative shadow-[0_0_50px_rgba(6,182,212,0.15)]">
+                                        <div className="w-64 h-64 border-2 border-dashed border-cyan-500/50 rounded-2xl relative ">
                                             {/* Corner brackets */}
                                             <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-cyan-400 -mt-1 -ml-1 rounded-tl-md" />
                                             <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-cyan-400 -mt-1 -mr-1 rounded-tr-md" />
@@ -252,7 +252,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                             <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-cyan-400 -mb-1 -mr-1 rounded-br-md" />
                                             
                                             {/* Sweeping laser light */}
-                                            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent shadow-[0_0_10px_#ef4444] animate-pulse" style={{
+                                            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse" style={{
                                                 top: '50%',
                                                 animation: 'sweep 2.5s infinite linear'
                                             }} />
@@ -263,7 +263,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                     <div className="absolute bottom-4 left-4 right-4 flex justify-between pointer-events-auto">
                                         <button
                                             onClick={handleToggleTorch}
-                                            className={`p-3 rounded-full border backdrop-blur-md transition-all active:scale-95 ${torchActive ? 'bg-cyan-500 border-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'bg-black/60 border-white/10 text-slate-400'}`}
+                                            className={`p-3 rounded-full border transition-all active:scale-95 ${torchActive ? 'bg-cyan-500 border-cyan-500 text-black ' : 'bg-black/60 border-white/10 text-slate-400'}`}
                                         >
                                             <Zap size={18} className={torchActive ? 'fill-black' : ''} />
                                         </button>
@@ -271,7 +271,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                         {cameraDevices.length > 1 && (
                                             <button
                                                 onClick={handleSwitchCamera}
-                                                className="p-3 rounded-full bg-black/60 border border-white/10 text-slate-400 active:scale-95 transition-all backdrop-blur-md"
+                                                className="p-3 rounded-full bg-black/60 border border-white/10 text-slate-400 active:scale-95 transition-all"
                                             >
                                                 <RefreshCw size={18} />
                                             </button>
@@ -279,8 +279,8 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                     </div>
                                 </>
                             ) : (
-                                <div className="absolute inset-0 bg-[#04070c] p-6 flex flex-col items-center justify-center text-center space-y-4">
-                                    <div className="w-12 h-12 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400">
+                                <div className="absolute inset-0 bg-[var(--bg-0)] p-6 flex flex-col items-center justify-center text-center space-y-4">
+                                    <div className="w-12 h-12 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                                         <ShieldAlert size={24} />
                                     </div>
                                     <div className="space-y-1">
@@ -333,7 +333,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                                         type="number"
                                                         value={partLength}
                                                         onChange={e => setPartLength(Math.max(10, Number(e.target.value)))}
-                                                        className="w-full bg-[#03060a] border border-cyan-900/30 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-cyan-500/70"
+                                                        className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-cyan-500/70"
                                                     />
                                                 </div>
                                             )}
@@ -343,7 +343,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                                     type="number"
                                                     value={partQty}
                                                     onChange={e => setPartQty(Math.max(1, Number(e.target.value)))}
-                                                    className="w-full bg-[#03060a] border border-cyan-900/30 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-cyan-500/70"
+                                                    className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-cyan-500/70"
                                                 />
                                             </div>
                                         </div>
@@ -362,7 +362,7 @@ export function QRScannerModal({ isOpen, onClose, onAddPart, ft: propFt, languag
                                             </button>
                                             <button
                                                 onClick={handleAddToBOM}
-                                                className="flex-1 py-3.5 bg-cyan-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-cyan-400 transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] flex items-center justify-center gap-1.5 active:scale-95"
+                                                className="flex-1 py-3.5 bg-cyan-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-cyan-400 transition-all flex items-center justify-center gap-1.5 active:scale-95"
                                             >
                                                 <Layers size={14} />
                                                 {ft.addToBom}

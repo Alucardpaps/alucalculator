@@ -1,4 +1,5 @@
 import type { Language } from '@/store/i18nStore';
+import { t12 } from './t12';
 
 export interface DesignStudioLocale {
   design: string;
@@ -86,6 +87,8 @@ export const DESIGN_KIND_LABELS: Record<string, Partial<Record<Language, string>
   'U-channel': { en: 'U-Channel', tr: 'U-Kanal Profil', zh: 'U型槽钢 (U-Channel)', ar: 'قناة U' },
   'I-beam': { en: 'I-Beam', tr: 'I-Kiriş Profil', zh: '工字钢梁 (I-Beam)', ar: 'عارضة I' },
   'T-beam': { en: 'T-Beam', tr: 'T-Kiriş Profil', zh: 'T型钢梁 (T-Beam)', ar: 'عارضة T' },
+  't-slot': { en: 'T-Slot Profile', tr: 'T-Kanal Profil', zh: '工业铝型材 (T-Slot)', ar: 'قطاع T-Slot' },
+  'profile': { en: 'Sketch Solid', tr: 'Eskiz Katı', zh: '草图实体 (Sketch Solid)', ar: 'جسم من رسم' },
   'cross-prism': { en: 'Cross Beam', tr: 'Çapraz Profil', zh: '十字梁型材 (Cross Beam)', ar: 'عارضة صليبية' },
   'gear-blank': { en: 'Gear Blank', tr: 'Dişli Taslağı', zh: '齿轮坯 (Gear Blank)', ar: 'قرص ترس خام' },
   'pulley': { en: 'Pulley', tr: 'Kayış Kasnağı', zh: '皮带轮 (Pulley)', ar: 'بكرة سير' },
@@ -101,9 +104,9 @@ export const DESIGN_KIND_LABELS: Record<string, Partial<Record<Language, string>
 
 export function getDesignKindLabel(kind: string, lang: Language): string {
   const custom = DESIGN_KIND_LABELS[kind];
+  const en = custom?.en || kind.replace(/-/g, ' ');
   if (custom && custom[lang]) return custom[lang]!;
-  if (custom && custom.en) return custom.en;
-  return kind.replace('-', ' ');
+  return t12(lang, en, custom?.tr);
 }
 
 const DESIGN_STUDIO_LOCALES: Record<Language, DesignStudioLocale> = {

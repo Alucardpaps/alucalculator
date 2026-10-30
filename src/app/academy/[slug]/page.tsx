@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: data.meta.title,
       description: data.meta.description,
       alternates: {
-        canonical: `https://www.alucalculator.com/academy/${slug}`,
+        canonical: `https://www.alucalculator.com/academy/${slug}/`,
       },
       openGraph: {
         title: data.meta.title,
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: seoCalc.meta.title,
         description: seoCalc.meta.description,
         alternates: {
-          canonical: `https://www.alucalculator.com/academy/${slug}`,
+          canonical: `https://www.alucalculator.com/academy/${slug}/`,
         },
         openGraph: {
           title: seoCalc.meta.title,
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
     const chrome = getAcademyPage('en');
     return {
-      title: `${chrome.articleNotFound} | AluCalc Academy`,
+      title: `${chrome.articleNotFound} | AluCAD Academy`,
       description: chrome.articleNotFound,
     };
   }

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * 🧮 ALUCALC OS — ULTIMATE SCIENCE, MATH & COMPUTING CAS SUITE (v5.2)
+ * 🧮 ALUCAD OS — ULTIMATE SCIENCE, MATH & COMPUTING CAS SUITE (v5.2)
  * 
  * The All-in-One Comprehensive STEM & Engineering Student Powerhouse:
  * 1. 🧮 CAS & Algebra: Symbolic math, Polynomial Solvers (Quadratic/Cubic), 2x2/3x3 Systems, GCD/LCM, Combinatorics
@@ -24,6 +24,9 @@ import {
   Atom, Flame, Droplet, Eye, Compass, GitBranch, Share2
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
+import { APP_MAJOR_MINOR } from '@/config/app';
 
 // ═════════════════════════════════════════════════════════════
 // SCIENTIFIC CONSTANTS & DATA
@@ -81,8 +84,8 @@ interface HistoryEntry {
 }
 
 export function CalculatorModule() {
+  const precision = useGlobalPrecision();
   const { language } = useI18nStore();
-  const tr = language === 'tr';
 
   // Navigation Sub-Workspaces
   const [activeTab, setActiveTab] = useState<
@@ -160,7 +163,7 @@ export function CalculatorModule() {
       const val = new Function(`return (${expr})`)();
       if (typeof val !== 'number' || isNaN(val)) throw new Error('NaN');
 
-      const formatted = Number.isInteger(val) ? val.toString() : parseFloat(val.toFixed(8)).toString();
+      const formatted = Number.isInteger(val) ? val.toString() : formatEngineeringValue(val, precision, false);
       setCasResult(formatted);
 
       setHistory((prev) => [
@@ -168,14 +171,14 @@ export function CalculatorModule() {
         ...prev.slice(0, 19),
       ]);
     } catch {
-      setCasResult(tr ? 'Hata: Sözdizimi Kontrol Edin' : 'Error: Check Syntax');
+      setCasResult(t12(language, 'Error: Check Syntax', 'Hata: Sözdizimi Kontrol Edin'));
     }
-  }, [casInput, angleMode, tr]);
+  }, [casInput, angleMode, language]);
 
   // Solve Polynomials
   const solvePolynomial = () => {
     if (polyA === 0) {
-      setPolyResult(tr ? 'Hata: a katsayısı 0 olamaz' : 'Error: Coefficient "a" cannot be 0');
+      setPolyResult(t12(language, 'Error: Coefficient "a" cannot be 0', 'Hata: a katsayısı 0 olamaz'));
       return;
     }
     // Quadratic (if polyA is non-zero, but we solve ax² + bx + c = 0 when polyA treated as quad or full cubic)
@@ -184,14 +187,14 @@ export function CalculatorModule() {
     if (disc > 0) {
       const x1 = (-polyB + Math.sqrt(disc)) / (2 * polyA);
       const x2 = (-polyB - Math.sqrt(disc)) / (2 * polyA);
-      quadMsg = `İkinci Derece Kökler (ax² + bx + c = 0):\n  x₁ = ${x1.toFixed(6)}\n  x₂ = ${x2.toFixed(6)}\n  Diskriminant (Δ) = ${disc.toFixed(4)} (2 Gerçek Kök)`;
+      quadMsg = `${t12(language, 'Quadratic Roots (ax² + bx + c = 0):', 'İkinci Derece Kökler (ax² + bx + c = 0):')}\n  x₁ = ${x1.toFixed(6)}\n  x₂ = ${x2.toFixed(6)}\n  ${t12(language, 'Discriminant (Δ)', 'Diskriminant (Δ)')} = ${formatEngineeringValue(disc, precision, false)} (${t12(language, '2 Real Roots', '2 Gerçek Kök')})`;
     } else if (disc === 0) {
       const x = -polyB / (2 * polyA);
-      quadMsg = `İkinci Derece Kökler:\n  x₁ = x₂ = ${x.toFixed(6)}\n  Diskriminant (Δ) = 0 (Çift Katlı Kök)`;
+      quadMsg = `${t12(language, 'Quadratic Roots:', 'İkinci Derece Kökler:')}\n  x₁ = x₂ = ${x.toFixed(6)}\n  ${t12(language, 'Discriminant (Δ)', 'Diskriminant (Δ)')} = 0 (${t12(language, 'Double Root', 'Çift Katlı Kök')})`;
     } else {
       const real = -polyB / (2 * polyA);
       const imag = Math.sqrt(-disc) / (2 * polyA);
-      quadMsg = `İkinci Derece Kökler (Karmaşık):\n  x₁ = ${real.toFixed(4)} + ${imag.toFixed(4)}i\n  x₂ = ${real.toFixed(4)} - ${imag.toFixed(4)}i\n  Diskriminant (Δ) = ${disc.toFixed(4)} < 0`;
+      quadMsg = `${t12(language, 'Quadratic Roots (Complex):', 'İkinci Derece Kökler (Karmaşık):')}\n  x₁ = ${formatEngineeringValue(real, precision, false)} + ${formatEngineeringValue(imag, precision, false)}i\n  x₂ = ${formatEngineeringValue(real, precision, false)} - ${formatEngineeringValue(imag, precision, false)}i\n  ${t12(language, 'Discriminant (Δ)', 'Diskriminant (Δ)')} = ${formatEngineeringValue(disc, precision, false)} < 0`;
     }
     setPolyResult(quadMsg);
   };
@@ -200,18 +203,20 @@ export function CalculatorModule() {
   const solveSystem2x2 = () => {
     const det = sysA1 * sysB2 - sysB1 * sysA2;
     if (Math.abs(det) < 1e-12) {
-      setSysResult(tr ? 'Sistem Tekil veya Paralel (Tek Çözüm Yok)' : 'System Singular or Parallel (No Unique Solution)');
+      setSysResult(t12(language, 'System Singular or Parallel (No Unique Solution)', 'Sistem Tekil veya Paralel (Tek Çözüm Yok)'));
       return;
     }
     const detX = sysC1 * sysB2 - sysB1 * sysC2;
     const detY = sysA1 * sysC2 - sysC1 * sysA2;
     const x = detX / det;
     const y = detY / det;
+    const title = t12(language, "Cramer's Rule Solution:", "Cramer Kuralı Çözümü:");
+    const mainDet = t12(language, "Main Determinant (Δ)", "Ana Determinant (Δ)");
     setSysResult(
-      `Cramer Kuralı Çözümü:\n` +
-      `  Ana Determinant (Δ) = ${det.toFixed(4)}\n` +
-      `  Δx = ${detX.toFixed(4)}  →  x = Δx / Δ = ${x.toFixed(6)}\n` +
-      `  Δy = ${detY.toFixed(4)}  →  y = Δy / Δ = ${y.toFixed(6)}`
+      `${title}\n` +
+      `  ${mainDet} = ${formatEngineeringValue(det, precision, false)}\n` +
+      `  Δx = ${formatEngineeringValue(detX, precision, false)}  →  x = Δx / Δ = ${x.toFixed(6)}\n` +
+      `  Δy = ${formatEngineeringValue(detY, precision, false)}  →  y = Δy / Δ = ${y.toFixed(6)}`
     );
   };
 
@@ -225,11 +230,15 @@ export function CalculatorModule() {
     const nCr = combN >= combR && combR >= 0 ? fact(combN) / (fact(combR) * fact(combN - combR)) : 0;
     const nPr = combN >= combR && combR >= 0 ? fact(combN) / fact(combN - combR) : 0;
 
+    const gcdLbl = t12(language, 'GCD (Greatest Common Divisor)', 'EBOB (En Büyük Ortak Bölen)');
+    const lcmLbl = t12(language, 'LCM (Least Common Multiple)', 'EKOK (En Küçük Ortak Kat)');
+    const combLbl = t12(language, 'Combination', 'Kombinasyon');
+    const permLbl = t12(language, 'Permutation', 'Permütasyon');
     setCombResult(
-      `EBOB (GCD): ${g}\n` +
-      `EKOK (LCM): ${l}\n` +
-      `Kombinasyon C(${combN}, ${combR}) = ${nCr.toLocaleString()}\n` +
-      `Permütasyon P(${combN}, ${combR}) = ${nPr.toLocaleString()}`
+      `${gcdLbl}: ${g}\n` +
+      `${lcmLbl}: ${l}\n` +
+      `${combLbl} C(${combN}, ${combR}) = ${nCr.toLocaleString()}\n` +
+      `${permLbl} P(${combN}, ${combR}) = ${nPr.toLocaleString()}`
     );
   };
 
@@ -326,11 +335,17 @@ export function CalculatorModule() {
 
       if (tool === 'deriv') {
         const d1 = (f(diffX + h) - f(diffX - h)) / (2 * h);
-        setCalcResult(`Birinci Türev f'(${diffX}) = ${d1.toFixed(6)}\nTeğet Denklemi: y - ${f(diffX).toFixed(2)} = ${d1.toFixed(2)}·(x - ${diffX})`);
+        const l1 = t12(language, "First Derivative", "Birinci Türev");
+        const l2 = t12(language, "Tangent Equation", "Teğet Denklemi");
+        setCalcResult(`${l1} f'(${diffX}) = ${formatEngineeringValue(d1, precision, false)}\n${l2}: y - ${formatEngineeringValue(f(diffX), precision, false)} = ${formatEngineeringValue(d1, precision, false)}·(x - ${diffX})`);
       } else if (tool === '2nd_deriv') {
         const d2 = (f(diffX + h) - 2 * f(diffX) + f(diffX - h)) / (h * h);
-        const concavity = d2 > 0 ? 'Konkav Yukarı (Yerel Minimum Eğilimi)' : 'Konkav Aşağı (Yerel Maksimum Eğilimi)';
-        setCalcResult(`İkinci Türev f''(${diffX}) = ${d2.toFixed(6)}\nEğrilik Durumu: ${concavity}`);
+        const concavity = d2 > 0
+          ? t12(language, 'Concave Up (Local Minimum Tendency)', 'Konkav Yukarı (Yerel Minimum Eğilimi)')
+          : t12(language, 'Concave Down (Local Maximum Tendency)', 'Konkav Aşağı (Yerel Maksimum Eğilimi)');
+        const l1 = t12(language, "Second Derivative", "İkinci Türev");
+        const l2 = t12(language, "Curvature State", "Eğrilik Durumu");
+        setCalcResult(`${l1} f''(${diffX}) = ${formatEngineeringValue(d2, precision, false)}\n${l2}: ${concavity}`);
       } else if (tool === 'newton') {
         let x = rootGuess;
         const iterLog: string[] = [];
@@ -339,22 +354,27 @@ export function CalculatorModule() {
           const fpx = (f(x + h) - f(x - h)) / (2 * h);
           if (Math.abs(fpx) < 1e-12) break;
           const xNext = x - fx / fpx;
-          iterLog.push(`Adım ${iter}: x = ${xNext.toFixed(6)}, |f(x)| = ${Math.abs(fx).toExponential(2)}`);
+          iterLog.push(`${t12(language, 'Step', 'Adım')} ${iter}: x = ${formatEngineeringValue(xNext, precision, false)}, |f(x)| = ${Math.abs(fx).toExponential(2)}`);
           if (Math.abs(xNext - x) < 1e-8) {
             x = xNext;
             break;
           }
           x = xNext;
         }
-        setCalcResult(`Newton-Raphson Kök Yakınsaması:\n  Kök x ≈ ${x.toFixed(8)}\n\nİterasyon Tablosu:\n${iterLog.join('\n')}`);
+        const head = t12(language, "Newton-Raphson Root Convergence:", "Newton-Raphson Kök Yakınsaması:");
+        const rootLbl = t12(language, "Root", "Kök");
+        const tableLbl = t12(language, "Iteration Table:", "İterasyon Tablosu:");
+        setCalcResult(`${head}\n  ${rootLbl} x ≈ ${x.toFixed(8)}\n\n${tableLbl}\n${iterLog.join('\n')}`);
       } else if (tool === 'series_sum') {
         // Evaluate sum k=1 to seriesN of f(k)
         let sum = 0;
         for (let k = 1; k <= seriesN; k++) sum += f(k);
-        setCalcResult(`Seri Toplamı (Σ f(k), k=1..${seriesN}):\n  Toplam (Sum) = ${sum.toFixed(6)}`);
+        const seriesLbl = t12(language, `Series Sum (Σ f(k), k=1..${seriesN}):`, `Seri Toplamı (Σ f(k), k=1..${seriesN}):`);
+        const sumLbl = t12(language, "Total (Sum)", "Toplam");
+        setCalcResult(`${seriesLbl}\n  ${sumLbl} = ${formatEngineeringValue(sum, precision, false)}`);
       }
     } catch {
-      setCalcResult(tr ? 'Hesaplama Hatası: Fonksiyonu kontrol edin' : 'Error: Check function syntax');
+      setCalcResult(t12(language, 'Error: Check function syntax', 'Hesaplama Hatası: Fonksiyonu kontrol edin'));
     }
   };
 
@@ -387,12 +407,19 @@ export function CalculatorModule() {
     const projFactor = dot / (magV * magV);
     const projV = [v1 * projFactor, v2 * projFactor, v3 * projFactor];
 
+    const lMag = t12(language, "Vector Magnitudes", "Vektör Büyüklükleri");
+    const lDot = t12(language, "Dot Product (u·v)", "Nokta Çarpım (u·v)");
+    const lCross = t12(language, "Cross Product (u × v)", "Çapraz Çarpım (u × v)");
+    const lMagCross = t12(language, "Magnitude", "Büyüklük");
+    const lAngle = t12(language, "Angle (θ)", "Aralarındaki Açı (θ)");
+    const lProj = t12(language, "Projection Proj_v(u)", "İzdüşüm Proj_v(u)");
+
     setVecResult(
-      `Vektör Büyüklükleri: |u| = ${magU.toFixed(4)}, |v| = ${magV.toFixed(4)}\n` +
-      `Nokta Çarpım (Dot Product u·v): ${dot.toFixed(4)}\n` +
-      `Çapraz Çarpım (Cross Product u × v): [${cross.map((c) => c.toFixed(3)).join(', ')}] (Büyüklük = ${magCross.toFixed(3)})\n` +
-      `Aralarındaki Açı (θ): ${angleDeg.toFixed(2)}° (${(angleDeg * Math.PI / 180).toFixed(4)} rad)\n` +
-      `İzdüşüm Proj_v(u): [${projV.map((p) => p.toFixed(3)).join(', ')}]`
+      `${lMag}: |u| = ${formatEngineeringValue(magU, precision, false)}, |v| = ${formatEngineeringValue(magV, precision, false)}\n` +
+      `${lDot}: ${formatEngineeringValue(dot, precision, false)}\n` +
+      `${lCross}: [${cross.map((c) =>formatEngineeringValue(c, precision, false)).join(', ')}] (${lMagCross} = ${formatEngineeringValue(magCross, precision, false)})\n` +
+      `${lAngle}: ${formatEngineeringValue(angleDeg, precision, false)}° (${formatEngineeringValue((angleDeg * Math.PI / 180), precision, false)} rad)\n` +
+      `${lProj}: [${projV.map((p) =>formatEngineeringValue(p, precision, false)).join(', ')}]`
     );
   };
 
@@ -436,8 +463,8 @@ export function CalculatorModule() {
     const val = (RESISTOR_COLORS[band1].digit! * 10 + RESISTOR_COLORS[band2].digit!) * RESISTOR_COLORS[band3].mult;
     const tol = RESISTOR_COLORS[bandTol].tol;
     let formatted = `${val} Ω`;
-    if (val >= 1000000) formatted = `${(val / 1000000).toFixed(2)} MΩ`;
-    else if (val >= 1000) formatted = `${(val / 1000).toFixed(2)} kΩ`;
+    if (val >= 1000000) formatted = `${formatEngineeringValue((val / 1000000), precision, false)} MΩ`;
+    else if (val >= 1000) formatted = `${formatEngineeringValue((val / 1000), precision, false)} kΩ`;
     return { val, formatted, tol };
   }, [band1, band2, band3, bandTol]);
 
@@ -527,7 +554,7 @@ export function CalculatorModule() {
       {/* ─── TOP HEADER ─── */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 border border-amber-400/40 flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 border border-amber-400/40 flex items-center justify-center text-white shadow-xl ">
             <Calculator size={24} />
           </div>
           <div>
@@ -536,13 +563,11 @@ export function CalculatorModule() {
                 Science, Math & Computing CAS Suite
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                v5.2 STEM Sovereign Edition
+                v{APP_MAJOR_MINOR} STEM Sovereign Edition
               </span>
             </div>
             <p className="text-xs font-mono text-slate-400 mt-0.5">
-              {tr
-                ? 'Sembolik CAS · Polinom & Denklem Çözücü · 2D Çizici · Analiz & Vektörler · Fizik & Balistik · Devre & RLC · Kimya & Molarite · IEEE-754'
-                : 'Symbolic CAS · Polynomials & Systems · 2D Grapher · Calculus & Vectors · Physics & Projectiles · RLC Circuits · Chemistry · IEEE-754'}
+              {t12(language, 'Symbolic CAS · Polynomials & Systems · 2D Grapher · Calculus & Vectors · Physics & Projectiles · RLC Circuits · Chemistry · IEEE-754', 'Sembolik CAS · Polinom & Denklem Çözücü · 2D Çizici · Analiz & Vektörler · Fizik & Balistik · Devre & RLC · Kimya & Molarite · IEEE-754')}
             </p>
           </div>
         </div>
@@ -585,7 +610,7 @@ export function CalculatorModule() {
               className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-mono font-bold transition-all whitespace-nowrap ${
                 isSelected
                   ? 'bg-white/10 text-white border border-white/20 shadow-lg shadow-black/40'
-                  : 'bg-[#080d1a] border border-white/5 text-slate-400 hover:text-white hover:bg-[#0c1222]'
+                  : 'bg-[var(--bg-1)] border border-white/5 text-slate-400 hover:text-white hover:bg-[var(--bg-1)]'
               }`}
               style={{
                 borderColor: isSelected ? tab.color : undefined,
@@ -593,7 +618,7 @@ export function CalculatorModule() {
               }}
             >
               <Icon size={14} />
-              <span>{tr ? tab.labelTr : tab.labelEn}</span>
+              <span>{t12(language, tab.labelEn, tab.labelTr)}</span>
             </button>
           );
         })}
@@ -607,14 +632,14 @@ export function CalculatorModule() {
           {/* TAB 1: CAS & ALGEBRA */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'cas' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-5 shadow-2xl">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-5 shadow-2xl">
               {/* Sub-modes switch */}
               <div className="flex gap-2 border-b border-white/10 pb-3">
                 {[
-                  { id: 'basic' as const, name: tr ? 'Genel Hesaplama' : 'Scientific Keypad' },
-                  { id: 'polynomial' as const, name: tr ? 'Polinom Kökleri (ax²+bx+c)' : 'Polynomial Solver' },
-                  { id: 'system' as const, name: tr ? '2x2 Denklem Sistemi' : 'Linear System (2x2)' },
-                  { id: 'gcd_lcm' as const, name: tr ? 'EBOB/EKOK & Kombinasyon' : 'GCD/LCM & Comb' },
+                  { id: 'basic' as const, name: t12(language, 'Scientific Keypad', 'Genel Hesaplama') },
+                  { id: 'polynomial' as const, name: t12(language, 'Polynomial Solver', 'Polinom Kökleri (ax²+bx+c)') },
+                  { id: 'system' as const, name: t12(language, 'Linear System (2x2)', '2x2 Denklem Sistemi') },
+                  { id: 'gcd_lcm' as const, name: t12(language, 'GCD/LCM & Comb', 'EBOB/EKOK & Kombinasyon') },
                 ].map((m) => (
                   <button
                     key={m.id}
@@ -644,7 +669,7 @@ export function CalculatorModule() {
                       className="w-full bg-transparent text-lg font-bold text-white outline-none placeholder:text-slate-600"
                     />
                     <div className="flex items-center justify-between pt-2 border-t border-white/5 text-xs">
-                      <span className="text-slate-500">{tr ? 'Nihai Sonuç:' : 'Evaluated Result:'}</span>
+                      <span className="text-slate-500">{t12(language, 'Evaluated Result:', 'Nihai Sonuç:')}</span>
                       <span className="text-cyan-400 text-base font-black">{casResult}</span>
                     </div>
                   </div>
@@ -686,7 +711,7 @@ export function CalculatorModule() {
               {/* Submode 2: Polynomial Solver */}
               {casSubMode === 'polynomial' && (
                 <div className="space-y-4 font-mono text-xs">
-                  <span className="text-slate-400 block">Katsayıları girin: a·x² + b·x + c = 0</span>
+                  <span className="text-slate-400 block">{t12(language, 'Enter coefficients: a·x² + b·x + c = 0', 'Katsayıları girin: a·x² + b·x + c = 0')}</span>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="text-slate-400 block mb-1">a (x²):</label>
@@ -697,12 +722,12 @@ export function CalculatorModule() {
                       <input type="number" value={polyB} onChange={(e) => setPolyB(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                     <div>
-                      <label className="text-slate-400 block mb-1">c (Sabit):</label>
+                      <label className="text-slate-400 block mb-1">{t12(language, 'c (Constant):', 'c (Sabit):')}</label>
                       <input type="number" value={polyC} onChange={(e) => setPolyC(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                   </div>
                   <button type="button" onClick={solvePolynomial} className="w-full py-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold uppercase">
-                    Kökleri ve Diskriminantı Hesapla
+                    {t12(language, 'Calculate Roots & Discriminant', 'Kökleri ve Diskriminantı Hesapla')}
                   </button>
                   {polyResult && (
                     <div className="p-4 rounded-2xl bg-black/60 border border-amber-500/30 whitespace-pre-wrap text-amber-300 font-bold">
@@ -715,7 +740,7 @@ export function CalculatorModule() {
               {/* Submode 3: 2x2 System Solver */}
               {casSubMode === 'system' && (
                 <div className="space-y-4 font-mono text-xs">
-                  <span className="text-slate-400 block">Denklem 1: a₁·x + b₁·y = c₁ | Denklem 2: a₂·x + b₂·y = c₂</span>
+                  <span className="text-slate-400 block">{t12(language, 'Equation 1: a₁·x + b₁·y = c₁ | Equation 2: a₂·x + b₂·y = c₂', 'Denklem 1: a₁·x + b₁·y = c₁ | Denklem 2: a₂·x + b₂·y = c₂')}</span>
                   <div className="grid grid-cols-3 gap-2">
                     <input type="number" value={sysA1} onChange={(e) => setSysA1(Number(e.target.value))} placeholder="a1" className="p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
                     <input type="number" value={sysB1} onChange={(e) => setSysB1(Number(e.target.value))} placeholder="b1" className="p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
@@ -725,7 +750,7 @@ export function CalculatorModule() {
                     <input type="number" value={sysC2} onChange={(e) => setSysC2(Number(e.target.value))} placeholder="c2" className="p-2.5 rounded-xl bg-black/60 border border-cyan-500/40 text-cyan-300 text-center" />
                   </div>
                   <button type="button" onClick={solveSystem2x2} className="w-full py-3 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold uppercase">
-                    Cramer Kuralı ile Çöz
+                    {t12(language, "Solve via Cramer's Rule", "Cramer Kuralı ile Çöz")}
                   </button>
                   {sysResult && (
                     <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 whitespace-pre-wrap text-cyan-300 font-bold">
@@ -740,24 +765,24 @@ export function CalculatorModule() {
                 <div className="space-y-4 font-mono text-xs">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-slate-400 block mb-1">Sayı X:</label>
+                      <label className="text-slate-400 block mb-1">{t12(language, 'Number X:', 'Sayı X:')}</label>
                       <input type="number" value={numX} onChange={(e) => setNumX(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                     <div>
-                      <label className="text-slate-400 block mb-1">Sayı Y:</label>
+                      <label className="text-slate-400 block mb-1">{t12(language, 'Number Y:', 'Sayı Y:')}</label>
                       <input type="number" value={numY} onChange={(e) => setNumY(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                     <div>
-                      <label className="text-slate-400 block mb-1">Eleman Sayısı (n):</label>
+                      <label className="text-slate-400 block mb-1">{t12(language, 'Elements (n):', 'Eleman Sayısı (n):')}</label>
                       <input type="number" value={combN} onChange={(e) => setCombN(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                     <div>
-                      <label className="text-slate-400 block mb-1">Seçim Sayısı (r):</label>
+                      <label className="text-slate-400 block mb-1">{t12(language, 'Selection (r):', 'Seçim Sayısı (r):')}</label>
                       <input type="number" value={combR} onChange={(e) => setCombR(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                     </div>
                   </div>
                   <button type="button" onClick={computeGcdLcm} className="w-full py-3 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold uppercase">
-                    EBOB, EKOK & Kombinasyon Hesapla
+                    {t12(language, 'Calculate GCD, LCM & Combinatorics', 'EBOB, EKOK & Kombinasyon Hesapla')}
                   </button>
                   {combResult && (
                     <div className="p-4 rounded-2xl bg-black/60 border border-purple-500/30 whitespace-pre-wrap text-purple-300 font-bold">
@@ -773,7 +798,7 @@ export function CalculatorModule() {
           {/* TAB 2: 2D FUNCTION GRAPHER */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'graph' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-cyan-400 font-bold block mb-1">f₁(x) Curve (Cyan):</label>
@@ -810,7 +835,7 @@ export function CalculatorModule() {
 
               <div className="flex flex-wrap items-center justify-between p-3 rounded-xl bg-black/40 border border-white/10 font-mono">
                 <span>∫ f₁(x) dx [{intA} → {intB}]:</span>
-                <span className="text-cyan-300 font-bold">{plotData.integralVal.toFixed(6)}</span>
+                <span className="text-cyan-300 font-bold">{formatEngineeringValue(plotData.integralVal, precision, false)}</span>
               </div>
             </div>
           )}
@@ -819,32 +844,32 @@ export function CalculatorModule() {
           {/* TAB 3: CALCULUS & SERIES */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'calculus' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
               <div>
-                <label className="text-cyan-400 font-bold block mb-1">Hedef Fonksiyon f(x):</label>
+                <label className="text-cyan-400 font-bold block mb-1">{t12(language, 'Target Function f(x):', 'Hedef Fonksiyon f(x):')}</label>
                 <input type="text" value={calcFunc} onChange={(e) => setCalcFunc(e.target.value)} className="w-full p-3 rounded-xl bg-black/60 border border-white/15 text-white font-bold outline-none" />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">Hesap Noktası (x₀):</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Eval Point (x₀):', 'Hesap Noktası (x₀):')}</label>
                   <input type="number" value={diffX} onChange={(e) => setDiffX(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white" />
                 </div>
                 <div>
-                  <label className="text-slate-400 block mb-1">Kök Başlangıç (x₀):</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Root Guess (x₀):', 'Kök Başlangıç (x₀):')}</label>
                   <input type="number" value={rootGuess} onChange={(e) => setRootGuess(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white" />
                 </div>
                 <div>
-                  <label className="text-slate-400 block mb-1">Seri Terim Sayısı (N):</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Series Terms (N):', 'Seri Terim Sayısı (N):')}</label>
                   <input type="number" value={seriesN} onChange={(e) => setSeriesN(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white" />
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                <button type="button" onClick={() => solveCalculusTools('deriv')} className="px-4 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold">f'(x) Türev</button>
-                <button type="button" onClick={() => solveCalculusTools('2nd_deriv')} className="px-4 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold">f''(x) 2. Türev</button>
-                <button type="button" onClick={() => solveCalculusTools('newton')} className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold">Newton Kök Bulucu</button>
-                <button type="button" onClick={() => solveCalculusTools('series_sum')} className="px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold">Seri Toplamı (Σ)</button>
+                <button type="button" onClick={() => solveCalculusTools('deriv')} className="px-4 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold">{t12(language, "f'(x) Derivative", "f'(x) Türev")}</button>
+                <button type="button" onClick={() => solveCalculusTools('2nd_deriv')} className="px-4 py-2 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold">{t12(language, "f''(x) 2nd Deriv", "f''(x) 2. Türev")}</button>
+                <button type="button" onClick={() => solveCalculusTools('newton')} className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold">{t12(language, "Newton Root Finder", "Newton Kök Bulucu")}</button>
+                <button type="button" onClick={() => solveCalculusTools('series_sum')} className="px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold">{t12(language, "Series Sum (Σ)", "Seri Toplamı (Σ)")}</button>
               </div>
 
               {calcResult && (
@@ -859,10 +884,10 @@ export function CalculatorModule() {
           {/* TAB 4: VECTORS & MATRICES */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'vectors' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                  <span className="font-bold text-cyan-400">Vektör u [x, y, z]:</span>
+                  <span className="font-bold text-cyan-400">{t12(language, 'Vector u [x, y, z]:', 'Vektör u [x, y, z]:')}</span>
                   <div className="flex gap-2">
                     <input type="number" value={vecU[0]} onChange={(e) => setVecU([Number(e.target.value), vecU[1], vecU[2]])} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
                     <input type="number" value={vecU[1]} onChange={(e) => setVecU([vecU[0], Number(e.target.value), vecU[2]])} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
@@ -871,7 +896,7 @@ export function CalculatorModule() {
                 </div>
 
                 <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                  <span className="font-bold text-amber-400">Vektör v [x, y, z]:</span>
+                  <span className="font-bold text-amber-400">{t12(language, 'Vector v [x, y, z]:', 'Vektör v [x, y, z]:')}</span>
                   <div className="flex gap-2">
                     <input type="number" value={vecV[0]} onChange={(e) => setVecV([Number(e.target.value), vecV[1], vecV[2]])} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
                     <input type="number" value={vecV[1]} onChange={(e) => setVecV([vecV[0], Number(e.target.value), vecV[2]])} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-center" />
@@ -881,7 +906,7 @@ export function CalculatorModule() {
               </div>
 
               <button type="button" onClick={computeVectorMath} className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold uppercase tracking-wider">
-                Vektör Analizi (Nokta, Çapraz Çarpım, Açı & İzdüşüm)
+                {t12(language, 'Vector Analysis (Dot, Cross Product, Angle & Proj)', 'Vektör Analizi (Nokta, Çapraz Çarpım, Açı & İzdüşüm)')}
               </button>
 
               {vecResult && (
@@ -896,20 +921,20 @@ export function CalculatorModule() {
           {/* TAB 5: PHYSICS & MOTION */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'physics' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
-              <span className="font-bold text-rose-400 block text-sm">2D Eğik Atış & Balistik Hareketi (Projectile Motion):</span>
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+              <span className="font-bold text-rose-400 block text-sm">{t12(language, '2D Projectile Motion & Ballistics:', '2D Eğik Atış & Balistik Hareketi:')}</span>
               
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-slate-400 block mb-1">İlk Hız (V₀) [m/s]:</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Initial Velocity (V₀) [m/s]:', 'İlk Hız (V₀) [m/s]:')}</label>
                   <input type="number" value={projV0} onChange={(e) => setProjV0(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                 </div>
                 <div>
-                  <label className="text-slate-400 block mb-1">Atış Açısı (θ) [°]:</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Launch Angle (θ) [°]:', 'Atış Açısı (θ) [°]:')}</label>
                   <input type="number" value={projAngle} onChange={(e) => setProjAngle(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                 </div>
                 <div>
-                  <label className="text-slate-400 block mb-1">Başlangıç Yüksekliği (h₀) [m]:</label>
+                  <label className="text-slate-400 block mb-1">{t12(language, 'Initial Height (h₀) [m]:', 'Başlangıç Yüksekliği (h₀) [m]:')}</label>
                   <input type="number" value={projH0} onChange={(e) => setProjH0(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-bold" />
                 </div>
               </div>
@@ -936,16 +961,16 @@ export function CalculatorModule() {
               {/* Balistik Sonuç Kartları */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                  <span className="text-slate-500 text-[10px]">MAKSİMUM MENZİL (R)</span>
-                  <p className="text-rose-400 font-bold text-base">{projectileData.maxRange.toFixed(2)} m</p>
+                  <span className="text-slate-500 text-[10px]">{t12(language, 'MAXIMUM RANGE (R)', 'MAKSİMUM MENZİL (R)')}</span>
+                  <p className="text-rose-400 font-bold text-base">{formatEngineeringValue(projectileData.maxRange, precision, false)} m</p>
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                  <span className="text-slate-500 text-[10px]">MAKSİMUM YÜKSEKLİK (H)</span>
-                  <p className="text-amber-300 font-bold text-base">{projectileData.maxH.toFixed(2)} m</p>
+                  <span className="text-slate-500 text-[10px]">{t12(language, 'MAXIMUM HEIGHT (H)', 'MAKSİMUM YÜKSEKLİK (H)')}</span>
+                  <p className="text-amber-300 font-bold text-base">{formatEngineeringValue(projectileData.maxH, precision, false)} m</p>
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                  <span className="text-slate-500 text-[10px]">UÇUŞ SÜRESİ (T_flight)</span>
-                  <p className="text-cyan-300 font-bold text-base">{projectileData.tFlight.toFixed(2)} s</p>
+                  <span className="text-slate-500 text-[10px]">{t12(language, 'TIME OF FLIGHT (T_flight)', 'UÇUŞ SÜRESİ (T_flight)')}</span>
+                  <p className="text-cyan-300 font-bold text-base">{formatEngineeringValue(projectileData.tFlight, precision, false)} s</p>
                 </div>
               </div>
             </div>
@@ -955,11 +980,11 @@ export function CalculatorModule() {
           {/* TAB 6: CIRCUITS & RLC */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'circuits' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-5 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-5 shadow-2xl font-mono text-xs">
               {/* Resistor Color Code Visualizer */}
               <div className="space-y-3 p-4 rounded-2xl bg-black/40 border border-white/5">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-400">Direnç Renk Kodu Hesaplayıcı (4-Band Resistor):</span>
+                  <span className="font-bold text-amber-400">{t12(language, 'Resistor Color Code Calculator (4-Band):', 'Direnç Renk Kodu Hesaplayıcı (4-Band):')}</span>
                   <span className="font-bold text-cyan-300 text-sm">{resistorValue.formatted} ±{resistorValue.tol}%</span>
                 </div>
 
@@ -992,7 +1017,7 @@ export function CalculatorModule() {
 
               {/* RLC Series AC Resonance */}
               <div className="space-y-3 p-4 rounded-2xl bg-black/40 border border-white/5">
-                <span className="font-bold text-cyan-400 block">Seri RLC AC Empedans & Rezonans Frekansı:</span>
+                <span className="font-bold text-cyan-400 block">{t12(language, 'Series RLC AC Impedance & Resonant Frequency:', 'Seri RLC AC Empedans & Rezonans Frekansı:')}</span>
                 <div className="grid grid-cols-4 gap-2">
                   <div>
                     <label className="text-slate-400 block mb-1">R (Ω):</label>
@@ -1007,23 +1032,23 @@ export function CalculatorModule() {
                     <input type="number" value={rlcC} onChange={(e) => setRlcC(Number(e.target.value))} className="w-full p-2 rounded-lg bg-black/60 border border-white/10 text-white" />
                   </div>
                   <div>
-                    <label className="text-slate-400 block mb-1">Frekans (Hz):</label>
+                    <label className="text-slate-400 block mb-1">{t12(language, 'Frequency (Hz):', 'Frekans (Hz):')}</label>
                     <input type="number" value={rlcFreq} onChange={(e) => setRlcFreq(Number(e.target.value))} className="w-full p-2 rounded-lg bg-black/60 border border-white/10 text-white" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 pt-2">
                   <div className="p-3 rounded-xl bg-black/50 border border-white/5">
-                    <span className="text-[10px] text-slate-500 block">REZONANS (f₀)</span>
-                    <span className="text-amber-300 font-bold">{rlcAnalysis.f0.toFixed(2)} Hz</span>
+                    <span className="text-[10px] text-slate-500 block">{t12(language, 'RESONANCE (f₀)', 'REZONANS (f₀)')}</span>
+                    <span className="text-amber-300 font-bold">{formatEngineeringValue(rlcAnalysis.f0, precision, false)} Hz</span>
                   </div>
                   <div className="p-3 rounded-xl bg-black/50 border border-white/5">
-                    <span className="text-[10px] text-slate-500 block">TOPLAM EMPEDANS (|Z|)</span>
-                    <span className="text-cyan-300 font-bold">{rlcAnalysis.Z.toFixed(2)} Ω</span>
+                    <span className="text-[10px] text-slate-500 block">{t12(language, 'TOTAL IMPEDANCE (|Z|)', 'TOPLAM EMPEDANS (|Z|)')}</span>
+                    <span className="text-cyan-300 font-bold">{formatEngineeringValue(rlcAnalysis.Z, precision, false)} Ω</span>
                   </div>
                   <div className="p-3 rounded-xl bg-black/50 border border-white/5">
-                    <span className="text-[10px] text-slate-500 block">FAZ FARKI (θ)</span>
-                    <span className="text-purple-300 font-bold">{rlcAnalysis.phaseDeg.toFixed(2)}°</span>
+                    <span className="text-[10px] text-slate-500 block">{t12(language, 'PHASE ANGLE (θ)', 'FAZ FARKI (θ)')}</span>
+                    <span className="text-purple-300 font-bold">{formatEngineeringValue(rlcAnalysis.phaseDeg, precision, false)}°</span>
                   </div>
                 </div>
               </div>
@@ -1034,9 +1059,9 @@ export function CalculatorModule() {
           {/* TAB 7: CHEMISTRY & SOLUTIONS */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'chemistry' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
               <div>
-                <label className="text-cyan-400 font-bold block mb-1">Kimyasal Formül (Örn: H2SO4, Al2O3, C6H12O6):</label>
+                <label className="text-cyan-400 font-bold block mb-1">{t12(language, 'Chemical Formula (e.g., H2SO4, Al2O3, C6H12O6):', 'Kimyasal Formül (Örn: H2SO4, Al2O3, C6H12O6):')}</label>
                 <input
                   type="text"
                   value={chemFormula}
@@ -1047,19 +1072,19 @@ export function CalculatorModule() {
 
               <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="text-slate-400">Toplam Mol Kütlesi (Molar Mass):</span>
-                  <span className="text-cyan-300 text-base font-black">{molarAnalysis.totalMolarMass.toFixed(3)} g/mol</span>
+                  <span className="text-slate-400">{t12(language, 'Total Molar Mass:', 'Toplam Mol Kütlesi (Molar Mass):')}</span>
+                  <span className="text-cyan-300 text-base font-black">{formatEngineeringValue(molarAnalysis.totalMolarMass, precision, false)} g/mol</span>
                 </div>
 
                 {/* Element Breakdown Table */}
                 <div className="space-y-1.5">
-                  <span className="text-slate-500 block text-[10px]">Elementel Kütle Yüzdesi Dağılımı:</span>
+                  <span className="text-slate-500 block text-[10px]">{t12(language, 'Elemental Mass Percentage Breakdown:', 'Elementel Kütle Yüzdesi Dağılımı:')}</span>
                   {molarAnalysis.elements.map((el) => (
                     <div key={el.symbol} className="flex items-center justify-between text-slate-300">
-                      <span>{el.symbol} ({el.count} atom):</span>
+                      <span>{el.symbol} ({el.count} {t12(language, 'atoms', 'atom')}):</span>
                       <div className="flex items-center gap-3">
-                        <span>{el.weight.toFixed(2)} g/mol</span>
-                        <span className="text-amber-400 font-bold w-16 text-right">%{el.percent.toFixed(2)}</span>
+                        <span>{formatEngineeringValue(el.weight, precision, false)} g/mol</span>
+                        <span className="text-amber-400 font-bold w-16 text-right">%{formatEngineeringValue(el.percent, precision, false)}</span>
                       </div>
                     </div>
                   ))}
@@ -1068,20 +1093,20 @@ export function CalculatorModule() {
 
               {/* Molarity & Solution Box */}
               <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                <span className="font-bold text-amber-400 block">Çözelti Molarite Hesabı (M = n / V):</span>
+                <span className="font-bold text-amber-400 block">{t12(language, 'Solution Molarity Calculation (M = n / V):', 'Çözelti Molarite Hesabı (M = n / V):')}</span>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-400 block mb-1">Kütle (m) [gram]:</label>
+                    <label className="text-slate-400 block mb-1">{t12(language, 'Mass (m) [grams]:', 'Kütle (m) [gram]:')}</label>
                     <input type="number" value={chemMassGrams} onChange={(e) => setChemMassGrams(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white" />
                   </div>
                   <div>
-                    <label className="text-slate-400 block mb-1">Çözelti Hacmi (V) [Litre]:</label>
+                    <label className="text-slate-400 block mb-1">{t12(language, 'Solution Volume (V) [Liters]:', 'Çözelti Hacmi (V) [Litre]:')}</label>
                     <input type="number" value={solVolumeLiters} onChange={(e) => setSolVolumeLiters(Number(e.target.value))} className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white" />
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                  <span className="text-slate-400">Derişim (Molarite M):</span>
-                  <span className="text-emerald-400 font-bold text-sm">{molarAnalysis.molarity.toFixed(4)} mol/L (M)</span>
+                  <span className="text-slate-400">{t12(language, 'Concentration (Molarity M):', 'Derişim (Molarite M):')}</span>
+                  <span className="text-emerald-400 font-bold text-sm">{formatEngineeringValue(molarAnalysis.molarity, precision, false)} mol/L (M)</span>
                 </div>
               </div>
             </div>
@@ -1091,9 +1116,9 @@ export function CalculatorModule() {
           {/* TAB 8: COMPUTER SCIENCE & LOGIC */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'computing' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-5 shadow-2xl font-mono text-xs">
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-5 shadow-2xl font-mono text-xs">
               <div>
-                <label className="text-cyan-400 font-bold block mb-1">Desimal Giriş (DEC):</label>
+                <label className="text-cyan-400 font-bold block mb-1">{t12(language, 'Decimal Input (DEC):', 'Desimal Giriş (DEC):')}</label>
                 <input
                   type="number"
                   value={compDec}
@@ -1124,7 +1149,7 @@ export function CalculatorModule() {
 
               {/* IEEE-754 32-Bit Float Breakdown */}
               <div className="p-4 rounded-2xl bg-black/50 border border-cyan-500/20 space-y-3">
-                <span className="font-bold text-cyan-400 block">IEEE-754 Single-Precision Bit Alanları:</span>
+                <span className="font-bold text-cyan-400 block">{t12(language, 'IEEE-754 Single-Precision Bit Fields:', 'IEEE-754 Single-Precision Bit Alanları:')}</span>
                 <div className="flex gap-1 font-mono text-[11px]">
                   <div className="p-2 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-300 text-center">
                     <span className="block text-[9px] text-slate-400">Sign (1b)</span>
@@ -1143,7 +1168,7 @@ export function CalculatorModule() {
 
               {/* Logic Gates Truth Table */}
               <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                <span className="font-bold text-purple-400 block">Temel Mantık Kapıları (Logic Gates):</span>
+                <span className="font-bold text-purple-400 block">{t12(language, 'Basic Logic Gates:', 'Temel Mantık Kapıları (Logic Gates):')}</span>
                 <div className="grid grid-cols-4 gap-2 text-center text-[11px]">
                   <div className="p-2 rounded-lg bg-white/5">AND: {compDec & 1 ? '1' : '0'}</div>
                   <div className="p-2 rounded-lg bg-white/5">OR: {compDec | 1 ? '1' : '0'}</div>
@@ -1158,8 +1183,8 @@ export function CalculatorModule() {
           {/* TAB 9: CONSTANTS & FORMULAS */}
           {/* ═════════════════════════════════════════════════════════════ */}
           {activeTab === 'constants' && (
-            <div className="p-5 sm:p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
-              <span className="font-bold text-amber-400 block text-sm">Temel Evrensel Fizik ve Mühendislik Sabitleri:</span>
+            <div className="p-5 sm:p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-4 shadow-2xl font-mono text-xs">
+              <span className="font-bold text-amber-400 block text-sm">{t12(language, 'Universal Physical & Engineering Constants:', 'Temel Evrensel Fizik ve Mühendislik Sabitleri:')}</span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[460px] overflow-y-auto pr-1">
                 {PHYSICAL_CONSTANTS.map((c) => (
                   <div
@@ -1172,7 +1197,7 @@ export function CalculatorModule() {
                   >
                     <div>
                       <span className="font-bold text-cyan-300 text-sm mr-2">{c.symbol}</span>
-                      <p className="text-[10px] text-slate-400">{tr ? c.nameTr : c.nameEn}</p>
+                      <p className="text-[10px] text-slate-400">{t12(language, c.nameEn, c.nameTr)}</p>
                     </div>
                     <span className="text-amber-400 font-bold">{c.value.toExponential(3)} {c.unit}</span>
                   </div>
@@ -1185,50 +1210,50 @@ export function CalculatorModule() {
         {/* RIGHT COLUMN: CALCULATION HISTORY & QUICK PRESETS (4 COLS) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Quick Presets & Cheat-Sheet */}
-          <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3 shadow-xl font-mono text-xs">
+          <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3 shadow-xl font-mono text-xs">
             <h3 className="font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 border-b border-white/10 pb-2">
               <BookOpen size={14} />
-              <span>{tr ? 'Öğrenci Kısayol Formülleri' : 'Engineering Cheat-Sheet'}</span>
+              <span>{t12(language, 'Engineering Cheat-Sheet', 'Öğrenci Kısayol Formülleri')}</span>
             </h3>
 
             <div className="space-y-1.5 text-[11px] text-slate-300">
               <div className="p-2 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-cyan-300 font-bold block">Öklid / Pisagor:</span>
+                <span className="text-cyan-300 font-bold block">{t12(language, 'Euclidean / Pythagorean Theorem:', 'Öklid / Pisagor:')}</span>
                 <code>c = √(a² + b²)</code>
               </div>
               <div className="p-2 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-cyan-300 font-bold block">Euler Formülü:</span>
+                <span className="text-cyan-300 font-bold block">{t12(language, "Euler's Formula:", 'Euler Formülü:')}</span>
                 <code>e^(i·π) + 1 = 0</code>
               </div>
               <div className="p-2 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-cyan-300 font-bold block">Kinetik Enerji:</span>
+                <span className="text-cyan-300 font-bold block">{t12(language, 'Kinetic Energy:', 'Kinetik Enerji:')}</span>
                 <code>E_k = 0.5 · m · v²</code>
               </div>
               <div className="p-2 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-cyan-300 font-bold block">Ohm Kanunu:</span>
+                <span className="text-cyan-300 font-bold block">{t12(language, "Ohm's Law:", 'Ohm Kanunu:')}</span>
                 <code>V = I · R, P = V · I = I²·R</code>
               </div>
             </div>
           </div>
 
           {/* Session History Ledger */}
-          <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 space-y-3 shadow-xl font-mono text-xs">
+          <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-3 shadow-xl font-mono text-xs">
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <span className="font-bold text-cyan-400 uppercase tracking-wider">{tr ? 'Hesaplama Geçmişi' : 'Session History'}</span>
+              <span className="font-bold text-cyan-400 uppercase tracking-wider">{t12(language, 'Session History', 'Hesaplama Geçmişi')}</span>
               {history.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setHistory([])}
                   className="text-[10px] text-rose-400 hover:text-rose-300"
                 >
-                  {tr ? 'Temizle' : 'Clear'}
+                  {t12(language, 'Clear', 'Temizle')}
                 </button>
               )}
             </div>
 
             <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
               {history.length === 0 ? (
-                <p className="text-center text-slate-600 py-6">{tr ? 'Henüz hesaplama yok' : 'No calculations yet'}</p>
+                <p className="text-center text-slate-600 py-6">{t12(language, 'No calculations yet', 'Henüz hesaplama yok')}</p>
               ) : (
                 history.map((entry) => (
                   <div key={entry.id} className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">

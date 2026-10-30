@@ -13,7 +13,7 @@ export function AcademyEngineWalkthroughPanel({ walkthrough, t }: Props) {
   return (
     <section className="rounded-2xl border border-violet-500/20 bg-violet-500/[0.03] overflow-hidden">
       <div className="px-6 py-5 border-b border-violet-500/10 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center shrink-0">
           <Cpu size={20} className="text-violet-400" />
         </div>
         <div>

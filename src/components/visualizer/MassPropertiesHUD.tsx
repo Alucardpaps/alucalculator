@@ -77,10 +77,10 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
       <div className="absolute inset-0 bg-[linear-gradient(to_right,_rgba(0,229,255,0.02)_1px,_transparent_1px),linear-gradient(to_bottom,_rgba(0,229,255,0.02)_1px,_transparent_1px)] bg-[size:10px_10px] pointer-events-none" />
 
       {/* Top Title Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#00e5ff]/20 relative z-10">
+      <div className="flex items-center justify-between pb-3 border-b border-[var(--cyan)]/20 relative z-10">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-pulse" />
-          <span className="text-[10px] font-bold tracking-widest text-[#00e5ff] uppercase">Mass Properties</span>
+          <div className="w-2 h-2 rounded-full bg-[var(--cyan)] animate-pulse" />
+          <span className="text-[10px] font-bold tracking-widest text-[var(--cyan)] uppercase">Mass Properties</span>
         </div>
         <div className="flex items-center gap-1.5">
           <button
@@ -104,7 +104,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
       <div className="py-3 space-y-2 border-b border-white/5 relative z-10">
         <div className="flex items-center justify-between text-[9px] text-slate-400 uppercase">
           <span>Material Base</span>
-          <span className="text-[#00e5ff]">{currentDensity.toFixed(2)} g/cm³</span>
+          <span className="text-[var(--cyan)]">{currentDensity.toFixed(2)} g/cm³</span>
         </div>
         <select
           value={selectedMat.name}
@@ -115,7 +115,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
               setCustomDensity('');
             }
           }}
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[10px] text-white focus:outline-none focus:border-[#00e5ff]/40 transition-colors cursor-pointer"
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-[10px] text-white focus:outline-none focus:border-[var(--cyan)]/40 transition-colors cursor-pointer"
         >
           {PRESET_MATERIALS.map((mat) => (
             <option key={mat.name} value={mat.name} className="bg-slate-900 text-white">
@@ -133,7 +133,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
             type="number"
             value={width}
             onChange={(e) => setWidth(Math.max(1, Number(e.target.value)))}
-            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[#00e5ff]/40 font-bold"
+            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[var(--cyan)]/40 font-bold"
           />
         </div>
         <div>
@@ -142,7 +142,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
             type="number"
             value={height}
             onChange={(e) => setHeight(Math.max(1, Number(e.target.value)))}
-            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[#00e5ff]/40 font-bold"
+            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[var(--cyan)]/40 font-bold"
           />
         </div>
         <div>
@@ -151,7 +151,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
             type="number"
             value={length}
             onChange={(e) => setLength(Math.max(1, Number(e.target.value)))}
-            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[#00e5ff]/40 font-bold"
+            className="w-full bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[10px] text-center text-white focus:outline-none focus:border-[var(--cyan)]/40 font-bold"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ export const MassPropertiesHUD: React.FC<MassPropertiesHUDProps> = ({
         </div>
         <div className="bg-black/30 p-2 rounded-xl border border-white/5">
           <span className="block text-[8px] text-slate-500 uppercase">Volume</span>
-          <div className="text-sm font-black text-[#00e5ff] tracking-tight mt-0.5">
+          <div className="text-sm font-black text-[var(--cyan)] tracking-tight mt-0.5">
             {volumeCm3.toLocaleString(undefined, { maximumFractionDigits: 1 })} <span className="text-[9px] font-normal text-slate-400">cm³</span>
           </div>
         </div>

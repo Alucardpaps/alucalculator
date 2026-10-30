@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { ThemeGrid } from '@/components/settings/ThemePicker';
 import { useCadStore } from '@/cad/store/cadStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useOSStore, Theme, WorkspaceMode } from '@/store/osStore';
@@ -29,7 +30,7 @@ export function RibbonBar({ mode, dock = false }: { mode?: WorkspaceMode, dock?:
     if (dock) {
         return (
             <div className="w-full z-50 transition-all duration-300">
-                <div className="bg-[#0a0e14]/90 backdrop-blur-xl border-b border-white/10 px-4 py-1 flex items-center gap-2">
+                <div className="bg-[var(--bg-1)]/90 border-b border-white/10 px-4 py-1 flex items-center gap-2">
                     {mode === 'cad' ? <CADRibbon dock={true} /> :
                         mode === 'cam' ? <CAMRibbon dock={true} /> :
                             mode === 'desk' ? <DeskRibbon dock={true} /> :
@@ -82,21 +83,12 @@ function SystemControls() {
                     hasDropdown
                 />
                 {showTheme && (
-                    <DropdownPanel onClose={() => setShowTheme(false)} width={200}>
+                    <DropdownPanel onClose={() => setShowTheme(false)} width={320}>
                         <div className="p-1">
                             <div className="px-3 py-2 text-[10px] font-bold uppercase text-slate-500 tracking-wider">
                                 {t.theme}
                             </div>
-                            {themes.map(tOption => (
-                                <button
-                                    key={tOption.id}
-                                    className={`w-full text-left px-3 py-2 text-xs flex items-center gap-2 rounded transition-all ${theme === tOption.id ? 'bg-cyan-500/20 text-cyan-400' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}
-                                    onClick={() => { setTheme(tOption.id); setShowTheme(false); }}
-                                >
-                                    <div className="w-3 h-3 rounded-full border border-slate-600 shadow-inner" style={{ backgroundColor: tOption.color }} />
-                                    {tOption.label}
-                                </button>
-                            ))}
+                            <div className="p-1"><ThemeGrid onPicked={() => setShowTheme(false)} /></div>
                         </div>
                     </DropdownPanel>
                 )}
@@ -296,8 +288,7 @@ function WorkstationRibbon({ dock }: { dock?: boolean }) {
             <ToolGroup label={dock ? undefined : t.ribbon.groupContent}>
                 <RibbonBtn icon={Calculator} label={moduleLabel('calculator', 'All Calculators')} onClick={() => openWindow('calculator')} />
                 <RibbonBtn icon={BarChart3} label={moduleLabel('analytics-dashboard', 'Analytics')} onClick={() => openWindow('analytics-dashboard')} />
-                <RibbonBtn icon={Box} label={moduleLabel('materials-explorer', 'Materials')} onClick={() => openWindow('materials-explorer')} />
-                <RibbonBtn icon={Database} label={moduleLabel('handbook', 'Handbook')} onClick={() => openWindow('handbook')} />
+                <RibbonBtn icon={Database} label={moduleLabel('handbook', 'Handbook & Materials')} onClick={() => openWindow('handbook')} />
                 <RibbonBtn icon={FileText} label={moduleLabel('engineering-notes', 'Notes')} onClick={() => openWindow('engineering-notes')} />
             </ToolGroup>
 
@@ -427,7 +418,7 @@ function RibbonBtn({ icon: Icon, label, isActive, onClick, disabled, hasDropdown
             className={`
                 flex items-center justify-center gap-1.5 px-2 sm:px-3 h-8 sm:h-10 rounded transition-all text-sm
                 ${disabled ? 'text-slate-600 cursor-not-allowed opacity-50'
-                    : isActive ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] drop-shadow-md'
+                    : isActive ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 drop-shadow-md'
                         : 'text-slate-400 hover:bg-white/10 hover:text-white border border-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_2px_10px_rgba(0,0,0,0.2)]'
                 }
             `}
@@ -444,7 +435,7 @@ function DropdownPanel({ children, onClose, width = 280 }: { children: React.Rea
         <>
             <div className="fixed inset-0 z-40" onClick={onClose} />
             <div
-                className="absolute top-full left-0 mt-2 bg-[#0f1419] border border-[#2a3a4a] rounded-lg shadow-2xl z-50 overflow-hidden"
+                className="absolute top-full left-0 mt-2 bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg shadow-2xl z-50 overflow-hidden"
                 style={{ width }}
             >
                 {children}

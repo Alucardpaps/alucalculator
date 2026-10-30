@@ -6,8 +6,10 @@ import { useI18nStore } from '@/store/i18nStore';
 import { getFieldToolsStrings } from '@/locales/fieldToolsTranslations';
 import { playClickSound, playSuccessSound } from '@/mobile/services/audioSynth';
 import { useWorkspaceStore } from '@/store/workspaceStore';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export default function GPSSurveyorModule() {
+  const precision = useGlobalPrecision();
     const { language } = useI18nStore();
     const ft = getFieldToolsStrings(language);
     const debugMode = useWorkspaceStore((s) => s.debugMode);
@@ -71,13 +73,13 @@ export default function GPSSurveyorModule() {
     const activeHeading = isSimulated ? simHeading : heading;
 
     return (
-        <div className="flex flex-col h-full bg-[#05090e] p-6 text-white overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] p-6 text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
             {/* Header */}
             <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-10">
                 <div>
-                    <h2 className="text-lg font-black italic tracking-wider uppercase flex items-center gap-2 text-white">
+                    <h2 className="text-lg font-black tracking-wider uppercase flex items-center gap-2 text-white">
                         <Compass className="text-cyan-400 animate-pulse" size={20} />
                         {ft.gpsSurveyor || 'GPS Surveyor & Compass'}
                     </h2>
@@ -90,7 +92,7 @@ export default function GPSSurveyorModule() {
                 
                 {/* Left: Compass Ring */}
                 <div className="col-span-2 flex flex-col items-center justify-center bg-black/45 border border-white/5 rounded-2xl p-6">
-                    <div className="relative w-56 h-56 rounded-full border-2 border-cyan-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,229,255,0.05)]">
+                    <div className="relative w-56 h-56 rounded-full border-2 border-cyan-500/20 flex items-center justify-center ">
                         {/* Static cursor */}
                         <div className="absolute top-0 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-red-500 z-20 -mt-1.5" />
                         
@@ -109,7 +111,7 @@ export default function GPSSurveyorModule() {
                         </div>
 
                         {/* Dial center readout */}
-                        <div className="absolute w-24 h-24 rounded-full bg-[#03060a] border border-cyan-500/10 flex flex-col items-center justify-center shadow-lg">
+                        <div className="absolute w-24 h-24 rounded-full bg-[var(--bg-0)] border border-cyan-500/10 flex flex-col items-center justify-center shadow-lg">
                             <span className="text-2xl font-black font-mono text-cyan-400 tracking-tighter">
                                 {Math.round(activeHeading)}°
                             </span>
@@ -124,25 +126,25 @@ export default function GPSSurveyorModule() {
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.latitude || 'Latitude'}</span>
                             <span className="text-lg font-black font-mono text-cyan-400">
-                                {activeLat.toFixed(6)}°
+                                {formatEngineeringValue(activeLat, precision, false)}°
                             </span>
                         </div>
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.longitude || 'Longitude'}</span>
                             <span className="text-lg font-black font-mono text-cyan-400">
-                                {activeLon.toFixed(6)}°
+                                {formatEngineeringValue(activeLon, precision, false)}°
                             </span>
                         </div>
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.altitude || 'Altitude'}</span>
                             <span className="text-lg font-black font-mono text-cyan-400">
-                                {activeAlt !== null ? `${activeAlt.toFixed(1)} m` : 'N/A'}
+                                {activeAlt !== null ? `${formatEngineeringValue(activeAlt, precision, false)} m` : 'N/A'}
                             </span>
                         </div>
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.accuracy || 'Accuracy'}</span>
                             <span className="text-lg font-black font-mono text-cyan-400">
-                                ±{activeAcc.toFixed(1)} m
+                                ±{formatEngineeringValue(activeAcc, precision, false)} m
                             </span>
                         </div>
                     </div>
@@ -159,23 +161,23 @@ export default function GPSSurveyorModule() {
                                 <div className="space-y-1">
                                     <div className="flex justify-between text-[9px] font-mono text-slate-400">
                                         <span>Latitude</span>
-                                        <span className="text-yellow-500">{simLat.toFixed(4)}°</span>
+                                        <span className="text-yellow-500">{formatEngineeringValue(simLat, precision, false)}°</span>
                                     </div>
                                     <input 
                                         type="range" min="36.0" max="42.0" step="0.001" value={simLat}
                                         onChange={e => { setSimLat(Number(e.target.value)); if (Math.floor(simLat * 100) % 5 === 0) playClickSound(); }}
-                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex justify-between text-[9px] font-mono text-slate-400">
                                         <span>Longitude</span>
-                                        <span className="text-yellow-500">{simLon.toFixed(4)}°</span>
+                                        <span className="text-yellow-500">{formatEngineeringValue(simLon, precision, false)}°</span>
                                     </div>
                                     <input 
                                         type="range" min="26.0" max="45.0" step="0.001" value={simLon}
                                         onChange={e => { setSimLon(Number(e.target.value)); if (Math.floor(simLon * 100) % 5 === 0) playClickSound(); }}
-                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -186,7 +188,7 @@ export default function GPSSurveyorModule() {
                                     <input 
                                         type="range" min="0" max="2500" step="10" value={simAlt}
                                         onChange={e => { setSimAlt(Number(e.target.value)); if (simAlt % 100 === 0) playClickSound(); }}
-                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -197,7 +199,7 @@ export default function GPSSurveyorModule() {
                                     <input 
                                         type="range" min="0" max="360" step="1" value={simHeading}
                                         onChange={e => { setSimHeading(Number(e.target.value)); if (simHeading % 10 === 0) playClickSound(); }}
-                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                     />
                                 </div>
                             </div>

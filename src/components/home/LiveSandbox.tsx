@@ -117,7 +117,7 @@ export function LiveSandbox() {
   };
 
   return (
-    <section className="mb-6 sm:mb-10 rounded-2xl sm:rounded-3xl border border-white/12 bg-gradient-to-r from-[#0b0f19] via-[#0e1322] to-[#0a0d16] p-4 sm:p-8 shadow-2xl backdrop-blur-xl">
+    <section className="mb-6 sm:mb-10 rounded-2xl sm:rounded-3xl border border-white/12 bg-gradient-to-r from-[var(--bg-1)] via-[var(--bg-1)] to-[var(--bg-1)] p-4 sm:p-8 shadow-2xl">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export function LiveSandbox() {
             type="button"
             onClick={() => setActiveTab('bolt')}
             className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
-              activeTab === 'bolt' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
+              activeTab === 'bolt' ? 'bg-[var(--std)] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
             {s.tabBolt}
@@ -148,7 +148,7 @@ export function LiveSandbox() {
             type="button"
             onClick={() => setActiveTab('alloy')}
             className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
-              activeTab === 'alloy' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
+              activeTab === 'alloy' ? 'bg-[var(--std)] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
             {s.tabAlloy}
@@ -157,7 +157,7 @@ export function LiveSandbox() {
             type="button"
             onClick={() => setActiveTab('beam')}
             className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
-              activeTab === 'beam' ? 'bg-[#6b9fff] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
+              activeTab === 'beam' ? 'bg-[var(--std)] text-black shadow-md shadow-[#6b9fff]/30' : 'text-slate-400 hover:text-white'
             }`}
           >
             {s.tabBeam}
@@ -172,7 +172,7 @@ export function LiveSandbox() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono text-slate-300">
                 <span>{s.boltSize}</span>
-                <span className="text-[#6b9fff] font-bold">M{boltSize}</span>
+                <span className="text-[var(--std)] font-bold">M{boltSize}</span>
               </div>
               <input
                 type="range"
@@ -181,7 +181,7 @@ export function LiveSandbox() {
                 step="2"
                 value={boltSize}
                 onChange={(e) => setBoltSize(Number(e.target.value))}
-                className="w-full accent-[#6b9fff] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
+                className="w-full accent-[var(--std)] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
               />
             </div>
 
@@ -198,7 +198,7 @@ export function LiveSandbox() {
                       onClick={() => setStrengthClass(cls)}
                       className={`flex-1 py-2 sm:py-1.5 rounded-lg text-xs font-bold border transition-all active:scale-95 ${
                         strengthClass === cls
-                          ? 'border-[#6b9fff] bg-[#6b9fff]/20 text-white font-black'
+                          ? 'border-[var(--std)] bg-[var(--std)]/20 text-white font-black'
                           : 'border-white/10 bg-black/40 text-slate-400 hover:text-white'
                       }`}
                     >
@@ -211,7 +211,7 @@ export function LiveSandbox() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs font-mono text-slate-300">
                   <span>{s.friction}</span>
-                  <span className="text-[#6b9fff] font-bold">{friction.toFixed(2)}</span>
+                  <span className="text-[var(--std)] font-bold">{friction.toFixed(2)}</span>
                 </div>
                 <input
                   type="range"
@@ -220,7 +220,7 @@ export function LiveSandbox() {
                   step="0.01"
                   value={friction}
                   onChange={(e) => setFriction(Number(e.target.value))}
-                  className="w-full accent-[#6b9fff] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
+                  className="w-full accent-[var(--std)] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
                 />
               </div>
             </div>
@@ -228,7 +228,7 @@ export function LiveSandbox() {
 
           <div className="md:col-span-5 rounded-xl sm:rounded-2xl border border-white/15 bg-black/60 p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#6b9fff] font-bold">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--std)] font-bold">
                 {s.result}
               </span>
               <button
@@ -249,7 +249,7 @@ export function LiveSandbox() {
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
-                <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{boltResults.preload}</p>
+                <p className="text-xl sm:text-2xl font-black text-[var(--std)]">{boltResults.preload}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
                   {s.preload}
                 </p>
@@ -258,7 +258,7 @@ export function LiveSandbox() {
 
             <Link
               href="/bolt-torque/"
-              className="w-full py-2.5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#6b9fff] to-[#4b86e8] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-[#6b9fff]/20"
+              className="w-full py-2.5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[var(--std)] to-[var(--std)] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-[#6b9fff]/20"
             >
               <span>{s.openSolver}</span>
               <ArrowRight size={14} />
@@ -278,7 +278,7 @@ export function LiveSandbox() {
               <select
                 value={selectedAlloy}
                 onChange={(e) => setSelectedAlloy(e.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-black/60 py-2.5 px-3 text-xs text-white outline-none focus:border-[#6b9fff]"
+                className="w-full rounded-xl border border-white/15 bg-black/60 py-2.5 px-3 text-xs text-white outline-none focus:border-[var(--std)]"
               >
                 <option value="6061-t6">Aluminium 6061-T6 (2.70 g/cm³)</option>
                 <option value="7075-t6">Aluminium 7075-T6 Aerospace (2.81 g/cm³)</option>
@@ -333,7 +333,7 @@ export function LiveSandbox() {
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
-                <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{alloyResults.volumeCm3}</p>
+                <p className="text-xl sm:text-2xl font-black text-[var(--std)]">{alloyResults.volumeCm3}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
                   {s.volume}
                 </p>
@@ -342,7 +342,7 @@ export function LiveSandbox() {
 
             <Link
               href="/handbook/"
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-amber-400/20"
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md "
             >
               <span>{s.openAlloys}</span>
               <ArrowRight size={14} />
@@ -398,7 +398,7 @@ export function LiveSandbox() {
                   step="50"
                   value={spanLength}
                   onChange={(e) => setSpanLength(Number(e.target.value))}
-                  className="w-full accent-cyan-400 h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
+                  className="w-full accent-[var(--cyan)] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
                 />
               </div>
 
@@ -414,7 +414,7 @@ export function LiveSandbox() {
                   step="100"
                   value={appliedForce}
                   onChange={(e) => setAppliedForce(Number(e.target.value))}
-                  className="w-full accent-cyan-400 h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
+                  className="w-full accent-[var(--cyan)] h-3 sm:h-2 rounded-lg bg-black/60 cursor-pointer touch-manipulation"
                 />
               </div>
             </div>
@@ -433,7 +433,7 @@ export function LiveSandbox() {
                 </p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.04] border border-white/5">
-                <p className="text-xl sm:text-2xl font-black text-[#6b9fff]">{beamResults.stress}</p>
+                <p className="text-xl sm:text-2xl font-black text-[var(--std)]">{beamResults.stress}</p>
                 <p className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase mt-0.5">
                   {s.stress}
                 </p>
@@ -442,7 +442,7 @@ export function LiveSandbox() {
 
             <Link
               href="/beam-deflection/"
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-[#6b9fff] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-cyan-400/20"
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-[var(--std)] text-black font-black text-xs flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md "
             >
               <span>{s.openBeam}</span>
               <ArrowRight size={14} />

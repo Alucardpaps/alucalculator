@@ -41,10 +41,14 @@ export class MatingGearTool implements Command {
         // If we already have a source gear, jump to placement
         if (this.sourceGear) {
             this.step = 'PLACE';
-            useCadStore.setState({
-                commandState: 'AWAITING_POINT',
-                commandPrompt: `z=${this.params.targetTeeth} — Click to set meshing angle:`,
-            });
+            const newPrompt = `z=${this.params.targetTeeth} — Click to set meshing angle:`;
+            const current = useCadStore.getState();
+            if (current.commandPrompt !== newPrompt || current.commandState !== 'AWAITING_POINT') {
+                useCadStore.setState({
+                    commandState: 'AWAITING_POINT',
+                    commandPrompt: newPrompt,
+                });
+            }
         }
     }
 

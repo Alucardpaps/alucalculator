@@ -134,7 +134,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 w-[400px] h-[600px] bg-[#0d1117] border border-slate-700 rounded-lg shadow-2xl z-50 flex flex-col overflow-hidden font-mono">
+        <div className="fixed bottom-4 right-4 w-[400px] h-[600px] bg-[var(--bg-1)] border border-slate-700 rounded-lg shadow-2xl z-50 flex flex-col overflow-hidden font-mono">
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 bg-slate-800/50 border-b border-slate-700">
                 <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto bg-[#0a0e14]">
+            <div className="flex-1 overflow-y-auto bg-[var(--bg-1)]">
                 {/* INTELLIGENCE TAB */}
                 {!loading && activeTab === 'intelligence' && (
                     <div className="p-3 space-y-4">
@@ -210,7 +210,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                             { id: 'figma-context', title: 'Figma Design MCP', status: 'READY', tools: ['get_component_spec'] },
                             { id: 'git-fs', title: 'Git & Filesystem MCP', status: 'INDEXING', tools: ['read_file', 'git_diff'] }
                         ].map(mcp => (
-                            <div key={mcp.id} className="bg-[#161b22] border border-slate-800 rounded-lg overflow-hidden">
+                            <div key={mcp.id} className="bg-[var(--bg-2)] border border-slate-800 rounded-lg overflow-hidden">
                                 <div className="px-3 py-2 bg-slate-800/30 flex justify-between items-center border-b border-slate-800">
                                     <span className="text-xs font-bold text-white">{mcp.title}</span>
                                     <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${mcp.status === 'CONNECTED' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-slate-700 text-slate-400'}`}>
@@ -246,7 +246,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-1">{category}</div>
                                 <div className="space-y-1">
                                     {catSchemas.map(s => (
-                                        <div key={s.id} className="bg-[#161b22] border border-slate-800 rounded px-3 py-2 hover:border-amber-500/50 transition-colors group">
+                                        <div key={s.id} className="bg-[var(--bg-2)] border border-slate-800 rounded px-3 py-2 hover:border-amber-500/50 transition-colors group">
                                             <div className="flex justify-between items-center mb-1">
                                                 <span className="text-xs text-amber-200 font-bold">{s.id}</span>
                                                 <span className="text-[10px] px-1.5 py-0.5 bg-slate-800 rounded text-slate-400">v{s.version}</span>
@@ -271,7 +271,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                             <div className="text-center text-slate-600 text-xs py-8">{kd.noExecutionLogs}<br />{kd.runCalculationHint}</div>
                         )}
                         {[...logs].reverse().map((log, i) => (
-                            <div key={i} className="bg-[#161b22] border border-slate-800 rounded p-2 text-xs">
+                            <div key={i} className="bg-[var(--bg-2)] border border-slate-800 rounded p-2 text-xs">
                                 <div className="flex justify-between text-[10px] text-slate-500 mb-1">
                                     <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
                                     <span className="text-green-400">{kd.success}</span>
@@ -309,7 +309,7 @@ export function KernelDevPanel({ defaultOpen = false }: KernelDevPanelProps) {
                             <div key={category} className="mb-2">
                                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-1">{category}</div>
                                 {mods.map(mod => (
-                                    <div key={mod.id} className="bg-[#161b22] border border-slate-800 rounded px-2 py-1 mb-1 flex justify-between">
+                                    <div key={mod.id} className="bg-[var(--bg-2)] border border-slate-800 rounded px-2 py-1 mb-1 flex justify-between">
                                         <span className="text-cyan-200">{mod.metadata.title}</span>
                                         <span className="text-slate-500">{mod.id}</span>
                                     </div>

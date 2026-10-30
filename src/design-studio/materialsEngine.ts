@@ -1,5 +1,7 @@
 'use client';
 
+import { getCanonicalById } from '@/materials/canonical';
+
 export interface EngineeringMaterial {
   id: string;
   name: string;
@@ -18,7 +20,7 @@ export interface EngineeringMaterial {
   description: string;
 }
 
-export const ENGINEERING_MATERIALS: EngineeringMaterial[] = [
+const RAW_ENGINEERING_MATERIALS: EngineeringMaterial[] = [
   {
     id: 'al-6061-t6',
     name: 'Aluminum 6061-T6',
@@ -191,6 +193,19 @@ export const ENGINEERING_MATERIALS: EngineeringMaterial[] = [
   },
 ];
 
+export const ENGINEERING_MATERIALS: EngineeringMaterial[] = RAW_ENGINEERING_MATERIALS.map((m) => {
+  const c = getCanonicalById(m.id);
+  if (!c) return m;
+  return {
+    ...m,
+    density: c.density,
+    yieldStrength: c.Sy_typical,
+    ultimateStrength: c.Su_typical,
+    elasticModulus: c.E,
+    poissonRatio: c.nu,
+  };
+});
+
 export interface MassProperties {
   volumeMm3: number;
   volumeCm3: number;
@@ -262,7 +277,17 @@ export function calculateAssemblyMassProperties(
     let vol = w * h * d;
     let area = 2 * (w * h + w * d + h * d);
 
-    if (p.radius && !p.width) {
+    if (p.sectionAreaMm2 && (p.length || p.extrudeDepth)) {
+      const len = (p.length || p.extrudeDepth) * sy;
+      vol = p.sectionAreaMm2 * len * sx * sz;
+      const peri = 2 * (p.width || 40) + 2 * (p.height || 40);
+      area = p.sectionAreaMm2 * 2 + peri * len;
+    } else if (p.massPerM && (p.length || p.extrudeDepth)) {
+      const lenM = ((p.length || p.extrudeDepth) * sy) / 1000;
+      const matForLin = ENGINEERING_MATERIALS.find((m) => m.id === (part.materialId || defaultMaterialId))
+        || ENGINEERING_MATERIALS[0];
+      vol = (p.massPerM * lenM * 1000) / Math.max(0.1, matForLin.density) * 1000;
+    } else if (p.radius && !p.width) {
       // Cylinder / Tube approx
       const r = (p.radius || 20) * sx;
       const len = (p.length || 50) * sy;

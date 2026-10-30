@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Fits & Tolerances Calculator Schema
+ * AluCAD OS — Fits & Tolerances Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: ISO 286-1, ISO 286-2
@@ -20,7 +20,7 @@ export const fitsTolerancesSchema: CalculatorSchema = {
     metadata: {
         title: 'Fits & Tolerances Calculator',
         description: 'Calculate ISO shaft-hole fits and tolerance zones. Based on ISO 286-1/2.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['fits', 'tolerances', 'ISO 286', 'shaft', 'hole', 'clearance', 'interference']
     },

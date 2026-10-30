@@ -46,37 +46,7 @@ export const CalculatorVisualizer: React.FC<CalculatorVisualizerProps> = ({
 
             return (
                 <div className="w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
-                    {schema.id === 'chain-drive' ? (
-                        <ChainDriveBlueprint
-                            z1={Number((inputs as any).z1 ?? 19)}
-                            z2={Number((inputs as any).z2 ?? 57)}
-                            pitch={Number((inputs as any).pitch ?? 15.875)}
-                            centerDist={Number((inputs as any).centerDist ?? 500)}
-                            rpm1={Number((inputs as any).rpm1 ?? 1450)}
-                            ratio={outputs.ratio as number}
-                            rpm2={outputs.rpm2 as number}
-                            chainVelocity={outputs.chainVelocity as number}
-                            chainLength={outputs.chainLength as number}
-                            chainTension={outputs.chainTension as number}
-                            d1={outputs.d1 as number}
-                        />
-                    ) : schema.id === 'belt-drive' ? (
-                        <BeltDriveBlueprint
-                            d1={Number((inputs as any).d1 ?? 100)}
-                            d2={Number((inputs as any).d2 ?? 250)}
-                            centerDist={Number((inputs as any).centerDist ?? 500)}
-                            beltType={String((inputs as any).beltType ?? 'v-belt')}
-                            rpm1={Number((inputs as any).rpm1 ?? 1450)}
-                            rpm2={outputs.rpm2 as number}
-                            beltVelocity={outputs.beltVelocity as number}
-                            beltLength={outputs.beltLength as number}
-                            arcOfContact={outputs.arcOfContact as number}
-                            T1={outputs.T1 as number}
-                            T2={outputs.T2 as number}
-                        />
-                    ) : (
-                        schema.visualization.render(mockResult, inputs as any)
-                    )}
+                    {schema.visualization.render(mockResult, inputs as any)}
                 </div>
             );
         } catch (e) {
@@ -165,13 +135,13 @@ export const CalculatorVisualizer: React.FC<CalculatorVisualizerProps> = ({
     if (!visualizerContent) return null;
 
     return (
-        <div className="bg-[#0f1419] border border-[#1e2833] rounded-lg p-4 flex flex-col items-center justify-center overflow-hidden">
+        <div className="bg-[var(--bg-1)] border border-[var(--line)] rounded-lg p-4 flex flex-col items-center justify-center overflow-hidden">
             <div className="text-xs text-gray-500 uppercase tracking-widest mb-2 w-full text-left flex justify-between">
                 <span>VISUALIZATION</span>
                 <span>LIVE PREVIEW</span>
             </div>
 
-            <div className="relative w-full aspect-square max-h-[300px] flex items-center justify-center bg-[#1a2332]/50 rounded border border-[#2a3a4a]/50">
+            <div className="relative w-full aspect-square max-h-[300px] flex items-center justify-center bg-[var(--bg-3)]/50 rounded border border-[var(--line-strong)]/50">
                 <svg
                     viewBox={(() => {
                         const vb = visualizerContent.viewBox;

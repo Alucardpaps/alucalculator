@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dna, Activity, Grid3X3, Database, Beaker, ChevronRight, Zap, Microscope, Scale, Globe, TestTube } from 'lucide-react';
+import { APP_VERSION } from '@/config/app';
 
 // DNA -> RNA -> Amino Acid Translation Map
 const CODON_TABLE: Record<string, string> = {
@@ -121,17 +122,17 @@ export default function BiologyGenetics() {
     }, [pFreq]);
 
     return (
-        <div className="flex flex-col w-full h-full bg-[#030407] text-slate-100 overflow-hidden font-sans">
+        <div className="flex flex-col w-full h-full bg-[var(--bg-0)] text-slate-100 overflow-hidden font-sans">
             <HelixAnimation />
             
-            <header className="px-8 py-5 border-b border-white/5 flex items-center justify-between bg-black/40 backdrop-blur-xl z-10">
+            <header className="px-8 py-5 border-b border-white/5 flex items-center justify-between bg-black/40 z-10">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.3)] border border-purple-400/30">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center border border-purple-400/30">
                         <Microscope size={24} className="text-white ring-white/20" />
                     </div>
                     <div>
-                        <h1 className="text-[11px] font-black tracking-[0.4em] uppercase italic text-white/90">Bio-Engineering Center</h1>
-                        <p className="text-[9px] text-purple-500/80 font-mono font-bold uppercase tracking-widest mt-0.5">V5.5 - Molecular Systems Core</p>
+                        <h1 className="text-[11px] font-black tracking-[0.4em] uppercase text-white/90">Bio-Engineering Center</h1>
+                        <p className="text-[9px] text-purple-500/80 font-mono font-bold uppercase tracking-widest mt-0.5">v{APP_VERSION} - Molecular Systems Core</p>
                     </div>
                 </div>
 
@@ -140,7 +141,7 @@ export default function BiologyGenetics() {
                         <button
                             key={t}
                             onClick={() => setTab(t)}
-                            className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? 'bg-purple-500 text-white shadow-xl' : 'text-slate-500 hover:text-slate-300'}`}
+                            className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-xl' : 'text-slate-500 hover:text-slate-300'}`}
                         >
                             {t}
                         </button>
@@ -153,7 +154,7 @@ export default function BiologyGenetics() {
                     {tab === 'genomics' && (
                         <motion.div key="g" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-6xl mx-auto space-y-6">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <section className="lg:col-span-2 p-8 bg-black/40 border border-white/10 rounded-[32px] shadow-2xl relative overflow-hidden">
+                                <section className="lg:col-span-2 p-8 bg-black/40 border border-white/10 rounded-xl shadow-2xl relative overflow-hidden">
                                      <div className="absolute top-0 left-0 p-8 opacity-5"><Dna size={120}/></div>
                                      <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">Nucleotide Sequence (5' → 3')</h3>
                                      <textarea
@@ -175,7 +176,7 @@ export default function BiologyGenetics() {
                             </div>
 
                             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[32px]">
+                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-xl">
                                      <div className="flex items-center gap-3 mb-6">
                                          <Activity size={18} className="text-purple-400" />
                                          <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">ORF Detection (Start → Stop)</h3>
@@ -194,7 +195,7 @@ export default function BiologyGenetics() {
                                      </div>
                                 </div>
 
-                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[32px]">
+                                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-xl">
                                      <div className="flex items-center gap-3 mb-6">
                                          <Beaker size={18} className="text-cyan-400" />
                                          <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Complementary Strand</h3>
@@ -210,15 +211,15 @@ export default function BiologyGenetics() {
                     {tab === 'inheritance' && (
                         <motion.div key="i" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="max-w-4xl mx-auto space-y-8">
                             <section className="text-center">
-                                <h2 className="text-3xl font-black italic tracking-tighter mb-4 text-white/90">Hardy-Weinberg Equilibrium</h2>
+                                <h2 className="text-3xl font-black tracking-tighter mb-4 text-white/90">Hardy-Weinberg Equilibrium</h2>
                                 <p className="text-sm text-slate-500 max-w-xl mx-auto">Analyze population genomics by tracking allele frequency distributions and predictable equilibrium states.</p>
                             </section>
 
-                            <div className="p-10 bg-black/40 border border-white/10 rounded-[40px] shadow-2xl flex flex-col items-center">
+                            <div className="p-10 bg-black/40 border border-white/10 rounded-xl shadow-2xl flex flex-col items-center">
                                 <div className="w-full flex items-center justify-between mb-12">
                                      <AlleleControl label="Dominant (p)" value={pFreq} onChange={setPFreq} />
                                      <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-cyan-500/40 mx-12 relative">
-                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"></div>
+                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white "></div>
                                      </div>
                                      <AlleleControl label="Recessive (q)" value={1 - pFreq} onChange={(val: number) => setPFreq(1 - val)} />
                                 </div>
@@ -234,9 +235,9 @@ export default function BiologyGenetics() {
 
                     {tab === 'lab' && (
                         <motion.div key="l" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="p-8 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 border border-white/10 rounded-[40px] flex flex-col justify-between">
+                            <div className="p-8 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 border border-white/10 rounded-xl flex flex-col justify-between">
                                  <div>
-                                    <h3 className="text-2xl font-black italic mb-2">Molecular Dynamics</h3>
+                                    <h3 className="text-2xl font-black mb-2">Molecular Dynamics</h3>
                                     <p className="text-xs text-white/60 leading-relaxed">Integrated stoichiometry and molecular tools for biochemical laboratory preparation and complex titration metrics.</p>
                                  </div>
                                  <div className="mt-12 grid grid-cols-2 gap-4">
@@ -247,7 +248,7 @@ export default function BiologyGenetics() {
                                  </div>
                             </div>
 
-                            <section className="p-8 bg-black/40 border border-white/5 rounded-[40px] relative overflow-hidden">
+                            <section className="p-8 bg-black/40 border border-white/5 rounded-xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-8 opacity-5 rotate-12"><Zap size={100}/></div>
                                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Central Dogma Simulation</h3>
                                 <div className="space-y-4">
@@ -275,7 +276,7 @@ function BioMetric({ label, value, sub, color }: any) {
     return (
         <div className="p-6 bg-white/[0.03] border border-white/5 rounded-3xl group hover:border-white/10 transition-all">
              <div className="text-[9px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: `${color}cc` }}>{label}</div>
-             <div className="text-2xl font-black italic tracking-tighter text-white/90">{value}</div>
+             <div className="text-2xl font-black tracking-tighter text-white/90">{value}</div>
              <div className="text-[8px] font-bold text-slate-600 uppercase mt-1 tracking-widest">{sub}</div>
         </div>
     );
@@ -290,7 +291,7 @@ function AlleleControl({ label, value, onChange }: any) {
                 step={0.01} min={0} max={1}
                 value={value.toFixed(2)}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className="w-24 h-24 rounded-[32px] bg-black/60 border border-white/10 text-3xl font-black text-center text-purple-400 outline-none focus:border-purple-500/40"
+                className="w-24 h-24 rounded-xl bg-black/60 border border-white/10 text-3xl font-black text-center text-purple-400 outline-none focus:border-purple-500/40"
              />
         </div>
     );
@@ -331,7 +332,7 @@ function LinkCard({ icon, label, sub }: any) {
 function StatusDot({ label, active }: any) {
     return (
         <div className="flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-700'}`}></div>
+            <div className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-emerald-500 ' : 'bg-slate-700'}`}></div>
             <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{label}</span>
         </div>
     );

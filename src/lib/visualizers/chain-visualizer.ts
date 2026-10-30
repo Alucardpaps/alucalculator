@@ -1,5 +1,5 @@
 /**
- * AluCalc OS - Chain Drive Visualizer
+ * AluCAD OS - Chain Drive Visualizer
  */
 
 export interface ChainVisualizerParams {

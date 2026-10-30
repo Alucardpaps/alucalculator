@@ -9,7 +9,7 @@ export const thermodynamicsSchema: CalculatorSchemaV2 = {
         description: 'Calculates Enthalpy, Entropy effects and Reaction Spontaneity.',
         category: 'mechanical', // Temporarily bound to mechanical category type
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['thermodynamics', 'gibbs', 'enthalpy', 'entropy', 'energy', 'spontaneity'],
         verifiedStandards: ['IUPAC Thermodynamic Data']
@@ -82,7 +82,7 @@ export const thermodynamicsSchema: CalculatorSchemaV2 = {
             });
 
             return (
-                <div className="w-full h-full flex items-center justify-center p-8 bg-[#05080b]">
+                <div className="w-full h-full flex items-center justify-center p-8 bg-[var(--bg-0)]">
                     <svg viewBox="0 0 400 200" className="w-full max-w-sm drop-shadow-2xl font-mono">
                         <defs>
                             <linearGradient id="energyGrad" x1="0" y1="1" x2="0" y2="0">

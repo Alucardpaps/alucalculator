@@ -6,6 +6,7 @@ import { useI18nStore } from '@/store/i18nStore';
 import { getFieldToolsStrings } from '@/locales/fieldToolsTranslations';
 import { playClickSound, playWarningSound } from '@/mobile/services/audioSynth';
 import { useWorkspaceStore } from '@/store/workspaceStore';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 function evaluateNoiseSeverity(db: number, ft: any) {
     if (db < 80) {
@@ -47,6 +48,7 @@ function evaluateNoiseSeverity(db: number, ft: any) {
 }
 
 export default function SoundMeterModule() {
+  const precision = useGlobalPrecision();
     const { language } = useI18nStore();
     const ft = getFieldToolsStrings(language);
     const debugMode = useWorkspaceStore((s) => s.debugMode);
@@ -279,13 +281,13 @@ export default function SoundMeterModule() {
     const severity = evaluateNoiseSeverity(currentDb, ft);
 
     return (
-        <div className="flex flex-col h-full bg-[#05090e] p-6 text-white overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] p-6 text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
             {/* Header */}
             <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-10">
                 <div>
-                    <h2 className="text-lg font-black italic tracking-wider uppercase flex items-center gap-2 text-white">
+                    <h2 className="text-lg font-black tracking-wider uppercase flex items-center gap-2 text-white">
                         <Volume2 className="text-cyan-400 animate-pulse" size={20} />
                         {ft.soundMeter || 'Sound Decibel Meter'}
                     </h2>
@@ -301,14 +303,14 @@ export default function SoundMeterModule() {
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1 relative">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.soundIntensityDb || 'Sound Intensity'}</span>
                             <span className={`text-3xl font-black font-mono tracking-tighter ${currentDb > 85 ? 'text-red-400 animate-pulse' : 'text-cyan-400'}`}>
-                                {currentDb.toFixed(1)} <span className="text-xs font-normal text-slate-400 font-sans">dB</span>
+                                {formatEngineeringValue(currentDb, precision, false)} <span className="text-xs font-normal text-slate-400 font-sans">dB</span>
                             </span>
                         </div>
                         <div className="p-4 bg-slate-950/40 border border-white/5 rounded-2xl text-center space-y-1 relative">
                             <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider block">{ft.peakDb || 'Peak level'}</span>
                             <div className="flex items-baseline justify-center gap-2">
                                 <span className="text-3xl font-black font-mono text-slate-300 tracking-tighter">
-                                    {peakDb.toFixed(1)} <span className="text-xs font-normal text-slate-400 font-sans">dB</span>
+                                    {formatEngineeringValue(peakDb, precision, false)} <span className="text-xs font-normal text-slate-400 font-sans">dB</span>
                                 </span>
                                 <button onClick={handleResetPeak} className="p-1 rounded bg-white/5 text-slate-500 hover:text-white transition-all cursor-pointer">
                                     <RefreshCw size={10} />
@@ -331,7 +333,7 @@ export default function SoundMeterModule() {
                         {micPermission === 'default' && !isSimulated && (
                             <button
                                 onClick={requestPermissionAndStart}
-                                className="flex-1 py-3 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 shadow-[0_0_15px_rgba(234,179,8,0.2)] cursor-pointer"
+                                className="flex-1 py-3 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 cursor-pointer"
                             >
                                 {ft.enableMicrophone || 'Enable Microphone'}
                             </button>
@@ -353,7 +355,7 @@ export default function SoundMeterModule() {
                                         else if (streamRef.current) startAudioAnalysis(streamRef.current);
                                         else requestPermissionAndStart();
                                     }}
-                                    className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer"
+                                    className="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
                                     <Play size={14} className="fill-black" />
                                     {ft.startAnalysis || 'Start Analysis'}
@@ -391,7 +393,7 @@ export default function SoundMeterModule() {
                                         playClickSound();
                                         setSimSource(e.target.value as any);
                                     }}
-                                    className="flex-1 bg-[#03060a] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none focus:border-cyan-500 cursor-pointer"
+                                    className="flex-1 bg-[var(--bg-0)] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none focus:border-cyan-500 cursor-pointer"
                                 >
                                     <option value="office">{ft.sourceOffice || 'Quiet Office (40 dB)'}</option>
                                     <option value="traffic">{ft.sourceTraffic || 'Heavy Traffic (75 dB)'}</option>

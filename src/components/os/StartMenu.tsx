@@ -44,7 +44,7 @@ const AppGridItem = ({ id, title, hint, icon: Icon, accentColor, onSelect }: {
             <Icon size={28} className="text-white relative z-10" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }} />
         </div>
         <div className="flex flex-col flex-1 min-w-0 items-center justify-start mt-1">
-            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-[#e2e8f0] group-hover:text-white leading-tight line-clamp-2 transition-colors w-full">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-[var(--alu)] group-hover:text-white leading-tight line-clamp-2 transition-colors w-full">
                 {title}
             </span>
             {hint && (
@@ -96,9 +96,9 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
         'unit-converter': '#8b5cf6', 'cad-editor': '#06b6d4', 'simulation-fea': '#f59e0b',
         'sketch-pad': '#ec4899', 'physics-kinematics': '#8b5cf6', 'chemistry-reactions': '#10b981',
         'biology-genetics': '#ec4899', 'cs-algorithms': '#14b8a6', 'aerospace-dynamics': '#f97316',
-        'naval-hydrostatics': '#06b6d4', 'three-phase-power': '#f59e0b',
+        'three-phase-power': '#f59e0b',
         'digital-logic': '#10b981', 'filter-design': '#06b6d4',
-        'failure-diagnosis': '#ef4444', 'fatigue-advanced': '#dc2626',
+        'fatigue-advanced': '#dc2626',
         'planetary-gearbox': '#8b5cf6', 'material-selector-ai': '#ec4899',
         'materials-explorer': '#14b8a6', 'physics-solver': '#00e5ff',
         'gearbox-design': '#7c3aed', 'motor-selection-std': '#f97316',
@@ -146,7 +146,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+                        className="fixed inset-0 z-40 bg-black/40"
                     />
 
                     <motion.div
@@ -154,7 +154,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 30, scale: 0.98 }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed bottom-[60px] sm:bottom-[80px] left-1/2 -translate-x-1/2 z-50 w-[98vw] sm:w-[500px] md:w-[760px] lg:w-[940px] xl:w-[1100px] h-[85vh] max-h-[750px] bg-[#0c1017]/95 backdrop-blur-3xl border border-cyan-500/30 rounded-2xl shadow-[0_30px_100px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1)] flex overflow-hidden ring-1 ring-black/50"
+                        className="fixed bottom-[60px] sm:bottom-[80px] left-1/2 -translate-x-1/2 z-50 w-[98vw] sm:w-[500px] md:w-[760px] lg:w-[940px] xl:w-[1100px] h-[85vh] max-h-[750px] bg-[var(--bg-1)]/95 border border-cyan-500/30 rounded-2xl shadow-[0_30px_100px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.1)] flex overflow-hidden ring-1 ring-black/50"
                         role="menu"
                         aria-label="Start Menu"
                     >
@@ -164,7 +164,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                     <div className="relative w-7 h-7 flex items-center justify-center rounded-lg bg-gradient-to-br from-cyan-950 to-blue-900 border border-cyan-500/30">
                                         <Hexagon size={16} className="text-cyan-400" />
                                     </div>
-                                    <h2 className="text-sm font-black text-white italic tracking-widest">{t.osName}</h2>
+                                    <h2 className="text-sm font-black text-white tracking-widest">{t.osName}</h2>
                                 </div>
                                 <p className="text-[9px] text-cyan-500/70 font-mono tracking-widest uppercase pl-8">{t.version}</p>
                             </div>
@@ -172,7 +172,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                             <div className="flex-1 overflow-y-auto scrollbar-none px-3 space-y-1">
                                 <button
                                     onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
-                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all flex items-center gap-2 ${activeCategory === 'all' && !searchQuery ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'}`}
+                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-all flex items-center gap-2 ${activeCategory === 'all' && !searchQuery ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 ' : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'}`}
                                 >
                                     <Grid3X3 size={15} className={activeCategory === 'all' && !searchQuery ? 'text-cyan-400' : 'text-slate-500'} />
                                     {t.allApps || 'All Apps'}
@@ -210,8 +210,8 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                         </div>
 
                         <div className="flex-1 flex flex-col bg-gradient-to-br from-transparent to-black/40">
-                            <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] sticky top-0 z-10 backdrop-blur-md flex items-center gap-4">
-                                <div className="flex-1 flex items-center bg-black/40 border border-cyan-500/20 rounded-xl overflow-hidden focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(34,211,238,0.1)] transition-all h-11">
+                            <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] sticky top-0 z-10 flex items-center gap-4">
+                                <div className="flex-1 flex items-center bg-black/40 border border-cyan-500/20 rounded-xl overflow-hidden focus-within:border-cyan-400 transition-all h-11">
                                     <div className="pl-4 pr-2 text-cyan-600">
                                         <Search size={18} />
                                     </div>
@@ -234,7 +234,7 @@ export function StartMenu({ isOpen, onClose }: StartMenuProps) {
                                 <button
                                     onClick={toggleDebugMode}
                                     className={`w-11 h-11 shrink-0 rounded-xl transition-all border flex items-center justify-center ${debugMode
-                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 '
                                         : 'bg-black/40 hover:bg-white/10 text-slate-500 border-white/5'
                                         }`}
                                     title={t.toggleDevMode}

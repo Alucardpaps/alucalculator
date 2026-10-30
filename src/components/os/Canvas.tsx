@@ -72,7 +72,7 @@ export function Canvas({ children }: CanvasProps) {
     return (
         <div
             ref={containerRef}
-            className="w-full h-full overflow-hidden relative bg-[#1e1e1e] cursor-crosshair"
+            className="w-full h-full overflow-hidden relative bg-[var(--bg-3)] cursor-crosshair"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}

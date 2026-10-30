@@ -53,8 +53,8 @@
     --info-dim: rgba(6, 182, 212, 0.15);
 
     /* === TYPOGRAPHY === */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+    --font-sans: var(--font-inter, 'Inter'), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: var(--font-jetbrains-mono, 'JetBrains Mono'), 'Fira Code', 'SF Mono', Consolas, monospace;
 
     --text-xs: 10px;
     --text-sm: 12px;

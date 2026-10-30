@@ -9,7 +9,7 @@ export const mohrsCircleSchema: CalculatorSchemaV2 = {
         description: 'Interactive 2D stress transformation with visual element mapping.',
         category: 'mechanical',
         version: '2.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-25',
         tags: ['stress', 'mechanics', 'transformation', 'mohr', 'principal'],
         verifiedStandards: ['Mechanics of Materials']
@@ -207,7 +207,7 @@ export const mohrsCircleSchema: CalculatorSchemaV2 = {
             };
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="flex gap-4 w-full justify-between items-center mb-4">
                         <div className="flex-1 bg-black/40 rounded p-2 text-cyan-400 font-mono text-xs border border-cyan-900/30 shadow-inner">
                             <div>σ₁: {s1.toFixed(1)} MPa</div>

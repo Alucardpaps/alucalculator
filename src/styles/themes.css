@@ -1,0 +1,265 @@
+/* ════════════════════════════════════════════════════════════════════
+   AluCAD OS — Multi-theme token layer  (v6)
+   --------------------------------------------------------------------
+   Every component reads colours through CSS variables only. A theme is
+   selected with <html data-theme="…"> (set before paint by the inline
+   script in layout.tsx and managed by src/lib/theme/themeStore.ts).
+
+   Public token API (keep these names stable — 1 600+ files use them):
+     surfaces : --bg-0 (page) --bg-1 (chrome) --bg-2 (card) --bg-3 (inset)
+     lines    : --line --line-strong
+     text     : --ink (primary) --alu (secondary) --alu-dim (tertiary) --muted
+     accent   : --cyan (primary accent, name kept for compatibility)
+                --cyan-dim --cyan-glow --accent-ink (text on accent fill)
+     status   : --ok --warn --bad --std
+     overlay  : --scrim (modal backdrop) --shadow-1 --shadow-2
+
+   Dark-authored legacy classes (text-white, bg-white/5, slate-900, cyan-400 …)
+   are re-pointed per theme in palette.css, so light themes work without
+   rewriting every component.
+   ════════════════════════════════════════════════════════════════════ */
+
+:root,
+:root[data-theme="graphite"] {
+  color-scheme: dark;
+  --theme-kind: dark;
+
+  --bg-0: #0c0e11;
+  --bg-1: #111418;
+  --bg-2: #161a1f;
+  --bg-3: #1d2228;
+  --line: #252b33;
+  --line-strong: #353d48;
+
+  --ink: #eceff3;
+  --alu: #c5cbd3;
+  --alu-dim: #949daa;
+  --muted: #6e7783;
+
+  --cyan: #3cc6e6;
+  --cyan-dim: #2196b3;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 18%, transparent);
+  --accent-ink: #061317;
+
+  --ok: #34c77b;
+  --warn: #e9a83a;
+  --bad: #ef5b5b;
+  --std: #7aa7ff;
+
+  --scrim: rgb(4 6 8 / 0.66);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-2: 0 8px 28px rgb(0 0 0 / 0.45);
+  --grid-line: rgb(255 255 255 / 0.025);
+}
+
+:root[data-theme="midnight"] {
+  color-scheme: dark;
+  --theme-kind: dark;
+
+  --bg-0: #070b14;
+  --bg-1: #0b1120;
+  --bg-2: #101829;
+  --bg-3: #172136;
+  --line: #1e2a40;
+  --line-strong: #2c3b57;
+
+  --ink: #edf2fb;
+  --alu: #c3cee0;
+  --alu-dim: #8e9bb3;
+  --muted: #66748e;
+
+  --cyan: #4ea8ff;
+  --cyan-dim: #2b7bd6;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 20%, transparent);
+  --accent-ink: #04101f;
+
+  --ok: #3fd18a;
+  --warn: #f0b544;
+  --bad: #f2625f;
+  --std: #9bb5ff;
+
+  --scrim: rgb(2 5 12 / 0.7);
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 8px 28px rgb(0 0 0 / 0.5);
+  --grid-line: rgb(120 160 255 / 0.03);
+}
+
+:root[data-theme="oled"] {
+  color-scheme: dark;
+  --theme-kind: dark;
+
+  --bg-0: #000000;
+  --bg-1: #050505;
+  --bg-2: #0c0c0c;
+  --bg-3: #151515;
+  --line: #222222;
+  --line-strong: #333333;
+
+  --ink: #f5f5f5;
+  --alu: #cfcfcf;
+  --alu-dim: #9a9a9a;
+  --muted: #6f6f6f;
+
+  --cyan: #00e5ff;
+  --cyan-dim: #00a9bd;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 18%, transparent);
+  --accent-ink: #001417;
+
+  --ok: #22d07a;
+  --warn: #f5a524;
+  --bad: #ff4d4d;
+  --std: #6ea8ff;
+
+  --scrim: rgb(0 0 0 / 0.75);
+  --shadow-1: none;
+  --shadow-2: 0 0 0 1px var(--line);
+  --grid-line: transparent;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --theme-kind: light;
+
+  --bg-0: #f3f4f6;
+  --bg-1: #fbfbfc;
+  --bg-2: #ffffff;
+  --bg-3: #eceef1;
+  --line: #dfe2e7;
+  --line-strong: #c6cbd3;
+
+  --ink: #14171c;
+  --alu: #2f353e;
+  --alu-dim: #59626e;
+  --muted: #7a838f;
+
+  --cyan: #0a7ea4;
+  --cyan-dim: #086a8a;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 14%, transparent);
+  --accent-ink: #ffffff;
+
+  --ok: #15803d;
+  --warn: #b45309;
+  --bad: #c62828;
+  --std: #2457c5;
+
+  --scrim: rgb(20 24 30 / 0.4);
+  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-2: 0 8px 24px rgb(16 24 40 / 0.1);
+  --grid-line: rgb(15 23 42 / 0.035);
+}
+
+:root[data-theme="paper"] {
+  color-scheme: light;
+  --theme-kind: light;
+
+  --bg-0: #f1ede4;
+  --bg-1: #f8f5ee;
+  --bg-2: #fffdf8;
+  --bg-3: #e9e3d6;
+  --line: #ddd5c3;
+  --line-strong: #c7bca6;
+
+  --ink: #1b2440;
+  --alu: #2f3a58;
+  --alu-dim: #5a6178;
+  --muted: #847f75;
+
+  --cyan: #1f4fd1;
+  --cyan-dim: #173fa8;
+  --cyan-glow: color-mix(in oklab, var(--cyan) 13%, transparent);
+  --accent-ink: #ffffff;
+
+  --ok: #1e7a45;
+  --warn: #a95c08;
+  --bad: #b3261e;
+  --std: #1f4fd1;
+
+  --scrim: rgb(40 32 20 / 0.35);
+  --shadow-1: 0 1px 2px rgb(60 45 20 / 0.06);
+  --shadow-2: 0 8px 24px rgb(60 45 20 / 0.1);
+  --grid-line: rgb(31 79 209 / 0.05);
+}
+
+/* ── Derived tokens (theme independent) ───────────────────────────── */
+:root {
+  --line-faint: color-mix(in oklab, var(--line) 60%, transparent);
+  --hover: color-mix(in oklab, var(--ink) 5%, transparent);
+  --active: color-mix(in oklab, var(--ink) 9%, transparent);
+  --accent-soft: color-mix(in oklab, var(--cyan) 12%, transparent);
+  --accent-line: color-mix(in oklab, var(--cyan) 45%, transparent);
+  --ok-soft: color-mix(in oklab, var(--ok) 13%, transparent);
+  --warn-soft: color-mix(in oklab, var(--warn) 14%, transparent);
+  --bad-soft: color-mix(in oklab, var(--bad) 13%, transparent);
+  --focus-ring: 0 0 0 2px var(--bg-0), 0 0 0 4px var(--accent-line);
+
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 8px;
+
+  --font-inter: "Inter Variable", Inter;
+  --font-jetbrains-mono: "JetBrains Mono Variable", "JetBrains Mono";
+  --font-space-grotesk: "Space Grotesk Variable", "Space Grotesk";
+  --font-ui: var(--font-inter, Inter, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-jetbrains-mono, "JetBrains Mono", ui-monospace, monospace);
+  --font-tech: var(--font-space-grotesk, "Space Grotesk", ui-sans-serif, sans-serif);
+
+  /* legacy aliases (older components) */
+  --foreground-rgb: 236, 239, 243;
+  --color-os-canvas: var(--bg-0);
+  --color-os-panel: var(--bg-2);
+  --color-os-header: var(--bg-1);
+  --color-os-border: var(--line);
+  --color-os-accent: var(--cyan);
+  --color-os-accent-dim: var(--cyan-dim);
+  --color-os-text-primary: var(--ink);
+  --color-os-text-secondary: var(--alu-dim);
+}
+:root[data-theme="light"],
+:root[data-theme="paper"] {
+  --foreground-rgb: 20, 23, 28;
+}
+
+/* ── AeGiS mascot illustration tokens (derived, follow every theme) ──── */
+:root {
+  --ag-shell-hi: color-mix(in oklab, var(--alu-dim) 66%, var(--bg-3));
+  --ag-shell: color-mix(in oklab, var(--alu-dim) 34%, var(--bg-3));
+  --ag-shell-lo: color-mix(in oklab, var(--bg-1) 72%, black);
+  --ag-outline: color-mix(in oklab, var(--bg-0) 55%, black);
+  --ag-rim: var(--cyan);
+  --ag-spec: rgb(255 255 255 / 0.55);
+  --ag-joint: color-mix(in oklab, var(--bg-0) 70%, var(--alu-dim));
+  --ag-visor: #05090e;
+  --ag-visor-hi: #142536;
+  --ag-eye: var(--cyan);
+  --ag-eye-core: color-mix(in oklab, var(--cyan) 45%, white);
+  --ag-blush: color-mix(in oklab, #ff6f91 78%, var(--warn));
+  --ag-brass: var(--warn);
+  --ag-brass-hi: color-mix(in oklab, var(--warn) 52%, white);
+  --ag-shadow: color-mix(in oklab, black 62%, transparent);
+  --ag-ao: color-mix(in oklab, black 45%, transparent);
+}
+:root[data-theme="light"],
+:root[data-theme="paper"] {
+  --ag-shell-hi: var(--bg-2);
+  --ag-shell: color-mix(in oklab, var(--bg-3) 82%, var(--alu-dim));
+  --ag-shell-lo: color-mix(in oklab, var(--bg-3) 50%, var(--alu-dim));
+  --ag-outline: color-mix(in oklab, var(--alu-dim) 62%, var(--ink));
+  --ag-spec: rgb(255 255 255 / 0.95);
+  --ag-joint: color-mix(in oklab, var(--alu-dim) 72%, var(--ink));
+  --ag-visor: #0b141d;
+  --ag-visor-hi: #1d3346;
+  --ag-eye: color-mix(in oklab, var(--cyan) 50%, #5ee7ff);
+  --ag-eye-core: color-mix(in oklab, var(--cyan) 22%, white);
+  --ag-shadow: color-mix(in oklab, var(--ink) 20%, transparent);
+  --ag-ao: color-mix(in oklab, var(--ink) 16%, transparent);
+  --ag-brass: color-mix(in oklab, var(--warn) 55%, #f2b544);
+  --ag-brass-hi: color-mix(in oklab, #f2b544 60%, white);
+}
+
+/* Smooth theme switches without animating every hover */
+:root.theme-transition,
+:root.theme-transition *,
+:root.theme-transition *::before,
+:root.theme-transition *::after {
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, fill 180ms ease !important;
+}

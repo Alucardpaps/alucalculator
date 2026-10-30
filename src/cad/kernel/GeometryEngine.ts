@@ -8,7 +8,10 @@
  * Tools call GeometryEngine; GeometryEngine calls GeometryKernel primitives.
  */
 
-import { Point, CadEntity, GeometryType } from './types';
+import { Point, CadEntity, GeometryType, RectangleGeometry, HexagonGeometry, PolylineGeometry } from './types';
+import { polygonVertices } from './shapes';
+import { flattenPrimitive, geometryPrimitives, type Primitive } from './primitives';
+import { bulgeArc } from '@/lib/dxf/dxfGeometry';
 import { distance, intersectLineLine, add, scale, normalize, vector, perpendicular } from './GeometryKernel';
 import {
     getEntityIntersections,
@@ -52,16 +55,31 @@ export function findAllIntersections(e1: CadEntity, e2: CadEntity): Point[] {
 // EDGE DECOMPOSITION
 // ═══════════════════════════════════════════════════════════════
 
-interface LineEdge { kind: 'line'; start: Point; end: Point }
-interface ArcEdge { kind: 'arc'; center: Point; radius: number; startAngle: number; endAngle: number }
-interface CircleEdge { kind: 'circle'; center: Point; radius: number }
+export interface LineEdge { kind: 'line'; start: Point; end: Point }
+export interface ArcEdge { kind: 'arc'; center: Point; radius: number; startAngle: number; endAngle: number }
+export interface CircleEdge { kind: 'circle'; center: Point; radius: number }
 
-type Edge = LineEdge | ArcEdge | CircleEdge;
+export type Edge = LineEdge | ArcEdge | CircleEdge;
+
+/**
+ * Finds all intersection points between a line segment (p1->p2) and any CadEntity.
+ * Used by fence/trail trimming and cutting checks.
+ */
+export function findSegmentEntityIntersections(p1: Point, p2: Point, entity: CadEntity): Point[] {
+    const edges = decomposeToEdges(entity.geometry);
+    const fenceEdge: Edge = { kind: 'line', start: p1, end: p2 };
+    const results: Point[] = [];
+    for (const edge of edges) {
+        const pts = intersectEdges(edge, fenceEdge);
+        results.push(...pts);
+    }
+    return deduplicatePoints(results);
+}
 
 /**
  * Decomposes any GeometryType into primitive edges for intersection.
  */
-function decomposeToEdges(geom: GeometryType): Edge[] {
+export function decomposeToEdges(geom: GeometryType): Edge[] {
     switch (geom.type) {
         case 'LINE':
             return [{ kind: 'line', start: geom.start, end: geom.end }];
@@ -77,12 +95,19 @@ function decomposeToEdges(geom: GeometryType): Edge[] {
             const hh = geom.height / 2;
             const cx = geom.center.x;
             const cy = geom.center.y;
-            const corners: Point[] = [
-                { x: cx - hw, y: cy - hh },
-                { x: cx + hw, y: cy - hh },
-                { x: cx + hw, y: cy + hh },
-                { x: cx - hw, y: cy + hh }
+            const rot = geom.rotation || 0;
+            const cos = Math.cos(rot);
+            const sin = Math.sin(rot);
+            const localCorners: Point[] = [
+                { x: -hw, y: -hh },
+                { x: hw, y: -hh },
+                { x: hw, y: hh },
+                { x: -hw, y: hh }
             ];
+            const corners = localCorners.map(p => ({
+                x: cx + p.x * cos - p.y * sin,
+                y: cy + p.x * sin + p.y * cos
+            }));
             return [
                 { kind: 'line', start: corners[0], end: corners[1] },
                 { kind: 'line', start: corners[1], end: corners[2] },
@@ -92,17 +117,8 @@ function decomposeToEdges(geom: GeometryType): Edge[] {
         }
 
         case 'HEXAGON': {
-            const edges: LineEdge[] = [];
-            for (let i = 0; i < 6; i++) {
-                const angle1 = (Math.PI / 3) * i + (geom.rotation || 0);
-                const angle2 = (Math.PI / 3) * (i + 1) + (geom.rotation || 0);
-                edges.push({
-                    kind: 'line',
-                    start: { x: geom.center.x + geom.radius * Math.cos(angle1), y: geom.center.y + geom.radius * Math.sin(angle1) },
-                    end: { x: geom.center.x + geom.radius * Math.cos(angle2), y: geom.center.y + geom.radius * Math.sin(angle2) }
-                });
-            }
-            return edges;
+            const v = polygonVertices(geom);
+            return v.map((p, i): LineEdge => ({ kind: 'line', start: p, end: v[(i + 1) % v.length] }));
         }
 
         case 'POLYLINE': {
@@ -116,16 +132,94 @@ function decomposeToEdges(geom: GeometryType): Edge[] {
             return edges;
         }
 
+        case 'ELLIPSE': {
+            const edges: LineEdge[] = [];
+            const steps = 36;
+            const rot = geom.rotation || 0;
+            const cos = Math.cos(rot);
+            const sin = Math.sin(rot);
+            const startA = geom.startAngle ?? 0;
+            const endA = geom.endAngle ?? (2 * Math.PI);
+            const span = endA >= startA ? (endA - startA) : (endA - startA + 2 * Math.PI);
+            const pts: Point[] = [];
+            for (let i = 0; i <= steps; i++) {
+                const theta = startA + (span * i) / steps;
+                const lx = geom.radiusX * Math.cos(theta);
+                const ly = geom.radiusY * Math.sin(theta);
+                pts.push({
+                    x: geom.center.x + lx * cos - ly * sin,
+                    y: geom.center.y + lx * sin + ly * cos
+                });
+            }
+            for (let i = 0; i < pts.length - 1; i++) {
+                edges.push({ kind: 'line', start: pts[i], end: pts[i + 1] });
+            }
+            return edges;
+        }
+
+        case 'SPLINE': {
+            if (!geom.controlPoints || geom.controlPoints.length < 2) return [];
+            // the drawn curve, not its control polygon
+            return primitivesToEdges(geometryPrimitives(geom));
+        }
+
         default:
-            return [];
+            // gears, sprockets, fasteners, belts, hatches, leaders, text …: what the canvas draws
+            return primitivesToEdges(geometryPrimitives(geom));
     }
+}
+
+/** Lines and exact arcs/circles of drawing primitives (curves flattened finely). */
+export function primitivesToEdges(prims: Primitive[]): Edge[] {
+    const edges: Edge[] = [];
+    const chainEdges = (pts: Point[]) => {
+        for (let i = 0; i + 1 < pts.length; i++) {
+            if (distance(pts[i], pts[i + 1]) > 1e-9) edges.push({ kind: 'line', start: pts[i], end: pts[i + 1] });
+        }
+    };
+    for (const p of prims) {
+        switch (p.kind) {
+            case 'line': edges.push({ kind: 'line', start: p.a, end: p.b }); break;
+            case 'circle': edges.push({ kind: 'circle', center: p.c, radius: p.r }); break;
+            case 'arc': edges.push({ kind: 'arc', center: p.c, radius: p.r, startAngle: p.start, endAngle: p.end }); break;
+            case 'polyline': {
+                const n = p.points.length;
+                const segs = p.closed ? n : n - 1;
+                for (let i = 0; i < segs; i++) {
+                    const a = p.points[i], b = p.points[(i + 1) % n];
+                    const bulge = p.bulges?.[i] ?? 0;
+                    const arc = Math.abs(bulge) > 1e-12 ? bulgeArc(a, b, bulge) : null;
+                    if (arc) {
+                        const c = { x: arc.cx, y: arc.cy };
+                        const angA = Math.atan2(a.y - c.y, a.x - c.x), angB = Math.atan2(b.y - c.y, b.x - c.x);
+                        // edges run counter-clockwise from start to end
+                        edges.push(arc.sweep > 0
+                            ? { kind: 'arc', center: c, radius: arc.r, startAngle: angA, endAngle: angB }
+                            : { kind: 'arc', center: c, radius: arc.r, startAngle: angB, endAngle: angA });
+                    } else if (distance(a, b) > 1e-9) {
+                        edges.push({ kind: 'line', start: a, end: b });
+                    }
+                }
+                break;
+            }
+            case 'text':
+            case 'point':
+                break;
+            case 'hatch':
+                for (const r of p.rings) chainEdges([...r, r[0]]);
+                break;
+            default:
+                for (const chain of flattenPrimitive(p, 0.01)) chainEdges(chain);
+        }
+    }
+    return edges;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EDGE-LEVEL INTERSECTIONS
 // ═══════════════════════════════════════════════════════════════
 
-function intersectEdges(e1: Edge, e2: Edge): Point[] {
+export function intersectEdges(e1: Edge, e2: Edge): Point[] {
     // LINE-LINE
     if (e1.kind === 'line' && e2.kind === 'line') {
         const pt = intersectLineLine(e1.start, e1.end, e2.start, e2.end, true);
@@ -237,6 +331,12 @@ export function universalTrim(
             return trimCircle(entity, geom, allIntersections, pickPoint);
         case 'ARC':
             return trimArc(entity, geom, allIntersections, pickPoint);
+        case 'POLYLINE':
+            return trimPolyline(entity, geom, allIntersections, pickPoint);
+        case 'RECTANGLE':
+            return trimRectangle(entity, geom, allIntersections, pickPoint);
+        case 'HEXAGON':
+            return trimHexagon(entity, geom, allIntersections, pickPoint);
         default:
             return null; // Unsupported for now
     }
@@ -401,6 +501,205 @@ function trimArc(
                 endAngle: arc.endAngle
             }
         }));
+}
+
+function trimRectangle(
+    entity: CadEntity,
+    geom: RectangleGeometry,
+    intersections: Point[],
+    pickPoint: Point
+): CadEntity[] | null {
+    const hw = geom.width / 2;
+    const hh = geom.height / 2;
+    const cx = geom.center.x;
+    const cy = geom.center.y;
+    const rot = geom.rotation || 0;
+    const cos = Math.cos(rot);
+    const sin = Math.sin(rot);
+    const localCorners: Point[] = [
+        { x: -hw, y: -hh },
+        { x: hw, y: -hh },
+        { x: hw, y: hh },
+        { x: -hw, y: hh }
+    ];
+    const corners = localCorners.map(p => ({
+        x: cx + p.x * cos - p.y * sin,
+        y: cy + p.x * sin + p.y * cos
+    }));
+
+    const sides: { start: Point; end: Point }[] = [
+        { start: corners[0], end: corners[1] },
+        { start: corners[1], end: corners[2] },
+        { start: corners[2], end: corners[3] },
+        { start: corners[3], end: corners[0] }
+    ];
+
+    let pickedSideIdx = -1;
+    let minPickDist = Infinity;
+    sides.forEach((side, idx) => {
+        const d = distToSegment(pickPoint, side.start, side.end);
+        if (d < minPickDist) {
+            minPickDist = d;
+            pickedSideIdx = idx;
+        }
+    });
+
+    if (pickedSideIdx === -1) return null;
+
+    const pickedSide = sides[pickedSideIdx];
+    const sideIntersections = intersections.filter(p => isPointOnSegment(p, pickedSide.start, pickedSide.end));
+    if (sideIntersections.length === 0) return null;
+
+    const trimmedSideEntities = trimLine(
+        entity,
+        pickedSide,
+        sideIntersections,
+        pickPoint
+    );
+
+    if (!trimmedSideEntities) return null;
+
+    const intactSides: CadEntity[] = [];
+    sides.forEach((side, idx) => {
+        if (idx !== pickedSideIdx) {
+            intactSides.push({
+                ...entity,
+                id: crypto.randomUUID(),
+                isSelected: false,
+                geometry: {
+                    type: 'LINE',
+                    start: side.start,
+                    end: side.end
+                }
+            });
+        }
+    });
+
+    return [...intactSides, ...trimmedSideEntities];
+}
+
+function trimHexagon(
+    entity: CadEntity,
+    geom: HexagonGeometry,
+    intersections: Point[],
+    pickPoint: Point
+): CadEntity[] | null {
+    const verts = polygonVertices(geom);
+    const sides: { start: Point; end: Point }[] = verts.map((v, i) => ({ start: v, end: verts[(i + 1) % verts.length] }));
+
+    let pickedSideIdx = -1;
+    let minPickDist = Infinity;
+    sides.forEach((side, idx) => {
+        const d = distToSegment(pickPoint, side.start, side.end);
+        if (d < minPickDist) {
+            minPickDist = d;
+            pickedSideIdx = idx;
+        }
+    });
+
+    if (pickedSideIdx === -1) return null;
+
+    const pickedSide = sides[pickedSideIdx];
+    const sideIntersections = intersections.filter(p => isPointOnSegment(p, pickedSide.start, pickedSide.end));
+    if (sideIntersections.length === 0) return null;
+
+    const trimmedSideEntities = trimLine(
+        entity,
+        pickedSide,
+        sideIntersections,
+        pickPoint
+    );
+
+    if (!trimmedSideEntities) return null;
+
+    const intactSides: CadEntity[] = [];
+    sides.forEach((side, idx) => {
+        if (idx !== pickedSideIdx) {
+            intactSides.push({
+                ...entity,
+                id: crypto.randomUUID(),
+                isSelected: false,
+                geometry: {
+                    type: 'LINE',
+                    start: side.start,
+                    end: side.end
+                }
+            });
+        }
+    });
+
+    return [...intactSides, ...trimmedSideEntities];
+}
+
+function trimPolyline(
+    entity: CadEntity,
+    geom: PolylineGeometry,
+    intersections: Point[],
+    pickPoint: Point
+): CadEntity[] | null {
+    if (geom.vertices.length < 2) return null;
+
+    const segments: { start: Point; end: Point; index: number }[] = [];
+    for (let i = 0; i < geom.vertices.length - 1; i++) {
+        segments.push({ start: geom.vertices[i], end: geom.vertices[i + 1], index: i });
+    }
+    if (geom.closed && geom.vertices.length > 2) {
+        segments.push({
+            start: geom.vertices[geom.vertices.length - 1],
+            end: geom.vertices[0],
+            index: geom.vertices.length - 1
+        });
+    }
+
+    let pickedIdx = -1;
+    let minPickDist = Infinity;
+    segments.forEach((seg, i) => {
+        const d = distToSegment(pickPoint, seg.start, seg.end);
+        if (d < minPickDist) {
+            minPickDist = d;
+            pickedIdx = i;
+        }
+    });
+
+    if (pickedIdx === -1) return null;
+
+    const pickedSeg = segments[pickedIdx];
+    const segIntersections = intersections.filter(p => isPointOnSegment(p, pickedSeg.start, pickedSeg.end));
+    if (segIntersections.length === 0) return null;
+
+    const trimmedPieces = trimLine(entity, pickedSeg, segIntersections, pickPoint);
+    if (!trimmedPieces) return null;
+
+    const resultEntities: CadEntity[] = [];
+    segments.forEach((seg, i) => {
+        if (i !== pickedIdx) {
+            resultEntities.push({
+                ...entity,
+                id: crypto.randomUUID(),
+                isSelected: false,
+                geometry: {
+                    type: 'LINE',
+                    start: seg.start,
+                    end: seg.end
+                }
+            });
+        }
+    });
+
+    resultEntities.push(...trimmedPieces);
+    return resultEntities;
+}
+
+function distToSegment(p: Point, a: Point, b: Point): number {
+    const l2 = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+    if (l2 < EPSILON) return distance(p, a);
+    let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return distance(p, { x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
+}
+
+function isPointOnSegment(p: Point, a: Point, b: Point, tolerance = 0.05): boolean {
+    return distToSegment(p, a, b) <= tolerance;
 }
 
 // ═══════════════════════════════════════════════════════════════

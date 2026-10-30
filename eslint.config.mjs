@@ -5,6 +5,34 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    settings: {
+      react: {
+        version: "19.2.3",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "prefer-const": "warn",
+      "react-hooks/rules-of-hooks": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/static-components": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+      "react-hooks/error-boundaries": "warn",
+      "react/display-name": "warn",
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-img-element": "warn",
+      "@next/next/no-html-link-for-pages": "warn",
+      "@next/next/no-assign-module-variable": "warn",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -17,6 +45,10 @@ const eslintConfig = defineConfig([
     "_live_extract/**",
     "scratch/**",
     "tmp/**",
+    "graphify-out/**",
+    "scripts/archive/**",
+    "*.js",
+    "*.mjs",
   ]),
 ]);
 

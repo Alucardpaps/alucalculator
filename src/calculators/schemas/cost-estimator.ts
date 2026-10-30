@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Cost Estimator Schema
+ * AluCAD OS — Cost Estimator Schema
  * 
  * ENGINEERING DOMAIN: Finance / Manufacturing
  * 
@@ -19,7 +19,7 @@ export const costEstimatorSchema: CalculatorSchema = {
     metadata: {
         title: 'Cost Estimator',
         description: 'Estimate material, labor, and total manufacturing costs for engineering projects.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['cost', 'estimate', 'material', 'labor', 'manufacturing', 'quote']
     },

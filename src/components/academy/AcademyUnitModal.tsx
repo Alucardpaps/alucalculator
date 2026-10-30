@@ -1,5 +1,7 @@
 'use client';
 
+import { t12 } from '@/locales/t12';
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -10,6 +12,7 @@ import {
 import { AcademyMvpUnit } from '@/data/academyMvpUnits';
 import { AcademyInteractiveSimulators } from './AcademyInteractiveSimulators';
 import { CertificateModal } from './CertificateModal';
+import { useI18nStore } from '@/store/i18nStore';
 
 interface AcademyUnitModalProps {
   unit: AcademyMvpUnit;
@@ -17,7 +20,7 @@ interface AcademyUnitModalProps {
   onClose: () => void;
   onUnitCompleted: (unitId: string, earnedXp: number) => void;
   isCompleted: boolean;
-  tr: boolean;
+  tr?: boolean;
 }
 
 export function AcademyUnitModal({
@@ -26,8 +29,8 @@ export function AcademyUnitModal({
   onClose,
   onUnitCompleted,
   isCompleted,
-  tr,
 }: AcademyUnitModalProps) {
+  const { language } = useI18nStore();
   const [activeTab, setActiveTab] = useState<'theory' | 'simulator' | 'quiz' | 'cert'>('theory');
 
   // Quiz state
@@ -94,15 +97,15 @@ export function AcademyUnitModal({
   const stats = scoreStats();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-5xl h-[92vh] flex flex-col rounded-3xl bg-[#060a14] border border-cyan-500/30 shadow-[0_0_50px_rgba(0,229,255,0.15)] overflow-hidden"
+        className="relative w-full max-w-5xl h-[92vh] flex flex-col rounded-3xl bg-[var(--bg-0)] border border-cyan-500/30 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ─── MODAL HEADER BAR ─── */}
-        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/10 bg-[#080d1a]/90 backdrop-blur-md shrink-0">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/10 bg-[var(--bg-1)]/90 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 flex items-center justify-center font-mono text-xs font-bold shrink-0">
+            <span className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] border border-[var(--cyan)]/40 flex items-center justify-center font-mono text-xs font-bold shrink-0">
               U{unit.unitNumber}
             </span>
             <div className="truncate">
@@ -113,12 +116,12 @@ export function AcademyUnitModal({
                 <span className="text-xs font-mono text-slate-500">· {unit.category}</span>
                 {isCompleted && (
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
-                    <Check size={10} /> {tr ? 'Tamamlandı' : 'Completed'}
+                    <Check size={10} /> {t12(language, 'Completed', 'Tamamlandı')}
                   </span>
                 )}
               </div>
               <h2 className="text-base sm:text-lg font-bold text-white truncate mt-0.5">
-                {tr ? unit.titleTr : unit.titleEn}
+                {t12(language, unit.titleEn, unit.titleTr)}
               </h2>
             </div>
           </div>
@@ -130,7 +133,7 @@ export function AcademyUnitModal({
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-mono font-semibold transition"
             >
               <Calculator size={14} />
-              <span>{tr ? 'Canlı Çözücü' : 'Solver'}</span>
+              <span>{t12(language, 'Solver', 'Canlı Çözücü')}</span>
               <ExternalLink size={12} />
             </Link>
 
@@ -145,18 +148,18 @@ export function AcademyUnitModal({
         </div>
 
         {/* ─── TAB NAVIGATION ─── */}
-        <div className="flex items-center gap-2 px-4 sm:px-6 py-2.5 border-b border-white/10 bg-[#040711] font-mono text-xs overflow-x-auto shrink-0">
+        <div className="flex items-center gap-2 px-4 sm:px-6 py-2.5 border-b border-white/10 bg-[var(--bg-0)] font-mono text-xs overflow-x-auto shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('theory')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               activeTab === 'theory'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md '
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <BookOpen size={14} />
-            <span>1. {tr ? 'Normatif Teori & Formüller' : 'Theory & Standards'}</span>
+            <span>1. {t12(language, 'Theory & Standards', 'Normatif Teori & Formüller')}</span>
           </button>
 
           <button
@@ -164,12 +167,12 @@ export function AcademyUnitModal({
             onClick={() => setActiveTab('simulator')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               activeTab === 'simulator'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md '
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Activity size={14} className="text-emerald-400" />
-            <span>2. {tr ? 'İnteraktif Simülatör Laboratuvarı' : 'Interactive Lab'}</span>
+            <span>2. {t12(language, 'Interactive Lab', 'İnteraktif Simülatör Laboratuvarı')}</span>
           </button>
 
           <button
@@ -177,12 +180,12 @@ export function AcademyUnitModal({
             onClick={() => setActiveTab('quiz')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               activeTab === 'quiz'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md '
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <ShieldCheck size={14} className="text-amber-400" />
-            <span>3. {tr ? 'Doğrulama Sınavı' : 'Verification Quiz'}</span>
+            <span>3. {t12(language, 'Verification Quiz', 'Doğrulama Sınavı')}</span>
           </button>
 
           <button
@@ -190,12 +193,12 @@ export function AcademyUnitModal({
             onClick={() => setActiveTab('cert')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               activeTab === 'cert'
-                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md '
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Award size={14} className="text-yellow-400" />
-            <span>4. {tr ? 'Sertifika & Akreditasyon' : 'Certificate'}</span>
+            <span>4. {t12(language, 'Certificate', 'Sertifika & Akreditasyon')}</span>
           </button>
         </div>
 
@@ -207,10 +210,10 @@ export function AcademyUnitModal({
             <div className="space-y-6 max-w-4xl mx-auto">
               <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-cyan-950/20 to-slate-950 border border-white/10 space-y-2">
                 <span className="text-[11px] font-mono font-bold text-cyan-400 uppercase tracking-widest">
-                  {tr ? 'Mühendislik Özeti' : 'Engineering Abstract'}
+                  {t12(language, 'Engineering Abstract', 'Mühendislik Özeti')}
                 </span>
                 <p className="text-sm leading-relaxed text-slate-200 font-medium">
-                  {tr ? unit.summaryTr : unit.summaryEn}
+                  {t12(language, unit.summaryEn, unit.summaryTr)}
                 </p>
               </div>
 
@@ -218,10 +221,10 @@ export function AcademyUnitModal({
               <div className="space-y-3">
                 <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
                   <BookOpen size={16} />
-                  <span>{tr ? 'Kapsamlı Normatif Teori' : 'Comprehensive Normative Theory'}</span>
+                  <span>{t12(language, 'Comprehensive Normative Theory', 'Kapsamlı Normatif Teori')}</span>
                 </h3>
-                <div className="p-5 rounded-2xl bg-[#080d1a] border border-white/10 text-sm leading-relaxed text-slate-300 space-y-3 font-normal">
-                  <p>{tr ? unit.theoryTr : unit.theoryEn}</p>
+                <div className="p-5 rounded-2xl bg-[var(--bg-1)] border border-white/10 text-sm leading-relaxed text-slate-300 space-y-3 font-normal">
+                  <p>{t12(language, unit.theoryEn, unit.theoryTr)}</p>
                 </div>
               </div>
 
@@ -229,11 +232,11 @@ export function AcademyUnitModal({
               <div className="space-y-3">
                 <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
                   <Calculator size={16} />
-                  <span>{tr ? 'Yönetici Standart Formülleri' : 'Governing Standard Formulas'}</span>
+                  <span>{t12(language, 'Governing Standard Formulas', 'Yönetici Standart Formülleri')}</span>
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {unit.formulas.map((f, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-[#080d1a] border border-white/10 space-y-1.5 font-mono">
+                    <div key={idx} className="p-4 rounded-2xl bg-[var(--bg-1)] border border-white/10 space-y-1.5 font-mono">
                       <span className="text-xs text-slate-400 font-sans block">{f.label}</span>
                       <p className="text-sm font-bold text-cyan-300 overflow-x-auto whitespace-nowrap py-1">
                         {f.latex}
@@ -250,7 +253,7 @@ export function AcademyUnitModal({
                   onClick={() => setActiveTab('simulator')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider font-mono shadow-lg transition cursor-pointer"
                 >
-                  <span>{tr ? 'İnteraktif Simülatöre Geç' : 'Proceed to Simulator'}</span>
+                  <span>{t12(language, 'Proceed to Simulator', 'İnteraktif Simülatöre Geç')}</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -262,12 +265,10 @@ export function AcademyUnitModal({
             <div className="space-y-6 max-w-4xl mx-auto">
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-white">
-                  {tr ? 'Parametrik Deney ve Hesaplama Laboratuvarı' : 'Parametric Lab Simulator'}
+                  {t12(language, 'Parametric Lab Simulator', 'Parametrik Deney ve Hesaplama Laboratuvarı')}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  {tr
-                    ? 'Aşağıdaki parametreleri kaydırarak formüllerin davranışını, gerilmeleri ve güvenlik katsayılarını canlı inceleyin.'
-                    : 'Adjust parameters live to observe theoretical stress curves and factor of safety in real-time.'}
+                  {t12(language, 'Adjust parameters live to observe theoretical stress curves and factor of safety in real-time.', 'Aşağıdaki parametreleri kaydırarak formüllerin davranışını, gerilmeleri ve güvenlik katsayılarını canlı inceleyin.')}
                 </p>
               </div>
 
@@ -279,7 +280,7 @@ export function AcademyUnitModal({
                   onClick={() => setActiveTab('theory')}
                   className="text-xs font-mono text-slate-400 hover:text-white"
                 >
-                  ← {tr ? 'Teoriye Dön' : 'Back to Theory'}
+                  ← {t12(language, 'Back to Theory', 'Teoriye Dön')}
                 </button>
 
                 <button
@@ -287,7 +288,7 @@ export function AcademyUnitModal({
                   onClick={() => setActiveTab('quiz')}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider font-mono shadow-lg transition cursor-pointer"
                 >
-                  <span>{tr ? 'Sınava Başla (5 Soru)' : 'Start Quiz (5 Questions)'}</span>
+                  <span>{t12(language, 'Start Quiz (5 Questions)', 'Sınava Başla (5 Soru)')}</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -302,7 +303,7 @@ export function AcademyUnitModal({
                   {/* Progress Meter */}
                   <div className="flex items-center justify-between font-mono text-xs text-slate-400">
                     <span>
-                      {tr ? 'Soru' : 'Question'} {currentQuestionIndex + 1} / {unit.questions.length}
+                      {t12(language, 'Question', 'Soru')} {currentQuestionIndex + 1} / {unit.questions.length}
                     </span>
                     <span className="text-cyan-400 font-bold">
                       {Math.round(((currentQuestionIndex + 1) / unit.questions.length) * 100)}%
@@ -317,14 +318,14 @@ export function AcademyUnitModal({
                   </div>
 
                   {/* Question Card */}
-                  <div className="p-6 rounded-3xl bg-[#080d1a] border border-white/10 space-y-5 shadow-xl">
+                  <div className="p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 space-y-5 shadow-xl">
                     <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
-                      {tr ? currentQ.questionTr : currentQ.questionEn}
+                      {t12(language, currentQ.questionEn, currentQ.questionTr)}
                     </h3>
 
                     {/* Options */}
                     <div className="space-y-2.5 font-mono text-xs">
-                      {(tr ? currentQ.optionsTr : currentQ.optionsEn).map((opt, optIdx) => {
+                      {currentQ.optionsEn.map((opt, i) => t12(language, opt, currentQ.optionsTr[i])).map((opt, optIdx) => {
                         const isSelected = selectedOpt === optIdx;
                         const isCorrect = optIdx === currentQ.correctIndex;
 
@@ -374,7 +375,7 @@ export function AcademyUnitModal({
                           {selectedOpt === currentQ.correctIndex ? '✓ Doğru Açıklama' : 'ℹ Teknik Açıklama'}:
                         </span>
                         <p className="text-slate-300 font-sans">
-                          {tr ? currentQ.explanationTr : currentQ.explanationEn}
+                          {t12(language, currentQ.explanationEn, currentQ.explanationTr)}
                         </p>
                       </div>
                     )}
@@ -392,7 +393,7 @@ export function AcademyUnitModal({
                           onClick={handleConfirmAnswer}
                           className="px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-bold text-xs uppercase font-mono tracking-wider transition cursor-pointer"
                         >
-                          {tr ? 'Cevabı Onayla' : 'Submit Answer'}
+                          {t12(language, 'Submit Answer', 'Cevabı Onayla')}
                         </button>
                       ) : (
                         <button
@@ -400,7 +401,7 @@ export function AcademyUnitModal({
                           onClick={handleNextQuestion}
                           className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase font-mono tracking-wider transition cursor-pointer flex items-center gap-1.5"
                         >
-                          <span>{currentQuestionIndex < unit.questions.length - 1 ? (tr ? 'Sonraki Soru' : 'Next Question') : (tr ? 'Sonuçları Gör' : 'View Results')}</span>
+                          <span>{currentQuestionIndex < unit.questions.length - 1 ? (t12(language, 'Next Question', 'Sonraki Soru')) : (t12(language, 'View Results', 'Sonuçları Gör'))}</span>
                           <ChevronRight size={14} />
                         </button>
                       )}
@@ -409,10 +410,10 @@ export function AcademyUnitModal({
                 </div>
               ) : (
                 /* QUIZ COMPLETED SUMMARY */
-                <div className="p-8 rounded-3xl bg-[#080d1a] border border-white/10 text-center space-y-6 shadow-2xl">
+                <div className="p-8 rounded-3xl bg-[var(--bg-1)] border border-white/10 text-center space-y-6 shadow-2xl">
                   <div className={`w-16 h-16 rounded-3xl mx-auto flex items-center justify-center ${
                     stats.passed
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/20'
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg '
                       : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
                   }`}>
                     {stats.passed ? <Award size={32} /> : <RotateCcw size={32} />}
@@ -420,26 +421,26 @@ export function AcademyUnitModal({
 
                   <div className="space-y-2">
                     <h3 className="text-2xl font-black text-white">
-                      {stats.passed ? (tr ? 'Tebrikler! Üniteyi Başarıyla Tamamladınız' : 'Unit Passed Successfully!') : (tr ? 'Tekrar Deneyin' : 'Quiz Not Passed')}
+                      {stats.passed ? (t12(language, 'Unit Passed Successfully!', 'Tebrikler! Üniteyi Başarıyla Tamamladınız')) : (t12(language, 'Quiz Not Passed', 'Tekrar Deneyin'))}
                     </h3>
                     <p className="text-sm text-slate-400">
                       {stats.passed
-                        ? (tr ? `%${stats.pct} başarı oranıyla ${unit.titleTr} akreditasyonunu kazandınız. (+100 XP)` : `You scored ${stats.pct}% and passed the unit. (+100 XP)`)
-                        : (tr ? `%${stats.pct} puan aldınız. Sertifika için en az %80 gereklidir.` : `You scored ${stats.pct}%. 80% required to pass.`)}
+                        ? `${stats.pct}% — ${t12(language, 'You passed the unit. (+100 XP)', 'Üniteyi geçtiniz. (+100 XP)')}`
+                        : `${stats.pct}% — ${t12(language, '80% required to pass.', 'Sertifika için en az %80 gereklidir.')}`}
                     </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-black/40 border border-white/10 max-w-sm mx-auto font-mono text-sm flex justify-around">
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Doğru</span>
+                      <span className="text-[10px] text-slate-500 block">{t12(language, 'Correct', 'Doğru')}</span>
                       <strong className="text-emerald-400 text-lg">{stats.correct} / {stats.total}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Başarı Oranı</span>
+                      <span className="text-[10px] text-slate-500 block">{t12(language, 'Success Rate', 'Başarı Oranı')}</span>
                       <strong className="text-cyan-400 text-lg">%{stats.pct}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block">Kazanılan XP</span>
+                      <span className="text-[10px] text-slate-500 block">{t12(language, 'XP Earned', 'Kazanılan XP')}</span>
                       <strong className="text-amber-400 text-lg">{stats.passed ? '+100' : '0'}</strong>
                     </div>
                   </div>
@@ -455,7 +456,7 @@ export function AcademyUnitModal({
                       }}
                       className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs font-bold transition cursor-pointer"
                     >
-                      {tr ? 'Sınavı Tekrarla' : 'Retry Quiz'}
+                      {t12(language, 'Retry Quiz', 'Sınavı Tekrarla')}
                     </button>
 
                     {stats.passed && (
@@ -465,7 +466,7 @@ export function AcademyUnitModal({
                         className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider shadow-lg transition cursor-pointer flex items-center gap-2"
                       >
                         <Award size={16} />
-                        <span>{tr ? 'Sertifikayı İndir (PDF)' : 'Download PDF Certificate'}</span>
+                        <span>{t12(language, 'Download PDF Certificate', 'Sertifikayı İndir (PDF)')}</span>
                       </button>
                     )}
                   </div>
@@ -476,35 +477,33 @@ export function AcademyUnitModal({
 
           {/* TAB 4: CERTIFICATE */}
           {activeTab === 'cert' && (
-            <div className="max-w-xl mx-auto p-8 rounded-3xl bg-[#080d1a] border border-white/10 text-center space-y-5 shadow-2xl">
+            <div className="max-w-xl mx-auto p-8 rounded-3xl bg-[var(--bg-1)] border border-white/10 text-center space-y-5 shadow-2xl">
               <div className="w-16 h-16 rounded-3xl bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 mx-auto flex items-center justify-center">
                 <Award size={32} />
               </div>
 
               <div className="space-y-1">
                 <h3 className="text-xl font-bold text-white">
-                  {tr ? 'Doğrulanabilir Mühendislik Sertifikası' : 'Verified Engineering Certificate'}
+                  {t12(language, 'Verified Engineering Certificate', 'Doğrulanabilir Mühendislik Sertifikası')}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  {tr
-                    ? 'Bu üniteyi tamamlayarak SHA-256 kriptografik doğrulama kodlu resmi PDF sertifikanızı alabilirsiniz.'
-                    : 'Download your official PDF certificate signed with a cryptographic SHA-256 hash.'}
+                  {t12(language, 'Download your official PDF certificate signed with a cryptographic SHA-256 hash.', 'Bu üniteyi tamamlayarak SHA-256 kriptografik doğrulama kodlu resmi PDF sertifikanızı alabilirsiniz.')}
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-black/40 border border-white/10 text-left font-mono text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Ünite:</span>
-                  <span className="text-white font-bold">{unit.unitNumber}. {tr ? unit.titleTr : unit.titleEn}</span>
+                  <span className="text-slate-500">{t12(language, 'Unit', 'Ünite')}:</span>
+                  <span className="text-white font-bold">{unit.unitNumber}. {t12(language, unit.titleEn, unit.titleTr)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Akreditasyon Normu:</span>
+                  <span className="text-slate-500">{t12(language, 'Accreditation Standard', 'Akreditasyon Normu')}:</span>
                   <span className="text-cyan-400">{unit.standard}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Durum:</span>
+                  <span className="text-slate-500">{t12(language, 'Status', 'Durum')}:</span>
                   <span className={isCompleted ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-                    {isCompleted ? (tr ? '✓ Hak Kazandı' : '✓ Verified') : (tr ? 'Sınavı Geçin (%80+)' : 'Pass Quiz (80%+)')}
+                    {isCompleted ? (t12(language, '✓ Verified', '✓ Hak Kazandı')) : (t12(language, 'Pass Quiz (80%+)', 'Sınavı Geçin (%80+)'))}
                   </span>
                 </div>
               </div>
@@ -515,7 +514,7 @@ export function AcademyUnitModal({
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-mono font-bold text-xs uppercase tracking-wider shadow-lg transition cursor-pointer flex items-center justify-center gap-2"
               >
                 <Award size={16} />
-                <span>{tr ? 'Resmi PDF Sertifikasını Oluştur & İndir' : 'Generate & Download Certificate'}</span>
+                <span>{t12(language, 'Generate & Download Certificate', 'Resmi PDF Sertifikasını Oluştur & İndir')}</span>
               </button>
             </div>
           )}

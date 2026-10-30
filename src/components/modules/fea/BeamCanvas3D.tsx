@@ -53,9 +53,6 @@ const BeamMesh = ({ element, nodes, engine, deformationScale = 1 }: { element: E
     const section = engine.sections.find(s => s.id === element.sectionId);
     const [hovered, setHover] = useState(false);
 
-    // If not found or broken, don't render
-    if (!n1 || !n2 || element.broken || !section) return null;
-
     // Helper for scaled position
     const getPos = (n: Node3D) => {
         const rX = n.restX ?? n.x;
@@ -69,13 +66,37 @@ const BeamMesh = ({ element, nodes, engine, deformationScale = 1 }: { element: E
     };
 
     // Geometry Calculation
-    const start = getPos(n1);
-    const end = getPos(n2);
+    const start = n1 ? getPos(n1) : new THREE.Vector3();
+    const end = n2 ? getPos(n2) : new THREE.Vector3();
     const direction = new THREE.Vector3().subVectors(end, start);
     const length = direction.length();
 
-    // VERY IMPORTANT: Prevent NaN errors if the nodes are at the exact same position
-    if (length < 0.001) return null;
+    const extrudeSettings = useMemo(() => ({
+        depth: length || 0.001,
+        bevelEnabled: false,
+        steps: 1
+    }), [length]);
+
+    const shape = useMemo(() => {
+        const s = new THREE.Shape();
+        let w = 0.04; let h = 0.04;
+        const name = section?.name?.toLowerCase() || '';
+
+        if (name.includes('ipe')) {
+            w = 0.05; h = 0.1;
+            const tf = 0.008; const tw = 0.005;
+            s.moveTo(-w / 2, -h / 2); s.lineTo(w / 2, -h / 2); s.lineTo(w / 2, -h / 2 + tf); s.lineTo(tw / 2, -h / 2 + tf); s.lineTo(tw / 2, h / 2 - tf); s.lineTo(w / 2, h / 2 - tf); s.lineTo(w / 2, h / 2); s.lineTo(-w / 2, h / 2); s.lineTo(-w / 2, h / 2 - tf); s.lineTo(-tw / 2, h / 2 - tf); s.lineTo(-tw / 2, -h / 2 + tf); s.lineTo(-w / 2, -h / 2 + tf); s.lineTo(-w / 2, -h / 2);
+        } else if (name.includes('sigma') || name.includes('series')) {
+            w = (parseInt(name.match(/\d+/)?.[0] || '40') / 1000) || 0.04; h = (parseInt(name.match(/x(\d+)/)?.[1] || name.match(/\d+/)?.[0] || '40') / 1000) || 0.04;
+            s.moveTo(-w / 2 + 0.002, -h / 2); s.lineTo(w / 2 - 0.002, -h / 2); s.lineTo(w / 2, -h / 2 + 0.002); s.lineTo(w / 2, h / 2 - 0.002); s.lineTo(w / 2 - 0.002, h / 2); s.lineTo(-w / 2 + 0.002, h / 2); s.lineTo(-w / 2, h / 2 - 0.002); s.lineTo(-w / 2, -h / 2 + 0.002);
+        } else {
+            s.moveTo(-w / 2, -h / 2); s.lineTo(w / 2, -h / 2); s.lineTo(w / 2, h / 2); s.lineTo(-w / 2, h / 2); s.lineTo(-w / 2, -h / 2);
+        }
+        return s;
+    }, [section?.name]);
+
+    // If not found, broken or collapsed, don't render
+    if (!n1 || !n2 || element.broken || !section || length < 0.001) return null;
 
     const midPoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
 
@@ -110,30 +131,6 @@ const BeamMesh = ({ element, nodes, engine, deformationScale = 1 }: { element: E
     // Pulse animation logic if needed, but static override is fine for now
     const beamLenMm = Math.round(length * 1000);
 
-    const extrudeSettings = useMemo(() => ({
-        depth: length,
-        bevelEnabled: false,
-        steps: 1
-    }), [length]);
-
-    const shape = useMemo(() => {
-        const s = new THREE.Shape();
-        let w = 0.04; let h = 0.04;
-        const name = section.name.toLowerCase();
-
-        if (name.includes('ipe')) {
-            w = 0.05; h = 0.1;
-            const tf = 0.008; const tw = 0.005;
-            s.moveTo(-w / 2, -h / 2); s.lineTo(w / 2, -h / 2); s.lineTo(w / 2, -h / 2 + tf); s.lineTo(tw / 2, -h / 2 + tf); s.lineTo(tw / 2, h / 2 - tf); s.lineTo(w / 2, h / 2 - tf); s.lineTo(w / 2, h / 2); s.lineTo(-w / 2, h / 2); s.lineTo(-w / 2, h / 2 - tf); s.lineTo(-tw / 2, h / 2 - tf); s.lineTo(-tw / 2, -h / 2 + tf); s.lineTo(-w / 2, -h / 2 + tf); s.lineTo(-w / 2, -h / 2);
-        } else if (name.includes('sigma') || name.includes('series')) {
-            w = (parseInt(name.match(/\d+/)?.[0] || '40') / 1000) || 0.04; h = (parseInt(name.match(/x(\d+)/)?.[1] || name.match(/\d+/)?.[0] || '40') / 1000) || 0.04;
-            s.moveTo(-w / 2 + 0.002, -h / 2); s.lineTo(w / 2 - 0.002, -h / 2); s.lineTo(w / 2, -h / 2 + 0.002); s.lineTo(w / 2, h / 2 - 0.002); s.lineTo(w / 2 - 0.002, h / 2); s.lineTo(-w / 2 + 0.002, h / 2); s.lineTo(-w / 2, h / 2 - 0.002); s.lineTo(-w / 2, -h / 2 + 0.002);
-        } else {
-            s.moveTo(-w / 2, -h / 2); s.lineTo(w / 2, -h / 2); s.lineTo(w / 2, h / 2); s.lineTo(-w / 2, h / 2); s.lineTo(-w / 2, -h / 2);
-        }
-        return s;
-    }, [section.name]);
-
     return (
         <group position={midPoint} quaternion={quaternion}>
             <mesh
@@ -155,9 +152,9 @@ const BeamMesh = ({ element, nodes, engine, deformationScale = 1 }: { element: E
             </mesh>
             {hovered && (
                 <Html distanceFactor={10} position={[0, 0, 0]}>
-                    <div className="bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl p-3 text-[9px] text-white font-mono pointer-events-none whitespace-nowrap shadow-2xl flex flex-col gap-1 min-w-[160px]">
+                    <div className="bg-black/95 border border-white/20 rounded-xl p-3 text-[9px] text-white font-mono pointer-events-none whitespace-nowrap shadow-2xl flex flex-col gap-1 min-w-[160px]">
                         <div className="flex justify-between items-center border-b border-white/10 pb-1 mb-1">
-                            <span className="text-[#00e5ff] font-bold text-[10px]">{section.name}</span>
+                            <span className="text-[var(--cyan)] font-bold text-[10px]">{section.name}</span>
                             <span className="text-gray-500">{beamLenMm} mm</span>
                         </div>
                         <div className="flex justify-between">
@@ -399,22 +396,22 @@ const BeamCanvas3D = () => {
     };
 
     return (
-        <div className="relative w-full h-full bg-[#020305] overflow-hidden flex font-sans select-none">
+        <div className="relative w-full h-full bg-[var(--bg-0)] overflow-hidden flex font-sans select-none">
             {/* LEFT PANEL: BUILDER */}
             <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="absolute left-6 top-48 bottom-6 w-[280px] z-20 pointer-events-none flex flex-col gap-4 overflow-y-auto custom-scrollbar">
-                <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 pointer-events-auto shadow-2xl flex flex-col gap-4">
+                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 pointer-events-auto shadow-2xl flex flex-col gap-4">
                     <h3 className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.15em] mb-1 flex items-center gap-2">
-                        <Cpu size={12} className="text-[#00e5ff]" /> Builder
+                        <Cpu size={12} className="text-[var(--cyan)]" /> Builder
                     </h3>
                     <div>
                         <h3 className="text-[8px] text-gray-500 font-bold uppercase tracking-[0.15em] mb-2">Material</h3>
-                        <select value={activeMaterial} onChange={e => setActiveMaterial(e.target.value)} className="w-full bg-black/50 border border-white/10 text-white text-[11px] p-2 rounded-xl outline-none focus:border-[#00e5ff]">
+                        <select value={activeMaterial} onChange={e => setActiveMaterial(e.target.value)} className="w-full bg-black/50 border border-white/10 text-white text-[11px] p-2 rounded-xl outline-none focus:border-[var(--cyan)]">
                             {engine.current.materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
                     </div>
                     <div>
                         <h3 className="text-[8px] text-gray-500 font-bold uppercase tracking-[0.15em] mb-2">Section</h3>
-                        <select value={activeSection} onChange={e => setActiveSection(e.target.value)} className="w-full bg-black/50 border border-white/10 text-white text-[11px] p-2 rounded-xl outline-none focus:border-[#00e5ff]">
+                        <select value={activeSection} onChange={e => setActiveSection(e.target.value)} className="w-full bg-black/50 border border-white/10 text-white text-[11px] p-2 rounded-xl outline-none focus:border-[var(--cyan)]">
                             {engine.current.sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
                     </div>
@@ -428,7 +425,7 @@ const BeamCanvas3D = () => {
                             setSelectedNodes([]);
                             setTick(t => t + 1);
                         }
-                    }} disabled={selectedNodes.length < 2} className={"w-full py-3 text-[10px] font-black tracking-widest rounded-xl transition-all uppercase " + (selectedNodes.length >= 2 ? "bg-[#00e5ff] text-black shadow-[0_0_20px_rgba(0,229,255,0.3)]" : "bg-white/5 text-gray-600 cursor-not-allowed")}>
+                    }} disabled={selectedNodes.length < 2} className={"w-full py-3 text-[10px] font-black tracking-widest rounded-xl transition-all uppercase " + (selectedNodes.length >= 2 ? "bg-[var(--cyan)] text-black " : "bg-white/5 text-gray-600 cursor-not-allowed")}>
                         Connect {selectedNodes.length > 0 ? `(${selectedNodes.length})` : ''}
                     </button>
 
@@ -449,7 +446,7 @@ const BeamCanvas3D = () => {
                                             else if (axis === 'Y') setManualY(v);
                                             else setManualZ(v);
                                         }}
-                                        className="w-full bg-black/50 border border-white/5 text-white text-[10px] p-1.5 rounded-lg text-center outline-none focus:border-[#00e5ff]/50"
+                                        className="w-full bg-black/50 border border-white/5 text-white text-[10px] p-1.5 rounded-lg text-center outline-none focus:border-[var(--cyan)]/50"
                                     />
                                 </div>
                             ))}
@@ -460,7 +457,7 @@ const BeamCanvas3D = () => {
                                 engine.current.initSimulation();
                                 setTick(t => t + 1);
                             }}
-                            className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[9px] font-bold text-[#00e5ff] tracking-widest uppercase transition-all"
+                            className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[9px] font-bold text-[var(--cyan)] tracking-widest uppercase transition-all"
                         >
                             Add Node (X,Y,Z)
                         </button>
@@ -478,9 +475,9 @@ const BeamCanvas3D = () => {
                             <button
                                 key={preset.id}
                                 onClick={() => generateChassis(preset.id as any)}
-                                className="py-2.5 text-[9px] bg-white/5 hover:bg-[#00e5ff]/10 border border-white/5 hover:border-[#00e5ff]/30 rounded-xl font-black text-gray-400 hover:text-white transition-all flex flex-col items-center gap-1 group pointer-events-auto"
+                                className="py-2.5 text-[9px] bg-white/5 hover:bg-[var(--cyan)]/10 border border-white/5 hover:border-[var(--cyan)]/30 rounded-xl font-black text-gray-400 hover:text-white transition-all flex flex-col items-center gap-1 group pointer-events-auto"
                             >
-                                <preset.icon size={14} className="text-gray-500 group-hover:text-[#00e5ff] transition-colors" />
+                                <preset.icon size={14} className="text-gray-500 group-hover:text-[var(--cyan)] transition-colors" />
                                 {preset.label}
                             </button>
                         ))}
@@ -492,7 +489,7 @@ const BeamCanvas3D = () => {
             <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="absolute right-6 top-48 bottom-6 w-[320px] z-20 pointer-events-none flex flex-col gap-4">
                 <AnimatePresence>
                     {selectedNodes.length > 0 && (
-                        <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 20, opacity: 0 }} className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-5 pointer-events-auto shadow-2xl">
+                        <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 20, opacity: 0 }} className="bg-black/40 border border-white/10 rounded-2xl p-5 pointer-events-auto shadow-2xl">
                             <JointAnalyzer nodeId={selectedNodes[0]} engine={engine.current} activeMaterial={activeMaterial} />
                         </motion.div>
                     )}
@@ -501,7 +498,7 @@ const BeamCanvas3D = () => {
 
             {/* TOP CENTER: COMPACT MODE ICONS (Relocated from bottom) */}
             <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
-                <div className="flex bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-1 shadow-2xl items-center gap-1">
+                <div className="flex bg-black/40 border border-white/10 rounded-full p-1 shadow-2xl items-center gap-1">
                     {[
                         { id: 'DRAG', icon: MousePointer, color: '#00e5ff' },
                         { id: 'ADD_NODE', icon: PlusCircle, color: '#f59e0b' },
@@ -532,16 +529,16 @@ const BeamCanvas3D = () => {
 
             {/* TOP LEFT: VISUALIZATION CONTROLS */}
             <div className="absolute top-6 left-6 z-30 pointer-events-auto">
-                <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3.5 flex flex-col gap-3 shadow-2xl min-w-[180px]">
+                <div className="bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 flex flex-col gap-3 shadow-2xl min-w-[180px]">
                     <div className="flex flex-col gap-1.5">
                         <div className="flex justify-between text-[8px] font-bold text-gray-500 uppercase tracking-widest">
                             <span>Deformation</span>
-                            <span className="text-[#00e5ff]">{deformationScale.toFixed(1)}x</span>
+                            <span className="text-[var(--cyan)]">{deformationScale.toFixed(1)}x</span>
                         </div>
-                        <input type="range" min="1" max="100" step="1" value={deformationScale} onChange={e => setDeformationScale(Number(e.target.value))} className="w-full accent-[#00e5ff] h-1 rounded-full appearance-none bg-white/5 cursor-pointer" />
+                        <input type="range" min="1" max="100" step="1" value={deformationScale} onChange={e => setDeformationScale(Number(e.target.value))} className="w-full accent-[var(--cyan)] h-1 rounded-full appearance-none bg-white/5 cursor-pointer" />
                     </div>
                     <div className="h-px w-full bg-white/5" />
-                    <div className="flex items-center gap-2 text-[9px] font-black uppercase text-[#00e5ff] tracking-widest">
+                    <div className="flex items-center gap-2 text-[9px] font-black uppercase text-[var(--cyan)] tracking-widest">
                         <Activity size={12} /> Stress Heatmap
                     </div>
                 </div>
@@ -549,7 +546,7 @@ const BeamCanvas3D = () => {
 
             {/* TOP RIGHT: LEGEND */}
             <div className="absolute top-6 right-6 z-30 pointer-events-none">
-                <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[110px]">
+                <div className="bg-black/40 border border-white/10 p-4 rounded-2xl shadow-2xl flex flex-col gap-3 min-w-[110px]">
                     <div className="text-[9px] text-gray-400 font-bold uppercase tracking-widest border-b border-white/5 pb-2 text-center">Stress (MPa)</div>
                     <div className="h-32 w-full rounded-md relative overflow-hidden" style={{ background: 'linear-gradient(to top, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000)' }}>
                         <div className="absolute inset-x-0 bottom-0 px-2 flex flex-col justify-between h-full pointer-events-none">
@@ -560,7 +557,7 @@ const BeamCanvas3D = () => {
             </div>
 
             {/* 3D SCENE OVERLAY */}
-            <div className="absolute inset-0 z-0 bg-[#020305]">
+            <div className="absolute inset-0 z-0 bg-[var(--bg-0)]">
                 <Canvas shadows dpr={[1, 2]} camera={{ position: [8, 6, 8], fov: 45 }} gl={{ alpha: false, antialias: true }} onCreated={({ gl, scene }) => { scene.background = new THREE.Color("#020305"); gl.setClearColor("#020305"); }}>
                     <color attach="background" args={["#020305"]} />
                     <PerspectiveCamera makeDefault position={[8, 6, 8]} fov={45} />
@@ -610,7 +607,7 @@ const BeamCanvas3D = () => {
             </div>
 
             {/* STATUS BAR */}
-            <div className="absolute bottom-0 left-0 right-0 h-7 bg-black/70 backdrop-blur-md border-t border-white/5 flex items-center px-6 gap-6 z-30 text-[9px] font-mono text-gray-500">
+            <div className="absolute bottom-0 left-0 right-0 h-7 bg-black/70 border-t border-white/5 flex items-center px-6 gap-6 z-30 text-[9px] font-mono text-gray-500">
                 <span>Nodes: <span className="text-white">{engine.current.nodes.length}</span></span>
                 <span>Elements: <span className="text-white">{engine.current.elements.filter(e => !e.broken).length}</span></span>
                 <span className="ml-auto">Physics: <span className={isPlaying ? 'text-emerald-400' : 'text-amber-400'}>{isPlaying ? 'RUNNING' : 'PAUSED'}</span></span>
@@ -665,18 +662,18 @@ const JointAnalyzer = ({ nodeId, engine, activeMaterial }: { nodeId: string, eng
     }
 
     if (result.sf < 1.0) result.status = 'FAIL'; else if (result.sf < 1.5) result.status = 'MARGINAL'; else result.status = 'SAFE';
-    const statusColor = result.status === 'SAFE' ? 'text-emerald-400' : result.status === 'MARGINAL' ? 'text-amber-400' : 'text-[#ff0055]';
+    const statusColor = result.status === 'SAFE' ? 'text-emerald-400' : result.status === 'MARGINAL' ? 'text-amber-400' : 'text-[var(--bad)]';
 
     return (
         <div className="flex flex-col gap-4">
-            <h3 className="text-[#ff0055] text-[10px] font-black tracking-[0.2em] uppercase flex items-center gap-2"><Zap size={12} /> Joint Analyzer <span className="ml-auto text-white/40">{node.id.substring(0, 4)}</span></h3>
+            <h3 className="text-[var(--bad)] text-[10px] font-black tracking-[0.2em] uppercase flex items-center gap-2"><Zap size={12} /> Joint Analyzer <span className="ml-auto text-white/40">{node.id.substring(0, 4)}</span></h3>
             <div className="flex bg-black/50 border border-white/10 rounded-xl p-1">
                 {['BOLT', 'WELD', 'KEY', 'PIN'].map(type => (
                     <button key={type} onClick={() => setJointType(type as any)} className={"flex-1 py-1 text-[8px] font-bold rounded-lg " + (jointType === type ? "bg-white/10 text-white" : "text-gray-500")}>{type}</button>
                 ))}
             </div>
             <div className="grid grid-cols-2 gap-2">
-                <div className="col-span-2 bg-black/50 p-2 rounded-xl border border-white/5"><span className="text-[8px] text-gray-500 uppercase block text-center mb-1">Load Force (N)</span><input type="number" value={forceN} onChange={e => setForceN(Number(e.target.value))} className="w-full bg-transparent text-[#ff0055] text-center font-mono outline-none text-xs" /></div>
+                <div className="col-span-2 bg-black/50 p-2 rounded-xl border border-white/5"><span className="text-[8px] text-gray-500 uppercase block text-center mb-1">Load Force (N)</span><input type="number" value={forceN} onChange={e => setForceN(Number(e.target.value))} className="w-full bg-transparent text-[var(--bad)] text-center font-mono outline-none text-xs" /></div>
             </div>
             <div className={"mt-2 bg-black/40 p-3 rounded-xl border " + (result.status === 'SAFE' ? 'border-emerald-500/20' : 'border-red-500/20')}>
                 <div className="flex justify-between items-center text-[9px] mb-1"><span className="text-gray-400">Stress</span><span className="text-white font-mono">{result.stress.toFixed(2)} MPa</span></div>

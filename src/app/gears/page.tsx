@@ -6,10 +6,11 @@ import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
 import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
+import { MathFormula } from '@/components/ui/MathFormula';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Gear Design & Strength Calculator (ISO 6336) | AluCalc OS',
+  title: 'Gear Design & Strength Calculator (ISO 6336)',
   description:
     'Design and analyze spur, helical, and bevel gears with contact stress (pitting) and tooth root bending fatigue according to ISO 6336 / DIN 3990 standards.',
   alternates: {
@@ -22,16 +23,16 @@ export default function GearsPage() {
   const method = getModuleMethod('gears');
 
   return (
-    <div className="module-page-frame min-h-screen flex flex-col justify-between bg-[#020408] text-white">
+    <div className="module-page-frame min-h-screen flex flex-col justify-between bg-[var(--bg-0)] text-white">
       <ModulePageSeoShell slug="gears" seo={seo} />
       
-      <div className="flex-1 w-full p-4 lg:p-8">
+      <div className="flex-1 w-full p-1 sm:p-2 lg:p-3">
         <GearsModule />
       </div>
 
       <SolverTransparencyDrawer solverId="gears" />
 
-      <section className="shrink-0 border-t border-white/[0.06] bg-[#0a0c12]" aria-label="Calculation methodology">
+      <section className="shrink-0 border-t border-white/[0.06] bg-[var(--bg-1)]" aria-label="Calculation methodology">
         <details open className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
           <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-white/30 hover:text-white/50 [&::-webkit-details-marker]:hidden font-mono">
             <span className="inline-flex items-center gap-2">
@@ -45,7 +46,9 @@ export default function GearsPage() {
           <div className="mt-3 grid gap-3 border-t border-white/[0.05] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3 font-mono">
             <div className="work-panel rounded-lg p-3 bg-white/[0.02] border border-white/[0.06]">
               <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--cyan)]">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-white/85">{method.formula}</p>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-white/35 font-sans">{method.formulaNote}</p>
             </div>
             <div className="work-panel rounded-lg p-3 bg-white/[0.02] border border-white/[0.06]">
@@ -56,7 +59,7 @@ export default function GearsPage() {
                 ))}
               </ul>
               {method.academyHref && (
-                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[#6b9fff]/80 hover:text-[#9bbdff] font-mono">
+                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[var(--std)]/80 hover:text-[var(--std)] font-mono">
                   {method.academyLabel} →
                 </Link>
               )}

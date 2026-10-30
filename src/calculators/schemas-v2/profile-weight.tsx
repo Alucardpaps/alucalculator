@@ -10,7 +10,7 @@ const profileWeightSchema: CalculatorSchemaV2 = {
         description: 'Calculate weight and cost for standard engineering profiles.',
         category: 'fabrication',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['weight', 'cost', 'profile', 'materials'],
         verifiedStandards: [],
@@ -216,24 +216,100 @@ const profileWeightSchema: CalculatorSchemaV2 = {
             if (!inputs) return null;
 
             const typeVal = inputs.profileType; // 1..4
-            // Map to ProfileType string
             const typeMap: Record<number, ProfileType> = { 1: 'I', 2: 'BOX', 3: 'CHANNEL', 4: 'ANGLE' };
             const pType = typeMap[typeVal] || 'I';
 
             const dims: ProfileDimensions = {
                 type: pType,
-                height: inputs.height,
-                width: inputs.width,
-                webThickness: inputs.thickness1,
-                flangeThickness: inputs.thickness2,
-                length: inputs.length
+                height: inputs.height || 100,
+                width: inputs.width || 50,
+                webThickness: inputs.thickness1 || 5,
+                flangeThickness: inputs.thickness2 || 8,
+                length: inputs.length || 1000
             };
 
-            const svgPath = generateProfileSVG(dims);
+            const maxDim = Math.max(dims.width, dims.height, 10);
+            const scale = 140 / maxDim;
+            const w = dims.width * scale;
+            const h = dims.height * scale;
+            const tw = dims.webThickness * scale;
+            const tf = dims.flangeThickness * scale;
 
             return (
-                <svg viewBox="-100 -100 200 200" style={{ width: '100%', height: '100%' }}>
-                    <g dangerouslySetInnerHTML={{ __html: svgPath }} />
+                <svg viewBox="-150 -130 300 260" className="w-full h-full min-h-[300px]" style={{ background: 'var(--bg-0)' }}>
+                    <defs>
+                        <pattern id="pw-hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                            <line x1="0" y1="0" x2="0" y2="8" stroke="#00e5ff" strokeWidth="1" opacity="0.3" />
+                        </pattern>
+                        <marker id="pw-arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 0,1.5 L 9,5 L 0,8.5 Z" fill="#00e5ff" />
+                        </marker>
+                    </defs>
+
+                    {/* Blueprint grid lines */}
+                    {[-120, -80, -40, 0, 40, 80, 120].map(x => (
+                        <line key={`v${x}`} x1={x} y1={-120} x2={x} y2={120} stroke="#00e5ff" strokeWidth="0.5" opacity="0.05" />
+                    ))}
+                    {[-100, -60, -20, 20, 60, 100].map(y => (
+                        <line key={`h${y}`} x1={-140} y1={y} x2={140} y2={y} stroke="#00e5ff" strokeWidth="0.5" opacity="0.05" />
+                    ))}
+
+                    {/* Center Axes */}
+                    <line x1={-130} y1={0} x2={130} y2={0} stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="8 3 2 3" opacity="0.5" />
+                    <line x1={0} y1={-110} x2={0} y2={110} stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="8 3 2 3" opacity="0.5" />
+
+                    {/* Profile Contour */}
+                    {pType === 'I' && (
+                        <path
+                            d={`
+                                M ${-w/2} ${-h/2} L ${w/2} ${-h/2} L ${w/2} ${-h/2 + tf} L ${tw/2} ${-h/2 + tf}
+                                L ${tw/2} ${h/2 - tf} L ${w/2} ${h/2 - tf} L ${w/2} ${h/2} L ${-w/2} ${h/2}
+                                L ${-w/2} ${h/2 - tf} L ${-tw/2} ${h/2 - tf} L ${-tw/2} ${-h/2 + tf} L ${-w/2} ${-h/2 + tf} Z
+                            `}
+                            fill="url(#pw-hatch)" stroke="#00e5ff" strokeWidth="2"
+                        />
+                    )}
+
+                    {pType === 'BOX' && (
+                        <path
+                            d={`
+                                M ${-w/2} ${-h/2} L ${w/2} ${-h/2} L ${w/2} ${h/2} L ${-w/2} ${h/2} Z
+                                M ${-w/2 + tw} ${-h/2 + tf} L ${w/2 - tw} ${-h/2 + tf} L ${w/2 - tw} ${h/2 - tf} L ${-w/2 + tw} ${h/2 - tf} Z
+                            `}
+                            fillRule="evenodd" fill="url(#pw-hatch)" stroke="#00e5ff" strokeWidth="2"
+                        />
+                    )}
+
+                    {pType === 'CHANNEL' && (
+                        <path
+                            d={`
+                                M ${-w/2} ${-h/2} L ${w/2} ${-h/2} L ${w/2} ${-h/2 + tf} L ${-w/2 + tw} ${-h/2 + tf}
+                                L ${-w/2 + tw} ${h/2 - tf} L ${w/2} ${h/2 - tf} L ${w/2} ${h/2} L ${-w/2} ${h/2} Z
+                            `}
+                            fill="url(#pw-hatch)" stroke="#00e5ff" strokeWidth="2"
+                        />
+                    )}
+
+                    {pType === 'ANGLE' && (
+                        <path
+                            d={`
+                                M ${-w/2} ${h/2} L ${w/2} ${h/2} L ${w/2} ${h/2 - tf} L ${-w/2 + tw} ${h/2 - tf}
+                                L ${-w/2 + tw} ${-h/2} L ${-w/2} ${-h/2} Z
+                            `}
+                            fill="url(#pw-hatch)" stroke="#00e5ff" strokeWidth="2"
+                        />
+                    )}
+
+                    {/* Dimensions */}
+                    <line x1={-w/2} y1={-h/2 - 14} x2={w/2} y2={-h/2 - 14} stroke="#00e5ff" strokeWidth="1" markerStart="url(#pw-arr)" markerEnd="url(#pw-arr)" />
+                    <text x={0} y={-h/2 - 18} textAnchor="middle" fill="#00e5ff" fontSize="9" fontWeight="bold" fontFamily="monospace">{dims.width} mm</text>
+
+                    <line x1={w/2 + 16} y1={-h/2} x2={w/2 + 16} y2={h/2} stroke="#00e5ff" strokeWidth="1" markerStart="url(#pw-arr)" markerEnd="url(#pw-arr)" />
+                    <text x={w/2 + 22} y={3} fill="#00e5ff" fontSize="9" fontWeight="bold" fontFamily="monospace">{dims.height} mm</text>
+
+                    {/* Center of Gravity */}
+                    <circle cx="0" cy="0" r="3.5" fill="#f59e0b" stroke="#02050c" strokeWidth="1" />
+                    <text x="6" y="-4" fill="#f59e0b" fontSize="8" fontWeight="bold" fontFamily="monospace">G</text>
                 </svg>
             );
         }

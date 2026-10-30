@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Bolt Stress Calculator Schema
+ * AluCAD OS — Bolt Stress Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: ISO 898-1, DIN 931, VDI 2230
@@ -37,7 +37,7 @@ export const boltStressSchema: CalculatorSchema = {
     metadata: {
         title: 'Bolt Tensile Stress Calculator',
         description: 'Calculate tensile stress and safety factor for metric bolts under axial load. Based on ISO 898-1 stress area formulas.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-07',
         tags: ['bolt', 'fastener', 'stress', 'tensile', 'safety factor', 'metric']
     },

@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Compression Spring Calculator Schema
+ * AluCAD OS — Compression Spring Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical Engineering
  * STANDARDS: EN 13906-1, DIN 2095
@@ -18,7 +18,7 @@ export const springCalculatorSchema: CalculatorSchema = {
     metadata: {
         title: 'Compression Spring Calculator',
         description: 'Design and analyze helical compression springs. Calculate spring rate, stress, deflection, buckling, and fatigue life per EN 13906-1.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-14',
         tags: ['spring', 'compression', 'helical', 'stiffness', 'deflection', 'fatigue', 'EN 13906']
     },

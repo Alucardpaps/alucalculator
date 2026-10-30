@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Calculator Registry
+ * AluCAD OS — Calculator Registry
  * 
  * Central registry for all schema-driven calculators.
  * NOW UPDATED WITH PHASE 17 (V2) CALCULATORS.

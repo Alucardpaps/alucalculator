@@ -1,7 +1,7 @@
 {
   "nav": {
     "home": "Startseite",
-    "dashboard": "Dashboard",
+    "dashboard": "Übersicht",
     "modules": "Module",
     "settings": "Einstellungen",
     "homeDesc": "Haupt-Dashboard",
@@ -9,7 +9,7 @@
     "handbook": "Ingenieur-Handbuch",
     "library": "Modulbibliothek",
     "available": "Module verfügbar",
-    "news": "Industry News",
+    "news": "Branchennachrichten",
     "mechanical": "Mechanik",
     "civil": "Bauwesen",
     "electrical": "Elektrotechnik",
@@ -98,7 +98,7 @@
     "inputs": "Eingaben",
     "results": "Ergebnisse",
     "dimensions": "Abmessungen",
-    "material": "Material",
+    "material": "Werkstoff",
     "weight": "Gewicht",
     "cost": "Kosten",
     "unitPrice": "Stückpreis",
@@ -106,7 +106,7 @@
     "total": "Gesamt",
     "save": "Speichern",
     "export": "Exportieren",
-    "generatedBy": "Generiert von AluCalc OS",
+    "generatedBy": "Generiert von AluCAD OS",
     "design": "Entwurf",
     "view2d": "2D-Ansicht",
     "view3d": "3D-Ansicht",
@@ -192,55 +192,55 @@
     },
     "disclaimer": "Berechnungen basieren auf theoretischer Dichte (~2.70 g/cm³). Tatsächliches Gewicht kann fertigungsbedingt (ASTM B221) um ±5% variieren.",
     "projectList": {
-      "title": "Project List (BOM)",
-      "add": "Add to List",
-      "clear": "Clear List",
-      "empty": "List is empty.",
-      "totalWeight": "Grand Total Weight",
-      "totalCost": "Total Project Cost",
+      "title": "Projektliste (BOM)",
+      "add": "Zur Liste hinzufügen",
+      "clear": "Liste leeren",
+      "empty": "Liste ist leer.",
+      "totalWeight": "Gesamtgewicht",
+      "totalCost": "Gesamtkosten",
       "columns": {
         "id": "#",
-        "desc": "Material / Dim",
-        "qty": "Qty",
-        "unitWeight": "Unit W.",
-        "totalWeight": "Total W.",
-        "actions": "Action"
+        "desc": "Werkstoff / Maß",
+        "qty": "Anz.",
+        "unitWeight": "Einh.-Gew.",
+        "totalWeight": "Ges.-Gew.",
+        "actions": "Aktion"
       }
     },
     "costData": {
-      "pricePerKg": "Price per Unit (/kg)",
-      "estimatedCost": "Est. Cost"
+      "pricePerKg": "Stückpreis (/kg)",
+      "estimatedCost": "Geschätzte Kosten"
     },
     "engineering": {
-      "title": "Engineering Analysis",
-      "surfaceArea": "Surface Area (Paint)",
-      "mechProps": "Mechanical Properties",
-      "yield": "Yield Strength",
-      "tensile": "Tensile Strength",
-      "hardness": "Hardness",
-      "weldability": "Weldability",
-      "sectionProps": "Section Properties",
-      "inertia": "Moment of Inertia",
-      "modulus": "Section Modulus",
-      "radius": "Radius of Gyration"
+      "title": "Technische Analyse",
+      "surfaceArea": "Oberfläche (Lack)",
+      "mechProps": "Mechanische Eigenschaften",
+      "yield": "Streckgrenze",
+      "tensile": "Zugfestigkeit",
+      "hardness": "Härte",
+      "weldability": "Schweißeignung",
+      "sectionProps": "Querschnittswerte",
+      "inertia": "Flächenträgheitsmoment",
+      "modulus": "Widerstandsmoment",
+      "radius": "Trägheitsradius"
     },
     "simulation": {
-      "title": "Beam Deflection Sim",
-      "open": "Open Simulator",
-      "close": "Close",
-      "length": "Beam Length (L)",
-      "load": "Load (F)",
-      "support": "Support Type",
-      "simple": "Simple Support",
-      "cantilever": "Cantilever",
-      "result": "Max Deflection",
-      "safe": "SAFE",
-      "unsafe": "UNSAFE (>L/300)",
-      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+      "title": "Balkendurchbiegung-Sim",
+      "open": "Simulator öffnen",
+      "close": "Schließen",
+      "length": "Balkenlänge (L)",
+      "load": "Last (F)",
+      "support": "Lagerart",
+      "simple": "Einfaches Lager",
+      "cantilever": "Kragarm",
+      "result": "Max. Durchbiegung",
+      "safe": "SICHER",
+      "unsafe": "UNSICHER (>L/300)",
+      "warning": "Warnung: Nur grobe Schätzung. Für kritische Lasten FEA verwenden."
     },
     "export": {
-      "pdf": "Download Quote (PDF)",
-      "dxf": "Download DXF (CAD)"
+      "pdf": "Angebot herunterladen (PDF)",
+      "dxf": "DXF herunterladen (CAD)"
     }
   },
   "handbook": {
@@ -348,7 +348,7 @@
     "results": {
       "principalStresses": "Hauptspannungen",
       "maxShear": "Max. Schubspannung (τmax)",
-      "vonMises": "Von Mises",
+      "vonMises": "von Mises",
       "transformed": "Transformierter Zustand"
     }
   },
@@ -404,7 +404,7 @@
     "title": "Blechbearbeitung",
     "subtitle": "Biegekraft & Zuschnitt",
     "inputs": {
-      "material": "Material",
+      "material": "Werkstoff",
       "thickness": "Dicke (t)",
       "angle": "Biegewinkel (α)",
       "radius": "Innenradius (ri)",
@@ -517,11 +517,11 @@
     "safetyWarning": "Sicherheitsfaktoren sind Schätzungen basierend auf vereinfachten Lewis-Formeln. Für kritische Anwendungen wird eine Analyse nach ISO 6336 oder AGMA 2001 empfohlen."
   },
   "market": {
-    "title": "Market Data",
-    "aluminum": "LME Aluminum",
-    "copper": "LME Copper",
+    "title": "Marktdaten",
+    "aluminum": "LME-Aluminium",
+    "copper": "LME-Kupfer",
     "live": "LIVE",
-    "useLivePrice": "Use Live Price"
+    "useLivePrice": "Live-Preis verwenden"
   },
   "news": {
     "title": "Branchennachrichten",

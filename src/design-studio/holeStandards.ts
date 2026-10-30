@@ -62,11 +62,12 @@ export interface HoleItem {
   type: 'tap' | 'clearance' | 'counterbore' | 'countersink';
   depth?: number; // mm
   isThroughAll?: boolean;
+  diameter?: number; // mm (optional custom or parametric hole diameter)
 }
 
 export interface SurfaceCutItem {
   id: string;
-  type: 'rect' | 'circle' | 'slot';
+  type: 'rect' | 'circle' | 'slot' | 'chamfer' | 'profile' | 'revolve' | 'helix';
   face: SurfaceFace;
   x: number; // mm on face
   y: number; // mm on face
@@ -76,6 +77,16 @@ export interface SurfaceCutItem {
   depth: number; // mm
   isThroughAll?: boolean;
   angle?: number;
+  angleDeg?: number;
+  profile?: Array<{ x: number; y: number }>;
+  cutOp?: 'extrude' | 'revolve' | 'helix';
+  draftAngle?: number;
+  draftDirection?: 'inward' | 'outward';
+  revolveAngle?: number;
+  revolveAxis?: 'X' | 'Y' | 'center';
+  helixPitch?: number;
+  helixTurns?: number;
+  helixRadius?: number;
 }
 
 

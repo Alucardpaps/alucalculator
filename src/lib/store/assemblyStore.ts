@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — Assembly Store
+ * AluCAD OS v5.0 — Assembly Store
  *
  * THE single source of truth for the entire Workspace Engine.
  * All 3D scene components read from this. All UI writes to this.

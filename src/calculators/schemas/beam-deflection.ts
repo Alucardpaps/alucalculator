@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Beam Deflection Calculator Schema
+ * AluCAD OS — Beam Deflection Calculator Schema
  * 
  * ENGINEERING DOMAIN: Civil/Structural
  * STANDARDS: Euler-Bernoulli Beam Theory, AISC, Eurocode 3
@@ -39,7 +39,7 @@ export const beamDeflectionSchema: CalculatorSchema = {
     metadata: {
         title: 'Simply Supported Beam Deflection',
         description: 'Calculate maximum deflection and stress for a simply supported beam with central point load using Euler-Bernoulli theory.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-07',
         tags: ['beam', 'deflection', 'structural', 'stress', 'moment', 'Euler-Bernoulli']
     },

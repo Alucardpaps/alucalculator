@@ -11,7 +11,7 @@ const sheetMetalSchema: CalculatorSchemaV2 = {
         description: 'Advanced bend analysis using dynamic K-Factor and material-aware validation.',
         category: 'fabrication',
         version: '3.0.0',
-        author: 'AluCalc OS Core',
+        author: 'AluCAD OS Core',
         lastUpdated: '2026-02-25',
         tags: ['bending', 'sheet-metal', 'k-factor', 'fabrication', 'deterministic'],
         verifiedStandards: ['DIN 6935', 'ASTM B209'],
@@ -127,7 +127,7 @@ const sheetMetalSchema: CalculatorSchemaV2 = {
 
             // Simple visualization with safety warning
             return (
-                <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', backgroundColor: '#050505' }}>
+                <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', backgroundColor: 'var(--bg-0)' }}>
                     <defs>
                         <linearGradient id="metal-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stopColor="#333" />

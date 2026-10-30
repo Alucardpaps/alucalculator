@@ -15,6 +15,21 @@ async function generateVdiSamplePdf() {
   const fontMono = await doc.embedFont(StandardFonts.Courier);
   const fontMonoBold = await doc.embedFont(StandardFonts.CourierBold);
 
+  // Strict physical bounds validator: checks widthOfTextAtSize for every rendered string
+  const margin = 28;
+  const maxAllowedX = width - margin + 0.5; // 567.78 pt (strictly inside technical frame)
+  const origDrawText = page.drawText.bind(page);
+  page.drawText = (text, options) => {
+    if (options && options.font && options.size && typeof options.x === 'number') {
+      const textWidth = options.font.widthOfTextAtSize(text, options.size);
+      const rightEdge = options.x + textWidth;
+      if (rightEdge > maxAllowedX) {
+        throw new Error(`[PDF Overflow Error] Text "${text}" overflows frame: rightEdge=${rightEdge.toFixed(2)} pt > maxAllowed=${maxAllowedX.toFixed(2)} pt`);
+      }
+    }
+    return origDrawText(text, options);
+  };
+
   // Colors
   const cDark = rgb(0.06, 0.09, 0.14);
   const cLightBg = rgb(0.96, 0.97, 0.98);
@@ -27,7 +42,6 @@ async function generateVdiSamplePdf() {
   const cWhite = rgb(1, 1, 1);
 
   // Outer border & frame (technical drawing style)
-  const margin = 28;
   page.drawRectangle({
     x: margin,
     y: margin,
@@ -119,20 +133,20 @@ async function generateVdiSamplePdf() {
     page.drawText('DOC-VDI2230-M12-SAMPLE', { x: col3, y: y - 22, size: 8, font: fontMonoBold, color: cText });
 
     page.drawText('REVISION / STATUS', { x: col4, y: y - 12, size: 5.5, font: fontRegular, color: cDimText });
-    page.drawText('Rev 01 / SAMPLE (PASS)', { x: col4, y: y - 22, size: 8, font: fontBold, color: cSuccess });
+    page.drawText('Rev 01 / SAMPLE RECORD', { x: col4, y: y - 22, size: 8, font: fontBold, color: cSuccess });
 
     // Row 2
     page.drawText('PREPARED BY (HESAPLAYAN)', { x: col1, y: y - 40, size: 5.5, font: fontRegular, color: cDimText });
-    page.drawText('M. Demir (Lead Fastener Eng.)', { x: col1, y: y - 50, size: 7.5, font: fontRegular, color: cText });
+    page.drawText('Automated Fastener Solver (Sample)', { x: col1, y: y - 50, size: 7.5, font: fontRegular, color: cText });
 
     page.drawText('CHECKED BY (KONTROL)', { x: col2, y: y - 40, size: 5.5, font: fontRegular, color: cDimText });
-    page.drawText('Dr. Ing. K. Weber (Chief Analyst)', { x: col2, y: y - 50, size: 7.5, font: fontRegular, color: cText });
+    page.drawText('System-generated sample (Not reviewed)', { x: col2, y: y - 50, size: 7.5, font: fontRegular, color: cText });
 
     page.drawText('RELEASE DATE', { x: col3, y: y - 40, size: 5.5, font: fontRegular, color: cDimText });
-    page.drawText('2026-09-08 (Benchmark)', { x: col3, y: y - 50, size: 7.5, font: fontRegular, color: cText });
+    page.drawText('2026-10-30 (Benchmark)', { x: col3, y: y - 50, size: 7.5, font: fontRegular, color: cText });
 
     page.drawText('SYSTEM / APP_VERSION', { x: col4, y: y - 40, size: 5.5, font: fontRegular, color: cDimText });
-    page.drawText('AluCalc OS v5.2.0', { x: col4, y: y - 50, size: 8, font: fontBold, color: cPrimary });
+    page.drawText('AluCalc OS v6.0.0', { x: col4, y: y - 50, size: 8, font: fontBold, color: cPrimary });
 
     return y - tbH - 12;
   };
@@ -170,17 +184,17 @@ async function generateVdiSamplePdf() {
   };
 
   // 2. INPUT DATA TABLE (Girdi Tablosu)
-  currentY = drawSectionHeading('1. JOINT & FASTENER SPECIFICATION (GIRDI PARAMETRELERI)', 'ISO 898-1 / ISO 4017', currentY);
+  currentY = drawSectionHeading('1. JOINT & FASTENER SPECIFICATION (GIRDI PARAMETRELERI)', 'ISO 898-1 / ISO 4017 / ISO 724', currentY);
 
   const inputs = [
     { k: 'Bolt Designation', v: 'M12 x 1.75 (Regular Hex Head ISO 4017)', u: 'Standard coarse metric thread' },
-    { k: 'Property Class', v: 'Grade 8.8 (Quenched & Tempered)', u: 'Sy = 640 MPa, Sp = 600 MPa, Rm = 800 MPa' },
-    { k: 'Nominal & Core Diameters', v: 'd = 12.00 mm, d2 = 10.863 mm, d3 = 10.106 mm', u: 'ISO 68-1 / ISO 965-1 standard geometry' },
+    { k: 'Property Class', v: 'Grade 8.8 (Quenched & Tempered)', u: 'Sy = 640 MPa, Sp = 580 MPa, Rm = 800 MPa' },
+    { k: 'Nominal & Core Diameters', v: 'd = 12.00 mm, d2 = 10.863 mm, d3 = 9.853 mm', u: 'ISO 724 / ISO 965-1 (D1 = 10.106 mm)' },
     { k: 'Tensile Stress Area As', v: '84.3 mm2', u: 'As = 0.7854 * (d - 0.9382*P)^2' },
     { k: 'Thread Friction Coeff. muG', v: '0.140 (Standard lubricated state)', u: 'ISO 16047 verification test' },
-    { k: 'Underhead Friction Coeff. muK', v: '0.140 (Standard lubricated collar)', u: 'dh = 13.5 mm, dw = 15.35 mm' },
+    { k: 'Underhead Friction Coeff. muK', v: '0.140 (Standard lubricated collar)', u: 'dh = 13.5 mm, dw = 17.6 mm (DIN 933)' },
     { k: 'Tightening Factor alphaA', v: '1.20 (Standard torque control)', u: 'VDI 2230 Table A8 (Torque wrench)' },
-    { k: 'Target Utilization nu', v: '0.700 (70% Proof Stress utilization)', u: 'FM = nu * As * Sp' },
+    { k: 'Target Utilization nu', v: '0.700 (70% Proof Stress utilization)', u: 'FM = nu * As * Sp (Sp = 580 MPa)' },
   ];
 
   const rowH = 14;
@@ -203,57 +217,57 @@ async function generateVdiSamplePdf() {
   currentY -= (inputs.length * rowH) + 12;
 
   // 3. STEP-BY-STEP CALCULATION TRACE (Madde Atifli Hesap Izi)
-  currentY = drawSectionHeading('2. STEP-BY-STEP CALCULATION TRACE (MADDE ATIFLI HESAP IZI)', 'VDI 2230 PART 1 (2015)', currentY);
+  currentY = drawSectionHeading('2. STEP-BY-STEP CALCULATION TRACE (MADDE ATIFLI HESAP IZI)', 'VDI 2230 PART 1 (2015) / ISO 898-1', currentY);
 
   const steps = [
     {
       num: 'Step 1',
       title: 'Fastener Proof Strength Boundary',
-      clause: 'ISO 898-1:2013',
-      formula: 'Fp = Sp * As = 600.0 MPa * 84.3 mm2',
-      result: 'Fp = 50.58 kN (Proof load threshold)',
+      clause: 'ISO 898-1:2013 Table 3',
+      formula: 'Fp = Sp * As = 580.0 MPa * 84.3 mm2',
+      result: 'Fp = 48.89 kN (ISO 898-1 proof)',
     },
     {
       num: 'Step 2',
       title: 'Assembly Preload Clamp Force FM',
       clause: 'VDI 2230 Eq. R8/1',
-      formula: 'FM = nu * Sp * As = 0.700 * 600.0 * 84.3 * 10^-3',
-      result: 'FM = 35.4 kN (Target preload clamp force)',
+      formula: 'FM = nu * Sp * As = 0.700 * 580.0 * 84.3 * 10^-3',
+      result: 'FM = 34.23 kN (Preload force)',
     },
     {
       num: 'Step 3',
       title: 'Nut Torque Factors K1, K2, K3',
       clause: 'VDI 2230 Clause 5.4',
-      formula: 'K1 = 0.023 (lead), K2 = 0.125 (thread friction), K3 = 0.048 (underhead)',
-      result: 'Total nut factor K = 0.196',
+      formula: 'K1 = 0.0232 (lead), K2 = 0.0731 (thread), K3 = 0.0907 (collar)',
+      result: 'Total nut factor K = 0.1870',
     },
     {
       num: 'Step 4',
       title: 'Calibrated Tightening Torque MA',
       clause: 'VDI 2230 Eq. 5.4/1',
-      formula: 'MA = K * FM * d = 0.196 * 35400 N * 12.0 mm * 10^-3',
-      result: 'MA = 83.1 N.m (Assembly tightening torque)',
+      formula: 'MA = K * FM * d = 0.1870 * 34226 N * 12.0 mm * 10^-3',
+      result: 'MA = 76.8 N.m (Tightening)',
     },
     {
       num: 'Step 5',
       title: 'Axial Tensile Stress sigma_z',
       clause: 'VDI 2230 Clause 5.5.1',
-      formula: 'sigma_z = FM / As = 35400 N / 84.3 mm2',
-      result: 'sigma_z = 420.0 MPa (Axial tension component)',
+      formula: 'sigma_z = FM / As = 34226 N / 84.3 mm2',
+      result: 'sigma_z = 406.0 MPa (Axial)',
     },
     {
       num: 'Step 6',
       title: 'Torsional Shear Stress tau',
       clause: 'VDI 2230 Clause 5.5.2',
-      formula: 'Wp = (pi * d3^3) / 16 = 346.4 mm3 | tau = (M2 * 1000) / Wp',
-      result: 'tau = 153.0 MPa (Thread shear component)',
+      formula: 'Wp = (pi * dS^3) / 16 = 218.2 mm3 (dS=10.358) | tau = (MG * 1000) / Wp',
+      result: 'tau = 181.1 MPa (MG=39.5 N.m)',
     },
     {
       num: 'Step 7',
       title: 'von Mises Stress sigma_eq & Yield Reserve',
       clause: 'VDI 2230 / ISO 898-1',
-      formula: 'sigma_eq = sqrt(sigma_z^2 + 3*tau^2) = sqrt(420^2 + 3*153^2) = 497.0 MPa | n = Sy / sigma_eq',
-      result: 'sigma_eq = 497.0 MPa <= 640.0 MPa (FoS = 1.29 >= 1.05)',
+      formula: 'sigma_eq = sqrt(sigma_z^2 + 3*tau^2) = sqrt(406^2 + 3*181.1^2) = 513.1 MPa <= 640 MPa',
+      result: 'sigma_eq = 513.1 MPa (FoS = 1.25)',
     },
   ];
 
@@ -262,8 +276,8 @@ async function generateVdiSamplePdf() {
     const sY = currentY - (idx * stepH);
     page.drawText(`${s.num}: ${s.title}`, { x: margin + 8, y: sY - 7, size: 7.5, font: fontBold, color: cText });
     page.drawText(`[${s.clause}]`, { x: margin + 215, y: sY - 7, size: 6.5, font: fontMono, color: cPrimary });
-    page.drawText(s.formula, { x: margin + 8, y: sY - 17, size: 6.8, font: fontMono, color: cDimText });
-    page.drawText(s.result, { x: width - margin - 185, y: sY - 12, size: 7.2, font: fontMonoBold, color: cDark });
+    page.drawText(s.formula, { x: margin + 8, y: sY - 17, size: 6.5, font: fontMono, color: cDimText });
+    page.drawText(s.result, { x: width - margin - 175, y: sY - 12, size: 6.5, font: fontMonoBold, color: cDark });
     
     page.drawLine({
       start: { x: margin, y: sY - stepH + 2 },
@@ -276,57 +290,58 @@ async function generateVdiSamplePdf() {
   currentY -= (steps.length * stepH) + 10;
 
   // 4. VERIFICATION RESULT CALLOUT (Sonuc ve Sinir Ozeti)
+  const calloutH = 50;
   page.drawRectangle({
     x: margin,
-    y: currentY - 42,
+    y: currentY - calloutH,
     width: width - margin * 2,
-    height: 42,
+    height: calloutH,
     color: rgb(0.92, 0.98, 0.94),
     borderWidth: 1.2,
     borderColor: cSuccess,
   });
 
-  page.drawText('VERIFICATION RESULT: SAMPLE BENCHMARK / PASS (VDI 2230 / ISO 898-1)', {
+  page.drawText('SAMPLE BENCHMARK RECORD — VDI 2230-1 / ISO 898-1 (ILLUSTRATIVE)', {
     x: margin + 12,
-    y: currentY - 14,
-    size: 9,
+    y: currentY - 13,
+    size: 8.5,
     font: fontBold,
     color: rgb(0.04, 0.45, 0.25),
   });
 
-  page.drawText('TIGHTENING TORQUE: MA = 83.1 N.m', {
+  page.drawText('TORQUE: MA = 76.8 N.m', {
     x: margin + 12,
-    y: currentY - 26,
-    size: 8,
+    y: currentY - 25,
+    size: 7.5,
     font: fontMonoBold,
     color: cDark,
   });
 
-  page.drawText('ASSEMBLY PRELOAD: FM = 35.4 kN', {
-    x: margin + 185,
-    y: currentY - 26,
-    size: 8,
+  page.drawText('PRELOAD: FM = 34.2 kN (FM,min = 28.5 kN, alphaA = 1.20)', {
+    x: margin + 160,
+    y: currentY - 25,
+    size: 7.0,
     font: fontMonoBold,
     color: cDark,
   });
 
-  page.drawText('VON MISES: sigma_eq = 497.0 MPa <= 640.0 MPa (FoS = 1.29)', {
-    x: margin + 335,
-    y: currentY - 26,
-    size: 7.2,
-    font: fontMonoBold,
-    color: cDark,
-  });
-
-  page.drawText('Sample calculation record generated by AluCalc OS live deterministic solver engine (1:1 numerical parity).', {
+  page.drawText('STRESS: sigma_eq = 513.1 MPa <= 640.0 MPa (FoS = 1.25 >= 1.05)', {
     x: margin + 12,
-    y: currentY - 37,
-    size: 6.8,
+    y: currentY - 36,
+    size: 7.0,
+    font: fontMonoBold,
+    color: cDark,
+  });
+
+  page.drawText('Illustrative sample benchmark generated by AluCalc OS VDI 2230 engine. Not independently certified.', {
+    x: margin + 12,
+    y: currentY - 46,
+    size: 6.2,
     font: fontRegular,
     color: rgb(0.20, 0.45, 0.30),
   });
 
-  currentY -= 52;
+  currentY -= calloutH + 12;
 
   // 5. SIGNATURE BOX (İmza Kutusu per ISO 7200)
   const sigH = 68;
@@ -364,28 +379,28 @@ async function generateVdiSamplePdf() {
     font: fontBold,
     color: cDimText,
   });
-  page.drawText('Mustafa Demir, B.Sc. Mechanical Eng.', {
+  page.drawText('AluCalc OS VDI 2230 Solver', {
     x: margin + 6,
     y: margin + 16 + sigH - 22,
     size: 7.5,
     font: fontBold,
     color: cText,
   });
-  page.drawText('Lead Fastener Systems Engineer', {
+  page.drawText('Automated Fastener Analysis Kernel', {
     x: margin + 6,
     y: margin + 16 + sigH - 32,
     size: 6.5,
     font: fontRegular,
     color: cDimText,
   });
-  page.drawText('Status: [MD-VDI2230-VERIFIED]', {
+  page.drawText('Status: [SAMPLE BENCHMARK - UNREVIEWED]', {
     x: margin + 6,
     y: margin + 16 + sigH - 46,
     size: 6.5,
     font: fontMonoBold,
-    color: cPrimary,
+    color: cDimText,
   });
-  page.drawText('Date: 2026-09-08 | Location: Istanbul HQ', {
+  page.drawText('Date: 2026-10-30 | Model: M12 Gr 8.8 (nu=0.7)', {
     x: margin + 6,
     y: margin + 16 + sigH - 58,
     size: 6,
@@ -401,28 +416,28 @@ async function generateVdiSamplePdf() {
     font: fontBold,
     color: cDimText,
   });
-  page.drawText('Dr. Ing. Klaus Weber, Eur.Ing.', {
+  page.drawText('Not Independently Reviewed', {
     x: margin + sColW + 6,
     y: margin + 16 + sigH - 22,
     size: 7.5,
     font: fontBold,
     color: cText,
   });
-  page.drawText('Chief Structural Stress Analyst', {
+  page.drawText('System-generated sample benchmark', {
     x: margin + sColW + 6,
     y: margin + 16 + sigH - 32,
     size: 6.5,
     font: fontRegular,
     color: cDimText,
   });
-  page.drawText('Status: [KW-VDI2230-APPROVED]', {
+  page.drawText('Status: [SAMPLE BENCHMARK - NOT CERTIFIED]', {
     x: margin + sColW + 6,
     y: margin + 16 + sigH - 46,
     size: 6.5,
     font: fontMonoBold,
-    color: cSuccess,
+    color: cDimText,
   });
-  page.drawText('Date: 2026-09-08 | Compliance: ISO 7200 / VDI 2230', {
+  page.drawText('Date: 2026-10-30 | Compliance: VDI 2230 Blatt 1', {
     x: margin + sColW + 6,
     y: margin + 16 + sigH - 58,
     size: 6,
@@ -431,7 +446,7 @@ async function generateVdiSamplePdf() {
   });
 
   // Box 3: Sample Benchmark Information
-  page.drawText('SAMPLE VERIFICATION BENCHMARK', {
+  page.drawText('SAMPLE BENCHMARK RECORD', {
     x: margin + sColW * 2 + 6,
     y: margin + 16 + sigH - 10,
     size: 5.5,
@@ -452,21 +467,21 @@ async function generateVdiSamplePdf() {
     font: fontRegular,
     color: cDimText,
   });
-  page.drawText('Parity: Exact live solver numerical match', {
+  page.drawText('Model: VDI 2230-1 / ISO 898-1 Benchmark', {
     x: margin + sColW * 2 + 6,
     y: margin + 16 + sigH - 44,
     size: 6.5,
     font: fontMonoBold,
     color: cDark,
   });
-  page.drawText('Notice: For illustrative evaluation only', {
+  page.drawText('Notice: Illustrative sample · Not certified', {
     x: margin + sColW * 2 + 6,
     y: margin + 16 + sigH - 54,
     size: 6.5,
     font: fontMonoBold,
     color: cDimText,
   });
-  page.drawText('Exported via AluCalc OS Technical Report Engine', {
+  page.drawText('AluCalc OS Technical Report Engine', {
     x: margin + sColW * 2 + 6,
     y: margin + 16 + sigH - 63,
     size: 5.5,
@@ -475,7 +490,7 @@ async function generateVdiSamplePdf() {
   });
 
   // Bottom footer page info
-  page.drawText('AluCalc OS v5.2.0 - Sample Engineering Report (Illustrative) - Page 1 of 1 - www.alucalculator.com', {
+  page.drawText('AluCalc OS v6.0.0 - Sample Engineering Report (Illustrative) - Page 1 of 1 - www.alucalculator.com', {
     x: margin + 10,
     y: margin + 5,
     size: 6.5,

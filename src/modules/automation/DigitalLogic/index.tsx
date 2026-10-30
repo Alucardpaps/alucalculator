@@ -207,12 +207,12 @@ function PaletteBtn({ label, onClick, t }: PaletteBtnProps) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 4 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 px-3 py-2 bg-[#0c1220] border border-emerald-500/20 rounded-lg shadow-xl max-w-[200px] pointer-events-none"
+                        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 px-3 py-2 bg-[var(--bg-1)] border border-emerald-500/20 rounded-lg shadow-xl max-w-[200px] pointer-events-none"
                     >
                         <p className="text-[9px] text-slate-400 leading-relaxed whitespace-normal">
                             {t.gateDescriptions[label]}
                         </p>
-                        <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 bg-[#0c1220] border-l border-t border-emerald-500/20 rotate-45" />
+                        <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 bg-[var(--bg-1)] border-l border-t border-emerald-500/20 rotate-45" />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -349,26 +349,26 @@ export default function DigitalLogicModule() {
         : null;
 
     return (
-        <div className="flex w-full h-full bg-[#03060a] text-white overflow-hidden relative selection:bg-emerald-500/30 font-sans">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative font-sans">
             {/* Background Data Stream Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.02)_1px,transparent_1px)] bg-[size:30px_30px]" />
 
             {/* SIDEBAR: Components, Inspector & Registry */}
-            <div className="w-[320px] bg-[#05080f]/95 backdrop-blur-3xl border-r border-white/5 flex flex-col z-20 shadow-2xl">
+            <div className="w-[320px] bg-[var(--bg-0)]/95 border-r border-white/5 flex flex-col z-20 shadow-2xl">
 
                 {/* Header + Palette */}
-                <div className="p-8 border-b border-white/5 bg-gradient-to-b from-emerald-500/10 to-transparent">
+                <div className="p-8 border-b border-white/5 ">
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] ">
                             <Cpu size={24} />
                         </div>
                         <div className="flex-1">
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none text-white">{t.title}</h1>
+                            <h1 className="text-xl font-black tracking-tighter uppercase leading-none text-white">{t.title}</h1>
                             <p className="text-[10px] text-emerald-500/60 font-mono tracking-widest uppercase mt-1">{t.subtitle}</p>
                         </div>
                         <button
                             onClick={() => setShowInfo(prev => !prev)}
-                            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 flex items-center justify-center transition-all"
+                            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[var(--cyan-glow)] border border-white/5 hover:border-[var(--cyan)]/40 flex items-center justify-center transition-all"
                             title="Module info"
                         >
                             <Info size={14} className="text-slate-400" />
@@ -507,7 +507,7 @@ export default function DigitalLogicModule() {
                                     {tick.slice(0, 4).map((state, si) => (
                                         <div
                                             key={si}
-                                            className={`w-full transition-all ${state ? 'h-4 bg-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'h-1 bg-white/5'}`}
+                                            className={`w-full transition-all ${state ? 'h-4 bg-emerald-500/40 ' : 'h-1 bg-white/5'}`}
                                         />
                                     ))}
                                 </div>
@@ -537,7 +537,6 @@ export default function DigitalLogicModule() {
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
             >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 blur-[150px] rounded-full pointer-events-none" />
 
                 {/* Wire Overlay */}
                 <WireOverlay gates={resolvedGates} />
@@ -555,19 +554,19 @@ export default function DigitalLogicModule() {
                             }}
                         >
                             <div
-                                className={`p-6 bg-[#0a0f18]/90 backdrop-blur-xl border-2 rounded-2xl flex flex-col items-center gap-4 shadow-2xl transition-all ${
+                                className={`p-6 bg-[var(--bg-1)]/90 border-2 rounded-2xl flex flex-col items-center gap-4 shadow-2xl transition-all ${
                                     selectedGateId === gate.id
-                                        ? 'border-emerald-400/70 shadow-[0_0_40px_rgba(16,185,129,0.25)] ring-1 ring-emerald-500/20'
+                                        ? 'border-emerald-400/70 ring-1 ring-emerald-500/20'
                                         : gate.output
-                                            ? 'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)] scale-105'
+                                            ? 'border-emerald-500/50 scale-105'
                                             : 'border-white/10 opacity-80'
                                 }`}
                                 onClick={() => setSelectedGateId(gate.id)}
                             >
-                                <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest absolute -top-3 left-4 bg-[#0a0f18] px-2">
+                                <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest absolute -top-3 left-4 bg-[var(--bg-1)] px-2">
                                     {gate.id}
                                 </div>
-                                <div className="text-xl font-black italic tracking-tighter text-white">{gate.type}</div>
+                                <div className="text-xl font-black tracking-tighter text-white">{gate.type}</div>
 
                                 <div className="flex gap-4 items-center">
                                     <div className="flex flex-col gap-2">
@@ -596,8 +595,8 @@ export default function DigitalLogicModule() {
                                         })}
                                     </div>
                                     <ChevronRight className="text-slate-700" size={16} />
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all ${gate.output ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]' : 'bg-black/40 border-white/5'}`}>
-                                        <div className={`w-3 h-3 rounded-full ${gate.output ? 'bg-emerald-400 shadow-[0_0_10px_#34d399]' : 'bg-slate-800'}`} />
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all ${gate.output ? 'bg-emerald-500/20 border-emerald-500 ' : 'bg-black/40 border-white/5'}`}>
+                                        <div className={`w-3 h-3 rounded-full ${gate.output ? 'bg-emerald-400 ' : 'bg-slate-800'}`} />
                                     </div>
                                 </div>
 
@@ -613,7 +612,7 @@ export default function DigitalLogicModule() {
                             {gate.output && (
                                 <motion.div
                                     layoutId={`${gate.id}-trace`}
-                                    className="absolute left-full top-1/2 -translate-y-1/2 w-20 h-[2px] bg-gradient-to-r from-emerald-500 to-transparent shadow-[0_0_10px_#14b8a6]"
+                                    className="absolute left-full top-1/2 -translate-y-1/2 w-20 h-[2px] bg-gradient-to-r from-emerald-500 to-transparent "
                                 />
                             )}
                         </div>

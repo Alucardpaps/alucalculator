@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Standards Reference Panel
+ * AluCAD OS — Standards Reference Panel
  * 
  * Context-aware panel showing relevant engineering standards,
  * formulas, and reference materials for the active calculator.
@@ -38,11 +38,11 @@ export interface StandardsReferencePanelProps {
 
 const styles = {
     container: `
-        bg-[#0f1419] border border-[#2a3a4a] rounded-lg overflow-hidden
+        bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg overflow-hidden
     `,
     header: `
-        flex items-center justify-between px-4 py-3 bg-[#1a2332] 
-        border-b border-[#2a3a4a] cursor-pointer hover:bg-[#1a2332]/80
+        flex items-center justify-between px-4 py-3 bg-[var(--bg-3)] 
+        border-b border-[var(--line-strong)] cursor-pointer hover:bg-[var(--bg-3)]/80
     `,
     title: `
         flex items-center gap-2 text-sm font-bold text-white
@@ -51,11 +51,11 @@ const styles = {
         max-h-[400px] overflow-y-auto
     `,
     section: `
-        border-b border-[#2a3a4a] last:border-b-0
+        border-b border-[var(--line-strong)] last:border-b-0
     `,
     sectionHeader: `
         flex items-center justify-between px-4 py-2 
-        bg-[#0f1419] cursor-pointer hover:bg-[#1a2332]/50
+        bg-[var(--bg-1)] cursor-pointer hover:bg-[var(--bg-3)]/50
     `,
     sectionTitle: `
         flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase
@@ -64,7 +64,7 @@ const styles = {
         px-4 py-3 space-y-3
     `,
     refItem: `
-        p-3 bg-[#0a0e14] rounded-lg border border-[#2a3a4a] hover:border-[#00e5ff]/30
+        p-3 bg-[var(--bg-1)] rounded-lg border border-[var(--line-strong)] hover:border-[var(--cyan)]/30
         transition-colors
     `,
     refTitle: `
@@ -74,7 +74,7 @@ const styles = {
         text-xs text-gray-500
     `,
     refLink: `
-        flex items-center gap-1 text-[#00e5ff] hover:underline text-xs mt-2
+        flex items-center gap-1 text-[var(--cyan)] hover:underline text-xs mt-2
     `,
     assumption: `
         flex gap-3 p-3 rounded-lg
@@ -115,14 +115,14 @@ const ReferenceItem: React.FC<{ ref: Reference }> = ({ ref }) => {
 
     const getTypeIcon = () => {
         switch (displayType) {
-            case 'standard': return <Scale size={14} className="text-[#00e5ff]" />;
+            case 'standard': return <Scale size={14} className="text-[var(--cyan)]" />;
             default: return <BookOpen size={14} className="text-purple-400" />;
         }
     };
 
     const getTypeBadge = () => {
         const colors: Record<string, string> = {
-            standard: 'bg-[#00e5ff]/20 text-[#00e5ff]',
+            standard: 'bg-[var(--cyan)]/20 text-[var(--cyan)]',
             handbook: 'bg-amber-500/20 text-amber-400',
         };
         return colors[displayType] || 'bg-gray-500/20 text-gray-400';
@@ -245,7 +245,7 @@ export const StandardsReferencePanel: React.FC<StandardsReferencePanelProps> = (
             <div className={`${styles.container} ${className}`}>
                 <div className={styles.header}>
                     <span className={styles.title}>
-                        <BookOpen size={16} className="text-[#00e5ff]" />
+                        <BookOpen size={16} className="text-[var(--cyan)]" />
                         Standards & References
                     </span>
                 </div>
@@ -262,7 +262,7 @@ export const StandardsReferencePanel: React.FC<StandardsReferencePanelProps> = (
             {/* Header */}
             <div className={styles.header} onClick={handleToggle}>
                 <span className={styles.title}>
-                    <BookOpen size={16} className="text-[#00e5ff]" />
+                    <BookOpen size={16} className="text-[var(--cyan)]" />
                     Standards & References
                 </span>
                 {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -363,7 +363,7 @@ export const StandardsReferencePanel: React.FC<StandardsReferencePanelProps> = (
                                         <div className="text-sm font-medium text-white mb-2">
                                             {output.name}
                                         </div>
-                                        <code className="block px-3 py-2 bg-[#1a2332] rounded text-xs text-[#00e5ff] font-mono overflow-x-auto">
+                                        <code className="block px-3 py-2 bg-[var(--bg-3)] rounded text-xs text-[var(--cyan)] font-mono overflow-x-auto">
                                             {output.formula}
                                         </code>
                                     </div>

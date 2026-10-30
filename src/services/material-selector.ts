@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Material Selector AI Service
+ * AluCAD OS — Material Selector AI Service
  * 
  * Filters and ranks engineering materials from the knowledge base
  * based on user constraints (strength, weight, temperature, cost).

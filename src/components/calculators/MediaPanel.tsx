@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Context-Aware Media Panel
+ * AluCAD OS — Context-Aware Media Panel
  * 
  * Displays relevant educational content (videos, PDFs, diagrams)
  * based on the active calculator or workflow context.
@@ -44,11 +44,11 @@ interface MediaItem {
 
 const styles = {
     container: `
-        bg-[#0f1419] border border-[#2a3a4a] rounded-lg overflow-hidden
+        bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg overflow-hidden
     `,
     header: `
-        flex items-center justify-between px-4 py-3 bg-[#1a2332] 
-        border-b border-[#2a3a4a]
+        flex items-center justify-between px-4 py-3 bg-[var(--bg-3)] 
+        border-b border-[var(--line-strong)]
     `,
     title: `
         flex items-center gap-2 text-sm font-bold text-white
@@ -66,12 +66,12 @@ const styles = {
         grid grid-cols-2 gap-3
     `,
     mediaCard: `
-        relative bg-[#0a0e14] rounded-lg border border-[#2a3a4a] 
-        overflow-hidden cursor-pointer hover:border-[#00e5ff]/50 
+        relative bg-[var(--bg-1)] rounded-lg border border-[var(--line-strong)] 
+        overflow-hidden cursor-pointer hover:border-[var(--cyan)]/50 
         transition-all group
     `,
     thumbnail: `
-        aspect-video bg-[#1a2332] flex items-center justify-center relative
+        aspect-video bg-[var(--bg-3)] flex items-center justify-center relative
     `,
     playOverlay: `
         absolute inset-0 flex items-center justify-center 
@@ -85,12 +85,12 @@ const styles = {
         bg-black/80 backdrop-blur-sm
     `,
     modalContent: `
-        relative bg-[#0f1419] rounded-xl border border-[#2a3a4a] 
+        relative bg-[var(--bg-1)] rounded-xl border border-[var(--line-strong)] 
         overflow-hidden max-w-4xl w-full mx-4 max-h-[90vh]
     `,
     modalHeader: `
-        flex items-center justify-between px-4 py-3 bg-[#1a2332] 
-        border-b border-[#2a3a4a]
+        flex items-center justify-between px-4 py-3 bg-[var(--bg-3)] 
+        border-b border-[var(--line-strong)]
     `,
     modalBody: `
         aspect-video
@@ -148,7 +148,7 @@ const MediaCard: React.FC<{
                 )}
                 <div className={styles.playOverlay}>
                     {item.type === 'video' ? (
-                        <div className="w-12 h-12 rounded-full bg-[#00e5ff] flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-[var(--cyan)] flex items-center justify-center">
                             <Play size={20} className="text-black ml-0.5" />
                         </div>
                     ) : (
@@ -288,7 +288,7 @@ export const MediaPanel: React.FC<MediaPanelProps> = ({
                     style={{ cursor: 'pointer' }}
                 >
                     <span className={styles.title}>
-                        <Video size={16} className="text-[#00e5ff]" />
+                        <Video size={16} className="text-[var(--cyan)]" />
                         Learning Resources
                         {calculatorTitle && (
                             <span className="text-gray-500 font-normal">

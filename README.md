@@ -44,7 +44,7 @@ To compile the application, generate all static pages via `generateStaticParams`
 npm run build
 ```
 
-This project statically exports over 250+ engineering routes and calculators. The 3D engines are completely decoupled from the initial server-side render, ensuring a Perfect Lighthouse score for time-to-interactive.
+This project statically exports 86 verified deterministic engineering solvers and structured educational/CAD routes (Single Source of Truth: `src/lib/registry/calculatorRegistry.ts`). The 3D engines are completely decoupled from the initial server-side render, ensuring a Perfect Lighthouse score for time-to-interactive.
 
 ## 🛡 Security & Hygiene
 

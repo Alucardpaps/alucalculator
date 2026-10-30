@@ -30,7 +30,7 @@ export default memo(({ id, data }: any) => {
         <BaseNode id={id} data={{ title: "BOX PROFILE DETECTOR", ...data }}>
             <div className="flex flex-col gap-3">
                 {/* Visual Representation (Placeholder for SVG) */}
-                <div className="h-24 bg-[#111] rounded border border-[#333] flex items-center justify-center relative overflow-hidden">
+                <div className="h-24 bg-[var(--bg-1)] rounded border border-[var(--line)] flex items-center justify-center relative overflow-hidden">
                     <div
                         className="border-2 border-accent"
                         style={{
@@ -59,7 +59,7 @@ export default memo(({ id, data }: any) => {
 
                 {/* Results - Engineering Grid */}
                 {results && !error && (
-                    <div className="grid grid-cols-2 gap-1 bg-[#111] p-2 rounded border border-[#333] font-mono text-[10px]">
+                    <div className="grid grid-cols-2 gap-1 bg-[var(--bg-1)] p-2 rounded border border-[var(--line)] font-mono text-[10px]">
                         <div className="text-gray-500">Mass</div>
                         <div className="text-right text-accent">{results.mass.value.toFixed(2)} {results.mass.unit}</div>
 
@@ -81,7 +81,7 @@ const Input = ({ label, value, onChange, disabled }: { label: string, value: num
         <label className="text-[9px] text-gray-500 uppercase font-bold">{label}</label>
         <input
             type="number"
-            className="w-full bg-[#111] border border-[#333] rounded px-2 py-1 focus:border-accent outline-none font-mono text-white text-xs disabled:opacity-50"
+            className="w-full bg-[var(--bg-1)] border border-[var(--line)] rounded px-2 py-1 focus:border-accent outline-none font-mono text-white text-xs disabled:opacity-50"
             value={value}
             onChange={e => onChange?.(parseFloat(e.target.value))}
             disabled={disabled}

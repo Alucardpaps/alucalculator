@@ -17,8 +17,10 @@ import {
     BearingType
 } from '@/data/skfBearings';
 import { analyzeBearingLife, getLifeSensitivity } from '@/lib/mechanical/bearingLifeEngine';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export default function BearingAnalysisModule() {
+  const precision = useGlobalPrecision();
     const [searchQuery, setSearchQuery] = useState('6204');
     const [radialLoad, setRadialLoad] = useState(2.5); // kN
     const [axialLoad, setAxialLoad] = useState(0.5);   // kN
@@ -83,9 +85,9 @@ export default function BearingAnalysisModule() {
     }, [activeBearing, radialLoad, axialLoad, rpm, reliability, viscosity]);
 
     return (
-        <div className="flex flex-col lg:flex-row h-full w-full bg-[#03060a] text-white overflow-y-auto lg:overflow-hidden p-2 gap-4">
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[var(--bg-0)] text-white overflow-y-auto lg:overflow-hidden p-2 gap-4">
             {/* CONFIGURATION SIDEBAR (38%) */}
-            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[#0b121d]/80 rounded-2xl border border-white/5 backdrop-blur-3xl px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl">
+            <div className="w-full lg:w-[380px] shrink-0 flex flex-col h-auto lg:h-full bg-[var(--bg-1)]/80 rounded-2xl border border-white/5 px-6 py-6 overflow-y-auto custom-scrollbar shadow-2xl">
                 
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
                     <div className="flex items-center gap-3">
@@ -142,7 +144,7 @@ export default function BearingAnalysisModule() {
                                     <button 
                                         key={b.code} 
                                         onClick={() => setSearchQuery(b.code)} 
-                                        className={`px-3 py-1.5 border rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest ${activeBearing.code === b.code ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white/[0.03] border-white/5 text-gray-400 hover:text-white hover:bg-white/[0.08]'}`}
+                                        className={`px-3 py-1.5 border rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest ${activeBearing.code === b.code ? 'bg-[var(--cyan)] text-[var(--accent-ink)] border-indigo-500' : 'bg-white/[0.03] border-white/5 text-gray-400 hover:text-white hover:bg-white/[0.08]'}`}
                                     >
                                         {b.code}
                                     </button>
@@ -171,7 +173,7 @@ export default function BearingAnalysisModule() {
                                         onChange={(e) => setReliability(Number(e.target.value))}
                                         className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-indigo-500/50 transition-all appearance-none cursor-pointer"
                                     >
-                                        {[90, 95, 96, 97, 98, 99].map(r => <option key={r} value={r} className="bg-[#0b121d] text-white">L{100-r} ({r}%)</option>)}
+                                        {[90, 95, 96, 97, 98, 99].map(r => <option key={r} value={r} className="bg-[var(--bg-1)] text-white">L{100-r} ({r}%)</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -185,7 +187,7 @@ export default function BearingAnalysisModule() {
             <div className="flex-1 h-auto lg:h-full flex flex-col gap-4 overflow-y-auto custom-scrollbar min-w-0">
                 
                 {/* PREVIEW HEADER */}
-                <div className="bg-[#0b121d]/50 p-6 rounded-[28px] border border-white/5 relative overflow-hidden flex items-center justify-between shadow-lg">
+                <div className="bg-[var(--bg-1)]/50 p-6 rounded-xl border border-white/5 relative overflow-hidden flex items-center justify-between shadow-lg">
                     <div className="flex flex-col gap-1 relative z-10">
                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-2">{activeBearing.type.replace(/-/g, ' ')}</span>
                         <h1 className="text-4xl font-black tracking-tighter text-white">SKF {activeBearing.code}</h1>
@@ -202,17 +204,16 @@ export default function BearingAnalysisModule() {
                         </div>
                     </div>
                     {/* Abstract background graphics */}
-                    <div className="absolute -right-12 -top-12 w-64 h-64 bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 flex-none">
-                    <KPICard label="Rating Life L10h" value={results.L10h.toFixed(0)} unit="Hours" color="#10b981" sub={`At ${rpm} RPM`} />
-                    <KPICard label="Equivalent Load P" value={results.P.toFixed(2)} unit="kN" color="#6366f1" sub="Dynamic Equiv." />
-                    <KPICard label="Safety Factor s0" value={results.staticSafety.toFixed(2)} unit="Safety" color="#f59e0b" sub="Static P0 Check" />
+                    <KPICard label="Rating Life L10h" value={formatEngineeringValue(results.L10h, precision, false)} unit="Hours" color="#10b981" sub={`At ${rpm} RPM`} />
+                    <KPICard label="Equivalent Load P" value={formatEngineeringValue(results.P, precision, false)} unit="kN" color="#6366f1" sub="Dynamic Equiv." />
+                    <KPICard label="Safety Factor s0" value={formatEngineeringValue(results.staticSafety, precision, false)} unit="Safety" color="#f59e0b" sub="Static P0 Check" />
                 </div>
 
                 {/* SENSITIVITY PLOT */}
-                <div className="flex-1 min-h-[350px] bg-[#080d14] rounded-[32px] border border-white/5 flex flex-col p-8 relative overflow-hidden group shadow-inner">
+                <div className="flex-1 min-h-[350px] bg-[var(--bg-1)] rounded-xl border border-white/5 flex flex-col p-8 relative overflow-hidden group shadow-inner">
                     <div className="flex justify-between items-center mb-10 relative z-10">
                         <div>
                             <h3 className="text-sm font-bold text-gray-200 flex items-center gap-2">
@@ -222,7 +223,7 @@ export default function BearingAnalysisModule() {
                         </div>
                         <div className="flex gap-4 items-center">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+                                <div className="w-2 h-2 rounded-full bg-indigo-500 " />
                                 <span className="text-[9px] font-bold text-gray-500 uppercase italic">L10h Target</span>
                             </div>
                         </div>
@@ -235,14 +236,14 @@ export default function BearingAnalysisModule() {
                     </div>
 
                     <div className="absolute top-0 right-0 p-8">
-                         <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${results.status === 'safe' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : results.status === 'warning' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse'}`}>
+                         <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${results.status === 'safe' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 ' : results.status === 'warning' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse'}`}>
                              System Status: {results.status}
                          </div>
                     </div>
                 </div>
 
                 {/* ENGINEERING DETAILS */}
-                <div className="bg-[#0b121d]/40 p-6 rounded-[28px] border border-white/5 flex gap-8 items-center text-gray-400 shadow-md">
+                <div className="bg-[var(--bg-1)]/40 p-6 rounded-xl border border-white/5 flex gap-8 items-center text-gray-400 shadow-md">
                    <div className="flex flex-col gap-1 flex-1">
                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400/60">Reliability & Lube (κ)</span>
                        <p className="text-[11px] leading-relaxed">Adjusted life <span className="text-white font-bold">Lnm = {results.Lna?.toFixed(0)}h</span> calculated for {reliability}% reliability and <span className="text-sky-400 font-bold">κ = {results.viscosityRatio?.toFixed(2)}</span>. Lubrication film is {results.viscosityRatio! < 1 ? 'insufficient' : results.viscosityRatio! < 4 ? 'adequate' : 'optimal'}.</p>
@@ -297,7 +298,7 @@ function PremiumNumBox({ label, unit, value, min, max, step, onChange, color }: 
                 <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-indigo-400 transition-colors">{label}</span>
                 <span className="text-[9px] font-black font-mono transition-transform group-hover:scale-110" style={{ color }}>{unit}</span>
             </div>
-            <div className="relative flex items-center bg-indigo-500/5 border border-white/5 rounded-xl transition-all duration-300 group-focus-within:border-indigo-500/40 group-focus-within:shadow-[0_0_20px_rgba(99,102,241,0.05)]">
+            <div className="relative flex items-center bg-indigo-500/5 border border-white/5 rounded-xl transition-all duration-300 group-focus-within:border-indigo-500/40 ">
                 <input
                     type="number" value={value} onChange={(e) => onChange(Number(e.target.value))}
                     min={min} max={max} step={step}
@@ -318,7 +319,7 @@ function PremiumNumBox({ label, unit, value, min, max, step, onChange, color }: 
 
 function KPICard({ label, value, unit, color, sub }: any) {
     return (
-        <div className="bg-[#0b121d]/80 rounded-[28px] border border-white/5 p-6 flex flex-col gap-1 shadow-lg backdrop-blur-xl group hover:border-indigo-500/20 transition-all">
+        <div className="bg-[var(--bg-1)]/80 rounded-xl border border-white/5 p-6 flex flex-col gap-1 shadow-lg group hover:border-indigo-500/20 transition-all">
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">{label}</span>
             <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-black font-mono tracking-tighter transition-all group-hover:scale-105" style={{ color }}>{value}</span>
@@ -330,6 +331,7 @@ function KPICard({ label, value, unit, color, sub }: any) {
 }
 
 function SensitivityPlot({ data, currentLife, currentLoad }: any) {
+    const precision = useGlobalPrecision();
     const [hoverPos, setHoverPos] = useState<{ x: number, y: number, load: number, life: number } | null>(null);
     
     const width = 800;
@@ -379,7 +381,7 @@ function SensitivityPlot({ data, currentLife, currentLoad }: any) {
                             stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="2,2" 
                         />
                         <text x={padding.left - 10} y={getY(val)} fill="#4b5563" fontSize="10" fontWeight="bold" textAnchor="end" alignmentBaseline="middle" className="font-mono">
-                            {val.toFixed(0)}
+                            {formatEngineeringValue(val, precision, false)}
                         </text>
                     </g>
                 ))}
@@ -391,7 +393,7 @@ function SensitivityPlot({ data, currentLife, currentLoad }: any) {
                             stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="2,2" 
                         />
                         <text x={getX(val)} y={height - padding.bottom + 15} fill="#4b5563" fontSize="10" fontWeight="bold" textAnchor="middle" className="font-mono">
-                            {val.toFixed(1)} kN
+                            {formatEngineeringValue(val, precision, false)} kN
                         </text>
                     </g>
                 ))}
@@ -419,8 +421,8 @@ function SensitivityPlot({ data, currentLife, currentLoad }: any) {
                         <circle cx={hoverPos.x} cy={hoverPos.y} r="6" fill="rgba(99,102,241,0.5)" stroke="#fff" strokeWidth="1" />
                         
                         <rect x={hoverPos.x + 10} y={hoverPos.y - 40} width="100" height="35" rx="4" fill="#111827" stroke="#374151" strokeWidth="1" />
-                        <text x={hoverPos.x + 15} y={hoverPos.y - 28} fill="#fff" fontSize="9" fontWeight="bold" className="font-mono">LOAD: {hoverPos.load.toFixed(1)} kN</text>
-                        <text x={hoverPos.x + 15} y={hoverPos.y - 15} fill="#10b981" fontSize="9" fontWeight="bold" className="font-mono">LIFE: {hoverPos.life.toFixed(0)} HRS</text>
+                        <text x={hoverPos.x + 15} y={hoverPos.y - 28} fill="#fff" fontSize="9" fontWeight="bold" className="font-mono">LOAD: {formatEngineeringValue(hoverPos.load, precision, false)} kN</text>
+                        <text x={hoverPos.x + 15} y={hoverPos.y - 15} fill="#10b981" fontSize="9" fontWeight="bold" className="font-mono">LIFE: {formatEngineeringValue(hoverPos.life, precision, false)} HRS</text>
                     </g>
                 )}
             </svg>

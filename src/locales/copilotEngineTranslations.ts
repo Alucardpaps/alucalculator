@@ -1,5 +1,6 @@
 import type { Language } from '@/store/i18nStore';
 import { getCopilotModuleLabel } from './copilotModuleLabels';
+import { t12 } from './t12';
 
 export type CopilotEngineStrings = {
   feedbackReply: string;
@@ -59,7 +60,7 @@ const EN: CopilotEngineStrings = {
   "defaultFallback": "No verifiable engineering boundary conditions or analytical tokens were detected. Please specify clear parametric queries like 'S235 steel 5000N load' or 'M12 thread'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -121,7 +122,7 @@ const DE: CopilotEngineStrings = {
   "defaultFallback": "Keine Ingenieurparameter erkannt. Bitte z. B. 'S235 Stahl 5000N' angeben.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -152,7 +153,7 @@ const ES: CopilotEngineStrings = {
   "defaultFallback": "No se detectaron parámetros de ingeniería. Especifique p. ej. 'acero S235 5000N' o 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -183,7 +184,7 @@ const FR: CopilotEngineStrings = {
   "defaultFallback": "Aucun paramètre d'ingénierie détecté. Précisez p. ex. 'acier S235 5000N' ou 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -214,7 +215,7 @@ const IT: CopilotEngineStrings = {
   "defaultFallback": "Nessun parametro rilevato. Specificare es. 'acciaio S235 5000N' o 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -245,7 +246,7 @@ const PT: CopilotEngineStrings = {
   "defaultFallback": "Nenhum parâmetro detectado. Especifique ex. 'aço S235 5000N' ou 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -276,7 +277,7 @@ const RU: CopilotEngineStrings = {
   "defaultFallback": "Инженерные параметры не обнаружены. Укажите, напр., 'сталь S235 5000Н' или 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -307,7 +308,7 @@ const JA: CopilotEngineStrings = {
   "defaultFallback": "工学パラメータが検出されませんでした。例：'S235鋼 5000N' または 'M12'。",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -338,7 +339,7 @@ const ZH: CopilotEngineStrings = {
   "defaultFallback": "未检测到工程参数。请指定如 'S235钢 5000N' 或 'M12螺纹'。",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -369,7 +370,7 @@ const KO: CopilotEngineStrings = {
   "defaultFallback": "공학 매개변수가 감지되지 않았습니다. 예: 'S235 강철 5000N' 또는 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -400,7 +401,7 @@ const AR: CopilotEngineStrings = {
   "defaultFallback": "لم يتم اكتشاف معاملات هندسية. حدد مثلاً 'فولاذ S235 5000N' أو 'M12'.",
   "whoAreYou": "I am the **Sovereign Intelligence** of AluCalc. Current active parameters:\n• Material: {material}\n• Load: {load}\n• Span: {span}\n\nAsk me 'calculate deflection' once you have set these parameters!",
   "helpReply": "**Emergency Mode Triggered**\n\nAre you stuck in a simulation loop? Describe your problem—like 'M10 thread pitch' or 'S355 steel yield strength'—and I'll provide standard reference values immediately.",
-  "generalFallback": "I've analyzed your input (\"{query}\"). While it sounds interesting, I'm currently specialized in **50+ engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!",
+  "generalFallback": `I've analyzed your input ("{query}"). While it sounds interesting, I'm currently specialized in **engineering modules** including CAD, FEA, and Structural analysis. Give me a technical parameter to get a real Gemini-level breakdown!`,
   "notSet": "Not set"
 } as CopilotEngineStrings;
 
@@ -426,7 +427,7 @@ export function getModuleLocaleCopy<T extends { en: { label: string; desc: strin
   const route = item.route ?? '';
   const label = route
     ? getCopilotModuleLabel(route, lang, item.en.label)
-    : (lang === 'tr' ? item.tr.label : item.en.label);
-  const desc = lang === 'tr' ? item.tr.desc : item.en.desc;
+    : t12(lang, item.en.label, item.tr.label);
+  const desc = t12(lang, item.en.desc, item.tr.desc);
   return { label, desc };
 }

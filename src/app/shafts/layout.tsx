@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     canonical: 'https://www.alucalculator.com/shafts',
   },
   openGraph: {
-    title: 'Shaft Analysis Workstation | AluCalc OS',
+    title: 'Shaft Analysis Workstation',
     description: 'Shaft statics analysis with bearing reaction forces, bending moment diagrams, and assembly data-bus integration.',
     type: 'website',
     url: 'https://www.alucalculator.com/shafts',

@@ -11,7 +11,7 @@ export default memo(({ id, data }: any) => {
                     Waiting for mass input...
                 </div>
                 {/* In a real implementation, this would read from the 'data.inputs' prop populated by the graph engine */}
-                <div className="flex justify-between items-center py-2 border-t border-[#333]">
+                <div className="flex justify-between items-center py-2 border-t border-[var(--line)]">
                     <span>Total Cost</span>
                     <span className="text-lg font-bold text-green-400">$0.00</span>
                 </div>

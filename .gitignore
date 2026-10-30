@@ -24,16 +24,22 @@
 # misc
 .DS_Store
 *.pem
+*.bak
 
-# debug
+# debug / stale diagnostic dumps (never commit)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 build_error*.log
 lint_*.txt
 lint_*.json
 fix_*.js
+*errors*.txt
+*errors*.json
+tsc-errors.txt
+ts-errors.txt
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -61,3 +67,28 @@ jdk17/
 /android/manifest-checksum.txt
 /alucalc-deploy.zip
 /scratch/
+/tmp/
+.tmp*
+/graphify-out/
+
+# deploy artifacts and extracted static copies
+*.zip
+*.exe
+scratch*.*
+_live_extract/
+_zip_extracted/
+
+# Keystores & Signing Keys (Security Rule #5)
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+android/alucalc-release.NEW.keystore
+android-wear/alucalc-release.NEW.keystore
+
+# Test screenshots & visual verification artifacts
+test_*.png
+test_*.jpg
+test_*.webp
+*.png.tmp
+

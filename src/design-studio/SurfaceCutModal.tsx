@@ -7,11 +7,14 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  X, Scissors, Check, Copy, Download, Box, Disc, Layers, Zap, Sliders
+  X, Scissors, Check, Copy, Download, Box, Disc, Layers, Zap, Sliders,
+  GripHorizontal, RotateCcw
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { useDesignStore, type DesignPart } from './designStore';
 import { getSurfaceCutStrings } from '@/locales/designStudioTranslations';
+import { useDraggableDialog } from './useDraggableDialog';
 
 interface SurfaceCutModalProps {
   isOpen: boolean;
@@ -21,7 +24,6 @@ interface SurfaceCutModalProps {
 
 export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutModalProps) {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
   const tCut = getSurfaceCutStrings(language);
 
   const [cutType, setCutType] = useState<'rect' | 'circle' | 'slot' | 'chamfer'>('rect');
@@ -69,7 +71,7 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
     const depth = isThroughAll ? (selectedPart?.params?.height || 30) : cutDepth;
     const lines = [
       '%',
-      'O2002 (ALUCALC OS - 2.5D SURFACE POCKET CUT)',
+      'O2002 (ALUCAD OS - 2.5D SURFACE POCKET CUT)',
       'G21 G90 G17 G40 G80 G49',
       'T02 M06 (END MILL DIA 8.0MM)',
       'S4500 M03',
@@ -104,16 +106,32 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
   const handleApplyCut = () => {
     if (!selectedPart) return;
     const store = useDesignStore.getState();
+    const targetFace = store.activeFace || 'top';
+    const resolvedDepth = isThroughAll ? (selectedPart.params?.height || 40) : cutDepth;
+    const resolvedWidth = cutType === 'circle' ? cutDiameter : cutType === 'rect' ? cutWidth : slotWidth;
+    const resolvedLength = cutType === 'circle' ? cutDiameter : cutType === 'rect' ? cutLength : slotLength;
 
-    // Attach cut parameters or sub-pocket to the selected part
+    // 1. Add to part.cuts[] so multiple pockets/slots/chamfers are rendered & editable in Right Inspector
+    store.addCut(selectedPart.id, {
+      type: cutType,
+      face: targetFace,
+      width: resolvedWidth,
+      length: resolvedLength,
+      depth: resolvedDepth,
+      x: offsetX,
+      y: offsetY,
+    });
+
+    // 2. Also maintain legacy params compatibility for geometryFactory boolean subtraction
     const nextParams = {
       ...selectedPart.params,
       hasSurfaceCut: true,
       cutType,
-      cutWidth: cutType === 'rect' ? cutWidth : slotWidth,
-      cutLength: cutType === 'rect' ? cutLength : slotLength,
+      cutFace: targetFace,
+      cutWidth: resolvedWidth,
+      cutLength: resolvedLength,
       cutDiameter: cutType === 'circle' ? cutDiameter : 0,
-      cutDepth: isThroughAll ? (selectedPart.params?.height || 40) : cutDepth,
+      cutDepth: resolvedDepth,
       cutOffsetX: offsetX,
       cutOffsetY: offsetY,
       cutAngle,
@@ -123,30 +141,72 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
     onClose();
   };
 
+  const { position, resetPosition, isDragging, elementRef, dragHandleProps } = useDraggableDialog({
+    initialPosition: () => {
+      if (typeof window === 'undefined') return { x: 300, y: 50 };
+      const isDesktop = window.innerWidth >= 768;
+      const modalWidth = Math.min(512, window.innerWidth - 32);
+      return {
+        x: isDesktop ? Math.max(16, (window.innerWidth - modalWidth) / 2) : 16,
+        y: 40,
+      };
+    },
+  });
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-3xl bg-[#090d16] border border-cyan-500/30 p-5 sm:p-6 shadow-[0_0_50px_rgba(0,229,255,0.15)] flex flex-col max-h-[92vh] overflow-y-auto custom-scrollbar font-mono text-xs text-slate-200 space-y-4">
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/60 select-none"
+        onClick={onClose}
+      />
+
+      <div
+        ref={elementRef}
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        }}
+        className={`fixed z-50 w-full max-w-lg rounded-3xl bg-[var(--bg-1)] border border-cyan-500/30 p-5 sm:p-6 flex flex-col max-h-[92vh] overflow-y-auto custom-scrollbar font-mono text-xs text-slate-200 space-y-4 select-none transition-shadow ${
+          isDragging ? 'ring-2 ring-cyan-400 shadow-[0_25px_70px_rgba(0,229,255,0.4)]' : ''
+        }`}
+      >
         {/* ─── HEADER ─── */}
-        <div className="flex items-start justify-between border-b border-white/10 pb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+        <div
+          {...dragHandleProps}
+          onDoubleClick={resetPosition}
+          title={tCut.title + ' (Sürükleyip Taşı · Sıfırlamak İçin Çift Tıkla)'}
+          className="group flex items-start justify-between border-b border-white/10 pb-3 cursor-grab active:cursor-grabbing hover:bg-white/5 -mx-2 -mt-2 p-2 rounded-t-2xl transition-colors"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] shrink-0">
               <Scissors size={20} />
             </div>
-            <div>
-              <h2 className="text-sm sm:text-base font-black text-white">
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-black text-white truncate">
                 {tCut.title}
               </h2>
-              <p className="text-[10px] text-slate-400">
-                {selectedPart ? `${selectedPart.name} (${selectedPart.kind})` : tCut.noPart}
+              <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                <GripHorizontal size={11} className="text-cyan-500/60 group-hover:text-cyan-400 shrink-0" />
+                <span className="truncate">{selectedPart ? `${selectedPart.name} (${selectedPart.kind})` : tCut.noPart}</span>
               </p>
             </div>
           </div>
 
-          <button type="button" onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-white">
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={resetPosition}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-white/10 transition-colors"
+              title="Konumu Sıfırla"
+            >
+              <RotateCcw size={14} />
+            </button>
+            <button type="button" onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-white">
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* ─── CUT SHAPE TYPE ─── */}
@@ -155,12 +215,13 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
             { id: 'rect' as const, label: tCut.rect },
             { id: 'circle' as const, label: tCut.circle },
             { id: 'slot' as const, label: tCut.slot },
+            { id: 'chamfer' as const, label: t12(language, 'Edge Chamfer', 'Kenar Pahı') },
           ].map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => setCutType(item.id)}
-              className={`flex-1 py-2 rounded-xl font-bold text-[10px] transition-all ${
+              className={`flex-1 py-2 rounded-xl font-bold text-[10px] transition-all cursor-pointer ${
                 cutType === item.id
                   ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
                   : 'bg-white/5 text-slate-400 hover:text-white'
@@ -219,14 +280,14 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
                 type="checkbox"
                 checked={isThroughAll}
                 onChange={(e) => setIsThroughAll(e.target.checked)}
-                className="rounded accent-cyan-400"
+                className="rounded accent-[var(--cyan)]"
               />
-              <span className="font-bold">{tr ? 'Boydan Boya Del / Kes (Through All)' : 'Through-All Cut'}</span>
+              <span className="font-bold">{t12(language, 'Through-All Cut', 'Boydan Boya Del / Kes (Through All)')}</span>
             </label>
 
             {!isThroughAll && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400">{tr ? 'Derinlik (mm):' : 'Depth (mm):'}</span>
+                <span className="text-[10px] text-slate-400">{t12(language, 'Depth (mm):', 'Derinlik (mm):')}</span>
                 <input
                   type="number"
                   value={cutDepth}
@@ -240,7 +301,7 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
 
         {/* ─── POSITION OFFSETS ON FACE ─── */}
         <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-          <span className="font-bold text-amber-400 block text-[11px]">{tr ? 'Yüzey Konumlandırma (Offset):' : 'Face Position Offset:'}</span>
+          <span className="font-bold text-amber-400 block text-[11px]">{t12(language, 'Face Position Offset:', 'Yüzey Konumlandırma (Offset):')}</span>
           <div className="grid grid-cols-3 gap-2.5">
             <div>
               <label className="text-[9px] text-slate-400 block mb-1">X Ofset (mm)</label>
@@ -259,7 +320,7 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
 
         {/* ─── REMOVED VOLUME SUMMARY ─── */}
         <div className="p-3 rounded-xl bg-black/60 border border-white/5 flex items-center justify-between text-slate-300">
-          <span>{tr ? 'Talaş / Boşaltılan Hacim:' : 'Removed Volume:'}</span>
+          <span>{t12(language, 'Removed Volume:', 'Talaş / Boşaltılan Hacim:')}</span>
           <span className="text-cyan-300 font-bold">{(removedVolumeMm3 / 1000).toFixed(2)} cm³</span>
         </div>
 
@@ -281,14 +342,14 @@ export function SurfaceCutModal({ isOpen, onClose, selectedPart }: SurfaceCutMod
           <button
             type="button"
             onClick={handleApplyCut}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg "
           >
             <Scissors size={16} />
             <span>✂️ {tCut.applyCut}</span>
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

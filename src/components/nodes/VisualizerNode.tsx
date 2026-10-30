@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Visualizer Node
+ * AluCAD OS — Visualizer Node
  * 
  * Renders 2D/3D visualizations driven by incoming data connections.
  * Supports:
@@ -33,13 +33,13 @@ import { STEPWriter, addCartesianPoint, addVertexPoint, addDirection, addVector,
 
 const styles = {
     node: `
-        min-w-[320px] bg-[#05090e]/85 backdrop-blur-2xl
+        min-w-[320px] bg-[var(--bg-0)]/85 backdrop-blur-2xl
         border border-cyan-900/40 rounded-xl overflow-hidden
         shadow-[0_8px_32px_rgba(0,0,0,0.6)]
         transition-all duration-300 group
     `,
     nodeSelected: `
-        ring-1 ring-[#00e5ff] shadow-[0_0_30px_rgba(0,229,255,0.2)]
+        ring-1 ring-[var(--cyan)] 
     `,
     header: `
         flex items-center justify-between gap-2 px-4 py-3
@@ -56,13 +56,13 @@ const styles = {
         p-0 bg-transparent relative min-h-[250px] flex items-center justify-center
     `,
     handle: `
-        !w-5 !h-5 !bg-[#05090e] !border-2 !border-[#00e5ff] !rounded-[4px]
-        hover:!bg-[#00e5ff]/20 transition-all !cursor-crosshair z-20
-        !shadow-[0_0_12px_rgba(0,229,255,0.6),_inset_0_0_8px_rgba(0,229,255,0.4)]
+        !w-5 !h-5 !bg-[var(--bg-0)] !border-2 !border-[var(--cyan)] !rounded-[4px]
+        hover:!bg-[var(--cyan)]/20 transition-all !cursor-crosshair z-20
+        !
     `,
     handleLabel: `
-        absolute text-[10px] text-[#00e5ff] font-mono tracking-widest
-        pointer-events-none whitespace-nowrap bg-[#05090e]/90 backdrop-blur px-2 py-0.5 rounded-sm border border-[#00e5ff]/40 shadow-[0_0_15px_rgba(0,229,255,0.2)]
+        absolute text-[10px] text-[var(--cyan)] font-mono tracking-widest
+        pointer-events-none whitespace-nowrap bg-[var(--bg-0)]/90 backdrop-blur px-2 py-0.5 rounded-sm border border-[var(--cyan)]/40 
         opacity-0 group-hover:opacity-100 transition-opacity duration-300
     `,
     exportBar: `
@@ -70,9 +70,9 @@ const styles = {
         bg-black/20 border-t border-cyan-900/10 backdrop-blur-md
     `,
     exportBtn: `
-        text-[9px] px-3 py-1.5 bg-[#0a0f16]/60 border border-cyan-900/50 rounded
-        text-cyan-600 hover:text-[#00e5ff] hover:border-[#00e5ff]/50 font-bold uppercase tracking-widest
-        transition-all flex items-center gap-2 hover:shadow-[0_0_10px_rgba(0,229,255,0.2)] cursor-pointer
+        text-[9px] px-3 py-1.5 bg-[var(--bg-1)]/60 border border-cyan-900/50 rounded
+        text-cyan-600 hover:text-[var(--cyan)] hover:border-[var(--cyan)]/50 font-bold uppercase tracking-widest
+        transition-all flex items-center gap-2 cursor-pointer
     `
 };
 
@@ -281,7 +281,7 @@ const VisualizerNode: React.FC<NodeProps<VisualizerNodeData>> = ({
             {/* Header */}
             <div className={`${styles.header} draggable-handle`}>
                 <div className={styles.headerTitle}>
-                    <Eye size={14} className="text-[#00e5ff]" />
+                    <Eye size={14} className="text-[var(--cyan)]" />
                     {data.title || 'Visualizer 3D'}
                 </div>
                 <div className="flex items-center gap-1">

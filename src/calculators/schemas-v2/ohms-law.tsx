@@ -20,7 +20,7 @@ const ohmsLawSchema: CalculatorSchemaV2 = {
         description: 'Calculate relationships between Voltage, Current, Resistance, and Power.',
         category: 'electrical',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['electrical', 'ohms-law', 'power', 'circuit'],
         verifiedStandards: ['Ohm\'s Law'],

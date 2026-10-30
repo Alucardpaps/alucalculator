@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Profile Weight Calculator Schema
+ * AluCAD OS — Profile Weight Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: EN 755-2, EN 573-3
@@ -22,7 +22,7 @@ export const profileWeightSchema: CalculatorSchema = {
     metadata: {
         title: 'Profile Weight Calculator',
         description: 'Calculate cross-section area and weight of aluminum/steel profiles. Supports box, tube, angle, channel, and I-beam sections.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['profile', 'weight', 'aluminum', 'steel', 'section', 'area']
     },

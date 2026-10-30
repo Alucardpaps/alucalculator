@@ -12,7 +12,7 @@ import { useProjectStore } from '@/store/projectStore';
 function CadLoading() {
   const lang = useI18nStore.getState().language;
   return (
-    <div className="w-full h-full flex items-center justify-center bg-[#080c12]">
+    <div className="w-full h-full flex items-center justify-center bg-[var(--bg-1)]">
       <div className="w-8 h-8 border-2 border-t-cyan-400 border-white/10 rounded-full animate-spin" />
       <p className="sr-only">{getMobileStrings(lang).loading3D}</p>
     </div>
@@ -93,7 +93,7 @@ export function CadScreen({ m }: Props) {
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
-            className="fixed inset-x-0 bottom-0 z-50 h-[65vh] bg-[#070b11] border-t border-cyan-950/80 rounded-t-[2.5rem] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 h-[65vh] bg-[var(--bg-0)] border-t border-cyan-950/80 rounded-t-xl flex flex-col"
           >
             <header className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
               <h3 className="font-bold text-sm text-white">{m.bomTitle} ({items.length})</h3>
@@ -114,7 +114,7 @@ export function CadScreen({ m }: Props) {
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
-            className="fixed inset-x-0 bottom-0 z-50 h-[60vh] bg-[#070b11] border-t border-cyan-950/80 rounded-t-[2.5rem] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 h-[60vh] bg-[var(--bg-0)] border-t border-cyan-950/80 rounded-t-xl flex flex-col"
           >
             <header className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
               <h3 className="font-bold text-sm text-white">{m.compTitle}</h3>

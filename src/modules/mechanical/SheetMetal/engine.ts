@@ -30,15 +30,20 @@ export class SheetMetalEngine {
     static calculate(input: SheetMetalInput): { result: SheetMetalResult, metadata: EngineMetadata } {
         const { thickness, bendAngle, innerRadius, kFactor, material } = input;
 
-        // Convert angle to radians for calculations
-        const angleRad = bendAngle * (Math.PI / 180);
+        // Guard against 180° hemming singularity: tan(pi/2) -> infinity
+        const isHemming = bendAngle >= 179.5;
+        const clampedAngle = isHemming ? 179.5 : Math.max(0.1, bendAngle);
+        const angleRad = clampedAngle * (Math.PI / 180);
 
         // 1. Outside Setback (OSSB)
         const tanHalfAngle = Math.tan(angleRad / 2);
-        const outsideSetback = (innerRadius + thickness) * tanHalfAngle;
+        const outsideSetback = isHemming
+            ? innerRadius + thickness
+            : (innerRadius + thickness) * tanHalfAngle;
 
-        // 2. Bend Allowance (BA)
-        const bendAllowance = angleRad * (innerRadius + kFactor * thickness);
+        // 2. Bend Allowance (BA) per DIN 6935
+        const actualAngleRad = (bendAngle * Math.PI) / 180;
+        const bendAllowance = actualAngleRad * (innerRadius + kFactor * thickness);
 
         // 3. Bend Deduction (BD)
         const bendDeduction = (2 * outsideSetback) - bendAllowance;
@@ -49,6 +54,13 @@ export class SheetMetalEngine {
             outsideSetback: Number(outsideSetback.toFixed(3))
         };
 
+        const warnings: string[] = [];
+        if (bendAngle >= 179.5) {
+            warnings.push('180° hem detected: Standard air-bend OSSB has a singularity at 180°; hemming correction applied.');
+        } else if (bendAngle > 165) {
+            warnings.push('Severe bend angle (>165°): Verify press brake tooling and springback clearance.');
+        }
+
         const metadata: EngineMetadata = {
             calculationId: `SM-${Date.now()}`,
             engineVersion: this.VERSION,
@@ -58,8 +70,8 @@ export class SheetMetalEngine {
             standardReference: 'DIN 6935',
             assumptions: ['Neutral axis remains constant', 'Isotropic material properties'],
             safetyFactors: { yield: 1.0 },
-            validationStatus: bendAngle > 180 ? 'warning' : 'success',
-            warnings: bendAngle > 180 ? ['Bend angle exceeds typical press brake limits'] : [],
+            validationStatus: warnings.length > 0 ? 'warning' : 'success',
+            warnings,
             calculationHash: this._generateHash(input, result) // Mock hash for now
         };
 

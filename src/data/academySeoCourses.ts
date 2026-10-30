@@ -94,7 +94,7 @@ export function seoCalculatorToCourse(calc: SEOCalculatorData): AcademyCourse {
     slug: calc.slug,
     title: cleanSeoTitle(calc.title ?? calc.slug),
     year: yearForCategory(category),
-    ref: CATEGORY_REF[category] ?? 'AluCalc Engineering Guide',
+    ref: CATEGORY_REF[category] ?? 'AluCAD Engineering Guide',
     kind: 'guide',
     category,
   };

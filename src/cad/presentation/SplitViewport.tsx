@@ -16,12 +16,12 @@ import { LayoutGrid, Cuboid, Activity, Settings2, Maximize2 } from 'lucide-react
 
 export default function SplitViewport() {
     return (
-        <div className="w-full h-full flex flex-col bg-[#05090e] text-slate-300 font-sans select-none overflow-hidden">
+        <div className="w-full h-full flex flex-col bg-[var(--bg-0)] text-slate-300 font-sans select-none overflow-hidden">
 
             {/* 1. TOP STATUS BAR (Integrated into Ribbon or separate here) */}
-            <div className="h-10 bg-[#0f1419] border-b border-[#1e2833] flex items-center px-4 justify-between z-20">
+            <div className="h-10 bg-[var(--bg-1)] border-b border-[var(--line)] flex items-center px-4 justify-between z-20">
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-2 py-1 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded text-[10px] text-green-400 font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-2 px-2 py-1 bg-[var(--ok)]/10 border border-[var(--ok)]/20 rounded text-[10px] text-green-400 font-bold uppercase tracking-widest">
                         <Activity size={12} />
                         Solver Active
                     </div>
@@ -45,8 +45,8 @@ export default function SplitViewport() {
 
                             {/* LEFT: 2D Engineering View */}
                             <Panel defaultSize={50} minSize={20}>
-                                <div className="w-full h-full bg-[#080c10] relative flex flex-col border-r border-[#1e2833]/50">
-                                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-2 py-1 bg-black/40 backdrop-blur rounded border border-white/5 shadow-xl">
+                                <div className="w-full h-full bg-[var(--bg-1)] relative flex flex-col border-r border-[var(--line)]/50">
+                                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2 px-2 py-1 bg-black/40 rounded border border-white/5 shadow-xl">
                                         <LayoutGrid size={14} className="text-cyan-400" />
                                         <span className="text-[10px] font-bold uppercase tracking-tighter text-cyan-50 opacity-80">Top View (2D)</span>
                                     </div>
@@ -54,16 +54,16 @@ export default function SplitViewport() {
                                 </div>
                             </Panel>
 
-                            <Separator className="w-1 bg-[#1e2833] hover:bg-cyan-500/50 transition-colors cursor-col-resize relative z-10">
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-[#0f1419] border border-[#1e2833] rounded-sm flex items-center justify-center">
+                            <Separator className="w-1 bg-[var(--bg-3)] hover:bg-cyan-500/50 transition-colors cursor-col-resize relative z-10">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-[var(--bg-1)] border border-[var(--line)] rounded-sm flex items-center justify-center">
                                     <div className="h-3 w-px bg-slate-700" />
                                 </div>
                             </Separator>
 
                             {/* RIGHT: 3D Visualization */}
                             <Panel defaultSize={50} minSize={20}>
-                                <div className="w-full h-full bg-[#080c10] relative flex flex-col">
-                                    <div className="absolute top-4 right-4 z-10 flex items-center gap-2 px-2 py-1 bg-black/40 backdrop-blur rounded border border-white/5 shadow-xl">
+                                <div className="w-full h-full bg-[var(--bg-1)] relative flex flex-col">
+                                    <div className="absolute top-4 right-4 z-10 flex items-center gap-2 px-2 py-1 bg-black/40 rounded border border-white/5 shadow-xl">
                                         <Cuboid size={14} className="text-amber-400" />
                                         <span className="text-[10px] font-bold uppercase tracking-tighter text-amber-50 opacity-80">Iso Perspective (3D)</span>
                                     </div>
@@ -74,15 +74,15 @@ export default function SplitViewport() {
                         </Group>
                     </Panel>
 
-                    <Separator className="h-1 bg-[#1e2833] hover:bg-cyan-500/50 transition-colors cursor-row-resize relative z-10">
-                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-8 bg-[#0f1419] border border-[#1e2833] rounded-sm flex items-center justify-center">
+                    <Separator className="h-1 bg-[var(--bg-3)] hover:bg-cyan-500/50 transition-colors cursor-row-resize relative z-10">
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-8 bg-[var(--bg-1)] border border-[var(--line)] rounded-sm flex items-center justify-center">
                             <div className="w-3 h-px bg-slate-700" />
                         </div>
                     </Separator>
 
                     {/* BOTTOM HALF: Validation & Console */}
                     <Panel defaultSize={25} minSize={15}>
-                        <div className="w-full h-full bg-[#0a0e14]">
+                        <div className="w-full h-full bg-[var(--bg-1)]">
                             <ValidationPanel />
                         </div>
                     </Panel>
@@ -91,7 +91,7 @@ export default function SplitViewport() {
             </div>
 
             {/* 3. FOOTER INFO */}
-            <div className="h-6 bg-[#0f1419] border-t border-[#1e2833] flex items-center px-4 justify-between gap-4">
+            <div className="h-6 bg-[var(--bg-1)] border-t border-[var(--line)] flex items-center px-4 justify-between gap-4">
                 <div className="flex items-center gap-3 text-[9px] font-mono text-gray-600">
                     <span className="text-cyan-600">READY</span>
                     <span>X: 0.000</span>

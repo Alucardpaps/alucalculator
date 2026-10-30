@@ -34,7 +34,7 @@ export class DimensionSystem {
             end,
             textPoint,
             value: distance(start, end),
-            text: distance(start, end).toFixed(2),
+            text: `${distance(start, end).toFixed(2)} mm`,
             offset: 20 // Default offset
         };
 
@@ -53,21 +53,50 @@ export class DimensionSystem {
     /**
      * Render a dimension entity to the canvas context
      */
+    /**
+     * Convert and format dimension text dynamically for inch or mm units
+     */
+    public static formatDimensionText(
+        textOrDist: string | number | undefined,
+        distMm: number,
+        units: 'mm' | 'in' = 'mm'
+    ): string {
+        if (units === 'in') {
+            if (typeof textOrDist === 'string') {
+                const match = textOrDist.match(/^([^\d.-]*)([-+]?\d*\.?\d+)(\s*(?:mm|in|")?)?$/);
+                if (match) {
+                    const prefix = match[1] || '';
+                    const valNum = parseFloat(match[2]);
+                    if (!Number.isNaN(valNum)) {
+                        const isAlreadyInch = match[3] && (match[3].includes('in') || match[3].includes('"'));
+                        const valIn = isAlreadyInch ? valNum : valNum / 25.4;
+                        return `${prefix}${valIn.toFixed(valIn < 1 ? 3 : 2)}"`;
+                    }
+                }
+            }
+            const inVal = distMm / 25.4;
+            return `${inVal.toFixed(inVal < 1 ? 3 : 2)}"`;
+        }
+        if (typeof textOrDist === 'string' && textOrDist.length > 0) {
+            return textOrDist;
+        }
+        return `${distMm.toFixed(2)} mm`;
+    }
+
     public renderDimension(
         ctx: CanvasRenderingContext2D,
         entity: CadEntity,
         transform: (p: Point) => Point,
-        scaleFactor: number // zoom level for text scaling
-    ) {
-        if (entity.geometry.type !== 'DIMENSION') return;
-
+        zoom: number
+    ): void {
         const dim = entity.geometry as DimensionGeometry;
         const p1 = transform(dim.start);
         const p2 = transform(dim.end);
         const pt = transform(dim.textPoint);
 
         const dist = distance(dim.start, dim.end);
-        const textStr = dist.toFixed(2);
+        const isInch = useCadStore.getState().units === 'in';
+        const textStr = DimensionSystem.formatDimensionText(dim.text, dist, isInch ? 'in' : 'mm');
 
         ctx.save();
         ctx.strokeStyle = entity.isSelected ? '#00e5ff' : (entity.color || '#white');
@@ -79,18 +108,27 @@ export class DimensionSystem {
         // Vector from start/end to text line
         // Simple implementation: Draw lines from start->offset and end->offset
 
-        // Calculate offset vector
-        const v = vector(dim.start, dim.end);
-        const n = normalize(perpendicular(v));
+        // Calculate screen-space offset vector
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const screenDist = Math.sqrt(dx * dx + dy * dy);
+        if (screenDist < 1) {
+            ctx.restore();
+            return;
+        }
 
-        // Determine side based on textPoint
-        const vText = vector(dim.start, dim.textPoint);
-        const side = (n.x * vText.x + n.y * vText.y) > 0 ? 1 : -1;
+        const nx = -dy / screenDist;
+        const ny = dx / screenDist;
+        let offset = 30;
+        if (dim.textPoint) {
+            const proj = (pt.x - p1.x) * nx + (pt.y - p1.y) * ny;
+            if (Math.abs(proj) > 5) {
+                offset = proj;
+            }
+        }
 
-        const offsetVec = scale(n, 30 * side); // Fixed pixel offset for now, should be world units
-
-        const p1Ext = { x: p1.x + offsetVec.x, y: p1.y + offsetVec.y };
-        const p2Ext = { x: p2.x + offsetVec.x, y: p2.y + offsetVec.y };
+        const p1Ext = { x: p1.x + nx * offset, y: p1.y + ny * offset };
+        const p2Ext = { x: p2.x + nx * offset, y: p2.y + ny * offset };
 
         // Extension lines
         ctx.beginPath();
@@ -113,7 +151,7 @@ export class DimensionSystem {
         // Text
         const textCenter = {
             x: (p1Ext.x + p2Ext.x) / 2,
-            y: (p1Ext.y + p2Ext.y) / 2 - 5 * side
+            y: (p1Ext.y + p2Ext.y) / 2
         };
 
         ctx.textAlign = 'center';
@@ -126,26 +164,37 @@ export class DimensionSystem {
             const tolU = dim.tolUpper ?? 0;
             const tolL = dim.tolLower ?? 0;
 
-            // Draw nominal value slightly left
-            ctx.font = '12px sans-serif';
+            ctx.font = '12px monospace';
             const nominalText = textStr;
             const nominalWidth = ctx.measureText(nominalText).width;
-            const nomX = textCenter.x - 8;
+            const tolWidth = 36;
+            const totalWidth = nominalWidth + tolWidth + 8;
+
+            ctx.fillStyle = '#080c12';
+            ctx.fillRect(textCenter.x - totalWidth / 2 - 2, textCenter.y - 10, totalWidth + 4, 20);
+
+            // Draw nominal value slightly left
+            ctx.fillStyle = ctx.strokeStyle;
+            const nomX = textCenter.x - tolWidth / 2 - 2;
             ctx.fillText(nominalText, nomX, textCenter.y);
 
             // Draw tolerance stack (superscript/subscript) to the right
-            ctx.font = '8px sans-serif';
+            ctx.font = '8px monospace';
             ctx.textAlign = 'left';
             const tolX = nomX + nominalWidth / 2 + 3;
 
-            // Upper tolerance (superscript)
             const upperText = tolU >= 0 ? `+${tolU.toFixed(3)}` : tolU.toFixed(3);
-            ctx.fillText(upperText, tolX, textCenter.y - 6);
+            ctx.fillText(upperText, tolX, textCenter.y - 5);
 
-            // Lower tolerance (subscript)
             const lowerText = tolL >= 0 ? `+${tolL.toFixed(3)}` : tolL.toFixed(3);
-            ctx.fillText(lowerText, tolX, textCenter.y + 6);
+            ctx.fillText(lowerText, tolX, textCenter.y + 5);
         } else {
+            ctx.font = '12px monospace';
+            const tw = ctx.measureText(textStr).width;
+            ctx.fillStyle = '#080c12';
+            ctx.fillRect(textCenter.x - tw / 2 - 4, textCenter.y - 8, tw + 8, 16);
+
+            ctx.fillStyle = ctx.strokeStyle;
             ctx.fillText(textStr, textCenter.x, textCenter.y);
         }
 

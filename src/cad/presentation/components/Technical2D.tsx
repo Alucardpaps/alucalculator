@@ -18,7 +18,7 @@ export function Technical2D() {
 
     if (!geometry) {
         return (
-            <div className="w-full h-full flex items-center justify-center bg-[#0b0f14] text-slate-600">
+            <div className="w-full h-full flex items-center justify-center bg-[var(--bg-1)] text-slate-600">
                 <div className="flex flex-col items-center gap-2">
                     <MousePointer2 size={32} />
                     <span className="text-xs font-mono uppercase tracking-widest">Select a node to view geometry</span>
@@ -43,13 +43,13 @@ export function Technical2D() {
                     <>
                         <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                             {/* Controls Overlay */}
-                            <button onClick={() => resetTransform()} className="bg-[#1a2332] p-1.5 rounded hover:bg-cyan-900/50 text-cyan-400 border border-[#2a3a4a]" title="Reset View">
+                            <button onClick={() => resetTransform()} className="bg-[var(--bg-3)] p-1.5 rounded hover:bg-cyan-900/50 text-cyan-400 border border-[var(--line-strong)]" title="Reset View">
                                 <Grid3X3 size={16} />
                             </button>
                         </div>
 
                         <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full">
-                            <svg className="w-full h-full bg-[#05090e]" viewBox="-500 -500 1000 1000">
+                            <svg className="w-full h-full bg-[var(--bg-0)]" viewBox="-500 -500 1000 1000">
                                 <defs>
                                     <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
                                         <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#1e2833" strokeWidth="0.5" />

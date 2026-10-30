@@ -9,7 +9,7 @@ export const flywheelDesignSchema: CalculatorSchemaV2 = {
         description: 'Sizing, mass, mass moment of inertia, energy capacity, and hoop stress limits for solid or rimmed flywheels.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['flywheel', 'inertia', 'kinetic energy', 'hoop stress', 'fluctuation', 'machine elements'],
         verifiedStandards: ['Shigley\'s Mechanical Engineering Design']
@@ -134,7 +134,7 @@ export const flywheelDesignSchema: CalculatorSchemaV2 = {
             const isFailing = SF < 2.0;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Flywheel Wheel Layout */}
                     <div className="relative w-[200px] h-[200px]">
                         <svg viewBox="0 0 200 200" width="100%" height="100%" className="overflow-visible animate-spin" style={{ animationDuration: '4s', animationTimingFunction: 'linear' }}>
@@ -154,21 +154,21 @@ export const flywheelDesignSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Energy Cap</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 {((out.dE?.value as number) || 0).toFixed(2)} <span className="text-[10px] text-gray-500">kJ</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Hoop Stress</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.sigma?.value as number) || 0).toFixed(1)} <span className="text-[10px] text-gray-500">MPa</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Safety Factor</div>
                             <div className={`text-xs font-bold font-mono ${isFailing ? 'text-red-400' : 'text-emerald-400'}`}>

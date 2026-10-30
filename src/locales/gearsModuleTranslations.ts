@@ -1,42 +1,141 @@
 import type { Language } from '@/store/i18nStore';
 
 export type GearsModuleStrings = {
-  toothGeometry: string;
-  motorMaterial: string;
-  serviceConditions: string;
+  // General Header & Actions
+  title: string;
+  subtitle: string;
+  export3D: string;
+  export3DTooltip: string;
+  exportCSV: string;
+  exportCSVTooltip: string;
+  exportPDF: string;
+  exportPDFTooltip: string;
+
+  // Workflow Modes
+  pairMode: string;
+  trainMode: string;
+
+  // Multi-Gear Train Controls
+  quickAddPresets: string;
+  reset: string;
+  addPlanetary: string;
+  addInternal: string;
+  addExternal: string;
+  addCoaxial: string;
+  presetLabel: string;
+  presetCompound: string;
+  presetPlanetary: string;
+  presetHybrid: string;
+  trainGearsTitle: string;
+  coaxialTag: string;
+  internalTag: string;
+  planetaryTag: string;
+  deleteGear: string;
+  gearParamsTitle: string;
+  shaftLabel: string;
+  gearTypeLabel: string;
+  externalType: string;
+  internalType: string;
+  planetaryType: string;
+  sunTeeth: string;
+  planetTeeth: string;
+  computedRing: string;
+  teethCount: string;
+  gearModule: string;
+  helixAngle: string;
   profileShift: string;
-  loadClass: string;
-  dailyHours: string;
-  startsPerHour: string;
-  outputConnect: string;
-  serviceFactor: string;
+  faceWidth: string;
+  materialType: string;
+  trainMotorDrive: string;
+  motorSpeedTorque: string;
+
+  // Single Pair Controls
+  toothGeometry: string;
+  meshTypeLabel: string;
+  externalPair: string;
+  internalRing: string;
+  pinionTeeth: string;
+  gearTeeth: string;
+  internalRingTeeth: string;
+  pressureAngle: string;
+  profileShiftSection: string;
   shiftX1: string;
   shiftX2: string;
+  pinionPinDia: string;
+  gearPinDia: string;
+  workingPressureAngle: string;
+  workingCenterDistance: string;
+  wildhaberSpan: string;
+  overPinsMeasure: string;
+  materialSection: string;
+  materialSelect: string;
+  sigmaBending: string;
+  sigmaContact: string;
+  serviceConditions: string;
+  loadClass: string;
   loadUniform: string;
   loadModerate: string;
   loadHeavy: string;
+  dailyHours: string;
   hoursLess3: string;
   hours3to10: string;
   hoursMore10: string;
+  startsPerHour: string;
+  outputConnect: string;
   connDirect: string;
   connChain: string;
   connVBelt: string;
   connFlatBelt: string;
+  serviceFactor: string;
+  reqFs: string;
+  motorLoad: string;
+  motorPower: string;
+  motorPoles: string;
+  poles2: string;
+  poles4: string;
+  poles6: string;
+
+  // Right Panel KPI & Visualizer
+  kpiTotalRatio: string;
+  kpiInputRpm: string;
+  kpiOutputRpm: string;
+  kpiOutputTorque: string;
+  kpiTotalEfficiency: string;
+  canvasTitle: string;
+  viewBoth: string;
+  viewFront: string;
+  viewSection: string;
   designSafe: string;
   designWarning: string;
-  rootBending: string;
-  flankContact: string;
+  bendingSafety: string;
+  contactSafety: string;
+  ratio: string;
+  centerDist: string;
+  pitchVelocity: string;
+  contactRatio: string;
+  circPitch: string;
+  tipInterferenceWarning: string;
+  internalMeshBlueprint: string;
   dynamicBlueprint: string;
   mfgDimensions: string;
   parameter: string;
   pinionCol: string;
   gearCol: string;
+  internalGearCol: string;
   tipDia: string;
   refDia: string;
   rootDia: string;
+  workingPitchDia?: string;
+  workingPitchRadius?: string;
+  baseDia?: string;
+  ringOuterDia: string;
   overPins: string;
+  mfgSheetTitle?: string;
+  mfgSheetSubtitle?: string;
   alertTitle: string;
   alertDesc: string;
+
+  // Descriptions & Tooltips
   descModule: string;
   descFaceWidth: string;
   descPinionTeeth: string;
@@ -51,656 +150,1247 @@ export type GearsModuleStrings = {
   descConnection: string;
   descShiftX1: string;
   descShiftX2: string;
+  descPoles: string;
   isoSubtitle: string;
+
+  // Passport Strings
+  clickGearHint: string;
+  passportTitle: string;
+  tabGages: string;
+  tabMachining: string;
+  tabForces: string;
+  tabQuality: string;
+  tabCarrier: string;
+  sunGear: string;
+  planetGear: string;
+  ringGear: string;
+
+  // KHK Gear Families
+  khkFamilyTitle: string;
+  khkCylindrical: string;
+  khkInternal: string;
+  khkRack: string;
+  khkBevel: string;
+  khkWorm: string;
+  khkScrew: string;
+
+  // Rack & Pinion
+  rackTitle: string;
+  rackPitchHeight: string;
+  rackFeedForce: string;
+  rackTravelPerRev: string;
+  rackFeedVelocity: string;
+  rackSeparatingForce: string;
+  rackBlueprintTitle: string;
+
+  // Bevel Gear
+  bevelTitle: string;
+  bevelGleasonSystem: string;
+  bevelStandardSystem: string;
+  bevelShaftAngle: string;
+  bevelConeDistance: string;
+  bevelApexToCrown: string;
+  bevelMaxFaceWidth: string;
+  bevelBlueprintTitle: string;
+
+  // Worm Gear
+  wormTitle: string;
+  wormAxialModule: string;
+  wormStarts: string;
+  wormWheelTeeth: string;
+  wormDiameterFactor: string;
+  wormFrictionCoeff: string;
+  wormSelfLocking: string;
+  wormReversible: string;
+  wormLeadAngle: string;
+  wormEfficiency: string;
+  wormOutputTorque: string;
+  wormThroatRadius: string;
+  wormBlueprintTitle: string;
+
+  // Screw Gear
+  screwTitle: string;
+  screwHelixPinion: string;
+  screwHelixGear: string;
+  screwShaftAngle: string;
+  screwSlidingVelocity: string;
+  screwBlueprintTitle: string;
 };
 
 const EN: GearsModuleStrings = {
-  "toothGeometry": "Tooth Geometry",
-  "motorMaterial": "Motor & Material",
-  "serviceConditions": "Service Conditions",
-  "profileShift": "Profile Shift",
-  "loadClass": "Load Class",
-  "dailyHours": "Daily Hours",
-  "startsPerHour": "Starts / Hour",
-  "outputConnect": "Output Connect",
-  "serviceFactor": "Service Factor (fs)",
-  "shiftX1": "Shift x₁",
-  "shiftX2": "Shift x₂",
-  "loadUniform": "Uniform (U)",
-  "loadModerate": "Moderate (M)",
-  "loadHeavy": "Heavy Shock (H)",
-  "hoursLess3": "< 3 Hours",
-  "hours3to10": "3 – 10 Hours",
-  "hoursMore10": "> 10 Hours",
-  "connDirect": "Direct (1.0)",
-  "connChain": "Chain (1.25)",
-  "connVBelt": "V-Belt (1.5)",
-  "connFlatBelt": "Flat Belt (2.5)",
-  "designSafe": "DESIGN VERIFIED — SAFE",
-  "designWarning": "WARNING: INSUFFICIENT SAFETY FACTOR",
-  "rootBending": "Root Bending",
-  "flankContact": "Flank Contact",
-  "dynamicBlueprint": "DYNAMIC MESH BLUEPRINT",
-  "mfgDimensions": "Manufacturing Dimensions (mm)",
-  "parameter": "Parameter",
-  "pinionCol": "Pinion (z₁)",
-  "gearCol": "Gear (z₂)",
-  "tipDia": "Tip Dia (da)",
-  "refDia": "Ref Dia (d)",
-  "rootDia": "Root Dia (df)",
-  "overPins": "Over Pins (M)",
-  "alertTitle": "Safety Factor Below Threshold",
-  "alertDesc": "Root bending requires SF > 1.4, flank contact requires SF > 1.0. Increase module, face width, or select stronger material.",
-  "descModule": "Standard tooth size parameter; increases bending strength.",
-  "descFaceWidth": "Face width of the tooth; increases contact load capacity.",
-  "descPinionTeeth": "Pinion teeth count. Min 17 recommended to avoid undercut.",
-  "descGearTeeth": "Driven gear teeth count; determines speed reduction ratio.",
-  "descHelixAngle": "Helix angle. Increasing it grows mt = m/cosβ, so diameters and center distance (a) increase.",
-  "descPressureAngle": "Pressure (contact) angle. Affects base circle, over-pin dimension and radial force.",
-  "descMotorPower": "Nominal drive motor power based on IEC standards.",
-  "descMaterial": "Gear material chemistry; hardness limits safety margins.",
-  "descLoadClass": "Operational shock severity level.",
-  "descDailyHours": "Daily operating time.",
-  "descStartsPerHour": "Starts per hour; affects fatigue.",
-  "descConnection": "Output shaft connection factor.",
-  "descShiftX1": "Pinion profile shift; thickens tooth root.",
-  "descShiftX2": "Gear profile shift; avoids undercutting.",
-  "isoSubtitle": "ISO 6336 Spur & Helical"
-} as GearsModuleStrings;
+  title: "Gear Design & Strength",
+  subtitle: "ISO 6336 Spur, Helical & Multi-Gear Train",
+  export3D: "Export to 3D",
+  export3DTooltip: "Exports gear geometry & kinematic parameters to 3D Design Studio & BOM",
+  exportCSV: "CSV",
+  exportCSVTooltip: "Download gear parameters & manufacturing table as CSV",
+  exportPDF: "PDF",
+  exportPDFTooltip: "Generate & print complete ISO 6336 Technical Drawing & Passport PDF",
+
+  pairMode: "2-Gear Pair (Single Stage)",
+  trainMode: "Multi-Gear & Compound Train",
+
+  quickAddPresets: "Quick Add & Presets",
+  reset: "Reset",
+  addPlanetary: "+ Planetary Stage",
+  addInternal: "+ Internal Ring",
+  addExternal: "+ External Gear",
+  addCoaxial: "+ Coaxial Shaft",
+  presetLabel: "Presets:",
+  presetCompound: "Compound Train",
+  presetPlanetary: "Planetary Set",
+  presetHybrid: "Int+Ext Hybrid",
+  trainGearsTitle: "Train Gears",
+  coaxialTag: "COAXIAL (SHAFT {n})",
+  internalTag: "INTERNAL RING",
+  planetaryTag: "PLANET SET",
+  deleteGear: "Delete gear",
+  gearParamsTitle: "Parameters",
+  shaftLabel: "Shaft",
+  gearTypeLabel: "Gear Type",
+  externalType: "External Gear",
+  internalType: "Internal Gear",
+  planetaryType: "Planetary",
+  sunTeeth: "Sun Gear (z_sun)",
+  planetTeeth: "Planet Gear (z_p)",
+  computedRing: "Computed Ring (z_ring):",
+  teethCount: "Teeth Count (z)",
+  gearModule: "Module (m)",
+  helixAngle: "Helix Angle (β)",
+  profileShift: "Profile Shift (x)",
+  faceWidth: "Face Width (b)",
+  materialType: "Material Grade",
+  trainMotorDrive: "Drive Motor & Input Power",
+  motorSpeedTorque: "Input Speed / Torque:",
+
+  toothGeometry: "Tooth Geometry",
+  meshTypeLabel: "Mesh Connection Type",
+  externalPair: "External Gear Pair",
+  internalRing: "Internal Gear (Ring)",
+  pinionTeeth: "Pinion Teeth (z₁)",
+  gearTeeth: "Driven Gear Teeth (z₂)",
+  internalRingTeeth: "Ring Teeth (z₂)",
+  pressureAngle: "Pressure Angle (αn)",
+  profileShiftSection: "Profile Shift & Inspection (x₁, x₂)",
+  shiftX1: "Pinion Shift (x₁)",
+  shiftX2: "Gear Shift (x₂)",
+  pinionPinDia: "Pinion Pin Dia (dp₁)",
+  gearPinDia: "Gear Pin Dia (dp₂)",
+  workingPressureAngle: "Working Pressure Angle (α_wt):",
+  workingCenterDistance: "Working Center Distance (a_wt):",
+  wildhaberSpan: "Wildhaber Span (W_k):",
+  overPinsMeasure: "Over-Pins Dimension (M_d):",
+  materialSection: "Material & Strength",
+  materialSelect: "Gear Material",
+  sigmaBending: "σ_Flim (Bending):",
+  sigmaContact: "σ_Hlim (Contact):",
+  serviceConditions: "Service Conditions & Service Factor",
+  loadClass: "Load Characteristic",
+  loadUniform: "Uniform (U)",
+  loadModerate: "Moderate Shock (M)",
+  loadHeavy: "Heavy Shock (H)",
+  dailyHours: "Daily Operating Time",
+  hoursLess3: "< 3 Hours/Day",
+  hours3to10: "3 – 10 Hours/Day",
+  hoursMore10: "> 10 Hours/Day",
+  startsPerHour: "Starts / Hour",
+  outputConnect: "Output Connection Type",
+  connDirect: "Direct Coupling (fz=1.0)",
+  connChain: "Sprocket / Chain (fz=1.25)",
+  connVBelt: "V-Belt (fz=1.5)",
+  connFlatBelt: "Flat Belt (fz=2.5)",
+  serviceFactor: "Service Factor (fs)",
+  reqFs: "Required Service Factor (fs_req):",
+  motorLoad: "Drive & Motor",
+  motorPower: "Motor Power (kW)",
+  motorPoles: "Pole Count",
+  poles2: "2 Poles (~3000 RPM)",
+  poles4: "4 Poles (~1500 RPM)",
+  poles6: "6 Poles (~1000 RPM)",
+
+  kpiTotalRatio: "Total Ratio",
+  kpiInputRpm: "Input Speed",
+  kpiOutputRpm: "Output Speed",
+  kpiOutputTorque: "Output Torque",
+  kpiTotalEfficiency: "Total Efficiency",
+  canvasTitle: "2D TECHNICAL DRAFTING CANVAS:",
+  viewBoth: "Full Sheet (Front + Section)",
+  viewFront: "Front Kinematics",
+  viewSection: "Top Section",
+  designSafe: "SCREENING TARGET MET — SAFE",
+  designWarning: "WARNING: INSUFFICIENT SAFETY FACTOR",
+  bendingSafety: "Tooth Root Bending Safety (SF)",
+  contactSafety: "Tooth Flank Contact Safety (SH)",
+  ratio: "Gear Ratio",
+  centerDist: "Center Dist",
+  pitchVelocity: "Pitch Velocity (v)",
+  contactRatio: "Contact Ratio (εα)",
+  circPitch: "Circ. Pitch (p)",
+  tipInterferenceWarning: "TOOTH TIP INTERFERENCE (DIN 3960: Δz < 8)",
+  internalMeshBlueprint: "INTERNAL RING & PINION MESH BLUEPRINT",
+  dynamicBlueprint: "DYNAMIC MESH BLUEPRINT",
+  mfgDimensions: "Manufacturing Dimensions (mm)",
+  parameter: "Parameter",
+  pinionCol: "Pinion (z₁)",
+  gearCol: "Gear (z₂)",
+  internalGearCol: "Internal Ring (z₂)",
+  tipDia: "Tip Dia (da)",
+  refDia: "Ref Dia (d)",
+  rootDia: "Root Dia (df)",
+  workingPitchDia: "Working Pitch Dia (dw)",
+  workingPitchRadius: "Working Pitch Radius (rw)",
+  baseDia: "Base Dia (db)",
+  ringOuterDia: "Ring Outer Dia (D_ring)",
+  overPins: "Over Pins (M)",
+  mfgSheetTitle: "GEAR MANUFACTURING DATA SHEET (DIN 3960 / ISO 1328)",
+  mfgSheetSubtitle: "Standard technical drawing manufacturing parameters & inspection table",
+  alertTitle: "Safety Factor Below Threshold",
+  alertDesc: "Root bending requires SF > 1.4, flank contact requires SF > 1.0. Increase module, face width, or select stronger material.",
+
+  descModule: "Standard tooth size parameter; increases bending strength.",
+  descFaceWidth: "Face width of the tooth; increases contact load capacity.",
+  descPinionTeeth: "Pinion teeth count. Min 17 recommended to avoid undercut.",
+  descGearTeeth: "Driven gear teeth count; determines speed reduction ratio.",
+  descHelixAngle: "Helix angle. Increasing it grows mt = m/cosβ, so diameters and center distance (a) increase.",
+  descPressureAngle: "Pressure (contact) angle. Affects base circle, over-pin dimension and radial force.",
+  descMotorPower: "Nominal drive motor power based on IEC standards.",
+  descMaterial: "Gear material chemistry; hardness limits safety margins.",
+  descLoadClass: "Operational shock severity level.",
+  descDailyHours: "Daily operating time.",
+  descStartsPerHour: "Starts per hour; affects fatigue.",
+  descConnection: "Output shaft connection factor.",
+  descShiftX1: "Pinion profile shift; thickens tooth root.",
+  descShiftX2: "Gear profile shift; avoids undercutting.",
+  descPoles: "Motor pole count determines operating speed.",
+  isoSubtitle: "ISO 6336 Spur & Helical",
+
+  clickGearHint: "Click on any gear in the diagram to inspect manufacturing & machining parameters.",
+  passportTitle: "Manufacturing Passport",
+  tabGages: "Gages & Inspection",
+  tabMachining: "Machining & Tooling",
+  tabForces: "Forces & Strength",
+  tabQuality: "Quality & Standards",
+  tabCarrier: "Planetary Carrier",
+  sunGear: "Sun Gear",
+  planetGear: "Planet Gear",
+  ringGear: "Ring Gear",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK Gear Family",
+  khkCylindrical: "Cylindrical",
+  khkInternal: "Internal Ring",
+  khkRack: "Rack & Pinion",
+  khkBevel: "Bevel Gear",
+  khkWorm: "Worm Gear",
+  khkScrew: "Screw Gear",
+
+  // Rack & Pinion
+  rackTitle: "RACK & PINION PARAMETERS",
+  rackPitchHeight: "Pitch Line Height (H)",
+  rackFeedForce: "Linear Feed Thrust (Fx)",
+  rackTravelPerRev: "Travel / 1 Rev",
+  rackFeedVelocity: "Feed Velocity (v)",
+  rackSeparatingForce: "Separating Force (Fr)",
+  rackBlueprintTitle: "RACK & PINION PRECISION MESH BLUEPRINT",
+
+  // Bevel Gear
+  bevelTitle: "BEVEL GEAR PARAMETERS",
+  bevelGleasonSystem: "Gleason System",
+  bevelStandardSystem: "Standard Bevel",
+  bevelShaftAngle: "Shaft Angle (Σ)",
+  bevelConeDistance: "Outer Cone Distance (Re)",
+  bevelApexToCrown: "Apex to Crown (X)",
+  bevelMaxFaceWidth: "Max Face Width (b)",
+  bevelBlueprintTitle: "GLEASON BEVEL GEAR SECTION & MESH BLUEPRINT",
+
+  // Worm Gear
+  wormTitle: "WORM & WHEEL PARAMETERS",
+  wormAxialModule: "Axial Module (mx)",
+  wormStarts: "Worm Starts (z₁)",
+  wormWheelTeeth: "Wheel Teeth (z₂)",
+  wormDiameterFactor: "Diameter Factor (q)",
+  wormFrictionCoeff: "Friction Coeff (μ)",
+  wormSelfLocking: "SELF-LOCKING (SAFE)",
+  wormReversible: "REVERSIBLE (BACKDRIVE)",
+  wormLeadAngle: "Lead Angle (γ)",
+  wormEfficiency: "Mechanical Efficiency (η)",
+  wormOutputTorque: "Output Torque (T₂)",
+  wormThroatRadius: "Throat Radius (ri)",
+  wormBlueprintTitle: "CYLINDRICAL WORM & GLOBOID WHEEL BLUEPRINT",
+
+  // Screw Gear
+  screwTitle: "CROSSED HELICAL PARAMETERS",
+  screwHelixPinion: "Pinion Helix (β₁)",
+  screwHelixGear: "Gear Helix (β₂)",
+  screwShaftAngle: "Shaft Angle (Σ)",
+  screwSlidingVelocity: "Sliding Speed (vs)",
+  screwBlueprintTitle: "CROSSED HELICAL GEAR SPATIAL BLUEPRINT",
+};
 
 const TR: GearsModuleStrings = {
-  "toothGeometry": "Diş Geometrisi",
-  "motorMaterial": "Motor & Malzeme",
-  "serviceConditions": "Çalışma Şartları",
-  "profileShift": "Profil Kaydırma",
-  "loadClass": "Yük Sınıfı",
-  "dailyHours": "Günlük Çalışma",
-  "startsPerHour": "Saatlik Start",
-  "outputConnect": "Mil Bağlantısı",
-  "serviceFactor": "Servis Faktörü (fs)",
-  "shiftX1": "Profil Kaydırma x₁",
-  "shiftX2": "Profil Kaydırma x₂",
-  "loadUniform": "Düzgün (U)",
-  "loadModerate": "Orta (M)",
-  "loadHeavy": "Ağır Şok (H)",
-  "hoursLess3": "< 3 Saat",
-  "hours3to10": "3 – 10 Saat",
-  "hoursMore10": "> 10 Saat",
-  "connDirect": "Direkt (1.0)",
-  "connChain": "Zincir (1.25)",
-  "connVBelt": "V-Kayışı (1.5)",
-  "connFlatBelt": "Düz Kayış (2.5)",
-  "designSafe": "TASARIM ONAYLANDI — GÜVENLİ",
-  "designWarning": "UYARI: YETERSİZ GÜVENLİK FAKTÖRÜ",
-  "rootBending": "Diş Dibi Eğilme",
-  "flankContact": "Diş Yüzeyi Temas",
-  "dynamicBlueprint": "DİNAMİK DİŞLİ ŞABLONU",
-  "mfgDimensions": "İmalat Boyutları (mm)",
-  "parameter": "Parametre",
-  "pinionCol": "Pinyon (z₁)",
-  "gearCol": "Çark (z₂)",
-  "tipDia": "Diş Üstü Çapı (da)",
-  "refDia": "Bölüm Dairesi Çapı (d)",
-  "rootDia": "Diş Dibi Çapı (df)",
-  "overPins": "Pimler Üzeri Ölçü (M)",
-  "alertTitle": "Güvenlik Sınırının Altında",
-  "alertDesc": "Diş dibi eğilmesi için SF > 1.4, yüzey ezilmesi için SF > 1.0 olmalıdır. Modülü, diş genişliğini veya malzeme dayanımını artırın.",
-  "descModule": "Diş boyutu ve dayanımını belirleyen modül değeri.",
-  "descFaceWidth": "Diş genişliği. Genişlik arttıkça yük taşıma kapasitesi artar.",
-  "descPinionTeeth": "Pinyon diş sayısı. Girişimi önlemek için min. 17 önerilir.",
-  "descGearTeeth": "Dişli diş sayısı. Hızı düşürme oranını belirler.",
-  "descHelixAngle": "Helis açısı. Artırınca mt = m/cos(β) büyür; çaplar ve eksenler arası mesafe (a) artar.",
-  "descPressureAngle": "Kavrama (değme) açısı. Taban dairesini, ölçü piminden ölçüyü ve radyal kuvveti değiştirir.",
-  "descMotorPower": "Tahrik motoru nominal gücü (IEC standartları).",
-  "descMaterial": "Dişli malzemesi. Sertlik yük sınırlarını belirler.",
-  "descLoadClass": "Çalışmadaki şok seviyesi.",
-  "descDailyHours": "Günlük toplam çalışma süresi.",
-  "descStartsPerHour": "Saatteki start-stop sayısı.",
-  "descConnection": "Mil bağlantı tipi.",
-  "descShiftX1": "Pinyon dişli profil kaydırma miktarı.",
-  "descShiftX2": "Dişli profil kaydırma miktarı.",
-  "isoSubtitle": "ISO 6336 Düz ve Helisel"
-} as GearsModuleStrings;
+  title: "Dişli Tasarımı & Mukavemet",
+  subtitle: "ISO 6336 Düz, Helis ve Çoklu Dişli Treni",
+  export3D: "3D Aktar",
+  export3DTooltip: "Dişli geometrisini ve kinematik parametrelerini 3D Tasarım Stüdyosuna ve BOM'a aktarır",
+  exportCSV: "CSV",
+  exportCSVTooltip: "Dişli ve imalat tablosunu CSV olarak indir",
+  exportPDF: "PDF",
+  exportPDFTooltip: "ISO 6336 Teknik Resim ve İmalat Pasaportunu PDF Olarak Kaydet / Yazdır",
+
+  pairMode: "2'li Eşleşme (Çift)",
+  trainMode: "Çoklu & Bileşik Tren",
+
+  quickAddPresets: "Hızlı Ekle & Şablonlar",
+  reset: "Sıfırla",
+  addPlanetary: "+ Planet Redüktör",
+  addInternal: "+ İç Dişli Ring",
+  addExternal: "+ Dış Dişli",
+  addCoaxial: "+ Koaksiyel Mil",
+  presetLabel: "Hazır:",
+  presetCompound: "Bileşik Tren",
+  presetPlanetary: "Planet Set",
+  presetHybrid: "İç+Dış Hibrit",
+  trainGearsTitle: "Tren Dişlileri",
+  coaxialTag: "KOAKSİYEL (MİL {n})",
+  internalTag: "İÇ DİŞLİ",
+  planetaryTag: "PLANET SET",
+  deleteGear: "Dişliyi sil",
+  gearParamsTitle: "Parametreleri",
+  shaftLabel: "Mil",
+  gearTypeLabel: "Dişli Türü",
+  externalType: "Dış Dişli",
+  internalType: "İç Dişli",
+  planetaryType: "Planet",
+  sunTeeth: "Güneş Dişlisi (z_sun)",
+  planetTeeth: "Planet Dişlisi (z_p)",
+  computedRing: "Hesaplanan Çember (z_ring):",
+  teethCount: "Diş Sayısı (z)",
+  gearModule: "Modül (m)",
+  helixAngle: "Helis Açısı (β)",
+  profileShift: "Profil Kaydırma (x)",
+  faceWidth: "Diş Genişliği (b)",
+  materialType: "Malzeme Cinsi",
+  trainMotorDrive: "Tahrik Motoru & Giriş Gücü",
+  motorSpeedTorque: "Giriş Devri / Torku:",
+
+  toothGeometry: "Diş Geometrisi",
+  meshTypeLabel: "Bağlantı Türü",
+  externalPair: "Dış Dişli Çifti",
+  internalRing: "İç Dişli (Ring)",
+  pinionTeeth: "Pinyon Diş Sayısı (z₁)",
+  gearTeeth: "Çark Diş Sayısı (z₂)",
+  internalRingTeeth: "İç Dişli Sayısı (z₂)",
+  pressureAngle: "Kavrama Açısı (αn)",
+  profileShiftSection: "Profil Kaydırma & Kontrol (x₁, x₂)",
+  shiftX1: "Pinyon Kaydırma (x₁)",
+  shiftX2: "Çark Kaydırma (x₂)",
+  pinionPinDia: "Pinyon Pim Çapı (dp₁)",
+  gearPinDia: "Çark Pim Çapı (dp₂)",
+  workingPressureAngle: "İşletme Kavrama Açısı (α_wt):",
+  workingCenterDistance: "İşletme Eksen Mesafesi (a_wt):",
+  wildhaberSpan: "Wildhaber Kiriş Ölçüsü (W_k):",
+  overPinsMeasure: "Pimler Üzeri Ölçü (M_d):",
+  materialSection: "Malzeme & Mukavemet",
+  materialSelect: "Dişli Malzemesi",
+  sigmaBending: "σ_Flim (Eğilme):",
+  sigmaContact: "σ_Hlim (Ezilme):",
+  serviceConditions: "İşletme Şartları & Servis Faktörü",
+  loadClass: "Yük Karakteristiği",
+  loadUniform: "Düzgün Yük (U)",
+  loadModerate: "Orta Darbeli (M)",
+  loadHeavy: "Ağır Şok (H)",
+  dailyHours: "Günlük Çalışma",
+  hoursLess3: "< 3 Saat/Gün",
+  hours3to10: "3 – 10 Saat/Gün",
+  hoursMore10: "> 10 Saat/Gün",
+  startsPerHour: "Başlatma / Saat",
+  outputConnect: "Çıkış Bağlantı Türü",
+  connDirect: "Kaplin / Direkt (fz=1.0)",
+  connChain: "Zincir Dişli (fz=1.25)",
+  connVBelt: "V-Kayış (fz=1.5)",
+  connFlatBelt: "Düz Kayış (fz=2.5)",
+  serviceFactor: "Servis Faktörü (fs)",
+  reqFs: "Gerekli Servis Faktörü (fs_req):",
+  motorLoad: "Tahrik & Motor",
+  motorPower: "Motor Gücü (kW)",
+  motorPoles: "Kutup Sayısı",
+  poles2: "2 Kutup (~3000 RPM)",
+  poles4: "4 Kutup (~1500 RPM)",
+  poles6: "6 Kutup (~1000 RPM)",
+
+  kpiTotalRatio: "Toplam Çevrim Oranı",
+  kpiInputRpm: "Giriş Devri",
+  kpiOutputRpm: "Çıkış Devri",
+  kpiOutputTorque: "Çıkış Torku",
+  kpiTotalEfficiency: "Toplam Verim",
+  canvasTitle: "2D TEKNİK RESİM KANVASI:",
+  viewBoth: "Tam Levha (Önden + Kesit)",
+  viewFront: "Önden Kinematik",
+  viewSection: "Üstten Kesit",
+  designSafe: "ÖN ELEME HEDEFİ SAĞLANDI — GÜVENLİ",
+  designWarning: "UYARI: YETERSİZ GÜVENLİK FAKTÖRÜ",
+  bendingSafety: "Diş Dibi Eğilme Emniyeti (SF)",
+  contactSafety: "Diş Yüzeyi Ezilme Emniyeti (SH)",
+  ratio: "Çevrim Oranı",
+  centerDist: "Eksen Mesafesi",
+  pitchVelocity: "Çevre Hızı (v)",
+  contactRatio: "Kavrama Oranı (εα)",
+  circPitch: "Diş Adımı (p)",
+  tipInterferenceWarning: "DİŞ TEPE GİRİŞİMİ (DIN 3960: Δz < 8)",
+  internalMeshBlueprint: "İÇ DİŞLİ VE PİNYON KAVRAMA ŞEMASI",
+  dynamicBlueprint: "DİNAMİK DİŞLİ ŞABLONU",
+  mfgDimensions: "İmalat Boyutları (mm)",
+  parameter: "Parametre",
+  pinionCol: "Pinyon (z₁)",
+  gearCol: "Çark (z₂)",
+  internalGearCol: "İç Dişli (z₂)",
+  tipDia: "Diş Üstü Çapı (da)",
+  refDia: "Bölüm / Referans Çapı (d)",
+  rootDia: "Diş Dibi / Kök Çapı (df)",
+  workingPitchDia: "Yuvarlanma Çapı (dw)",
+  workingPitchRadius: "Yuvarlanma Yarıçapı (rw)",
+  baseDia: "Temel Daire Çapı (db)",
+  ringOuterDia: "Halka Dış Çapı (D_ring)",
+  overPins: "Pimler Üzeri Ölçü (M)",
+  mfgSheetTitle: "DİŞLİ İMALAT TABLOSU (DIN 3960 / ISO 1328)",
+  mfgSheetSubtitle: "Teknik resim imalat verileri & kalite kontrol parametreleri tablosu",
+  alertTitle: "Güvenlik Sınırının Altında",
+  alertDesc: "Diş dibi eğilmesi için SF > 1.4, yüzey ezilmesi için SF > 1.0 olmalıdır. Modülü, diş genişliğini veya malzeme dayanımını artırın.",
+
+  descModule: "Diş boyutu ve dayanımını belirleyen modül değeri.",
+  descFaceWidth: "Diş genişliği. Genişlik arttıkça yük taşıma kapasitesi artar.",
+  descPinionTeeth: "Pinyon diş sayısı. Girişimi önlemek için min. 17 önerilir.",
+  descGearTeeth: "Dişli diş sayısı. Hızı düşürme oranını belirler.",
+  descHelixAngle: "Helis açısı. Artırınca mt = m/cos(β) büyür; çaplar ve eksenler arası mesafe (a) artar.",
+  descPressureAngle: "Kavrama (değme) açısı. Taban dairesini, ölçü piminden ölçüyü ve radyal kuvveti değiştirir.",
+  descMotorPower: "Tahrik motoru nominal gücü (IEC standartları).",
+  descMaterial: "Dişli malzemesi. Sertlik yük sınırlarını belirler.",
+  descLoadClass: "Çalışmadaki şok seviyesi.",
+  descDailyHours: "Günlük toplam çalışma süresi.",
+  descStartsPerHour: "Saatteki start-stop sayısı.",
+  descConnection: "Mil bağlantı tipi.",
+  descShiftX1: "Pinyon dişli profil kaydırma miktarı.",
+  descShiftX2: "Dişli profil kaydırma miktarı.",
+  descPoles: "Motorun kutup sayısı devir hızını belirler.",
+  isoSubtitle: "ISO 6336 Düz ve Helisel",
+
+  clickGearHint: "İmalat ve talaşlı işleme parametrelerini görmek için şemadan bir dişliye tıklayın.",
+  passportTitle: "İmalat Pasaportu",
+  tabGages: "Mastar & Kontrol",
+  tabMachining: "Talaşlı İmalat",
+  tabForces: "Kuvvetler & Mukavemet",
+  tabQuality: "Kalite & Standartlar",
+  tabCarrier: "Planet Taşıyıcı",
+  sunGear: "Güneş Dişlisi",
+  planetGear: "Planet Dişlisi",
+  ringGear: "İç Çember (Ring)",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK Dişli Mimarisi",
+  khkCylindrical: "Silindirik",
+  khkInternal: "İç Dişli",
+  khkRack: "Kremayer",
+  khkBevel: "Konik",
+  khkWorm: "Sonsuz Vida",
+  khkScrew: "Çapraz Helis",
+
+  // Rack & Pinion
+  rackTitle: "KREMAYER & PİNYON GİRDİLERİ",
+  rackPitchHeight: "Bölüm Yüksekliği (H)",
+  rackFeedForce: "Doğrusal İtme Kuvveti (Fx)",
+  rackTravelPerRev: "1 Turda İlerleme",
+  rackFeedVelocity: "İlerleme Hızı (v)",
+  rackSeparatingForce: "Ayrılma Kuvveti (Fr)",
+  rackBlueprintTitle: "KREMAYER - PİNYON HASSAS KAVRAMA ŞEMASI",
+
+  // Bevel Gear
+  bevelTitle: "KONİK DİŞLİ GİRDİLERİ",
+  bevelGleasonSystem: "Gleason Sistemi",
+  bevelStandardSystem: "Standart Konik",
+  bevelShaftAngle: "Mil Açısı (Σ)",
+  bevelConeDistance: "Dış Koni Mesafesi (Re)",
+  bevelApexToCrown: "Tepe - Taç Mesafesi (X)",
+  bevelMaxFaceWidth: "Azami Diş Eni (b)",
+  bevelBlueprintTitle: "GLEASON KONİK DİŞLİ KESİT & KAVRAMA ŞEMASI",
+
+  // Worm Gear
+  wormTitle: "SONSUZ VİDA & ÇARK GİRDİLERİ",
+  wormAxialModule: "Eksenel Modül (mx)",
+  wormStarts: "Vida Ağız Sayısı (z₁)",
+  wormWheelTeeth: "Çark Diş Sayısı (z₂)",
+  wormDiameterFactor: "Çap Katsayısı (q)",
+  wormFrictionCoeff: "Sürtünme Katsayısı (μ)",
+  wormSelfLocking: "KENDİ KENDİNE KİLİTLENİR (OTO-BLOKAJ)",
+  wormReversible: "TERS SÜRÜLEBİLİR (SERBEST)",
+  wormLeadAngle: "Vida Hatve Açısı (γ)",
+  wormEfficiency: "Mekanik Verim (η)",
+  wormOutputTorque: "Çıkış Torku (T₂)",
+  wormThroatRadius: "Boğaz Yarıçapı (ri)",
+  wormBlueprintTitle: "SONSUZ VİDA & GLOBOİD ÇARK HASSAS KAVRAMA ŞEMASI",
+
+  // Screw Gear
+  screwTitle: "ÇAPRAZ HELİS GİRDİLERİ",
+  screwHelixPinion: "Pinyon Helis Açısı (β₁)",
+  screwHelixGear: "Çark Helis Açısı (β₂)",
+  screwShaftAngle: "Uzaysal Mil Açısı (Σ)",
+  screwSlidingVelocity: "Kayma Hızı (vs)",
+  screwBlueprintTitle: "ÇAPRAZ HELİS UZAYSAL KAVRAMA ŞEMASI",
+};
 
 const DE: GearsModuleStrings = {
-  "toothGeometry": "Zahngeometrie",
-  "motorMaterial": "Motor & Material",
-  "serviceConditions": "Betriebsbedingungen",
-  "profileShift": "Profilverschiebung",
-  "loadClass": "Lastklasse",
-  "dailyHours": "Tägliche Betriebszeit",
-  "startsPerHour": "Starts / Stunde",
-  "outputConnect": "Wellenanschluss",
-  "serviceFactor": "Betriebsfaktor (fs)",
-  "shiftX1": "Profilverschiebung x₁",
-  "shiftX2": "Profilverschiebung x₂",
-  "loadUniform": "Gleichmäßig (U)",
-  "loadModerate": "Mittel (M)",
-  "loadHeavy": "Stoßlast (H)",
-  "hoursLess3": "< 3 Stunden",
-  "hours3to10": "3 – 10 Stunden",
-  "hoursMore10": "> 10 Stunden",
-  "connDirect": "Direkt (1.0)",
-  "connChain": "Kette (1.25)",
-  "connVBelt": "Keilriemen (1.5)",
-  "connFlatBelt": "Flachriemen (2.5)",
-  "designSafe": "AUSLEGUNG VERIFIZIERT — SICHER",
-  "designWarning": "WARNUNG: UNZUREICHENDER SICHERHEITSFAKTOR",
-  "rootBending": "Zahnfußbiegung",
-  "flankContact": "Flankenpressung",
-  "dynamicBlueprint": "DYNAMISCHE VERZAHNUNGSZEICHNUNG",
-  "mfgDimensions": "Fertigungsmaße (mm)",
-  "parameter": "Parameter",
-  "pinionCol": "Ritzel (z₁)",
-  "gearCol": "Rad (z₂)",
-  "tipDia": "Kopfkreis (da)",
-  "refDia": "Teilkreis (d)",
-  "rootDia": "Fußkreis (df)",
-  "overPins": "Rollenmaß (M)",
-  "alertTitle": "Sicherheitsfaktor unter Grenzwert",
-  "alertDesc": "Zahnfußbiegung erfordert SF > 1,4, Flankenpressung SF > 1,0. Modul, Zahnbreite oder Materialfestigkeit erhöhen.",
-  "descModule": "Standard-Zahnmodul; erhöht die Biegefestigkeit.",
-  "descFaceWidth": "Zahnbreite; erhöht die Tragfähigkeit im Eingriff.",
-  "descPinionTeeth": "Zähnezahl Ritzel. Min. 17 empfohlen gegen Unterschnitt.",
-  "descGearTeeth": "Zähnezahl Rad; bestimmt das Übersetzungsverhältnis.",
-  "descHelixAngle": "Schrägungswinkel. Erhöht mt = m/cosβ und Achsabstand (a).",
-  "descPressureAngle": "Eingriffswinkel. Beeinflusst Grundkreis und Rollenmaß.",
-  "descMotorPower": "Nennleistung des Antriebsmotors nach IEC.",
-  "descMaterial": "Werkstoff; Härte begrenzt die Sicherheitsreserven.",
-  "descLoadClass": "Stoßschwere im Betrieb.",
-  "descDailyHours": "Tägliche Betriebsstunden.",
-  "descStartsPerHour": "Starts pro Stunde; beeinflusst Ermüdung.",
-  "descConnection": "Anschlussfaktor der Abtriebswelle.",
-  "descShiftX1": "Profilverschiebung Ritzel; verdickt den Zahnfuß.",
-  "descShiftX2": "Profilverschiebung Rad; vermeidet Unterschnitt.",
-  "isoSubtitle": "ISO 6336 Stirn- & Schrägverzahnung"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Getriebeberechnung & Festigkeit",
+  subtitle: "ISO 6336 Stirn-, Schräg- & Mehrstufengetriebe",
+  export3D: "In 3D exportieren",
+  export3DTooltip: "Überträgt Verzahnungsdaten in das 3D Design Studio & Stückliste",
+  pairMode: "2-Rad Paar (Einzelstufe)",
+  trainMode: "Mehrstufen- & Koppelgetriebe",
+  quickAddPresets: "Schnell hinzufügen & Vorlagen",
+  reset: "Zurücksetzen",
+  addPlanetary: "+ Planetenstufe",
+  addInternal: "+ Hohlrad",
+  addExternal: "+ Stirnrad",
+  addCoaxial: "+ Koaxialwelle",
+  presetLabel: "Vorlagen:",
+  presetCompound: "Stufengetriebe",
+  presetPlanetary: "Planetensatz",
+  presetHybrid: "Innen+Außen Hybrid",
+  trainGearsTitle: "Getrieberäder",
+  gearParamsTitle: "Parameter",
+  shaftLabel: "Welle",
+  gearTypeLabel: "Zahnradtyp",
+  externalType: "Außenverzahnung",
+  internalType: "Innenverzahnung",
+  planetaryType: "Planetenstufe",
+  toothGeometry: "Zahngeometrie",
+  meshTypeLabel: "Eingriffsart",
+  externalPair: "Außenradpaar",
+  internalRing: "Innenzahnkranz (Hohlrad)",
+  pinionTeeth: "Ritzel Zähnezahl (z₁)",
+  gearTeeth: "Rad Zähnezahl (z₂)",
+  pressureAngle: "Eingriffswinkel (αn)",
+  profileShiftSection: "Profilverschiebung & Prüfung (x₁, x₂)",
+  shiftX1: "Profilverschiebung x₁",
+  shiftX2: "Profilverschiebung x₂",
+  materialSection: "Werkstoff & Festigkeit",
+  materialSelect: "Werkstoff",
+  serviceConditions: "Betriebsbedingungen & Betriebsfaktor",
+  loadClass: "Lastklasse",
+  dailyHours: "Tägliche Betriebszeit",
+  startsPerHour: "Starts / Stunde",
+  outputConnect: "Wellenanschluss",
+  serviceFactor: "Betriebsfaktor (fs)",
+  motorLoad: "Antrieb & Motor",
+  motorPower: "Motorleistung (kW)",
+  motorPoles: "Polzahl",
+  kpiTotalRatio: "Gesamtübersetzung",
+  kpiInputRpm: "Eingangsdrehzahl",
+  kpiOutputRpm: "Ausgangsdrehzahl",
+  kpiOutputTorque: "Ausgangsdrehmoment",
+  kpiTotalEfficiency: "Gesamtwirkungsgrad",
+  canvasTitle: "2D TECHNISCHE ZEICHNUNG:",
+  viewBoth: "Gesamtblatt (Vorne + Schnitt)",
+  viewFront: "Kinematik (Vorne)",
+  viewSection: "Draufsicht (Schnitt)",
+  designSafe: "AUSLEGUNG VERIFIZIERT — SICHER",
+  designWarning: "WARNUNG: UNZUREICHENDER SICHERHEITSFAKTOR",
+  bendingSafety: "Zahnfuß-Sicherheit (SF)",
+  contactSafety: "Flanken-Sicherheit (SH)",
+  ratio: "Übersetzung",
+  centerDist: "Achsabstand",
+  pitchVelocity: "Umfangsgeschwindigkeit (v)",
+  mfgDimensions: "Fertigungsmaße (mm)",
+  parameter: "Parameter",
+  pinionCol: "Ritzel (z₁)",
+  gearCol: "Rad (z₂)",
+  tipDia: "Kopfkreis (da)",
+  refDia: "Teilkreis (d)",
+  rootDia: "Fußkreis (df)",
+  overPins: "Rollenmaß (M)",
+  clickGearHint: "Klicken Sie auf ein Zahnrad im Schema, um Fertigungsparameter anzuzeigen.",
+  passportTitle: "Fertigungspass",
+  tabGages: "Lehren & Messung",
+  tabMachining: "Zerspanung & Werkzeuge",
+  tabForces: "Kräfte & Festigkeit",
+  tabQuality: "Qualität & Normen",
+  tabCarrier: "Planetenträger",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK Getriebefamilie",
+  khkCylindrical: "Zylindrisch",
+  khkInternal: "Hohlrad",
+  khkRack: "Zahnstange",
+  khkBevel: "Kegelrad",
+  khkWorm: "Schneckengetriebe",
+  khkScrew: "Schraubenrad",
+
+  // Rack & Pinion
+  rackTitle: "ZAHNSTANGEN-PARAMETER",
+  rackPitchHeight: "Teilungshöhe (H)",
+  rackFeedForce: "Vorschubkraft (Fx)",
+  rackTravelPerRev: "Vorschub / Umdrehung",
+  rackFeedVelocity: "Vorschubgeschwindigkeit (v)",
+  rackSeparatingForce: "Trennkraft (Fr)",
+  rackBlueprintTitle: "ZAHNSTANGEN-RITZEL-EINGRIFFSPLAN",
+
+  // Bevel Gear
+  bevelTitle: "KEGELRAD-PARAMETER",
+  bevelGleasonSystem: "Gleason-System",
+  bevelStandardSystem: "Standard-Kegelrad",
+  bevelShaftAngle: "Achswinkel (Σ)",
+  bevelConeDistance: "Äußere Teillänge (Re)",
+  bevelApexToCrown: "Spitzenabstand (X)",
+  bevelMaxFaceWidth: "Max. Zahnbreite (b)",
+  bevelBlueprintTitle: "GLEASON-KEGELRAD SCHNITT- UND EINGRIFFSPLAN",
+
+  // Worm Gear
+  wormTitle: "SCHNECKENGETRIEBE-PARAMETER",
+  wormAxialModule: "Axialmodul (mx)",
+  wormStarts: "Gangzahl (z₁)",
+  wormWheelTeeth: "Schneckenradzähne (z₂)",
+  wormDiameterFactor: "Durchmesserfaktor (q)",
+  wormFrictionCoeff: "Reibungskoeffizient (μ)",
+  wormSelfLocking: "SELBSTHEMMEND (SICHER)",
+  wormReversible: "RÜCKTREIBBAR",
+  wormLeadAngle: "Steigungswinkel (γ)",
+  wormEfficiency: "Wirkungsgrad (η)",
+  wormOutputTorque: "Abtriebsdrehmoment (T₂)",
+  wormThroatRadius: "Halsradius (ri)",
+  wormBlueprintTitle: "SCHNECKEN- UND GLOBOIDRAD-EINGRIFFSPLAN",
+
+  // Screw Gear
+  screwTitle: "SCHRAUBENRAD-PARAMETER",
+  screwHelixPinion: "Schrägungswinkel Ritzel (β₁)",
+  screwHelixGear: "Schrägungswinkel Rad (β₂)",
+  screwShaftAngle: "Achsenkreuzungswinkel (Σ)",
+  screwSlidingVelocity: "Gleitgeschwindigkeit (vs)",
+  screwBlueprintTitle: "KREUZSCHRAUBENRAD-RAUMPLAN",
+};
 
 const ES: GearsModuleStrings = {
-  "toothGeometry": "Geometría del diente",
-  "motorMaterial": "Motor y material",
-  "serviceConditions": "Condiciones de servicio",
-  "profileShift": "Desplazamiento de perfil",
-  "loadClass": "Clase de carga",
-  "dailyHours": "Horas diarias",
-  "startsPerHour": "Arranques / hora",
-  "outputConnect": "Conexión de salida",
-  "serviceFactor": "Factor de servicio (fs)",
-  "shiftX1": "Desplazamiento x₁",
-  "shiftX2": "Desplazamiento x₂",
-  "loadUniform": "Uniforme (U)",
-  "loadModerate": "Moderada (M)",
-  "loadHeavy": "Choque fuerte (H)",
-  "hoursLess3": "< 3 horas",
-  "hours3to10": "3 – 10 horas",
-  "hoursMore10": "> 10 horas",
-  "connDirect": "Directo (1.0)",
-  "connChain": "Cadena (1.25)",
-  "connVBelt": "Correa en V (1.5)",
-  "connFlatBelt": "Correa plana (2.5)",
-  "designSafe": "DISEÑO VERIFICADO — SEGURO",
-  "designWarning": "ADVERTENCIA: FACTOR DE SEGURIDAD INSUFICIENTE",
-  "rootBending": "Flexión en el pie",
-  "flankContact": "Contacto en flanco",
-  "dynamicBlueprint": "PLANO DINÁMICO DE ENGRANAJES",
-  "mfgDimensions": "Dimensiones de fabricación (mm)",
-  "parameter": "Parámetro",
-  "pinionCol": "Piñón (z₁)",
-  "gearCol": "Engranaje (z₂)",
-  "tipDia": "Diámetro de cabeza (da)",
-  "refDia": "Diámetro de referencia (d)",
-  "rootDia": "Diámetro de pie (df)",
-  "overPins": "Sobre bolas (M)",
-  "alertTitle": "Factor de seguridad por debajo del umbral",
-  "alertDesc": "Flexión en pie requiere SF > 1,4; contacto en flanco SF > 1,0. Aumente módulo, ancho o material.",
-  "descModule": "Módulo estándar; aumenta la resistencia a la flexión.",
-  "descFaceWidth": "Ancho de cara; aumenta la capacidad de carga.",
-  "descPinionTeeth": "Dientes del piñón. Mín. 17 recomendado.",
-  "descGearTeeth": "Dientes del engranaje; define la relación de transmisión.",
-  "descHelixAngle": "Ángulo de hélice. Aumenta mt = m/cosβ y la distancia entre ejes.",
-  "descPressureAngle": "Ángulo de presión. Afecta círculo base y medida sobre bolas.",
-  "descMotorPower": "Potencia nominal del motor según IEC.",
-  "descMaterial": "Material del engranaje; la dureza limita los márgenes.",
-  "descLoadClass": "Severidad de choque operativo.",
-  "descDailyHours": "Tiempo de operación diario.",
-  "descStartsPerHour": "Arranques por hora; afecta la fatiga.",
-  "descConnection": "Factor de conexión del eje de salida.",
-  "descShiftX1": "Desplazamiento del piñón; engrosa la raíz.",
-  "descShiftX2": "Desplazamiento del engranaje; evita socavado.",
-  "isoSubtitle": "ISO 6336 rectos y helicoidales"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Diseño de Engranajes y Resistencia",
+  subtitle: "ISO 6336 Rectos, Helicoidales y Trenes de Engranajes",
+  export3D: "Exportar a 3D",
+  pairMode: "Par de Engranajes",
+  trainMode: "Tren de Engranajes Múltiple",
+  toothGeometry: "Geometría del Diente",
+  materialSection: "Material y Resistencia",
+  serviceConditions: "Condiciones de Servicio",
+  profileShift: "Desplazamiento de Perfil",
+  loadClass: "Clase de Carga",
+  dailyHours: "Horas Diarias",
+  designSafe: "DISEÑO VERIFICADO — SEGURO",
+  designWarning: "ADVERTENCIA: FACTOR DE SEGURIDAD INSUFICIENTE",
+  bendingSafety: "Seguridad a Flexión (SF)",
+  contactSafety: "Seguridad a Contacto (SH)",
+  mfgDimensions: "Dimensiones de Fabricación (mm)",
+  passportTitle: "Pasaporte de Fabricación",
+
+  // KHK Gear Families
+  khkFamilyTitle: "Familia de Engranajes KHK",
+  khkCylindrical: "Cilíndrico",
+  khkInternal: "Corona Interior",
+  khkRack: "Cremallera",
+  khkBevel: "Cónico",
+  khkWorm: "Tornillo Sin Fin",
+  khkScrew: "Helicoidal Cruzado",
+
+  // Rack & Pinion
+  rackTitle: "PARÁMETROS CREMALLERA Y PIÑÓN",
+  rackPitchHeight: "Altura Primitiva (H)",
+  rackFeedForce: "Fuerza de Avance (Fx)",
+  rackTravelPerRev: "Avance / Revolución",
+  rackFeedVelocity: "Velocidad de Avance (v)",
+  rackSeparatingForce: "Fuerza Radial (Fr)",
+  rackBlueprintTitle: "PLANO DE ENGRANE PIÑÓN-CREMALLERA",
+
+  // Bevel Gear
+  bevelTitle: "PARÁMETROS ENGRANAJE CÓNICO",
+  bevelGleasonSystem: "Sistema Gleason",
+  bevelStandardSystem: "Cónico Estándar",
+  bevelShaftAngle: "Ángulo entre Ejes (Σ)",
+  bevelConeDistance: "Distancia de Cono Exterior (Re)",
+  bevelApexToCrown: "Distancia Vértice-Corona (X)",
+  bevelMaxFaceWidth: "Ancho de Diente Máx (b)",
+  bevelBlueprintTitle: "SECCIÓN Y ENGRANE CÓNICO GLEASON",
+
+  // Worm Gear
+  wormTitle: "PARÁMETROS SINFÍN Y CORONA",
+  wormAxialModule: "Módulo Axial (mx)",
+  wormStarts: "Número de Entradas (z₁)",
+  wormWheelTeeth: "Dientes de la Corona (z₂)",
+  wormDiameterFactor: "Factor de Diámetro (q)",
+  wormFrictionCoeff: "Coeficiente de Fricción (μ)",
+  wormSelfLocking: "AUTOBLOQUEANTE (SEGURO)",
+  wormReversible: "REVERSIBLE",
+  wormLeadAngle: "Ángulo de Hélice (γ)",
+  wormEfficiency: "Rendimiento Mecánico (η)",
+  wormOutputTorque: "Par de Salida (T₂)",
+  wormThroatRadius: "Radio de Garganta (ri)",
+  wormBlueprintTitle: "PLANO DE SINFÍN CILÍNDRICO Y CORONA GLOBOIDE",
+
+  // Screw Gear
+  screwTitle: "PARÁMETROS HELICOIDALES CRUZADOS",
+  screwHelixPinion: "Hélice Piñón (β₁)",
+  screwHelixGear: "Hélice Rueda (β₂)",
+  screwShaftAngle: "Ángulo de Ejes (Σ)",
+  screwSlidingVelocity: "Velocidad de Deslizamiento (vs)",
+  screwBlueprintTitle: "PLANO ESPACIAL HELICOIDAL CRUZADO",
+};
 
 const FR: GearsModuleStrings = {
-  "toothGeometry": "Géométrie dentaire",
-  "motorMaterial": "Moteur et matériau",
-  "serviceConditions": "Conditions de service",
-  "profileShift": "Déport de profil",
-  "loadClass": "Classe de charge",
-  "dailyHours": "Heures quotidiennes",
-  "startsPerHour": "Démarrages / heure",
-  "outputConnect": "Connexion de sortie",
-  "serviceFactor": "Facteur de service (fs)",
-  "shiftX1": "Déport x₁",
-  "shiftX2": "Déport x₂",
-  "loadUniform": "Uniforme (U)",
-  "loadModerate": "Modérée (M)",
-  "loadHeavy": "Choc fort (H)",
-  "hoursLess3": "< 3 heures",
-  "hours3to10": "3 – 10 heures",
-  "hoursMore10": "> 10 heures",
-  "connDirect": "Direct (1.0)",
-  "connChain": "Chaîne (1.25)",
-  "connVBelt": "Courroie trapézoïdale (1.5)",
-  "connFlatBelt": "Courroie plate (2.5)",
-  "designSafe": "CONCEPTION VÉRIFIÉE — SÛRE",
-  "designWarning": "ALERTE : FACTEUR DE SÉCURITÉ INSUFFISANT",
-  "rootBending": "Flexion à la racine",
-  "flankContact": "Pression de contact",
-  "dynamicBlueprint": "PLAN DYNAMIQUE D'ENGRENAGE",
-  "mfgDimensions": "Dimensions de fabrication (mm)",
-  "parameter": "Paramètre",
-  "pinionCol": "Pignon (z₁)",
-  "gearCol": "Roue (z₂)",
-  "tipDia": "Diamètre de tête (da)",
-  "refDia": "Diamètre primitif (d)",
-  "rootDia": "Diamètre de pied (df)",
-  "overPins": "Sur billes (M)",
-  "alertTitle": "Facteur de sécurité sous le seuil",
-  "alertDesc": "Flexion racine : SF > 1,4 ; contact flanc : SF > 1,0. Augmentez le module, la largeur ou le matériau.",
-  "descModule": "Module standard ; augmente la résistance à la flexion.",
-  "descFaceWidth": "Largeur de dent ; augmente la capacité de charge.",
-  "descPinionTeeth": "Nombre de dents du pignon. Min. 17 recommandé.",
-  "descGearTeeth": "Nombre de dents de la roue ; définit le rapport.",
-  "descHelixAngle": "Angle d'hélice. Augmente mt = m/cosβ et l'entraxe.",
-  "descPressureAngle": "Angle de pression. Affecte le cercle de base.",
-  "descMotorPower": "Puissance nominale du moteur selon IEC.",
-  "descMaterial": "Matériau ; la dureté limite les marges de sécurité.",
-  "descLoadClass": "Sévérité des chocs en service.",
-  "descDailyHours": "Temps de fonctionnement quotidien.",
-  "descStartsPerHour": "Démarrages par heure ; influence la fatigue.",
-  "descConnection": "Facteur de connexion de l'arbre de sortie.",
-  "descShiftX1": "Déport pignon ; épaissit la racine.",
-  "descShiftX2": "Déport roue ; évite le contre-dépouillement.",
-  "isoSubtitle": "ISO 6336 droits et hélicoïdaux"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Conception et Résistance des Engrenages",
+  subtitle: "ISO 6336 Droits, Hélicoïdaux et Trains d'Engrenages",
+  export3D: "Exporter en 3D",
+  pairMode: "Paire d'Engrenages",
+  trainMode: "Train d'Engrenages Multiple",
+  toothGeometry: "Géométrie Dentaire",
+  materialSection: "Matériau et Résistance",
+  serviceConditions: "Conditions de Service",
+  profileShift: "Déport de Profil",
+  designSafe: "CONCEPTION VÉRIFIÉE — SÛRE",
+  designWarning: "ALERTE : FACTEUR DE SÉCURITÉ INSUFFISANT",
+  bendingSafety: "Sécurité Flexion Racine (SF)",
+  contactSafety: "Sécurité Contact Flanc (SH)",
+  mfgDimensions: "Dimensions de Fabrication (mm)",
+  passportTitle: "Passeport de Fabrication",
+
+  // KHK Gear Families
+  khkFamilyTitle: "Famille d'Engrenages KHK",
+  khkCylindrical: "Cylindrique",
+  khkInternal: "Couronne Interne",
+  khkRack: "Crémaillère",
+  khkBevel: "Conique",
+  khkWorm: "Roue et Vis Sans Fin",
+  khkScrew: "Hélicoïdal Croisé",
+
+  // Rack & Pinion
+  rackTitle: "PARAMÈTRES PIGNON-CRÉMAILLÈRE",
+  rackPitchHeight: "Hauteur Primitive (H)",
+  rackFeedForce: "Force d'Avance (Fx)",
+  rackTravelPerRev: "Avance / Tour",
+  rackFeedVelocity: "Vitesse d'Avance (v)",
+  rackSeparatingForce: "Force Radiale (Fr)",
+  rackBlueprintTitle: "PLAN D'ENGRENEMENT PIGNON-CRÉMAILLÈRE",
+
+  // Bevel Gear
+  bevelTitle: "PARAMÈTRES ENGRENAGE CONIQUE",
+  bevelGleasonSystem: "Système Gleason",
+  bevelStandardSystem: "Conique Standard",
+  bevelShaftAngle: "Angle des Arbres (Σ)",
+  bevelConeDistance: "Distance de Cône Externe (Re)",
+  bevelApexToCrown: "Distance Sommet-Couronne (X)",
+  bevelMaxFaceWidth: "Largeur de Denture Max (b)",
+  bevelBlueprintTitle: "SECTION ET ENGRENEMENT CONIQUE GLEASON",
+
+  // Worm Gear
+  wormTitle: "PARAMÈTRES ROUE ET VIS SANS FIN",
+  wormAxialModule: "Module Axial (mx)",
+  wormStarts: "Nombre de Filets (z₁)",
+  wormWheelTeeth: "Dents de la Roue (z₂)",
+  wormDiameterFactor: "Facteur de Diamètre (q)",
+  wormFrictionCoeff: "Coefficient de Frottement (μ)",
+  wormSelfLocking: "AUTO-BLOQUANT (SÉCURITÉ)",
+  wormReversible: "RÉVERSIBLE",
+  wormLeadAngle: "Angle d'Hélice (γ)",
+  wormEfficiency: "Rendement Mécanique (η)",
+  wormOutputTorque: "Couple de Sortie (T₂)",
+  wormThroatRadius: "Rayon de Gorge (ri)",
+  wormBlueprintTitle: "PLAN VIS CYLINDRIQUE ET ROUE GLOBOÏDE",
+
+  // Screw Gear
+  screwTitle: "PARAMÈTRES ENGRENAGES HÉLICOÏDAUX CROISÉS",
+  screwHelixPinion: "Hélice Pignon (β₁)",
+  screwHelixGear: "Hélice Roue (β₂)",
+  screwShaftAngle: "Angle des Arbres (Σ)",
+  screwSlidingVelocity: "Vitesse de Glissement (vs)",
+  screwBlueprintTitle: "PLAN SPATIAL HÉLICOÏDAL CROISÉ",
+};
 
 const IT: GearsModuleStrings = {
-  "toothGeometry": "Geometria del dente",
-  "motorMaterial": "Motore e materiale",
-  "serviceConditions": "Condizioni di servizio",
-  "profileShift": "Spostamento di profilo",
-  "loadClass": "Classe di carico",
-  "dailyHours": "Ore giornaliere",
-  "startsPerHour": "Avviamenti / ora",
-  "outputConnect": "Collegamento uscita",
-  "serviceFactor": "Fattore di servizio (fs)",
-  "shiftX1": "Spostamento x₁",
-  "shiftX2": "Spostamento x₂",
-  "loadUniform": "Uniforme (U)",
-  "loadModerate": "Moderato (M)",
-  "loadHeavy": "Urto forte (H)",
-  "hoursLess3": "< 3 ore",
-  "hours3to10": "3 – 10 ore",
-  "hoursMore10": "> 10 ore",
-  "connDirect": "Diretto (1.0)",
-  "connChain": "Catena (1.25)",
-  "connVBelt": "Cinghia trapezoidale (1.5)",
-  "connFlatBelt": "Cinghia piatta (2.5)",
-  "designSafe": "PROGETTO VERIFICATO — SICURO",
-  "designWarning": "ATTENZIONE: FATTORE DI SICUREZZA INSUFFICIENTE",
-  "rootBending": "Flessione alla radice",
-  "flankContact": "Pressione al fianco",
-  "dynamicBlueprint": "SCHEMA DINAMICO INGRANAGGI",
-  "mfgDimensions": "Dimensioni di produzione (mm)",
-  "parameter": "Parametro",
-  "pinionCol": "Pignone (z₁)",
-  "gearCol": "Ruota (z₂)",
-  "tipDia": "Diametro di testa (da)",
-  "refDia": "Diametro primitivo (d)",
-  "rootDia": "Diametro di piede (df)",
-  "overPins": "Su rulli (M)",
-  "alertTitle": "Fattore di sicurezza sotto soglia",
-  "alertDesc": "Flessione radice SF > 1,4; contatto flanco SF > 1,0. Aumentare modulo, larghezza o materiale.",
-  "descModule": "Modulo standard; aumenta la resistenza a flessione.",
-  "descFaceWidth": "Larghezza faccia; aumenta la capacità di carico.",
-  "descPinionTeeth": "Denti pignone. Min. 17 consigliati.",
-  "descGearTeeth": "Denti ruota; definisce il rapporto di trasmissione.",
-  "descHelixAngle": "Angolo elica. Aumenta mt = m/cosβ e l'interasse.",
-  "descPressureAngle": "Angolo di pressione. Influenza il cerchio di base.",
-  "descMotorPower": "Potenza nominale motore IEC.",
-  "descMaterial": "Materiale ingranaggio; la durezza limita i margini.",
-  "descLoadClass": "Severità urti operativi.",
-  "descDailyHours": "Tempo di funzionamento giornaliero.",
-  "descStartsPerHour": "Avviamenti all'ora; influenza la fatica.",
-  "descConnection": "Fattore collegamento albero di uscita.",
-  "descShiftX1": "Spostamento pignone; ispessisce la radice.",
-  "descShiftX2": "Spostamento ruota; evita sottosquadro.",
-  "isoSubtitle": "ISO 6336 cilindrici ed elicoidali"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Progettazione Ingranaggi e Resistenza",
+  subtitle: "ISO 6336 Cilindrici, Elicoidali e Treni di Ingranaggi",
+  export3D: "Esporta in 3D",
+  pairMode: "Coppia Ingranaggi",
+  trainMode: "Treno di Ingranaggi Multiplo",
+  toothGeometry: "Geometria del Dente",
+  materialSection: "Materiale e Resistenza",
+  serviceConditions: "Condizioni di Servizio",
+  designSafe: "PROGETTO VERIFICATO — SICURO",
+  designWarning: "ATTENZIONE: FATTORE DI SICUREZZA INSUFFICIENTE",
+  bendingSafety: "Sicurezza Flessione Radice (SF)",
+  contactSafety: "Sicurezza Pressione Fianco (SH)",
+  mfgDimensions: "Dimensioni di Produzione (mm)",
+  passportTitle: "Passaporto di Produzione",
+
+  // KHK Gear Families
+  khkFamilyTitle: "Famiglia Ingranaggi KHK",
+  khkCylindrical: "Cilindrico",
+  khkInternal: "Corona Interna",
+  khkRack: "Cremagliera",
+  khkBevel: "Conico",
+  khkWorm: "Vite Senza Fine",
+  khkScrew: "Elicoidale Incrociato",
+
+  // Rack & Pinion
+  rackTitle: "PARAMETRI PIGNONE-CREMAGLIERA",
+  rackPitchHeight: "Altezza Primitiva (H)",
+  rackFeedForce: "Forza di Avanzamento (Fx)",
+  rackTravelPerRev: "Avanzamento / Giro",
+  rackFeedVelocity: "Velocità di Avanzamento (v)",
+  rackSeparatingForce: "Forza Radiale (Fr)",
+  rackBlueprintTitle: "SCHEMA D'INGRANAMENTO PIGNONE-CREMAGLIERA",
+
+  // Bevel Gear
+  bevelTitle: "PARAMETRI INGRANAGGIO CONICO",
+  bevelGleasonSystem: "Sistema Gleason",
+  bevelStandardSystem: "Conico Standard",
+  bevelShaftAngle: "Angolo Tra gli Alberi (Σ)",
+  bevelConeDistance: "Distanza Conica Esterna (Re)",
+  bevelApexToCrown: "Distanza Vertice-Corona (X)",
+  bevelMaxFaceWidth: "Larghezza Fascia Max (b)",
+  bevelBlueprintTitle: "SEZIONE E INGRANAMENTO CONICO GLEASON",
+
+  // Worm Gear
+  wormTitle: "PARAMETRI VITE SENZA FINE E RUOTA",
+  wormAxialModule: "Modulo Assiale (mx)",
+  wormStarts: "Principi Vite (z₁)",
+  wormWheelTeeth: "Denti Ruota (z₂)",
+  wormDiameterFactor: "Fattore di Diametro (q)",
+  wormFrictionCoeff: "Coefficiente di Attrito (μ)",
+  wormSelfLocking: "AUTOBLOCCANTE (SICURO)",
+  wormReversible: "REVERSIBILE",
+  wormLeadAngle: "Angolo d'Elica (γ)",
+  wormEfficiency: "Rendimento Meccanico (η)",
+  wormOutputTorque: "Coppia d'Uscita (T₂)",
+  wormThroatRadius: "Raggio di Gola (ri)",
+  wormBlueprintTitle: "SCHEMA VITE CILINDRICA E RUOTA GLOBOIDE",
+
+  // Screw Gear
+  screwTitle: "PARAMETRI ELICOIDALI INCROCIATI",
+  screwHelixPinion: "Elica Pignone (β₁)",
+  screwHelixGear: "Elica Ruota (β₂)",
+  screwShaftAngle: "Angolo Assi (Σ)",
+  screwSlidingVelocity: "Velocità di Strisciamento (vs)",
+  screwBlueprintTitle: "SCHEMA SPAZIALE ELICOIDALE INCROCIATO",
+};
 
 const PT: GearsModuleStrings = {
-  "toothGeometry": "Geometria do dente",
-  "motorMaterial": "Motor e material",
-  "serviceConditions": "Condições de serviço",
-  "profileShift": "Deslocamento de perfil",
-  "loadClass": "Classe de carga",
-  "dailyHours": "Horas diárias",
-  "startsPerHour": "Partidas / hora",
-  "outputConnect": "Ligação de saída",
-  "serviceFactor": "Fator de serviço (fs)",
-  "shiftX1": "Deslocamento x₁",
-  "shiftX2": "Deslocamento x₂",
-  "loadUniform": "Uniforme (U)",
-  "loadModerate": "Moderada (M)",
-  "loadHeavy": "Choque forte (H)",
-  "hoursLess3": "< 3 horas",
-  "hours3to10": "3 – 10 horas",
-  "hoursMore10": "> 10 horas",
-  "connDirect": "Direto (1.0)",
-  "connChain": "Corrente (1.25)",
-  "connVBelt": "Correia em V (1.5)",
-  "connFlatBelt": "Correia plana (2.5)",
-  "designSafe": "PROJETO VERIFICADO — SEGURO",
-  "designWarning": "AVISO: FATOR DE SEGURANÇA INSUFICIENTE",
-  "rootBending": "Flexão na raiz",
-  "flankContact": "Contacto no flanco",
-  "dynamicBlueprint": "PLANTA DINÂMICA DE ENGRENAGENS",
-  "mfgDimensions": "Dimensões de fabrico (mm)",
-  "parameter": "Parâmetro",
-  "pinionCol": "Pinhão (z₁)",
-  "gearCol": "Coroa (z₂)",
-  "tipDia": "Diâmetro de cabeça (da)",
-  "refDia": "Diâmetro primitivo (d)",
-  "rootDia": "Diâmetro de pé (df)",
-  "overPins": "Sobre esferas (M)",
-  "alertTitle": "Fator de segurança abaixo do limite",
-  "alertDesc": "Flexão na raiz requer SF > 1,4; contacto no flanco SF > 1,0. Aumente módulo, largura ou material.",
-  "descModule": "Módulo padrão; aumenta a resistência à flexão.",
-  "descFaceWidth": "Largura da face; aumenta a capacidade de carga.",
-  "descPinionTeeth": "Dentes do pinhão. Mín. 17 recomendado.",
-  "descGearTeeth": "Dentes da coroa; define a relação de transmissão.",
-  "descHelixAngle": "Ângulo de hélice. Aumenta mt = m/cosβ e a distância entre eixos.",
-  "descPressureAngle": "Ângulo de pressão. Afeta o círculo de base.",
-  "descMotorPower": "Potência nominal do motor IEC.",
-  "descMaterial": "Material da engrenagem; dureza limita margens.",
-  "descLoadClass": "Severidade de choque operacional.",
-  "descDailyHours": "Tempo de operação diário.",
-  "descStartsPerHour": "Partidas por hora; afeta fadiga.",
-  "descConnection": "Fator de ligação do eixo de saída.",
-  "descShiftX1": "Deslocamento pinhão; engrossa a raiz.",
-  "descShiftX2": "Deslocamento coroa; evita contracorte.",
-  "isoSubtitle": "ISO 6336 retas e helicoidais"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Projeto de Engrenagens e Resistência",
+  subtitle: "ISO 6336 Retas, Helicoidais e Trens de Engrenagens",
+  export3D: "Exportar para 3D",
+  pairMode: "Par de Engranagens",
+  trainMode: "Trem de Engrenagens Múltiplo",
+  toothGeometry: "Geometria do Dente",
+  materialSection: "Material e Resistência",
+  serviceConditions: "Condições de Serviço",
+  designSafe: "PROJETO VERIFICADO — SEGURO",
+  designWarning: "AVISO: FATOR DE SEGURANÇA INSUFICIENTE",
+  bendingSafety: "Segurança Flexão Raiz (SF)",
+  contactSafety: "Segurança Contacto Flanco (SH)",
+  mfgDimensions: "Dimensões de Fabrico (mm)",
+  passportTitle: "Passaporto de Fabrico",
+
+  // KHK Gear Families
+  khkFamilyTitle: "Família de Engrenagens KHK",
+  khkCylindrical: "Cilíndrica",
+  khkInternal: "Coroa Interna",
+  khkRack: "Cremalheira",
+  khkBevel: "Cônica",
+  khkWorm: "Sem-Fim e Coroa",
+  khkScrew: "Helicoidal Cruzada",
+
+  // Rack & Pinion
+  rackTitle: "PARÂMETROS PINHÃO E CREMALHEIRA",
+  rackPitchHeight: "Altura Primitiva (H)",
+  rackFeedForce: "Força de Avanço (Fx)",
+  rackTravelPerRev: "Avanço / Volta",
+  rackFeedVelocity: "Velocidade de Avanço (v)",
+  rackSeparatingForce: "Força Radial (Fr)",
+  rackBlueprintTitle: "PLANO DE ENGRENAMENTO PINHÃO-CREMALHEIRA",
+
+  // Bevel Gear
+  bevelTitle: "PARÂMETROS ENGRENAGEM CÔNICA",
+  bevelGleasonSystem: "Sistema Gleason",
+  bevelStandardSystem: "Cônica Padrão",
+  bevelShaftAngle: "Ângulo dos Eixos (Σ)",
+  bevelConeDistance: "Distância Cônica Externa (Re)",
+  bevelApexToCrown: "Distância Vértice-Coroa (X)",
+  bevelMaxFaceWidth: "Largura Máx do Dente (b)",
+  bevelBlueprintTitle: "SEÇÃO E ENGRENAMENTO CÔNICO GLEASON",
+
+  // Worm Gear
+  wormTitle: "PARÂMETROS PAR SEM-FIM E COROA",
+  wormAxialModule: "Módulo Axial (mx)",
+  wormStarts: "Entradas do Sem-Fim (z₁)",
+  wormWheelTeeth: "Dentes da Coroa (z₂)",
+  wormDiameterFactor: "Fator de Diâmetro (q)",
+  wormFrictionCoeff: "Coeficiente de Atrito (μ)",
+  wormSelfLocking: "AUTO-BLOQUEANTE (SEGURO)",
+  wormReversible: "REVERSÍVEL",
+  wormLeadAngle: "Ângulo de Hélice (γ)",
+  wormEfficiency: "Rendimento Mecânico (η)",
+  wormOutputTorque: "Torque de Saída (T₂)",
+  wormThroatRadius: "Raio de Garganta (ri)",
+  wormBlueprintTitle: "PLANO SEM-FIM CILÍNDRICO E COROA GLOBOIDE",
+
+  // Screw Gear
+  screwTitle: "PARÂMETROS HELICOIDAIS CRUZADOS",
+  screwHelixPinion: "Hélice Pinhão (β₁)",
+  screwHelixGear: "Hélice Coroa (β₂)",
+  screwShaftAngle: "Ângulo dos Eixos (Σ)",
+  screwSlidingVelocity: "Velocidade de Deslizamento (vs)",
+  screwBlueprintTitle: "PLANO ESPACIAL HELICOIDAL CRUZADO",
+};
 
 const RU: GearsModuleStrings = {
-  "toothGeometry": "Геометрия зуба",
-  "motorMaterial": "Двигатель и материал",
-  "serviceConditions": "Условия эксплуатации",
-  "profileShift": "Смещение профиля",
-  "loadClass": "Класс нагрузки",
-  "dailyHours": "Часов в сутки",
-  "startsPerHour": "Пусков / час",
-  "outputConnect": "Соединение вала",
-  "serviceFactor": "Коэффициент сервиса (fs)",
-  "shiftX1": "Смещение x₁",
-  "shiftX2": "Смещение x₂",
-  "loadUniform": "Равномерная (U)",
-  "loadModerate": "Умеренная (M)",
-  "loadHeavy": "Сильные удары (H)",
-  "hoursLess3": "< 3 часов",
-  "hours3to10": "3 – 10 часов",
-  "hoursMore10": "> 10 часов",
-  "connDirect": "Прямое (1.0)",
-  "connChain": "Цепь (1.25)",
-  "connVBelt": "Клиновой ремень (1.5)",
-  "connFlatBelt": "Плоский ремень (2.5)",
-  "designSafe": "РАСЧЁТ ПОДТВЕРЖДЁН — БЕЗОПАСНО",
-  "designWarning": "ПРЕДУПРЕЖДЕНИЕ: НЕДОСТАТОЧНЫЙ ЗАПАС",
-  "rootBending": "Изгиб у основания",
-  "flankContact": "Контактное напряжение",
-  "dynamicBlueprint": "ДИНАМИЧЕСКАЯ СХЕМА ЗАЦЕПЛЕНИЯ",
-  "mfgDimensions": "Производственные размеры (мм)",
-  "parameter": "Параметр",
-  "pinionCol": "Шестерня (z₁)",
-  "gearCol": "Колесо (z₂)",
-  "tipDia": "Диаметр вершин (da)",
-  "refDia": "Делительный диаметр (d)",
-  "rootDia": "Диаметр впадин (df)",
-  "overPins": "Размер по роликам (M)",
-  "alertTitle": "Запас прочности ниже порога",
-  "alertDesc": "Изгиб у основания: SF > 1,4; контакт: SF > 1,0. Увеличьте модуль, ширину или прочность материала.",
-  "descModule": "Стандартный модуль; повышает изгибную прочность.",
-  "descFaceWidth": "Ширина венца; увеличивает несущую способность.",
-  "descPinionTeeth": "Число зубьев шестерни. Рекомендуется мин. 17.",
-  "descGearTeeth": "Число зубьев колеса; определяет передаточное число.",
-  "descHelixAngle": "Угол наклона. Увеличивает mt = m/cosβ и межосевое расстояние.",
-  "descPressureAngle": "Угол зацепления. Влияет на основную окружность.",
-  "descMotorPower": "Номинальная мощность двигателя по IEC.",
-  "descMaterial": "Материал; твёрдость ограничивает запасы прочности.",
-  "descLoadClass": "Степень ударных нагрузок.",
-  "descDailyHours": "Суточное время работы.",
-  "descStartsPerHour": "Пусков в час; влияет на усталость.",
-  "descConnection": "Коэффициент соединения выходного вала.",
-  "descShiftX1": "Смещение шестерни; утолщает корень зуба.",
-  "descShiftX2": "Смещение колеса; предотвращает подрез.",
-  "isoSubtitle": "ISO 6336 прямозубые и косозубые"
-} as GearsModuleStrings;
+  ...EN,
+  title: "Расчёт зубчатых передач и прочность",
+  subtitle: "ISO 6336 Прямозубые, косозубые и планетарные передачи",
+  export3D: "Экспорт в 3D",
+  pairMode: "Пара шестерён",
+  trainMode: "Многоступенчатый редуктор",
+  toothGeometry: "Геометрия зуба",
+  materialSection: "Материал и прочность",
+  serviceConditions: "Условия эксплуатации",
+  designSafe: "РАСЧЁТ ПОДТВЕРЖДЁН — БЕЗОПАСНО",
+  designWarning: "ПРЕДУПРЕЖДЕНИЕ: НЕДОСТАТОЧНЫЙ ЗАПАС",
+  bendingSafety: "Запас по изгибу (SF)",
+  contactSafety: "Запас по контакту (SH)",
+  mfgDimensions: "Производственные размеры (мм)",
+  passportTitle: "Производственный паспорт",
+
+  // KHK Gear Families
+  khkFamilyTitle: "Семейство передач KHK",
+  khkCylindrical: "Цилиндрическая",
+  khkInternal: "Внутреннее зацепление",
+  khkRack: "Рейка и шестерня",
+  khkBevel: "Коническая",
+  khkWorm: "Червячная",
+  khkScrew: "Винтовая (винтовые колёса)",
+
+  // Rack & Pinion
+  rackTitle: "ПАРАМЕТРЫ РЕЕЧНОЙ ПЕРЕДАЧИ",
+  rackPitchHeight: "Высота делительной линии (H)",
+  rackFeedForce: "Сила подачи (Fx)",
+  rackTravelPerRev: "Перемещение / оборот",
+  rackFeedVelocity: "Скорость подачи (v)",
+  rackSeparatingForce: "Радиальная сила (Fr)",
+  rackBlueprintTitle: "ЧЕРТЁЖ ЗАЦЕПЛЕНИЯ ШЕСТЕРНЯ-РЕЙКА",
+
+  // Bevel Gear
+  bevelTitle: "ПАРАМЕТРЫ КОНИЧЕСКОЙ ПЕРЕДАЧИ",
+  bevelGleasonSystem: "Система Gleason",
+  bevelStandardSystem: "Стандартная коническая",
+  bevelShaftAngle: "Угол между валами (Σ)",
+  bevelConeDistance: "Внешнее конусное расстояние (Re)",
+  bevelApexToCrown: "Расстояние от вершины до венца (X)",
+  bevelMaxFaceWidth: "Макс. ширина венца (b)",
+  bevelBlueprintTitle: "СЕЧЕНИЕ И ЗАЦЕПЛЕНИЕ КОНИЧЕСКИХ КОЛЁС GLEASON",
+
+  // Worm Gear
+  wormTitle: "ПАРАМЕТРЫ ЧЕРВЯЧНОЙ ПЕРЕДАЧИ",
+  wormAxialModule: "Осевой модуль (mx)",
+  wormStarts: "Число заходов червяка (z₁)",
+  wormWheelTeeth: "Число зубьев колеса (z₂)",
+  wormDiameterFactor: "Коэффициент диаметра червяка (q)",
+  wormFrictionCoeff: "Коэффициент трения (μ)",
+  wormSelfLocking: "САМОТОРМОЖЕНИЕ (НАДЁЖНО)",
+  wormReversible: "ОБРАТИМАЯ ПЕРЕДАЧА",
+  wormLeadAngle: "Угол подъема (γ)",
+  wormEfficiency: "Механический КПД (η)",
+  wormOutputTorque: "Выходной крутящий момент (T₂)",
+  wormThroatRadius: "Радиус выемки колеса (ri)",
+  wormBlueprintTitle: "ЧЕРТЁЖ ЦИЛИНДРИЧЕСКОГО ЧЕРВЯКА И ГЛОБОИДНОГО КОЛЕСА",
+
+  // Screw Gear
+  screwTitle: "ПАРАМЕТРЫ СКРЕЩИВАЮЩИХСЯ ВИНТОВЫХ КОЛЁС",
+  screwHelixPinion: "Угол наклона шестерни (β₁)",
+  screwHelixGear: "Угол наклона колеса (β₂)",
+  screwShaftAngle: "Угол скрещивания осей (Σ)",
+  screwSlidingVelocity: "Скорость скольжения (vs)",
+  screwBlueprintTitle: "ПРОСТРАНСТВЕННАЯ СХЕМА ВИНТОВЫХ КОЛЁС",
+};
 
 const JA: GearsModuleStrings = {
-  "toothGeometry": "歯形",
-  "motorMaterial": "モータと材料",
-  "serviceConditions": "使用条件",
-  "profileShift": "歯ずれ（プロファイルシフト）",
-  "loadClass": "荷重クラス",
-  "dailyHours": "稼働時間/日",
-  "startsPerHour": "起動回数/時",
-  "outputConnect": "出力接続",
-  "serviceFactor": "使用係数 (fs)",
-  "shiftX1": "シフト量 x₁",
-  "shiftX2": "シフト量 x₂",
-  "loadUniform": "均一 (U)",
-  "loadModerate": "中程度 (M)",
-  "loadHeavy": "強い衝撃 (H)",
-  "hoursLess3": "< 3 時間",
-  "hours3to10": "3 – 10 時間",
-  "hoursMore10": "> 10 時間",
-  "connDirect": "直結 (1.0)",
-  "connChain": "チェーン (1.25)",
-  "connVBelt": "Vベルト (1.5)",
-  "connFlatBelt": "平ベルト (2.5)",
-  "designSafe": "設計検証済み — 安全",
-  "designWarning": "警告: 安全率が不十分です",
-  "rootBending": "歯根曲げ応力",
-  "flankContact": "歯面接触応力",
-  "dynamicBlueprint": "動的かみ合い図面",
-  "mfgDimensions": "製造寸法 (mm)",
-  "parameter": "パラメータ",
-  "pinionCol": "小歯車 (z₁)",
-  "gearCol": "大歯車 (z₂)",
-  "tipDia": "歯先円直径 (da)",
-  "refDia": "基準円直径 (d)",
-  "rootDia": "歯底円直径 (df)",
-  "overPins": "オーバーピン寸法 (M)",
-  "alertTitle": "安全率がしきい値未満です",
-  "alertDesc": "歯根曲げ安全率は SF > 1.4、歯面接触安全率は SF > 1.0 が必要です。モジュール、歯幅を増やすか、より高強度の材料を選択してください。",
-  "descModule": "標準モジュール。曲げ強度を高めます。",
-  "descFaceWidth": "歯幅。接触荷重容量を増加させます。",
-  "descPinionTeeth": "小歯車の歯数。アンダーカット防止に最小17推奨。",
-  "descGearTeeth": "大歯車の歯数。減速比を決定します。",
-  "descHelixAngle": "ねじれ角。mt = m/cosβ が増加し中心距離も増えます。",
-  "descPressureAngle": "圧力角。基準円とオーバーピン寸法に影響します。",
-  "descMotorPower": "IEC基準のモータ定格出力。",
-  "descMaterial": "歯車材料。硬度が安全余裕を制限します。",
-  "descLoadClass": "運転時の衝撃の大きさ。",
-  "descDailyHours": "1日の総稼働時間。",
-  "descStartsPerHour": "時間あたりの起動回数。疲労に影響。",
-  "descConnection": "出力軸の接続係数。",
-  "descShiftX1": "小歯車のプロファイルシフト。歯元を厚くします。",
-  "descShiftX2": "大歯車のプロファイルシフト。アンダーカットを回避。",
-  "isoSubtitle": "ISO 6336 平歯車・はすば歯車"
-} as GearsModuleStrings;
+  ...EN,
+  title: "歯車設計と強度計算",
+  subtitle: "ISO 6336 平歯車・はすば歯車・遊星歯車列",
+  export3D: "3Dへ転送",
+  pairMode: "2段歯車ペア",
+  trainMode: "複合・遊星歯車列",
+  toothGeometry: "歯形ジオメトリ",
+  materialSection: "材料と強度",
+  serviceConditions: "使用条件",
+  designSafe: "設計検証済み — 安全",
+  designWarning: "警告: 安全率が不十分です",
+  bendingSafety: "歯根曲げ安全率 (SF)",
+  contactSafety: "歯面接触安全率 (SH)",
+  mfgDimensions: "製造寸法 (mm)",
+  passportTitle: "製造パスポート",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK歯車ファミリー",
+  khkCylindrical: "円筒歯車",
+  khkInternal: "内歯車",
+  khkRack: "ラック＆ピニオン",
+  khkBevel: "かさ歯車 (ベベル)",
+  khkWorm: "ウォームギヤ",
+  khkScrew: "ねじ歯車",
+
+  // Rack & Pinion
+  rackTitle: "ラック＆ピニオン諸元",
+  rackPitchHeight: "基準線高さ (H)",
+  rackFeedForce: "推力・送り力 (Fx)",
+  rackTravelPerRev: "1回転あたり移動量",
+  rackFeedVelocity: "送り速度 (v)",
+  rackSeparatingForce: "分離力・ラジアル力 (Fr)",
+  rackBlueprintTitle: "ラック＆ピニオン噛合い図面",
+
+  // Bevel Gear
+  bevelTitle: "かさ歯車諸元",
+  bevelGleasonSystem: "グリーソン方式",
+  bevelStandardSystem: "標準かさ歯車",
+  bevelShaftAngle: "軸角 (Σ)",
+  bevelConeDistance: "基準円すい母線の長さ (Re)",
+  bevelApexToCrown: "頂点から歯先角までの距離 (X)",
+  bevelMaxFaceWidth: "最大歯幅 (b)",
+  bevelBlueprintTitle: "グリーソンかさ歯車断面・噛合い図面",
+
+  // Worm Gear
+  wormTitle: "ウォームギヤ諸元",
+  wormAxialModule: "軸直角/軸方向モジュール (mx)",
+  wormStarts: "ウォーム条数 (z₁)",
+  wormWheelTeeth: "ホイール歯数 (z₂)",
+  wormDiameterFactor: "直径係数 (q)",
+  wormFrictionCoeff: "摩擦係数 (μ)",
+  wormSelfLocking: "セルフロック (安全自ロック)",
+  wormReversible: "逆駆動可能",
+  wormLeadAngle: "進み角 (γ)",
+  wormEfficiency: "伝達効率 (η)",
+  wormOutputTorque: "出力トルク (T₂)",
+  wormThroatRadius: "のど半径 (ri)",
+  wormBlueprintTitle: "円筒ウォームとウォームホイール噛合い図面",
+
+  // Screw Gear
+  screwTitle: "ねじ歯車諸元",
+  screwHelixPinion: "小歯車ねじれ角 (β₁)",
+  screwHelixGear: "大歯車ねじれ角 (β₂)",
+  screwShaftAngle: "食違い軸角 (Σ)",
+  screwSlidingVelocity: "すべり速度 (vs)",
+  screwBlueprintTitle: "ねじ歯車空間配置図面",
+};
 
 const ZH: GearsModuleStrings = {
-  "toothGeometry": "齿形几何",
-  "motorMaterial": "电机与材料",
-  "serviceConditions": "工况条件",
-  "profileShift": "变位系数",
-  "loadClass": "载荷等级",
-  "dailyHours": "日运行时间",
-  "startsPerHour": "启动次数/小时",
-  "outputConnect": "输出连接",
-  "serviceFactor": "使用系数 (fs)",
-  "shiftX1": "变位 x₁",
-  "shiftX2": "变位 x₂",
-  "loadUniform": "均匀 (U)",
-  "loadModerate": "中等 (M)",
-  "loadHeavy": "重冲击 (H)",
-  "hoursLess3": "< 3 小时",
-  "hours3to10": "3 – 10 小时",
-  "hoursMore10": "> 10 小时",
-  "connDirect": "直接 (1.0)",
-  "connChain": "链条 (1.25)",
-  "connVBelt": "V带 (1.5)",
-  "connFlatBelt": "平带 (2.5)",
-  "designSafe": "设计已验证 — 安全",
-  "designWarning": "警告：安全系数不足",
-  "rootBending": "齿根弯曲",
-  "flankContact": "齿面接触",
-  "dynamicBlueprint": "动态啮合蓝图",
-  "mfgDimensions": "制造尺寸 (mm)",
-  "parameter": "参数",
-  "pinionCol": "小齿轮 (z₁)",
-  "gearCol": "大齿轮 (z₂)",
-  "tipDia": "齿顶圆直径 (da)",
-  "refDia": "分度圆直径 (d)",
-  "rootDia": "齿根圆直径 (df)",
-  "overPins": "跨棒距 (M)",
-  "alertTitle": "安全系数低于阈值",
-  "alertDesc": "齿根弯曲要求 SF > 1.4，齿面接触要求 SF > 1.0。请增大模数、齿宽或选用更强材料。",
-  "descModule": "标准模数；提高弯曲强度。",
-  "descFaceWidth": "齿宽；提高接触承载能力。",
-  "descPinionTeeth": "小齿轮齿数。建议最少17齿以避免根切。",
-  "descGearTeeth": "大齿轮齿数；决定传动比。",
-  "descHelixAngle": "螺旋角。增大 mt = m/cosβ 及中心距。",
-  "descPressureAngle": "压力角。影响基圆与跨棒距。",
-  "descMotorPower": "按 IEC 标准的电机额定功率。",
-  "descMaterial": "齿轮材料；硬度限制安全裕度。",
-  "descLoadClass": "运行冲击严重程度。",
-  "descDailyHours": "每日总运行时间。",
-  "descStartsPerHour": "每小时启动次数；影响疲劳。",
-  "descConnection": "输出轴连接系数。",
-  "descShiftX1": "小齿轮变位；加厚齿根。",
-  "descShiftX2": "大齿轮变位；避免根切。",
-  "isoSubtitle": "ISO 6336 直齿与斜齿"
-} as GearsModuleStrings;
+  ...EN,
+  title: "齿轮设计与强度计算",
+  subtitle: "ISO 6336 直齿、斜齿与多级行星齿轮系",
+  export3D: "导出至3D",
+  pairMode: "双齿轮副",
+  trainMode: "多级与行星轮系",
+  toothGeometry: "齿形几何",
+  materialSection: "材料与强度",
+  serviceConditions: "工况条件",
+  designSafe: "设计已验证 — 安全",
+  designWarning: "警告：安全系数不足",
+  bendingSafety: "齿根弯曲安全系数 (SF)",
+  contactSafety: "齿面接触安全系数 (SH)",
+  mfgDimensions: "制造尺寸 (mm)",
+  passportTitle: "制造护照",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK齿轮系列",
+  khkCylindrical: "圆柱齿轮",
+  khkInternal: "内齿轮",
+  khkRack: "齿轮齿条",
+  khkBevel: "锥齿轮",
+  khkWorm: "蜗轮蜗杆",
+  khkScrew: "交错轴斜齿轮",
+
+  // Rack & Pinion
+  rackTitle: "齿轮齿条参数",
+  rackPitchHeight: "节线高度 (H)",
+  rackFeedForce: "进给推力 (Fx)",
+  rackTravelPerRev: "每转进给量",
+  rackFeedVelocity: "进给线速度 (v)",
+  rackSeparatingForce: "径向分离力 (Fr)",
+  rackBlueprintTitle: "齿轮齿条啮合工程蓝图",
+
+  // Bevel Gear
+  bevelTitle: "锥齿轮参数",
+  bevelGleasonSystem: "格里森制 (Gleason)",
+  bevelStandardSystem: "标准锥齿轮制",
+  bevelShaftAngle: "轴交角 (Σ)",
+  bevelConeDistance: "外锥距 (Re)",
+  bevelApexToCrown: "顶点至齿顶冠距 (X)",
+  bevelMaxFaceWidth: "最大齿宽 (b)",
+  bevelBlueprintTitle: "格里森锥齿轮剖面与啮合图",
+
+  // Worm Gear
+  wormTitle: "蜗轮蜗杆参数",
+  wormAxialModule: "轴向模数 (mx)",
+  wormStarts: "蜗杆头数 (z₁)",
+  wormWheelTeeth: "蜗轮齿数 (z₂)",
+  wormDiameterFactor: "蜗杆直径系数 (q)",
+  wormFrictionCoeff: "摩擦系数 (μ)",
+  wormSelfLocking: "自锁 (安全逆止)",
+  wormReversible: "可逆驱动",
+  wormLeadAngle: "导程角 (γ)",
+  wormEfficiency: "传动效率 (η)",
+  wormOutputTorque: "输出扭矩 (T₂)",
+  wormThroatRadius: "喉部圆弧半径 (ri)",
+  wormBlueprintTitle: "圆柱蜗杆与阿基米德蜗轮啮合图",
+
+  // Screw Gear
+  screwTitle: "交错轴斜齿轮参数",
+  screwHelixPinion: "小轮螺旋角 (β₁)",
+  screwHelixGear: "大轮螺旋角 (β₂)",
+  screwShaftAngle: "轴交错角 (Σ)",
+  screwSlidingVelocity: "相对滑动速度 (vs)",
+  screwBlueprintTitle: "交错轴斜齿轮三维工程蓝图",
+};
 
 const KO: GearsModuleStrings = {
-  "toothGeometry": "치형 기하",
-  "motorMaterial": "모터 및 재료",
-  "serviceConditions": "운전 조건",
-  "profileShift": "프로파일 시프트",
-  "loadClass": "하중 등급",
-  "dailyHours": "일일 가동 시간",
-  "startsPerHour": "시간당 기동",
-  "outputConnect": "출력 연결",
-  "serviceFactor": "서비스 계수 (fs)",
-  "shiftX1": "시프트 x₁",
-  "shiftX2": "시프트 x₂",
-  "loadUniform": "균일 (U)",
-  "loadModerate": "중간 (M)",
-  "loadHeavy": "강한 충격 (H)",
-  "hoursLess3": "< 3시간",
-  "hours3to10": "3 – 10시간",
-  "hoursMore10": "> 10시간",
-  "connDirect": "직결 (1.0)",
-  "connChain": "체인 (1.25)",
-  "connVBelt": "V벨트 (1.5)",
-  "connFlatBelt": "평벨트 (2.5)",
-  "designSafe": "설계 검증 완료 — 안전",
-  "designWarning": "경고: 안전계수 부족",
-  "rootBending": "치근 굽힘",
-  "flankContact": "치면 접촉",
-  "dynamicBlueprint": "동적 맞물림 도면",
-  "mfgDimensions": "제조 치수 (mm)",
-  "parameter": "매개변수",
-  "pinionCol": "피니언 (z₁)",
-  "gearCol": "기어 (z₂)",
-  "tipDia": "치정원 직경 (da)",
-  "refDia": "기준원 직경 (d)",
-  "rootDia": "치저원 직경 (df)",
-  "overPins": "롤러 간 치수 (M)",
-  "alertTitle": "안전계수가 임계값 미만",
-  "alertDesc": "치근 굽힘 SF > 1.4, 치면 접촉 SF > 1.0 필요. 모듈, 치폭 또는 재료 강도를 높이세요.",
-  "descModule": "표준 모듈. 굽힘 강도를 높입니다.",
-  "descFaceWidth": "치폭. 접촉 하중 용량을 증가시킵니다.",
-  "descPinionTeeth": "피니언 잇수. 언더컷 방지를 위해 최소 17 권장.",
-  "descGearTeeth": "기어 잇수. 감속비를 결정합니다.",
-  "descHelixAngle": "나선각. mt = m/cosβ 및 중심거리 증가.",
-  "descPressureAngle": "압력각. 기준원과 롤러 치수에 영향.",
-  "descMotorPower": "IEC 기준 모터 정격 출력.",
-  "descMaterial": "기어 재료. 경도가 안전 여유를 제한.",
-  "descLoadClass": "운전 충격 심각도.",
-  "descDailyHours": "일일 총 운전 시간.",
-  "descStartsPerHour": "시간당 기동 횟수. 피로에 영향.",
-  "descConnection": "출력축 연결 계수.",
-  "descShiftX1": "피니언 시프트. 치근을 두껍게.",
-  "descShiftX2": "기어 시프트. 언더컷 방지.",
-  "isoSubtitle": "ISO 6336 평기어 및 헬리컬"
-} as GearsModuleStrings;
+  ...EN,
+  title: "기어 설계 및 강도 해석",
+  subtitle: "ISO 6336 평기어, 헬리컬 및 다단 유성기어열",
+  export3D: "3D로 내보내기",
+  pairMode: "2단 기어 맞물림",
+  trainMode: "다단 및 유성기어열",
+  toothGeometry: "치형 기하",
+  materialSection: "재료 및 강도",
+  serviceConditions: "운전 조건",
+  designSafe: "설계 검증 완료 — 안전",
+  designWarning: "경고: 안전계수 부족",
+  bendingSafety: "치근 굽힘 안전계수 (SF)",
+  contactSafety: "치면 접촉 안전계수 (SH)",
+  mfgDimensions: "제조 치수 (mm)",
+  passportTitle: "제조 패스포트",
+
+  // KHK Gear Families
+  khkFamilyTitle: "KHK 기어 시리즈",
+  khkCylindrical: "원통 기어",
+  khkInternal: "내치차 (링기어)",
+  khkRack: "랙 & 피니언",
+  khkBevel: "베벨 기어 (원추)",
+  khkWorm: "웜 & 웜휠",
+  khkScrew: "나사치차 (헬리컬 크로스)",
+
+  // Rack & Pinion
+  rackTitle: "랙 & 피니언 제원",
+  rackPitchHeight: "피치선 높이 (H)",
+  rackFeedForce: "선형 이송력 (Fx)",
+  rackTravelPerRev: "1회전당 이송량",
+  rackFeedVelocity: "이송 속도 (v)",
+  rackSeparatingForce: "분리력 (Fr)",
+  rackBlueprintTitle: "랙 & 피니언 맞물림 엔지니어링 도면",
+
+  // Bevel Gear
+  bevelTitle: "베벨 기어 제원",
+  bevelGleasonSystem: "글리슨 방식 (Gleason)",
+  bevelStandardSystem: "표준 베벨 방식",
+  bevelShaftAngle: "축각 (Σ)",
+  bevelConeDistance: "외측 원추거리 (Re)",
+  bevelApexToCrown: "원추 정점-치선 거리 (X)",
+  bevelMaxFaceWidth: "최대 치폭 (b)",
+  bevelBlueprintTitle: "글리슨 베벨 기어 단면 및 맞물림도",
+
+  // Worm Gear
+  wormTitle: "웜 & 웜휠 제원",
+  wormAxialModule: "축방향 모듈 (mx)",
+  wormStarts: "웜 줄수 (z₁)",
+  wormWheelTeeth: "웜휠 잇수 (z₂)",
+  wormDiameterFactor: "직경 계수 (q)",
+  wormFrictionCoeff: "마찰 계수 (μ)",
+  wormSelfLocking: "셀프 록킹 (자립 잠금)",
+  wormReversible: "역구동 가능",
+  wormLeadAngle: "리드각 (γ)",
+  wormEfficiency: "전달 효율 (η)",
+  wormOutputTorque: "출력 토크 (T₂)",
+  wormThroatRadius: "목 반경 (ri)",
+  wormBlueprintTitle: "원통 웜 및 글로보이드 웜휠 맞물림도",
+
+  // Screw Gear
+  screwTitle: "나사치차 제원",
+  screwHelixPinion: "소기어 비틀림각 (β₁)",
+  screwHelixGear: "대기어 비틀림각 (β₂)",
+  screwShaftAngle: "어긋난 축각 (Σ)",
+  screwSlidingVelocity: "미끄럼 속도 (vs)",
+  screwBlueprintTitle: "교차 나사치차 3차원 투영도",
+};
 
 const AR: GearsModuleStrings = {
-  "toothGeometry": "هندسة السن",
-  "motorMaterial": "المحرك والمادة",
-  "serviceConditions": "ظروف التشغيل",
-  "profileShift": "إزاحة الملف",
-  "loadClass": "فئة الحمل",
-  "dailyHours": "ساعات يومية",
-  "startsPerHour": "بدء / ساعة",
-  "outputConnect": "توصيل المخرج",
-  "serviceFactor": "عامل الخدمة (fs)",
-  "shiftX1": "إزاحة x₁",
-  "shiftX2": "إزاحة x₂",
-  "loadUniform": "منتظم (U)",
-  "loadModerate": "متوسط (M)",
-  "loadHeavy": "صدمة شديدة (H)",
-  "hoursLess3": "< 3 ساعات",
-  "hours3to10": "3 – 10 ساعات",
-  "hoursMore10": "> 10 ساعات",
-  "connDirect": "مباشر (1.0)",
-  "connChain": "سلسلة (1.25)",
-  "connVBelt": "حزام V (1.5)",
-  "connFlatBelt": "حزام مسطح (2.5)",
-  "designSafe": "التصميم مُحقق — آمن",
-  "designWarning": "تحذير: عامل أمان غير كافٍ",
-  "rootBending": "انحناء الجذر",
-  "flankContact": "ضغط التماس",
-  "dynamicBlueprint": "مخطط التعشيق الديناميكي",
-  "mfgDimensions": "أبعاد التصنيع (مم)",
-  "parameter": "المعامل",
-  "pinionCol": "ترس صغير (z₁)",
-  "gearCol": "ترس كبير (z₂)",
-  "tipDia": "قطر القمة (da)",
-  "refDia": "القطر المرجعي (d)",
-  "rootDia": "قطر القاع (df)",
-  "overPins": "على الدبابيس (M)",
-  "alertTitle": "عامل الأمان دون الحد",
-  "alertDesc": "انحناء الجذر يتطلب SF > 1.4 والتماس SF > 1.0. زِد الوحدة أو العرض أو قوة المادة.",
-  "descModule": "الوحدة القياسية؛ تزيد مقاومة الانحناء.",
-  "descFaceWidth": "عرض السن؛ يزيد قدرة الحمل.",
-  "descPinionTeeth": "عدد أسنان الترس الصغير. يُنصح بـ 17 كحد أدنى.",
-  "descGearTeeth": "عدد أسنان الترس الكبير؛ يحدد نسبة التخفيض.",
-  "descHelixAngle": "زاوية الحلزنة. تزيد mt = m/cosβ والمسافة بين المحاور.",
-  "descPressureAngle": "زاوية الضغط. تؤثر على الدائرة الأساسية.",
-  "descMotorPower": "قدرة المحرك الاسمية وفق IEC.",
-  "descMaterial": "مادة الترس؛ الصلابة تحد الهوامش.",
-  "descLoadClass": "شدة الصدمات التشغيلية.",
-  "descDailyHours": "وقت التشغيل اليومي.",
-  "descStartsPerHour": "مرات البدء في الساعة؛ تؤثر على الإجهاد.",
-  "descConnection": "عامل توصيل عمود الإخراج.",
-  "descShiftX1": "إزاحة الترس الصغير؛ تسمك الجذر.",
-  "descShiftX2": "إزاحة الترس الكبير؛ تمنع القطع السفلي.",
-  "isoSubtitle": "ISO 6336 مسننة مستقيمة وحلزونية"
-} as GearsModuleStrings;
+  ...EN,
+  title: "تصميم التروس وحساب الإجهادات",
+  subtitle: "ISO 6336 مسننات مستقيمة وحلزونية وقطارات تروس",
+  export3D: "تصدير إلى 3D",
+  pairMode: "زوج تروس",
+  trainMode: "قطار تروس مركب",
+  toothGeometry: "هندسة السن",
+  materialSection: "المادة والمقاومة",
+  serviceConditions: "ظروف التشغيل",
+  designSafe: "التصميم مُحقق — آمن",
+  designWarning: "تحذير: عامل أمان غير كافٍ",
+  bendingSafety: "أمان انحناء الجذر (SF)",
+  contactSafety: "أمان تلامس السطح (SH)",
+  mfgDimensions: "أبعاد التصنيع (مم)",
+  passportTitle: "جواز التصنيع",
+
+  // KHK Gear Families
+  khkFamilyTitle: "عائلة تروس KHK",
+  khkCylindrical: "أسطواني",
+  khkInternal: "ترس داخلي",
+  khkRack: "جريدة مسننة وبنيون",
+  khkBevel: "مخروطي",
+  khkWorm: "ترس ودودة (حلزوني)",
+  khkScrew: "تروس لولبية متقاطعة",
+
+  // Rack & Pinion
+  rackTitle: "معلمات الجريدة والبنيون",
+  rackPitchHeight: "ارتفاع خط الخطوة (H)",
+  rackFeedForce: "قوة التغذية الخطية (Fx)",
+  rackTravelPerRev: "المسافة لكل دورة",
+  rackFeedVelocity: "سرعة التغذية (v)",
+  rackSeparatingForce: "القوة الشعاعية (Fr)",
+  rackBlueprintTitle: "مخطط تعشيق الجريدة المسننة والبنيون",
+
+  // Bevel Gear
+  bevelTitle: "معلمات الترس المخروطي",
+  bevelGleasonSystem: "نظام جليسون",
+  bevelStandardSystem: "مخروطي قياسي",
+  bevelShaftAngle: "زاوية المحاور (Σ)",
+  bevelConeDistance: "مسافة المخروط الخارجية (Re)",
+  bevelApexToCrown: "مسافة القمة للتاج (X)",
+  bevelMaxFaceWidth: "عرض السن الأقصى (b)",
+  bevelBlueprintTitle: "مقطع ومخطط تعشيق الترس المخروطي جليسون",
+
+  // Worm Gear
+  wormTitle: "معلمات الترس الحلزوني (الدودة والعجلة)",
+  wormAxialModule: "الموديول المحوري (mx)",
+  wormStarts: "عدد أسنان الدودة (z₁)",
+  wormWheelTeeth: "عدد أسنان العجلة (z₂)",
+  wormDiameterFactor: "معامل القطر (q)",
+  wormFrictionCoeff: "معامل الاحتكاك (μ)",
+  wormSelfLocking: "قفل ذاتي (آمن)",
+  wormReversible: "قابل للعكس",
+  wormLeadAngle: "زاوية الخطوة (γ)",
+  wormEfficiency: "الكفاءة الميكانيكية (η)",
+  wormOutputTorque: "عزم الدوران الخارج (T₂)",
+  wormThroatRadius: "نصف قطر الخنق (ri)",
+  wormBlueprintTitle: "مخطط تعشيق الدودة الأسطوانية وعجلة الجلوبويد",
+
+  // Screw Gear
+  screwTitle: "معلمات التروس اللولبية المتقاطعة",
+  screwHelixPinion: "زاوية ميل البنيون (β₁)",
+  screwHelixGear: "زاوية ميل الترس (β₂)",
+  screwShaftAngle: "زاوية تقاطع المحاور (Σ)",
+  screwSlidingVelocity: "سرعة الانزلاق (vs)",
+  screwBlueprintTitle: "المخطط الفضائي للتروس المتقاطعة",
+};
 
 const BY_LOCALE: Record<Language, GearsModuleStrings> = {
   en: EN,
@@ -720,3 +1410,4 @@ const BY_LOCALE: Record<Language, GearsModuleStrings> = {
 export function getGearsModuleStrings(locale: string): GearsModuleStrings {
   return BY_LOCALE[locale as Language] ?? EN;
 }
+

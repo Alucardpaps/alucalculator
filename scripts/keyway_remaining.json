@@ -1,0 +1,474 @@
+[
+  {
+    "en": "Carbon Steel C45 / 1.0503 (Standard Key Steel)",
+    "tr": "Karbon Çeliği C45 / 1.0503 (Standart Kama Çeliği)"
+  },
+  {
+    "en": "Quenched & Tempered Steel 42CrMo4 / 1.7225 (High Strength)",
+    "tr": "Islah Çeliği 42CrMo4 / 1.7225 (Yüksek Dayanımlı)"
+  },
+  {
+    "en": "Structural Steel S275 / St 44 (General Machinery)",
+    "tr": "Yapı Çeliği S275 / St 44 (Genel İmalat)"
+  },
+  {
+    "en": "Structural Steel S355 / St 52",
+    "tr": "Yapı Çeliği S355 / St 52"
+  },
+  {
+    "en": "Grey Cast Iron GG-25 / EN-GJL-250 (Cast Hub)",
+    "tr": "Pik Döküm GG-25 / EN-GJL-250 (Dökme Gövde/Göbek)"
+  },
+  {
+    "en": "Ductile Iron GGG-40 / EN-GJS-400 (Impact Resistant)",
+    "tr": "Sfero Döküm GGG-40 / EN-GJS-400 (Darbe Dayanımlı)"
+  },
+  {
+    "en": "Aluminum 6061-T6 (Lightweight Hub)",
+    "tr": "Alüminyum 6061-T6 (Hafif Yapı Göbeği)"
+  },
+  {
+    "en": "DIN 6885 PARALLEL KEYWAY CALCULATION REPORT",
+    "tr": "DIN 6885 PARALEL KAMA HESAP RAPORU"
+  },
+  {
+    "en": "Form A Round Ends",
+    "tr": "Form A Yuvarlak Uç"
+  },
+  {
+    "en": "Form B Square Ends",
+    "tr": "Form B Düz Uç"
+  },
+  {
+    "en": "Calculated Torque",
+    "tr": "Hesaplanan Tork"
+  },
+  {
+    "en": "Tangential Force (F_t)",
+    "tr": "Teğetsel Kuvvet (F_t)"
+  },
+  {
+    "en": "Hub Surface Pressure (p_hub)",
+    "tr": "Göbek Yüzey Basıncı (p_hub)"
+  },
+  {
+    "en": "Safety",
+    "tr": "Emniyet"
+  },
+  {
+    "en": "Key Shear Stress (tau)",
+    "tr": "Kama Kayma Gerilmesi (tau)"
+  },
+  {
+    "en": "Safety",
+    "tr": "Emniyet"
+  },
+  {
+    "en": "DIN 6885 Parallel Key",
+    "tr": "DIN 6885 Paralel Kama"
+  },
+  {
+    "en": "DIN 471/472 Retaining Ring",
+    "tr": "DIN 471/472 Emniyet Segmanı"
+  },
+  {
+    "en": "DIN 509 Relief Undercut",
+    "tr": "DIN 509 Taşlama Kanalı"
+  },
+  {
+    "en": "DIN 332 Center Hole",
+    "tr": "DIN 332 Torna Puntası"
+  },
+  {
+    "en": "DIN 912 / 74 Fasteners",
+    "tr": "DIN 912 / 74 Civata Yuvaları"
+  },
+  {
+    "en": "Retaining Rings",
+    "tr": "Emniyet Segmanları"
+  },
+  {
+    "en": "Relief Undercuts",
+    "tr": "Taşlama Oyukları"
+  },
+  {
+    "en": "Center Drill Holes",
+    "tr": "Torna Punta Delikleri"
+  },
+  {
+    "en": "Fastener Recesses",
+    "tr": "Cıvata Yuvaları"
+  },
+  {
+    "en": "Axial Retaining Ring & Groove Calculation",
+    "tr": "Eksenel Emniyet Segmanı ve Yuvası"
+  },
+  {
+    "en": "Grinding Relief Undercut Geometry (DIN 509)",
+    "tr": "DIN 509 Taşlama Serbest Oyuk Formları"
+  },
+  {
+    "en": "Machining Center Hole & Chamfers (DIN 332)",
+    "tr": "DIN 332 Torna Punta ve Havşa Geometrisi"
+  },
+  {
+    "en": "Cap Screw Counterbore & Countersink Standards",
+    "tr": "DIN 912 / 74 Cıvata Yuvası ve Havşaları"
+  },
+  {
+    "en": "1. Shaft & Key Dimensions",
+    "tr": "1. Mil & Kama Boyutları"
+  },
+  {
+    "en": "2. Transmitted Load & Materials",
+    "tr": "2. İletilen Yük & Malzemeler"
+  },
+  {
+    "en": "Nominal Torque (N·m):",
+    "tr": "Nominal Tork (N·m):"
+  },
+  {
+    "en": "Power (kW):",
+    "tr": "Güç (kW):"
+  },
+  {
+    "en": "Speed (RPM):",
+    "tr": "Devir (d/d):"
+  },
+  {
+    "en": "Application Factor (K_A):",
+    "tr": "İşletme Faktörü (K_A):"
+  },
+  {
+    "en": "1.0 - Uniform / Smooth (Electric Motor, Centrifugal Pump)",
+    "tr": "1.0 - Düzgün / Sabit (Elektrik Motoru, Santrifüj Pompa)"
+  },
+  {
+    "en": "1.25 - Light Shocks (Conveyor, Machine Tool)",
+    "tr": "1.25 - Hafif Darbeli (Konveyör, Takım Tezgahı)"
+  },
+  {
+    "en": "1.50 - Moderate Shocks (Crane, Piston Pump)",
+    "tr": "1.50 - Orta Darbeli (Vinç, Pistonlu Pompa)"
+  },
+  {
+    "en": "2.00 - Heavy Shocks (Crusher, Mill, Press)",
+    "tr": "2.00 - Ağır Darbeli (Kırıcı, Değirmen, Pres)"
+  },
+  {
+    "en": "Shaft Circlip (DIN 471)",
+    "tr": "Mil Segmanı (DIN 471)"
+  },
+  {
+    "en": "Bore Circlip (DIN 472)",
+    "tr": "Delik Segmanı (DIN 472)"
+  },
+  {
+    "en": "Quick Diameter Select",
+    "tr": "Hızlı Çap Seçimi"
+  },
+  {
+    "en": "Nominal Diameter (d1):",
+    "tr": "Nominal Çap (d1):"
+  },
+  {
+    "en": "Grinding Relief Undercut Form (DIN 509)",
+    "tr": "Taşlama Serbest Oyuk Formu (DIN 509)"
+  },
+  {
+    "en": "Cylindrical Only",
+    "tr": "Yalnız Silindirik"
+  },
+  {
+    "en": "Cylinder + Face",
+    "tr": "Silindirik + Alın"
+  },
+  {
+    "en": "55° Face Relief",
+    "tr": "55° Açılı Alın"
+  },
+  {
+    "en": "60° Face Relief",
+    "tr": "60° Açılı Alın"
+  },
+  {
+    "en": "Shaft Diameter (d₁)",
+    "tr": "Mil Çapı (d₁)"
+  },
+  {
+    "en": "Center Drill Form (DIN 332-1)",
+    "tr": "Punta Form Seçimi (DIN 332-1)"
+  },
+  {
+    "en": "Center Drill Size",
+    "tr": "Punta Matkabı Boyutu"
+  },
+  {
+    "en": "Nominal Screw Size",
+    "tr": "Cıvata Anma Boyutu"
+  },
+  {
+    "en": "Clearance Hole Fit Series (ISO 273)",
+    "tr": "Geçiş Deliği Serisi (ISO 273)"
+  },
+  {
+    "en": "Engineering Calculation Steps & DIN 6885 Stress Formulas",
+    "tr": "Mühendislik Hesap Adımları & DIN 6885 Formülleri"
+  },
+  {
+    "en": "[Collapse]",
+    "tr": "[Gizle]"
+  },
+  {
+    "en": "[Expand]",
+    "tr": "[Göster]"
+  },
+  {
+    "en": "DIN 471 / DIN 472 Retaining Ring Standard Criteria",
+    "tr": "DIN 471 / DIN 472 Emniyet Segmanı İmalat Kriterleri"
+  },
+  {
+    "en": "Axial Load Capacity (F_N):",
+    "tr": "Eksenel Taşıma Kapasitesi (F_N):"
+  },
+  {
+    "en": "Assuming shaft steel Re = 240 MPa",
+    "tr": "Mil çeliği Akma = 240 MPa kabulüyle"
+  },
+  {
+    "en": "Minimum Edge Margin (m_n):",
+    "tr": "Asgari Kenar Mesafesi (m_n):"
+  },
+  {
+    "en": "Prevents shaft edge shearing",
+    "tr": "Mil kenarından sıyrılmayı önler"
+  },
+  {
+    "en": "DIN 332-1 Center Hole Machining Standard",
+    "tr": "DIN 332-1 Torna Puntası İmalat Kriterleri"
+  },
+  {
+    "en": "Cone Angle 60° (Tailstock):",
+    "tr": "Punta Açısı 60° (Torna Gezer Punta):"
+  },
+  {
+    "en": "Precision bearing seat for turning and cylindrical grinding between centers.",
+    "tr": "Puntalar arasında tornalama ve silindirik taşlama için hassas merkezleme yatağıdır."
+  },
+  {
+    "en": "Form B Protecting Chamfer 120°:",
+    "tr": "Form B Koruyucu Havşa 120°:"
+  },
+  {
+    "en": "Guards the precision 60° cone from handling damage and center burrs.",
+    "tr": "60° hassas koniyi parça taşıma hasarlarından ve çapak darbelerinden korur."
+  },
+  {
+    "en": "VDI 2230 Fastener Seating & Tightening Guidelines",
+    "tr": "VDI 2230 Cıvata Oturma ve Sıkma Kriterleri"
+  },
+  {
+    "en": "Counterbore Face Flatness:",
+    "tr": "Havşa Taban Düzlemselliği:"
+  },
+  {
+    "en": "Ensure counterbore bottom is perpendicular to hole axis within 0.1mm to avoid screw head bending.",
+    "tr": "Cıvata kafasında eğilme gerilmesini önlemek için yuva tabanı delik eksenine dik işlenmelidir."
+  },
+  {
+    "en": "Tightening Preload (F_M):",
+    "tr": "Ön Yükleme Kuvveti (F_M):"
+  },
+  {
+    "en": "Grade 8.8 / 10.9 tightened using calibrated torque wrench per VDI 2230.",
+    "tr": "8.8 / 10.9 kalite cıvatalar VDI 2230 standardına göre tork anahtarıyla sıkılmalıdır."
+  },
+  {
+    "en": "CONNECTION IS SAFE",
+    "tr": "BAĞLANTI GÜVENLİ"
+  },
+  {
+    "en": "Tangential Force (F_t)",
+    "tr": "Teğetsel Kuvvet (F_t)"
+  },
+  {
+    "en": "Torque:",
+    "tr": "Tork:"
+  },
+  {
+    "en": "Hub Pressure (p_hub)",
+    "tr": "Göbek Basıncı (p_hub)"
+  },
+  {
+    "en": "Limit:",
+    "tr": "Sınır:"
+  },
+  {
+    "en": "Key Shear (τ)",
+    "tr": "Kama Kayma (τ)"
+  },
+  {
+    "en": "Limit:",
+    "tr": "Sınır:"
+  },
+  {
+    "en": "Safety (S_p / S_τ)",
+    "tr": "Emniyet (S_p / S_τ)"
+  },
+  {
+    "en": "DIN 6885 Keyway Tolerances",
+    "tr": "DIN 6885 Kanal Toleransları"
+  },
+  {
+    "en": "DIN 6885 Engineering Recommendation",
+    "tr": "DIN 6885 Mühendislik Tavsiyesi"
+  },
+  {
+    "en": "Both hub contact pressure (${formatEngineeringValue(keywayResults.pHub, precision, true)} MPa > ${keywayResults.allowablePHub} MPa) and key shear stress (${formatEngineeringValue(keywayResults.tauKey, precision, true)} MPa > ${keywayResults.allowableTauKey} MPa) exceed safe limits! Increase key length to L ≥ ${keywayResults.minKeyLength} mm, upgrade hub material to higher-yield steel, or configure 2 parallel keys at 180° (DIN 6885).",
+    "tr": "Hem göbek temas basıncı (${formatEngineeringValue(keywayResults.pHub, precision, true)} MPa > ${keywayResults.allowablePHub} MPa) hem kama kayma gerilmesi (${formatEngineeringValue(keywayResults.tauKey, precision, true)} MPa > ${keywayResults.allowableTauKey} MPa) aşıldı! Kama boyunu L ≥ ${keywayResults.minKeyLength} mm'ye uzatın, göbek malzemesini daha yüksek akma dayanımlı çeliğe yükseltin veya 180° çift paralel kama (DIN 6885) kullanın."
+  },
+  {
+    "en": "Hub surface pressure exceeded (${formatEngineeringValue(keywayResults.pHub, precision, true)} MPa > ${keywayResults.allowablePHub} MPa)! Increase key length from ${keyLength} mm to at least ${keywayResults.minKeyLength} mm, switch to 2 parallel keys, or select a hub material with higher allowable pressure (e.g. C45 / 42CrMo4 instead of GG-25).",
+    "tr": "Göbek ezilme gerilmesi aşıldı (${formatEngineeringValue(keywayResults.pHub, precision, true)} MPa > ${keywayResults.allowablePHub} MPa)! Kama boyunu ${keyLength} mm'den en az ${keywayResults.minKeyLength} mm'ye uzatın, çift kamaya geçin veya göbek malzemesini daha yüksek p_em değerli çeliğe (ör. GG-25 yerine C45/42CrMo4) yükseltin."
+  },
+  {
+    "en": "Key shear stress exceeded (${formatEngineeringValue(keywayResults.tauKey, precision, true)} MPa > ${keywayResults.allowableTauKey} MPa)! Increase key length to L ≥ ${keywayResults.minKeyLength} mm, select higher-strength key steel (e.g. C45+C / 16MnCr5), or use 2 keys.",
+    "tr": "Kama kayma gerilmesi aşıldı (${formatEngineeringValue(keywayResults.tauKey, precision, true)} MPa > ${keywayResults.allowableTauKey} MPa)! Kama boyunu L ≥ ${keywayResults.minKeyLength} mm'ye uzatın, daha yüksek mukavemetli kama çeliği seçin veya 2 kama kullanın."
+  },
+  {
+    "en": "Borderline safety margin (S_p=${formatEngineeringValue(keywayResults.safetyFactorHub, precision, true)}, S_τ=${formatEngineeringValue(keywayResults.safetyFactorShear, precision, true)}). For reversing or shock-loaded torque (KA ≥ 1.5), consider increasing key length L or switching to Form B square ends for full bearing length.",
+    "tr": "Sınırda emniyet marjı (S_p=${formatEngineeringValue(keywayResults.safetyFactorHub, precision, true)}, S_τ=${formatEngineeringValue(keywayResults.safetyFactorShear, precision, true)}). Yön değiştiren veya darbeli tork (KA ≥ 1.5) durumunda kama boyunu L artırmayı veya Form B düz uçlu kamaya geçerek etkin taşıma boyunu büyütmeyi değerlendirin."
+  },
+  {
+    "en": "Optimum DIN 6885-1 keyway connection. Hub surface pressure (S_p=${formatEngineeringValue(keywayResults.safetyFactorHub, precision, true)}) and key shear stress (S_τ=${formatEngineeringValue(keywayResults.safetyFactorShear, precision, true)}) conform strictly to allowable DIN standards. Max safe torque: ${formatEngineeringValue(keywayResults.maxTransmissibleTorque, precision, true)} N·m.",
+    "tr": "Optimum DIN 6885-1 kama bağlantısı. Göbek ezilme gerilmesi (S_p=${formatEngineeringValue(keywayResults.safetyFactorHub, precision, true)}) ve kama kayma gerilmesi (S_τ=${formatEngineeringValue(keywayResults.safetyFactorShear, precision, true)}) standart sınırları içindedir. Azami güvenli tork: ${formatEngineeringValue(keywayResults.maxTransmissibleTorque, precision, true)} N·m."
+  },
+  {
+    "en": "Groove Dia (d2)",
+    "tr": "Kanal Çapı (d2)"
+  },
+  {
+    "en": "Groove Width (m)",
+    "tr": "Kanal Genişliği (m)"
+  },
+  {
+    "en": "Groove Depth (t)",
+    "tr": "Kanal Derinliği (t)"
+  },
+  {
+    "en": "Thickness (s)",
+    "tr": "Segman Kalınlığı (s)"
+  },
+  {
+    "en": "Load Capacity & Edge Safety",
+    "tr": "Yük Kapasitesi & Kenar Güvenliği"
+  },
+  {
+    "en": "Axial Load Capacity (F_N):",
+    "tr": "Eksenel Yük Sınırı (F_N):"
+  },
+  {
+    "en": "Min Edge Margin (m_n):",
+    "tr": "Asgari Kenar Mesafesi (m_n):"
+  },
+  {
+    "en": "Standard Groove Chamfer:",
+    "tr": "Standart Pah / Radyus:"
+  },
+  {
+    "en": "Technical Drawing Callout:",
+    "tr": "Teknik Resim Gösterimi:"
+  },
+  {
+    "en": "Cyl. Depth (t1)",
+    "tr": "Silindirik Dalma (t1)"
+  },
+  {
+    "en": "Face Depth (t2)",
+    "tr": "Alın Dalma (t2)"
+  },
+  {
+    "en": "Groove Width (f)",
+    "tr": "Oyuk Genişliği (f)"
+  },
+  {
+    "en": "Shaft Ramp Angle:",
+    "tr": "Mil Rampası Açısı:"
+  },
+  {
+    "en": "Face Relief Angle:",
+    "tr": "Alın Boşaltma Açısı:"
+  },
+  {
+    "en": "Grinding Surface Finish:",
+    "tr": "Yüzey Pürüzlülüğü:"
+  },
+  {
+    "en": "Technical Drawing Callout (DIN 509):",
+    "tr": "Teknik Resim Gösterimi (DIN 509):"
+  },
+  {
+    "en": "Pilot Dia (d1)",
+    "tr": "Kılavuz Çapı (d1)"
+  },
+  {
+    "en": "60° Cone Dia (d2)",
+    "tr": "60° Koni Çapı (d2)"
+  },
+  {
+    "en": "Protecting Dia (d3)",
+    "tr": "Koruyucu Çap (d3)"
+  },
+  {
+    "en": "Radius (r)",
+    "tr": "Radyus (r)"
+  },
+  {
+    "en": "Total Depth (t)",
+    "tr": "Toplam Derinlik (t)"
+  },
+  {
+    "en": "Pilot Depth (t1):",
+    "tr": "Kılavuz Boyu (t1):"
+  },
+  {
+    "en": "Cone Angle:",
+    "tr": "Punta Koni Açısı:"
+  },
+  {
+    "en": "Protecting Rim Angle:",
+    "tr": "Koruyucu Havşa Açısı:"
+  },
+  {
+    "en": "Technical Drawing Callout (DIN 332):",
+    "tr": "Teknik Resim Gösterimi (DIN 332):"
+  },
+  {
+    "en": "Clearance Hole (dh)",
+    "tr": "Geçiş Deliği (dh)"
+  },
+  {
+    "en": "Counterbore (D)",
+    "tr": "Yuva Çapı (D)"
+  },
+  {
+    "en": "Countersink (d2)",
+    "tr": "Havşa Çapı (d2)"
+  },
+  {
+    "en": "Recess Depth (T / t)",
+    "tr": "Yuva Derinliği (T / t)"
+  },
+  {
+    "en": "Head Dia (dk)",
+    "tr": "Kafa Çapı (dk)"
+  },
+  {
+    "en": "VDI 2230 Tightening Torques (MA)",
+    "tr": "VDI 2230 Sıkma Torkları (MA)"
+  },
+  {
+    "en": "Technical Drawing Callout:",
+    "tr": "Teknik Resim Gösterimi:"
+  }
+]

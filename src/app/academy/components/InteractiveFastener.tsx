@@ -65,11 +65,11 @@ export const InteractiveFastener: React.FC = () => {
     const currentStatus = validation ? statusConfig[validation.status] : statusConfig.success;
 
     return (
-        <div className="w-full bg-[#05080f] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
+        <div className="w-full bg-[var(--bg-0)] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
             {/* Header */}
             <div className="px-6 py-4 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center border border-blue-500/30">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--cyan-glow)] flex items-center justify-center border border-[var(--cyan)]/40">
                         <Zap size={14} className="text-blue-400" />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">Interactive Lab: Fastener Analysis</span>
@@ -89,7 +89,7 @@ export const InteractiveFastener: React.FC = () => {
                                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-blue-500/50 transition-all cursor-pointer"
                             >
                                 {Object.keys(METRIC_COARSE_THREADS).map(size => (
-                                    <option key={size} value={size} className="bg-[#0b121d]">{size}</option>
+                                    <option key={size} value={size} className="bg-[var(--bg-1)]">{size}</option>
                                 ))}
                             </select>
                         </div>
@@ -101,7 +101,7 @@ export const InteractiveFastener: React.FC = () => {
                                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-blue-500/50 transition-all cursor-pointer"
                             >
                                 {Object.keys(BOLT_GRADES_ISO_898_1).map(grade => (
-                                    <option key={grade} value={grade} className="bg-[#0b121d]">Class {grade}</option>
+                                    <option key={grade} value={grade} className="bg-[var(--bg-1)]">Class {grade}</option>
                                 ))}
                             </select>
                         </div>

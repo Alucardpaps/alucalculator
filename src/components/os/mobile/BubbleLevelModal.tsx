@@ -160,9 +160,9 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/90 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/90 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-md mx-auto bg-[#070b12] border-t md:border border-cyan-900/30 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] md:h-auto">
+                    <div className="w-full max-w-md mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-900/30 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] md:h-auto">
                         
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20">
@@ -184,7 +184,7 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                         {/* Spirit Level Viewport */}
                         <div className="flex-1 p-6 flex flex-col items-center justify-center space-y-8 min-h-[350px]">
                             {permissionState === 'default' && (
-                                <div className="absolute inset-0 bg-[#070b12] p-8 flex flex-col items-center justify-center text-center space-y-6 z-20">
+                                <div className="absolute inset-0 bg-[var(--bg-0)] p-8 flex flex-col items-center justify-center text-center space-y-6 z-20">
                                     <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
                                         <Smartphone size={32} />
                                     </div>
@@ -196,7 +196,7 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                                     </div>
                                     <button
                                         onClick={requestPermission}
-                                        className="px-6 py-3 bg-cyan-500 text-black font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:bg-cyan-400 transition-all active:scale-95"
+                                        className="px-6 py-3 bg-cyan-500 text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-cyan-400 transition-all active:scale-95"
                                     >
                                         {ft.enableGyroscope}
                                     </button>
@@ -204,7 +204,7 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                             )}
 
                             {/* Bubble Level concentric circles */}
-                            <div className="relative w-64 h-64 rounded-full border border-cyan-900/30 bg-[#03060a] flex items-center justify-center shadow-inner overflow-hidden">
+                            <div className="relative w-64 h-64 rounded-full border border-cyan-900/30 bg-[var(--bg-0)] flex items-center justify-center shadow-inner overflow-hidden">
                                 {/* Crosshair axes */}
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <div className="w-full h-[1px] bg-cyan-900/15" />
@@ -216,14 +216,14 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                                 <div className="absolute w-32 h-32 rounded-full border border-cyan-900/20 pointer-events-none" />
                                 <div className="absolute w-16 h-16 rounded-full border border-cyan-500/20 pointer-events-none flex items-center justify-center">
                                     {/* Perfect target level center */}
-                                    <div className={`w-3 h-3 rounded-full border border-cyan-400/50 ${isLevel ? 'bg-emerald-500 border-emerald-400 shadow-[0_0_10px_#10b981]' : ''} transition-colors duration-150`} />
+                                    <div className={`w-3 h-3 rounded-full border border-cyan-400/50 ${isLevel ? 'bg-emerald-500 border-emerald-400 ' : ''} transition-colors duration-150`} />
                                 </div>
 
                                 {/* Floating bubble */}
                                 <motion.div
                                     animate={{ x: bubbleX, y: bubbleY }}
                                     transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                                    className={`absolute w-8 h-8 rounded-full shadow-[0_0_15px_rgba(0,229,255,0.4)] border flex items-center justify-center ${isLevel ? 'bg-emerald-400 border-emerald-300' : 'bg-cyan-400 border-cyan-300'}`}
+                                    className={`absolute w-8 h-8 rounded-full border flex items-center justify-center ${isLevel ? 'bg-emerald-400 border-emerald-300' : 'bg-cyan-400 border-cyan-300'}`}
                                 >
                                     {/* Liquid bubble sheen */}
                                     <div className="w-2.5 h-2.5 bg-white/40 rounded-full absolute top-1 left-1.5" />
@@ -281,7 +281,7 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                                                 step="0.1" 
                                                 value={tilt.x} 
                                                 onChange={e => setTilt(prev => ({ ...prev, x: Number(e.target.value) }))}
-                                                className="w-full accent-cyan-500 h-1 bg-cyan-950 rounded-lg outline-none cursor-pointer"
+                                                className="w-full accent-[var(--cyan)] h-1 bg-cyan-950 rounded-lg outline-none cursor-pointer"
                                             />
                                         </div>
                                         <div className="space-y-1">
@@ -296,7 +296,7 @@ export function BubbleLevelModal({ isOpen, onClose, ft: propFt, debugMode = fals
                                                 step="0.1" 
                                                 value={tilt.y} 
                                                 onChange={e => setTilt(prev => ({ ...prev, y: Number(e.target.value) }))}
-                                                className="w-full accent-cyan-500 h-1 bg-cyan-950 rounded-lg outline-none cursor-pointer"
+                                                className="w-full accent-[var(--cyan)] h-1 bg-cyan-950 rounded-lg outline-none cursor-pointer"
                                             />
                                         </div>
                                     </div>

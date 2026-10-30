@@ -311,9 +311,9 @@ export function SoundMeterModal({ isOpen, onClose, ft: propFt, debugMode = false
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/90 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/90 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-lg mx-auto bg-[#070b12] border-t md:border border-cyan-900/30 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
+                    <div className="w-full max-w-lg mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-900/30 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20">
                             <div>
@@ -363,7 +363,7 @@ export function SoundMeterModal({ isOpen, onClose, ft: propFt, debugMode = false
                             {/* Big decibel dials */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-slate-950/30 border border-white/5 rounded-2xl text-center space-y-1 relative group overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     <span className="text-[8px] font-mono text-slate-500 uppercase tracking-wider block">{ft.soundIntensityDb || 'Sound Intensity'}</span>
                                     <span className={`text-3xl font-black font-mono tracking-tighter ${currentDb > 85 ? 'text-red-400 animate-pulse' : 'text-cyan-400'}`}>
                                         {currentDb.toFixed(1)} <span className="text-xs font-normal text-slate-400 font-sans">dB</span>
@@ -421,7 +421,7 @@ export function SoundMeterModal({ isOpen, onClose, ft: propFt, debugMode = false
                                                 playClickSound();
                                                 setSimSource(e.target.value as any);
                                             }}
-                                            className="w-full bg-[#03060a] border border-cyan-900/30 rounded-lg p-2.5 text-white text-xs outline-none focus:border-cyan-500 transition-all cursor-pointer"
+                                            className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-lg p-2.5 text-white text-xs outline-none focus:border-cyan-500 transition-all cursor-pointer"
                                         >
                                             <option value="office">{ft.sourceOffice || 'Quiet Office (40 dB)'}</option>
                                             <option value="traffic">{ft.sourceTraffic || 'Heavy Traffic (75 dB)'}</option>
@@ -440,7 +440,7 @@ export function SoundMeterModal({ isOpen, onClose, ft: propFt, debugMode = false
                             {micPermission === 'default' && !isSimulated && (
                                 <button
                                     onClick={requestPermissionAndStart}
-                                    className="flex-1 py-3.5 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 shadow-[0_0_15px_rgba(234,179,8,0.2)] cursor-pointer"
+                                    className="flex-1 py-3.5 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 cursor-pointer"
                                 >
                                     {ft.enableMicrophone || 'Enable Microphone'}
                                 </button>
@@ -463,7 +463,7 @@ export function SoundMeterModal({ isOpen, onClose, ft: propFt, debugMode = false
                                             else if (streamRef.current) startAudioAnalysis(streamRef.current);
                                             else requestPermissionAndStart();
                                         }}
-                                        className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer"
+                                        className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                                     >
                                         <Play size={14} className="fill-black" />
                                         {ft.startAnalysis || 'Start Analysis'}

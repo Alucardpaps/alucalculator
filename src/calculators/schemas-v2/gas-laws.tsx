@@ -21,7 +21,7 @@ export const gasLawsSchema: CalculatorSchemaV2 = {
         description: 'Computes pressure using Ideal Gas Law and Van der Waals equation.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['thermodynamics', 'gas', 'ideal', 'van-der-waals', 'pressure'],
         verifiedStandards: ['NIST reference data for Van der Waals parameters']
@@ -83,7 +83,7 @@ export const gasLawsSchema: CalculatorSchemaV2 = {
             const hReal = (P_real / maxP) * 100;
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="text-white/60 mb-8 font-mono text-sm tracking-widest uppercase">
                         Gas State Pressure (Bar)
                     </div>
@@ -103,16 +103,16 @@ export const gasLawsSchema: CalculatorSchemaV2 = {
                         </div>
 
                         <div className="flex flex-col items-center w-20 group">
-                            <div className="text-[#3b82f6] font-mono text-xl mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="text-[var(--std)] font-mono text-xl mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {P_real.toFixed(2)}
                             </div>
                             <div
-                                className="w-full bg-gradient-to-t from-[#1d4ed8] to-[#93c5fd] rounded-t transition-all duration-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                                className="w-full bg-gradient-to-t from-[#1d4ed8] to-[var(--std)] rounded-t transition-all duration-500 "
                                 style={{ height: `${hReal}%` }}
                             >
                                 <div className="absolute inset-0 bg-white/10" style={{ boxShadow: 'inset 0 10px 10px rgba(255,255,255,0.5)' }}></div>
                             </div>
-                            <div className="mt-4 text-[#93c5fd] text-xs font-bold uppercase tracking-wider">Van der Waals</div>
+                            <div className="mt-4 text-[var(--std)] text-xs font-bold uppercase tracking-wider">Van der Waals</div>
                         </div>
                     </div>
                 </div>

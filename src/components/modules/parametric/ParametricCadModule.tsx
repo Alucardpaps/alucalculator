@@ -12,7 +12,7 @@ import { PartControls } from '@/components/PartControls';
  */
 export default function ParametricCadModule() {
     return (
-        <div className="w-full h-full flex items-center justify-center p-6 gap-6 bg-[#020305]">
+        <div className="w-full h-full flex items-center justify-center p-6 gap-6 bg-[var(--bg-0)]">
             {/* 3D Viewer Space */}
             <div className="flex-1 h-full w-full min-w-0 flex items-center justify-center">
                 <Viewer3D />

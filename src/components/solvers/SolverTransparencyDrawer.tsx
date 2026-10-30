@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ShieldCheck, BookOpen, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Cpu } from 'lucide-react';
 import solversData from '@/data/solvers.json';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+import { MathFormula } from '@/components/ui/MathFormula';
 
 export interface SolverTransparencyProps {
   solverId: string;
@@ -13,7 +15,6 @@ export interface SolverTransparencyProps {
 
 export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: SolverTransparencyProps) {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const solver = (solversData as any[]).find((s) => s.id === solverId);
@@ -23,17 +24,17 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
     <section className="w-full border-t border-[var(--line)] bg-[var(--bg-1)] text-[var(--alu)] select-none" aria-label="Calculation transparency and standards">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5">
         <button
-          type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between py-1 text-left group transition-colors"
+          className="w-full flex items-center justify-between gap-3 text-left focus:outline-none group"
+          aria-expanded={isOpen}
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-s)] bg-[var(--ok)]/10 border border-[var(--ok)]/30 text-[var(--ok)]">
+            <span className="p-1 rounded-[var(--radius-s)] bg-[var(--cyan)]/10 text-[var(--cyan)] border border-[var(--cyan)]/25">
               <ShieldCheck size={14} />
-            </div>
-            <div className="truncate text-xs font-mono">
+            </span>
+            <div className="min-w-0 truncate text-xs font-mono">
               <span className="font-bold text-[var(--ink)] group-hover:text-[var(--cyan)] transition-colors">
-                {tr ? 'Kaynak ve Norm Varsayımları' : 'Standard Methodology & Assumptions'}
+                {t12(language, 'Standard Methodology & Assumptions', 'Resmi Standart ve Mühendislik Kabulleri')}
               </span>
               <span className="mx-2 text-[var(--alu-dim)]/50">·</span>
               <span className="text-[var(--cyan)] font-bold uppercase tracking-wider text-[11px]">
@@ -44,7 +45,7 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
 
           <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--alu-dim)] group-hover:text-white">
             <span className="px-1.5 py-0.5 rounded-[var(--radius-s)] bg-[var(--ok)]/15 text-[var(--ok)] text-[10px] font-bold uppercase border border-[var(--ok)]/30">
-              {solver.status === 'stable' ? (tr ? 'DOĞRULANMIŞ' : 'STABLE') : solver.status}
+              {solver.status === 'stable' ? (t12(language, 'STABLE', 'KARARLI')) : solver.status}
             </span>
             {isOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </div>
@@ -56,15 +57,13 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
             <div className="p-3.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2">
               <div className="flex items-center gap-2 text-[var(--cyan)] font-bold uppercase text-[11px]">
                 <Cpu size={14} />
-                <span>{tr ? 'Resmi Norm ve Formülasyon' : 'Normative Formula'}</span>
+                <span>{t12(language, 'Normative Formula', 'Resmi Norm ve Formülasyon')}</span>
               </div>
-              <div className="p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] font-mono text-[11px] text-[var(--ink)] overflow-x-auto">
-                <code>{solver.formula}</code>
+              <div className="p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] overflow-x-auto text-[11px] text-[var(--ink)]">
+                <MathFormula formula={solver.formula} />
               </div>
               <p className="text-[10px] text-[var(--alu-dim)] leading-relaxed font-sans">
-                {tr
-                  ? `${solver.standard} normu kapsamında doğrudan analitik çözücü motoru tarafından hesaplanır.`
-                  : `Computed deterministically per official ${solver.standard} standards without heuristic rounding.`}
+                {t12(language, `Computed deterministically per official ${solver.standard} standards without heuristic rounding.`, `${solver.standard} normu kapsamında doğrudan analitik çözücü motoru tarafından hesaplanır.`)}
               </p>
             </div>
 
@@ -72,7 +71,7 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
             <div className="p-3.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2">
               <div className="flex items-center gap-2 text-[var(--ok)] font-bold uppercase text-[11px]">
                 <CheckCircle2 size={14} />
-                <span>{tr ? 'Mühendislik Kabul ve Varsayımları' : 'Engineering Assumptions'}</span>
+                <span>{t12(language, 'Engineering Assumptions', 'Mühendislik Kabul ve Varsayımları')}</span>
               </div>
               <ul className="space-y-1.5 text-[11px] text-[var(--alu-dim)] font-sans">
                 {solver.assumptions.map((a: string, idx: number) => (
@@ -88,7 +87,7 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
             <div className="p-3.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-2 text-[var(--warn)] font-bold uppercase text-[11px]">
                 <AlertTriangle size={14} />
-                <span>{tr ? 'Kritik Sınırlar ve Uyarılar' : 'Boundary Limitations'}</span>
+                <span>{t12(language, 'Boundary Limitations', 'Kritik Sınırlar ve Uyarılar')}</span>
               </div>
               <ul className="space-y-1.5 text-[11px] text-[var(--alu-dim)] font-sans">
                 {solver.limitations.map((l: string, idx: number) => (
@@ -104,7 +103,7 @@ export function SolverTransparencyDrawer({ solverId, defaultOpen = false }: Solv
                   className="inline-flex items-center gap-1.5 text-[11px] text-[var(--cyan)] hover:text-[var(--cyan-dim)] font-bold transition-colors font-mono"
                 >
                   <BookOpen size={12} />
-                  <span>{tr ? 'Akademi Teori ve Örnek Çözüm →' : 'Academy Theory & Examples →'}</span>
+                  <span>{t12(language, 'Academy Theory & Examples →', 'Akademi Teori ve Örnek Çözüm →')}</span>
                 </Link>
               </div>
             </div>

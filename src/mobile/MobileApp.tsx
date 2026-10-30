@@ -5,6 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useOSStore } from '@/store/osStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { useProjectStore } from '@/store/projectStore';
 import { useWorkspaceStore } from '@/store/workspaceStore';
 import { MODULE_REGISTRY, ModuleType } from '@/config/modules';
@@ -79,7 +80,7 @@ export function MobileApp() {
   useEffect(() => setIsHydrated(true), []);
 
   const tLite = getLitePage(language);
-  const isLight = theme === 'light';
+  const isLight = (theme as string) === 'light' || (theme as string) === 'paper';
 
   const getModuleTitle = useCallback(
     (type: ModuleType | string) =>
@@ -171,12 +172,12 @@ export function MobileApp() {
     if (!soundEnabled) {
       setTimeout(() => playClickSound(), 50);
     }
-    triggerToast(!soundEnabled ? (language === 'tr' ? 'Ses Sentezleyici Etkin' : 'Sound Synth Enabled') : (language === 'tr' ? 'Ses Sentezleyici Kapatıldı' : 'Sound Synth Disabled'));
+    triggerToast(!soundEnabled ? (t12(language, 'Sound Synth Enabled', 'Ses Sentezleyici Etkin')) : (t12(language, 'Sound Synth Disabled', 'Ses Sentezleyici Kapatıldı')));
   };
 
   if (!isHydrated) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#020408]">
+      <div className="fixed inset-0 flex items-center justify-center bg-[var(--bg-0)]">
         <div className="w-8 h-8 border-2 border-t-cyan-400 border-white/10 rounded-full animate-spin" />
       </div>
     );

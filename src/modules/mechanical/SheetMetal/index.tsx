@@ -56,7 +56,7 @@ export default function SheetMetalModule({ windowId }: Props) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Inputs Section */}
-                <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-5 backdrop-blur-sm">
+                <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-5">
                     <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Parameters</h3>
 
                     <div className="space-y-4">
@@ -104,7 +104,7 @@ export default function SheetMetalModule({ windowId }: Props) {
 
                 {/* Results Section */}
                 <div className="flex flex-col gap-4">
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-5 backdrop-blur-sm flex-1">
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-5 flex-1">
                         <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Results</h3>
 
                         {result ? (

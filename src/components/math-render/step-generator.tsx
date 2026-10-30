@@ -36,7 +36,7 @@ export const StepGenerator: React.FC<StepGeneratorProps> = ({ steps }) => {
               )}
               
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 z-10 border border-blue-200 dark:border-blue-800">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-[var(--cyan-glow)] text-[var(--cyan)] dark:text-[var(--cyan)] flex items-center justify-center font-bold text-sm shrink-0 z-10 border border-[var(--cyan)]/40 dark:border-[var(--cyan)]/40">
                   {index + 1}
                 </div>
                 

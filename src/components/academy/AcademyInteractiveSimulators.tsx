@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { Wrench, CircleDot, Layers, Cog, ShieldCheck, Activity, RotateCcw } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 interface SimulatorProps {
   unitId: string;
@@ -29,6 +31,7 @@ export function AcademyInteractiveSimulators({ unitId }: SimulatorProps) {
 // 1. BOLT TORQUE & PRELOAD SIMULATOR (VDI 2230)
 // ══════════════════════════════════════════════════════════════
 function BoltTorqueSimulator() {
+  const { language } = useI18nStore();
   const [diameter, setDiameter] = useState<number>(12); // M12
   const [grade, setGrade] = useState<'8.8' | '10.9' | '12.9'>('8.8');
   const [friction, setFriction] = useState<number>(0.12); // μ = 0.12 (lubricated steel)
@@ -75,10 +78,10 @@ function BoltTorqueSimulator() {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-cyan-400 font-bold">
           <Wrench size={16} />
-          <span>VDI 2230 Canlı Cıvata Ön Gerilme & Tork Simülatörü</span>
+          <span>{t12(language, 'VDI 2230 Live Bolt Preload & Torque Simulator', 'VDI 2230 Canlı Cıvata Ön Gerilme & Tork Simülatörü')}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-[10px] text-cyan-300 border border-cyan-500/20">
-          Hassas Çözücü
+          {t12(language, 'Precision Solver', 'Hassas Çözücü')}
         </span>
       </div>
 
@@ -87,7 +90,7 @@ function BoltTorqueSimulator() {
         {/* Bolt Diameter */}
         <div className="space-y-2">
           <div className="flex justify-between text-slate-400">
-            <span>Anma Çapı:</span>
+            <span>{t12(language, 'Nominal Diameter:', 'Anma Çapı:')}</span>
             <strong className="text-white">M{diameter}</strong>
           </div>
           <select
@@ -108,7 +111,7 @@ function BoltTorqueSimulator() {
         {/* Grade */}
         <div className="space-y-2">
           <div className="flex justify-between text-slate-400">
-            <span>Kalite Sınıfı:</span>
+            <span>{t12(language, 'Strength Grade:', 'Kalite Sınıfı:')}</span>
             <strong className="text-cyan-400">{grade} ({yieldStrength} MPa)</strong>
           </div>
           <div className="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-lg border border-white/10">
@@ -118,7 +121,7 @@ function BoltTorqueSimulator() {
                 type="button"
                 onClick={() => setGrade(g)}
                 className={`py-1.5 rounded text-center transition cursor-pointer font-bold ${
-                  grade === g ? 'bg-cyan-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+                  grade === g ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {g}
@@ -130,7 +133,7 @@ function BoltTorqueSimulator() {
         {/* Friction */}
         <div className="space-y-2">
           <div className="flex justify-between text-slate-400">
-            <span>Sürtünme Katsayısı (μ):</span>
+            <span>{t12(language, 'Friction Coefficient (μ):', 'Sürtünme Katsayısı (μ):')}</span>
             <strong className="text-amber-400">{friction.toFixed(2)}</strong>
           </div>
           <input
@@ -140,12 +143,12 @@ function BoltTorqueSimulator() {
             step="0.01"
             value={friction}
             onChange={(e) => setFriction(Number(e.target.value))}
-            className="w-full accent-cyan-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-slate-500">
-            <span>Yağlı (0.08)</span>
-            <span>Kuru Çelik (0.15)</span>
-            <span>Paslı (0.25)</span>
+            <span>{t12(language, 'Lubricated (0.08)', 'Yağlı (0.08)')}</span>
+            <span>{t12(language, 'Dry Steel (0.15)', 'Kuru Çelik (0.15)')}</span>
+            <span>{t12(language, 'Rusty (0.25)', 'Paslı (0.25)')}</span>
           </div>
         </div>
       </div>
@@ -153,22 +156,22 @@ function BoltTorqueSimulator() {
       {/* Live Output HUD */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Sıkma Torku (MA)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'TIGHTENING TORQUE (MA)', 'SIKMA TORKU (MA)')}</span>
           <p className="text-lg font-black text-cyan-400 mt-1">{results.torqueNm} <span className="text-xs font-normal">Nm</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Ön Gerilme (FM)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'PRELOAD FORCE (FM)', 'ÖN GERİLME (FM)')}</span>
           <p className="text-lg font-black text-emerald-400 mt-1">{results.preloadKN} <span className="text-xs font-normal">kN</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Çekme Gerilmesi (σ0)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'TENSILE STRESS (σ0)', 'ÇEKMEGERİLMESİ (σ0)')}</span>
           <p className="text-lg font-black text-white mt-1">{results.stressMPa} <span className="text-xs font-normal">MPa</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Akma Oranı (αA)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'YIELD RATIO (αA)', 'AKMA ORANI (αA)')}</span>
           <p className="text-lg font-black text-amber-400 mt-1">%{results.utilization}</p>
         </div>
       </div>
@@ -180,6 +183,7 @@ function BoltTorqueSimulator() {
 // 2. BEARING RATING LIFE SIMULATOR (ISO 281)
 // ══════════════════════════════════════════════════════════════
 function BearingLifeSimulator() {
+  const { language } = useI18nStore();
   const [dynamicCapacity, setDynamicCapacity] = useState<number>(32); // C in kN
   const [radialLoad, setRadialLoad] = useState<number>(6.5); // Fr in kN
   const [rpm, setRpm] = useState<number>(1450);
@@ -204,10 +208,10 @@ function BearingLifeSimulator() {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-sky-400 font-bold">
           <CircleDot size={16} />
-          <span>ISO 281 Rulman L10 Yorulma Ömrü Simülatörü</span>
+          <span>{t12(language, 'ISO 281 Bearing L10 Fatigue Life Simulator', 'ISO 281 Rulman L10 Yorulma Ömrü Simülatörü')}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-sky-500/10 text-[10px] text-sky-300 border border-sky-500/20">
-          L10 Hesaplayıcı
+          {t12(language, 'L10 Calculator', 'L10 Hesaplayıcı')}
         </span>
       </div>
 
@@ -215,7 +219,7 @@ function BearingLifeSimulator() {
         {/* Dynamic Capacity */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Dinamik Yük (C):</span>
+            <span>{t12(language, 'Dynamic Load (C):', 'Dinamik Yük (C):')}</span>
             <strong className="text-white">{dynamicCapacity} kN</strong>
           </div>
           <input
@@ -225,14 +229,14 @@ function BearingLifeSimulator() {
             step="1"
             value={dynamicCapacity}
             onChange={(e) => setDynamicCapacity(Number(e.target.value))}
-            className="w-full accent-sky-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
         </div>
 
         {/* Radial Load */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Eşdeğer Yük (P):</span>
+            <span>{t12(language, 'Equivalent Load (P):', 'Eşdeğer Yük (P):')}</span>
             <strong className="text-amber-400">{radialLoad} kN</strong>
           </div>
           <input
@@ -242,14 +246,14 @@ function BearingLifeSimulator() {
             step="0.5"
             value={radialLoad}
             onChange={(e) => setRadialLoad(Number(e.target.value))}
-            className="w-full accent-amber-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
         </div>
 
         {/* RPM */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Dönme Hızı (n):</span>
+            <span>{t12(language, 'Rotational Speed (n):', 'Dönme Hızı (n):')}</span>
             <strong className="text-cyan-400">{rpm} RPM</strong>
           </div>
           <input
@@ -259,31 +263,31 @@ function BearingLifeSimulator() {
             step="50"
             value={rpm}
             onChange={(e) => setRpm(Number(e.target.value))}
-            className="w-full accent-cyan-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
         </div>
 
         {/* Type */}
         <div className="space-y-1.5">
-          <span className="text-slate-400 block">Rulman Tipi (p üssü):</span>
+          <span className="text-slate-400 block">{t12(language, 'Bearing Type (p exponent):', 'Rulman Tipi (p üssü):')}</span>
           <div className="grid grid-cols-2 gap-1 bg-slate-900 p-1 rounded-lg border border-white/10">
             <button
               type="button"
               onClick={() => setBearingType('ball')}
               className={`py-1 rounded text-center transition cursor-pointer font-bold ${
-                bearingType === 'ball' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                bearingType === 'ball' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Bilyalı (p=3)
+              {t12(language, 'Ball (p=3)', 'Bilyalı (p=3)')}
             </button>
             <button
               type="button"
               onClick={() => setBearingType('roller')}
               className={`py-1 rounded text-center transition cursor-pointer font-bold ${
-                bearingType === 'roller' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                bearingType === 'roller' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Makaralı (10/3)
+              {t12(language, 'Roller (10/3)', 'Makaralı (10/3)')}
             </button>
           </div>
         </div>
@@ -292,18 +296,18 @@ function BearingLifeSimulator() {
       {/* Results */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">L10 Ömrü (Milyon Devir)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'L10 LIFE (MILLION REVS)', 'L10 ÖMRÜ (MİLYON DEVİR)')}</span>
           <p className="text-xl font-black text-sky-400 mt-1">{results.millionRevs} <span className="text-xs font-normal">M-rev</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Çalışma Ömrü (L10h)</span>
-          <p className="text-xl font-black text-emerald-400 mt-1">{results.hours} <span className="text-xs font-normal">Saat</span></p>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'SERVICE LIFE (L10h)', 'ÇALIŞMA ÖMRÜ (L10h)')}</span>
+          <p className="text-xl font-black text-emerald-400 mt-1">{results.hours} <span className="text-xs font-normal">{t12(language, 'Hours', 'Saat')}</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">7/24 Sürekli Çalışma</span>
-          <p className="text-xl font-black text-amber-400 mt-1">{results.years247} <span className="text-xs font-normal">Yıl</span></p>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, '24/7 CONTINUOUS OPERATION', '7/24 SÜREKLİ ÇALIŞMA')}</span>
+          <p className="text-xl font-black text-amber-400 mt-1">{results.years247} <span className="text-xs font-normal">{t12(language, 'Years', 'Yıl')}</span></p>
         </div>
       </div>
     </div>
@@ -314,6 +318,7 @@ function BearingLifeSimulator() {
 // 3. BEAM DEFLECTION & MOMENT SIMULATOR (EULER-BERNOULLI)
 // ══════════════════════════════════════════════════════════════
 function BeamDeflectionSimulator() {
+  const { language } = useI18nStore();
   const [spanLength, setSpanLength] = useState<number>(1200); // mm
   const [pointLoad, setPointLoad] = useState<number>(2500); // N
   const [material, setMaterial] = useState<'alu' | 'steel'>('alu');
@@ -324,10 +329,7 @@ function BeamDeflectionSimulator() {
   const results = useMemo(() => {
     const L = spanLength;
     const F = pointLoad;
-    // Simply supported beam with center point load:
-    // M_max = F*L / 4 (N*mm)
     const maxMomentNm = (F * L) / (4 * 1000);
-    // Deflection: w_max = (F * L³) / (48 * E * I)
     const maxDeflectionMm = (F * Math.pow(L, 3)) / (48 * E * I);
     const allowableDeflection = L / 500;
     const isSafe = maxDeflectionMm <= allowableDeflection;
@@ -345,18 +347,17 @@ function BeamDeflectionSimulator() {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-emerald-400 font-bold">
           <Layers size={16} />
-          <span>Euler-Bernoulli Kiriş Sehim & Moment Simülatörü</span>
+          <span>{t12(language, 'Euler-Bernoulli Beam Deflection & Moment Simulator', 'Euler-Bernoulli Kiriş Sehim & Moment Simülatörü')}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-[10px] text-emerald-300 border border-emerald-500/20">
-          Basit Mesnetli
+          {t12(language, 'Simply Supported', 'Basit Mesnetli')}
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Span Length */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Açıklık Boyu (L):</span>
+            <span>{t12(language, 'Span Length (L):', 'Açıklık Boyu (L):')}</span>
             <strong className="text-white">{spanLength} mm</strong>
           </div>
           <input
@@ -366,14 +367,13 @@ function BeamDeflectionSimulator() {
             step="50"
             value={spanLength}
             onChange={(e) => setSpanLength(Number(e.target.value))}
-            className="w-full accent-emerald-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
         </div>
 
-        {/* Load */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Merkezi Noktasal Yük (F):</span>
+            <span>{t12(language, 'Center Point Load (F):', 'Merkezi Noktasal Yük (F):')}</span>
             <strong className="text-cyan-400">{pointLoad} N ({Math.round(pointLoad / 9.81)} kg)</strong>
           </div>
           <input
@@ -383,31 +383,30 @@ function BeamDeflectionSimulator() {
             step="100"
             value={pointLoad}
             onChange={(e) => setPointLoad(Number(e.target.value))}
-            className="w-full accent-cyan-400 cursor-pointer"
+            className="w-full accent-[var(--cyan)] cursor-pointer"
           />
         </div>
 
-        {/* Material */}
         <div className="space-y-1.5">
-          <span className="text-slate-400 block">Malzeme (Elastisite Modülü):</span>
+          <span className="text-slate-400 block">{t12(language, 'Material (Elastic Modulus):', 'Malzeme (Elastisite Modülü):')}</span>
           <div className="grid grid-cols-2 gap-1 bg-slate-900 p-1 rounded-lg border border-white/10">
             <button
               type="button"
               onClick={() => setMaterial('alu')}
               className={`py-1 rounded text-center transition cursor-pointer font-bold ${
-                material === 'alu' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                material === 'alu' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Alüminyum (70 GPa)
+              {t12(language, 'Aluminum (70 GPa)', 'Alüminyum (70 GPa)')}
             </button>
             <button
               type="button"
               onClick={() => setMaterial('steel')}
               className={`py-1 rounded text-center transition cursor-pointer font-bold ${
-                material === 'steel' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
+                material === 'steel' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Çelik (210 GPa)
+              {t12(language, 'Steel (210 GPa)', 'Çelik (210 GPa)')}
             </button>
           </div>
         </div>
@@ -416,19 +415,19 @@ function BeamDeflectionSimulator() {
       {/* Results */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Maksimum Eğilme Momenti</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'MAXIMUM BENDING MOMENT', 'MAKSİMUM EĞİLME MOMENTİ')}</span>
           <p className="text-xl font-black text-cyan-400 mt-1">{results.momentNm} <span className="text-xs font-normal">Nm</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Maksimum Sehim (w_max)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'MAXIMUM DEFLECTION (w_max)', 'MAKSİMUM SEHİM (w_max)')}</span>
           <p className="text-xl font-black text-emerald-400 mt-1">{results.deflectionMm} <span className="text-xs font-normal">mm</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">L/500 Sınırı ({results.allowableMm} mm)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, `L/500 LIMIT (${results.allowableMm} mm)`, `L/500 SINIRI (${results.allowableMm} mm)`)}</span>
           <p className={`text-xl font-black mt-1 ${results.isSafe ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {results.isSafe ? 'GÜVENLİ (✓)' : 'SEHİM AŞILDI (✗)'}
+            {results.isSafe ? t12(language, 'SAFE (✓)', 'GÜVENLİ (✓)') : t12(language, 'DEFLECTION EXCEEDED (✗)', 'SEHİM AŞILDI (✗)')}
           </p>
         </div>
       </div>
@@ -440,6 +439,7 @@ function BeamDeflectionSimulator() {
 // 4. GEAR STRESS SIMULATOR (ISO 6336)
 // ══════════════════════════════════════════════════════════════
 function GearStressSimulator() {
+  const { language } = useI18nStore();
   const [module, setModule] = useState<number>(3); // mm
   const [teeth, setTeeth] = useState<number>(24);
   const [torque, setTorque] = useState<number>(120); // Nm
@@ -448,7 +448,6 @@ function GearStressSimulator() {
     const dPitch = module * teeth; // mm
     const ftForce = (2 * torque * 1000) / dPitch; // N
     const faceWidth = module * 10; // mm (b = 10*m)
-    // Approximate tooth root bending stress: sigma_F = (Ft * YF * YS) / (b * m)
     const YF = 2.4; // Form factor approx
     const rootStressMPa = (ftForce * YF) / (faceWidth * module);
 
@@ -465,85 +464,58 @@ function GearStressSimulator() {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-amber-400 font-bold">
           <Cog size={16} />
-          <span>ISO 6336 Düz Dişli Diş Dibi Gerilme Simülatörü</span>
+          <span>{t12(language, 'ISO 6336 Spur Gear Root Stress Simulator', 'ISO 6336 Düz Dişli Diş Dibi Gerilme Simülatörü')}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-amber-500/10 text-[10px] text-amber-300 border border-amber-500/20">
-          ISO 6336 Metot B
+          ISO 6336 {t12(language, 'Method B', 'Metot B')}
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Module */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Modül (m):</span>
+            <span>{t12(language, 'Module (m):', 'Modül (m):')}</span>
             <strong className="text-white">{module} mm</strong>
           </div>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.5"
-            value={module}
-            onChange={(e) => setModule(Number(e.target.value))}
-            className="w-full accent-amber-400 cursor-pointer"
-          />
+          <input type="range" min="1" max="10" step="0.5" value={module} onChange={(e) => setModule(Number(e.target.value))} className="w-full accent-[var(--cyan)] cursor-pointer" />
         </div>
 
-        {/* Teeth */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Diş Sayısı (z):</span>
+            <span>{t12(language, 'Number of Teeth (z):', 'Diş Sayısı (z):')}</span>
             <strong className="text-cyan-400">{teeth}</strong>
           </div>
-          <input
-            type="range"
-            min="12"
-            max="80"
-            step="1"
-            value={teeth}
-            onChange={(e) => setTeeth(Number(e.target.value))}
-            className="w-full accent-cyan-400 cursor-pointer"
-          />
+          <input type="range" min="12" max="80" step="1" value={teeth} onChange={(e) => setTeeth(Number(e.target.value))} className="w-full accent-[var(--cyan)] cursor-pointer" />
         </div>
 
-        {/* Torque */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>İletilen Tork (T):</span>
+            <span>{t12(language, 'Transmitted Torque (T):', 'İletilen Tork (T):')}</span>
             <strong className="text-emerald-400">{torque} Nm</strong>
           </div>
-          <input
-            type="range"
-            min="10"
-            max="1000"
-            step="10"
-            value={torque}
-            onChange={(e) => setTorque(Number(e.target.value))}
-            className="w-full accent-emerald-400 cursor-pointer"
-          />
+          <input type="range" min="10" max="1000" step="10" value={torque} onChange={(e) => setTorque(Number(e.target.value))} className="w-full accent-[var(--cyan)] cursor-pointer" />
         </div>
       </div>
 
       {/* Results */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Bölüm Dairesi Çapı (d)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'PITCH CIRCLE DIA. (d)', 'BÖLÜM DAİRESİ ÇAPI (d)')}</span>
           <p className="text-lg font-black text-white mt-1">{results.pitchDiameter} <span className="text-xs font-normal">mm</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Teğetsel Kuvvet (Ft)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'TANGENTIAL FORCE (Ft)', 'TEĞETSEL KUVVET (Ft)')}</span>
           <p className="text-lg font-black text-cyan-400 mt-1">{results.tangentialForceN} <span className="text-xs font-normal">N</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Diş Genişliği (b)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'FACE WIDTH (b)', 'DİŞ GENİŞLİĞİ (b)')}</span>
           <p className="text-lg font-black text-slate-300 mt-1">{results.faceWidthMm} <span className="text-xs font-normal">mm</span></p>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Diş Dibi Gerilmesi (σF)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'ROOT BENDING STRESS (σF)', 'DİŞ DİBİ GERİLMESİ (σF)')}</span>
           <p className="text-lg font-black text-amber-400 mt-1">{results.rootStressMPa} <span className="text-xs font-normal">MPa</span></p>
         </div>
       </div>
@@ -555,6 +527,7 @@ function GearStressSimulator() {
 // 5. COLUMN BUCKLING SIMULATOR (EULER)
 // ══════════════════════════════════════════════════════════════
 function BucklingSimulator() {
+  const { language } = useI18nStore();
   const [length, setLength] = useState<number>(1500); // mm
   const [endCondition, setEndCondition] = useState<number>(1.0); // K factor (pivoted-pivoted)
 
@@ -563,7 +536,6 @@ function BucklingSimulator() {
 
   const results = useMemo(() => {
     const Le = length * endCondition;
-    // Euler critical load: P_cr = (pi^2 * E * I) / (Le^2)
     const PcrN = (Math.PI * Math.PI * E * I) / (Le * Le);
 
     return {
@@ -578,35 +550,25 @@ function BucklingSimulator() {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-rose-400 font-bold">
           <Activity size={16} />
-          <span>Euler Kolon Burkulma Kritik Yük Simülatörü</span>
+          <span>{t12(language, 'Euler Column Buckling Critical Load Simulator', 'Euler Kolon Burkulma Kritik Yük Simülatörü')}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-rose-500/10 text-[10px] text-rose-300 border border-rose-500/20">
-          Kritik Yük Hesabı
+          {t12(language, 'Critical Load Calculator', 'Kritik Yük Hesabı')}
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Length */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Kolon Boyu (L):</span>
+            <span>{t12(language, 'Column Length (L):', 'Kolon Boyu (L):')}</span>
             <strong className="text-white">{length} mm</strong>
           </div>
-          <input
-            type="range"
-            min="400"
-            max="4000"
-            step="100"
-            value={length}
-            onChange={(e) => setLength(Number(e.target.value))}
-            className="w-full accent-rose-400 cursor-pointer"
-          />
+          <input type="range" min="400" max="4000" step="100" value={length} onChange={(e) => setLength(Number(e.target.value))} className="w-full accent-[var(--cyan)] cursor-pointer" />
         </div>
 
-        {/* End Condition */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-slate-400">
-            <span>Mesnet Tipi (K Katsayısı):</span>
+            <span>{t12(language, 'Support Type (K Factor):', 'Mesnet Tipi (K Katsayısı):')}</span>
             <strong className="text-rose-400">K = {endCondition}</strong>
           </div>
           <select
@@ -614,10 +576,10 @@ function BucklingSimulator() {
             onChange={(e) => setEndCondition(Number(e.target.value))}
             className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-white font-bold"
           >
-            <option value={1.0}>İki Uçtan Mafsallı (K = 1.0)</option>
-            <option value={0.5}>İki Uçtan Ankastre (K = 0.5)</option>
-            <option value={0.7}>Bir Uç Ankastre, Bir Uç Mafsallı (K = 0.7)</option>
-            <option value={2.0}>Konsol / Serbest Uç (K = 2.0)</option>
+            <option value={1.0}>{t12(language, 'Pinned-Pinned (K = 1.0)', 'İki Uçtan Mafsallı (K = 1.0)')}</option>
+            <option value={0.5}>{t12(language, 'Fixed-Fixed (K = 0.5)', 'İki Uçtan Ankastre (K = 0.5)')}</option>
+            <option value={0.7}>{t12(language, 'Fixed-Pinned (K = 0.7)', 'Bir Uç Ankastre, Bir Uç Mafsallı (K = 0.7)')}</option>
+            <option value={2.0}>{t12(language, 'Cantilever / Free End (K = 2.0)', 'Konsol / Serbest Uç (K = 2.0)')}</option>
           </select>
         </div>
       </div>
@@ -625,17 +587,17 @@ function BucklingSimulator() {
       {/* Results */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Etkin Burkulma Boyu (Le)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'EFFECTIVE BUCKLING LENGTH (Le)', 'ETKİN BURKULMA BOYU (Le)')}</span>
           <p className="text-xl font-black text-white mt-1">{results.effectiveLengthMm} <span className="text-xs font-normal">mm</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">Euler Kritik Yük (Pcr)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'EULER CRITICAL LOAD (Pcr)', 'EULER KRİTİK YÜK (Pcr)')}</span>
           <p className="text-xl font-black text-rose-400 mt-1">{results.criticalLoadKN} <span className="text-xs font-normal">kN</span></p>
         </div>
 
         <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
-          <span className="text-[10px] text-slate-400 uppercase">İzin Verilen Yük (S=2.5)</span>
+          <span className="text-[10px] text-slate-400 uppercase">{t12(language, 'ALLOWABLE LOAD (S=2.5)', 'İZİN VERİLEN YÜK (S=2.5)')}</span>
           <p className="text-xl font-black text-emerald-400 mt-1">{results.maxSafeLoadKN} <span className="text-xs font-normal">kN</span></p>
         </div>
       </div>
@@ -647,6 +609,7 @@ function BucklingSimulator() {
 // 6. GENERIC INTERACTIVE WORKBENCH
 // ══════════════════════════════════════════════════════════════
 function GenericEngineeringSimulator({ unitId }: { unitId: string }) {
+  const { language } = useI18nStore();
   const [loadRatio, setLoadRatio] = useState<number>(65);
 
   return (
@@ -654,16 +617,16 @@ function GenericEngineeringSimulator({ unitId }: { unitId: string }) {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2 text-cyan-400 font-bold">
           <ShieldCheck size={16} />
-          <span>Normatif Tasarım Parametre Analizi ({unitId})</span>
+          <span>{t12(language, `Normative Design Parameter Analysis (${unitId})`, `Normatif Tasarım Parametre Analizi (${unitId})`)}</span>
         </div>
         <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-[10px] text-cyan-300">
-          Canlı Analiz
+          {t12(language, 'Live Analysis', 'Canlı Analiz')}
         </span>
       </div>
 
       <div className="space-y-2">
         <div className="flex justify-between text-slate-400">
-          <span>Yükleme / Kapasite Kullanım Oranı:</span>
+          <span>{t12(language, 'Load / Capacity Utilization Ratio:', 'Yükleme / Kapasite Kullanım Oranı:')}</span>
           <strong className={loadRatio > 85 ? 'text-rose-400' : 'text-emerald-400'}>%{loadRatio}</strong>
         </div>
         <input
@@ -672,18 +635,18 @@ function GenericEngineeringSimulator({ unitId }: { unitId: string }) {
           max="120"
           value={loadRatio}
           onChange={(e) => setLoadRatio(Number(e.target.value))}
-          className="w-full accent-cyan-400 cursor-pointer"
+          className="w-full accent-[var(--cyan)] cursor-pointer"
         />
       </div>
 
       <div className="p-3 rounded-xl bg-slate-900/90 border border-white/10 flex items-center justify-between">
-        <span className="text-slate-400">Güvenlik Katsayısı Durumu:</span>
+        <span className="text-slate-400">{t12(language, 'Safety Factor Status:', 'Güvenlik Katsayısı Durumu:')}</span>
         <span className={`font-bold px-2 py-0.5 rounded text-xs ${
           loadRatio <= 75 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
           loadRatio <= 90 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
           'bg-rose-500/20 text-rose-300 border border-rose-500/30'
         }`}>
-          {loadRatio <= 75 ? 'Optimal Güvenlik (S ≥ 1.5)' : loadRatio <= 90 ? 'Kritik Sınır (S ≈ 1.1)' : 'Aşırı Yükleme Riski (S < 1.0)'}
+          {loadRatio <= 75 ? t12(language, 'Optimal Safety (S ≥ 1.5)', 'Optimal Güvenlik (S ≥ 1.5)') : loadRatio <= 90 ? t12(language, 'Critical Limit (S ≈ 1.1)', 'Kritik Sınır (S ≈ 1.1)') : t12(language, 'Overload Risk (S < 1.0)', 'Aşırı Yükleme Riski (S < 1.0)')}
         </span>
       </div>
     </div>

@@ -6,10 +6,11 @@ import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
 import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
+import { MathFormula } from '@/components/ui/MathFormula';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Bearing Life Calculator (ISO 281 / L10h) | AluCalc OS',
+  title: 'Bearing Life Calculator (ISO 281 / L10h)',
   description:
     'Calculate rolling element bearing life (L10 rating life in millions of revolutions and L10h operating hours) according to ISO 281 and DIN ISO 281 standards.',
   alternates: {
@@ -45,7 +46,9 @@ export default function BearingsPage() {
           <div className="mt-3 grid gap-3 border-t border-[var(--line)] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3 font-mono">
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">
               <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--cyan)]">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-[var(--ink)]">{method.formula}</p>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--alu-dim)] font-sans">{method.formulaNote}</p>
             </div>
             <div className="work-panel rounded-[var(--radius-s)] p-3 bg-[var(--bg-2)] border border-[var(--line)]">

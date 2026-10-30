@@ -16,7 +16,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
         { label: dict.welding?.title || 'Welding', icon: Flame, path: '/welding' },
         { label: dict.sheetMetal?.title || 'Sheet Metal', icon: Layers, path: '/sheet-metal' },
         { label: dict.pump?.title || 'Pumps', icon: Droplets, path: '/pumps' },
-        { label: dict.fastener?.title || 'Fasteners', icon: Settings, path: '/fasteners' },
+        { label: dict.fastener?.title || 'Bolt Torque', icon: Settings, path: '/bolt-torque' },
         { label: dict.converter?.title || 'Converter', icon: ArrowRightLeft, path: '/converter' },
         { label: 'Mobile & Watch APK', icon: Smartphone, path: '/download' },
         { label: dict.nav?.handbook || 'Handbook', icon: BookOpen, path: '/handbook' },
@@ -46,11 +46,17 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
         };
         document.addEventListener("mousedown", handleClickOutside);
 
-        // Init theme
-        const isDark = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        // Init theme: AluCAD OS defaults to dark instrument mode
+        const savedTheme = localStorage.getItem('theme');
+        const isDark = savedTheme === 'light' ? false : true;
         setDarkMode(isDark);
-        if (isDark) document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+        }
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
@@ -62,8 +68,13 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
         const newMode = !darkMode;
         setDarkMode(newMode);
         localStorage.setItem('theme', newMode ? 'dark' : 'light');
-        if (newMode) document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
+        if (newMode) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+        }
     };
 
     // Placeholder links - hidden if not implemented to avoid "useless" errors
@@ -77,7 +88,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
         <>
             <AdvancedCalculator isOpen={calcOpen} onClose={() => setCalcOpen(false)} />
 
-            <nav className={`w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200/50 shadow-sm py-3' : 'bg-transparent py-4 text-white'}`}>
+            <nav className={`w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 border-b border-slate-200/50 shadow-sm py-3' : 'bg-transparent py-4 text-white'}`}>
                 <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
 
                     {/* Logo & Brand */}
@@ -186,7 +197,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                                                 <Link prefetch={false}
                                                     key={locale}
                                                     href={path}
-                                                    className={`px-3 py-2 text-xs font-bold uppercase rounded-lg flex items-center justify-center transition-colors ${lang === locale ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-600'}`}
+                                                    className={`px-3 py-2 text-xs font-bold uppercase rounded-lg flex items-center justify-center transition-colors ${lang === locale ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'hover:bg-slate-50 text-slate-600'}`}
                                                 >
                                                     {locale}
                                                 </Link>
@@ -211,7 +222,7 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
 
                         {/* Mail Feedback Button */}
                         <a
-                            href="mailto:contact@alucalculator.com?subject=Feedback"
+                            href="mailto:abdulsametyildirim95@gmail.com?subject=Feedback"
                             className={`p-2 transition-colors ${scrolled ? 'text-slate-400 hover:text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
                             title="Send Feedback"
                         >
@@ -219,10 +230,10 @@ export const Navbar = ({ lang, dict }: { lang: string, dict: any }) => {
                         </a>
 
                         <a
-                            href="mailto:sales@alucalculator.com"
-                            className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
+                            href="mailto:abdulsametyildirim95@gmail.com"
+                            className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-600 transition-all hover:scale-105 active:scale-95 shadow-lg "
                         >
-                            Contact Sales
+                            Contact
                         </a>
                     </div>
 

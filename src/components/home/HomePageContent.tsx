@@ -1,241 +1,278 @@
 'use client';
 
-import React, { useState } from 'react';
+/**
+ * Home — a calm, mascot-centred landing page (v6).
+ *
+ * AeGiS hovers over a slowly turning rotary table in the middle of the page and reacts
+ * to the ask box: it looks down at the box while you type, speaks when it finds matching
+ * calculations and thinks when it does not (Enter then hands the question to the AeGiS
+ * chat). Below it: one question, one box and a dock with the five workspaces.
+ */
+
+import React, { useId, useMemo, useState } from 'react';
 import Link from 'next/link';
-import {
-  Box,
-  Pencil,
-  ShieldCheck,
-  GraduationCap,
-  ArrowRight,
-  Smartphone,
-  Check,
-  ChevronRight,
-  Layers,
-  Cpu,
-  Compass,
-  FileCode2,
-  HardDriveDownload,
-} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Box, Calculator, CornerDownLeft, GraduationCap, PenTool, Search, Workflow } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
-import { getHomeTranslations } from '@/locales/homeTranslations';
-import { getAppPages } from '@/locales/appPagesTranslations';
-import { AegisHeroStage } from '@/components/copilot/AegisHeroStage';
+import { t12 } from '@/locales/t12';
+import { AegisHeroCard } from '@/components/home/AegisHeroCard';
+import { AegisMascot, type AegisPose } from '@/components/copilot/AegisMascot';
+import { solverCount } from '@/lib/registry/calculatorRegistry';
+import { searchTools } from '@/lib/search/toolSearch';
+import styles from './HomeStage.module.css';
+
+// ─── the rotary table under AeGiS ───────────────────────────────────────────
+
+const MINOR_TICKS = Array.from({ length: 72 }, (_, i) => i * 5).filter((a) => a % 30 !== 0);
+const MAJOR_TICKS = Array.from({ length: 12 }, (_, i) => i * 30);
+const T_SLOTS = [45, 135, 225, 315];
+
+const RotaryTable = React.memo(function RotaryTable() {
+  const gid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <div aria-hidden className={styles.dial}>
+      <svg viewBox="-200 -200 400 400" className={styles.layer}>
+        <defs>
+          <radialGradient id={`${gid}-glow`}>
+            <stop offset="0" style={{ stopColor: 'var(--cyan)', stopOpacity: 0.2 }} />
+            <stop offset="0.5" style={{ stopColor: 'var(--cyan)', stopOpacity: 0.06 }} />
+            <stop offset="1" style={{ stopColor: 'var(--cyan)', stopOpacity: 0 }} />
+          </radialGradient>
+        </defs>
+        <circle r="200" fill={`url(#${gid}-glow)`} />
+        <circle r="194" fill="none" style={{ stroke: 'var(--line-strong)' }} strokeWidth="1.4" />
+      </svg>
+      <div className={styles.rotor}>
+        <svg viewBox="-200 -200 400 400" className={styles.layer}>
+          <g style={{ stroke: 'var(--line-strong)' }} strokeWidth="1.6" strokeLinecap="round">
+            {MINOR_TICKS.map((a) => (
+              <line key={a} x1="0" y1="-187" x2="0" y2="-178" transform={`rotate(${a})`} />
+            ))}
+          </g>
+          <g style={{ stroke: 'var(--alu-dim)' }} strokeWidth="2.4" strokeLinecap="round">
+            {MAJOR_TICKS.map((a) => (
+              <line key={a} x1="0" y1="-187" x2="0" y2="-166" transform={`rotate(${a})`} />
+            ))}
+          </g>
+          <circle r="140" fill="none" style={{ stroke: 'var(--line-strong)' }} strokeWidth="1.4" strokeDasharray="2 9" strokeLinecap="round" />
+          <g fill="none" style={{ stroke: 'var(--line-strong)' }} strokeWidth="1.4">
+            {T_SLOTS.map((a) => (
+              <rect key={a} x="-6" y="-128" width="12" height="54" rx="6" transform={`rotate(${a})`} />
+            ))}
+          </g>
+          <circle r="64" fill="none" style={{ stroke: 'var(--accent-line)' }} strokeWidth="1.8" />
+        </svg>
+      </div>
+      {/* fixed index mark at the front edge */}
+      <svg viewBox="-200 -200 400 400" className={styles.layer}>
+        <path d="M 0 180 L -9 198 L 9 198 Z" style={{ fill: 'var(--cyan)' }} />
+      </svg>
+    </div>
+  );
+});
+
+// ─── workspaces dock ────────────────────────────────────────────────────────
+
+const WORKSPACES = [
+  { href: '/calculators/', icon: Calculator, en: 'Solvers', tr: 'Çözücüler', hintEn: `${solverCount} calculations`, hintTr: `${solverCount} hesap` },
+  { href: '/design-studio/', icon: Box, en: '3D CAD', tr: '3D CAD', hintEn: 'Parametric parts', hintTr: 'Parametrik parça' },
+  { href: '/cad-editor/', icon: PenTool, en: '2D CAD', tr: '2D CAD', hintEn: 'Technical drawing', hintTr: 'Teknik çizim' },
+  { href: '/flow/', icon: Workflow, en: 'Flow', tr: 'Flow', hintEn: 'Calculation graphs', hintTr: 'Hesap akışları' },
+  { href: '/academy/', icon: GraduationCap, en: 'Academy', tr: 'Akademi', hintEn: 'Learn and practise', hintTr: 'Öğren, pratik yap' },
+] as const;
+
+const LOOK_AT_BOX = { x: 0, y: 0.9 } as const;
+
+type StageState = 'idle' | 'listening' | 'found' | 'unknown';
+
+const POSE: Record<StageState, AegisPose | null> = {
+  idle: null,
+  listening: 'listening',
+  found: 'speaking',
+  unknown: 'thinking',
+};
+
+// ─── page ───────────────────────────────────────────────────────────────────
 
 export function HomePageContent() {
   const { language } = useI18nStore();
-  const tHome = getHomeTranslations(language);
-  const tExtra = getAppPages(language).homeExtra;
+  const router = useRouter();
+  const listId = useId();
+  const headingId = useId();
 
-  // CAD Mockup state for interactive feel
-  const [activeCadView, setActiveCadView] = useState<'3d' | 'wireframe'>('3d');
+  const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const results = useMemo(() => searchTools(query), [query]);
+  const text = query.trim();
+  const state: StageState = !focused ? 'idle' : !text ? 'listening' : results.length ? 'found' : 'unknown';
+  const showList = state === 'found';
+
+  const message = {
+    idle: t12(language, 'Hi, I’m AeGiS.', 'Merhaba, ben AeGiS.'),
+    listening: t12(language, 'Type it and I’ll find it.', 'Yaz, hemen bulayım.'),
+    found: t12(language, 'Found these. Pick one.', 'Bunları buldum, birini seç.'),
+    unknown: t12(
+      language,
+      'No ready-made calculation for that. Ask me and we’ll work it out in the chat.',
+      'Bunun için hazır bir hesap yok. Bana sor, sohbette birlikte çözelim.'
+    ),
+  }[state];
+
+  const askAegis = (prompt?: string) => {
+    window.dispatchEvent(
+      new CustomEvent('alucalc:open-copilot', prompt ? { detail: { prompt, send: true } } : undefined)
+    );
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return;
+    if (e.key === 'ArrowDown' && results.length) {
+      e.preventDefault();
+      setActiveIdx((i) => (i + 1) % results.length);
+    } else if (e.key === 'ArrowUp' && results.length) {
+      e.preventDefault();
+      setActiveIdx((i) => (i - 1 + results.length) % results.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const hit = results[activeIdx];
+      if (hit) router.push(hit.route);
+      else if (text) askAegis(text);
+    } else if (e.key === 'Escape' && query) {
+      e.preventDefault();
+      setQuery('');
+      setActiveIdx(0);
+    }
+  };
 
   return (
-    <div className="w-full flex flex-col space-y-16 md:space-y-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8 sm:py-12 select-none">
-      
-      {/* ─── 1. HERO (NO BOXES, EXPANSIVE SOFT DARK) ─── */}
-      <section className="relative flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16 pt-4 sm:pt-8">
-        
-        {/* Left: Bold Typography & 2 Clean CTAs */}
-        <div className="flex-1 flex flex-col space-y-6 text-left max-w-2xl">
-          
-          {/* Subtle Version Pill */}
-          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 text-xs font-mono w-fit">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-semibold text-slate-200">AluCalc OS v5.2</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-cyan-400 font-medium">100+ Deterministik Çözücü</span>
-          </div>
+    <div
+      className={`relative isolate flex min-h-[calc(100svh-53px-80px)] shrink-0 flex-col items-center justify-center overflow-x-clip px-4 text-center sm:min-h-[calc(100svh-53px)] ${styles.page}`}
+    >
+      <div className={styles.stage}>
+        <RotaryTable />
+        <AegisHeroCard
+          size={styles.mascot}
+          greet
+          forcedPose={POSE[state]}
+          lookAt={state === 'listening' || state === 'found' ? LOOK_AT_BOX : null}
+          message={message}
+          className="max-w-[420px]"
+        />
+      </div>
 
-          {/* Large Hero Title */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-            Mühendisler için <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
-              Deterministik CAD & Hesaplama
-            </span>{' '}
-            Platformu.
-          </h1>
+      <h1
+        id={headingId}
+        className={`font-tech font-semibold leading-[1.1] tracking-[-0.02em] text-[var(--ink)] ${styles.title}`}
+      >
+        {t12(language, 'What do you want to calculate?', 'Ne hesaplamak istersin?')}
+      </h1>
+      <p className={`max-w-[34rem] text-[15px] leading-relaxed text-[var(--alu-dim)] sm:text-base ${styles.lede}`}>
+        {t12(
+          language,
+          `${solverCount} ISO, DIN and VDI calculations, 3D CAD and 2D drawing in one place.`,
+          `${solverCount} ISO, DIN ve VDI hesabı, 3D CAD ve 2D çizim tek yerde.`
+        )}
+      </p>
 
-          {/* 2 Clear, Concise Sentences */}
-          <p className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-xl font-normal">
-            ISO, DIN ve VDI normlarına uygun 100+ deterministik mekanik çözücü ve tarayıcı tabanlı parametrik 3D CAD konfigüratörü.
-            Tüm mühendislik hesaplamalarınızı sıfır hata payı ve doğrudan STL/STEP ihracı ile tek platformda yürütün.
-          </p>
-
-          {/* 2 Primary Action Buttons */}
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link
-              href="/design-studio"
-              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm tracking-wide transition-all shadow-[0_0_25px_rgba(6,182,212,0.25)] hover:shadow-[0_0_35px_rgba(6,182,212,0.4)] active:scale-[0.99]"
-            >
-              <Box size={18} className="text-slate-950" />
-              <span>3D Design Studio</span>
-              <ArrowRight size={16} />
-            </Link>
-
-            <Link
-              href="/calculators"
-              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-slate-200 hover:text-white font-semibold text-sm transition-all active:scale-[0.99]"
-            >
-              <Pencil size={17} className="text-cyan-400" />
-              <span>2D AluCAD & Çözücüler</span>
-            </Link>
-          </div>
-
-          {/* Direct Mobile Download Link */}
-          <div className="flex items-center gap-4 pt-2 text-xs text-slate-400">
-            <Link
-              href="/download"
-              className="inline-flex items-center gap-1.5 text-slate-400 hover:text-cyan-300 transition-colors"
-            >
-              <Smartphone size={14} className="text-cyan-400" />
-              <span>Android & Wear OS APK İndir (v5.0)</span>
-              <ChevronRight size={13} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Right: AeGiS Copilot Mascot Stage */}
-        <div className="w-full lg:w-[480px] shrink-0">
-          <div className="relative h-[300px] sm:h-[340px] rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-[#080d1a] to-[#020408] p-2 shadow-[0_0_35px_rgba(0,229,255,0.15)] overflow-hidden group hover:border-cyan-400/50 transition-all">
-            <AegisHeroStage />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 2. NORM STRIP (SINGLE CLEAN LINE, NO CLUTTERED BOXES) ─── */}
-      <section className="border-y border-white/10 py-4 font-mono text-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-400">
-          <span className="font-semibold text-slate-300 uppercase tracking-wider text-[11px]">
-            Norm Uyumluluğu:
-          </span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-300 text-[11px]">
-            <span className="text-cyan-400 font-bold">VDI 2230</span>
-            <span className="text-slate-700">•</span>
-            <span>ISO 281:2007</span>
-            <span className="text-slate-700">•</span>
-            <span>ISO 6336</span>
-            <span className="text-slate-700">•</span>
-            <span>DIN 6935</span>
-            <span className="text-slate-700">•</span>
-            <span>ISO 5291</span>
-            <span className="text-slate-700">•</span>
-            <span>DIN 743</span>
-            <span className="text-slate-700">•</span>
-            <span className="text-emerald-400 font-medium">64-bit IEEE 754</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 3. THREE CORE PILLARS (BORDERLESS, AIRY COLUMNS) ─── */}
-      <section className="space-y-6">
-        <div className="space-y-1">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Kapsamlı Mühendislik Ekosistemi
-          </h2>
-          <p className="text-sm text-slate-400 max-w-2xl">
-            Mekanik tasarımcılar, atölye uzmanları ve Ar-Ge ekipleri için tek bir tarayıcı çalışma alanında birleşen modüller.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-4">
-          
-          {/* Pillar 1 */}
-          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-cyan-500/30 transition-all duration-300 shadow-lg space-y-4 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20 group-hover:scale-105 transition-all">
-              <ShieldCheck size={22} />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">
-              100+ Deterministik Çözücü
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-              Cıvata ön gerilimi (VDI 2230), rulman ömrü (ISO 281), dişli mukavemeti (ISO 6336), kiriş sehimleri ve mil burulması hesaplamalarında sıfır halüsinasyon ile garantili matematiksel doğruluk.
-            </p>
-            <Link
-              href="/calculators"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 pt-2 transition-colors"
-            >
-              <span>Tüm Çözücüleri Keşfet</span>
-              <ArrowRight size={13} />
-            </Link>
-          </div>
-
-          {/* Pillar 2 */}
-          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-sky-500/30 transition-all duration-300 shadow-lg space-y-4 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:bg-sky-500/20 group-hover:scale-105 transition-all">
-              <Box size={22} />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-sky-400 transition-colors">
-              2D & 3D Parametrik CAD
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-              Web tarayıcınızda çalışan donanım hızlandırmalı 3D parça konfigüratörü ve 2D AluCAD motoru. Delik, havşa ve özel alüminyum profil geometrilerini anında STL, STEP veya DXF olarak dışa aktarın.
-            </p>
-            <Link
-              href="/design-studio"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 pt-2 transition-colors"
-            >
-              <span>Design Studio'yu Başlat</span>
-              <ArrowRight size={13} />
-            </Link>
-          </div>
-
-          {/* Pillar 3 */}
-          <div className="p-6 rounded-2xl bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-blue-500/30 transition-all duration-300 shadow-lg space-y-4 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20 group-hover:scale-105 transition-all">
-              <GraduationCap size={22} />
-            </div>
-            <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">
-              Mühendislik Akademisi & Saha
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-              Formül mantıklarını, mukavemet temellerini ve talaşlı imalat parametrelerini açıklayan zengin akademi içeriği. Sahada akustik ölçüm, titreşim ve eğim sensör araçları.
-            </p>
-            <Link
-              href="/academy"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 pt-2 transition-colors"
-            >
-              <span>Akademiye Göz At</span>
-              <ArrowRight size={13} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 4. STREAMLINED DOWNLOAD BAR (MINIMAL, ELEGANT) ─── */}
-      <section className="rounded-2xl bg-gradient-to-r from-[#0a1224]/90 via-[#060b18]/90 to-[#020408]/90 border border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-xl shadow-2xl">
-        <div className="space-y-1.5 text-left">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-cyan-400 uppercase">Mobil & Giyilebilir Platform</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950 border border-emerald-500/30 text-emerald-400 font-semibold">v5.0 İmzalı</span>
-          </div>
-          <h3 className="text-xl font-bold text-white tracking-tight">AluCalc OS'u Cebinize ve Saatinize Taşıyın</h3>
-          <p className="text-xs text-slate-400 max-w-xl font-normal leading-relaxed">
-            Atölyede veya şantiyede internet olmadan dahi çalışan bağımsız Android (1.16 MB) ve Wear OS akıllı saat APK paketleri.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <a
-            href="/app/alucalc-release.apk"
-            download="alucalc-release.apk"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-[0.98]"
+      {/* ask box */}
+      <div data-tour="home-search" className={`relative w-full max-w-[560px] text-left ${styles.ask}`}>
+        <div
+          className={`flex h-14 items-center gap-3 rounded-[var(--radius-l)] border bg-[var(--bg-1)] pl-4 pr-1.5 transition-[border-color,box-shadow] ${
+            focused
+              ? 'border-[var(--cyan)] shadow-[0_0_0_3px_var(--accent-soft)]'
+              : 'border-[var(--line-strong)] shadow-[var(--shadow-1)]'
+          }`}
+        >
+          <Search size={18} className="shrink-0 text-[var(--alu-dim)]" aria-hidden />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIdx(0);
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => window.setTimeout(() => setFocused(false), 120)}
+            onKeyDown={onKeyDown}
+            placeholder={t12(language, 'e.g. M12 bolt torque, 6205 bearing life, H7/g6', 'Örn. M12 cıvata torku, 6205 rulman ömrü, H7/g6')}
+            aria-labelledby={headingId}
+            role="combobox"
+            aria-expanded={showList}
+            aria-controls={listId}
+            aria-autocomplete="list"
+            aria-activedescendant={showList ? `${listId}-${activeIdx}` : undefined}
+            enterKeyHint="search"
+            autoComplete="off"
+            spellCheck={false}
+            // the box itself shows focus (border + ring); the global :focus-visible outline is unlayered
+            style={{ outline: 'none' }}
+            className="h-full min-w-0 flex-1 bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--muted)]"
+          />
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => askAegis(text || undefined)}
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-[var(--radius-m)] bg-[var(--cyan)] pl-2 pr-3.5 text-sm font-semibold text-[var(--accent-ink)] transition-[filter] hover:brightness-110"
           >
-            <HardDriveDownload size={16} />
-            <span>Telefon APK (1.16 MB)</span>
-          </a>
-
-          <a
-            href="/app/alucalc-wear-release.apk"
-            download="alucalc-wear-release.apk"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 text-white font-semibold text-xs uppercase tracking-wider transition-all backdrop-blur-md active:scale-[0.98]"
-          >
-            <Smartphone size={16} className="text-sky-400" />
-            <span>Wear OS APK</span>
-          </a>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--accent-ink)_14%,transparent)]">
+              <AegisMascot size={24} variant="face" interactive={false} />
+            </span>
+            <span className="hidden sm:inline">{t12(language, 'Ask AeGiS', 'AeGiS’e sor')}</span>
+            <span className="sr-only sm:hidden">{t12(language, 'Ask AeGiS', 'AeGiS’e sor')}</span>
+          </button>
         </div>
-      </section>
 
+        <ul
+          id={listId}
+          role="listbox"
+          hidden={!showList}
+          className="absolute left-0 right-0 top-[62px] z-30 overflow-hidden rounded-[var(--radius-l)] border border-[var(--line-strong)] bg-[var(--bg-1)] py-1 shadow-[var(--shadow-2)]"
+        >
+          {results.map((r, i) => (
+            <li key={r.route} id={`${listId}-${i}`} role="option" aria-selected={i === activeIdx}>
+              <Link
+                href={r.route}
+                tabIndex={-1}
+                onMouseDown={(e) => e.preventDefault()}
+                onMouseEnter={() => setActiveIdx(i)}
+                className={`flex items-center justify-between gap-3 px-4 py-2.5 text-sm transition-colors ${
+                  i === activeIdx ? 'bg-[var(--hover)] text-[var(--ink)]' : 'text-[var(--alu)]'
+                }`}
+              >
+                <span className="truncate">{language === 'tr' ? r.titleTr : r.titleEn}</span>
+                <span className="flex shrink-0 items-center gap-2 text-[12px] text-[var(--alu-dim)]">
+                  {r.standard && <span className="hidden sm:inline">{r.standard}</span>}
+                  <CornerDownLeft size={13} aria-hidden className={i === activeIdx ? 'opacity-100' : 'opacity-0'} />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* workspaces */}
+      <nav
+        data-tour="home-cta-bar"
+        aria-label={t12(language, 'Workspaces', 'Çalışma alanları')}
+        className={`grid w-full max-w-[520px] grid-cols-5 gap-1 rounded-[var(--radius-l)] border border-[var(--line)] bg-[var(--bg-1)] p-1 ${styles.dock}`}
+      >
+        {WORKSPACES.map((w) => {
+          const Icon = w.icon;
+          return (
+            <Link
+              key={w.href}
+              href={w.href}
+              title={language === 'tr' ? w.hintTr : w.hintEn}
+              className="group flex flex-col items-center gap-1.5 rounded-[var(--radius-m)] px-1 py-2.5 text-[var(--alu)] transition-colors hover:bg-[var(--hover)] hover:text-[var(--ink)]"
+            >
+              <Icon size={19} aria-hidden className="text-[var(--alu-dim)] transition-colors group-hover:text-[var(--cyan)]" />
+              <span className="text-[12px] font-medium leading-none sm:text-[13px]">{language === 'tr' ? w.tr : w.en}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

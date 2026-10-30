@@ -12,7 +12,7 @@ type Props = {
 
 export function BiometricGate({ m, onUnlock, isChecking }: Props) {
   return (
-    <div className="fixed inset-0 z-[200] bg-[#020408] flex flex-col items-center justify-center p-8">
+    <div className="fixed inset-0 z-[200] bg-[var(--bg-0)] flex flex-col items-center justify-center p-8">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

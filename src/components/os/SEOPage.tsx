@@ -13,6 +13,8 @@ export interface SEOCalculatorData {
   category?: 'mechanical' | 'structural' | 'fluid' | 'electrical' | 'manufacturing' | 'science' | 'civil' | 'software';
   title: string;
   slug: string;
+  standard?: string;
+  standards?: string[];
   keyword?: string;
   intent?: string;
   meta: {
@@ -124,7 +126,7 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-12 safe-bottom">
         {/* Breadcrumbs */}
         <nav className="flex flex-wrap mb-6 text-[10px] font-mono uppercase tracking-wider text-[var(--alu-dim)]" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-[var(--cyan)] transition-colors">AluCalc</Link>
+          <Link href="/" className="hover:text-[var(--cyan)] transition-colors">AluCAD OS</Link>
           <span className="mx-2 text-[var(--line)]">/</span>
           <Link href="/academy?tab=calculators" className="hover:text-[var(--cyan)] transition-colors">{t.calculators}</Link>
           <span className="mx-2 text-[var(--line)]">/</span>
@@ -133,9 +135,14 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
 
         {/* Header */}
         <header className="mb-10 space-y-3 font-mono">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="h-1.5 w-4 bg-[var(--cyan)] rounded-[1px]"></span>
             <span className="text-[10px] font-mono tracking-wider text-[var(--cyan)] uppercase font-bold">{t.engineeringWorkspace}</span>
+            {data.standard && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--std)] text-[var(--std)] text-[10px] font-mono font-bold tracking-wider uppercase ml-1">
+                {data.standard}
+              </span>
+            )}
           </div>
           <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-[var(--ink)] uppercase max-w-4xl leading-tight">
             {data.seo.h1}
@@ -351,7 +358,7 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
               <div className="bg-[var(--bg-1)] border border-[var(--line)] p-5 rounded-[var(--radius-m)] space-y-4">
                 <h3 className="text-xs font-bold text-[var(--ink)] uppercase tracking-wider">{t.engineeringSuite}</h3>
                 <p className="text-[11px] text-[var(--alu-dim)] font-sans leading-relaxed">
-                  Access advanced 3D visual CAD modelling, live material databases, and professional datasheet generations inside AluCalc OS.
+                  Access advanced 3D visual CAD modelling, live material databases, and professional datasheet generations inside AluCAD OS.
                 </p>
                 <Link href={data.cta.link || '/workspace'}
                       className="block w-full bg-[var(--cyan)] hover:bg-[var(--cyan-dim)] text-[var(--bg-0)] hover:text-white font-bold py-2.5 px-3 rounded-[var(--radius-s)] text-xs text-center uppercase tracking-wider transition-colors">
@@ -458,7 +465,7 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
               "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "AluCalc OS", "item": "https://www.alucalculator.com" },
+                { "@type": "ListItem", "position": 1, "name": "AluCAD OS", "item": "https://www.alucalculator.com" },
                 { "@type": "ListItem", "position": 2, "name": "Calculators", "item": "https://www.alucalculator.com/academy?tab=calculators" },
                 { "@type": "ListItem", "position": 3, "name": calcName, "item": `https://www.alucalculator.com/calculators/${data.slug}` },
               ],
@@ -504,7 +511,7 @@ export const SEOPage: React.FC<SEOPageProps> = ({ data }) => {
         {/* Footer */}
         <footer className="mt-32 pt-16 border-t border-white/5">
           <div className="flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-white/20 gap-8">
-            <p>© 2026 <Link href="/" className="hover:text-white transition-colors">AluCalc OS</Link> — {t.footerTagline}</p>
+            <p>© 2026 <Link href="/" className="hover:text-white transition-colors">AluCAD OS</Link> — {t.footerTagline}</p>
             <div className="flex gap-8">
               <Link href="/" className="hover:text-white transition-colors">{t.home}</Link>
               <Link href="/academy?tab=calculators" className="hover:text-white transition-colors">{t.allCalculators}</Link>

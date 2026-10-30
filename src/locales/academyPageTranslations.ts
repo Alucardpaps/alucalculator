@@ -1,5 +1,6 @@
 import type { Language } from '@/store/i18nStore';
 import { ACADEMY_PAGE_UI_CHROME } from './academyPageUiChrome';
+import { APP_MAJOR_MINOR } from '@/config/app';
 
 export type AcademyPageStrings = {
   badge: string;
@@ -138,7 +139,7 @@ export type AcademyDepartment = {
 };
 
 const EN: AcademyPageStrings = {
-  badge: 'Established v5.1 — Pure Engineering Integration',
+  badge: `Established v${APP_MAJOR_MINOR} — Pure Engineering Integration`,
   heroTitle1: 'Academic',
   heroTitle2: 'Engineering Syllabus',
   heroDesc:
@@ -154,7 +155,7 @@ const EN: AcademyPageStrings = {
   standardVerified: 'Standard Verified',
   standardVerifiedDesc: 'ISO/DIN/VDI 2230 Compliant',
   realTimeData: 'Real-Time Data',
-  realTimeDataDesc: 'Synced with OS Kernel v5.0',
+  realTimeDataDesc: `Synced with OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'AluCalc Faculty of Engineering',
   footerSubtitle: 'Academic Strategy & Data Mining by AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
@@ -164,7 +165,7 @@ const EN: AcademyPageStrings = {
   readTime: '{minutes}m Read',
   governingFormula: 'Governing Formula',
   intelligenceLab: 'Intelligence Lab',
-  liveEngineBadge: 'Live Engine v5.0',
+  liveEngineBadge: `Live Engine v${APP_MAJOR_MINOR}`,
   principalStressSimulator: 'Principal Stress Simulator',
   physicsLabBadge: 'Physics Lab v2.1',
   stepByStepTitle: 'Step-by-Step Calculation',
@@ -229,7 +230,7 @@ const EN: AcademyPageStrings = {
   quizRetry: 'Try again',
   quizPassed: 'Quiz passed',
   practiceTitle: 'Hands-on practice',
-  practiceDesc: 'Adjust inputs \u2014 results update live using the same formulas as AluCalc OS.',
+  practiceDesc: 'Adjust inputs \u2014 results update live using the same formulas as AluCAD OS.',
   practiceDoneHint: 'Practice logged \u2014 great job exploring the parameter space.',
   lessonProgressTitle: 'Lesson checklist',
   progressRead: 'Read lesson',
@@ -260,7 +261,7 @@ const EN: AcademyPageStrings = {
 };
 
 const TR: AcademyPageStrings = {
-  badge: 'Kuruldu v5.1 — Saf Mühendislik Entegrasyonu',
+  badge: `Kuruldu v${APP_MAJOR_MINOR} — Saf Mühendislik Entegrasyonu`,
   heroTitle1: 'Akademik',
   heroTitle2: 'Mühendislik Müfredatı',
   heroDesc:
@@ -276,7 +277,7 @@ const TR: AcademyPageStrings = {
   standardVerified: 'Standart Doğrulandı',
   standardVerifiedDesc: 'ISO/DIN/VDI 2230 Uyumlu',
   realTimeData: 'Gerçek Zamanlı Veri',
-  realTimeDataDesc: 'OS Çekirdek v5.0 ile senkronize',
+  realTimeDataDesc: `OS Çekirdek v${APP_MAJOR_MINOR} ile senkronize`,
   footerTitle: 'AluCalc M\u00fchendislik Fak\u00fcltesi',
   footerSubtitle: 'Akademik Strateji ve Veri Madencili\u011fi \u2014 AluCalc AI Engine.',
   backToFaculty: 'AluCalc Fak\u00fcltesi',
@@ -286,7 +287,7 @@ const TR: AcademyPageStrings = {
   readTime: '{minutes} dk Okuma',
   governingFormula: 'Y\u00f6netici Form\u00fcl',
   intelligenceLab: 'Zeka Laboratuvar\u0131',
-  liveEngineBadge: 'Canl\u0131 Motor v5.0',
+  liveEngineBadge: `Canlı Motor v${APP_MAJOR_MINOR}`,
   principalStressSimulator: 'Ana Gerilim Sim\u00fclat\u00f6r\u00fc',
   physicsLabBadge: 'Fizik Lab v2.1',
   stepByStepTitle: 'Ad\u0131m Ad\u0131m Hesaplama',
@@ -351,7 +352,7 @@ const TR: AcademyPageStrings = {
   quizRetry: 'Tekrar dene',
   quizPassed: 'Quiz ge\u00e7ildi',
   practiceTitle: 'Uygulamal\u0131 al\u0131\u015ft\u0131rma',
-  practiceDesc: 'Girdileri de\u011fi\u015ftirin \u2014 sonu\u00e7lar AluCalc OS ile ayn\u0131 form\u00fcllerle an\u0131nda g\u00fcncellenir.',
+  practiceDesc: 'Girdileri de\u011fi\u015ftirin \u2014 sonu\u00e7lar AluCAD OS ile ayn\u0131 form\u00fcllerle an\u0131nda g\u00fcncellenir.',
   practiceDoneHint: 'Al\u0131\u015ft\u0131rma kaydedildi \u2014 parametreleri ke\u015ffetmeye devam edin.',
   lessonProgressTitle: 'Ders kontrol listesi',
   progressRead: 'Dersi oku',
@@ -478,7 +479,7 @@ const TR_DEPARTMENTS: AcademyDepartment[] = [
 ];
 
 const DE: Partial<AcademyPageStrings> = {
-  badge: 'Gegründet v5.1 — Reine Engineering-Integration',
+  badge: `Gegründet v${APP_MAJOR_MINOR} — Reine Engineering-Integration`,
   heroTitle1: 'Akademisch',
   heroTitle2: 'Ingenieur-Lehrplan',
   heroDesc:
@@ -494,14 +495,14 @@ const DE: Partial<AcademyPageStrings> = {
   standardVerified: 'Standard verifiziert',
   standardVerifiedDesc: 'ISO/DIN/VDI 2230 konform',
   realTimeData: 'Echtzeitdaten',
-  realTimeDataDesc: 'Synchronisiert mit OS Kernel v5.0',
+  realTimeDataDesc: `Synchronisiert mit OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'AluCalc Ingenieurfakultät',
   footerSubtitle: 'Akademische Strategie & Data Mining — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const ES: Partial<AcademyPageStrings> = {
-  badge: 'Establecido v5.1 — Integración de ingeniería pura',
+  badge: `Establecido v${APP_MAJOR_MINOR} — Integración de ingeniería pura`,
   heroTitle1: 'Académico',
   heroTitle2: 'Plan de estudios de ingeniería',
   heroDesc:
@@ -517,14 +518,14 @@ const ES: Partial<AcademyPageStrings> = {
   standardVerified: 'Estándar verificado',
   standardVerifiedDesc: 'Conforme ISO/DIN/VDI 2230',
   realTimeData: 'Datos en tiempo real',
-  realTimeDataDesc: 'Sincronizado con OS Kernel v5.0',
+  realTimeDataDesc: `Sincronizado con OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'Facultad de Ingeniería AluCalc',
   footerSubtitle: 'Estrategia académica y minería de datos — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const FR: Partial<AcademyPageStrings> = {
-  badge: 'Établi v5.1 — Intégration ingénierie pure',
+  badge: `Établi v${APP_MAJOR_MINOR} — Intégration ingénierie pure`,
   heroTitle1: 'Académique',
   heroTitle2: 'Programme d\'ingénierie',
   heroDesc:
@@ -540,14 +541,14 @@ const FR: Partial<AcademyPageStrings> = {
   standardVerified: 'Norme vérifiée',
   standardVerifiedDesc: 'Conforme ISO/DIN/VDI 2230',
   realTimeData: 'Données en temps réel',
-  realTimeDataDesc: 'Synchronisé avec OS Kernel v5.0',
+  realTimeDataDesc: `Synchronisé avec OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'Faculté d\'ingénierie AluCalc',
   footerSubtitle: 'Stratégie académique et data mining — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const IT: Partial<AcademyPageStrings> = {
-  badge: 'Fondato v5.1 — Integrazione ingegneristica pura',
+  badge: `Fondato v${APP_MAJOR_MINOR} — Integrazione ingegneristica pura`,
   heroTitle1: 'Accademico',
   heroTitle2: 'Programma di ingegneria',
   heroDesc:
@@ -563,14 +564,14 @@ const IT: Partial<AcademyPageStrings> = {
   standardVerified: 'Standard verificato',
   standardVerifiedDesc: 'Conforme ISO/DIN/VDI 2230',
   realTimeData: 'Dati in tempo reale',
-  realTimeDataDesc: 'Sincronizzato con OS Kernel v5.0',
+  realTimeDataDesc: `Sincronizzato con OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'Facoltà di ingegneria AluCalc',
   footerSubtitle: 'Strategia accademica e data mining — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const PT: Partial<AcademyPageStrings> = {
-  badge: 'Estabelecido v5.1 — Integração pura de engenharia',
+  badge: `Estabelecido v${APP_MAJOR_MINOR} — Integração pura de engenharia`,
   heroTitle1: 'Acadêmico',
   heroTitle2: 'Programa de engenharia',
   heroDesc:
@@ -586,14 +587,14 @@ const PT: Partial<AcademyPageStrings> = {
   standardVerified: 'Padrão verificado',
   standardVerifiedDesc: 'Conforme ISO/DIN/VDI 2230',
   realTimeData: 'Dados em tempo real',
-  realTimeDataDesc: 'Sincronizado com OS Kernel v5.0',
+  realTimeDataDesc: `Sincronizado com OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'Faculdade de Engenharia AluCalc',
   footerSubtitle: 'Estratégia acadêmica e mineração de dados — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const RU: Partial<AcademyPageStrings> = {
-  badge: 'Основано v5.1 — Чистая инженерная интеграция',
+  badge: `Основано v${APP_MAJOR_MINOR} — Чистая инженерная интеграция`,
   heroTitle1: 'Академический',
   heroTitle2: 'Инженерный учебный план',
   heroDesc:
@@ -609,14 +610,14 @@ const RU: Partial<AcademyPageStrings> = {
   standardVerified: 'Стандарт проверен',
   standardVerifiedDesc: 'Соответствует ISO/DIN/VDI 2230',
   realTimeData: 'Данные в реальном времени',
-  realTimeDataDesc: 'Синхронизировано с OS Kernel v5.0',
+  realTimeDataDesc: `Синхронизировано с OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'Инженерный факультет AluCalc',
   footerSubtitle: 'Академическая стратегия и data mining — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const ZH: Partial<AcademyPageStrings> = {
-  badge: '成立 v5.1 — 纯工程集成',
+  badge: `成立 v${APP_MAJOR_MINOR} — 纯工程集成`,
   heroTitle1: '学术',
   heroTitle2: '工程教学大纲',
   heroDesc:
@@ -632,14 +633,14 @@ const ZH: Partial<AcademyPageStrings> = {
   standardVerified: '标准已验证',
   standardVerifiedDesc: '符合 ISO/DIN/VDI 2230',
   realTimeData: '实时数据',
-  realTimeDataDesc: '与 OS Kernel v5.0 同步',
+  realTimeDataDesc: `与 OS Kernel v${APP_MAJOR_MINOR} 同步`,
   footerTitle: 'AluCalc 工程学院',
   footerSubtitle: '学术策略与数据挖掘 — AluCalc AI Engine。',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const JA: Partial<AcademyPageStrings> = {
-  badge: '設立 v5.1 — 純粋なエンジニアリング統合',
+  badge: `設立 v${APP_MAJOR_MINOR} — 純粋なエンジニアリング統合`,
   heroTitle1: 'アカデミック',
   heroTitle2: 'エンジニアリングシラバス',
   heroDesc:
@@ -655,14 +656,14 @@ const JA: Partial<AcademyPageStrings> = {
   standardVerified: '規格検証済み',
   standardVerifiedDesc: 'ISO/DIN/VDI 2230 準拠',
   realTimeData: 'リアルタイムデータ',
-  realTimeDataDesc: 'OS Kernel v5.0 と同期',
+  realTimeDataDesc: `OS Kernel v${APP_MAJOR_MINOR} と同期`,
   footerTitle: 'AluCalc 工学部',
   footerSubtitle: 'アカデミック戦略とデータマイニング — AluCalc AI Engine。',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const KO: Partial<AcademyPageStrings> = {
-  badge: '설립 v5.1 — 순수 엔지니어링 통합',
+  badge: `설립 v${APP_MAJOR_MINOR} — 순수 엔지니어링 통합`,
   heroTitle1: '학술',
   heroTitle2: '엔지니어링 교육과정',
   heroDesc:
@@ -678,14 +679,14 @@ const KO: Partial<AcademyPageStrings> = {
   standardVerified: '표준 검증됨',
   standardVerifiedDesc: 'ISO/DIN/VDI 2230 준수',
   realTimeData: '실시간 데이터',
-  realTimeDataDesc: 'OS Kernel v5.0과 동기화',
+  realTimeDataDesc: `OS Kernel v${APP_MAJOR_MINOR}과 동기화`,
   footerTitle: 'AluCalc 공과대학',
   footerSubtitle: '학술 전략 및 데이터 마이닝 — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',
 };
 
 const AR: Partial<AcademyPageStrings> = {
-  badge: 'تأسست v5.1 — تكامل هندسي خالص',
+  badge: `تأسست v${APP_MAJOR_MINOR} — تكامل هندسي خالص`,
   heroTitle1: 'أكاديمي',
   heroTitle2: 'منهج الهندسة',
   heroDesc:
@@ -701,7 +702,7 @@ const AR: Partial<AcademyPageStrings> = {
   standardVerified: 'معيار موثق',
   standardVerifiedDesc: 'متوافق مع ISO/DIN/VDI 2230',
   realTimeData: 'بيانات فورية',
-  realTimeDataDesc: 'متزامن مع OS Kernel v5.0',
+  realTimeDataDesc: `متزامن مع OS Kernel v${APP_MAJOR_MINOR}`,
   footerTitle: 'كلية الهندسة AluCalc',
   footerSubtitle: 'الاستراتيجية الأكاديمية واستخراج البيانات — AluCalc AI Engine.',
   backToFaculty: 'AluCalc Faculty',

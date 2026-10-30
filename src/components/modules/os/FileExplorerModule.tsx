@@ -131,7 +131,7 @@ export default function FileExplorerModule() {
 
     return (
         <div
-            className="flex flex-col h-full bg-[#0a0a0a] text-slate-200 select-none relative"
+            className="flex flex-col h-full bg-[var(--bg-0)] text-slate-200 select-none relative"
             onContextMenu={(e) => handleContextMenu(e, null)}
             onClick={() => {
                 if (renamingId) submitRename(renamingId);
@@ -139,7 +139,7 @@ export default function FileExplorerModule() {
             }}
         >
             {/* TOOLBAR */}
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 bg-[#121212]">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 bg-[var(--bg-1)]">
                 <div className="flex gap-1 mr-2">
                     <button onClick={handleBack} disabled={!currentFolderId} className="p-1.5 hover:bg-white/10 rounded-md transition-colors disabled:opacity-30 disabled:hover:bg-transparent">
                         <ArrowLeft size={16} />
@@ -190,7 +190,7 @@ export default function FileExplorerModule() {
             {/* SIDEBAR + MAIN */}
             <div className="flex flex-1 overflow-hidden" ref={containerRef}>
                 {/* Sidebar */}
-                <div className="w-48 border-r border-white/5 bg-[#0d0d0d] p-3 hidden md:flex md:flex-col gap-4">
+                <div className="w-48 border-r border-white/5 bg-[var(--bg-1)] p-3 hidden md:flex md:flex-col gap-4">
                     <div>
                         <div className="text-[10px] font-bold text-slate-600 mb-2 uppercase tracking-widest px-2">Quick Access</div>
                         <div className="space-y-0.5">
@@ -208,7 +208,7 @@ export default function FileExplorerModule() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-[#050505]" onClick={() => setContextMenu(null)}>
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-[var(--bg-0)]" onClick={() => setContextMenu(null)}>
 
                     {/* List Headers */}
                     {viewMode === 'list' && currentFiles.length > 0 && (
@@ -304,7 +304,7 @@ export default function FileExplorerModule() {
             </div>
 
             {/* STATUS BAR */}
-            <div className="h-7 border-t border-white/5 bg-[#0a0a0a] flex items-center justify-between px-4 text-[10px] text-slate-500 font-mono">
+            <div className="h-7 border-t border-white/5 bg-[var(--bg-0)] flex items-center justify-between px-4 text-[10px] text-slate-500 font-mono">
                 <span className="flex items-center gap-2">
                     <HardDrive size={12} className="text-slate-600" />
                     {currentFiles.length} item{currentFiles.length !== 1 ? 's' : ''}
@@ -320,7 +320,7 @@ export default function FileExplorerModule() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.1 }}
-                        className="fixed z-50 bg-[#121212]/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl py-1 w-48 overflow-hidden"
+                        className="fixed z-50 bg-[var(--bg-1)]/95 border border-white/10 rounded-lg shadow-2xl py-1 w-48 overflow-hidden"
                         style={{ left: contextMenu.x, top: contextMenu.y }}
                         onClick={e => e.stopPropagation()}
                     >

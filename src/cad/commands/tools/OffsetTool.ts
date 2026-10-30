@@ -15,28 +15,71 @@ export class OffsetTool extends BaseCommand {
 
     start(): void {
         this.sourceEntity = null;
-        this.state = 'ENTER_DISTANCE';
-        this.setPrompt(`Specify offset distance <${this.offsetDist}>:`);
+        const { entities, selectedIds } = useCadStore.getState();
+        const selected = entities.find(e => selectedIds.includes(e.id));
+        if (selected) {
+            this.sourceEntity = selected;
+            this.state = 'SPECIFY_SIDE';
+            this.setPrompt(`Öteleme yönünü seçmek için tıklayın (Mesafe: ${this.offsetDist}mm):`);
+        } else {
+            this.state = 'SELECT_ENTITY';
+            this.setPrompt(`Ötelenecek şekli seçin (Mesafe: ${this.offsetDist}mm, değiştirmek için yazın):`);
+        }
+    }
+
+    public setOffsetDistance(dist: number): void {
+        if (dist > 0) {
+            this.offsetDist = dist;
+            this.setPrompt(`Öteleme mesafesi: ${this.offsetDist}mm. Şekli veya yönü tıklayın:`);
+        }
+    }
+
+    public executeOffset(isOutside: boolean = true): void {
+        const store = useCadStore.getState();
+        const entity = this.sourceEntity || store.entities.find(e => store.selectedIds.includes(e.id));
+        if (!entity) {
+            this.setPrompt('Ötelenecek nesneyi seçin:');
+            return;
+        }
+        let refPoint: Point = { x: 0, y: 0 };
+        const geom = entity.geometry as any;
+        if (geom.type === 'LINE') {
+            const v = { x: geom.end.x - geom.start.x, y: geom.end.y - geom.start.y };
+            const len = Math.hypot(v.x, v.y) || 1;
+            const nx = -v.y / len;
+            const ny = v.x / len;
+            const mid = { x: (geom.start.x + geom.end.x) / 2, y: (geom.start.y + geom.end.y) / 2 };
+            refPoint = { x: mid.x + nx * (isOutside ? 20 : -20), y: mid.y + ny * (isOutside ? 20 : -20) };
+        } else if (geom.center) {
+            refPoint = { x: geom.center.x + (isOutside ? 9999 : 0), y: geom.center.y };
+        } else if (geom.vertices && geom.vertices.length > 0) {
+            refPoint = { x: geom.vertices[0].x + (isOutside ? 9999 : 0), y: geom.vertices[0].y };
+        }
+        const offset = offsetEntity(entity, this.offsetDist, refPoint);
+        if (offset) {
+            store.addEntity(offset);
+            store.setPreviewEntity(null);
+            this.setPrompt(`✅ Öteleme uygulandı (${this.offsetDist} mm).`);
+        }
     }
 
     onValueInput(value: string): void {
-        if (this.state === 'ENTER_DISTANCE') {
-            const dist = parseFloat(value);
-            if (!isNaN(dist) && dist > 0) {
-                this.offsetDist = dist;
-                this.state = 'SELECT_ENTITY';
-                this.setPrompt('Select object to offset:');
+        const dist = parseFloat(value);
+        if (!isNaN(dist) && dist > 0) {
+            this.offsetDist = dist;
+            if (this.sourceEntity) {
+                this.state = 'SPECIFY_SIDE';
+                this.setPrompt(`Öteleme yönünü seçin (Mesafe: ${this.offsetDist}mm):`);
             } else {
-                this.setPrompt(`Invalid distance. Specify offset distance <${this.offsetDist}>:`);
+                this.state = 'SELECT_ENTITY';
+                this.setPrompt(`Ötelenecek şekli seçin (Mesafe: ${this.offsetDist}mm):`);
             }
         }
     }
 
     onKeyInput(key: string): void {
-        if (key === 'Enter' && this.state === 'ENTER_DISTANCE') {
-            // Accept default
-            this.state = 'SELECT_ENTITY';
-            this.setPrompt('Select object to offset:');
+        if (key === 'Escape') {
+            this.cancel();
         } else {
             super.onKeyInput(key);
         }

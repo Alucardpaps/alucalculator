@@ -973,7 +973,7 @@ export function AcademyCalculatorHub({ externalSearch = '' }: Props) {
     <div id="calculators" className="scroll-mt-28 pb-24">
 
       {/* ── Hero header ── */}
-      <div className="relative mb-16 overflow-hidden rounded-[3rem] border border-white/5 bg-gradient-to-br from-[#050a12] to-[#020408] px-10 py-14">
+      <div className="relative mb-16 overflow-hidden rounded-xl border border-white/5 bg-gradient-to-br from-[var(--bg-0)] to-[var(--bg-0)] px-10 py-14">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,229,255,0.06)_0%,transparent_60%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.06)_0%,transparent_60%)] pointer-events-none" />
 
@@ -983,7 +983,7 @@ export function AcademyCalculatorHub({ externalSearch = '' }: Props) {
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               Engineering Calculator Registry
             </div>
-            <h2 className="text-5xl md:text-6xl font-black italic tracking-tighter uppercase leading-none text-white">
+            <h2 className="text-5xl md:text-5xl font-black tracking-tighter uppercase leading-none text-white">
               {page.engineeringRegistry}
             </h2>
             <p className="mt-4 text-sm text-slate-500 max-w-xl leading-relaxed">
@@ -1072,12 +1072,12 @@ export function AcademyCalculatorHub({ externalSearch = '' }: Props) {
                     <Link
                       key={mod.id}
                       href={mod.path}
-                      className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-white/5 bg-[#060a10] transition-all duration-300 hover:-translate-y-1 hover:border-white/10 hover:shadow-[0_30px_60px_rgba(0,0,0,0.7)]"
+                      className="group relative flex flex-col overflow-hidden rounded-xl border border-white/5 bg-[var(--bg-0)] transition-all duration-300 hover:-translate-y-1 hover:border-white/10 hover:shadow-[0_30px_60px_rgba(0,0,0,0.7)]"
                       style={{ '--glow': accent.glow } as React.CSSProperties}
                     >
                       {/* Hover glow */}
                       <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[1.75rem]"
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-xl"
                         style={{ background: `radial-gradient(ellipse at 50% 0%, ${mod.color}18 0%, transparent 70%)` }}
                       />
 

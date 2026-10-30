@@ -15,6 +15,7 @@ import { CalculatorInput } from "@/components/CalculatorInput";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
 import { Search, Info, AlertTriangle, CheckCircle, Save } from 'lucide-react';
 import { SaveButton } from '@/components/calculation/SaveButton';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 const BEARING_TYPE_FILTERS: { id: BearingType | 'all'; label: string; labelTr: string }[] = [
     { id: 'all', label: 'All Types', labelTr: 'Tüm Tipler' },
@@ -29,6 +30,7 @@ const BEARING_TYPE_FILTERS: { id: BearingType | 'all'; label: string; labelTr: s
 import { getBearingsPageStrings, getBearingFilterLabel } from '@/locales/bearingsPageTranslations';
 
 export default function BearingsPageClient({ dict, lang }: { dict: any, lang: string }) {
+    const precision = useGlobalPrecision();
     const s = getBearingsPageStrings(lang);
     // Search & Filter State
     const [searchCode, setSearchCode] = useState('');
@@ -109,7 +111,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4 lg:p-12 font-sans overflow-hidden">
             {/* Header */}
-            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-emerald-600 rounded flex items-center justify-center text-white font-black text-xl">B</div>
                     <div>
@@ -165,7 +167,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                                 key={filter.id}
                                 onClick={() => setTypeFilter(filter.id)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${typeFilter === filter.id
-                                        ? 'bg-emerald-600 text-white shadow-md'
+                                        ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md'
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                     }`}
                             >
@@ -298,7 +300,7 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                                 {dict.bearing?.results?.lifeHours || 'Basic Rating Life (L₁₀h)'}
                             </div>
                             <div className="text-5xl font-mono font-bold text-white">
-                                {results.L10h > 1000000 ? '>1M' : results.L10h > 1000 ? `${(results.L10h / 1000).toFixed(1)}k` : results.L10h.toFixed(0)}
+                                {results.L10h > 1000000 ? '>1M' : results.L10h > 1000 ? `${formatEngineeringValue(results.L10h / 1000, precision, false)}k` : formatEngineeringValue(results.L10h, precision, false)}
                                 <span className="text-xl text-emerald-400 ml-2">hours</span>
                             </div>
                         </div>
@@ -306,21 +308,21 @@ export default function BearingsPageClient({ dict, lang }: { dict: any, lang: st
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-emerald-700">
                             <div>
                                 <div className="text-[10px] text-emerald-300 uppercase">{dict.bearing?.results?.equivalentLoad || 'Equiv. Load (P)'}</div>
-                                <div className="font-mono text-lg">{(results.P * 1000).toFixed(0)} N</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(results.P * 1000, precision, false)} N</div>
                             </div>
                             <div>
                                 <div className="text-[10px] text-emerald-300 uppercase">Adjusted Life (Lₙₐ)</div>
-                                <div className="font-mono text-lg">{results.Lna > 1000 ? `${(results.Lna / 1000).toFixed(1)}k` : results.Lna.toFixed(0)} h</div>
+                                <div className="font-mono text-lg">{results.Lna > 1000 ? `${formatEngineeringValue(results.Lna / 1000, precision, false)}k` : formatEngineeringValue(results.Lna, precision, false)} h</div>
                             </div>
                             <div>
                                 <div className="text-[10px] text-emerald-300 uppercase">{dict.bearing?.results?.staticSafety || 'Static Safety (S₀)'}</div>
                                 <div className={`font-mono text-lg font-bold ${results.staticSafety < 1 ? 'text-red-400' : results.staticSafety < 2 ? 'text-yellow-400' : 'text-emerald-200'}`}>
-                                    {results.staticSafety.toFixed(2)}
+                                    {formatEngineeringValue(results.staticSafety, precision, false)}
                                 </div>
                             </div>
                             <div>
                                 <div className="text-[10px] text-emerald-300 uppercase">L₁₀ (Mrev)</div>
-                                <div className="font-mono text-lg">{results.L10.toFixed(1)}</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(results.L10, precision, false)}</div>
                             </div>
                         </div>
                     </div>

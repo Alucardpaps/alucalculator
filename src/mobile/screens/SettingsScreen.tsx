@@ -1,9 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { ThemeGrid } from '@/components/settings/ThemePicker';
 import { Settings, Info, Mail, ExternalLink } from 'lucide-react';
 import type { MobileStrings } from '@/locales/mobileTranslations';
 import type { Language } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import type { Theme } from '@/store/osStore';
 import type { MobileFontSize } from '@/mobile/store/mobileStore';
 import { MOBILE_APP_VERSION } from '@/mobile/theme/mobileTheme';
@@ -95,17 +97,7 @@ export function SettingsScreen({
         </Section>
 
         <Section title={m.theme}>
-          <div className="flex gap-2">
-            {(['dark', 'light'] as Theme[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTheme(t)}
-                className={`flex-1 py-3 text-xs font-bold uppercase rounded-lg border ${theme === t ? 'bg-cyan-500/15 border-cyan-500 text-cyan-400' : 'bg-transparent border-white/5 text-slate-400'}`}
-              >
-                {t === 'dark' ? m.themeDark : m.themeLight}
-              </button>
-            ))}
-          </div>
+          <ThemeGrid />
         </Section>
 
         <Section title={m.unitSystem}>
@@ -143,7 +135,7 @@ export function SettingsScreen({
             onChange={setReduceMotion}
           />
           <ToggleRow
-            label={language === 'tr' ? 'Sesli Geri Bildirim' : 'Audio Feedback'}
+            label={t12(language, 'Audio Feedback', 'Sesli Geri Bildirim')}
             checked={soundEnabled}
             onChange={onToggleSound}
           />
@@ -233,22 +225,22 @@ export function AboutScreen({ m, onClose }: { m: MobileStrings; onClose: () => v
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed inset-0 z-[60] bg-[#020408] flex flex-col p-6"
+      className="fixed inset-0 z-[60] bg-[var(--bg-0)] flex flex-col p-6"
     >
       <button onClick={onClose} className="self-end text-slate-500 text-xs font-bold uppercase mb-8">
         {m.back}
       </button>
       <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
-        <div className="w-24 h-24 bg-cyan-500 rounded-3xl flex items-center justify-center text-black font-black text-3xl shadow-[0_0_40px_rgba(6,182,212,0.4)]">
+        <div className="w-24 h-24 bg-cyan-500 rounded-3xl flex items-center justify-center text-black font-black text-3xl ">
           AC
         </div>
         <div>
           <h1 className="text-xl font-black text-white">{m.aboutTitle}</h1>
-          <p className="text-sm text-slate-500 mt-2">AluCalc OS — {m.appVersion} {MOBILE_APP_VERSION}</p>
+          <p className="text-sm text-slate-500 mt-2">AluCAD OS — {m.appVersion} {MOBILE_APP_VERSION}</p>
         </div>
         <p className="text-xs text-slate-400 max-w-xs leading-relaxed">{m.aboutDescription}</p>
         <a
-          href="mailto:feedback@alucalculator.com?subject=AluCalc%20Mobile%20Feedback"
+          href="mailto:abdulsametyildirim95@gmail.com?subject=AluCalc%20Mobile%20Feedback"
           className="flex items-center gap-2 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl text-xs font-bold uppercase"
         >
           <Mail size={14} />

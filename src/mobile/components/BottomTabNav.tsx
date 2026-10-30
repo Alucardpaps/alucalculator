@@ -38,7 +38,7 @@ type Props = {
 
 export function BottomTabNav({ activeTab, onTabChange, m, reduceMotion }: Props) {
   return (
-    <nav className="flex-none fixed bottom-0 left-0 right-0 h-16 bg-slate-950/90 border-t border-cyan-950/50 backdrop-blur-xl flex items-center justify-around z-30 px-1 select-none safe-area-pb">
+    <nav className="flex-none fixed bottom-0 left-0 right-0 h-16 bg-slate-950/90 border-t border-cyan-950/50 flex items-center justify-around z-30 px-1 select-none safe-area-pb">
       {TABS.map((tab) => {
         const TabIcon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -54,7 +54,7 @@ export function BottomTabNav({ activeTab, onTabChange, m, reduceMotion }: Props)
           >
             <div
               className={`p-1 rounded-lg transition-all flex items-center justify-center ${
-                isActive ? 'text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-500'
+                isActive ? 'text-cyan-400 scale-110 drop-' : 'text-slate-500'
               }`}
             >
               <TabIcon size={18} />

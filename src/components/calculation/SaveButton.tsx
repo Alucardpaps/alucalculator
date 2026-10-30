@@ -68,7 +68,7 @@ export function SaveButton({ type, inputData, engineVersion, resultJson, disable
                         ? 'bg-red-600 text-white'
                         : !currentProjectId
                             ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/25'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg '
                 }
             `}
         >

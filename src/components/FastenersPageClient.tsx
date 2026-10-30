@@ -2,10 +2,13 @@
 import { useState } from "react";
 
 import { useFastenerCalculator } from "@/hooks/useFastenerCalculator";
+import { GEOMETRY_STANDARDS_LIST } from "@/lib/fastener/sharedEngine";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
 import { TheorySection } from "@/components/TheorySection";
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
 
 export default function FastenersPageClient({ lang, dict }: { lang: string, dict: any }) {
+    const precision = useGlobalPrecision();
     const {
         standard, setStandard,
         size, setSize,
@@ -24,7 +27,7 @@ export default function FastenersPageClient({ lang, dict }: { lang: string, dict
         <main className="min-h-screen bg-blueprint-grid flex flex-col items-center justify-center p-4 lg:p-12 font-sans overflow-hidden">
 
             {/* Header */}
-            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-slate-700 dark:bg-slate-600 rounded flex items-center justify-center text-white font-black text-xl">M</div>
                     <div>
@@ -57,10 +60,10 @@ export default function FastenersPageClient({ lang, dict }: { lang: string, dict
 
                     {/* Standard Tabs - Only show if relevant, keeping global for now */}
                     <div className="flex flex-wrap gap-2 p-1 bg-slate-200 dark:bg-slate-800 rounded-lg">
-                        {(['ISO Metric', 'ISO Metric Fine', 'UNC', 'UNF', 'BSPP (G)', 'BSPT (R)', 'NPT', 'Trapezoidal (Tr)'] as const).map(s => (
+                        {GEOMETRY_STANDARDS_LIST.filter(s => s !== 'Custom').map(s => (
                             <button
                                 key={s}
-                                onClick={() => setStandard(s as any)}
+                                onClick={() => setStandard(s)}
                                 className={`flex-1 min-w-[80px] py-2 text-[10px] font-bold uppercase rounded-md transition-all ${standard === s ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                             >
                                 {s.replace('ISO ', '')}
@@ -131,7 +134,7 @@ export default function FastenersPageClient({ lang, dict }: { lang: string, dict
                         <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-2 shadow-sm min-w-[200px]">
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-1">
                                 <span className="text-slate-400">{dict.fastener.results.majorDia}</span>
-                                <span className="dark:text-slate-200">{results.majorDia.toFixed(3)} {results.unit}</span>
+                                <span className="dark:text-slate-200">{formatEngineeringValue(results.majorDia, precision, false)} {results.unit}</span>
                             </div>
                             <div className="flex justify-between border-b border-slate-100 dark:border-slate-700 pb-1">
                                 <span className="text-slate-400">{dict.fastener.inputs.pitch}</span>

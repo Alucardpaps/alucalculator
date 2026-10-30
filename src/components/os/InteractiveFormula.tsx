@@ -16,6 +16,7 @@ import {
   ShieldCheck, 
   AlertTriangle 
 } from 'lucide-react';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 interface InteractiveFormulaProps {
   id?: string;
@@ -33,9 +34,9 @@ const COLORS = {
 // ════════════════════════════════════════════
 
 const DataDisplay = ({ label, value, unit, icon: Icon, color = COLORS.accent }: any) => (
-  <div className="relative group overflow-hidden bg-[#0a1018]/80 border border-white/5 rounded-2xl p-5 transition-all hover:border-[#00e5ff]/30 hover:scale-[1.01] duration-300">
+  <div className="relative group overflow-hidden bg-[var(--bg-1)]/80 border border-white/5 rounded-2xl p-5 transition-all hover:border-[var(--cyan)]/30 hover:scale-[1.01] duration-300">
     <div className="flex items-center gap-3 mb-2">
-      <div className="p-2 rounded-xl bg-black/40 text-[#00e5ff]">
+      <div className="p-2 rounded-xl bg-black/40 text-[var(--cyan)]">
         <Icon size={18} />
       </div>
       <span className="text-[10px] uppercase tracking-widest font-mono text-white/40">{label}</span>
@@ -198,6 +199,7 @@ function getDefaultValueForVariable(name: string, description: string): string {
 
 // 1. BEARING LIFE (ISO 281)
 const BearingLifeCalculator = () => {
+  const precision = useGlobalPrecision();
   const [C, setC] = useState<number>(28000);
   const [P, setP] = useState<number>(4000);
   const [p, setPExponent] = useState<number>(3);
@@ -224,25 +226,25 @@ const BearingLifeCalculator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0a1018]/20 backdrop-blur-xl border border-white/5 p-5 rounded-2xl">
-        <h3 className="text-xs font-mono text-[#00e5ff] uppercase tracking-widest mb-4">ISO 281 Expanded Parameters</h3>
+      <div className="bg-[var(--bg-1)]/20 border border-white/5 p-5 rounded-2xl">
+        <h3 className="text-xs font-mono text-[var(--cyan)] uppercase tracking-widest mb-4">ISO 281 Expanded Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-4 bg-black/20 p-4 rounded-xl border border-white/5">
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">C: Dynamic Load Rating (N)</label>
-              <input type="number" value={C} onChange={(e) => setC(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={C} onChange={(e) => setC(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">P: Equivalent Dynamic Load (N)</label>
-              <input type="number" value={P} onChange={(e) => setP(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={P} onChange={(e) => setP(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">n: Rotational Speed (rpm)</label>
-              <input type="number" value={n} onChange={(e) => setN(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={n} onChange={(e) => setN(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Bearing Exponent (p)</label>
-              <select value={p} onChange={(e) => setPExponent(parseFloat(e.target.value))} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={p} onChange={(e) => setPExponent(parseFloat(e.target.value))} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value={3}>Ball Bearings (p=3)</option>
                 <option value={3.3333}>Roller Bearings (p=3.33)</option>
               </select>
@@ -252,7 +254,7 @@ const BearingLifeCalculator = () => {
           <div className="space-y-4 bg-black/20 p-4 rounded-xl border border-white/5">
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">a1: Reliability Factor</label>
-              <select value={a1} onChange={(e) => setA1(parseFloat(e.target.value))} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={a1} onChange={(e) => setA1(parseFloat(e.target.value))} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value={1.0}>90% Reliability (a1 = 1.00)</option>
                 <option value={0.62}>95% Reliability (a1 = 0.62)</option>
                 <option value={0.21}>99% Reliability (a1 = 0.21)</option>
@@ -260,7 +262,7 @@ const BearingLifeCalculator = () => {
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">eC: Contamination Factor</label>
-              <select value={eC} onChange={(e) => setEC(parseFloat(e.target.value))} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={eC} onChange={(e) => setEC(parseFloat(e.target.value))} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value={0.8}>Ultra Clean Lubrication (eC = 0.8)</option>
                 <option value={0.5}>Clean Lubrication (eC = 0.5)</option>
                 <option value={0.3}>Typical Industrial (eC = 0.3)</option>
@@ -271,20 +273,20 @@ const BearingLifeCalculator = () => {
               <div className="flex justify-between items-center mb-1">
                 <label className="text-[10px] text-white/40 uppercase font-mono">κ (kappa): Viscosity Ratio ({kappa})</label>
               </div>
-              <input type="range" min="0.1" max="10" step="0.1" value={kappa} onChange={(e) => setKappa(parseFloat(e.target.value))} className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[#00e5ff]" />
+              <input type="range" min="0.1" max="10" step="0.1" value={kappa} onChange={(e) => setKappa(parseFloat(e.target.value))} className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]" />
             </div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <DataDisplay label="aISO Mod. Factor" value={aISO.toFixed(3)} unit="dimensionless" icon={Activity} />
-        <DataDisplay label="Lnm Rating Life" value={Lnm.toFixed(2)} unit="Million Revs" icon={TrendingUp} />
+        <DataDisplay label="aISO Mod. Factor" value={formatEngineeringValue(aISO, precision, false)} unit="dimensionless" icon={Activity} />
+        <DataDisplay label="Lnm Rating Life" value={formatEngineeringValue(Lnm, precision, false)} unit="Million Revs" icon={TrendingUp} />
         <DataDisplay label="Lnmh Operating Life" value={Math.round(Lnmh).toLocaleString()} unit="Hours" icon={ShieldCheck} />
       </div>
 
-      <div className="p-4 bg-[#00e5ff]/5 border border-[#00e5ff]/10 rounded-xl text-[10px] font-mono text-white/40">
-        <span className="text-[#00e5ff]">Note:</span> {"$a_{ISO}$"} is approximated as a function of lubrication quality ($\kappa$), contamination factor ($e_C$), and fatigue limit load ratio ($C_u/P$) following standard ISO 281:2007 Annex guidelines. Catalog values modeled from SKF / Schaeffler design references.
+      <div className="p-4 bg-[var(--cyan)]/5 border border-[var(--cyan)]/10 rounded-xl text-[10px] font-mono text-white/40">
+        <span className="text-[var(--cyan)]">Note:</span> {"$a_{ISO}$"} is approximated as a function of lubrication quality ($\kappa$), contamination factor ($e_C$), and fatigue limit load ratio ($C_u/P$) following standard ISO 281:2007 Annex guidelines. Catalog values modeled from SKF / Schaeffler design references.
       </div>
     </div>
   );
@@ -292,6 +294,7 @@ const BearingLifeCalculator = () => {
 
 // 2. BOLT FATIGUE (VDI 2230)
 const BoltFatigueCalculator = () => {
+  const precision = useGlobalPrecision();
   const [grade, setGrade] = useState<'8.8' | '10.9' | '12.9'>('8.8');
   const [size, setSize] = useState<string>('M12');
   const [Fmax, setFmax] = useState<number>(25000);
@@ -328,13 +331,13 @@ const BoltFatigueCalculator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0a1018]/20 backdrop-blur-xl border border-white/5 p-5 rounded-2xl">
-        <h3 className="text-xs font-mono text-[#00e5ff] uppercase tracking-widest mb-4">VDI 2230 Fatigue Parameters</h3>
+      <div className="bg-[var(--bg-1)]/20 border border-white/5 p-5 rounded-2xl">
+        <h3 className="text-xs font-mono text-[var(--cyan)] uppercase tracking-widest mb-4">VDI 2230 Fatigue Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4 bg-black/20 p-4 rounded-xl border border-white/5">
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Bolt Material Grade</label>
-              <select value={grade} onChange={(e) => setGrade(e.target.value as any)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={grade} onChange={(e) => setGrade(e.target.value as any)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value="8.8">Grade 8.8 (Su=800 MPa, Sy=640 MPa)</option>
                 <option value="10.9">Grade 10.9 (Su=1000 MPa, Sy=900 MPa)</option>
                 <option value="12.9">Grade 12.9 (Su=1200 MPa, Sy=1080 MPa)</option>
@@ -342,7 +345,7 @@ const BoltFatigueCalculator = () => {
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Bolt Thread Designation</label>
-              <select value={size} onChange={(e) => setSize(e.target.value)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={size} onChange={(e) => setSize(e.target.value)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 {Object.keys(boltSizes).map((s) => (
                   <option key={s} value={s}>{s} (Stress Area: {boltSizes[s]} mm²)</option>
                 ))}
@@ -350,15 +353,15 @@ const BoltFatigueCalculator = () => {
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Fmax: Peak Load (N)</label>
-              <input type="number" value={Fmax} onChange={(e) => setFmax(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={Fmax} onChange={(e) => setFmax(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Fmin: Minimum Load (N)</label>
-              <input type="number" value={Fmin} onChange={(e) => setFmin(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={Fmin} onChange={(e) => setFmin(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Target Safety Factor (SF)</label>
-              <input type="number" step="0.1" value={targetSF} onChange={(e) => setTargetSF(parseFloat(e.target.value) || 1)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" step="0.1" value={targetSF} onChange={(e) => setTargetSF(parseFloat(e.target.value) || 1)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
           </div>
 
@@ -422,7 +425,7 @@ const BoltFatigueCalculator = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <DataDisplay label="Mean Stress σm" value={Math.round(sigma_m)} unit="MPa" icon={Activity} />
         <DataDisplay label="Amp Stress σa" value={Math.round(sigma_a)} unit="MPa" icon={TrendingUp} />
-        <DataDisplay label="Safety Factor SF" value={SF_calc > 0 && SF_calc < 100 ? SF_calc.toFixed(2) : 'N/A'} unit={`Target: ${targetSF}`} icon={ShieldCheck} color={status.color} />
+        <DataDisplay label="Safety Factor SF" value={SF_calc > 0 && SF_calc < 100 ? formatEngineeringValue(SF_calc, precision, false) : 'N/A'} unit={`Target: ${targetSF}`} icon={ShieldCheck} color={status.color} />
       </div>
     </div>
   );
@@ -430,6 +433,7 @@ const BoltFatigueCalculator = () => {
 
 // 3. SHAFT FATIGUE (ASME + SODERBERG)
 const ShaftFatigueCalculator = () => {
+  const precision = useGlobalPrecision();
   const [d, setD] = useState<number>(40);
   const [M, setM] = useState<number>(400);
   const [T, setT] = useState<number>(600);
@@ -485,13 +489,13 @@ const ShaftFatigueCalculator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0a1018]/20 backdrop-blur-xl border border-white/5 p-5 rounded-2xl">
-        <h3 className="text-xs font-mono text-[#00e5ff] uppercase tracking-widest mb-4">ASME / Soderberg Shaft Parameters</h3>
+      <div className="bg-[var(--bg-1)]/20 border border-white/5 p-5 rounded-2xl">
+        <h3 className="text-xs font-mono text-[var(--cyan)] uppercase tracking-widest mb-4">ASME / Soderberg Shaft Parameters</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4 bg-black/20 p-4 rounded-xl border border-white/5">
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Shaft Material</label>
-              <select value={material} onChange={(e) => setMaterial(e.target.value as any)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={material} onChange={(e) => setMaterial(e.target.value as any)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value="1045">AISI 1045 (Sy=310 MPa, Su=570 MPa)</option>
                 <option value="4140">AISI 4140 (Sy=655 MPa, Su=950 MPa)</option>
                 <option value="4340">AISI 4340 (Sy=850 MPa, Su=1010 MPa)</option>
@@ -499,19 +503,19 @@ const ShaftFatigueCalculator = () => {
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">Shaft Diameter d (mm)</label>
-              <input type="number" value={d} onChange={(e) => setD(parseFloat(e.target.value) || 1)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={d} onChange={(e) => setD(parseFloat(e.target.value) || 1)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">M: Bending Moment (N·m)</label>
-              <input type="number" value={M} onChange={(e) => setM(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={M} onChange={(e) => setM(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">T: Torsional Moment (N·m)</label>
-              <input type="number" value={T} onChange={(e) => setT(parseFloat(e.target.value) || 0)} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
+              <input type="number" value={T} onChange={(e) => setT(parseFloat(e.target.value) || 0)} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono" />
             </div>
             <div>
               <label className="block text-[10px] text-white/40 uppercase font-mono mb-1">ka: Surface Finish Factor</label>
-              <select value={ka} onChange={(e) => setKa(parseFloat(e.target.value))} className="w-full bg-[#0a1018] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
+              <select value={ka} onChange={(e) => setKa(parseFloat(e.target.value))} className="w-full bg-[var(--bg-1)] border border-white/10 rounded px-2.5 py-1.5 text-xs text-white font-mono">
                 <option value={0.9}>Ground Finish (ka = 0.90)</option>
                 <option value={0.8}>Machined Finish (ka = 0.80)</option>
                 <option value={0.7}>Hot-Rolled (ka = 0.70)</option>
@@ -569,7 +573,7 @@ const ShaftFatigueCalculator = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <DataDisplay label="Von Mises Mean Stress" value={Math.round(sigma_m_VM)} unit="MPa" icon={Activity} />
         <DataDisplay label="Von Mises Amp Stress" value={Math.round(sigma_a_VM)} unit="MPa" icon={TrendingUp} />
-        <DataDisplay label="Safety Factor (Min Size)" value={SF_calc > 0 && SF_calc < 100 ? SF_calc.toFixed(2) : 'N/A'} unit={`Rec Min: ${d_safe.toFixed(1)} mm`} icon={ShieldCheck} color={status.color} />
+        <DataDisplay label="Safety Factor (Min Size)" value={SF_calc > 0 && SF_calc < 100 ? formatEngineeringValue(SF_calc, precision, false) : 'N/A'} unit={`Rec Min: ${formatEngineeringValue(d_safe, precision, false)} mm`} icon={ShieldCheck} color={status.color} />
       </div>
     </div>
   );
@@ -580,6 +584,7 @@ const ShaftFatigueCalculator = () => {
 // ════════════════════════════════════════════
 
 export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, formula, variables }) => {
+  const precision = useGlobalPrecision();
   // If it's a custom bearing life, VDI fatigue, or shaft fatigue, dispatch immediately
   if (id === 'bearing-life-calc') {
     return <BearingLifeCalculator />;
@@ -824,9 +829,9 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
   return (
     <div className="space-y-6">
       {/* Target Formula Card */}
-      <div className="bg-[#0a1018]/20 backdrop-blur-xl border border-white/5 p-6 rounded-2xl font-mono text-lg text-[#00e5ff] flex items-center justify-between shadow-lg relative overflow-hidden">
+      <div className="bg-[var(--bg-1)]/20 border border-white/5 p-6 rounded-2xl font-mono text-lg text-[var(--cyan)] flex items-center justify-between shadow-lg relative overflow-hidden">
         <div className="flex items-center gap-3">
-          <span className="h-1.5 w-4 bg-[#00e5ff] rounded-full"></span>
+          <span className="h-1.5 w-4 bg-[var(--cyan)] rounded-full"></span>
           <span>{formula}</span>
         </div>
         <button 
@@ -834,7 +839,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
           title="Copy share link with these parameters"
           className="flex items-center gap-2 px-3 py-1 bg-white/5 hover:bg-white/10 rounded-xl text-xs text-white/60 font-mono transition-all"
         >
-          {copiedShare ? <Check size={12} className="text-[#00e5ff]" /> : <Share2 size={12} />}
+          {copiedShare ? <Check size={12} className="text-[var(--cyan)]" /> : <Share2 size={12} />}
           <span>{copiedShare ? 'Copied' : 'Share'}</span>
         </button>
       </div>
@@ -847,7 +852,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
       )}
 
       {/* Inputs Section */}
-      <div className="space-y-6 bg-[#0a1018]/10 border border-white/5 p-6 rounded-2xl backdrop-blur-md">
+      <div className="space-y-6 bg-[var(--bg-1)]/10 border border-white/5 p-6 rounded-2xl">
         <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-3">
           <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest font-mono">Parameters Configuration</h3>
           <span className="px-2 py-0.5 rounded bg-black/40 text-[9px] font-mono text-white/30">Interactive Solver</span>
@@ -862,8 +867,8 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
             return (
               <div key={v} className="space-y-2 p-3 bg-black/10 rounded-xl border border-white/[0.02] hover:border-white/5 transition-all">
                 <div className="flex justify-between items-center">
-                  <label className="font-mono text-xs font-bold text-[#00e5ff] flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff]/50"></span>
+                  <label className="font-mono text-xs font-bold text-[var(--cyan)] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)]/50"></span>
                     {v} <span className="text-[10px] text-white/30 font-normal normal-case">— {variables[v]}</span>
                   </label>
                   <input
@@ -871,7 +876,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
                     value={inputs[v]}
                     onChange={(e) => setInputs({ ...inputs, [v]: e.target.value })}
                     placeholder="Value"
-                    className="w-24 bg-[#0a1018] border border-white/10 focus:border-[#00e5ff]/50 rounded-lg px-2 py-1 text-xs text-white font-mono text-right focus:outline-none"
+                    className="w-24 bg-[var(--bg-1)] border border-white/10 focus:border-[var(--cyan)]/50 rounded-lg px-2 py-1 text-xs text-white font-mono text-right focus:outline-none"
                   />
                 </div>
 
@@ -883,7 +888,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
                   step={stepVal}
                   value={inputs[v] === '' ? '0' : inputs[v]}
                   onChange={(e) => setInputs({ ...inputs, [v]: e.target.value })}
-                  className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[#00e5ff]"
+                  className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                 />
 
                 {/* Tolerance slider */}
@@ -897,7 +902,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
                       step="1"
                       value={tolerances[v] || 0}
                       onChange={(e) => setTolerances({ ...tolerances, [v]: parseInt(e.target.value) || 0 })}
-                      className="w-20 h-0.5 bg-white/5 rounded appearance-none cursor-pointer accent-emerald-500"
+                      className="w-20 h-0.5 bg-white/5 rounded appearance-none cursor-pointer accent-[var(--cyan)]"
                     />
                     <span className="text-emerald-500/80">±{tolerances[v] || 0}%</span>
                   </div>
@@ -912,7 +917,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
           <div className="flex-1 w-full">
             <DataDisplay
               label={`Calculated Output (${resultVar})`}
-              value={result !== null ? (Number.isInteger(result * factor) ? (result * factor).toLocaleString() : (result * factor).toFixed(5)) : 'Waiting...'}
+              value={result !== null ? formatEngineeringValue(result * factor, precision, false) : 'Waiting...'}
               unit={activeUnit}
               icon={Activity}
             />
@@ -922,7 +927,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
               <div className="mt-2 text-[10px] font-mono text-emerald-400/70 bg-emerald-500/5 border border-emerald-500/10 px-3 py-1.5 rounded-lg flex justify-between">
                 <span>Worst-case bounds (under tolerance limits)</span>
                 <span>
-                  {(toleranceRange.min * factor).toFixed(4)} ↔ {(toleranceRange.max * factor).toFixed(4)} {activeUnit}
+                  {formatEngineeringValue(toleranceRange.min * factor, precision, false)} ↔ {formatEngineeringValue(toleranceRange.max * factor, precision, false)} {activeUnit}
                 </span>
               </div>
             )}
@@ -940,7 +945,7 @@ export const InteractiveFormula: React.FC<InteractiveFormulaProps> = ({ id, form
                       setActiveUnit(opt.label);
                       setFactor(opt.factor);
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all font-mono border ${activeUnit === opt.label ? 'bg-[#00e5ff] border-[#00e5ff] text-black shadow-[0_0_10px_rgba(0,229,255,0.2)]' : 'bg-white/5 border-white/10 text-white/30 hover:border-white/20'}`}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all font-mono border ${activeUnit === opt.label ? 'bg-[var(--cyan)] border-[var(--cyan)] text-black ' : 'bg-white/5 border-white/10 text-white/30 hover:border-white/20'}`}
                   >
                     {opt.label}
                   </button>

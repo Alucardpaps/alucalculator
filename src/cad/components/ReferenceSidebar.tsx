@@ -41,7 +41,7 @@ export function ReferenceSidebar() {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed right-4 bottom-20 z-50 p-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 backdrop-blur-xl transition-all shadow-[0_0_20px_rgba(0,229,255,0.1)] group"
+                className="fixed right-4 bottom-20 z-50 p-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 transition-all group"
             >
                 <Book size={20} className="group-hover:rotate-12 transition-transform" />
             </button>
@@ -52,7 +52,7 @@ export function ReferenceSidebar() {
                         initial={{ x: 400 }}
                         animate={{ x: 0 }}
                         exit={{ x: 400 }}
-                        className="fixed right-0 top-0 h-full w-80 z-[60] bg-[#05090e]/90 backdrop-blur-2xl border-l border-white/5 flex flex-col shadow-2xl"
+                        className="fixed right-0 top-0 h-full w-80 z-[60] bg-[var(--bg-0)]/90 border-l border-white/5 flex flex-col shadow-2xl"
                     >
                         {/* Header */}
                         <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">

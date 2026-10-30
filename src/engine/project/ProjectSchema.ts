@@ -12,7 +12,16 @@ export interface EngineMetadata {
     moduleName: string;
     timestamp: number;
     inputSnapshot: Record<string, any>;
+    /**
+     * Methodology classification:
+     * - 'normative': Official standards (ISO, DIN, VDI, ASME, Eurocode)
+     * - 'empirical': Academic papers, manufacturer engineering handbooks (SKF, Festo), test curves
+     * - 'numerical': Computational methods (FEA, Runge-Kutta, PlaneGCS solver, topology optimization)
+     * - 'heuristic': Heuristic algorithms, reverse-engineered specifications, AI-assisted routines
+     */
+    methodologyType?: 'normative' | 'empirical' | 'numerical' | 'heuristic';
     standardReference?: string;
+    methodologyCitation?: string;
     assumptions?: string[];
     safetyFactors?: Record<string, number>;
     validationStatus: 'success' | 'warning' | 'error';

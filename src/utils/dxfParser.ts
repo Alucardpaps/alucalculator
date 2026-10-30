@@ -1,10 +1,43 @@
 /**
- * DXF Parser Utility
- * Converts DXF entities (LINE, ARC, CIRCLE, LWPOLYLINE) to Simple Polygons
+ * DXF → nesting parts.
+ *
+ * Reads the geometry of a DXF drawing and turns every closed outline into a Part2D
+ * (outer contour + holes, millimetres, Y up).
+ *
+ *  - Entities: LINE, ARC, CIRCLE, ELLIPSE, LWPOLYLINE / POLYLINE (with bulges, including
+ *    the closing segment and negative = clockwise bulges), SPLINE (de Boor evaluation of
+ *    the B-spline, fit points as fallback) and INSERT (block references, nested, with
+ *    position / scale / rotation / mirror).
+ *  - Loose LINE / ARC / open polyline pieces are chained end-to-end into closed loops
+ *    (strict pass, then a tolerant pass for small drafting gaps).
+ *  - $INSUNITS is honoured: inch, foot, cm, m … drawings are converted to millimetres.
+ *  - OCS mirroring (extrusion Z = −1, typical for mirrored arcs and polylines) is applied.
+ *  - Paper-space entities, frozen / hidden layers and the stock "SHEET" layer are skipped.
+ *  - Outer contours are returned counter-clockwise, holes clockwise.
+ *
+ * Note: dxf-parser 1.x stores ARC / CIRCLE angles in radians and LINE end points in
+ * `vertices`; this module relies on that format.
  */
 
 import DxfParser from 'dxf-parser';
 import type { Point2D, Polygon, Part2D, BoundingBox } from '@/types/nesting2d.types';
+import { buildPartHierarchy } from '@/cam/core/hierarchy';
+import {
+    INSUNITS_NAMES as UNIT_NAMES,
+    INSUNITS_TO_MM,
+    MIRROR_X,
+    apply,
+    arcPoints,
+    compose,
+    dist,
+    ellipsePoints,
+    insertTransform,
+    ocsMirrored,
+    polylinePoints,
+    splinePoints,
+    type Affine,
+} from '@/lib/dxf/dxfGeometry';
+import type { CamPart, Contour } from '@/cam/core/geometry';
 
 // ============================================
 // TYPES
@@ -16,36 +49,87 @@ export interface DxfParseResult {
     warnings: string[];
     rawEntityCount: number;
     skippedTypes: Record<string, number>;
+    /** Factor applied to convert drawing units to millimetres. */
+    unitScale?: number;
+    /** Pieces that could not be chained into a closed outline. */
+    openContours?: number;
 }
 
+export interface DxfParseOptions {
+    normalizeOrigin?: boolean; // default true
+    autoTagMetadata?: boolean; // default true
+    /** Override the unit conversion (drawing unit → mm). Default: from $INSUNITS. */
+    unitScale?: number;
+}
+
+/** Loosely typed view of a dxf-parser entity (fields differ per entity type). */
 interface DxfEntity {
     type: string;
-    // LINE
+    layer?: string;
+    inPaperSpace?: boolean;
+    // LINE (dxf-parser 1.x) / legacy start-end
+    vertices?: Array<{ x: number; y: number; bulge?: number; splineControlPoint?: boolean }>;
     start?: { x: number; y: number };
     end?: { x: number; y: number };
-    // ARC
+    // ARC / CIRCLE / ELLIPSE
     center?: { x: number; y: number };
     radius?: number;
     startAngle?: number;
     endAngle?: number;
-    // CIRCLE
-    // uses center and radius
-    // LWPOLYLINE / POLYLINE
-    vertices?: Array<{ x: number; y: number; bulge?: number }>;
-    shape?: boolean; // closed
-    // Common
-    layer?: string;
+    majorAxisEndPoint?: { x: number; y: number };
+    axisRatio?: number;
+    // POLYLINE
+    shape?: boolean;
+    is3dPolyline?: boolean;
+    isPolyfaceMesh?: boolean;
+    is3dPolygonMesh?: boolean;
+    // SPLINE
+    controlPoints?: Array<{ x: number; y: number }>;
+    fitPoints?: Array<{ x: number; y: number }>;
+    knotValues?: number[];
+    degreeOfSplineCurve?: number;
+    closed?: boolean;
+    // INSERT
+    name?: string;
+    position?: { x: number; y: number };
+    xScale?: number;
+    yScale?: number;
+    rotation?: number;
+    columnCount?: number;
+    rowCount?: number;
+    columnSpacing?: number;
+    rowSpacing?: number;
+    // OCS extrusion
+    extrusionDirectionZ?: number;
+    extrusionDirection?: { x: number; y: number; z: number };
+    // TEXT
+    text?: string;
+    string?: string;
+    startPoint?: { x: number; y: number };
+    insertionPoint?: { x: number; y: number };
 }
+
+interface DxfBlock {
+    name?: string;
+    position?: { x: number; y: number };
+    entities?: DxfEntity[];
+}
+
+interface Path {
+    points: Point2D[];
+    closed: boolean;
+}
+
 
 // ============================================
 // CONSTANTS
 // ============================================
 
-/** Arc approximation tolerance in mm */
-const ARC_TOLERANCE = 0.1;
 
 /** Minimum points to consider a valid polygon */
 const MIN_POLYGON_POINTS = 3;
+
+
 
 // ============================================
 // GEOMETRY UTILITIES
@@ -66,260 +150,317 @@ function calculateBoundingBox(points: Point2D[]): BoundingBox {
     return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }
 
-function calculatePolygonArea(points: Point2D[]): number {
+function signedArea(points: Point2D[]): number {
     let area = 0;
     const n = points.length;
     for (let i = 0; i < n; i++) {
         const j = (i + 1) % n;
-        area += points[i].x * points[j].y;
-        area -= points[j].x * points[i].y;
+        area += points[i].x * points[j].y - points[j].x * points[i].y;
     }
-    return Math.abs(area / 2);
+    return area / 2;
 }
 
 function createPolygon(points: Point2D[]): Polygon {
     return {
         points,
         bounds: calculateBoundingBox(points),
-        area: calculatePolygonArea(points)
+        area: Math.abs(signedArea(points)),
     };
 }
 
-/**
- * Calculate number of segments needed to approximate an arc
- * Based on tolerance (max deviation from true arc)
- */
-function calculateArcSegments(radius: number, angleSpan: number): number {
-    if (radius <= 0 || angleSpan <= 0) return 1;
-    // Using the formula: tolerance = radius * (1 - cos(theta/2))
-    // Solving for theta: theta = 2 * acos(1 - tolerance/radius)
-    const maxAngle = 2 * Math.acos(Math.max(0, 1 - ARC_TOLERANCE / radius));
-    const segments = Math.max(1, Math.ceil(angleSpan / maxAngle));
-    return Math.min(segments, 360); // Cap at 360 segments
-}
-
-/**
- * Approximate an arc as line segments
- */
-function approximateArc(
-    cx: number,
-    cy: number,
-    radius: number,
-    startAngleDeg: number,
-    endAngleDeg: number
-): Point2D[] {
-    // Convert to radians
-    let startAngle = (startAngleDeg * Math.PI) / 180;
-    let endAngle = (endAngleDeg * Math.PI) / 180;
-
-    // Ensure we go counter-clockwise (DXF standard)
-    if (endAngle <= startAngle) {
-        endAngle += 2 * Math.PI;
-    }
-
-    const angleSpan = endAngle - startAngle;
-    const segments = calculateArcSegments(radius, angleSpan);
-    const points: Point2D[] = [];
-
-    for (let i = 0; i <= segments; i++) {
-        const angle = startAngle + (angleSpan * i) / segments;
-        points.push({
-            x: cx + radius * Math.cos(angle),
-            y: cy + radius * Math.sin(angle)
-        });
-    }
-
-    return points;
-}
-
-/**
- * Approximate a full circle as polygon
- */
-function approximateCircle(cx: number, cy: number, radius: number): Point2D[] {
-    return approximateArc(cx, cy, radius, 0, 360);
-}
-
-/**
- * Handle polyline bulge (arc between vertices)
- * Bulge = tan(theta/4) where theta is the arc's included angle
- */
-function processBulge(
-    start: Point2D,
-    end: Point2D,
-    bulge: number
-): Point2D[] {
-    if (Math.abs(bulge) < 0.0001) {
-        return [start]; // Straight line, just return start point
-    }
-
-    // Calculate arc parameters from bulge
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const chordLength = Math.sqrt(dx * dx + dy * dy);
-
-    // Included angle: theta = 4 * atan(bulge)
-    const theta = 4 * Math.atan(Math.abs(bulge));
-
-    // Radius: r = chord / (2 * sin(theta/2))
-    const radius = chordLength / (2 * Math.sin(theta / 2));
-
-    // Sagitta (height of arc): s = r * (1 - cos(theta/2))
-    const sagitta = radius * (1 - Math.cos(theta / 2));
-
-    // Direction from start to end
-    const chordAngle = Math.atan2(dy, dx);
-
-    // Center is perpendicular to chord at midpoint
-    const midX = (start.x + end.x) / 2;
-    const midY = (start.y + end.y) / 2;
-
-    // Distance from midpoint to center
-    const d = radius - sagitta;
-
-    // Perpendicular direction (depends on bulge sign)
-    const perpAngle = chordAngle + (bulge > 0 ? Math.PI / 2 : -Math.PI / 2);
-
-    const cx = midX + d * Math.cos(perpAngle);
-    const cy = midY + d * Math.sin(perpAngle);
-
-    // Start and end angles from center
-    const startAngle = Math.atan2(start.y - cy, start.x - cx) * 180 / Math.PI;
-    const endAngle = Math.atan2(end.y - cy, end.x - cx) * 180 / Math.PI;
-
-    // Generate arc points (excluding end point, will be added by next segment)
-    const arcPoints = approximateArc(cx, cy, radius, startAngle, endAngle);
-    return arcPoints.slice(0, -1); // Remove last point (will be added as next vertex)
+/** Return the contour with the requested orientation (counter-clockwise when ccw = true). */
+function oriented(points: Point2D[], ccw: boolean): Point2D[] {
+    const isCcw = signedArea(points) > 0;
+    return isCcw === ccw ? points : [...points].reverse();
 }
 
 // ============================================
-// ENTITY CONVERTERS
+// TRANSFORMS (OCS mirror, block references, units)
 // ============================================
 
-function convertLine(entity: DxfEntity): Point2D[] {
-    if (!entity.start || !entity.end) return [];
-    return [
-        { x: entity.start.x, y: entity.start.y },
-        { x: entity.end.x, y: entity.end.y }
-    ];
+// ============================================
+// ENTITY → PATH
+// ============================================
+
+function entityPath(e: DxfEntity): Path | null {
+    switch (e.type) {
+        case 'LINE': {
+            const a = e.vertices?.[0] ?? e.start;
+            const b = e.vertices?.[1] ?? e.end;
+            if (!a || !b) return null;
+            return { points: [{ x: a.x, y: a.y }, { x: b.x, y: b.y }], closed: false };
+        }
+        case 'ARC': {
+            if (!e.center || !e.radius) return null;
+            const a0 = e.startAngle ?? 0;
+            let a1 = e.endAngle ?? Math.PI * 2;
+            if (a1 <= a0) a1 += Math.PI * 2;
+            return { points: arcPoints(e.center.x, e.center.y, e.radius, a0, a1 - a0), closed: false };
+        }
+        case 'CIRCLE': {
+            if (!e.center || !e.radius) return null;
+            const pts = arcPoints(e.center.x, e.center.y, e.radius, 0, Math.PI * 2);
+            pts.pop();
+            return { points: pts, closed: true };
+        }
+        case 'ELLIPSE': {
+            if (!e.center || !e.majorAxisEndPoint) return null;
+            return ellipsePoints({ center: e.center, majorAxisEndPoint: e.majorAxisEndPoint, axisRatio: e.axisRatio, startAngle: e.startAngle, endAngle: e.endAngle });
+        }
+        case 'LWPOLYLINE':
+        case 'POLYLINE': {
+            if (e.isPolyfaceMesh || e.is3dPolygonMesh) return null;
+            const verts = (e.vertices ?? []).filter((v) => !v.splineControlPoint);
+            if (verts.length < 2) return null;
+            const closed = !!e.shape;
+            return { points: polylinePoints(verts, closed), closed };
+        }
+        case 'SPLINE': {
+            const pts = splinePoints(e);
+            if (pts.length < 2) return null;
+            const closed = !!e.closed || (pts.length > 2 && dist(pts[0], pts[pts.length - 1]) < 1e-9);
+            if (closed && dist(pts[0], pts[pts.length - 1]) < 1e-9) pts.pop();
+            return { points: pts, closed };
+        }
+        default:
+            return null;
+    }
 }
 
-function convertArc(entity: DxfEntity): Point2D[] {
-    if (!entity.center || !entity.radius) return [];
-    return approximateArc(
-        entity.center.x,
-        entity.center.y,
-        entity.radius,
-        entity.startAngle || 0,
-        entity.endAngle || 360
-    );
+// ============================================
+// CHAINING
+// ============================================
+
+function dropClosingDuplicate(points: Point2D[], tol: number): Point2D[] {
+    const out = [...points];
+    while (out.length > 1 && dist(out[0], out[out.length - 1]) <= tol) out.pop();
+    return out;
 }
 
-function convertCircle(entity: DxfEntity): Point2D[] {
-    if (!entity.center || !entity.radius) return [];
-    return approximateCircle(entity.center.x, entity.center.y, entity.radius);
-}
+/**
+ * Join open pieces whose end points meet (within `tol`) into closed loops.
+ * Returns the closed loops and the pieces that stayed open.
+ */
+function chainOpenPaths(open: Path[], tol: number): { loops: Point2D[][]; rest: Path[] } {
+    const loops: Point2D[][] = [];
+    const rest: Path[] = [];
+    if (open.length === 0) return { loops, rest };
 
-function convertPolyline(entity: DxfEntity): Point2D[] {
-    if (!entity.vertices || entity.vertices.length < 2) return [];
+    const cell = Math.max(tol * 4, 1e-9);
+    const grid = new Map<string, Array<{ idx: number; end: 0 | 1 }>>();
+    const keyOf = (ix: number, iy: number) => `${ix},${iy}`;
+    const add = (p: Point2D, idx: number, end: 0 | 1) => {
+        const k = keyOf(Math.floor(p.x / cell), Math.floor(p.y / cell));
+        let list = grid.get(k);
+        if (!list) grid.set(k, (list = []));
+        list.push({ idx, end });
+    };
+    open.forEach((p, i) => {
+        add(p.points[0], i, 0);
+        add(p.points[p.points.length - 1], i, 1);
+    });
+    const used = new Array<boolean>(open.length).fill(false);
 
-    const points: Point2D[] = [];
-    const vertices = entity.vertices;
+    const findMatch = (p: Point2D): { idx: number; end: 0 | 1 } | null => {
+        const ix = Math.floor(p.x / cell), iy = Math.floor(p.y / cell);
+        let best: { idx: number; end: 0 | 1 } | null = null;
+        let bestD = tol;
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                for (const cand of grid.get(keyOf(ix + dx, iy + dy)) ?? []) {
+                    if (used[cand.idx]) continue;
+                    const pts = open[cand.idx].points;
+                    const q = cand.end === 0 ? pts[0] : pts[pts.length - 1];
+                    const d = dist(p, q);
+                    if (d <= bestD) {
+                        bestD = d;
+                        best = cand;
+                    }
+                }
+            }
+        }
+        return best;
+    };
 
-    for (let i = 0; i < vertices.length; i++) {
-        const curr = vertices[i];
-        const next = vertices[(i + 1) % vertices.length];
-
-        if (curr.bulge && i < vertices.length - 1) {
-            // Has bulge - convert to arc
-            const arcPoints = processBulge(
-                { x: curr.x, y: curr.y },
-                { x: next.x, y: next.y },
-                curr.bulge
-            );
-            points.push(...arcPoints);
+    for (let i = 0; i < open.length; i++) {
+        if (used[i]) continue;
+        used[i] = true;
+        const chain = [...open[i].points];
+        const pieces = [i];
+        let closed = false;
+        // extend forwards, then backwards
+        for (const forward of [true, false]) {
+            while (!closed) {
+                const tip = forward ? chain[chain.length - 1] : chain[0];
+                const m = findMatch(tip);
+                if (!m) break;
+                used[m.idx] = true;
+                pieces.push(m.idx);
+                const pts = open[m.idx].points;
+                if (forward) {
+                    const seq = m.end === 0 ? pts : [...pts].reverse();
+                    chain.push(...seq.slice(1));
+                } else {
+                    const seq = m.end === 1 ? pts : [...pts].reverse();
+                    chain.unshift(...seq.slice(0, -1));
+                }
+                closed = chain.length >= 3 && dist(chain[0], chain[chain.length - 1]) <= tol;
+            }
+            if (closed) break;
+        }
+        if (!closed) closed = chain.length >= 3 && dist(chain[0], chain[chain.length - 1]) <= tol;
+        if (closed) {
+            loops.push(dropClosingDuplicate(chain, tol));
         } else {
-            points.push({ x: curr.x, y: curr.y });
+            // keep the joined piece; a later, more tolerant pass may still close it
+            rest.push({ points: chain, closed: false });
         }
     }
-
-    return points;
+    return { loops, rest };
 }
 
 // ============================================
-// CHAIN BUILDING
+// METADATA FROM TEXT
 // ============================================
 
-interface EntityChain {
-    points: Point2D[];
-    closed: boolean;
+interface DxfTextTag {
+    text: string;
+    x: number;
+    y: number;
+    layer?: string;
 }
 
 /**
- * Try to connect entities into closed polygons
+ * Strips DXF/RTF formatting codes from MTEXT strings
  */
-function buildPolygonChains(entities: DxfEntity[]): EntityChain[] {
-    const chains: EntityChain[] = [];
-    const used = new Set<number>();
+function cleanDxfText(raw: string): string {
+    if (!raw) return '';
+    return raw
+        .replace(/\\A[0-9];/g, '')
+        .replace(/\\[A-Za-z][^;]*;/g, '')
+        .replace(/[\{\}]/g, '')
+        .replace(/\\P/g, ' ')
+        .replace(/\^J/g, ' ')
+        .trim();
+}
 
-    // First, handle self-contained entities (circles, closed polylines)
-    entities.forEach((entity, index) => {
-        if (entity.type === 'CIRCLE') {
-            const points = convertCircle(entity);
-            if (points.length >= MIN_POLYGON_POINTS) {
-                chains.push({ points, closed: true });
-                used.add(index);
-            }
-        } else if ((entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') && entity.shape) {
-            const points = convertPolyline(entity);
-            if (points.length >= MIN_POLYGON_POINTS) {
-                chains.push({ points, closed: true });
-                used.add(index);
+/**
+ * Extracts metadata (quantity, thickness, material, part name) from text tags or layer names
+ */
+function extractPartMetadata(tags: DxfTextTag[], layerNames: string[]): {
+    quantity?: number;
+    thickness?: number;
+    material?: string;
+    label?: string;
+    notes?: string;
+} {
+    let quantity: number | undefined;
+    let thickness: number | undefined;
+    let material: string | undefined;
+    let label: string | undefined;
+    const collectedNotes: string[] = [];
+
+    const allStrings = [
+        ...tags.map(t => t.text),
+        ...tags.map(t => t.layer || ''),
+        ...layerNames
+    ].filter(Boolean);
+
+    for (const str of allStrings) {
+        // Quantity pattern: ADET: 10, QTY: 5, 10 ADET, 10 PCS, x10, QTY_10
+        if (quantity === undefined) {
+            const qtyMatch = str.match(/(?:ADET|QTY|PIECES?|PCS|COUNT|AD)\s*[:=_-]?\s*(\d+)/i)
+                || str.match(/\b(\d+)\s*(?:ADET|PCS|PIECES?)\b/i)
+                || str.match(/(?:^|\s)[xX]\s*(\d+)(?:\s|$)/)
+                || str.match(/\b(?:QTY|ADET)[_-]?(\d+)\b/i);
+            if (qtyMatch) {
+                const parsed = parseInt(qtyMatch[1], 10);
+                if (parsed > 0 && parsed < 100000) {
+                    quantity = parsed;
+                }
             }
         }
-    });
 
-    // Then handle open polylines as individual parts
-    entities.forEach((entity, index) => {
-        if (used.has(index)) return;
-
-        if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-            const points = convertPolyline(entity);
-            if (points.length >= MIN_POLYGON_POINTS) {
-                chains.push({ points, closed: false });
-                used.add(index);
-            }
-        } else if (entity.type === 'ARC') {
-            const points = convertArc(entity);
-            if (points.length >= MIN_POLYGON_POINTS) {
-                chains.push({ points, closed: false });
-                used.add(index);
+        // Thickness pattern: KALINLIK: 15, THK: 15mm, 15 MM, T: 15, THK_15
+        if (thickness === undefined) {
+            const thkMatch = str.match(/(?:THK|KALINLIK|THICKNESS|KAL)\s*[:=_-]?\s*(\d+(?:[.,]\d+)?)\s*(?:MM)?/i)
+                || str.match(/\b(?:THK|KAL|T)[_-]?(\d+(?:[.,]\d+)?)\b/i)
+                || str.match(/\b(\d+(?:[.,]\d+)?)\s*MM\b/i);
+            if (thkMatch) {
+                const parsed = parseFloat(thkMatch[1].replace(',', '.'));
+                if (parsed > 0 && parsed < 200) {
+                    thickness = parsed;
+                }
             }
         }
-    });
 
-    // TODO: Chain LINEs and ARCs into connected paths
-    // For MVP, we treat each LINE as separate (may need enhancement)
+        // Material pattern: MALZEME: ST37, MAT: S235, ST-52, HARDOX 450, 6082-T6, 304, etc.
+        if (material === undefined) {
+            const matExplicit = str.match(/(?:MAT|MALZEME|MATERIAL)\s*[:=_-]?\s*([A-Za-z0-9\-_\s]+)/i);
+            if (matExplicit) {
+                material = matExplicit[1].trim();
+            } else {
+                const matStandard = str.match(/\b(ST-?37(?:-[0-9])?|ST-?52(?:-[0-9])?|S235(?:JR)?|S355(?:JR|J2)?|HARDOX\s*\d+|6082(?:-T6)?|6061(?:-T6)?|304L?|316L?|ALUM[Iİ]NYUM|PASLANMAZ|DKP)\b/i);
+                if (matStandard) {
+                    material = matStandard[1].trim();
+                }
+            }
+        }
 
-    return chains;
+        // Name / Label pattern: PARCA: FLANS-1, NAME: LEVHA-A, ITEM: B1
+        if (label === undefined) {
+            const nameMatch = str.match(/(?:NAME|PARCA|PARÇA|LABEL|ITEM|NO)\s*[:=_-]?\s*([A-Za-z0-9\-_]+)/i);
+            if (nameMatch) {
+                label = nameMatch[1].trim();
+            }
+        }
+
+        collectedNotes.push(str);
+    }
+
+    return {
+        quantity,
+        thickness,
+        material,
+        label,
+        notes: collectedNotes.length > 0 ? collectedNotes.join(' | ') : undefined,
+    };
 }
 
 // ============================================
 // MAIN PARSER
 // ============================================
 
+const GEOMETRY_TYPES = ['LINE', 'ARC', 'CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE'];
+const TEXT_TYPES = ['TEXT', 'MTEXT', 'DIMENSION', 'LEADER', 'ATTDEF', 'ATTRIB'];
+
 /**
  * Parse DXF file content to Part2D array
  */
-export function parseDxfContent(dxfContent: string, filename: string): DxfParseResult {
+export function parseDxfContent(
+    dxfContent: string,
+    filename: string,
+    options?: DxfParseOptions
+): DxfParseResult {
+    const normalizeOrigin = options?.normalizeOrigin !== false; // default: true
+    const autoTagMetadata = options?.autoTagMetadata !== false; // default: true
+
     const parts: Part2D[] = [];
     const errors: string[] = [];
     const warnings: string[] = [];
     const skippedTypes: Record<string, number> = {};
     let rawEntityCount = 0;
+    let unitScale = 1;
+    let openContours = 0;
 
     try {
         const parser = new DxfParser();
-        const dxf = parser.parseSync(dxfContent);
+        const dxf = parser.parseSync(dxfContent) as unknown as {
+            entities?: DxfEntity[];
+            blocks?: Record<string, DxfBlock>;
+            header?: Record<string, unknown>;
+            tables?: { layer?: { layers?: Record<string, { visible?: boolean; frozen?: boolean }> } };
+        } | null;
 
         if (!dxf || !dxf.entities) {
             errors.push('No entities found in DXF file');
@@ -328,55 +469,204 @@ export function parseDxfContent(dxfContent: string, filename: string): DxfParseR
 
         rawEntityCount = dxf.entities.length;
 
-        // Track skipped entity types
-        const textTypes = ['TEXT', 'MTEXT', 'DIMENSION', 'LEADER', 'ATTDEF', 'ATTRIB'];
-        const supportedGeometry = ['LINE', 'ARC', 'CIRCLE', 'LWPOLYLINE', 'POLYLINE'];
-
-        // Count and track skipped types
-        for (const e of dxf.entities as DxfEntity[]) {
-            if (textTypes.includes(e.type)) {
-                skippedTypes[e.type] = (skippedTypes[e.type] || 0) + 1;
-            } else if (!supportedGeometry.includes(e.type)) {
-                skippedTypes[e.type] = (skippedTypes[e.type] || 0) + 1;
+        // ── units ──
+        const insUnits = Number(dxf.header?.['$INSUNITS'] ?? 0);
+        if (options?.unitScale && options.unitScale > 0) {
+            unitScale = options.unitScale;
+        } else if (INSUNITS_TO_MM[insUnits] !== undefined) {
+            unitScale = INSUNITS_TO_MM[insUnits];
+            if (unitScale !== 1) {
+                warnings.push(`Drawing units: ${UNIT_NAMES[insUnits] ?? insUnits} — converted to millimetres (×${unitScale}).`);
             }
         }
+        const toMm: Affine = [unitScale, 0, 0, unitScale, 0, 0];
 
-        // Report skipped text/dimension entities
-        for (const [type, count] of Object.entries(skippedTypes)) {
-            if (textTypes.includes(type)) {
-                warnings.push(`Skipped ${count} ${type} entities (text/dimensions not supported for cutting)`);
-            }
-        }
+        const layers = dxf.tables?.layer?.layers ?? {};
+        const layerHidden = (name?: string) => {
+            if (!name) return false;
+            const l = layers[name];
+            return !!l && (l.frozen === true || l.visible === false);
+        };
 
-        // Filter to supported entity types
-        const supportedEntities = dxf.entities.filter((e: DxfEntity) =>
-            supportedGeometry.includes(e.type)
-        );
+        // ── flatten model space (block references expanded) ──
+        const paths: Path[] = [];
+        const textTags: DxfTextTag[] = [];
+        let sheetSkipped = 0;
+        let hiddenSkipped = 0;
 
-        if (supportedEntities.length === 0) {
-            errors.push('No supported geometry (LINE, ARC, CIRCLE, POLYLINE) found');
-            return { parts, errors, warnings, rawEntityCount, skippedTypes };
-        }
-
-        // Build polygon chains
-        const chains = buildPolygonChains(supportedEntities);
-
-        // Convert chains to Part2D
-        chains.forEach((chain, index) => {
-            if (chain.points.length >= MIN_POLYGON_POINTS) {
-                const polygon = createPolygon(chain.points);
-
-                // Only add if area is meaningful (> 1 mm²)
-                if (polygon.area > 1) {
-                    parts.push({
-                        id: `${filename}-part-${index}`,
-                        label: `Part ${index + 1}`,
-                        polygon,
-                        quantity: 1,
-                        allowedRotations: [0, 90, 180, 270],
-                        source: filename
-                    });
+        const visit = (entities: DxfEntity[], m: Affine, depth: number) => {
+            for (const e of entities) {
+                if (e.inPaperSpace) continue;
+                if (e.layer && e.layer.toUpperCase() === 'SHEET') {
+                    if (GEOMETRY_TYPES.includes(e.type)) sheetSkipped++;
+                    continue;
                 }
+                if (layerHidden(e.layer)) {
+                    hiddenSkipped++;
+                    continue;
+                }
+                if (e.type === 'TEXT' || e.type === 'MTEXT') {
+                    const cleaned = cleanDxfText(e.text || e.string || '');
+                    const pos = e.startPoint || e.position || e.start || e.insertionPoint || { x: 0, y: 0 };
+                    if (cleaned) {
+                        const p = apply(m, { x: pos.x ?? 0, y: pos.y ?? 0 });
+                        textTags.push({ text: cleaned, x: p.x, y: p.y, layer: e.layer });
+                    }
+                    skippedTypes[e.type] = (skippedTypes[e.type] || 0) + 1;
+                    continue;
+                }
+                if (e.type === 'INSERT') {
+                    const block = e.name ? dxf.blocks?.[e.name] : undefined;
+                    if (!block?.entities || depth > 8) {
+                        skippedTypes.INSERT = (skippedTypes.INSERT || 0) + 1;
+                        continue;
+                    }
+                    const base = block.position ?? { x: 0, y: 0 };
+                    const cols = Math.max(1, e.columnCount ?? 1);
+                    const rows = Math.max(1, e.rowCount ?? 1);
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            const shifted: DxfEntity = {
+                                ...e,
+                                position: {
+                                    x: (e.position?.x ?? 0) + c * (e.columnSpacing ?? 0),
+                                    y: (e.position?.y ?? 0) + r * (e.rowSpacing ?? 0),
+                                },
+                            };
+                            visit(block.entities, compose(m, insertTransform(shifted, base)), depth + 1);
+                        }
+                    }
+                    continue;
+                }
+                if (!GEOMETRY_TYPES.includes(e.type)) {
+                    skippedTypes[e.type] = (skippedTypes[e.type] || 0) + 1;
+                    continue;
+                }
+                const path = entityPath(e);
+                if (!path) continue;
+                const local = ocsMirrored(e) ? compose(m, MIRROR_X) : m;
+                paths.push({ points: path.points.map((p) => apply(local, p)), closed: path.closed });
+            }
+        };
+        visit(dxf.entities, toMm, 0);
+
+        if (sheetSkipped > 0) {
+            warnings.push(`Skipped ${sheetSkipped} SHEET layer entit${sheetSkipped === 1 ? 'y' : 'ies'} (stock boundary).`);
+        }
+        if (hiddenSkipped > 0) {
+            warnings.push(`Skipped ${hiddenSkipped} entit${hiddenSkipped === 1 ? 'y' : 'ies'} on frozen or hidden layers.`);
+        }
+        for (const [type, count] of Object.entries(skippedTypes)) {
+            if (TEXT_TYPES.includes(type)) warnings.push(`Extracted metadata from ${count} ${type} text annotations.`);
+        }
+
+        if (paths.length === 0) {
+            errors.push('No supported geometry (LINE, ARC, CIRCLE, ELLIPSE, POLYLINE, SPLINE) found in part layers');
+            return { parts, errors, warnings, rawEntityCount, skippedTypes, unitScale };
+        }
+
+        // ── closed loops: native closed entities + chained pieces ──
+        const allPts = paths.flatMap((p) => [p.points[0], p.points[p.points.length - 1]]);
+        const ext = calculateBoundingBox(allPts);
+        const diag = Math.hypot(ext.width, ext.height) || 1;
+        const strictTol = Math.max(1e-4, diag * 1e-7);
+        const looseTol = Math.max(0.05, diag * 2e-5);
+
+        const loops: Point2D[][] = [];
+        const open: Path[] = [];
+        for (const p of paths) {
+            if (p.closed) {
+                loops.push(dropClosingDuplicate(p.points, strictTol));
+            } else if (p.points.length >= 3 && dist(p.points[0], p.points[p.points.length - 1]) <= strictTol) {
+                loops.push(dropClosingDuplicate(p.points, strictTol)); // open entity that returns to its start
+            } else if (p.points.length >= 2) {
+                open.push(p);
+            }
+        }
+        const pass1 = chainOpenPaths(open, strictTol);
+        const pass2 = chainOpenPaths(pass1.rest, looseTol);
+        loops.push(...pass1.loops, ...pass2.loops);
+        openContours = pass2.rest.length;
+        if (pass2.loops.length > 0) {
+            warnings.push(`Closed ${pass2.loops.length} outline${pass2.loops.length === 1 ? '' : 's'} across small gaps (≤ ${looseTol.toFixed(2)} mm).`);
+        }
+        if (openContours > 0) {
+            warnings.push(`${openContours} open contour${openContours === 1 ? '' : 's'} could not be closed and ${openContours === 1 ? 'was' : 'were'} ignored.`);
+        }
+
+        // ── contours → parts (even-odd containment) ──
+        const rawContours: Contour[] = loops
+            .filter((pts) => pts.length >= MIN_POLYGON_POINTS && Math.abs(signedArea(pts)) > 1e-6)
+            .map((pts, idx) => {
+                const poly = createPolygon(pts);
+                return {
+                    id: `contour_${idx}`,
+                    segments: [],
+                    points: pts,
+                    isClosed: true,
+                    role: 'outer' as const,
+                    area: poly.area,
+                    bounds: {
+                        minX: poly.bounds.x,
+                        minY: poly.bounds.y,
+                        maxX: poly.bounds.x + poly.bounds.width,
+                        maxY: poly.bounds.y + poly.bounds.height,
+                        width: poly.bounds.width,
+                        height: poly.bounds.height,
+                    },
+                    isClockwise: signedArea(pts) < 0,
+                };
+            });
+
+        const camParts = buildPartHierarchy(rawContours, filename.replace(/\.dxf$/i, ''));
+
+        camParts.forEach((camPart: CamPart, index: number) => {
+            const origMinX = camPart.outerContour.bounds.minX;
+            const origMinY = camPart.outerContour.bounds.minY;
+            const origMaxX = camPart.outerContour.bounds.maxX;
+            const origMaxY = camPart.outerContour.bounds.maxY;
+
+            // Multi-part DXF origin normalization: offset coordinates to (0, 0)
+            const offsetX = normalizeOrigin ? origMinX : 0;
+            const offsetY = normalizeOrigin ? origMinY : 0;
+            const shift = (pts: Point2D[]) => pts.map((pt) => ({ x: pt.x - offsetX, y: pt.y - offsetY }));
+
+            const outerPoly = createPolygon(oriented(shift(camPart.outerContour.points), true));
+            const innerPolys = camPart.holes.map((h: Contour) => createPolygon(oriented(shift(h.points), false)));
+
+            // Associate text metadata tags within or near this part's bounding box
+            let taggedMeta: ReturnType<typeof extractPartMetadata> = {};
+            if (autoTagMetadata) {
+                const nearbyTags = textTags.filter(t =>
+                    t.x >= origMinX - 40 &&
+                    t.x <= origMaxX + 40 &&
+                    t.y >= origMinY - 40 &&
+                    t.y <= origMaxY + 40
+                );
+                const partLayers = [
+                    camPart.outerContour.id,
+                    ...camPart.holes.map(h => h.id)
+                ];
+                taggedMeta = extractPartMetadata(nearbyTags, partLayers);
+            }
+
+            if (outerPoly.area > 1) {
+                const partLabel = taggedMeta.label || camPart.label || `Part ${index + 1}`;
+                const quantity = taggedMeta.quantity || 1;
+
+                parts.push({
+                    id: `${filename}-part-${index}`,
+                    label: partLabel,
+                    polygon: outerPoly,
+                    quantity: quantity,
+                    allowedRotations: [0, 90, 180, 270],
+                    source: filename,
+                    holeCount: innerPolys.length,
+                    innerPolygons: innerPolys.length > 0 ? innerPolys : undefined,
+                    material: taggedMeta.material,
+                    thickness: taggedMeta.thickness,
+                    notes: taggedMeta.notes,
+                });
             }
         });
 
@@ -388,8 +678,10 @@ export function parseDxfContent(dxfContent: string, filename: string): DxfParseR
         errors.push(`DXF parse error: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
 
-    return { parts, errors, warnings, rawEntityCount, skippedTypes };
+    return { parts, errors, warnings, rawEntityCount, skippedTypes, unitScale, openContours };
 }
+
+export const parseDxfToParts = parseDxfContent;
 
 /**
  * Validate DXF file before full parsing

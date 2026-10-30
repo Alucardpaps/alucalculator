@@ -5,12 +5,15 @@
  * Client component for /design-studio
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Box, Pencil, Sparkles, Wand2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Box, Pencil, Sparkles, Wand2, ArrowRight, PenTool } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { useDesignStore } from '@/design-studio/designStore';
 import { generateSolidFromPrompt } from '@/engines/cad/AegisGenerativeEngine';
+import { consumeDesignImport } from '@/system/crossModuleBridge';
 
 const StudioLoadingFallback = ({ title, sub }: { title: string; sub: string }) => (
   <div className="w-full h-full min-h-[500px] flex flex-col items-center justify-center bg-[var(--bg-0)] px-4 text-center">
@@ -55,6 +58,15 @@ const DesktopDesignStudio = dynamic(
   }
 );
 
+// Unified 3D Studio V2 (Professional 3D Core with Integrated Workbenches)
+const Unified3DStudioV2 = dynamic(
+  () => import('@/design-studio/Unified3DStudioV2').then((m) => m.Unified3DStudioV2 || m.default),
+  {
+    ssr: false,
+    loading: () => <StudioLoadingFallback title="AluCalc Unified 3D Studio V2" sub="Initializing professional 3D kernel and workbenches..." />,
+  }
+);
+
 // Mobile 3D Configurator
 const MobileDesignStudio = dynamic(
   () => import('@/design-studio/MobileDesignStudio').then((m) => m.MobileDesignStudio || m.default),
@@ -84,10 +96,18 @@ const Mobile2DCad = dynamic(
 
 export function DesignStudioClient() {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
+  const parts = useDesignStore((s) => s.parts);
   const [activeTab, setActiveTab] = useState<'3d' | '2d' | 'invent'>('3d');
+  const [v2Mode, setV2Mode] = useState<boolean>(true);
   const [inventPrompt, setInventPrompt] = useState('');
   const [inventLoading, setInventLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__designStore = useDesignStore;
+    }
+    consumeDesignImport();
+  }, []);
 
   const handleGenerateSolid = () => {
     if (!inventPrompt.trim()) return;
@@ -111,14 +131,23 @@ export function DesignStudioClient() {
         locked: false,
         parentId: null,
         holes: generated.holes || [],
+        cuts: generated.cuts || [],
       };
 
       store.pushHistory();
-      useDesignStore.setState((s) => ({ parts: [...s.parts, newPart], selectedId: newPartId }));
-
-      if (generated.holes && generated.holes.length > 0) {
-        store.clearHoles();
-        generated.holes.forEach((h) => store.addHole(h));
+      if (generated.assemblyParts && generated.assemblyParts.length > 0) {
+        const assemblyParts = generated.assemblyParts;
+        useDesignStore.setState((s) => ({
+          parts: [...s.parts, ...assemblyParts],
+          selectedId: assemblyParts[0]?.id || null,
+        }));
+      } else {
+        useDesignStore.setState((s) => ({
+          parts: [...s.parts, newPart],
+          selectedId: newPartId,
+          holes: generated.holes || [],
+          cuts: generated.cuts || [],
+        }));
       }
 
       if (generated.materialId) {
@@ -135,15 +164,35 @@ export function DesignStudioClient() {
     }
   };
 
+  // In V2 Mode, Unified3DStudioV2 is the complete full-screen workstation (no duplicate headers)
+  if (v2Mode) {
+    return (
+      <div className="w-full flex-1 h-full min-h-0 flex flex-col overflow-hidden bg-[var(--bg-0)] select-none font-mono">
+        <Unified3DStudioV2 onToggleV1Classic={() => setV2Mode(false)} />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-[calc(100dvh-3.5rem)] pb-16 sm:pb-0 flex flex-col overflow-hidden bg-[var(--bg-0)] select-none">
-      {/* ─── Mode Switcher Header (3D / 2D / Invent) ─── */}
-      <div className="flex-none flex items-center justify-center p-1.5 border-b border-[var(--line)] bg-[var(--bg-1)] z-30">
-        <div className="flex items-center gap-1 p-1 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] font-mono">
+    <div className="w-full h-full flex flex-col overflow-hidden bg-[var(--bg-0)] select-none">
+      {/* ─── Classic V1 Mode Switcher Header (3D / 2D / Invent) ─── */}
+      <div className="flex-none flex items-center justify-between px-3 py-1.5 border-b border-[var(--line)] bg-[var(--bg-1)] z-30">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-1 text-xs font-bold font-mono text-[var(--ink)]">
+            <span className="text-[var(--cyan)]">AluCAD</span>
+            <span>Studio · 3D</span>
+          </div>
+          <span className="hidden sm:inline-block text-[10px] font-mono text-[var(--alu-dim)]">
+            · {parts.length} {t12(language, 'parts', 'parça')}
+          </span>
+        </div>
+
+        {/* Center Tabs: 3D / 2D / Invent */}
+        <div className="flex items-center gap-1 p-0.5 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] font-mono">
           <button
             type="button"
             onClick={() => setActiveTab('3d')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === '3d'
                 ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
                 : 'text-[var(--alu-dim)] hover:text-white'
@@ -156,7 +205,7 @@ export function DesignStudioClient() {
           <button
             type="button"
             onClick={() => setActiveTab('2d')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === '2d'
                 ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
                 : 'text-[var(--alu-dim)] hover:text-white'
@@ -169,7 +218,7 @@ export function DesignStudioClient() {
           <button
             type="button"
             onClick={() => setActiveTab('invent')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-s)] text-xs font-bold transition-colors ${
               activeTab === 'invent'
                 ? 'bg-[var(--cyan)] text-[var(--bg-0)]'
                 : 'text-[var(--alu-dim)] hover:text-white'
@@ -178,6 +227,32 @@ export function DesignStudioClient() {
             <Sparkles size={13} className={activeTab === 'invent' ? 'text-[var(--bg-0)]' : 'text-[var(--cyan)]'} />
             <span>Invent</span>
           </button>
+        </div>
+
+        {/* Right Action: V1/V2 Switcher & Direct jump to /cad-editor */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setV2Mode(!v2Mode)}
+            className={`px-2 py-1 rounded-[var(--radius-s)] border text-[10.5px] font-bold font-mono transition-colors cursor-pointer ${
+              v2Mode
+                ? 'bg-[var(--cyan)]/15 border-[var(--cyan)]/40 text-[var(--cyan)]'
+                : 'bg-purple-500/15 border-purple-500/40 text-purple-300'
+            }`}
+            title="Toggle between V2 Unified 3D Studio and V1 Classic Configurator"
+          >
+            {v2Mode ? '🌟 V2 UNIFIED 3D' : '🖥️ V1 CLASSIC'}
+          </button>
+
+          <Link
+            href="/cad-editor/"
+            className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-s)] bg-[var(--bg-0)] border border-[var(--line)] hover:border-[var(--cyan)] text-[11px] font-bold font-mono text-[var(--alu-dim)] hover:text-cyan-300 transition-colors"
+            title={t12(language, 'Open Dedicated 2D CAD', 'Tam Ekran 2D CAD Editörüne Git')}
+          >
+            <PenTool size={12} className="text-cyan-400" />
+            <span className="hidden xs:inline">{t12(language, 'CAD Editor', 'CAD Editör')}</span>
+            <ArrowRight size={11} className="text-slate-500" />
+          </Link>
         </div>
       </div>
 
@@ -192,7 +267,11 @@ export function DesignStudioClient() {
             </div>
             {/* Desktop View */}
             <div className="hidden sm:block w-full h-full">
-              <DesktopDesignStudio embedded />
+              {v2Mode ? (
+                <Unified3DStudioV2 onToggleV1Classic={() => setV2Mode(false)} />
+              ) : (
+                <DesktopDesignStudio embedded />
+              )}
             </div>
           </>
         )}
@@ -220,12 +299,10 @@ export function DesignStudioClient() {
 
             <div className="max-w-lg space-y-2">
               <h2 className="text-lg font-mono font-bold text-[var(--ink)] flex items-center justify-center gap-2 uppercase">
-                <span>{tr ? 'AeGiS Yapay Zeka CAD Üretici' : 'AeGiS Generative CAD Engine'}</span>
+                <span>{t12(language, 'AeGiS Generative CAD Engine', 'AeGiS Yapay Zeka CAD Üretici')}</span>
               </h2>
               <p className="text-xs text-[var(--alu-dim)] leading-relaxed font-sans">
-                {tr
-                  ? 'Doğal dilde istediğiniz her türlü mekanik parçayı tarif edin. Sistem ölçüleri, metrik delikleri, federleri ve malzemeyi otomatik çözümler ve 3D katı modelini oluşturur.'
-                  : 'Describe any mechanical part in natural language. The engine calculates geometry, metric hole patterns, and material to synthesize a full 3D solid.'}
+                {t12(language, 'Describe any mechanical part in natural language. The engine calculates geometry, metric hole patterns, and material to synthesize a full 3D solid.', 'Doğal dilde istediğiniz her türlü mekanik parçayı tarif edin. Sistem ölçüleri, metrik delikleri, federleri ve malzemeyi otomatik çözümler ve 3D katı modelini oluşturur.')}
               </p>
             </div>
 
@@ -239,7 +316,7 @@ export function DesignStudioClient() {
                     handleGenerateSolid();
                   }
                 }}
-                placeholder={tr ? 'Örn: 4 delikli M12 flanş, 50x50 L braket, Ø25x120 kamalı mil...' : 'e.g., 4-hole M12 flange, 50x50 L-bracket, Ø25x120 keyway shaft...'}
+                placeholder={t12(language, 'e.g., 4-hole M12 flange, 50x50 L-bracket, Ø25x120 keyway shaft...', 'Örn: 4 delikli M12 flanş, 50x50 L braket, Ø25x120 kamalı mil...')}
                 className="w-full p-3.5 rounded-[var(--radius-s)] bg-[var(--bg-1)] border border-[var(--line)] text-[var(--ink)] text-xs placeholder-[var(--alu-dim)]/50 focus:outline-none focus:border-[var(--cyan)]"
               />
 
@@ -261,7 +338,7 @@ export function DesignStudioClient() {
                     }}
                     className="px-2.5 py-1 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] text-[var(--alu)] text-[10px] hover:bg-[var(--bg-3)] hover:text-[var(--cyan)] hover:border-[var(--cyan)]/30 transition-colors"
                   >
-                    {tr ? item.tr : item.en}
+                    {t12(language, item.en, item.tr)}
                   </button>
                 ))}
               </div>
@@ -273,7 +350,7 @@ export function DesignStudioClient() {
                 className="w-full py-3 rounded-[var(--radius-s)] bg-[var(--cyan)] hover:bg-[var(--cyan-dim)] text-[var(--bg-0)] hover:text-white text-xs font-bold uppercase tracking-wider disabled:opacity-40 transition-colors flex items-center justify-center gap-2"
               >
                 <Wand2 size={15} className={inventLoading ? 'animate-spin' : ''} />
-                <span>{inventLoading ? (tr ? '3D Katı Model Çözümleniyor...' : 'Synthesizing 3D Solid...') : (tr ? '✨ 3D Katı Modeli Çiz & Aç' : '✨ Generate & Open 3D Solid')}</span>
+                <span>{inventLoading ? (t12(language, 'Synthesizing 3D Solid...', '3D Katı Model Çözümleniyor...')) : (t12(language, '✨ Generate & Open 3D Solid', '✨ 3D Katı Modeli Çiz & Aç'))}</span>
               </button>
             </div>
           </div>

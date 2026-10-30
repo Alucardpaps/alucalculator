@@ -5,6 +5,8 @@ import { Share2, RefreshCw } from 'lucide-react';
 import { exportPackage, CreatePackageOptions, ExportResult } from '../export-package';
 import { ShareModal } from './ShareModal';
 import { SCALE_REGISTRY } from '../scale-registry';
+import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 interface AluShareButtonProps {
   module: string;
@@ -25,6 +27,7 @@ export const AluShareButton: React.FC<AluShareButtonProps> = ({
   getPackageData,
   className = '',
 }) => {
+  const { language } = useI18nStore();
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<ExportResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +48,7 @@ export const AluShareButton: React.FC<AluShareButtonProps> = ({
 
       if (missingKeys.length > 0) {
         throw new Error(
-          `Bu solver alanları henüz SCALE_REGISTRY'de eşlenmemiştir: ${missingKeys.join(', ')}`,
+          t12(language, `These solver parameters are not yet registered in SCALE_REGISTRY: ${missingKeys.join(', ')}`, `Bu solver alanları henüz SCALE_REGISTRY'de eşlenmemiştir: ${missingKeys.join(', ')}`),
         );
       }
 
@@ -72,7 +75,7 @@ export const AluShareButton: React.FC<AluShareButtonProps> = ({
       }
     } catch (err) {
       console.error('AluShare export failed:', err);
-      alert(err instanceof Error ? err.message : 'Paket dışa aktarılamadı.');
+      alert(err instanceof Error ? err.message : t12(language, 'Package could not be exported.', 'Paket dışa aktarılamadı.'));
     } finally {
       setIsExporting(false);
     }
@@ -85,14 +88,14 @@ export const AluShareButton: React.FC<AluShareButtonProps> = ({
         onClick={handleOpenShare}
         disabled={isExporting}
         className={`px-3 py-1.5 bg-cyan-950/70 hover:bg-cyan-900/90 border border-cyan-500/40 text-cyan-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition active:scale-95 disabled:opacity-50 cursor-pointer ${className}`}
-        title="AluShare v1 Local Paketi Olarak Dışa Aktar"
+        title={t12(language, 'Export as AluShare v1 Offline Bundle', 'AluShare v1 Yerel Paketi Olarak Dışa Aktar')}
       >
         {isExporting ? (
           <RefreshCw className="w-3.5 h-3.5 animate-spin" />
         ) : (
           <Share2 className="w-3.5 h-3.5" />
         )}
-        <span>Paylaş (AluShare)</span>
+        <span>{t12(language, 'Share (AluShare)', 'Paylaş (AluShare)')}</span>
       </button>
 
       <ShareModal

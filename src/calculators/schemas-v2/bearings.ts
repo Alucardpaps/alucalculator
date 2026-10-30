@@ -11,7 +11,7 @@ const bearingLifeSchema: CalculatorSchemaV2 = {
         description: 'Calculate L10 life for standard deep groove ball bearings (ISO 281).',
         category: 'mechanical',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-09',
         tags: ['bearing', 'life', 'L10', 'skf', 'iso'],
         verifiedStandards: ['ISO 281'],

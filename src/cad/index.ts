@@ -11,6 +11,10 @@ export * from './kernel/CoordinateSystem';
 
 // Geometry
 export * from './geometry/SnapEngine';
+export * from './geometry/sectionProperties';
+export * from './geometry/contourAssembler';
+export * from './catalog/tSlotProfiles';
+export { parseDXF, simpleParseDXF } from './dxf/DxfParser';
 
 // Store
 export { useCadStore } from './store/cadStore';

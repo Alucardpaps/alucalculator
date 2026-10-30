@@ -110,13 +110,13 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#020408]/95 p-4 text-white overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg-0)]/95 p-4 text-white overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
                     <Compass className="text-cyan-400 animate-pulse" size={20} />
                     <div>
-                        <h3 className="text-sm font-black italic uppercase tracking-wider">{ft.gpsSurveyor || 'GPS Surveyor'}</h3>
+                        <h3 className="text-sm font-black uppercase tracking-wider">{ft.gpsSurveyor || 'GPS Surveyor'}</h3>
                         <span className="text-[9px] text-slate-500 font-mono block leading-none">{ft.gpsSurveyorDesc}</span>
                     </div>
                 </div>
@@ -133,7 +133,7 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.05)_0%,transparent_75%)] pointer-events-none" />
                     
                     {/* Compass dial */}
-                    <div className="relative w-44 h-44 rounded-full border-2 border-cyan-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(0,229,255,0.05)]">
+                    <div className="relative w-44 h-44 rounded-full border-2 border-cyan-500/20 flex items-center justify-center ">
                         {/* Static cursor */}
                         <div className="absolute top-0 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-red-500 z-20 -mt-1" />
                         
@@ -163,7 +163,7 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
                         </div>
 
                         {/* Dial center readout */}
-                        <div className="absolute w-20 h-20 rounded-full bg-[#03060a] border border-cyan-500/10 flex flex-col items-center justify-center shadow-lg">
+                        <div className="absolute w-20 h-20 rounded-full bg-[var(--bg-0)] border border-cyan-500/10 flex flex-col items-center justify-center shadow-lg">
                             <span className="text-xl font-black font-mono text-cyan-400 tracking-tighter">
                                 {Math.round(activeHeading)}°
                             </span>
@@ -228,7 +228,7 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
                                         setSimLat(Number(e.target.value));
                                         if (soundEnabled && Math.floor(simLat * 100) % 5 === 0) playClickSound();
                                     }}
-                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                             </div>
 
@@ -248,7 +248,7 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
                                         setSimAlt(Number(e.target.value));
                                         if (soundEnabled && simAlt % 50 === 0) playClickSound();
                                     }}
-                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                             </div>
 
@@ -268,7 +268,7 @@ export function GPSSurveyorModal({ isOpen, onClose, ft: propFt, debugMode }: GPS
                                         setSimHeading(Number(e.target.value));
                                         if (soundEnabled && simHeading % 10 === 0) playClickSound();
                                     }}
-                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                    className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                             </div>
                         </div>

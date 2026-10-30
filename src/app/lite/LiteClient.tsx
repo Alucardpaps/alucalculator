@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { MODULE_REGISTRY, ModuleType, getModuleIcon, TOTAL_CALCULATORS_LABEL } from '@/config/modules';
+import { MODULE_REGISTRY, ModuleType, getModuleIcon } from '@/config/modules';
 import { WindowContent } from '@/components/os/WindowContent';
 import { X, LayoutGrid, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { getLitePage, type LiteCategoryKey } from '@/locales/liteTranslations';
 import { HIDDEN_LITE_TYPES } from '@/config/retiredModules';
 
@@ -19,9 +20,13 @@ export function LiteClient() {
     const [activeModule, setActiveModule] = useState<ModuleType | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const modules = Object.values(MODULE_REGISTRY).filter(mod =>
-        !HIDDEN_LITE_TYPES.has(mod.type)
-    );
+    const seenTypes = new Set<string>();
+    const modules = Object.values(MODULE_REGISTRY).filter(mod => {
+        if (HIDDEN_LITE_TYPES.has(mod.type)) return false;
+        if (seenTypes.has(mod.type)) return false;
+        seenTypes.add(mod.type);
+        return true;
+    });
 
     const filteredModules = modules.filter(mod => 
         mod.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -42,7 +47,7 @@ export function LiteClient() {
                     <div className="flex items-center gap-2">
                         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--ink)] uppercase">{t.title}</h1>
                         <span className="px-2 py-0.5 rounded-[var(--radius-s)] text-[10px] font-mono font-bold bg-[var(--cyan)]/10 text-[var(--cyan)] border border-[var(--cyan)]/30">
-                            {TOTAL_CALCULATORS_LABEL} {language === 'tr' ? 'MODÜL' : 'SOLVERS'}
+                            {t12(language, 'DETERMINISTIC SOLVERS', 'DETERMİNİSTİK MODÜLLER')}
                         </span>
                     </div>
                     <p className="text-xs text-[var(--alu-dim)] font-sans mt-0.5">{t.subtitle}</p>
@@ -80,7 +85,7 @@ export function LiteClient() {
                                     const IconNode = getModuleIcon(mod.iconName);
                                     return (
                                         <Link
-                                            key={mod.type}
+                                            key={`${group.category}-${mod.type}`}
                                             href={`/${mod.type}`}
                                             onClick={(e) => {
                                                 // On mobile, allow instant modal preview or direct route
@@ -130,7 +135,7 @@ export function LiteClient() {
                                     href={`/${activeModule}`}
                                     className="px-2.5 py-1 text-[11px] font-bold rounded-[var(--radius-s)] bg-[var(--cyan)] text-[var(--bg-0)]"
                                 >
-                                    {language === 'tr' ? 'Tam Sayfa ↗' : 'Full Page ↗'}
+                                    {t12(language, 'Full Page ↗', 'Tam Sayfa ↗')}
                                 </Link>
                                 <button 
                                     onClick={() => setActiveModule(null)}

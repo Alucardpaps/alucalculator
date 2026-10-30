@@ -16,9 +16,15 @@
  *   - Never trigger React re-renders from mouse movement
  */
 
-import type { Point, Viewport, CadEntity, SnapResult as SnapIndicator } from '../kernel/types';
+import type { Point, Viewport, CadEntity, Layer, SnapResult as SnapIndicator, CadUnit } from '../kernel/types';
+import { isEntityShown, layerOf, screenDash } from '../kernel/layers';
 import { SpatialIndex } from '../geometry/SpatialIndex';
 import { worldToScreen, calculateGridSpacing } from '../kernel/CoordinateSystem';
+import * as parametric from './parametricDraw';
+import { DynamicBlockEngine } from '../blocks/dynamic/DynamicBlockEngine';
+import { DynamicBlockRegistry } from '../blocks/dynamic/registry';
+import { pathEllipse, pathPolygon, pathRectangle, pathSpline, drawHatch } from './shapePaths';
+import { canvasPalette, displayColor } from './canvasTheme';
 
 // ============================================
 // TYPES
@@ -38,6 +44,9 @@ export interface RenderContext {
     entityMap: Map<string, CadEntity>;
     selectedIds: Set<string>;
     spatialIndex: SpatialIndex;
+    units?: CadUnit;
+    /** layer table (flags and linetypes); a change redraws the geometry */
+    layers?: Layer[];
     /** World → screen transform */
     worldToScreen: (p: Point) => Point;
     /** Screen → world transform */
@@ -67,9 +76,11 @@ abstract class RenderLayer {
     }
 
     resize(width: number, height: number): void {
+        const safeW = Math.max(1, Math.floor(width));
+        const safeH = Math.max(1, Math.floor(height));
         if (this.canvas) {
-            this.canvas.width = width;
-            this.canvas.height = height;
+            this.canvas.width = safeW;
+            this.canvas.height = safeH;
         }
         this.dirty = true;
     }
@@ -79,13 +90,16 @@ abstract class RenderLayer {
      * If cached, renders to internal OffscreenCanvas first, then composites.
      */
     renderTo(targetCtx: CanvasRenderingContext2D, ctx: RenderContext): void {
-        if (this.canvas && !this.dirty) {
-            // Use cached bitmap
-            targetCtx.drawImage(this.canvas, 0, 0);
-            return;
-        }
-
         if (this.canvas) {
+            if (this.canvas.width <= 0 || this.canvas.height <= 0) {
+                return;
+            }
+            if (!this.dirty) {
+                // Use cached bitmap
+                targetCtx.drawImage(this.canvas, 0, 0);
+                return;
+            }
+
             const offCtx = this.canvas.getContext('2d');
             if (offCtx) {
                 offCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -128,7 +142,7 @@ class GridLayer extends RenderLayer {
         const endY = Math.ceil((center.y + halfH) / gridSpacing) * gridSpacing;
 
         // Minor grid
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.strokeStyle = canvasPalette().gridMinor;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
 
@@ -151,7 +165,7 @@ class GridLayer extends RenderLayer {
         const majorEndX = Math.ceil((center.x + halfW) / majorSpacing) * majorSpacing;
         const majorEndY = Math.ceil((center.y + halfH) / majorSpacing) * majorSpacing;
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = canvasPalette().gridMajor;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
 
@@ -171,7 +185,7 @@ class GridLayer extends RenderLayer {
         const originScreen = renderCtx.worldToScreen({ x: 0, y: 0 });
 
         // X axis (red)
-        ctx.strokeStyle = 'rgba(255, 50, 50, 0.4)';
+        ctx.strokeStyle = canvasPalette().axisX;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, originScreen.y);
@@ -179,7 +193,7 @@ class GridLayer extends RenderLayer {
         ctx.stroke();
 
         // Y axis (green)
-        ctx.strokeStyle = 'rgba(50, 255, 50, 0.4)';
+        ctx.strokeStyle = canvasPalette().axisY;
         ctx.beginPath();
         ctx.moveTo(originScreen.x, 0);
         ctx.lineTo(originScreen.x, height);
@@ -210,22 +224,31 @@ class GeometryLayer extends RenderLayer {
             maxY: viewport.center.y + halfH,
         };
 
-        const visibleIds = renderCtx.spatialIndex.queryBBox(viewBBox);
+        // Viewport culling: For moderate drawings (<=500 entities), render directly from entities
+        // to guarantee zero-latency visibility and prevent any culling or bounding box edge cases.
+        // For large industrial layouts (>500 entities), cull with spatial index.
+        const targetEntities: CadEntity[] = entities.length <= 500
+            ? entities
+            : renderCtx.spatialIndex.queryBBox(viewBBox)
+                .map(id => renderCtx.entityMap.get(id))
+                .filter((e): e is CadEntity => Boolean(e && e.isVisible));
 
         // Batch rendering by type for performance
         const normalLineWidth = Math.max(1, 1.5 / zoom * zoom); // Zoom-normalized
+        const drawnDynamicBlockGrips = new Set<string>();
 
-        for (const id of visibleIds) {
-            const entity = renderCtx.entityMap.get(id);
-            if (!entity || !entity.isVisible) continue;
+        for (const entity of targetEntities) {
+            if (!entity || !isEntityShown(entity)) continue;
             if (entity.geometry.type === 'DIMENSION') continue;
 
             const isSelected = selectedIds.has(entity.id);
-            const color = isSelected ? '#00e5ff' : (entity.color || '#ffffff');
+            const color = isSelected ? canvasPalette().selection : displayColor(entity.color);
 
             ctx.strokeStyle = color;
             ctx.fillStyle = color;
             ctx.lineWidth = isSelected ? 2 : 1;
+            // layer linetype (CENTER, HIDDEN, …) at drawing scale
+            ctx.setLineDash(screenDash(layerOf(entity.layerId)?.lineType, zoom));
 
             const g = entity.geometry;
 
@@ -286,52 +309,21 @@ class GeometryLayer extends RenderLayer {
                 }
 
                 case 'RECTANGLE': {
-                    const gRect = g as any;
-                    const c = worldToScreen(gRect.center);
-                    const rw = gRect.width * zoom;
-                    const rh = gRect.height * zoom;
-                    ctx.save();
-                    ctx.translate(c.x, c.y);
-                    if (gRect.rotation) ctx.rotate(gRect.rotation);
-                    ctx.strokeRect(-rw / 2, -rh / 2, rw, rh);
-                    ctx.restore();
+                    ctx.beginPath();
+                    pathRectangle(ctx, g, worldToScreen);
+                    ctx.stroke();
                     break;
                 }
 
                 case 'HEXAGON': {
-                    const gPoly = g as any;
-                    const c = worldToScreen(gPoly.center);
-                    const r = gPoly.radius * viewport.zoom;
-                    const sides = gPoly.sides || 6;
-                    const rotation = gPoly.rotation || 0;
                     ctx.beginPath();
-                    for (let i = 0; i < sides; i++) {
-                        const angle = rotation + (Math.PI * 2 / sides) * i;
-                        const px = c.x + r * Math.cos(angle);
-                        const py = c.y + r * Math.sin(angle);
-                        if (i === 0) ctx.moveTo(px, py);
-                        else ctx.lineTo(px, py);
-                    }
-                    ctx.closePath();
+                    pathPolygon(ctx, g, worldToScreen);
                     ctx.stroke();
                     break;
                 }
 
                 case 'GEAR': {
-                    const gGear = g as any;
-                    const c = worldToScreen(gGear.center);
-                    const vertices = RenderPipeline.computeGearVertices(gGear);
-                    RenderPipeline.strokeVertices(ctx, vertices, worldToScreen);
-
-                    // Pitch circle (reference)
-                    const rPitch = (gGear.module * gGear.teeth) / 2 * zoom;
-                    ctx.save();
-                    ctx.strokeStyle = 'rgba(74, 222, 128, 0.4)';
-                    ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y, rPitch, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.restore();
+                    parametric.drawGear(ctx, g, worldToScreen, zoom);
                     break;
                 }
 
@@ -353,25 +345,111 @@ class GeometryLayer extends RenderLayer {
                     break;
                 }
 
+                case 'SPROCKET': {
+                    const gSpr = g as any;
+                    RenderPipeline.drawSprocket(ctx, gSpr, worldToScreen, zoom);
+                    break;
+                }
+
+                case 'ELLIPSE': {
+                    ctx.beginPath();
+                    pathEllipse(ctx, g, worldToScreen, zoom);
+                    ctx.stroke();
+                    break;
+                }
+
+                case 'SPLINE': {
+                    const gSpl = g as any;
+                    if (!gSpl.controlPoints || gSpl.controlPoints.length < 2) break;
+                    ctx.beginPath();
+                    pathSpline(ctx, gSpl.controlPoints, Boolean(gSpl.closed), worldToScreen);
+                    ctx.stroke();
+                    break;
+                }
+
+                case 'LEADER': {
+                    const gLead = g as any;
+                    const pStart = worldToScreen(gLead.start);
+                    const pEnd = worldToScreen(gLead.end);
+                    ctx.save();
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = isSelected ? 2 : 1.5;
+
+                    // 1. Leader Line & Shoulder
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pEnd.x, pEnd.y);
+                    const shoulderLen = 18;
+                    const shoulderX = pEnd.x >= pStart.x ? pEnd.x + shoulderLen : pEnd.x - shoulderLen;
+                    ctx.lineTo(shoulderX, pEnd.y);
+                    ctx.stroke();
+
+                    // 2. Arrowhead at start point
+                    const angle = Math.atan2(pStart.y - pEnd.y, pStart.x - pEnd.x);
+                    const arrowLen = 11;
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pStart.x - arrowLen * Math.cos(angle - Math.PI / 6), pStart.y - arrowLen * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(pStart.x - arrowLen * Math.cos(angle + Math.PI / 6), pStart.y - arrowLen * Math.sin(angle + Math.PI / 6));
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 3. Text with high-contrast badge
+                    const text = gLead.text || 'NOTE';
+                    ctx.font = 'bold 11px monospace';
+                    const tw = ctx.measureText(text).width;
+                    const textX = pEnd.x >= pStart.x ? pEnd.x + 4 : pEnd.x - tw - 4;
+                    const textY = pEnd.y - 14;
+
+                    ctx.fillStyle = canvasPalette().labelBg;
+                    ctx.fillRect(textX - 3, textY - 2, tw + 6, 16);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(textX - 3, textY - 2, tw + 6, 16);
+
+                    ctx.fillStyle = color;
+                    ctx.textBaseline = 'top';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(text, textX, textY);
+                    ctx.restore();
+                    break;
+                }
+
+                case 'HATCH': {
+                    drawHatch(ctx, g, worldToScreen, zoom, color, {
+                        selected: isSelected,
+                        tint: canvasPalette().isLight ? 'rgba(2, 132, 199, 0.07)' : 'rgba(56, 189, 248, 0.08)',
+                        border: (g as any).strokeBorder !== false,
+                    });
+                    break;
+                }
+
                 case 'TEXT': {
                     const gText = g as any;
                     const pos = worldToScreen(gText.position);
-                    const fontSize = Math.max(8, gText.fontSize * zoom);
+                    const fontSize = Math.max(10, (gText.fontSize || 14) * zoom);
                     const fontWeight = gText.bold ? 'bold' : 'normal';
                     const fontStyle = gText.italic ? 'italic' : 'normal';
                     ctx.save();
-                    ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${gText.fontFamily || 'Arial'}`;
+                    ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${gText.fontFamily || '"JetBrains Mono", Arial, monospace'}`;
+                    
+                    const textStr = gText.content || 'Text';
+                    const metrics = ctx.measureText(textStr);
+                    const textW = metrics.width;
+                    const textH = fontSize;
+
+                    // backing plate and text share the text's own (rotated) frame
+                    ctx.translate(pos.x, pos.y);
+                    if (gText.rotation) ctx.rotate(-gText.rotation);
+                    const plateX = gText.justification === 'center' ? -textW / 2 - 3 : gText.justification === 'right' ? -textW - 3 : -3;
+                    ctx.fillStyle = canvasPalette().labelBg;
+                    ctx.fillRect(plateX, -2, textW + 6, textH + 4);
+
                     ctx.fillStyle = color;
                     ctx.textAlign = gText.justification || 'left';
                     ctx.textBaseline = 'top';
-
-                    if (gText.rotation) {
-                        ctx.translate(pos.x, pos.y);
-                        ctx.rotate(-gText.rotation);
-                        ctx.fillText(gText.content, 0, 0);
-                    } else {
-                        ctx.fillText(gText.content, pos.x, pos.y);
-                    }
+                    ctx.fillText(textStr, 0, 0);
                     ctx.restore();
                     break;
                 }
@@ -381,6 +459,8 @@ class GeometryLayer extends RenderLayer {
                     break;
             }
 
+
+            ctx.setLineDash([]);
 
             // Render Modifiers (Holes, Welds, Milling)
             if (entity.modifiers && entity.modifiers.length > 0) {
@@ -437,7 +517,14 @@ class GeometryLayer extends RenderLayer {
 
         // --- DRAW GRIPS FOR SELECTED ENTITIES ---
         if (isSelected) {
-            this.drawGrips(ctx, entity, worldToScreen, zoom);
+            if (entity.isDynamic && entity.dynamicBlockId && entity.blockInstanceId) {
+                if (!drawnDynamicBlockGrips.has(entity.blockInstanceId)) {
+                    drawnDynamicBlockGrips.add(entity.blockInstanceId);
+                    this.drawDynamicBlockGrips(ctx, entity, worldToScreen);
+                }
+            } else {
+                this.drawGrips(ctx, entity, worldToScreen, zoom);
+            }
         }
         }
     }
@@ -472,7 +559,7 @@ class GeometryLayer extends RenderLayer {
         }
 
         ctx.save();
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = canvasPalette().gripFill;
         ctx.strokeStyle = gripColor;
         ctx.lineWidth = 1;
 
@@ -481,6 +568,101 @@ class GeometryLayer extends RenderLayer {
             ctx.fillRect(sp.x - gripSize, sp.y - gripSize, gripSize * 2, gripSize * 2);
             ctx.strokeRect(sp.x - gripSize, sp.y - gripSize, gripSize * 2, gripSize * 2);
         });
+        ctx.restore();
+    }
+
+    private drawDynamicBlockGrips(
+        ctx: CanvasRenderingContext2D,
+        entity: CadEntity,
+        worldToScreen: (p: Point) => Point
+    ) {
+        if (!entity.dynamicBlockId) return;
+        const blockDef = DynamicBlockRegistry.getById(entity.dynamicBlockId);
+        if (!blockDef) return;
+
+        const grips = DynamicBlockEngine.getGripsWorld(
+            blockDef,
+            entity.dynamicParams || {},
+            entity.dynamicBasePoint || { x: 0, y: 0 },
+            entity.dynamicScale ?? 1,
+            entity.dynamicRotationRad ?? 0
+        );
+
+        ctx.save();
+        for (const grip of grips) {
+            const sp = worldToScreen(grip.position);
+
+            if (grip.type === 'point') {
+                // AutoCAD Base Point Grip: Solid Cyan Square
+                ctx.fillStyle = '#00e5ff';
+                ctx.strokeStyle = canvasPalette().gripStroke;
+                ctx.lineWidth = 1.5;
+                const sq = 4.5;
+                ctx.fillRect(sp.x - sq, sp.y - sq, sq * 2, sq * 2);
+                ctx.strokeRect(sp.x - sq, sp.y - sq, sq * 2, sq * 2);
+            } else if (grip.type === 'stretch' || grip.type === 'linear') {
+                // AutoCAD Stretch Grip: Cyan Arrowhead in grip.direction
+                ctx.fillStyle = '#00e5ff';
+                ctx.strokeStyle = canvasPalette().gripStroke;
+                ctx.lineWidth = 1.5;
+
+                const arrowSize = 10;
+                let dir = grip.direction;
+                if (!dir || (dir.x === 0 && dir.y === 0)) {
+                    dir = { x: 1, y: 0 };
+                }
+                const len = Math.hypot(dir.x, dir.y) || 1;
+                // CAD Y is inverted in screen space:
+                const nx = dir.x / len;
+                const ny = -dir.y / len;
+                const px = -ny;
+                const py = nx;
+
+                const tipX = sp.x + nx * arrowSize;
+                const tipY = sp.y + ny * arrowSize;
+                const b1X = sp.x - nx * arrowSize * 0.4 + px * arrowSize * 0.7;
+                const b1Y = sp.y - ny * arrowSize * 0.4 + py * arrowSize * 0.7;
+                const b2X = sp.x - nx * arrowSize * 0.4 - px * arrowSize * 0.7;
+                const b2Y = sp.y - ny * arrowSize * 0.4 - py * arrowSize * 0.7;
+
+                ctx.beginPath();
+                ctx.moveTo(tipX, tipY);
+                ctx.lineTo(b1X, b1Y);
+                ctx.lineTo(b2X, b2Y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else if (grip.type === 'flip') {
+                // Amber Flip Circle with swap arrows
+                ctx.fillStyle = '#f59e0b';
+                ctx.strokeStyle = canvasPalette().gripStroke;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(sp.x, sp.y, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = canvasPalette().gripStroke;
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⇄', sp.x, sp.y);
+            } else if (grip.type === 'visibility' || grip.type === 'lookup') {
+                // Magenta / Purple Downward Inverted Triangle (AutoCAD lookup glyph)
+                ctx.fillStyle = '#c084fc';
+                ctx.strokeStyle = canvasPalette().gripStroke;
+                ctx.lineWidth = 1.5;
+
+                const size = 6;
+                ctx.beginPath();
+                ctx.moveTo(sp.x - size, sp.y - size * 0.6);
+                ctx.lineTo(sp.x + size, sp.y - size * 0.6);
+                ctx.lineTo(sp.x, sp.y + size * 0.9);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
         ctx.restore();
     }
 
@@ -509,6 +691,8 @@ class OverlayLayer extends RenderLayer {
         previewEntity: null,
     };
 
+    customPreview: ((ctx: CanvasRenderingContext2D, worldToScreen: (p: Point) => Point) => void) | null = null;
+
     constructor() {
         // Never cached — redrawn every frame
         super({ id: 'overlay', order: 2, cached: false });
@@ -521,7 +705,7 @@ class OverlayLayer extends RenderLayer {
         if (this.overlayState.previewEntity) {
             const ent = this.overlayState.previewEntity;
             const g = ent.geometry;
-            ctx.strokeStyle = '#ffff00'; // Preview yellow
+            ctx.strokeStyle = canvasPalette().preview;
             ctx.fillStyle = ctx.strokeStyle;
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 3]);
@@ -542,30 +726,47 @@ class OverlayLayer extends RenderLayer {
                 case 'ARC': {
                     const c = worldToScreen((g as any).center);
                     const r = (g as any).radius * viewport.zoom;
-                    ctx.beginPath(); ctx.arc(c.x, c.y, r, (g as any).startAngle, (g as any).endAngle); ctx.stroke();
-                    break;
-                }
-                case 'HEXAGON': {
-                    const gPoly = g as any;
-                    const c = worldToScreen(gPoly.center);
-                    const r = gPoly.radius * viewport.zoom;
-                    const sides = gPoly.sides || 6;
-                    const rotation = gPoly.rotation || 0;
                     ctx.beginPath();
-                    for (let i = 0; i < sides; i++) {
-                        const a = rotation + (Math.PI * 2 / sides) * i;
-                        const px = c.x + r * Math.cos(a);
-                        const py = c.y + r * Math.sin(a);
-                        if (i === 0) ctx.moveTo(px, py);
-                        else ctx.lineTo(px, py);
-                    }
-                    ctx.closePath();
+                    // Screen Y is inverted, so world CCW is screen CCW if we invert angles and set anticlockwise to true
+                    ctx.arc(c.x, c.y, Math.max(0.1, r), -(g as any).startAngle, -(g as any).endAngle, true);
                     ctx.stroke();
                     break;
                 }
+                case 'HEXAGON': {
+                    ctx.beginPath();
+                    pathPolygon(ctx, g, worldToScreen);
+                    ctx.stroke();
+                    break;
+                }
+                case 'RECTANGLE': {
+                    ctx.beginPath();
+                    pathRectangle(ctx, g, worldToScreen);
+                    ctx.stroke();
+                    break;
+                }
+                case 'POLYLINE': {
+                    const gPoly = g as any;
+                    if (!gPoly.vertices || gPoly.vertices.length < 2) break;
+                    ctx.beginPath();
+                    const first = worldToScreen(gPoly.vertices[0]);
+                    ctx.moveTo(first.x, first.y);
+                    for (let i = 1; i < gPoly.vertices.length; i++) {
+                        const p = worldToScreen(gPoly.vertices[i]);
+                        ctx.lineTo(p.x, p.y);
+                    }
+                    if (gPoly.closed) ctx.closePath();
+                    ctx.stroke();
+                    break;
+                }
+                case 'POINT': {
+                    const gp = worldToScreen({ x: (g as any).x, y: (g as any).y });
+                    ctx.beginPath();
+                    ctx.arc(gp.x, gp.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                }
                 case 'GEAR': {
-                    const verts = RenderPipeline.computeGearVertices(g);
-                    RenderPipeline.strokeVertices(ctx, verts, worldToScreen);
+                    parametric.drawGear(ctx, g, worldToScreen, viewport.zoom);
                     break;
                 }
                 case 'FASTENER': {
@@ -580,13 +781,96 @@ class OverlayLayer extends RenderLayer {
                     RenderPipeline.drawPlanetaryGear(ctx, g, worldToScreen, viewport.zoom);
                     break;
                 }
+                case 'SPROCKET': {
+                    RenderPipeline.drawSprocket(ctx, g, worldToScreen, viewport.zoom);
+                    break;
+                }
+                case 'ELLIPSE': {
+                    ctx.beginPath();
+                    pathEllipse(ctx, g, worldToScreen, viewport.zoom);
+                    ctx.stroke();
+                    break;
+                }
+                case 'SPLINE': {
+                    const gSpl = g as any;
+                    if (!gSpl.controlPoints || gSpl.controlPoints.length < 2) break;
+                    ctx.beginPath();
+                    pathSpline(ctx, gSpl.controlPoints, Boolean(gSpl.closed), worldToScreen);
+                    ctx.stroke();
+                    break;
+                }
+                case 'LEADER': {
+                    const gLead = g as any;
+                    const pStart = worldToScreen(gLead.start);
+                    const pEnd = worldToScreen(gLead.end);
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pEnd.x, pEnd.y);
+                    ctx.stroke();
+
+                    // Arrowhead
+                    const angle = Math.atan2(pStart.y - pEnd.y, pStart.x - pEnd.x);
+                    const arrowLen = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pStart.x - arrowLen * Math.cos(angle - Math.PI / 6), pStart.y - arrowLen * Math.sin(angle - Math.PI / 6));
+                    ctx.lineTo(pStart.x - arrowLen * Math.cos(angle + Math.PI / 6), pStart.y - arrowLen * Math.sin(angle + Math.PI / 6));
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Text
+                    ctx.font = '11px monospace';
+                    ctx.fillText(gLead.text || 'NOTE', pEnd.x + 5, pEnd.y);
+                    ctx.restore();
+                    break;
+                }
+                case 'HATCH': {
+                    ctx.setLineDash([]);
+                    drawHatch(ctx, g, worldToScreen, viewport.zoom, canvasPalette().preview, { border: false });
+                    ctx.setLineDash([5, 3]);
+                    break;
+                }
+                case 'TEXT': {
+                    const gText = g as any;
+                    if (!gText.position) break;
+                    const pos = worldToScreen(gText.position);
+                    const fontSize = Math.max(10, (gText.fontSize || 12) * viewport.zoom);
+                    const content = gText.content || 'Text';
+                    ctx.save();
+                    ctx.translate(pos.x, pos.y);
+                    if (gText.rotation) ctx.rotate(-gText.rotation);
+                    // same anchor as the final text: top edge, horizontal justification
+                    ctx.font = `${gText.bold ? 'bold ' : ''}${fontSize}px ${gText.fontFamily || '"JetBrains Mono", Arial, monospace'}`;
+                    ctx.textBaseline = 'top';
+                    ctx.textAlign = gText.justification || 'left';
+                    ctx.fillText(content, 0, 0);
+                    const w = ctx.measureText(content).width;
+                    const x0 = gText.justification === 'center' ? -w / 2 : gText.justification === 'right' ? -w : 0;
+                    ctx.strokeRect(x0 - 2, -2, w + 4, fontSize + 4);
+                    ctx.restore();
+                    break;
+                }
+                case 'DIMENSION': {
+                    const gDim = g as any;
+                    if (!gDim.start || !gDim.end) break;
+                    const p1 = worldToScreen(gDim.start);
+                    const p2 = worldToScreen(gDim.end);
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                    ctx.restore();
+                    break;
+                }
             }
             ctx.setLineDash([]);
         }
 
         // --- Dimension entities ---
         for (const entity of entities) {
-            if (!entity.isVisible || entity.geometry.type !== 'DIMENSION') continue;
+            if (!isEntityShown(entity) || entity.geometry.type !== 'DIMENSION') continue;
 
             const g = entity.geometry as any;
             if (!g.start || !g.end) continue;
@@ -595,7 +879,7 @@ class OverlayLayer extends RenderLayer {
             const p2 = worldToScreen(g.end);
 
             const isSelected = renderCtx.selectedIds.has(entity.id);
-            const dimColor = isSelected ? '#00e5ff' : '#ffcc00';
+            const dimColor = isSelected ? canvasPalette().selection : canvasPalette().dimension;
             ctx.strokeStyle = dimColor;
             ctx.fillStyle = dimColor;
             ctx.lineWidth = 1;
@@ -608,7 +892,14 @@ class OverlayLayer extends RenderLayer {
 
             const nx = -dy / dist;
             const ny = dx / dist;
-            const offset = 30; // pixels
+            let offset = 30; // default pixels
+            if (g.textPoint) {
+                const pt = worldToScreen(g.textPoint);
+                const proj = (pt.x - p1.x) * nx + (pt.y - p1.y) * ny;
+                if (Math.abs(proj) > 5) {
+                    offset = proj;
+                }
+            }
 
             const p1Ext = { x: p1.x + nx * offset, y: p1.y + ny * offset };
             const p2Ext = { x: p2.x + nx * offset, y: p2.y + ny * offset };
@@ -647,7 +938,33 @@ class OverlayLayer extends RenderLayer {
             drawArrow(p2Ext.x, p2Ext.y, angle + Math.PI);
 
             // Value text
-            const text = g.text || (g.value ? g.value.toFixed(2) : (dist / viewport.zoom).toFixed(2));
+            const unit = renderCtx.units || 'mm';
+            const isInch = unit === 'in';
+            let text = g.text;
+
+            if (isInch) {
+                if (text && typeof text === 'string') {
+                    const match = text.match(/^([^\d.-]*)([-+]?\d*\.?\d+)(\s*(?:mm|in|")?)?$/);
+                    if (match) {
+                        const prefix = match[1] || '';
+                        const valNum = parseFloat(match[2]);
+                        if (!Number.isNaN(valNum)) {
+                            const isAlreadyInch = match[3] && (match[3].includes('in') || match[3].includes('"'));
+                            const valIn = isAlreadyInch ? valNum : valNum / 25.4;
+                            text = `${prefix}${valIn.toFixed(valIn < 1 ? 3 : 2)}"`;
+                        }
+                    }
+                } else {
+                    const mmVal = g.value ?? (dist / viewport.zoom);
+                    const inVal = mmVal / 25.4;
+                    text = `${inVal.toFixed(inVal < 1 ? 3 : 2)}"`;
+                }
+            } else {
+                if (!text) {
+                    text = g.value ? `${g.value.toFixed(2)} mm` : `${(dist / viewport.zoom).toFixed(2)} mm`;
+                }
+            }
+
             ctx.font = '11px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -661,16 +978,19 @@ class OverlayLayer extends RenderLayer {
             if (hasTol) {
                 const tolU = g.tolUpper ?? 0;
                 const tolL = g.tolLower ?? 0;
+                const scaleTol = isInch ? 1 / 25.4 : 1;
+                const tolDecimals = isInch ? 4 : 3;
+                const tolUnitSuffix = isInch ? '"' : '';
 
                 // Text background (wider for tolerance)
                 const nomWidth = ctx.measureText(text).width;
-                const tolText = `+${Math.abs(tolU).toFixed(3)}`;
+                const tolText = `+${Math.abs(tolU * scaleTol).toFixed(tolDecimals)}`;
                 ctx.font = '8px monospace';
                 const tolWidth = ctx.measureText(tolText).width;
                 const totalWidth = nomWidth + tolWidth + 8;
 
                 ctx.font = '11px monospace';
-                ctx.fillStyle = '#080c12';
+                ctx.fillStyle = canvasPalette().labelBg;
                 ctx.fillRect(textCenterX - totalWidth / 2 - 2, textCenterY - 10, totalWidth + 4, 20);
 
                 // Nominal value
@@ -683,17 +1003,23 @@ class OverlayLayer extends RenderLayer {
                 ctx.font = '8px monospace';
                 ctx.textAlign = 'left';
                 const tolX = nomX + nomWidth / 2 + 3;
-                const upperText = tolU >= 0 ? `+${tolU.toFixed(3)}` : tolU.toFixed(3);
+                const upperVal = tolU * scaleTol;
+                const upperText = upperVal >= 0 ? `+${upperVal.toFixed(tolDecimals)}${tolUnitSuffix}` : `${upperVal.toFixed(tolDecimals)}${tolUnitSuffix}`;
                 ctx.fillText(upperText, tolX, textCenterY - 5);
 
                 // Lower tolerance (subscript)
-                const lowerText = tolL >= 0 ? `+${tolL.toFixed(3)}` : tolL.toFixed(3);
+                const lowerVal = tolL * scaleTol;
+                const lowerText = lowerVal >= 0 ? `+${lowerVal.toFixed(tolDecimals)}${tolUnitSuffix}` : `${lowerVal.toFixed(tolDecimals)}${tolUnitSuffix}`;
                 ctx.fillText(lowerText, tolX, textCenterY + 5);
             } else {
                 // Text Background
+                ctx.font = 'bold 11px monospace';
                 const textWidth = ctx.measureText(text).width;
-                ctx.fillStyle = '#080c12';
-                ctx.fillRect(textCenterX - textWidth / 2 - 2, textCenterY - 7, textWidth + 4, 14);
+                ctx.fillStyle = canvasPalette().labelBg;
+                ctx.fillRect(textCenterX - textWidth / 2 - 4, textCenterY - 8, textWidth + 8, 16);
+                ctx.strokeStyle = dimColor;
+                ctx.lineWidth = 0.8;
+                ctx.strokeRect(textCenterX - textWidth / 2 - 4, textCenterY - 8, textWidth + 8, 16);
 
                 ctx.fillStyle = dimColor;
                 ctx.fillText(text, textCenterX, textCenterY);
@@ -705,7 +1031,7 @@ class OverlayLayer extends RenderLayer {
             const sp = worldToScreen(this.overlayState.snapIndicator.point);
             const size = 6;
 
-            ctx.strokeStyle = '#ffcc00';
+            ctx.strokeStyle = canvasPalette().snap;
             ctx.lineWidth = 1.5;
 
             switch (this.overlayState.snapIndicator.mode) {
@@ -845,6 +1171,15 @@ class OverlayLayer extends RenderLayer {
                     ctx.fillText(type[0], sp.x, sp.y);
             }
         }
+
+        // --- Custom command previews (transforms, fence trim, measure, etc.) ---
+        if (this.customPreview) {
+            try {
+                this.customPreview(ctx, worldToScreen);
+            } catch (err) {
+                console.error('Error rendering command custom preview:', err);
+            }
+        }
     }
 }
 
@@ -878,7 +1213,7 @@ class UIInteractionLayer extends RenderLayer {
         // --- Cursor crosshair ---
         if (this.uiState.cursorWorld && this.uiState.crosshairEnabled) {
             const sp = worldToScreen(this.uiState.cursorWorld);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.strokeStyle = canvasPalette().cursor;
             ctx.lineWidth = 0.5;
             ctx.setLineDash([2, 4]);
             ctx.beginPath();
@@ -893,7 +1228,7 @@ class UIInteractionLayer extends RenderLayer {
         // --- Dynamic coordinate input ---
         if (this.uiState.dynamicInputText && this.uiState.cursorWorld) {
             const sp = worldToScreen(this.uiState.cursorWorld);
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillStyle = canvasPalette().labelBg;
             const textWidth = ctx.measureText(this.uiState.dynamicInputText).width;
             ctx.fillRect(sp.x + 15, sp.y - 10, textWidth + 12, 20);
             ctx.fillStyle = '#00e5ff';
@@ -911,218 +1246,31 @@ class UIInteractionLayer extends RenderLayer {
 
 export class RenderPipeline {
     public static computeGearVertices(g: any): Point[] {
-        const { module: m, teeth: z, pressureAngle, center } = g;
-        const phi = (pressureAngle || 20) * (Math.PI / 180);
+        return parametric.computeGearVertices(g);
+    }
 
-        const rPitch = (m * z) / 2;
-        const rBase = rPitch * Math.cos(phi);
-        const rAddendum = rPitch + m;
-        const rDedendum = rPitch - 1.25 * m;
-        const rRoot = Math.max(rDedendum, rBase * 0.9);
-
-        const toothThickAngle = Math.PI / (2 * z);
-        const invPhi = Math.tan(phi) - phi;
-        const halfToothAngle = toothThickAngle + invPhi;
-
-        const vertices: Point[] = [];
-        const rightProfile: { angle: number; radius: number }[] = [];
-        const steps = 10;
-        for (let i = 0; i <= steps; i++) {
-            const r = rBase + (rAddendum - rBase) * (i / steps);
-            if (r < rBase) continue;
-            const alpha = Math.acos(rBase / r);
-            const invAlpha = Math.tan(alpha) - alpha;
-            rightProfile.push({ angle: invAlpha, radius: r });
-        }
-
-        for (let tooth = 0; tooth < z; tooth++) {
-            const toothCenterAngle = (2 * Math.PI / z) * tooth + (g.rotation || 0);
-
-            // Right flank
-            for (let i = 0; i < rightProfile.length; i++) {
-                const { angle: invAngle, radius: r } = rightProfile[i];
-                const a = toothCenterAngle + halfToothAngle - invAngle;
-                vertices.push({ x: center.x + r * Math.cos(a), y: center.y + r * Math.sin(a) });
-            }
-
-            // Tip
-            const tipRight = toothCenterAngle + halfToothAngle - rightProfile[rightProfile.length - 1].angle;
-            const tipLeft = toothCenterAngle - halfToothAngle + rightProfile[rightProfile.length - 1].angle;
-            for (let i = 1; i <= 2; i++) {
-                const a = tipRight + (tipLeft - tipRight) * (i / 3);
-                vertices.push({ x: center.x + rAddendum * Math.cos(a), y: center.y + rAddendum * Math.sin(a) });
-            }
-
-            // Left flank
-            for (let i = rightProfile.length - 1; i >= 0; i--) {
-                const { angle: invAngle, radius: r } = rightProfile[i];
-                const a = toothCenterAngle - halfToothAngle + invAngle;
-                vertices.push({ x: center.x + r * Math.cos(a), y: center.y + r * Math.sin(a) });
-            }
-
-            // Root
-            const nextToothAngle = (2 * Math.PI / z) * (tooth + 1) + (g.rotation || 0);
-            const rootStart = toothCenterAngle - halfToothAngle + rightProfile[0].angle;
-            const rootEnd = nextToothAngle + halfToothAngle - rightProfile[0].angle;
-            for (let i = 1; i <= 2; i++) {
-                const a = rootStart + (rootEnd - rootStart) * (i / 3);
-                vertices.push({ x: center.x + rRoot * Math.cos(a), y: center.y + rRoot * Math.sin(a) });
-            }
-        }
-        return vertices;
+    public static drawGear(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
+        parametric.drawGear(ctx, g, worldToScreen, zoom);
     }
 
     public static drawFastener(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
-        const { origin, fastenerType, diameter: d, length: len, pitch: p } = g;
-        
-        const METRIC_TABLE: Record<number, { headH: number; headW: number }> = {
-            3: { headH: 2, headW: 5.5 }, 4: { headH: 2.8, headW: 7 }, 5: { headH: 3.5, headW: 8 },
-            6: { headH: 4, headW: 10 }, 8: { headH: 5.3, headW: 13 }, 10: { headH: 6.4, headW: 16 },
-            12: { headH: 7.5, headW: 18 }, 16: { headH: 10, headW: 24 }, 20: { headH: 12.5, headW: 30 },
-            24: { headH: 15, headW: 36 }
-        };
-        const meta = METRIC_TABLE[d] || { headH: d * 0.7, headW: d * 1.6 };
-
-        if (fastenerType === 'BOLT') {
-            const hH = meta.headH; const hW = meta.headW; const r = d / 2;
-            const headPts = [
-                { x: origin.x - hW / 2, y: origin.y }, { x: origin.x + hW / 2, y: origin.y },
-                { x: origin.x + hW / 2, y: origin.y + hH }, { x: origin.x - hW / 2, y: origin.y + hH }
-            ].map(worldToScreen);
-            
-            ctx.beginPath(); ctx.moveTo(headPts[0].x, headPts[0].y);
-            headPts.forEach(p => ctx.lineTo(p.x, p.y)); ctx.closePath(); ctx.stroke();
-
-            const shaftTop = origin.y + hH; const shaftBottom = origin.y + hH + len;
-            const sL = worldToScreen({ x: origin.x - r, y: shaftTop });
-            const sLE = worldToScreen({ x: origin.x - r, y: shaftBottom });
-            const sR = worldToScreen({ x: origin.x + r, y: shaftTop });
-            const sRE = worldToScreen({ x: origin.x + r, y: shaftBottom });
-
-            ctx.beginPath(); ctx.moveTo(sL.x, sL.y); ctx.lineTo(sLE.x, sLE.y); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(sR.x, sR.y); ctx.lineTo(sRE.x, sRE.y); ctx.stroke();
-            
-            // Threads
-            const threadH = 0.866 * p; const threadLen = len * 0.7; const threadStart = shaftBottom - threadLen;
-            ctx.beginPath();
-            let y = threadStart;
-            const startP = worldToScreen({ x: origin.x - r, y });
-            ctx.moveTo(startP.x, startP.y);
-            while (y < shaftBottom - p) {
-                const p1 = worldToScreen({ x: origin.x - r - threadH * 0.5, y: y + p / 4 });
-                const p2 = worldToScreen({ x: origin.x - r, y: y + p / 2 });
-                ctx.lineTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                y += p / 2;
-            }
-            ctx.stroke();
-        } else {
-            // Nut
-            const r = meta.headW / 2;
-            ctx.beginPath();
-            for (let i = 0; i < 6; i++) {
-                const a = (Math.PI / 3) * i;
-                const p = worldToScreen({ x: origin.x + r * Math.cos(a), y: origin.y + r * Math.sin(a) });
-                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
-            }
-            ctx.closePath(); ctx.stroke();
-            const c = worldToScreen(origin); ctx.beginPath(); ctx.arc(c.x, c.y, (d/2)*zoom, 0, Math.PI*2); ctx.stroke();
-        }
+        parametric.drawFastener(ctx, g, worldToScreen, zoom);
     }
 
     public static drawBeltPulley(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
-        const { center1: c1, radius1: r1, center2: c2, radius2: r2, beltType } = g;
-        const p1 = worldToScreen(c1);
-        const p2 = worldToScreen(c2);
-        const sr1 = r1 * zoom;
-        const sr2 = r2 * zoom;
-
-        // Draw Pulleys
-        ctx.beginPath(); ctx.arc(p1.x, p1.y, sr1, 0, Math.PI * 2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(p2.x, p2.y, sr2, 0, Math.PI * 2); ctx.stroke();
-
-        // Calculate Tangents
-        const dx = p2.x - p1.x;
-        const dy = p2.y - p1.y;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < Math.abs(sr1 - sr2)) return; // One inside another
-
-        const angleBase = Math.atan2(dy, dx);
-        
-        ctx.save();
-        ctx.setLineDash([5, 3]);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-        
-        if (beltType === 'OPEN') {
-            const angleOffset = Math.acos((sr1 - sr2) / d);
-            const t1_1 = { x: p1.x + sr1 * Math.cos(angleBase + angleOffset), y: p1.y + sr1 * Math.sin(angleBase + angleOffset) };
-            const t2_1 = { x: p2.x + sr2 * Math.cos(angleBase + angleOffset), y: p2.y + sr2 * Math.sin(angleBase + angleOffset) };
-            const t1_2 = { x: p1.x + sr1 * Math.cos(angleBase - angleOffset), y: p1.y + sr1 * Math.sin(angleBase - angleOffset) };
-            const t2_2 = { x: p2.x + sr2 * Math.cos(angleBase - angleOffset), y: p2.y + sr2 * Math.sin(angleBase - angleOffset) };
-
-            ctx.beginPath(); ctx.moveTo(t1_1.x, t1_1.y); ctx.lineTo(t2_1.x, t2_1.y); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(t1_2.x, t1_2.y); ctx.lineTo(t2_2.x, t2_2.y); ctx.stroke();
-        } else {
-            const angleOffset = Math.acos((sr1 + sr2) / d);
-            const t1_1 = { x: p1.x + sr1 * Math.cos(angleBase + angleOffset), y: p1.y + sr1 * Math.sin(angleBase + angleOffset) };
-            const t2_1 = { x: p2.x + sr2 * Math.cos(angleBase + angleOffset + Math.PI), y: p2.y + sr2 * Math.sin(angleBase + angleOffset + Math.PI) };
-            const t1_2 = { x: p1.x + sr1 * Math.cos(angleBase - angleOffset), y: p1.y + sr1 * Math.sin(angleBase - angleOffset) };
-            const t2_2 = { x: p2.x + sr2 * Math.cos(angleBase - angleOffset + Math.PI), y: p2.y + sr2 * Math.sin(angleBase - angleOffset + Math.PI) };
-
-            ctx.beginPath(); ctx.moveTo(t1_1.x, t1_1.y); ctx.lineTo(t2_1.x, t2_1.y); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(t1_2.x, t1_2.y); ctx.lineTo(t2_2.x, t2_2.y); ctx.stroke();
-        }
-        ctx.restore();
+        parametric.drawBeltPulley(ctx, g, worldToScreen, zoom);
     }
 
     public static drawPlanetaryGear(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
-        const { center, module: m, sunTeeth, planetTeeth, planetCount } = g;
-        const ringTeeth = sunTeeth + 2 * planetTeeth;
-        const orbitRadius = m * (sunTeeth + planetTeeth) / 2;
+        parametric.drawPlanetaryGear(ctx, g, worldToScreen, zoom);
+    }
 
-        // 1. Draw Sun Gear
-        const sunGeom = { center, module: m, teeth: sunTeeth, rotation: g.rotationSun || 0 };
-        const sunVerts = this.computeGearVertices(sunGeom);
-        this.strokeVertices(ctx, sunVerts, worldToScreen);
-
-        // 2. Draw Planets
-        for (let i = 0; i < planetCount; i++) {
-            const angle = (2 * Math.PI / planetCount) * i + (g.rotationCarrier || 0);
-            const pCenter = {
-                x: center.x + orbitRadius * Math.cos(angle),
-                y: center.y + orbitRadius * Math.sin(angle)
-            };
-            // Planet rotation: linked to sun rotation for visual sync
-            // Ratio = sun / planet
-            const pRotation = (g.rotationSun || 0) * (-sunTeeth / planetTeeth) - angle * (1 + sunTeeth/planetTeeth);
-            
-            const pGeom = { center: pCenter, module: m, teeth: planetTeeth, rotation: pRotation };
-            const pVerts = this.computeGearVertices(pGeom);
-            this.strokeVertices(ctx, pVerts, worldToScreen);
-        }
-
-        // 3. Draw Ring Gear (Internal)
-        // For internal gear, we draw a circle for now, or reversed involute
-        const ringRadius = (m * ringTeeth / 2) * zoom;
-        const c = worldToScreen(center);
-        ctx.save();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.beginPath(); ctx.arc(c.x, c.y, ringRadius, 0, Math.PI * 2); ctx.stroke();
-        // Outer housing
-        ctx.beginPath(); ctx.arc(c.x, c.y, ringRadius + 10 * zoom, 0, Math.PI * 2); ctx.stroke();
-        ctx.restore();
+    public static drawSprocket(ctx: CanvasRenderingContext2D, g: any, worldToScreen: (p: Point) => Point, zoom: number) {
+        parametric.drawSprocket(ctx, g, worldToScreen, zoom);
     }
 
     public static strokeVertices(ctx: CanvasRenderingContext2D, vertices: Point[], worldToScreen: (p: Point) => Point) {
-        if (vertices.length === 0) return;
-        ctx.beginPath();
-        const first = worldToScreen(vertices[0]);
-        ctx.moveTo(first.x, first.y);
-        for (let i = 1; i < vertices.length; i++) {
-            const p = worldToScreen(vertices[i]);
-            ctx.lineTo(p.x, p.y);
-        }
-        ctx.closePath();
-        ctx.stroke();
+        parametric.strokeVertices(ctx, vertices, worldToScreen);
     }
 
     private layers: RenderLayer[];
@@ -1201,6 +1349,8 @@ export class RenderPipeline {
         if (!this.targetCtx || !this.renderContext || !this.targetCanvas) return;
 
         const { width, height } = this.targetCanvas;
+        if (width <= 0 || height <= 0) return;
+
         this.targetCtx.clearRect(0, 0, width, height);
 
         for (const layer of this.layers) {
@@ -1260,6 +1410,11 @@ export class RenderPipeline {
     /** Update preview entity (shown while drawing) */
     setPreviewEntity(entity: CadEntity | null): void {
         this.overlayLayer.overlayState.previewEntity = entity;
+    }
+
+    /** Set custom preview render callback (active command previews) */
+    setCustomPreview(cb: ((ctx: CanvasRenderingContext2D, worldToScreen: (p: Point) => Point) => void) | null): void {
+        this.overlayLayer.customPreview = cb;
     }
 
     /** Force full redraw of all layers */

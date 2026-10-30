@@ -250,7 +250,7 @@
     "id": "fluid-dynamics",
     "name": "Fluid Dynamics & Pipe Friction",
     "nameTr": "Boru Sürtünme & Hidrolik Kayıplar",
-    "standard": "Darcy-Weisbach / Colebrook-White / ISO 5167",
+    "standard": "Darcy-Weisbach / Colebrook-White / Crane TP-410",
     "category": "fluids",
     "formula": "hf = f * (L/D) * (v^2 / (2*g))",
     "assumptions": [

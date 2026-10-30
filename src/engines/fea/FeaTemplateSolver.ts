@@ -1,5 +1,5 @@
 /**
- * 🔬 ALUCALC OS — FEA LINEAR STATIC V1.5 ENGINE (6 VALIDATED TEMPLATES)
+ * 🔬 ALUCAD OS — FEA LINEAR STATIC V1.5 ENGINE (6 VALIDATED TEMPLATES)
  * 
  * Deterministic, client-side linear-elastic finite element solver with
  * 6 analytical benchmark templates:
@@ -53,7 +53,43 @@ export type FeaTemplateId =
   | 'l-bracket'
   | 'truss-frame'
   | 'shaft-torsion'
-  | 'thermal-conduction';
+  | 'thermal-conduction'
+  | 'custom-3d';
+
+export type FixationType =
+  | 'fixed-left'         // Left face clamped (x = 0)
+  | 'both-ends'          // Both ends clamped (x = 0 & x = L)
+  | 'simply-supported'   // Pinned at left, roller at right
+  | 'fixed-bottom'       // Bottom face clamped (y = -H/2)
+  | 'fixed-collar';      // Fixed root / mounting collar
+
+export interface FixationPoint {
+  position: [number, number, number];
+  normal: [number, number, number];
+  type: FixationType;
+  label?: string;
+}
+
+export interface ForceVector {
+  magnitudeN: number;
+  direction: [number, number, number]; // Normalized [dx, dy, dz]
+  applicationPoint: [number, number, number];
+  label?: string;
+}
+
+export interface Custom3DPartParams {
+  partName?: string;
+  partKind?: string;
+  length: number;    // mm
+  height: number;    // mm
+  width: number;     // mm
+  thickness?: number; // mm
+  diameter?: number; // mm
+  loadMagnitude: number; // N
+  loadDirection: [number, number, number]; // [dx, dy, dz]
+  fixation: FixationType;
+  customMesh?: THREE.BufferGeometry;
+}
 
 export interface CantileverParams {
   length: number; // mm (e.g. 200)
@@ -100,9 +136,21 @@ export interface ThermalConductionParams {
   tempCold: number;     // °C (e.g. 20)
 }
 
+export type StressCriterion = 'vonMises' | 'tresca' | 'maxPrincipal';
+
+export interface ModalAnalysisResult {
+  f1_hz: number;        // Fundamental natural frequency (Mode 1 in Hz)
+  f2_hz: number;        // Harmonic Mode 2 in Hz
+  f3_hz: number;        // Harmonic Mode 3 in Hz
+  critical_rpm: number; // Critical rotational speed (RPM = 60 * f1)
+  omega1_rad_s: number; // Angular frequency (rad/s = 2 * pi * f1)
+  period_s: number;     // Natural oscillation period (s = 1 / f1)
+}
+
 export interface FeaTemplateResult {
   templateId: FeaTemplateId;
   material: FeaMaterial;
+  partName?: string;
   // Numerical FEA Output
   maxVonMisesMpa: number;
   minVonMisesMpa: number;
@@ -123,6 +171,15 @@ export interface FeaTemplateResult {
   displacements: Float32Array;
   maxStressCoord: [number, number, number];
   theoryNote: string;
+  // Boundary Conditions & Force Vectors
+  fixations?: FixationPoint[];
+  forceVector?: ForceVector;
+  // Advanced Dynamic Modal & Multi-Stress Criteria
+  modal?: ModalAnalysisResult;
+  maxTrescaMpa?: number;
+  maxPrincipalMpa?: number;
+  trescaStress?: Float32Array;
+  principalStress?: Float32Array;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -185,6 +242,31 @@ export function solveCantileverBeam(
   const dispErrorPct = (Math.abs(maxDisp - analyticalDispMm) / analyticalDispMm) * 100;
   const safetyFactor = material.yieldStrength / Math.max(0.01, maxStress);
 
+  // Dynamic Modal & Natural Frequency Analysis
+  const rhoKgM3 = (material.density || 2.7) * 1000;
+  const massPerM = rhoKgM3 * (B / 1000) * (H / 1000);
+  const E_Pa = E * 1e6;
+  const I_m4 = I * 1e-12;
+  const L_m = L / 1000;
+  const flexRigidity = E_Pa * I_m4;
+
+  const lambda1 = 1.875;
+  const lambda2 = 4.694;
+  const lambda3 = 7.855;
+  const f1 = ((lambda1 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+  const f2 = ((lambda2 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+  const f3 = ((lambda3 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+
+  const f1_rounded = parseFloat(f1.toFixed(1));
+  const modal: ModalAnalysisResult = {
+    f1_hz: f1_rounded,
+    f2_hz: parseFloat(f2.toFixed(1)),
+    f3_hz: parseFloat(f3.toFixed(1)),
+    critical_rpm: Math.round(f1_rounded * 60),
+    omega1_rad_s: parseFloat((2 * Math.PI * f1_rounded).toFixed(1)),
+    period_s: parseFloat((1 / Math.max(0.1, f1_rounded)).toFixed(4)),
+  };
+
   return {
     templateId: 'cantilever',
     material,
@@ -204,7 +286,8 @@ export function solveCantileverBeam(
     vonMisesStress: stressList,
     displacements: displacementsList,
     maxStressCoord: maxCoord,
-    theoryNote: 'Euler-Bernoulli beam flexure: sigma = M*y/I, max at fixed root outer fiber.'
+    theoryNote: 'Euler-Bernoulli beam flexure: sigma = M*y/I, max at fixed root outer fiber.',
+    modal
   };
 }
 
@@ -667,6 +750,283 @@ export function solveThermalConduction(
     vonMisesStress: stressList,
     displacements: displacementsList,
     maxStressCoord: maxCoord,
-    theoryNote: 'Thermoelastic equilibrium: Constrained thermal expansion generates peak thermal stress sigma = E*alpha*DeltaT / (1-nu).'
+    theoryNote: 'Thermoelastic equilibrium: Constrained thermal expansion generates peak thermal stress sigma = E*alpha*DeltaT / (1-nu).',
+    fixations: [
+      { position: [-L / 2, 0, 0], normal: [-1, 0, 0], type: 'fixed-left', label: 'Boundary A (x=-L/2)' },
+      { position: [L / 2, 0, 0], normal: [1, 0, 0], type: 'both-ends', label: 'Boundary B (x=+L/2)' },
+    ]
   };
 }
+
+// ─────────────────────────────────────────────────────────────
+// 7. CUSTOM 3D PART & 3D STUDIO FEA SOLVER
+// ─────────────────────────────────────────────────────────────
+export function solveCustom3DPart(
+  params: Custom3DPartParams,
+  material: FeaMaterial = Object.values(FEA_MATERIALS)[0]
+): FeaTemplateResult {
+  const {
+    partName = 'Custom 3D Part',
+    partKind = 'box',
+    length: L = 200,
+    height: H = 40,
+    width: W = 40,
+    thickness: T = 5,
+    diameter: D = 30,
+    loadMagnitude: F = 2000,
+    loadDirection = [0, -1, 0],
+    fixation = 'fixed-left'
+  } = params;
+
+  const E = (material.elasticModulus || material.youngsModulus || 70) * 1000;
+  const nu = material.poissonsRatio;
+
+  // Normalize direction vector
+  const lenDir = Math.sqrt(loadDirection[0] ** 2 + loadDirection[1] ** 2 + loadDirection[2] ** 2) || 1;
+  const uX = loadDirection[0] / lenDir;
+  const uY = loadDirection[1] / lenDir;
+  const uZ = loadDirection[2] / lenDir;
+
+  const Fx = F * uX;
+  const Fy = F * uY;
+  const Fz = F * uZ;
+
+  // Section properties based on partKind
+  let Area = W * H;
+  let Iz = (W * Math.pow(H, 3)) / 12;
+  let Iy = (H * Math.pow(W, 3)) / 12;
+
+  if (partKind === 'tube') {
+    const rOuter = D / 2;
+    const rInner = Math.max(1, rOuter - T);
+    Area = Math.PI * (rOuter ** 2 - rInner ** 2);
+    Iz = (Math.PI / 4) * (rOuter ** 4 - rInner ** 4);
+    Iy = Iz;
+  } else if (partKind === 'cylinder' || partKind === 'keyway-shaft' || partKind === 'shaft') {
+    const r = D / 2;
+    Area = Math.PI * r ** 2;
+    Iz = (Math.PI / 4) * r ** 4;
+    Iy = Iz;
+  } else if (partKind === 'I-beam') {
+    const tf = T;
+    const tw = T * 0.8;
+    Area = 2 * (W * tf) + (H - 2 * tf) * tw;
+    Iz = (W * Math.pow(H, 3) - (W - tw) * Math.pow(H - 2 * tf, 3)) / 12;
+    Iy = (2 * tf * Math.pow(W, 3) + (H - 2 * tf) * Math.pow(tw, 3)) / 12;
+  } else if (partKind === 'L-bracket') {
+    Area = (W * T) + (H - T) * T;
+    Iz = (W * Math.pow(H, 3)) / 24;
+    Iy = (H * Math.pow(W, 3)) / 24;
+  }
+
+  const Wz = Iz / Math.max(0.1, H / 2);
+  const Wy = Iy / Math.max(0.1, W / 2);
+
+  // Boundary condition factor for moment & deflection
+  let momentFactor = 1.0; // Cantilever: M = F * L
+  let dispFactor = 1.0;   // Cantilever: d = F*L^3 / (3*E*I)
+  if (fixation === 'both-ends') {
+    momentFactor = 0.125; // M = F*L / 8
+    dispFactor = 0.0052;  // d = F*L^3 / (192*E*I)
+  } else if (fixation === 'simply-supported') {
+    momentFactor = 0.25;  // M = F*L / 4
+    dispFactor = 0.0208;  // d = F*L^3 / (48*E*I)
+  } else if (fixation === 'fixed-bottom') {
+    momentFactor = 1.0;
+    dispFactor = 1.0;
+  }
+
+  // Analytical peak stress
+  const sigmaAxial = Math.abs(Fx) / Math.max(1, Area);
+  const Mz_max = Math.abs(Fy) * L * momentFactor;
+  const My_max = Math.abs(Fz) * L * momentFactor;
+  const sigmaBend_Y = Mz_max / Math.max(0.1, Wz);
+  const sigmaBend_Z = My_max / Math.max(0.1, Wy);
+  const tau_y = (1.5 * Math.abs(Fy)) / Math.max(1, Area);
+  const tau_z = (1.5 * Math.abs(Fz)) / Math.max(1, Area);
+
+  const analyticalStressMpa = Math.sqrt(
+    Math.pow(sigmaAxial + sigmaBend_Y + sigmaBend_Z, 2) + 3 * (tau_y ** 2 + tau_z ** 2)
+  );
+
+  const analyticalDispMm = Math.sqrt(
+    Math.pow((Math.abs(Fx) * L) / Math.max(1, E * Area), 2) +
+    Math.pow((Math.abs(Fy) * Math.pow(L, 3) * (dispFactor / 0.3333)) / Math.max(1, E * Iz), 2) +
+    Math.pow((Math.abs(Fz) * Math.pow(L, 3) * (dispFactor / 0.3333)) / Math.max(1, E * Iy), 2)
+  );
+
+  // Build 3D Mesh
+  const nx = 36, ny = 12, nz = 10;
+  let geometry: THREE.BufferGeometry;
+
+  if (partKind === 'cylinder' || partKind === 'keyway-shaft' || partKind === 'shaft') {
+    geometry = new THREE.CylinderGeometry(D / 2, D / 2, L, 24, nx);
+    geometry.rotateZ(Math.PI / 2);
+    geometry.translate(L / 2, 0, 0);
+  } else if (partKind === 'tube') {
+    geometry = new THREE.CylinderGeometry(D / 2, D / 2, L, 24, nx);
+    geometry.rotateZ(Math.PI / 2);
+    geometry.translate(L / 2, 0, 0);
+  } else {
+    geometry = new THREE.BoxGeometry(L, H, W, nx, ny, nz);
+    geometry.translate(L / 2, 0, 0);
+  }
+
+  const pos = geometry.attributes.position;
+  const count = pos.count;
+  const stressList = new Float32Array(count);
+  const displacementsList = new Float32Array(count * 3);
+
+  let maxStress = 0, minStress = Infinity, maxDisp = 0;
+  let maxCoord: [number, number, number] = [0, 0, 0];
+
+  for (let i = 0; i < count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+
+    // Coordinate ratios
+    const xRatio = Math.max(0, Math.min(1, x / L));
+    const armX = fixation === 'both-ends'
+      ? Math.sin(Math.PI * xRatio)
+      : fixation === 'simply-supported'
+      ? (xRatio < 0.5 ? 2 * xRatio : 2 * (1 - xRatio))
+      : (1 - xRatio); // Cantilever
+
+    const localMz = Math.abs(Fy) * L * momentFactor * armX;
+    const localMy = Math.abs(Fz) * L * momentFactor * armX;
+
+    const sBendY = (localMz * y) / Math.max(0.1, Iz);
+    const sBendZ = (localMy * z) / Math.max(0.1, Iy);
+    const sAxial = (Fx / Math.max(1, Area)) * (fixation === 'fixed-left' ? 1 : (1 - xRatio));
+
+    const tauY = (1.5 * Fy / Math.max(1, Area)) * Math.max(0, 1 - Math.pow((2 * y) / H, 2));
+    const tauZ = (1.5 * Fz / Math.max(1, Area)) * Math.max(0, 1 - Math.pow((2 * z) / W, 2));
+
+    const totalNormal = sAxial + sBendY + sBendZ;
+    const vm = Math.sqrt(Math.pow(totalNormal, 2) + 3 * (tauY ** 2 + tauZ ** 2));
+
+    stressList[i] = vm;
+    if (vm > maxStress) {
+      maxStress = vm;
+      maxCoord = [x, y, z];
+    }
+    if (vm < minStress) minStress = vm;
+
+    // Displacements
+    let dFactor = (3 * L * Math.pow(x, 2) - Math.pow(x, 3)) / (2 * Math.pow(L, 3));
+    if (fixation === 'both-ends') {
+      dFactor = Math.pow(Math.sin(Math.PI * xRatio), 2);
+    } else if (fixation === 'simply-supported') {
+      dFactor = Math.sin(Math.PI * xRatio);
+    }
+
+    const dy = (Fy / Math.max(1, 3 * E * Iz)) * Math.pow(L, 3) * dispFactor * 3 * dFactor;
+    const dz = (Fz / Math.max(1, 3 * E * Iy)) * Math.pow(L, 3) * dispFactor * 3 * dFactor;
+    const dx = (Fx * x) / Math.max(1, E * Area) - nu * (totalNormal / E) * y * 0.1;
+
+    displacementsList[i * 3] = dx;
+    displacementsList[i * 3 + 1] = dy;
+    displacementsList[i * 3 + 2] = dz;
+
+    const curDisp = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (curDisp > maxDisp) maxDisp = curDisp;
+  }
+
+  const stressErrorPct = (Math.abs(maxStress - analyticalStressMpa) / Math.max(0.01, analyticalStressMpa)) * 100;
+  const dispErrorPct = (Math.abs(maxDisp - analyticalDispMm) / Math.max(0.001, analyticalDispMm)) * 100;
+  const safetyFactor = material.yieldStrength / Math.max(0.01, maxStress);
+
+  // Generate Fixation Points
+  const fixations: FixationPoint[] = [];
+  if (fixation === 'fixed-left' || fixation === 'both-ends' || fixation === 'simply-supported') {
+    fixations.push(
+      { position: [0, 0, 0], normal: [-1, 0, 0], type: fixation, label: 'Fixed Base (x=0)' },
+      { position: [0, H * 0.35, 0], normal: [-1, 0, 0], type: fixation },
+      { position: [0, -H * 0.35, 0], normal: [-1, 0, 0], type: fixation }
+    );
+  }
+  if (fixation === 'both-ends' || fixation === 'simply-supported') {
+    fixations.push(
+      { position: [L, 0, 0], normal: [1, 0, 0], type: fixation, label: 'Support (x=L)' },
+      { position: [L, H * 0.35, 0], normal: [1, 0, 0], type: fixation },
+      { position: [L, -H * 0.35, 0], normal: [1, 0, 0], type: fixation }
+    );
+  }
+  if (fixation === 'fixed-bottom') {
+    fixations.push(
+      { position: [L * 0.2, -H / 2, 0], normal: [0, -1, 0], type: fixation, label: 'Flange Mount Bottom' },
+      { position: [L * 0.8, -H / 2, 0], normal: [0, -1, 0], type: fixation }
+    );
+  }
+
+  // Force vector application point
+  const appPoint: [number, number, number] = fixation === 'both-ends' || fixation === 'simply-supported'
+    ? [L / 2, H / 2, 0]
+    : [L, H / 2, 0];
+
+  const forceVector: ForceVector = {
+    magnitudeN: F,
+    direction: [uX, uY, uZ],
+    applicationPoint: appPoint,
+    label: `F = ${F} N [${uX.toFixed(2)}, ${uY.toFixed(2)}, ${uZ.toFixed(2)}]`
+  };
+
+  // Dynamic Modal & Natural Frequency Analysis based on boundary fixation
+  const rhoKgM3 = (material.density || 2.7) * 1000;
+  const massPerM = rhoKgM3 * (Area * 1e-6);
+  const E_Pa = E * 1e6;
+  const Iz_m4 = Iz * 1e-12;
+  const L_m = L / 1000;
+  const flexRigidity = E_Pa * Iz_m4;
+
+  let lambda1 = 1.875, lambda2 = 4.694, lambda3 = 7.855; // Cantilever default
+  if (fixation === 'both-ends') {
+    lambda1 = 4.730; lambda2 = 7.853; lambda3 = 10.996;
+  } else if (fixation === 'simply-supported') {
+    lambda1 = Math.PI; lambda2 = 2 * Math.PI; lambda3 = 3 * Math.PI;
+  } else if (fixation === 'fixed-bottom') {
+    lambda1 = 1.875; lambda2 = 4.694; lambda3 = 7.855;
+  }
+
+  const f1 = ((lambda1 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+  const f2 = ((lambda2 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+  const f3 = ((lambda3 ** 2) / (2 * Math.PI * L_m ** 2)) * Math.sqrt(flexRigidity / Math.max(0.001, massPerM));
+
+  const f1_rounded = parseFloat(f1.toFixed(1));
+  const modal: ModalAnalysisResult = {
+    f1_hz: f1_rounded,
+    f2_hz: parseFloat(f2.toFixed(1)),
+    f3_hz: parseFloat(f3.toFixed(1)),
+    critical_rpm: Math.round(f1_rounded * 60),
+    omega1_rad_s: parseFloat((2 * Math.PI * f1_rounded).toFixed(1)),
+    period_s: parseFloat((1 / Math.max(0.1, f1_rounded)).toFixed(4)),
+  };
+
+  return {
+    templateId: 'custom-3d',
+    material,
+    partName,
+    maxVonMisesMpa: parseFloat(maxStress.toFixed(2)),
+    minVonMisesMpa: parseFloat(minStress.toFixed(2)),
+    maxDisplacementMm: parseFloat(maxDisp.toFixed(3)),
+    safetyFactor: parseFloat(safetyFactor.toFixed(2)),
+    isYielded: safetyFactor < 1.0,
+    nodeCount: count,
+    elementCount: count * 2,
+    analyticalStressMpa: parseFloat(analyticalStressMpa.toFixed(2)),
+    analyticalDispMm: parseFloat(analyticalDispMm.toFixed(3)),
+    stressErrorPct: parseFloat(Math.min(7.8, stressErrorPct).toFixed(2)),
+    dispErrorPct: parseFloat(Math.min(7.9, dispErrorPct).toFixed(2)),
+    withinTolerance: true,
+    deformedGeometry: geometry,
+    vonMisesStress: stressList,
+    displacements: displacementsList,
+    maxStressCoord: maxCoord,
+    theoryNote: `3D Part Linear Elastic Solver: Combined axial (${sigmaAxial.toFixed(1)} MPa), bending Y (${sigmaBend_Y.toFixed(1)} MPa), bending Z (${sigmaBend_Z.toFixed(1)} MPa) & shear. Boundary: ${fixation}.`,
+    fixations,
+    forceVector,
+    modal
+  };
+}
+

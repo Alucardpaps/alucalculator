@@ -162,11 +162,11 @@ export function AssemblyPropertiesPanel() {
       {/* Header */}
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between shrink-0 bg-white/[0.02]">
         <div className="flex items-center gap-3">
-          <div className="w-1 h-3 bg-[#00e5ff] rounded-full" />
+          <div className="w-1 h-3 bg-[var(--cyan)] rounded-full" />
           <span className="text-[10px] font-mono text-slate-200 uppercase tracking-[0.2em]">Part Specs</span>
         </div>
         <div className="px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
-          <span className="text-[9px] text-[#00e5ff] font-mono tracking-tighter uppercase">{component.type}</span>
+          <span className="text-[9px] text-[var(--cyan)] font-mono tracking-tighter uppercase">{component.type}</span>
         </div>
       </div>
 
@@ -205,6 +205,23 @@ export function AssemblyPropertiesPanel() {
           )}
           {component.type === 'bearing' && (
             <div className="grid grid-cols-2 gap-3 animate-slide-down">
+              <div className="col-span-2">
+                <label className="text-[11px] font-mono text-slate-400 block mb-1">Rulman Ailesi / Bearing Family</label>
+                <select
+                  value={component.metadata.bearingType || 'deep-groove-ball'}
+                  onChange={(e) => updateMetadata(selectedId, { bearingType: e.target.value })}
+                  className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-cyan-300 font-mono focus:border-cyan-400 focus:outline-none"
+                >
+                  <option value="deep-groove-ball">Derin Oluklu Bilyalı (6000)</option>
+                  <option value="cylindrical-roller">Silindirik Makaralı (NU/NJ)</option>
+                  <option value="tapered-roller">Konik Makaralı (30200/32000)</option>
+                  <option value="needle-roller">İğneli Makaralı (HK/NA)</option>
+                  <option value="spherical-roller">Oynak Makaralı (22200)</option>
+                  <option value="angular-contact-ball">Açısal Temaslı Bilyalı (7200)</option>
+                  <option value="self-aligning-ball">Oynak Bilyalı (1200)</option>
+                  <option value="thrust-ball">Eksenel Bilyalı (51100)</option>
+                </select>
+              </div>
               <PropInput 
                 label="Inner Dia (d) (mm)" 
                 value={component.metadata.innerDia || 20} 
@@ -354,7 +371,7 @@ export function AssemblyPropertiesPanel() {
                 viewBox={viewBox}
                 width="100%"
                 height="100"
-                className="bg-[#050811] border border-white/5 rounded-xl cursor-crosshair overflow-hidden touch-none"
+                className="bg-[var(--bg-0)] border border-white/5 rounded-xl cursor-crosshair overflow-hidden touch-none"
                 onPointerDown={handleSvgPointerDown}
                 onPointerMove={handleSvgPointerMove}
                 onPointerUp={handleSvgPointerUp}
@@ -582,7 +599,7 @@ export function AssemblyPropertiesPanel() {
         <Section title="Actions">
           <button 
             onClick={() => window.dispatchEvent(new Event('open-calculator-bridge'))}
-            className="w-full px-4 py-3 bg-[#00e5ff]/10 border border-[#00e5ff]/30 rounded-xl text-[#00e5ff] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#00e5ff]/20 transition-all mb-2 cursor-pointer flex items-center justify-center gap-2 font-mono"
+            className="w-full px-4 py-3 bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 rounded-xl text-[var(--cyan)] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--cyan)]/20 transition-all mb-2 cursor-pointer flex items-center justify-center gap-2 font-mono"
           >
             <Activity size={12} /> Run Calculation Check
           </button>
@@ -616,7 +633,7 @@ function PropInput({ label, value, onChange, small }: { label: string; value: nu
         type="number" 
         value={value} 
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)} 
-        className={`w-full bg-black/40 border border-white/10 rounded-lg ${small ? 'px-2 py-1.5' : 'px-3 py-2'} text-white text-[10px] font-mono focus:border-[#00e5ff]/50 outline-none transition-all`}
+        className={`w-full bg-black/40 border border-white/10 rounded-lg ${small ? 'px-2 py-1.5' : 'px-3 py-2'} text-white text-[10px] font-mono focus:border-[var(--cyan)]/50 outline-none transition-all`}
       />
     </div>
   );

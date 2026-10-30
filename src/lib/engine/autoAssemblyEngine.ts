@@ -1,10 +1,10 @@
 /**
- * AluCalc OS v5.0 — AI-Assisted Fastener Auto-Detection Engine
+ * AluCAD OS v5.0 — AI-Assisted Fastener Auto-Detection Engine
  *
  * Implements SolidWorks 2026-style heuristics to autonomously detect mating
  * surfaces, holes, and joints, and automatically insert standard ISO/DIN fasteners.
  *
- * Protocol Compliance: .agent/skills/ai_assisted_assembly/SKILL.md
+ * Protocol Compliance: .agents/skills/ai-assisted-assembly/SKILL.md
  * 1. Geometry Analysis: Traverse topological graph to identify holes spanning 2+ bodies.
  * 2. Fastener Sizing: Calculate hole diameter D and span length L -> Match ISO/DIN MD x L.
  * 3. Collision Avoidance: Ensure no bounding box overlap before insertion.

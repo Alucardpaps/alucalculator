@@ -16,7 +16,6 @@ const EN: ModuleHintsStrings = {
     'cutting-optimizer': "Stock cutting efficiency",
     'cost-estimator': "Predict manufacturing costs in real-time",
     'manufacturing-readiness': "Analyze part for CNC & 3D print readiness",
-    'topology-optimization': "AI-driven generative geometry reduction",
     'machine-assembly': "Pre-built mechanical system libraries",
     'failure-prediction': "Stress and fatigue failure AI simulation",
     'fluid-dynamics': "Pipe flow, pressure drop & Reynolds number",
@@ -28,11 +27,9 @@ const EN: ModuleHintsStrings = {
     'biology-genetics': "DNA sequencing and bioinformatics assistant",
     'cs-algorithms': "Algorithm visualization",
     'aerospace-dynamics': "Flight envelope and aerodynamic modeling",
-    'naval-hydrostatics': "Ship stability and hydrostatic curves",
     'three-phase-power': "Industrial 3-phase system analysis and vector diagrams",
     'digital-logic': "Logic gate simulation and truth tables",
     'filter-design': "Active and passive RC filter frequency response (Bode)",
-    'failure-diagnosis': "Probabilistic failure analysis and root cause diagnosis",
     'fatigue-advanced': "High-cycle fatigue and mean stress correction (Haigh)",
     'planetary-gearbox': "Multi-stage planetary gear kinematics and Willis equation",
     'material-selector-ai': "AI-driven material selection engine",
@@ -52,6 +49,9 @@ const EN: ModuleHintsStrings = {
     'motor-efficiency': "3-phase motor load factor, efficiency & CO2 footprint",
     'heat-exchanger': "Heat exchanger LMTD, thermal power & surface area",
     'hydraulic-cylinder': "Hydraulic cylinder bore, rod buckling & volume",
+    'keyway-connection': "Parallel keyway connection per DIN 6885",
+    'press-fit': "Interference & thermal shrink fit per DIN 7190",
+    'o-ring': "O-ring sealing & gland dimensions per ISO 3601",
 };
 
 const TR: ModuleHintsStrings = {
@@ -68,7 +68,6 @@ const TR: ModuleHintsStrings = {
     'cutting-optimizer': "Kesim verimliliği",
     'cost-estimator': "Gerçek zamanlı imalat maliyeti tahmini",
     'manufacturing-readiness': "CNC ve 3D baskı imalata uygunluk analizi",
-    'topology-optimization': "AI tabanlı geometri optimizasyonu",
     'machine-assembly': "Hazır mekanik sistem kütüphaneleri",
     'failure-prediction': "Yorulma ve kırılma riskleri tahminleme",
     'fluid-dynamics': "Boru içi sıvı akışı ve basınç kaybı",
@@ -80,11 +79,9 @@ const TR: ModuleHintsStrings = {
     'biology-genetics': "DNA dizileme ve biyoinformatik asistanı",
     'cs-algorithms': "Algoritma görselleştirme",
     'aerospace-dynamics': "Uçuş zarfı ve aerodinamik hesaplar",
-    'naval-hydrostatics': "Gemi stabilitesi ve hidrostatik eğriler",
     'three-phase-power': "Endüstriyel 3-fazlı sistem analizi ve vektör diyagramları",
     'digital-logic': "Mantıksal kapı simülasyonu ve doğruluk tabloları",
     'filter-design': "Aktif ve pasif RC filtre frekans tepkisi (Bode)",
-    'failure-diagnosis': "Olasılıksal hata analizi ve kök neden teşhisi",
     'fatigue-advanced': "Yüksek çevrimli yorulma ve ortalama gerilme düzeltmesi (Haigh)",
     'planetary-gearbox': "Çok kademeli planet dişli kinematiği ve Willis denklemi",
     'material-selector-ai': "AI destekli malzeme seçim motoru",
@@ -104,6 +101,9 @@ const TR: ModuleHintsStrings = {
     'motor-efficiency': "3 fazlı asenkron motor verimi, yük faktörü ve CO2 salınımı",
     'heat-exchanger': "Isı eşanjörü LMTD, transfer gücü ve yüzey alanı hesabı",
     'hydraulic-cylinder': "Hidrolik silindir çapı, mil burkulması ve yağ hacmi",
+    'keyway-connection': "DIN 6885 paralel kama ve mil-göbek bağlantı hesabı",
+    'press-fit': "DIN 7190 sıkı geçme, montaj kuvveti ve sıcak geçme hesabı",
+    'o-ring': "ISO 3601 O-ring sızdırmazlık ve yuva boyutlandırma",
 };
 
 const DE: ModuleHintsStrings = {
@@ -120,7 +120,6 @@ const DE: ModuleHintsStrings = {
     'cutting-optimizer': "Zuschnittoptimierung",
     'cost-estimator': "Fertigungskosten in Echtzeit",
     'manufacturing-readiness': "CNC- und 3D-Druck-Fertigungsanalyse",
-    'topology-optimization': "KI-gestützte Geometrieoptimierung",
     'machine-assembly': "Vorgefertigte Mechanik-Bibliotheken",
     'failure-prediction': "Spannungs- und Ermüdungsausfall-Simulation",
     'fluid-dynamics': "Rohrströmung, Druckverlust und Reynolds-Zahl",
@@ -132,11 +131,9 @@ const DE: ModuleHintsStrings = {
     'biology-genetics': "DNA-Sequenzierung und Bioinformatik",
     'cs-algorithms': "Algorithmus-Visualisierung",
     'aerospace-dynamics': "Flugenvelope und Aerodynamik",
-    'naval-hydrostatics': "Schiffsstabilität und hydrostatische Kurven",
     'three-phase-power': "Drehstromanalyse und Vektordiagramme",
     'digital-logic': "Logikgatter-Simulation und Wahrheitstabellen",
     'filter-design': "Aktive und passive RC-Filter (Bode)",
-    'failure-diagnosis': "Probabilistische Fehleranalyse und Ursachenfindung",
     'fatigue-advanced': "Hochzyklische Ermüdung und Mittelspannungskorrektur",
     'planetary-gearbox': "Planetengetriebe-Kinematik und Willis-Gleichung",
     'material-selector-ai': "KI-gestützte Materialauswahl",
@@ -156,6 +153,9 @@ const DE: ModuleHintsStrings = {
     'motor-efficiency': "Drehstrommotor-Wirkungsgrad und CO₂-Fußabdruck",
     'heat-exchanger': "Wärmetauscher LMTD, Leistung und Fläche",
     'hydraulic-cylinder': "Hydraulikzylinder-Bohrung, Stangenkippung und Volumen",
+    'keyway-connection': "Passfederberechnung nach DIN 6885 für Welle-Nabe-Verbindungen",
+    'press-fit': "Pressverband und thermisches Fügen nach DIN 7190",
+    'o-ring': "O-Ring Dichtungsauslegung und Nutmaße nach ISO 3601",
 };
 
 const ES: ModuleHintsStrings = {
@@ -172,7 +172,6 @@ const ES: ModuleHintsStrings = {
     'cutting-optimizer': "Eficiencia de corte de material",
     'cost-estimator': "Costes de fabricación en tiempo real",
     'manufacturing-readiness': "Análisis de fabricabilidad CNC y 3D",
-    'topology-optimization': "Optimización geométrica con IA",
     'machine-assembly': "Bibliotecas de sistemas mecánicos",
     'failure-prediction': "Simulación de fallo por fatiga y tensión",
     'fluid-dynamics': "Flujo en tuberías, pérdida de carga y Reynolds",
@@ -184,11 +183,9 @@ const ES: ModuleHintsStrings = {
     'biology-genetics': "Secuenciación de ADN y bioinformática",
     'cs-algorithms': "Visualización de algoritmos",
     'aerospace-dynamics': "Envolvente de vuelo y aerodinámica",
-    'naval-hydrostatics': "Estabilidad naval e hidrostática",
     'three-phase-power': "Análisis trifásico y diagramas vectoriales",
     'digital-logic': "Simulación de puertas lógicas y tablas de verdad",
     'filter-design': "Filtros RC activos y pasivos (Bode)",
-    'failure-diagnosis': "Análisis probabilístico de fallos",
     'fatigue-advanced': "Fatiga de alto ciclo y corrección de Haigh",
     'planetary-gearbox': "Cinemática planetaria y ecuación de Willis",
     'material-selector-ai': "Motor de selección de materiales con IA",
@@ -208,6 +205,9 @@ const ES: ModuleHintsStrings = {
     'motor-efficiency': "Eficiencia de motor trifásico y huella CO₂",
     'heat-exchanger': "LMTD, potencia térmica y área de intercambiador",
     'hydraulic-cylinder': "Cilindro hidráulico, pandeo de vástago y volumen",
+    'keyway-connection': "Cálculo de chaveta paralela según norma DIN 6885",
+    'press-fit': "Ajuste por interferencia y montaje térmico DIN 7190",
+    'o-ring': "Diseño de junta tórica y dimensiones de alojamiento ISO 3601",
 };
 
 const FR: ModuleHintsStrings = {
@@ -224,7 +224,6 @@ const FR: ModuleHintsStrings = {
     'cutting-optimizer': "Optimisation de coupe",
     'cost-estimator': "Coûts de fabrication en temps réel",
     'manufacturing-readiness': "Analyse d'aptitude CNC et impression 3D",
-    'topology-optimization': "Optimisation géométrique par IA",
     'machine-assembly': "Bibliothèques de systèmes mécaniques",
     'failure-prediction': "Simulation de rupture par fatigue et contrainte",
     'fluid-dynamics': "Écoulement en conduite, pertes de charge et Reynolds",
@@ -236,11 +235,9 @@ const FR: ModuleHintsStrings = {
     'biology-genetics': "Séquençage ADN et bioinformatique",
     'cs-algorithms': "Visualisation d'algorithmes",
     'aerospace-dynamics': "Enveloppe de vol et aérodynamique",
-    'naval-hydrostatics': "Stabilité navale et hydrostatique",
     'three-phase-power': "Analyse triphasée et diagrammes vectoriels",
     'digital-logic': "Simulation de portes logiques et tables de vérité",
     'filter-design': "Filtres RC actifs et passifs (Bode)",
-    'failure-diagnosis': "Analyse probabiliste des défaillances",
     'fatigue-advanced': "Fatigue à grand nombre de cycles et correction de Haigh",
     'planetary-gearbox': "Cinématique planétaire et équation de Willis",
     'material-selector-ai': "Sélection de matériaux par IA",
@@ -260,6 +257,9 @@ const FR: ModuleHintsStrings = {
     'motor-efficiency': "Rendement moteur triphasé et empreinte CO₂",
     'heat-exchanger': "LMTD, puissance thermique et surface d'échangeur",
     'hydraulic-cylinder': "Vérin hydraulique, flambement tige et volume",
+    'keyway-connection': "Calcul de clavetage parallèle selon la norme DIN 6885",
+    'press-fit': "Ajustement avec serrage et frettage thermique DIN 7190",
+    'o-ring': "Dimensionnement de joint torique et gorge selon ISO 3601",
 };
 
 const IT: ModuleHintsStrings = {
@@ -276,7 +276,6 @@ const IT: ModuleHintsStrings = {
     'cutting-optimizer': "Efficienza di taglio",
     'cost-estimator': "Costi di produzione in tempo reale",
     'manufacturing-readiness': "Analisi producibilità CNC e stampa 3D",
-    'topology-optimization': "Ottimizzazione geometrica con IA",
     'machine-assembly': "Librerie di sistemi meccanici",
     'failure-prediction': "Simulazione guasto da fatica e tensione",
     'fluid-dynamics': "Flusso in tubi, perdita di carico e Reynolds",
@@ -288,11 +287,9 @@ const IT: ModuleHintsStrings = {
     'biology-genetics': "Sequenziamento DNA e bioinformatica",
     'cs-algorithms': "Visualizzazione algoritmi",
     'aerospace-dynamics': "Inviluppo di volo e aerodinamica",
-    'naval-hydrostatics': "Stabilità navale e idrostatica",
     'three-phase-power': "Analisi trifase e diagrammi vettoriali",
     'digital-logic': "Simulazione porte logiche e tabelle di verità",
     'filter-design': "Filtri RC attivi e passivi (Bode)",
-    'failure-diagnosis': "Analisi probabilistica dei guasti",
     'fatigue-advanced': "Fatica ad alto ciclo e correzione di Haigh",
     'planetary-gearbox': "Cinematica planetaria ed equazione di Willis",
     'material-selector-ai': "Selezione materiali con IA",
@@ -312,6 +309,9 @@ const IT: ModuleHintsStrings = {
     'motor-efficiency': "Efficienza motore trifase e impronta CO₂",
     'heat-exchanger': "LMTD, potenza termica e area scambiatore",
     'hydraulic-cylinder': "Cilindro idraulico, instabilità asta e volume",
+    'keyway-connection': "Calcolo linguetta e cava parallela secondo DIN 6885",
+    'press-fit': "Accoppiamento con interferenza e calettamento a caldo DIN 7190",
+    'o-ring': "Dimensionamento guarnizione O-Ring e sede secondo ISO 3601",
 };
 
 const PT: ModuleHintsStrings = {
@@ -328,7 +328,6 @@ const PT: ModuleHintsStrings = {
     'cutting-optimizer': "Eficiência de corte",
     'cost-estimator': "Custos de fabricação em tempo real",
     'manufacturing-readiness': "Análise de fabricabilidade CNC e 3D",
-    'topology-optimization': "Otimização geométrica com IA",
     'machine-assembly': "Bibliotecas de sistemas mecânicos",
     'failure-prediction': "Simulação de falha por fadiga e tensão",
     'fluid-dynamics': "Fluxo em tubos, perda de carga e Reynolds",
@@ -340,11 +339,9 @@ const PT: ModuleHintsStrings = {
     'biology-genetics': "Sequenciamento de DNA e bioinformática",
     'cs-algorithms': "Visualização de algoritmos",
     'aerospace-dynamics': "Envelope de voo e aerodinâmica",
-    'naval-hydrostatics': "Estabilidade naval e hidrostática",
     'three-phase-power': "Análise trifásica e diagramas vetoriais",
     'digital-logic': "Simulação de portas lógicas e tabelas verdade",
     'filter-design': "Filtros RC ativos e passivos (Bode)",
-    'failure-diagnosis': "Análise probabilística de falhas",
     'fatigue-advanced': "Fadiga de alto ciclo e correção de Haigh",
     'planetary-gearbox': "Cinemática planetária e equação de Willis",
     'material-selector-ai': "Seleção de materiais com IA",
@@ -364,6 +361,9 @@ const PT: ModuleHintsStrings = {
     'motor-efficiency': "Eficiência de motor trifásico e pegada CO₂",
     'heat-exchanger': "LMTD, potência térmica e área do trocador",
     'hydraulic-cylinder': "Cilindro hidráulico, flambagem da haste e volume",
+    'keyway-connection': "Cálculo de chaveta paralela segundo a norma DIN 6885",
+    'press-fit': "Ajuste por interferência e montagem térmica DIN 7190",
+    'o-ring': "Dimensionamento de vedação O-Ring e canal segundo ISO 3601",
 };
 
 const RU: ModuleHintsStrings = {
@@ -380,7 +380,6 @@ const RU: ModuleHintsStrings = {
     'cutting-optimizer': "Оптимизация раскроя",
     'cost-estimator': "Стоимость производства в реальном времени",
     'manufacturing-readiness': "Анализ пригодности для ЧПУ и 3D-печати",
-    'topology-optimization': "ИИ-оптимизация геометрии",
     'machine-assembly': "Библиотеки механических систем",
     'failure-prediction': "Симуляция усталостного и прочностного разрушения",
     'fluid-dynamics': "Трубопроводный поток, потери давления и число Рейнольдса",
@@ -392,11 +391,9 @@ const RU: ModuleHintsStrings = {
     'biology-genetics': "Секвенирование ДНК и биоинформатика",
     'cs-algorithms': "Визуализация алгоритмов",
     'aerospace-dynamics': "Лётный диапазон и аэродинамика",
-    'naval-hydrostatics': "Судостабильность и гидростатика",
     'three-phase-power': "Трёхфазный анализ и векторные диаграммы",
     'digital-logic': "Симуляция логических элементов и таблицы истинности",
     'filter-design': "Активные и пассивные RC-фильтры (Боде)",
-    'failure-diagnosis': "Вероятностный анализ отказов",
     'fatigue-advanced': "Высокоцикловая усталость и поправка Хайга",
     'planetary-gearbox': "Кинематика планетарных передач и уравнение Уиллиса",
     'material-selector-ai': "ИИ-подбор материалов",
@@ -416,6 +413,9 @@ const RU: ModuleHintsStrings = {
     'motor-efficiency': "КПД трёхфазного двигателя и след CO₂",
     'heat-exchanger': "LMTD, тепловая мощность и площадь теплообменника",
     'hydraulic-cylinder': "Гидроцилиндр, продольная устойчивость штока и объём",
+    'keyway-connection': "Расчет шпоночного соединения по стандарту DIN 6885",
+    'press-fit': "Расчет посадок с натягом и тепловой посадки по DIN 7190",
+    'o-ring': "Проектирование уплотнений O-Ring и канавок по ISO 3601",
 };
 
 const JA: ModuleHintsStrings = {
@@ -432,7 +432,6 @@ const JA: ModuleHintsStrings = {
     'cutting-optimizer': "切断効率の最適化",
     'cost-estimator': "リアルタイム製造コスト",
     'manufacturing-readiness': "CNC・3Dプリント製造性分析",
-    'topology-optimization': "AIによる形状最適化",
     'machine-assembly': "機械システムライブラリ",
     'failure-prediction': "応力・疲労破壊シミュレーション",
     'fluid-dynamics': "配管流れ、圧力損失、レイノルズ数",
@@ -444,11 +443,9 @@ const JA: ModuleHintsStrings = {
     'biology-genetics': "DNAシーケンスとバイオインフォマティクス",
     'cs-algorithms': "アルゴリズム可視化",
     'aerospace-dynamics': "飛行包絡線と空力",
-    'naval-hydrostatics': "船舶安定性と静水曲線",
     'three-phase-power': "三相系解析とベクトル図",
     'digital-logic': "論理ゲートシミュレーションと真理値表",
     'filter-design': "能動・受動RCフィルタ（ボード線図）",
-    'failure-diagnosis': "確率的故障解析と根本原因診断",
     'fatigue-advanced': "高サイクル疲労と平均応力補正",
     'planetary-gearbox': "遊星ギア運動学とウィリス方程式",
     'material-selector-ai': "AI材料選定エンジン",
@@ -468,6 +465,9 @@ const JA: ModuleHintsStrings = {
     'motor-efficiency': "三相モータ効率とCO₂フットプリント",
     'heat-exchanger': "熱交換器LMTD、熱量と伝熱面積",
     'hydraulic-cylinder': "油圧シリンダ孔径、ロッド座屈と油量",
+    'keyway-connection': "DIN 6885規格に基づく平行キー及び軸・ボス強度計算",
+    'press-fit': "DIN 7190規格に基づく圧入・焼きばめ・はめあい計算",
+    'o-ring': "ISO 3601規格に基づくOリングシール圧縮率及び溝設計",
 };
 
 const ZH: ModuleHintsStrings = {
@@ -484,7 +484,6 @@ const ZH: ModuleHintsStrings = {
     'cutting-optimizer': "下料优化",
     'cost-estimator': "实时制造成本",
     'manufacturing-readiness': "CNC与3D打印可制造性分析",
-    'topology-optimization': "AI几何拓扑优化",
     'machine-assembly': "预制机械系统库",
     'failure-prediction': "应力与疲劳失效仿真",
     'fluid-dynamics': "管道流动、压降与雷诺数",
@@ -496,11 +495,9 @@ const ZH: ModuleHintsStrings = {
     'biology-genetics': "DNA测序与生物信息学",
     'cs-algorithms': "算法可视化",
     'aerospace-dynamics': "飞行包线与气动",
-    'naval-hydrostatics': "船舶稳性与静水力曲线",
     'three-phase-power': "三相系统分析与相量图",
     'digital-logic': "逻辑门仿真与真值表",
     'filter-design': "有源与无源RC滤波器（波特图）",
-    'failure-diagnosis': "概率失效分析与根因诊断",
     'fatigue-advanced': "高周疲劳与平均应力修正",
     'planetary-gearbox': "多级行星齿轮运动学",
     'material-selector-ai': "AI材料选择引擎",
@@ -520,6 +517,9 @@ const ZH: ModuleHintsStrings = {
     'motor-efficiency': "三相电机效率与碳足迹",
     'heat-exchanger': "换热器LMTD、热功率与面积",
     'hydraulic-cylinder': "液压缸孔径、杆屈曲与容积",
+    'keyway-connection': "依据 DIN 6885 的平键联接强度与挤压应力校核",
+    'press-fit': "依据 DIN 7190 的过盈配合与热装/冷装装配计算",
+    'o-ring': "依据 ISO 3601 的 O形密封圈压缩率与沟槽尺寸设计",
 };
 
 const KO: ModuleHintsStrings = {
@@ -536,7 +536,6 @@ const KO: ModuleHintsStrings = {
     'cutting-optimizer': "절단 최적화",
     'cost-estimator': "실시간 제조 비용",
     'manufacturing-readiness': "CNC 및 3D 프린트 제조성 분석",
-    'topology-optimization': "AI 기반 형상 최적화",
     'machine-assembly': "기계 시스템 라이브러리",
     'failure-prediction': "응력 및 피로 파괴 시뮬레이션",
     'fluid-dynamics': "배관 유동, 압력 손실 및 레이놀즈 수",
@@ -548,11 +547,9 @@ const KO: ModuleHintsStrings = {
     'biology-genetics': "DNA 시퀀싱 및 생물정보학",
     'cs-algorithms': "알고리즘 시각화",
     'aerospace-dynamics': "비행 영역 및 공기역학",
-    'naval-hydrostatics': "선박 안정성 및 정수력",
     'three-phase-power': "3상 시스템 분석 및 벡터도",
     'digital-logic': "논리 게이트 시뮬레이션 및 진리표",
     'filter-design': "능동·수동 RC 필터(보드)",
-    'failure-diagnosis': "확률적 고장 분석",
     'fatigue-advanced': "고주기 피로 및 평균 응력 보정",
     'planetary-gearbox': "행성 기어 운동학 및 윌리스 방정식",
     'material-selector-ai': "AI 재료 선택 엔진",
@@ -572,6 +569,9 @@ const KO: ModuleHintsStrings = {
     'motor-efficiency': "3상 모터 효율 및 CO₂ 발자국",
     'heat-exchanger': "열교환기 LMTD, 열량 및 면적",
     'hydraulic-cylinder': "유압 실린더 보어, 로드 좌굴 및 체적",
+    'keyway-connection': "DIN 6885 규격 기반 평행 키 및 축-허브 강도 계산",
+    'press-fit': "DIN 7190 규격 기반 억지끼워맞춤 및 열박음 계산",
+    'o-ring': "ISO 3601 규격 기반 O-링 실링 압축률 및 홈 치수 설계",
 };
 
 const AR: ModuleHintsStrings = {
@@ -588,7 +588,6 @@ const AR: ModuleHintsStrings = {
     'cutting-optimizer': "كفاءة القطع",
     'cost-estimator': "تكاليف التصنيع في الوقت الفعلي",
     'manufacturing-readiness': "تحليل الجاهزية للتصنيع CNC والطباعة ثلاثية الأبعاد",
-    'topology-optimization': "تحسين هندسي بالذكاء الاصطناعي",
     'machine-assembly': "مكتبات الأنظمة الميكانيكية",
     'failure-prediction': "محاكاة الفشل بالإجهاد والإجهاد التعب",
     'fluid-dynamics': "تدفق الأنابيب وفقد الضغط ورقم رينولدز",
@@ -600,11 +599,9 @@ const AR: ModuleHintsStrings = {
     'biology-genetics': "تسلسل DNA والمعلوماتية الحيوية",
     'cs-algorithms': "تصور الخوارزميات",
     'aerospace-dynamics': "مظلة الطيران والديناميكا الهوائية",
-    'naval-hydrostatics': "استقرار السفن والمنحنيات الستاتيكية",
     'three-phase-power': "تحليل الأنظمة ثلاثية الطور والرسوم المتجهية",
     'digital-logic': "محاكاة البوابات المنطقية وجداول الحقيقة",
     'filter-design': "مرشحات RC نشطة وسلبية (بود)",
-    'failure-diagnosis': "تحليل احتمالي للأعطال",
     'fatigue-advanced': "إجهاد التعب عالي الدورات وتصحيح هايغ",
     'planetary-gearbox': "حركية التروس الكوكبية ومعادلة ويليس",
     'material-selector-ai': "محرك اختيار المواد بالذكاء الاصطناعي",
@@ -624,6 +621,9 @@ const AR: ModuleHintsStrings = {
     'motor-efficiency': "كفاءة المحرك ثلاثي الطور وبصمة CO₂",
     'heat-exchanger': "LMTD والقدرة الحرارية ومساحة المبادل",
     'hydraulic-cylinder': "أسطوانة هيدروليكية وانبثاق القضيب والحجم",
+    'keyway-connection': "حساب وصلات الخابور المتوازي وفق معيار DIN 6885",
+    'press-fit': "حساب توافق التداخل والتركيب بالانكماش الحراري DIN 7190",
+    'o-ring': "تصميم موانع التسرب الدائرية O-Ring وأبعاد المجاري ISO 3601",
 };
 
 const BY_LOCALE: Record<Language, ModuleHintsStrings> = {

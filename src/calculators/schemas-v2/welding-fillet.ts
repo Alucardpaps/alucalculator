@@ -144,7 +144,7 @@ const weldingFilletSchema: CalculatorSchemaV2 = {
         description: 'Calculate shear stress and safety factor for fillet welds.',
         category: 'fabrication',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['weld', 'fillet', 'stress', 'strength', 'AISC'],
         verifiedStandards: ['AWS D1.1', 'AISC 360']

@@ -9,7 +9,7 @@ export const pressureVesselSchema: CalculatorSchemaV2 = {
         description: 'Analyzes stresses in thick and thin-walled cylindrical pressure vessels using Lame\'s equations.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['pressure', 'vessel', 'cylinder', 'lame', 'stress', 'thick-walled', 'thin-walled', 'machine elements'],
         verifiedStandards: ['General Solid Mechanics']
@@ -167,9 +167,9 @@ export const pressureVesselSchema: CalculatorSchemaV2 = {
             const pathR = pointsR.map((p, i) => `${i === 0 ? 'M' : 'L'} ${cx(p[0])} ${cy(p[1])}`).join(' ');
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="relative w-full max-w-[400px]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg">
                             {/* Grid/Axes */}
                             <line x1={padX} y1={y0} x2={W - padX} y2={y0} stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
                             <line x1={padX} y1={padY} x2={padX} y2={H - padY} stroke="#334155" strokeWidth="1" />
@@ -203,8 +203,8 @@ export const pressureVesselSchema: CalculatorSchemaV2 = {
                     </div>
 
                     <div className="mt-4 text-xs text-gray-400 max-w-[400px] text-center">
-                        <span className="text-[#00e5ff]">Hoop stress</span> is maximum at the inner radius.
-                        <span className="text-[#f43f5e]"> Radial stress</span> is compressive equal to the internal pressure at the inner wall.
+                        <span className="text-[var(--cyan)]">Hoop stress</span> is maximum at the inner radius.
+                        <span className="text-[var(--bad)]"> Radial stress</span> is compressive equal to the internal pressure at the inner wall.
                     </div>
                 </div>
             );

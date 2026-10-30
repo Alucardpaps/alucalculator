@@ -9,7 +9,7 @@ const heatTransferSchema: CalculatorSchemaV2 = {
         description: 'Calculate heat flow via conduction and convection.',
         category: 'thermal',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-25',
         tags: ['thermal', 'conduction', 'convection', 'heat-flux'],
         verifiedStandards: ['Fourier Law', 'Newton Law of Cooling']

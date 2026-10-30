@@ -65,7 +65,7 @@ export function DashboardScreen({
       animate={{ opacity: 1, y: 0 }}
       className="p-4 space-y-6"
     >
-      <div className="relative p-5 rounded-2xl border border-cyan-950/40 bg-slate-950/30 backdrop-blur-xl overflow-hidden shadow-xl">
+      <div className="relative p-5 rounded-2xl border border-cyan-950/40 bg-slate-950/30 overflow-hidden shadow-xl">
         <h3 className="text-[9px] font-mono font-bold text-cyan-400 uppercase tracking-widest mb-1">{m.activeProject}</h3>
         <h2 className="text-xl font-bold text-white truncate">{projectName}</h2>
         <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/5">

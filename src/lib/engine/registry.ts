@@ -4,8 +4,6 @@ import { computeGearStress, GearInput } from "./gears";
 import { ShaftEngine } from "./shafts";
 import { computeBoltedJoint } from "./boltedJoints";
 import { computeThermalExpansion } from "./thermal";
-import { computeFailureDiagnosis } from "./failure";
-import { computeNavalHydrostatics } from "./naval";
 import { computeBoltTorque } from "./torque";
 
 
@@ -81,24 +79,6 @@ const ThermalEngine: IEngine = {
 };
 
 /**
- * Failure Diagnosis Module
- */
-const FailureEngine: IEngine = {
-    metadata: { id: "failure", name: "Failure Diagnosis", version: "1.0.0", domain: "diagnostics" },
-    validate: (p) => p,
-    compute: (input) => computeFailureDiagnosis(input as any)
-};
-
-/**
- * Naval Hydrostatics Module
- */
-const NavalEngine: IEngine = {
-    metadata: { id: "naval", name: "Naval Hydrostatics", version: "1.0.0", domain: "marine" },
-    validate: (p) => p,
-    compute: (input) => computeNavalHydrostatics(input as any)
-};
-
-/**
  * Bolt Torque Module
  */
 const TorqueEngine: IEngine = {
@@ -117,8 +97,6 @@ export const ModuleRegistry: Record<string, IEngine> = {
     "shafts": ShaftEngine,
     "bolts": BoltedEngine,
     "thermal": ThermalEngine,
-    "failure": FailureEngine,
-    "naval": NavalEngine,
     "bolt-torque": TorqueEngine
 };
 

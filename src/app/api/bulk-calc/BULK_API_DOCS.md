@@ -1,6 +1,6 @@
-# AluCalc OS Bulk Calculation API Documentation
+# AluCAD OS Bulk Calculation API Documentation
 
-Welcome to the AluCalc OS Commercial API. This endpoint allows professional engineering teams to perform large-scale calculations using our proprietary structural analysis engine and AI Copilot.
+Welcome to the AluCAD OS Commercial API. This endpoint allows professional engineering teams to perform large-scale calculations using our proprietary structural analysis engine and AI Copilot.
 
 ## Base URL
 `POST /api/bulk-calc`

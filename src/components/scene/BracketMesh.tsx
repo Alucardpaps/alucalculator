@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Bracket Mesh
+ * AluCAD OS v5.0 — Bracket Mesh
  *
  * L-shaped bracket connector rendered as grouped box geometry.
  * PURE RENDERING — receives all data via props.

@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 const BeamCanvas3D = dynamic(() => import('@/components/modules/fea/BeamCanvas3D'), { ssr: false });
 import MohrCircleVisualization from '@/components/MohrCircleVisualization';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 /**
  * SimulationFEAModule 
@@ -22,6 +23,7 @@ import MohrCircleVisualization from '@/components/MohrCircleVisualization';
  * Unified Layout: [Inputs] | [Visualizer + Descriptions]
  */
 export default function SimulationFEAModule() {
+  const precision = useGlobalPrecision();
     const [activeTab, setActiveTab] = useState<(
         'beam' | 'buckling' | 'torsion' | 'pressure' | 'combined' | 'fatigue'
     )>('beam');
@@ -29,9 +31,9 @@ export default function SimulationFEAModule() {
     return (
         <div className="h-full flex flex-col bg-transparent text-cyan-50">
             {/* Header & Navigation */}
-            <div className="flex-none p-4 flex items-center justify-between border-b border-cyan-900/40 bg-[#05090e]/80 backdrop-blur-md">
+            <div className="flex-none p-4 flex items-center justify-between border-b border-cyan-900/40 bg-[var(--bg-0)]/80">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#00e5ff]/10 border border-[#00e5ff]/30 rounded-lg text-[#00e5ff] shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+                    <div className="p-2 bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 rounded-lg text-[var(--cyan)] ">
                         <Activity size={20} />
                     </div>
                     <div>
@@ -54,8 +56,8 @@ export default function SimulationFEAModule() {
                             onClick={() => setActiveTab(tab.id as any)}
                             className={`px-3 py-1.5 rounded-lg text-[10px] tracking-widest font-mono font-bold uppercase transition-all flex items-center gap-2
                                 ${activeTab === tab.id
-                                    ? 'bg-[#00e5ff] text-black shadow-[0_0_15px_rgba(0,229,255,0.4)]'
-                                    : 'text-cyan-900/60 hover:text-[#00e5ff] hover:bg-cyan-900/10 hover:border-cyan-900/30 border border-transparent border-dashed'}`}
+                                    ? 'bg-[var(--cyan)] text-black '
+                                    : 'text-cyan-900/60 hover:text-[var(--cyan)] hover:bg-cyan-900/10 hover:border-cyan-900/30 border border-transparent border-dashed'}`}
                         >
                             <tab.icon size={14} />
                             <span className="hidden sm:inline">{tab.label}</span>
@@ -94,9 +96,9 @@ export default function SimulationFEAModule() {
 
 function MaterialSelector({ value, onChange }: { value: string, onChange: (m: MaterialStrength) => void }) {
     return (
-        <div className="bg-[#020408]/60 p-4 rounded-xl border border-cyan-900/30">
+        <div className="bg-[var(--bg-0)]/60 p-4 rounded-xl border border-cyan-900/30">
             <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] shadow-[0_0_8px_rgba(0,229,255,0.5)]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] " />
                 <label className="text-[10px] font-bold font-mono uppercase text-cyan-50/50 tracking-[0.2em]">Material Engine</label>
             </div>
             <select
@@ -105,10 +107,10 @@ function MaterialSelector({ value, onChange }: { value: string, onChange: (m: Ma
                     const mat = STRENGTH_MATERIALS.find(m => m.name === e.target.value);
                     if (mat) onChange(mat);
                 }}
-                className="w-full bg-[#05090e]/80 border border-cyan-900/40 rounded-lg p-2.5 text-sm font-bold font-mono text-cyan-50 outline-none focus:border-[#00e5ff] transition-all cursor-pointer appearance-none shadow-inner"
+                className="w-full bg-[var(--bg-0)]/80 border border-cyan-900/40 rounded-lg p-2.5 text-sm font-bold font-mono text-cyan-50 outline-none focus:border-[var(--cyan)] transition-all cursor-pointer appearance-none shadow-inner"
             >
                 {STRENGTH_MATERIALS.map(m => (
-                    <option key={m.name} value={m.name} className="bg-[#020408] font-mono">{m.name}</option>
+                    <option key={m.name} value={m.name} className="bg-[var(--bg-0)] font-mono">{m.name}</option>
                 ))}
             </select>
             <div className="grid grid-cols-2 gap-2 mt-3 p-2 bg-black/30 rounded-lg text-[10px] font-mono text-slate-500">
@@ -121,13 +123,13 @@ function MaterialSelector({ value, onChange }: { value: string, onChange: (m: Ma
 
 function ResultCard({ title, value, unit, status, icon: Icon }: { title: string, value: string | number, unit?: string, status?: 'safe' | 'marginal' | 'failure', icon?: any }) {
     const statusGlow =
-        status === 'safe' ? 'shadow-[0_0_20px_rgba(0,229,255,0.1)] border-[#00e5ff]/30' :
-            status === 'marginal' ? 'shadow-[0_0_20px_rgba(245,158,11,0.1)] border-amber-500/30' :
-                status === 'failure' ? 'shadow-[0_0_20px_rgba(239,68,68,0.15)] border-red-500/40' :
+        status === 'safe' ? ' border-[var(--cyan)]/30' :
+            status === 'marginal' ? ' border-amber-500/30' :
+                status === 'failure' ? ' border-red-500/40' :
                     'border-cyan-900/30';
 
     const textColor =
-        status === 'safe' ? 'text-[#00e5ff]' :
+        status === 'safe' ? 'text-[var(--cyan)]' :
             status === 'marginal' ? 'text-amber-400' :
                 status === 'failure' ? 'text-red-400' :
                     'text-cyan-50';
@@ -135,10 +137,10 @@ function ResultCard({ title, value, unit, status, icon: Icon }: { title: string,
     return (
         <motion.div
             whileHover={{ scale: 1.02 }}
-            className={`p-4 rounded-2xl bg-[#020408]/60 border ${statusGlow} transition-all duration-300`}
+            className={`p-4 rounded-2xl bg-[var(--bg-0)]/60 border ${statusGlow} transition-all duration-300`}
         >
             <div className="flex items-center gap-2 mb-2 opacity-60">
-                {Icon && <Icon size={12} className="text-[#00e5ff]" />}
+                {Icon && <Icon size={12} className="text-[var(--cyan)]" />}
                 <div className="text-[10px] font-mono uppercase font-bold tracking-[0.2em]">{title}</div>
             </div>
             <div className={`text-2xl font-black font-mono flex items-baseline gap-1 ${textColor}`}>
@@ -151,8 +153,8 @@ function ResultCard({ title, value, unit, status, icon: Icon }: { title: string,
 
 function InfoSection({ title, formulas, desc }: { title: string, formulas?: string[], desc: string }) {
     return (
-        <div className="bg-[#00e5ff]/5 border border-[#00e5ff]/20 rounded-2xl p-5 space-y-4">
-            <div className="flex items-center gap-2 text-[#00e5ff]">
+        <div className="bg-[var(--cyan)]/5 border border-[var(--cyan)]/20 rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-2 text-[var(--cyan)]">
                 <BookOpen size={16} />
                 <h4 className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]">Technical Briefing: {title}</h4>
             </div>
@@ -160,7 +162,7 @@ function InfoSection({ title, formulas, desc }: { title: string, formulas?: stri
                 {desc}
             </p>
             {formulas && formulas.map((f, i) => (
-                <div key={i} className="bg-[#020408]/80 p-3 flex justify-center rounded-lg border border-[#00e5ff]/20 font-mono text-xs text-center text-[#00e5ff] shadow-inner">
+                <div key={i} className="bg-[var(--bg-0)]/80 p-3 flex justify-center rounded-lg border border-[var(--cyan)]/20 font-mono text-xs text-center text-[var(--cyan)] shadow-inner">
                     {f}
                 </div>
             ))}
@@ -277,8 +279,8 @@ function BeamAnalysis() {
                         {/* Supports */}
                         {type === 'simply_supported' && (
                             <>
-                                <polygon points="40,104 32,120 48,120" fill="#a855f7" className="drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
-                                <polygon points="360,104 352,120 368,120" fill="#a855f7" className="drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+                                <polygon points="40,104 32,120 48,120" fill="#a855f7" className="drop-" />
+                                <polygon points="360,104 352,120 368,120" fill="#a855f7" className="drop-" />
                             </>
                         )}
                         {type === 'fixed_both' && (
@@ -558,6 +560,7 @@ function FatigueAnalysis() {
 
 // --- COMBINED LOADING ---
 function CombinedLoadingAnalysis() {
+    const precision = useGlobalPrecision();
     const [axial, setAxial] = useState(1000);
     const [moment, setMoment] = useState(500000);
     const [torque, setTorque] = useState(250000);
@@ -618,11 +621,11 @@ function CombinedLoadingAnalysis() {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/5 p-4 rounded-xl border border-white/5 tracking-tight">
                         <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Principal σ₁</div>
-                        <div className="text-xl font-black text-emerald-400 font-mono">{result.principal.sigma1.toFixed(2)} MPa</div>
+                        <div className="text-xl font-black text-emerald-400 font-mono">{formatEngineeringValue(result.principal.sigma1, precision, false)} MPa</div>
                     </div>
                     <div className="bg-white/5 p-4 rounded-xl border border-white/5 tracking-tight">
                         <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Principal σ₂</div>
-                        <div className="text-xl font-black text-blue-400 font-mono">{result.principal.sigma2.toFixed(2)} MPa</div>
+                        <div className="text-xl font-black text-blue-400 font-mono">{formatEngineeringValue(result.principal.sigma2, precision, false)} MPa</div>
                     </div>
                 </div>
 

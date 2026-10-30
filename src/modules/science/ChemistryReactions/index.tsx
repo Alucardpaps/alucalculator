@@ -158,16 +158,16 @@ export default function ChemistryReactions() {
     const chartData = result ? result.chartData : [40, 60, 45, 70, 90, 65, 50, 80, 55, 40];
 
     return (
-        <div className="flex w-full h-full bg-[#050608] text-white overflow-hidden relative">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative">
             {/* LEFT SIDEBAR: Inventory & Controls */}
-            <div className="w-[320px] bg-[#0c1017]/80 backdrop-blur-xl border-r border-white/5 flex flex-col relative z-20">
+            <div className="w-[320px] bg-[var(--bg-1)]/80 border-r border-white/5 flex flex-col relative z-20">
                 <div className="p-6 border-b border-white/5">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                        <div className="w-10 h-10 bg-[var(--cyan-glow)] rounded-xl flex items-center justify-center border border-[var(--cyan)]/40 ">
                             <FlaskConical className="text-emerald-400" size={20} />
                         </div>
                         <div>
-                            <h1 className="text-sm font-black tracking-widest uppercase italic">Lab Workstation</h1>
+                            <h1 className="text-sm font-black tracking-widest uppercase">Lab Workstation</h1>
                             <div className="text-[10px] text-emerald-500/60 font-mono tracking-widest leading-none mt-1">CHEM-REACT V2.2</div>
                         </div>
                     </div>
@@ -243,7 +243,7 @@ export default function ChemistryReactions() {
             <div className="flex-1 flex flex-col relative z-10">
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
-                <div className="h-16 border-b border-white/5 bg-[#080b11]/80 backdrop-blur-md px-8 flex items-center justify-between relative z-20">
+                <div className="h-16 border-b border-white/5 bg-[var(--bg-0)]/80 px-8 flex items-center justify-between relative z-20">
                     <div className="flex items-center gap-6">
                         {['synthesizer', 'spectroscopy', 'thermodynamic'].map(tab => (
                             <button 
@@ -252,7 +252,7 @@ export default function ChemistryReactions() {
                                 className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative py-5 ${activeTab === tab ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'}`}
                             >
                                 {tab}
-                                {activeTab === tab && <motion.div layoutId="chemtab" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                                {activeTab === tab && <motion.div layoutId="chemtab" className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-emerald-500 " />}
                             </button>
                         ))}
                     </div>
@@ -266,7 +266,7 @@ export default function ChemistryReactions() {
                             disabled={selectedReagentIds.length === 0 || isSimulating}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest uppercase shadow-xl transition-all
                                 ${selectedReagentIds.length > 0 && !isSimulating 
-                                    ? 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-900/20 active:scale-95' 
+                                    ? 'bg-[var(--cyan)] text-[var(--accent-ink)] hover:bg-emerald-500 active:scale-95' 
                                     : 'bg-emerald-900/30 text-emerald-700 cursor-not-allowed border border-emerald-900/50'
                                 }
                             `}
@@ -286,8 +286,8 @@ export default function ChemistryReactions() {
                         
                         <div className="flex-1 grid grid-cols-12 gap-6 mb-6">
                             {/* Synthesis Area */}
-                            <div className={`col-span-8 bg-white/[0.01] border rounded-[32px] relative overflow-hidden flex flex-col items-center justify-center shadow-2xl transition-all duration-700
-                                ${result && !result.isSafe ? 'border-rose-500/40 shadow-rose-900/20' : result ? 'border-emerald-500/40 shadow-[0_0_50px_rgba(16,185,129,0.05)]' : 'border-white/10'}
+                            <div className={`col-span-8 bg-white/[0.01] border rounded-xl relative overflow-hidden flex flex-col items-center justify-center shadow-2xl transition-all duration-700
+                                ${result && !result.isSafe ? 'border-rose-500/40 ' : result ? 'border-emerald-500/40 ' : 'border-white/10'}
                             `}>
                                 {/* Background glow reacting to simulation */}
                                 <div className={`absolute inset-0 transition-opacity duration-1000 
@@ -299,7 +299,7 @@ export default function ChemistryReactions() {
                                 <div className="relative z-10 flex flex-col items-center w-full px-12">
                                     <div className="w-32 h-32 border border-emerald-500/20 rounded-full flex items-center justify-center p-4 mb-8 relative">
                                         <div className={`absolute inset-0 rounded-full opacity-20 ${isSimulating ? 'bg-emerald-500 animate-ping' : 'bg-emerald-500/10'}`} />
-                                        <div className={`w-full h-full bg-[#0c1017] rounded-full border flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.1)] transition-colors duration-500
+                                        <div className={`w-full h-full bg-[var(--bg-1)] rounded-full border flex items-center justify-center transition-colors duration-500
                                             ${isSimulating ? 'border-emerald-400 text-emerald-300' : 
                                               result && !result.isSafe ? 'border-rose-500/50 text-rose-500' : 
                                               'border-emerald-500/30 text-emerald-400'}
@@ -326,9 +326,9 @@ export default function ChemistryReactions() {
                                                 <motion.div 
                                                     initial={{ opacity: 0, scale: 0.8, y: 10 }}
                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                    className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3 backdrop-blur-md"
+                                                    className="px-6 py-3 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3"
                                                 >
-                                                    <div className="w-3 h-3 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: rg.color, color: rg.color }} />
+                                                    <div className="w-3 h-3 rounded-full " style={{ backgroundColor: rg.color, color: rg.color }} />
                                                     <span className="font-mono font-bold text-lg text-white">{ReactionEngine.formatHTMLSubscripts(rg.formula)}</span>
                                                     <button 
                                                         onClick={() => toggleReagent(rg.id)}
@@ -349,8 +349,8 @@ export default function ChemistryReactions() {
                                                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                                                 className="w-full flex justify-center"
                                             >
-                                                <div className={`px-8 py-4 rounded-2xl border backdrop-blur-xl
-                                                    ${result.isSafe ? 'bg-emerald-900/20 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : 'bg-rose-900/20 border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.2)]'}
+                                                <div className={`px-8 py-4 rounded-2xl border
+                                                    ${result.isSafe ? 'bg-emerald-900/20 border-emerald-500/50 ' : 'bg-rose-900/20 border-rose-500/50 '}
                                                 `}>
                                                     <div className="text-2xl font-mono font-bold text-white tracking-wider flex items-center gap-4">
                                                         {result.equation}
@@ -413,7 +413,7 @@ export default function ChemistryReactions() {
                                 {/* Parameters */}
                                 <div className="flex-1 bg-white/[0.01] border border-white/10 rounded-3xl p-6">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Safety Parameters</h3>
+                                        <h3 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Safety Parameters</h3>
                                         {result && !result.isSafe && <AlertTriangle size={14} className="text-rose-500 animate-pulse" />}
                                     </div>
                                     <div className="space-y-4">
@@ -442,10 +442,10 @@ export default function ChemistryReactions() {
 
                         {/* Status Bar */}
                         <div className={`border rounded-2xl px-6 py-4 flex items-center justify-between transition-colors
-                            ${result && !result.isSafe ? 'bg-rose-500/10 border-rose-500/20' : 'bg-[#05a5a5]/10 border-emerald-500/20'}
+                            ${result && !result.isSafe ? 'bg-rose-500/10 border-rose-500/20' : 'bg-[var(--cyan)]/10 border-emerald-500/20'}
                         `}>
                             <div className="flex items-center gap-4">
-                                <div className={`w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor]
+                                <div className={`w-2 h-2 rounded-full animate-pulse 
                                     ${result && !result.isSafe ? 'bg-rose-500 text-rose-500' : 'bg-emerald-500 text-emerald-500'}
                                 `} />
                                 <span className={`text-[10px] font-black uppercase tracking-widest

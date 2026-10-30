@@ -9,7 +9,7 @@ export const heatExchangerSchema: CalculatorSchemaV2 = {
         description: 'Heat transfer rate, Logarithmic Mean Temperature Difference (LMTD), and required heat transfer area for shell & tube or plate heat exchangers.',
         category: 'thermal',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-06-28',
         tags: ['heat exchanger', 'LMTD', 'thermal area', 'convection', 'heat transfer', 'thermal engineering'],
         verifiedStandards: ['ASME Sec VIII Div 1', 'TEMA Standards']
@@ -133,7 +133,7 @@ export const heatExchangerSchema: CalculatorSchemaV2 = {
             const area = (out.area?.value as number) || 5.0;
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
+                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[var(--bg-0)] gap-12">
                     {/* Temperature Profile SVG chart representation */}
                     <div className="relative w-[180px] h-[180px]">
                         <svg viewBox="0 0 160 160" width="100%" height="100%" className="overflow-visible">
@@ -159,21 +159,21 @@ export const heatExchangerSchema: CalculatorSchemaV2 = {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex flex-col gap-5 w-36 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
+                    <div className="flex flex-col gap-5 w-36 border border-[var(--line)] bg-[var(--bg-1)] p-4 rounded-xl">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Required Area</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
+                            <div className="text-xl font-bold font-mono text-[var(--cyan)]">
                                 {area.toFixed(2)} <span className="text-[10px] text-gray-500">m²</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">LMTD</div>
                             <div className="text-xl font-bold font-mono text-white">
                                 {((out.lmtd?.value as number) || 0).toFixed(1)} <span className="text-[10px] text-gray-500">°C</span>
                             </div>
                         </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
+                        <div className="w-full h-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Heat rate</div>
                             <div className="text-xl font-bold font-mono text-emerald-400">

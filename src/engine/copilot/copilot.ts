@@ -1,3 +1,4 @@
+import { t12 } from '@/locales/t12';
 import aluminumDB from '../knowledge-base/aluminum.json';
 import steelDB from '../knowledge-base/steel.json';
 import woodDB from '../knowledge-base/wood.json';
@@ -7,6 +8,7 @@ import compositeDB from '../knowledge-base/composite.json';
 import { GLOBAL_MODULES } from './module-routes';
 import { getCopilotEngineStrings, copilotFmt, getModuleLocaleCopy } from '@/locales/copilotEngineTranslations';
 import { MATERIALS_DB } from '@/data/materialsData';
+import { getFastenerStandardSpecs, computeBoltAssembly } from '@/lib/fastener/sharedEngine';
 
 // Types for parsed intent
 export interface CopilotIntent {
@@ -105,9 +107,9 @@ export class EngineeringCopilot {
     const isNegativeFeedback = /(yanlış|hata|bozuk|kusur|olmadı|saçma|wrong|error|broken|incorrect|invalid|fail|stupid|bad|sucks|trash)/.test(q);
     if (isNegativeFeedback) {
       intent.showSupportButton = true;
-      intent.replyOverride = 'Teknik bir hata veya tutarsızlık tespit ettiyseniz lütfen mühendislik ekibimizle iletişime geçin.';
-      intent.actionUrl = 'mailto:contact@alucalculator.com?subject=Technical Feedback Report';
-      intent.actionLabel = 'Destek ile İletişime Geç';
+      intent.replyOverride = t12(uiLanguage, 'If you spotted a technical error or inconsistency, please contact our engineering team.', 'Teknik bir hata veya tutarsızlık tespit ettiyseniz lütfen mühendislik ekibimizle iletişime geçin.');
+      intent.actionUrl = 'mailto:abdulsametyildirim95@gmail.com?subject=Technical Feedback Report';
+      intent.actionLabel = t12(uiLanguage, 'Contact Support', 'Destek ile İletişime Geç');
       return intent;
     }
 
@@ -128,47 +130,48 @@ export class EngineeringCopilot {
       
       // Determine grade (default 8.8)
       let grade = '8.8';
-      let gradeFactor = 1.0;
-      let yieldStress = 640; // MPa for 8.8 (0.8 * 800)
-      if (q.includes('10.9')) { grade = '10.9'; gradeFactor = 1.40; yieldStress = 900; }
-      else if (q.includes('12.9')) { grade = '12.9'; gradeFactor = 1.68; yieldStress = 1080; }
-      else if (q.includes('a2') || q.includes('inox') || q.includes('paslanmaz')) { grade = 'A2-70'; gradeFactor = 0.70; yieldStress = 450; }
+      if (q.includes('10.9')) grade = '10.9';
+      else if (q.includes('12.9')) grade = '12.9';
+      else if (q.includes('a2') || q.includes('inox') || q.includes('paslanmaz')) grade = 'A2-70';
 
-      // Friction coefficient (default mu = 0.14 for lightly oiled standard steel)
+      // Same engine and defaults as the /bolt-torque module (VDI 2230 torque split, ISO 898-1 Sp,
+      // 70 % proof-stress utilisation, μG = μK = 0.14) so the assistant never disagrees with the solver.
       const mu = 0.14;
-      const d = sizeNum; // nominal diameter in mm
-      const As = boltData.As; // stress area in mm2
-      const F_preload = 0.9 * yieldStress * As; // 90% yield utilization (N)
-      // VDI 2230 formula approximation: T = F_preload * (0.16 * pitch + 0.58 * d2 * mu + r_head * mu)
-      const K = 0.20; // Torque coefficient
-      const torqueNm = (K * (F_preload / 1000) * d) * gradeFactor;
+      const utilPct = 70;
+      const solved = VDI_2230_BOLTS[boltKey]
+        ? computeBoltAssembly({ threadStandard: 'Metric Coarse', size: boltKey, grade, muThread: mu, muHead: mu, yieldUtilization: utilPct, useProofStress: true })
+        : null;
+      const As = solved ? solved.As : boltData.As; // stress area in mm2
+      const F_preload = solved ? solved.Fm_max * 1000 : 0.7 * 580 * As; // N
+      const torqueNm = solved ? solved.MA : 0.19 * (F_preload / 1000) * sizeNum;
+      const spec = getFastenerStandardSpecs(boltKey.startsWith('M') ? 'Metric Coarse' : 'UNC', boltKey, false);
 
       if (isTr) {
         intent.replyOverride = `### 🔩 VDI 2230 Cıvata Sıkma Torku Analizi\n\n` +
-          `• **Cıvata Standardı:** ISO 4014 / DIN 931 **${boltKey} (Kalite: ${grade})**\n` +
+          `• **Cıvata Standardı:** ${spec.boltCurrent} **${boltKey} (Kalite: ${grade})**\n` +
           `• **Gerilme Alanı ($A_s$):** ${As.toFixed(1)} mm²\n` +
           `• **Anma Adımı ($P$):** ${boltData.pitch} mm\n` +
           `• **Sürtünme Katsayısı ($\mu$):** ${mu} (hafif yağlanmış)\n\n` +
           `#### ⚡ Hesaplanan Değerler:\n` +
           `• **Maksimum Montaj Ön Yükü ($F_M$):** ${(F_preload / 1000).toFixed(1)} kN\n` +
           `• **Önerilen Sıkma Torku ($M_A$):** **${torqueNm.toFixed(1)} N·m** (${(torqueNm * 0.73756).toFixed(1)} lbf·ft)\n` +
-          `• **Akma Emniyet Marjı:** %90 VDI 2230 Standardı\n\n` +
+          `• **Kullanım Oranı:** Sp'nin %${utilPct}'i (modül varsayılanı, ISO 898-1 / VDI 2230)\n\n` +
           `Detaylı sürtünme katsayısı tabloları ve tork aralıkları için Cıvata Tork Çözücüyü açabilirsiniz.`;
       } else {
         intent.replyOverride = `### 🔩 VDI 2230 Bolt Tightening Torque Analysis\n\n` +
-          `• **Fastener Spec:** ISO 4014 / DIN 931 **${boltKey} (Class ${grade})**\n` +
+          `• **Fastener Spec:** ${spec.boltCurrent} **${boltKey} (Class ${grade})**\n` +
           `• **Tensile Stress Area ($A_s$):** ${As.toFixed(1)} mm²\n` +
           `• **Thread Pitch ($P$):** ${boltData.pitch} mm\n` +
           `• **Friction Coefficient ($\mu$):** ${mu} (standard lubricated)\n\n` +
           `#### ⚡ Solver Results:\n` +
           `• **Max Assembly Preload ($F_M$):** ${(F_preload / 1000).toFixed(1)} kN\n` +
           `• **Recommended Tightening Torque ($M_A$):** **${torqueNm.toFixed(1)} N·m** (${(torqueNm * 0.73756).toFixed(1)} lbf·ft)\n` +
-          `• **Yield Utilization:** 90% per VDI 2230\n\n` +
+          `• **Utilization:** ${utilPct}% of proof stress Sp (module default, ISO 898-1 / VDI 2230)\n\n` +
           `You can navigate to the full Bolt Torque Calculator for clamping diagrams and friction tables.`;
       }
 
       intent.actionUrl = '/bolt-torque/';
-      intent.actionLabel = isTr ? 'Cıvata Torku Modülü' : 'Open Bolt Torque Solver';
+      intent.actionLabel = t12(uiLanguage, 'Open Bolt Torque Solver', 'Cıvata Torku Modülü');
       return intent;
     }
 
@@ -210,7 +213,7 @@ export class EngineeringCopilot {
       }
 
       intent.actionUrl = '/bearings/';
-      intent.actionLabel = isTr ? 'Rulman Ömrü Çözücü' : 'Open Bearing Solver';
+      intent.actionLabel = t12(uiLanguage, 'Open Bearing Solver', 'Rulman Ömrü Çözücü');
       return intent;
     }
 
@@ -257,7 +260,7 @@ export class EngineeringCopilot {
       }
 
       intent.actionUrl = '/gears/';
-      intent.actionLabel = isTr ? 'Dişli Modülünü Aç' : 'Open Gears Solver';
+      intent.actionLabel = t12(uiLanguage, 'Open Gears Solver', 'Dişli Modülünü Aç');
       return intent;
     }
 
@@ -267,13 +270,13 @@ export class EngineeringCopilot {
       const fitGradeMatch = q.match(/\b([a-zA-Z]\d{1,2})\/([a-zA-Z]\d{1,2})\b/i);
       const grade = fitGradeMatch ? fitGradeMatch[0].toUpperCase() : 'H7/g6';
       
-      let fitType = isTr ? 'Boşluklu Geçme (Hassas Kaymalı)' : 'Clearance Fit (Precision Sliding)';
+      let fitType = t12(uiLanguage, 'Clearance Fit (Precision Sliding)', 'Boşluklu Geçme (Hassas Kaymalı)');
       let clearanceRange = '+9 ile +34 µm';
       if (grade.includes('P6') || grade.includes('R6')) {
-        fitType = isTr ? 'Sıkı Geçme (Presli)' : 'Interference Fit (Press Fit)';
+        fitType = t12(uiLanguage, 'Interference Fit (Press Fit)', 'Sıkı Geçme (Presli)');
         clearanceRange = '-26 ile -45 µm (Sıkılık)';
       } else if (grade.includes('K6') || grade.includes('J6') || grade.includes('M6')) {
-        fitType = isTr ? 'Geçişli Geçme (Hafif Çakma)' : 'Transition Fit (Light Tap)';
+        fitType = t12(uiLanguage, 'Transition Fit (Light Tap)', 'Geçişli Geçme (Hafif Çakma)');
         clearanceRange = '-15 ile +18 µm';
       }
 
@@ -296,7 +299,7 @@ export class EngineeringCopilot {
       }
 
       intent.actionUrl = '/fits/';
-      intent.actionLabel = isTr ? 'Tolerans Çözücü' : 'Open Limits & Fits';
+      intent.actionLabel = t12(uiLanguage, 'Open Limits & Fits', 'Tolerans Çözücü');
       return intent;
     }
 
@@ -452,7 +455,7 @@ export class EngineeringCopilot {
       }
 
       intent.actionUrl = '/beam-deflection/';
-      intent.actionLabel = isTr ? 'Kiriş Sehimi Çözücü' : 'Open Beam Deflection';
+      intent.actionLabel = t12(uiLanguage, 'Open Beam Deflection', 'Kiriş Sehimi Çözücü');
       intent.materialType = this._state.materialType;
       intent.alloyOrGrade = this._state.alloyOrGrade;
       intent.forceApplied = this._state.forceApplied;
