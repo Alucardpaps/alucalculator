@@ -10,6 +10,7 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useDesignStore, PART_COLORS, customCADGeometries } from './designStore';
+import { saveCADGeometry } from './cadGeometryStorage';
 
 export interface ImportResult {
   success: boolean;
@@ -25,15 +26,39 @@ let occtInstancePromise: Promise<any> | null = null;
 
 async function getOcctInstance() {
   if (!occtInstancePromise) {
-    const occtimportjs = (await import('occt-import-js')).default || (await import('occt-import-js'));
-    occtInstancePromise = occtimportjs({
+    const rawModule: any = await import('occt-import-js');
+    const initFunc = typeof rawModule === 'function'
+      ? rawModule
+      : typeof rawModule.default === 'function'
+      ? rawModule.default
+      : rawModule;
+
+    const wasmUrl = `/occt-import-js.wasm?v=${process.env.NEXT_PUBLIC_BUILD_ID || '5.2.3'}`;
+    let wasmBinary: ArrayBuffer | null = null;
+    if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
+      try {
+        const resp = await fetch(wasmUrl);
+        if (resp.ok) {
+          wasmBinary = await resp.arrayBuffer();
+        }
+      } catch (e) {
+        console.warn(`[cadImporter] Direct fetch for ${wasmUrl} failed, falling back to locateFile:`, e);
+      }
+    }
+
+    const config: any = {
       locateFile: (name: string) => {
         if (name.endsWith('.wasm')) {
-          return '/occt-import-js.wasm';
+          return wasmUrl;
         }
         return name;
       },
-    });
+    };
+    if (wasmBinary) {
+      config.wasmBinary = wasmBinary;
+    }
+
+    occtInstancePromise = initFunc(config);
   }
   return occtInstancePromise;
 }
@@ -563,20 +588,21 @@ function normalizeCADAssembly(
   totalBBox.getSize(totalSize);
   const maxDim = Math.max(totalSize.x, totalSize.y, totalSize.z);
 
-  let scaleFactor = 1.0;
-  let unitScale = 1.0;
+  let scaleFactor = 0.1;
+  let mmMultiplier = 10;
 
-  // Scale from mm to Viewport Units (0.1x scale)
-  if (maxDim > 2) {
-    scaleFactor = 0.1;
-    unitScale = 1.0;
-  } else if (maxDim < 0.05) {
-    // Meters to Viewport Units
+  if (maxDim < 0.05) {
+    // Meters to Viewport Units (0.05m = 50mm -> 5.0 units)
     scaleFactor = 100;
-    unitScale = 1000;
+    mmMultiplier = 10;
+  } else if (maxDim >= 0.05 && maxDim <= 2) {
+    // Small model / centimeters
+    scaleFactor = 1.0;
+    mmMultiplier = 10;
   } else {
-    // Centimeters
-    unitScale = 10;
+    // Standard CAD export in millimeters (e.g. 10mm .. 2000mm)
+    scaleFactor = 0.1;
+    mmMultiplier = 10;
   }
 
   return items.map((item) => {
@@ -598,9 +624,9 @@ function normalizeCADAssembly(
       geometry: geom,
       color: item.color,
       dimensions: {
-        width: Math.round(sizeX * unitScale * 10) / 10,
-        height: Math.round(sizeY * unitScale * 10) / 10,
-        depth: Math.round(sizeZ * unitScale * 10) / 10,
+        width: Math.max(1, Math.round(sizeX * mmMultiplier * 10) / 10),
+        height: Math.max(1, Math.round(sizeY * mmMultiplier * 10) / 10),
+        depth: Math.max(1, Math.round(sizeZ * mmMultiplier * 10) / 10),
       },
     };
   });
@@ -639,6 +665,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
       const color = PART_COLORS[parts.length % PART_COLORS.length];
       const partId = importCADModel(baseName, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
       customCADGeometries.set(partId, item.geometry);
+      saveCADGeometry(partId, item.geometry).catch(() => {});
       return { success: true, partCount: 1, message: `STL Model "${baseName}" başarıyla yüklendi (${item.dimensions.width}x${item.dimensions.height}x${item.dimensions.depth} mm)` };
     }
 
@@ -652,11 +679,17 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
       const rawItems: Array<{ name: string; geometry: THREE.BufferGeometry; color?: string }> = [];
       try {
         const occt = await getOcctInstance();
+        const occtParams = {
+          linearUnit: 'millimeter',
+          linearDeflectionType: 'bounding_box_ratio',
+          linearDeflection: 0.001,
+          angularDeflection: 0.5,
+        };
         const result = (ext === 'iges' || ext === 'igs')
-          ? occt.ReadIgesFile(fileBytes, null)
+          ? occt.ReadIgesFile(fileBytes, occtParams)
           : (ext === 'brep')
-          ? occt.ReadBrepFile(fileBytes, null)
-          : occt.ReadStepFile(fileBytes, null);
+          ? occt.ReadBrepFile(fileBytes, occtParams)
+          : occt.ReadStepFile(fileBytes, occtParams);
 
         if (result && result.success && result.meshes && result.meshes.length > 0) {
           let meshIdx = 0;
@@ -670,7 +703,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
                 geom.computeVertexNormals();
               }
               if (mesh.index && mesh.index.array && mesh.index.array.length > 0) {
-                geom.setIndex(mesh.index.array);
+                geom.setIndex(new THREE.BufferAttribute(new Uint32Array(mesh.index.array), 1));
               }
 
               let colorHex: string | undefined = undefined;
@@ -699,6 +732,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
           // Keep all assembly parts locked together at the exact same assembly root origin
           const partId = importCADModel(item.name, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
           customCADGeometries.set(partId, item.geometry);
+          saveCADGeometry(partId, item.geometry).catch(() => {});
           count++;
         }
 
@@ -718,6 +752,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
       const color = '#38bdf8';
       const partId = importCADModel(`${baseName} (STEP)`, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
       customCADGeometries.set(partId, item.geometry);
+      saveCADGeometry(partId, item.geometry).catch(() => {});
       return {
         success: true,
         partCount: 1,
@@ -743,6 +778,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
             const color = '#a78bfa';
             const partId = importCADModel(`${baseName} (Parasolid)`, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
             customCADGeometries.set(partId, item.geometry);
+            saveCADGeometry(partId, item.geometry).catch(() => {});
             return {
               success: true,
               partCount: 1,
@@ -771,7 +807,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
                 geom.computeVertexNormals();
               }
               if (mesh.index?.array?.length > 0) {
-                geom.setIndex(mesh.index.array);
+                geom.setIndex(new THREE.BufferAttribute(new Uint32Array(mesh.index.array), 1));
               }
               let colorHex: string | undefined;
               if (mesh.color && mesh.color.length >= 3) {
@@ -795,6 +831,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
           const color = item.color || PART_COLORS[(parts.length + count) % PART_COLORS.length];
           const partId = importCADModel(item.name, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
           customCADGeometries.set(partId, item.geometry);
+          saveCADGeometry(partId, item.geometry).catch(() => {});
           count++;
         }
         return {
@@ -843,6 +880,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
         const color = PART_COLORS[(parts.length + i) % PART_COLORS.length];
         const partId = importCADModel(item.name, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
         customCADGeometries.set(partId, item.geometry);
+        saveCADGeometry(partId, item.geometry).catch(() => {});
       }
 
       return { success: true, partCount: normalizedItems.length, message: `${normalizedItems.length} parçalı OBJ montajı yüklendi` };
@@ -893,6 +931,7 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
               const color = item.color || PART_COLORS[(parts.length + i) % PART_COLORS.length];
               const partId = importCADModel(item.name, item.geometry, { x: 0, y: 15, z: 0 }, color, item.dimensions);
               customCADGeometries.set(partId, item.geometry);
+              saveCADGeometry(partId, item.geometry).catch(() => {});
             }
 
             resolve({
@@ -912,7 +951,52 @@ export async function loadCADFile(file: File): Promise<ImportResult> {
       });
     }
 
-    return { success: false, partCount: 0, message: `Desteklenmeyen dosya biçimi: .${ext} (Desteklenenler: .stl, .step, .stp, .x_t, .x_b, .iges, .igs, .brep, .obj, .gltf, .glb)` };
+    // ─────────────────────────────────────────────────────────
+    // 5. DXF (2D closed contours → extruded solids)
+    // ─────────────────────────────────────────────────────────
+    if (ext === 'dxf') {
+      const text = await file.text();
+      const { parseDXF } = await import('@/cad/dxf/DxfParser');
+      const { assembleRegions, regionToExtrusionProfile } = await import('@/cad/geometry/contourAssembler');
+      const parsed = parseDXF(text);
+      const regions = assembleRegions(parsed.entities);
+      if (regions.length === 0) {
+        return {
+          success: false,
+          partCount: 0,
+          message: `DXF içinde kapalı kontur bulunamadı (${parsed.entities.length} entity). LINE uçlarını birleştirin veya LWPOLYLINE kapalı gönderin.`,
+        };
+      }
+      const addPart = useDesignStore.getState().addPart;
+      let count = 0;
+      for (const region of regions) {
+        const profile = regionToExtrusionProfile(region);
+        const depth = 20;
+        const id = addPart('profile');
+        useDesignStore.getState().updatePart(id, {
+          name: `${baseName} (${count + 1})`,
+          kind: 'profile',
+          outer: profile.outer,
+          inner: profile.holes,
+          solidOp: 'extrude',
+          params: {
+            extrudeDepth: depth,
+            length: depth,
+            sectionAreaMm2: Number(profile.section.area.toFixed(3)),
+            ix_mm4: Number(profile.section.Ix.toFixed(1)),
+            iy_mm4: Number(profile.section.Iy.toFixed(1)),
+          },
+        });
+        count++;
+      }
+      return {
+        success: true,
+        partCount: count,
+        message: `${count} kapalı DXF konturu 20 mm ekstrüzyon olarak yüklendi (${baseName})`,
+      };
+    }
+
+    return { success: false, partCount: 0, message: `Desteklenmeyen dosya biçimi: .${ext} (Desteklenenler: .stl, .step, .stp, .x_t, .x_b, .iges, .igs, .brep, .obj, .gltf, .glb, .dxf)` };
   } catch (err: any) {
     console.error('CAD Import Error:', err);
     return { success: false, partCount: 0, message: 'Yükleme hatası: ' + err.message };

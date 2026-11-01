@@ -1,0 +1,27 @@
+{
+    "id": "alucalc.mechanical.cylinder-design",
+    "version": "1.0.0",
+    "type": "cylinder-design",
+    "category": "mechanical",
+    "title": "Hidrolik & Pnömatik Silindir 1:1 Komple Tasarımı",
+    "description": "ISO 6020-2, ISO 3320, DIN 2413 ve ISO 3601 standartlarında 1:1 silindir borusu, mil, piston, ön kapak, arka taban, Kastaş sızdırmazlık elemanları, Euler burkulma ve boyuna kesit 2D CAD teknik çizimi.",
+    "icon": "Box",
+    "defaultSize": {
+        "width": 1150,
+        "height": 800
+    },
+    "capabilities": [
+        "cylinder-sizing-iso6020",
+        "euler-buckling-analysis",
+        "d2413-burst-pressure",
+        "seals-integration-kastas-iso3601",
+        "cad-cutaway-drawing",
+        "bom-generation"
+    ],
+    "permissions": [
+        "project.read",
+        "project.write"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "AluCalc OS Mechanical Engineering Core"
+}

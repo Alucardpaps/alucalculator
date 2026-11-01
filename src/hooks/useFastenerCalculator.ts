@@ -101,14 +101,18 @@ export const useFastenerCalculator = () => {
             clearanceNormal: null,
             clearanceCoarse: null,
         };
-        const nativeIsImperial = standard === 'UNC' || standard === 'UNF' || standard === 'NPT';
+        const nativeIsImperial = standard === 'UNC' || standard === 'UNF' || standard === 'UNEF'
+            || standard === 'NPT' || standard === 'NPTF' || standard === 'BSW' || standard === 'BSF' || standard === 'ACME';
         const useImperial = manualUnit === 'auto' ? nativeIsImperial : manualUnit === 'inch';
 
         let angle = 60;
-        if (standard === 'BSPP (G)' || standard === 'BSPT (R)') angle = 55;
-        if (standard === 'Trapezoidal (Tr)') angle = 30;
+        if (standard === 'BSPP (G)' || standard === 'BSPT (R)' || standard === 'BSW' || standard === 'BSF') angle = 55;
+        if (standard === 'Trapezoidal (Tr)' || standard === 'Round (Rd)') angle = 30;
+        if (standard === 'ACME') angle = 29;
+        if (standard === 'Buttress (S)') angle = 45;
+        if (standard === 'Square') angle = 0;
 
-        const isTapered = standard === 'NPT' || standard === 'BSPT (R)';
+        const isTapered = standard === 'NPT' || standard === 'NPTF' || standard === 'BSPT (R)';
         const clearanceVal = clearanceSeries === 'fine' ? g.clearanceFine
             : clearanceSeries === 'coarse' ? g.clearanceCoarse
             : g.clearanceNormal;
@@ -127,7 +131,7 @@ export const useFastenerCalculator = () => {
             clearanceNormal: g.clearanceNormal != null ? conv(g.clearanceNormal).toFixed(3) : 'N/A',
             clearanceCoarse: g.clearanceCoarse != null ? conv(g.clearanceCoarse).toFixed(3) : 'N/A',
             stressArea: (useImperial ? s.stressArea / 645.16 : s.stressArea).toFixed(4),
-            displayPitch: nativeIsImperial || standard.includes('BSPP') || standard.includes('BSPT')
+            displayPitch: nativeIsImperial || standard.includes('BSPP') || standard.includes('BSPT') || (standard as string) === 'BSW' || (standard as string) === 'BSF'
                 ? `${s.pitch} TPI`
                 : `${s.pitch} mm`,
             angle,

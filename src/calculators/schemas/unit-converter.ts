@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Unit Converter Schema
+ * AluCAD OS — Unit Converter Schema
  * 
  * ENGINEERING DOMAIN: Science / General
  * 
@@ -19,7 +19,7 @@ export const unitConverterSchema: CalculatorSchema = {
     metadata: {
         title: 'Unit Converter',
         description: 'Convert between engineering units for length, pressure, temperature, and more.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['unit', 'converter', 'metric', 'imperial', 'SI']
     },

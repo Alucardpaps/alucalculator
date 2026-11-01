@@ -9,7 +9,7 @@ export const torsionNonCircularSchema: CalculatorSchemaV2 = {
         description: 'Analyzes torsion in non-circular cross sections (Rectangle, Ellipse, Equilateral Triangle) to find max shear stress and twist angle.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['torsion', 'shear', 'stress', 'twist', 'rectangle', 'ellipse', 'triangle', 'machine elements'],
         verifiedStandards: ['Roark\'s Formulas for Stress and Strain']
@@ -168,9 +168,9 @@ export const torsionNonCircularSchema: CalculatorSchemaV2 = {
             }
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="relative w-full max-w-[400px]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg">
                             {/* Grid/Axes */}
                             <line x1={0} y1={cy} x2={W} y2={cy} stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />
                             <line x1={cx} y1={0} x2={cx} y2={H} stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />

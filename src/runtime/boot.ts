@@ -1,3 +1,4 @@
+import { APP_RELEASE_NAME } from '@/config/app';
 /**
  * Engineering Runtime Boot Loader
  * 
@@ -34,7 +35,7 @@ export function bootEngineeringOS() {
     };
 
     console.log(
-        '%c 🏛 ALUCALC ENGINEERING OS v5.0 %c KERNEL BOOT SEQUENCE STARTED ',
+        '%c 🏛 ${APP_RELEASE_NAME.toUpperCase()} %c KERNEL BOOT SEQUENCE STARTED ',
         'background: #000; color: #fff; padding: 4px; border-radius: 4px; font-weight: bold;',
         'color: #00e5ff; font-family: monospace;'
     );

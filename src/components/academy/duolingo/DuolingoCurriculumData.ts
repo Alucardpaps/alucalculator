@@ -12,6 +12,8 @@
  * 12-Language Support: tr, en, de, es, fr, it, pt, ru, zh, ja, ko, ar
  */
 
+import { getInAppQuestsForLesson } from './inAppLessonQuests';
+
 export type SupportedLanguage = 'tr' | 'en' | 'de' | 'es' | 'fr' | 'it' | 'pt' | 'ru' | 'zh' | 'ja' | 'ko' | 'ar';
 
 export interface LocalizedString {
@@ -6498,7 +6500,18 @@ export const DUOLINGO_UNITS: CurriculumUnit[] = [
               "unit": "saat",
               "formulaHint": "t_f = 6000 / 2",
               "stepByStepSolution": {
-                "tr": "Doğru! Sıcaklık 15°C yükseldiğinde gres baz yağı oksidasyonu iki katına çıkarak ömrü 3000 saate indirir."
+                "tr": "Doğru! Sıcaklık 15°C yükseldiğinde gres baz yağı oksidasyonu iki katına çıkarak ömrü 3000 saate indirir.",
+                "en": "Correct! When temperature rises by 15°C, grease base oil oxidation doubles, halving grease life to 3000 hours.",
+                "de": "Richtig! Bei einem Temperaturanstieg um 15°C verdoppelt sich die Oxidation des Schmierfetts und halbiert die Lebensdauer auf 3000 Stunden.",
+                "es": "¡Correcto! Cuando la temperatura sube 15°C, la oxidación del aceite base se duplica, reduciendo la vida a 3000 horas.",
+                "fr": "Correct! Lorsque la température augmente de 15°C, l'oxydation de l'huile de base double, réduisant la durée à 3000 heures.",
+                "it": "Corretto! Quando la temperatura aumenta di 15°C, l'ossidazione dell'olio base raddoppia, dimezzando la durata a 3000 ore.",
+                "pt": "Correto! Quando a temperatura sobe 15°C, a oxidação do óleo base dobra, reduzindo a vida para 3000 horas.",
+                "ru": "Правильно! При повышении температуры на 15°C окисление базового масла удваивается, сокращая срок службы до 3000 часов.",
+                "zh": "正确！温度升高15°C时，基础油氧化速度翻倍，润滑脂寿命减半至3000小时。",
+                "ja": "正解です！温度が15°C上昇すると基油の酸化が2倍になり、寿命は3000時間に半減します。",
+                "ko": "정답입니다! 온도가 15°C 상승하면 기유 산화 속도가 2배가 되어 그리스 수명이 3000시간으로 줄어듭니다.",
+                "ar": "صحيح! عندما ترتفع درجة الحرارة بمقدار 15 درجة مئوية، يتضاعف أكسدة زيت الأساس، مما يقلل العمر الافتراضي إلى 3000 ساعة."
               }
             }
           }
@@ -23773,3 +23786,15 @@ export const DUOLINGO_I18N = {
     "ar": "الوحدة التالية"
   }
 };
+
+// ══════════════════════════════════════════════════════════════════════
+// AUTOMATIC IN-APP QUEST QUESTIONS ENRICHMENT (180 IN-APP CHALLENGES)
+// - Unit 1: 3 in-app quest questions per lesson topic (15 * 3 = 45 quests)
+// - Units 2..10: 1 in-app quest question per lesson topic (135 quests)
+// ══════════════════════════════════════════════════════════════════════
+DUOLINGO_UNITS.forEach((unit) => {
+  unit.lessons.forEach((lesson) => {
+    const quests = getInAppQuestsForLesson(unit.number, lesson.number, lesson.slug);
+    lesson.steps.push(...quests);
+  });
+});

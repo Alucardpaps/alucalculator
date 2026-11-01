@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Unified OS Frame
+ * AluCAD OS — Unified OS Frame
  * 
  * Combines ReactFlow-based Flow Canvas with OS chrome (RibbonBar, Taskbar).
  * This is the main frame that renders the entire application.

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 /**
  * PROJECT PERSISTENCE ENGINE v5.0
- * The Memory of AluCalc OS
+ * The Memory of AluCAD OS
  */
 
 export interface CalculationSnapshot {

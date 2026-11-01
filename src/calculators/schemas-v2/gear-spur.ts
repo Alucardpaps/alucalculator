@@ -7,8 +7,8 @@
  * Features:
  * - Undercut detection (z < 17 warning)
  * - Pressure angle < 20° DIN 3960 warning
- * - Profile shift calculations
- * - Lewis bending stress
+ * - Profile shift + operating centre distance
+ * - ISO 6336 Method B σF / σH / SF / SH
  * - Full formula traceability
  */
 
@@ -19,6 +19,7 @@ import {
     type ValidatedEngineeringValue,
     type CalculationResult
 } from '@/types/engineering';
+import { calculateIso6336Mesh } from '@/lib/iso6336';
 
 // ============================================
 // CALCULATION ENGINE
@@ -40,6 +41,7 @@ function calculateGearGeometry(
     const b = inputs.b.value as number;       // Face width [mm]
     const T = inputs.T.value as number;       // Torque [Nm]
     const Sy = inputs.Sy.value as number;     // Yield strength [MPa]
+    const n = (inputs.n?.value as number) ?? 1450; // Pinion rpm
     const x1 = (inputs.x1?.value as number) ?? 0; // Pinion shift
     const x2 = (inputs.x2?.value as number) ?? 0; // Gear shift
 
@@ -71,71 +73,80 @@ function calculateGearGeometry(
         });
     }
 
-    // ===== GEOMETRY CALCULATIONS =====
+    // ===== ISO 6336 / DIN 3960 =====
+    const iso = calculateIso6336Mesh({
+        mn: m,
+        z1,
+        z2,
+        b,
+        alphaNDeg: alpha,
+        betaDeg: beta,
+        x1,
+        x2,
+        torqueNm: T,
+        rpmPinion: n,
+        applicationFactor: 1.25,
+        qualityGrade: 6,
+        sigmaFlim1: 0.55 * Sy,
+        sigmaFlim2: 0.55 * Sy,
+        sigmaHlim: 1.3 * Sy,
+    });
 
-    const betaRad = beta * (Math.PI / 180);
-    const mt = m / Math.cos(betaRad); // Transverse module
-    formulaTrace['mt'] = 'm_t = \\frac{m}{\\cos\\beta}';
+    const mt = iso.mt;
+    formulaTrace['mt'] = 'm_t = m_n / \\cos\\beta';
+    const d1 = iso.d1;
+    const d2 = iso.d2;
+    formulaTrace['d1'] = 'd_1 = m_t z_1';
+    formulaTrace['d2'] = 'd_2 = m_t z_2';
+    const da1 = iso.da1;
+    const da2 = iso.da2;
+    formulaTrace['da1'] = 'd_{a1} = d_1 + 2 m_n (1 + x_1 - k)';
+    formulaTrace['da2'] = 'd_{a2} = d_2 + 2 m_n (1 + x_2 - k)';
+    const df1 = iso.df1;
+    const df2 = iso.df2;
+    formulaTrace['df1'] = 'd_{f1} = d_1 - 2 m_n (1.25 - x_1)';
+    formulaTrace['df2'] = 'd_{f2} = d_2 - 2 m_n (1.25 - x_2)';
+    const ratio = iso.u;
+    formulaTrace['ratio'] = 'i = z_2 / z_1';
+    const a = iso.aWorking;
+    formulaTrace['a'] = 'a_w = a \\cos\\alpha_t / \\cos\\alpha_{wt}';
 
-    // Pitch diameters (transverse)
-    const d1 = mt * z1;
-    const d2 = mt * z2;
-    formulaTrace['d1'] = 'd_1 = m_t \\cdot z_1';
-    formulaTrace['d2'] = 'd_2 = m_t \\cdot z_2';
+    const Ft = iso.Ft;
+    formulaTrace['Ft'] = 'F_t = 2000 T / d_1';
+    const sigmaBending = iso.sigmaF1;
+    formulaTrace['sigmaBending'] = '\\sigma_F = F_t K_A K_v K_{F\\beta} Y_F Y_S Y_\\beta / (b m_n)';
+    const sigmaH = iso.sigmaH;
+    formulaTrace['sigmaH'] = '\\sigma_H = Z_H Z_E Z_\\varepsilon Z_\\beta \\sqrt{F_t (u+1)/(d_1 b u)}';
+    const SF = iso.SF1;
+    formulaTrace['SF'] = 'S_F = \\sigma_{F\\lim} / \\sigma_F';
+    const SH = iso.SH;
+    formulaTrace['SH'] = 'S_H = \\sigma_{H\\lim} / \\sigma_H';
 
-    // Tip diameters (with profile shift)
-    const da1 = m * (z1 + 2 + 2 * x1);
-    const da2 = m * (z2 + 2 + 2 * x2);
-    formulaTrace['da1'] = 'd_{a1} = m \\cdot (z_1 + 2 + 2x_1)';
-    formulaTrace['da2'] = 'd_{a2} = m \\cdot (z_2 + 2 + 2x_2)';
-
-    // Root diameters (with profile shift)
-    const df1 = m * (z1 - 2.5 + 2 * x1);
-    const df2 = m * (z2 - 2.5 + 2 * x2);
-    formulaTrace['df1'] = 'd_{f1} = m \\cdot (z_1 - 2.5 + 2x_1)';
-    formulaTrace['df2'] = 'd_{f2} = m \\cdot (z_2 - 2.5 + 2x_2)';
-
-    // Gear ratio
-    const ratio = z2 / z1;
-    formulaTrace['ratio'] = 'i = \\frac{z_2}{z_1}';
-
-    // Center distance (with profile shift)
-    const a = (mt * (z1 + z2)) / 2 + m * (x1 + x2);
-    formulaTrace['a'] = 'a = \\frac{m_t(z_1 + z_2)}{2} + m(x_1 + x_2)';
-
-    // ===== FORCE & STRESS CALCULATIONS =====
-
-    // Tangential force at pitch circle (transverse)
-    const Ft = (2 * T * 1000) / d1; // N (T in Nm, d1 in mm)
-    formulaTrace['Ft'] = 'F_t = \\frac{2T}{d_1}';
-
-    // Lewis form factor (z- and pressure-angle dependent, Shigley approximation)
-    const alphaRad = alpha * (Math.PI / 180);
-    const Y20 = 0.484 - 2.87 / z1;
-    const Y = Math.max(0.1, Y20 * Math.pow(Math.cos(20 * Math.PI / 180) / Math.cos(alphaRad), 2));
-    formulaTrace['Y'] = 'Y \\approx (0.484 - 2.87/z_1) \\cdot (\\cos 20° / \\cos\\alpha)^2';
-
-    // Bending stress (Lewis formula)
-    const sigmaBending = Ft / (b * m * Y);
-    formulaTrace['sigmaBending'] = '\\sigma_b = \\frac{F_t}{b \\cdot m \\cdot Y}';
-
-    // Safety factor
-    const SF = Sy / sigmaBending;
-    formulaTrace['SF'] = 'SF = \\frac{S_y}{\\sigma_b}';
-
-    // Check safety factor
-    if (SF < 2.0) {
+    if (iso.epsilonAlpha < 1.2) {
         warnings.push({
-            field: 'SF',
-            message: `Safety factor ${SF.toFixed(2)} < 2.0. Consider stronger material or larger module.`,
+            field: 'epsilonAlpha',
+            message: `Transverse contact ratio εα=${iso.epsilonAlpha.toFixed(2)} < 1.2. Increase teeth, reduce helix, or add profile shift.`,
             severity: 'warning',
         });
     }
-
+    if (SF < 1.4) {
+        warnings.push({
+            field: 'SF',
+            message: `ISO 6336 bending safety SF=${SF.toFixed(2)} < 1.4. Increase module, face width, or material.`,
+            severity: 'warning',
+        });
+    }
+    if (SH < 1.0) {
+        warnings.push({
+            field: 'SH',
+            message: `ISO 6336 pitting safety SH=${SH.toFixed(2)} < 1.0. Risk of surface fatigue.`,
+            severity: 'critical',
+        });
+    }
     if (sigmaBending > 200) {
         warnings.push({
             field: 'sigmaBending',
-            message: `Bending stress ${sigmaBending.toFixed(0)} MPa is high. Consider larger module or wider teeth.`,
+            message: `Root bending stress ${sigmaBending.toFixed(0)} MPa is high. Consider larger module or wider face.`,
             severity: 'warning',
         });
     }
@@ -155,12 +166,23 @@ function calculateGearGeometry(
         ratio: createValidatedValue(ratio, '-', 'derived', { precision: 3 }),
         a: createValidatedValue(a, 'mm', 'derived', { precision: 2 }),
         Ft: createValidatedValue(Ft, 'N', 'derived', { precision: 1 }),
+        Fr: createValidatedValue(iso.Fr, 'N', 'derived', { precision: 1 }),
+        Fa: createValidatedValue(iso.Fa, 'N', 'derived', { precision: 1 }),
+        epsilonAlpha: createValidatedValue(iso.epsilonAlpha, '-', 'derived', { precision: 3 }),
+        epsilonBeta: createValidatedValue(iso.epsilonBeta, '-', 'derived', { precision: 3 }),
+        Kv: createValidatedValue(iso.Kv, '-', 'derived', { precision: 3 }),
         sigmaBending: verified
             ? createValidatedValue(sigmaBending, 'MPa', 'derived', { precision: 1 })
             : createUnverifiedValue(sigmaBending, 'MPa', 'Critical warnings present'),
+        sigmaH: verified
+            ? createValidatedValue(sigmaH, 'MPa', 'derived', { precision: 1 })
+            : createUnverifiedValue(sigmaH, 'MPa', 'Critical warnings present'),
         SF: verified
             ? createValidatedValue(SF, '-', 'derived', { precision: 2 })
             : createUnverifiedValue(SF, '-', 'Critical warnings present'),
+        SH: verified
+            ? createValidatedValue(SH, '-', 'derived', { precision: 2 })
+            : createUnverifiedValue(SH, '-', 'Critical warnings present'),
     };
 
     return {
@@ -180,14 +202,14 @@ const gearSpurSchema: CalculatorSchemaV2 = {
     id: 'gear-spur',
 
     metadata: {
-        title: 'Spur Gear Calculator',
-        description: 'Calculate spur gear geometry, bending stress, and safety factor. Includes undercut detection.',
+        title: 'Spur / Helical Gear Calculator',
+        description: 'DIN 3960 geometry and ISO 6336 Method B screening: σF, σH, SF, SH, εα, εβ for spur and helical pairs.',
         category: 'mechanical',
-        version: '2.0.0',
-        author: 'AluCalc Engineering',
-        lastUpdated: '2026-02-09',
-        tags: ['gear', 'spur', 'involute', 'bending', 'stress', 'undercut'],
-        verifiedStandards: ['ISO 6336', 'DIN 3990', 'DIN 3960'],
+        version: '2.1.0',
+        author: 'AluCAD Engineering',
+        lastUpdated: '2026-09-09',
+        tags: ['gear', 'spur', 'helical', 'involute', 'ISO 6336', 'bending', 'pitting', 'undercut'],
+        verifiedStandards: ['ISO 6336', 'DIN 3990', 'DIN 3960', 'ISO 21771'],
     },
 
     inputs: [
@@ -300,6 +322,20 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             description: 'Torque transmitted by the pinion.',
         },
         {
+            key: 'n',
+            label: 'Pinion Speed (n)',
+            unit: 'rpm',
+            defaultValue: 1450,
+            validation: {
+                min: 1,
+                max: 30000,
+                required: false,
+                step: 10,
+            },
+            description: 'Pinion speed for Kv and pitch-line velocity (ISO 6336-1).',
+            group: 'advanced',
+        },
+        {
             key: 'Sy',
             label: 'Material Yield Strength',
             unit: 'MPa',
@@ -397,42 +433,102 @@ const gearSpurSchema: CalculatorSchemaV2 = {
         },
         {
             key: 'a',
-            label: 'Center Distance',
+            label: 'Operating Center Distance',
             unit: 'mm',
-            formulaLatex: 'a = \\frac{m(z_1 + z_2)}{2} + m(x_1 + x_2)',
-            description: 'Operating center distance.',
+            formulaLatex: 'a_w = a \\frac{\\cos\\alpha_t}{\\cos\\alpha_{wt}}',
+            description: 'Operating centre distance from involute operating pressure angle (DIN 3960).',
             precision: 2,
         },
         {
             key: 'Ft',
             label: 'Tangential Force',
             unit: 'N',
-            formulaLatex: 'F_t = \\frac{2T}{d_1}',
-            description: 'Force at pitch circle.',
+            formulaLatex: 'F_t = \\frac{2000 T}{d_1}',
+            description: 'Circumferential force at the pitch cylinder.',
             precision: 1,
+        },
+        {
+            key: 'Fr',
+            label: 'Radial Force',
+            unit: 'N',
+            formulaLatex: 'F_r = F_t \\tan\\alpha_t',
+            description: 'Radial separating force (transverse pressure angle).',
+            precision: 1,
+        },
+        {
+            key: 'Fa',
+            label: 'Axial Force',
+            unit: 'N',
+            formulaLatex: 'F_a = F_t \\tan\\beta',
+            description: 'Helix thrust. Zero for spur gears.',
+            precision: 1,
+        },
+        {
+            key: 'epsilonAlpha',
+            label: 'Contact Ratio εα',
+            unit: '-',
+            formulaLatex: '\\varepsilon_\\alpha = g_\\alpha / (\\pi m_t \\cos\\alpha_t)',
+            description: 'Transverse contact ratio. Target ≥ 1.2.',
+            precision: 3,
+        },
+        {
+            key: 'epsilonBeta',
+            label: 'Overlap Ratio εβ',
+            unit: '-',
+            formulaLatex: '\\varepsilon_\\beta = b \\sin\\beta / (\\pi m_n)',
+            description: 'Face overlap ratio (helical). Zero for spur.',
+            precision: 3,
+        },
+        {
+            key: 'Kv',
+            label: 'Dynamic Factor Kv',
+            unit: '-',
+            formulaLatex: 'K_v = f(v, Q)',
+            description: 'ISO 6336-1 Method C dynamic factor from pitch velocity and quality.',
+            precision: 3,
         },
         {
             key: 'sigmaBending',
-            label: 'Bending Stress',
+            label: 'Root Bending Stress σF',
             unit: 'MPa',
-            formulaLatex: '\\sigma_b = \\frac{F_t}{b \\cdot m \\cdot Y}',
-            description: 'Tooth bending stress (Lewis formula).',
+            formulaLatex: '\\sigma_F = \\frac{F_t}{b m_n} Y_F Y_S Y_\\beta K_A K_v K_{F\\beta}',
+            description: 'ISO 6336-3 tooth-root stress (pinion).',
             precision: 1,
             warningThreshold: {
                 max: 200,
-                message: 'High bending stress. Consider larger module.',
+                message: 'High root bending stress. Consider larger module.',
             },
         },
         {
+            key: 'sigmaH',
+            label: 'Contact Stress σH',
+            unit: 'MPa',
+            formulaLatex: '\\sigma_H = Z_H Z_E Z_\\varepsilon \\sqrt{\\frac{F_t}{d_1 b}\\frac{u+1}{u}}',
+            description: 'ISO 6336-2 Hertzian pitting stress.',
+            precision: 1,
+        },
+        {
             key: 'SF',
-            label: 'Safety Factor',
+            label: 'Bending Safety SF',
             unit: '-',
-            formulaLatex: 'SF = \\frac{S_y}{\\sigma_b}',
-            description: 'Safety factor against yield.',
+            formulaLatex: 'S_F = \\sigma_{F\\lim}/\\sigma_F',
+            description: 'ISO 6336 bending safety. Industrial target ≥ 1.4.',
             precision: 2,
             warningThreshold: {
-                min: 2,
-                message: 'Safety factor below 2.0.',
+                min: 1.4,
+                message: 'Bending safety below 1.4.',
+            },
+        },
+        {
+            key: 'SH',
+            label: 'Pitting Safety SH',
+            unit: '-',
+            formulaLatex: 'S_H = \\sigma_{H\\lim}/\\sigma_H',
+            description: 'ISO 6336 pitting safety. Industrial target ≥ 1.0.',
+            precision: 2,
+            warningThreshold: {
+                min: 1.0,
+                message: 'Pitting safety below 1.0.',
             },
         },
     ],
@@ -448,20 +544,20 @@ const gearSpurSchema: CalculatorSchemaV2 = {
     documentation: {
         assumptions: [
             {
-                id: 'spur-only',
-                text: 'Calculation is for spur gears only. Helical gears require correction factors.',
-                impact: 'high',
+                id: 'method-b-screen',
+                text: 'ISO 6336 simplified Method B screening (YF/YS tables approximated, life and lubricant factors = 1). Not a Method-A certificate.',
+                impact: 'medium',
                 source: 'ISO 6336',
             },
             {
-                id: 'lewis-simplified',
-                text: 'Bending stress uses Lewis formula with z- and α-dependent form factor Y; dynamic factors not included.',
-                impact: 'medium',
-                source: 'Lewis 1892',
+                id: 'helical-transverse',
+                text: 'Helical geometry uses mt = mn/cos β and αt = atan(tan αn / cos β) per DIN 3960.',
+                impact: 'high',
+                source: 'DIN 3960',
             },
             {
                 id: 'standard-addendum',
-                text: 'Standard addendum (ha=m) and dedendum (hf=1.25m) assumed.',
+                text: 'Standard addendum (ha=mn) and dedendum (hf=1.25 mn) with DIN 3960 addendum shortening k.',
                 impact: 'low',
                 source: 'ISO 53',
             },
@@ -470,8 +566,9 @@ const gearSpurSchema: CalculatorSchemaV2 = {
             { code: 'ISO 6336', title: 'Calculation of load capacity of spur and helical gears' },
             { code: 'DIN 3990', title: 'Calculation of load capacity of cylindrical gears' },
             { code: 'DIN 3960', title: 'Undercut and profile shift definitions' },
+            { code: 'ISO 21771', title: 'Cylindrical involute gears and gear pairs — concepts and geometry' },
         ],
-        formulaLatex: '\\sigma_b = \\frac{F_t}{b \\cdot m \\cdot Y}, \\quad SF = \\frac{S_y}{\\sigma_b}',
+        formulaLatex: '\\sigma_F = \\frac{F_t}{b m_n} Y_F Y_S Y_\\beta K_A K_v, \\quad \\sigma_H = Z_H Z_E Z_\\varepsilon \\sqrt{\\frac{F_t}{d_1 b}\\frac{u+1}{u}}',
     },
 
     tier: 'free',

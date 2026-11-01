@@ -2,7 +2,11 @@
  * 🏛️ ALUCALCULATOR ENGINE - MATH - INVOLUTE
  * "The Gear Kernel"
  * Compliance: DIN 3960
+ *
+ * Flank points use the canonical kernel involutePoint.
  */
+
+import { involutePoint as kernelInvolutePoint } from '@/engines/math/involute';
 
 export interface Point {
     x: number;
@@ -99,11 +103,7 @@ export class InvoluteEngine {
             // where t is the roll angle = tan(alpha_r)
 
             const t = Math.tan(alpha_r);
-
-            const x = rb * (Math.cos(t) + t * Math.sin(t));
-            const y = rb * (Math.sin(t) - t * Math.cos(t));
-
-            flank.push({ x, y });
+            flank.push(kernelInvolutePoint(rb, t));
         }
 
         return {

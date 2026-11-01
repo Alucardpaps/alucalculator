@@ -56,9 +56,9 @@ export default function BoxProfileDetectorModule() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#1e1e1e] text-slate-200 p-4 gap-4">
+        <div className="flex flex-col h-full bg-[var(--bg-3)] text-slate-200 p-4 gap-4">
             {/* Upload Area */}
-            <div className="border-2 border-dashed border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center gap-4 hover:bg-[#252525] transition-colors relative">
+            <div className="border-2 border-dashed border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center gap-4 hover:bg-[var(--bg-3)] transition-colors relative">
                 <input
                     type="file"
                     accept="image/*"
@@ -89,7 +89,7 @@ export default function BoxProfileDetectorModule() {
                         flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all shadow-lg
                         ${!image || analyzing
                             ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:scale-105 hover:shadow-cyan-500/25'}
+                            : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:scale-105 '}
                     `}
                 >
                     {analyzing ? (
@@ -108,9 +108,9 @@ export default function BoxProfileDetectorModule() {
 
             {/* Results */}
             {result && (
-                <div className="bg-[#252525] border border-slate-700 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-[var(--bg-3)] border border-slate-700 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 shrink-0">
+                        <div className="w-12 h-12 rounded-lg bg-[var(--cyan-glow)] flex items-center justify-center text-[var(--cyan)] shrink-0">
                             <FileImage size={24} />
                         </div>
                         <div className="flex-1">
@@ -118,11 +118,11 @@ export default function BoxProfileDetectorModule() {
                             <h3 className="text-xl font-bold text-white mb-2">{result.type}</h3>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-[#1a1a1a] p-3 rounded-lg">
+                                <div className="bg-[var(--bg-2)] p-3 rounded-lg">
                                     <div className="text-[10px] text-slate-500 uppercase mb-1">Estimated Dimensions</div>
                                     <div className="font-mono text-cyan-400 font-bold">{result.dimensions}</div>
                                 </div>
-                                <div className="bg-[#1a1a1a] p-3 rounded-lg">
+                                <div className="bg-[var(--bg-2)] p-3 rounded-lg">
                                     <div className="text-[10px] text-slate-500 uppercase mb-1">AI Confidence</div>
                                     <div className="font-mono text-cyan-400 font-bold">{result.confidence}%</div>
                                 </div>

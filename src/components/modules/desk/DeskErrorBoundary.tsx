@@ -44,8 +44,8 @@ export class DeskErrorBoundary extends Component<Props, State> {
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-[#0a0e14] text-white p-8 font-mono">
-                    <div className="max-w-md w-full bg-[#131b26] border border-red-500/30 rounded-xl p-6 shadow-2xl relative overflow-hidden">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-1)] text-white p-8 font-mono">
+                    <div className="max-w-md w-full bg-[var(--bg-2)] border border-red-500/30 rounded-xl p-6 shadow-2xl relative overflow-hidden">
                         {/* Accessorizer */}
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500" />
 
@@ -58,14 +58,14 @@ export class DeskErrorBoundary extends Component<Props, State> {
                             The Desk module encountered a critical rendering error. This is likely due to corrupted local persistence data or a browser memory limit.
                         </p>
 
-                        <div className="bg-black/50 rounded p-3 mb-6 border border-[#2a3a4a] text-xs font-mono text-red-400 overflow-x-auto">
+                        <div className="bg-black/50 rounded p-3 mb-6 border border-[var(--line-strong)] text-xs font-mono text-red-400 overflow-x-auto">
                             {this.state.error?.message || 'Unknown Error'}
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={this.handleReload}
-                                className="flex items-center justify-center gap-2 px-4 py-3 bg-[#1e2833] hover:bg-[#2a3a4a] rounded-lg transition-colors text-xs font-bold uppercase tracking-widest text-[#00e5ff]"
+                                className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-3)] hover:bg-[var(--line-strong)] rounded-lg transition-colors text-xs font-bold uppercase tracking-widest text-[var(--cyan)]"
                             >
                                 <RefreshCw size={14} />
                                 Restart

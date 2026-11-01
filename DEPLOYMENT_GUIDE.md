@@ -1,5 +1,12 @@
 # 🚀 AluCalc OS – Deployment & Handover Guide (v5.0.0 Beta)
 
+> [!IMPORTANT]
+> **LIVE DEPLOYMENT REALITY (AUTHORITATIVE):**
+> The live production pipeline does **NOT** deploy to Vercel or Render. The active deployment is automated via GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)):
+> - **Build:** Statically compiled via `npm run build` (`output: export` to `./out/`).
+> - **Hosting:** Deployed via FTP (`SamKirkland/FTP-Deploy-Action@v4.3.5`) to **Hostinger** (`srv2070.hstgr.io` -> `./public_html/`).
+> - The Vercel / Supabase sections below describe historical or optional standalone SSR setups; they are not the live production pipeline.
+
 ## 📜 The Engineering OS Manifesto
 **AluCalc OS is not a standard web tool.** It is a modular **Engineering Operating System** designed for high-density simulation and assembly-level modeling. Its power lies in:
 - **Modular Plugin Architecture**: Decoupled engineering engines (Gears, Shafts, Bearings).

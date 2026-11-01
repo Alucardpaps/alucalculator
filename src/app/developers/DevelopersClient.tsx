@@ -69,8 +69,8 @@ ${NL}`}</pre>
       <div className="flex flex-wrap gap-2 mb-6">
         <Link href="/pricing/" className="work-btn-primary">{t.getTeam}</Link>
         <Link href="/sales/" className="work-btn">{t.requestKey}</Link>
-        <a href="mailto:sales@alucalculator.com?subject=Bulk%20API%20access" className="work-btn">
-          sales@alucalculator.com
+        <a href="mailto:abdulsametyildirim95@gmail.com?subject=Bulk%20API%20access" className="work-btn">
+          abdulsametyildirim95@gmail.com
         </a>
       </div>
       <p className="text-[12px] text-slate-500">

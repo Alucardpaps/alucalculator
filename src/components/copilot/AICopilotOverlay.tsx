@@ -1,45 +1,112 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Sparkles, X, Send, User, ChevronLeft, ChevronRight, Layers, AlertTriangle, CheckCircle } from 'lucide-react';
-import { EngineeringCopilot, CopilotIntent } from '@/engine/copilot/copilot';
+import { usePathname, useRouter } from 'next/navigation';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCopilotStore } from '@/store/copilotStore';
+import { useOSStore } from '@/store/osStore';
+import { MODULE_REGISTRY, MODULE_ALIASES } from '@/config/modules';
 
 import { getCopilotStrings, getCopilotEngineLocale, getCopilotResponseLanguage } from '@/locales/copilotTranslations';
 import { getCopilotGameStrings, getTriviaQuestions } from '@/locales/copilotGameTranslations';
-import { AegisMascot } from './AegisMascot';
-import { AegisIcon } from './AegisIcon';
-import { AegisAura } from './AegisAura';
+import { AegisMascot, playMascotChirp } from './AegisMascot';
+import { useAegisStore, type AegisMessage } from '@/store/aegisStore';
 
 interface GameOption {
   label: string;
   value: string;
 }
 
-interface Message {
-  id: string;
-  sender: 'ai' | 'user';
-  text: string;
-  timestamp: string;
-  intent?: CopilotIntent;
-  gameOptions?: GameOption[];
-}
+type Message = AegisMessage;
 
 const LOCALIZED_GREETINGS: Record<string, string[]> = {
-  en: ["Need some help, engineer?", "Let's build something!", "Ask me anything!", "I can solve formulas!", "Let's check tolerances!"],
-  tr: ["Yardım lazım mı mühendis?", "Hadi bir şeyler inşa edelim!", "Bana istediğini sor!", "Formülleri çözebilirim!", "Toleransları kontrol edelim!"],
-  de: ["Brauchen Sie Hilfe, Ingenieur?", "Lass uns etwas bauen!", "Fragen Sie mich alles!", "Ich kann Formeln lösen!", "Toleranzen prüfen!"],
-  es: ["¿Necesitas ayuda, ingeniero?", "¡Construyamos algo!", "¡Pregúntame lo que sea!", "¡Puedo resolver fórmulas!", "¡Ajustemos tolerancias!"],
-  fr: ["Besoin d'aide, ingénieur?", "Bâtissons quelque chose!", "Demandez-moi n'importe quoi!", "Je résous vos formules!", "Vérifions les tolérances!"],
-  it: ["Serve aiuto, ingegnere?", "Costruiamo qualcosa!", "Chiedimi qualsiasi cosa!", "Posso risolvere formule!", "Controlliamo le tolleranze!"],
-  pt: ["Precisa de ajuda, engenheiro?", "Vamos construir algo!", "Pergunte-me qualquer coisa!", "Posso resolver fórmulas!", "Vamos testar tolerâncias!"],
-  ru: ["Нужна помощь, инженер?", "Давайте что-нибудь построим!", "Спросите меня о чем угодно!", "Я умею решать формулы!", "Проверим допуски!"],
-  zh: ["需要帮助吗，工程师？", "让我们建造点什么！", "问我任何问题！", "我能解析公式！", "来检查一下公差吧！"],
-  ja: ["エンジニアさん、お手伝いしましょうか？", "何か作りましょう！", "何でも聞いてください！", "公式の計算もできますよ！", "公差を確認しましょう！"],
-  ko: ["도움이 필요하신가요, 엔지니어님?", "함께 무언가를 만들어봐요!", "무엇이든 물어보세요!", "공식을 계산할 수 있어요!", "공차를 확인해볼까요?"],
-  ar: ["هل تحتاج إلى مساعدة، أيها المهندس؟", "دعنا نبني شيئاً!", "اسألني عن أي شيء!", "يمكنني حل المعادلات!", "دعنا نتحقق من التفاوتات!"]
+  en: [
+    "Welcome to AluCAD OS R&D Lab. How may I assist your engineering design today?",
+    "Ready to solve and verify across deterministic ISO/DIN standards.",
+    "Let's audit tolerances, gear geometry, or structural stress.",
+    "Would you like to analyze a CAD assembly or flow calculation?",
+    "Chief Research Engineer on standby. What engineering problem shall we solve?",
+  ],
+  tr: [
+    "AluCAD OS AR-GE Laboratuvarına hoş geldiniz. Tasarımınızda nasıl yardımcı olabilirim?",
+    "ISO/DIN standartları ve 3D CAD üzerinde doğrulamaya hazırım.",
+    "Toleransları, dişli geometrisini veya yapısal gerilmeleri denetleyebiliriz.",
+    "Bir CAD montajı veya akış grafiği analiz etmek ister misiniz?",
+    "Baş Araştırma Mühendisi devrede. Hangi mühendislik problemini ele alalım?",
+  ],
+  de: [
+    "Willkommen im AluCAD OS F&E-Labor. Wie kann ich Ihre Konstruktion heute unterstützen?",
+    "Bereit zur Verifikation nach ISO/DIN-Standards.",
+    "Lassen Sie uns Toleranzen, Zahnradgeometrien oder Spannungen prüfen.",
+    "Möchten Sie eine CAD-Baugruppe oder einen Flow-Graphen analysieren?",
+    "Leitender Forschungsingenieur bereit. Welches technische Problem lösen wir?",
+  ],
+  es: [
+    "Bienvenido al Laboratorio I+D de AluCAD OS. ¿Cómo puedo asistirle en su diseño hoy?",
+    "Listo para verificar bajo normas ISO/DIN.",
+    "Revisemos tolerancias, geometría de engranajes o tensiones estructurales.",
+    "¿Desea analizar un ensamblaje CAD o un grafo de cálculo Flow?",
+    "Ingeniero Jefe de Investigación listo. ¿Qué desafío de ingeniería abordamos?",
+  ],
+  fr: [
+    "Bienvenue au Laboratoire R&D AluCAD OS. Comment puis-je vous assister aujourd'hui ?",
+    "Prêt à valider selon les normes ISO/DIN.",
+    "Vérifions les tolérances, la géométrie d'engrenages ou les contraintes.",
+    "Souhaitez-vous analyser un assemblage CAD ou un graphe Flow Engine ?",
+    "Ingénieur en Chef de Recherche en veille. Quel problème d'ingénierie traitons-nous ?",
+  ],
+  it: [
+    "Benvenuti nel Laboratorio R&S AluCAD OS. Come posso assistere il vostro progetto?",
+    "Pronto per la verifica secondo gli standard ISO/DIN.",
+    "Verifichiamo le tolleranze, la geometria degli ingranaggi o le sollecitazioni.",
+    "Desidera analizzare un assieme CAD o un grafo di calcolo Flow?",
+    "Ingegnere Capo della Ricerca a disposizione. Quale analisi vogliamo avviare?",
+  ],
+  pt: [
+    "Bem-vindo ao Laboratório de P&D AluCAD OS. Como posso apoiar seu projeto hoje?",
+    "Pronto para certificar conforme normas ISO/DIN.",
+    "Vamos inspecionar tolerâncias, geometria de engrenagens ou tensões.",
+    "Deseja analisar uma montagem CAD ou um fluxo de cálculo?",
+    "Engenheiro Chefe de Pesquisa a postos. Qual desafio técnico resolveremos?",
+  ],
+  ru: [
+    "Добро пожаловать в лабораторию НИОКР AluCAD OS. Чем могу помочь вашему проекту?",
+    "Готов верифицировать расчеты по стандартам ISO/DIN.",
+    "Проведем аудит допусков, геометрии зубчатых передач или напряжений.",
+    "Хотите проанализировать CAD-сборку или граф Flow Engine?",
+    "Главный инженер-исследователь на связи. Какую задачу решаем?",
+  ],
+  zh: [
+    "欢迎访问 AluCAD OS 工程研发实验室。今天能为您的工程设计提供什么协助？",
+    "已就绪根据 ISO/DIN 标准进行求解与验证。",
+    "让我们对公差匹配、齿轮啮合几何或结构应力进行合规审计。",
+    "您希望分析 3D CAD 装配体还是 Flow Engine 计算逻辑流？",
+    "首席研发工程师已上线。我们来解决哪项工程挑战？",
+  ],
+  ja: [
+    "AluCAD OS R&D研究所へようこそ。どのような設計課題をサポートいたしましょうか？",
+    "ISO/DIN規格に準拠した計算・検証が可能です。",
+    "公差、歯車幾何諸元、構造応力の適合性チェックを行いましょう。",
+    "3D CADアセンブリまたはFlowグラフの解析を開始しますか？",
+    "主任研究エンジニアが待機しています。どの工学課題を解決しましょうか？",
+  ],
+  ko: [
+    "AluCAD OS R&D 연구소에 오신 것을 환영합니다. 엔지니어링 설계를 어떻게 도와드릴까요?",
+    "ISO/DIN 표준에 따른 엄격한 검증이 준비되어 있습니다。",
+    "공차, 기어 형상 치수, 구조 응력 해석을 검토해 드립니다.",
+    "CAD 어셈블리 또는 Flow Engine 계산 그래프를 분석하시겠습니까?",
+    "수석 연구 엔지니어 대기 중입니다. 어떤 공학 과제를 해결할까요?",
+  ],
+  ar: [
+    "مرحباً بكم في مختبر الأبحاث والتطوير AluCAD OS. كيف يمكنني مساعدة تصميمكم اليوم؟",
+    "جاهز للتحقق والحل الحسابي وفق معايير ISO/DIN.",
+    "دعنا ندقق التفاوتات، هندسة التروس، أو الإجهادات الإنشائية.",
+    "هل ترغب في تحليل تجميع CAD ثلاثي الأبعاد أو مخطط Flow Engine؟",
+    "كبير مهندسي الأبحاث في الخدمة. ما المسألة الهندسية التي سنحلها؟",
+  ],
 };
 
 const hexagonsData = [
@@ -59,15 +126,75 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
   const { language } = useI18nStore();
   const strings = getCopilotStrings(language);
   const { isOpen, setIsOpen, greetingText, setGreetingText } = useCopilotStore();
+  const pathname = usePathname() || '';
+  const windows = useOSStore((s) => s.windows);
+  const activeWindowId = useOSStore((s) => s.activeWindowId);
 
+  const isEngineeringSolver = useMemo(() => {
+    const labSlugs = [
+      'biology-genetics',
+      'stem-codex',
+      'chemistry-reactions',
+      'chemistry-lab',
+      'periodic-table',
+      'matrix-screensaver',
+      'screensaver',
+    ];
 
-  const [messages, setMessages] = useState<Message[]>([]);
+    const cleanPath = pathname.replace(/^\/|\/$/g, '');
+    const pathParts = cleanPath.split('/');
+    const firstSegment = pathParts[0] || '';
+    const slugFromCalculators = (firstSegment === 'calculators' || firstSegment === 'calculator') ? pathParts[1] : null;
+    const targetSlug = slugFromCalculators || firstSegment;
+
+    const activeWin = windows.find((w) => w.id === activeWindowId);
+    const activeType = activeWin?.type;
+
+    if (
+      labSlugs.includes(targetSlug) ||
+      (activeType && labSlugs.includes(activeType)) ||
+      pathname.includes('biology') ||
+      pathname.includes('screensaver')
+    ) {
+      return false;
+    }
+
+    const resolvedModuleKey = (MODULE_ALIASES as Record<string, string>)[targetSlug] || targetSlug;
+    const moduleDef = MODULE_REGISTRY[resolvedModuleKey];
+    if (moduleDef) {
+      return ['mechanical', 'manufacturing', 'civil', 'electrical'].includes(moduleDef.category);
+    }
+
+    if (activeType) {
+      const activeDef = MODULE_REGISTRY[activeType];
+      if (activeDef && ['mechanical', 'manufacturing', 'civil', 'electrical'].includes(activeDef.category)) {
+        return true;
+      }
+    }
+
+    const engineeringKeywords = [
+      'mechanical', 'manufacturing', 'civil', 'electrical',
+      'beam', 'bolt', 'torque', 'bearing', 'gear', 'welding', 'weld', 'stress', 'strain',
+      'deflection', 'shaft', 'keyway', 'press-fit', 'oring', 'o-ring', 'tolerance', 'thermal',
+      'fluid', 'pump', 'fatigue', 'buckling', 'spring', 'vibration', 'hvac', 'pipe',
+      'profile', 'sheet-metal', 'concrete', 'ohms-law', 'voltage-drop', 'hydrostatic', 'aerospace'
+    ];
+    return engineeringKeywords.some((kw) => targetSlug.toLowerCase().includes(kw));
+  }, [pathname, windows, activeWindowId]);
+
+  // Conversation lives in the shared AeGiS store (same thread as the sidebar bubble).
+  const router = useRouter();
+  const storedMessages = useAegisStore((s) => s.messages);
+  const setMessages = useAegisStore((s) => s.setMessages);
+  const isTyping = useAegisStore((s) => s.isThinking);
+  const setIsTyping = useAegisStore((s) => s.setThinking);
+  const thinkingSteps = useAegisStore((s) => s.thinkingSteps);
+  const sendToAegis = useAegisStore((s) => s.send);
+  const resetAegis = useAegisStore((s) => s.reset);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [thinkingSteps, setThinkingSteps] = useState<string[]>([]);
 
-  // Synchronize local isTyping with global copilot store isThinking
+  // Keep the legacy copilot flag (mascot animations elsewhere) in sync.
   const setIsThinking = useCopilotStore((s) => s.setIsThinking);
   useEffect(() => {
     setIsThinking(isTyping);
@@ -80,7 +207,6 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
   }>({ type: 'none', score: 0, triviaIndex: 0 });
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const copilotEngine = useRef(new EngineeringCopilot());
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -92,16 +218,10 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome-1',
-        sender: 'ai',
-        text: getCopilotStrings(language).welcome,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ]);
-  }, [language]);
+  // Welcome line is virtual (not stored) so it follows the UI language.
+  const messages: Message[] = storedMessages.length
+    ? storedMessages
+    : [{ id: 'welcome-1', sender: 'ai', text: getCopilotStrings(language).welcome, timestamp: '' }];
 
   useEffect(() => {
     if (embedded || isOpen) {
@@ -111,17 +231,9 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
 
     const triggerGreeting = () => {
       const activeLang = language || 'en';
-      const localeStrings = getCopilotStrings(activeLang);
-      const isJoke = Math.random() < 0.6;
-
-      if (isJoke && localeStrings.jokes.length > 0) {
-        const randomJoke = localeStrings.jokes[Math.floor(Math.random() * localeStrings.jokes.length)];
-        setGreetingText(`🎭 ${randomJoke}`);
-      } else {
-        const greetingList = LOCALIZED_GREETINGS[activeLang] || LOCALIZED_GREETINGS['en'];
-        const randomGreeting = greetingList[Math.floor(Math.random() * greetingList.length)];
-        setGreetingText(`🤖 ${randomGreeting}`);
-      }
+      const greetingList = LOCALIZED_GREETINGS[activeLang] || LOCALIZED_GREETINGS['en'];
+      const randomGreeting = greetingList[Math.floor(Math.random() * greetingList.length)];
+      setGreetingText(randomGreeting);
 
       setTimeout(() => {
         setGreetingText(null);
@@ -135,7 +247,7 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, [embedded, isOpen, language, setGreetingText]);
+  }, [embedded, isOpen, language, setGreetingText, isEngineeringSolver]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -335,177 +447,51 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
     }, 600);
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userText = input.trim();
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    const userMsg: Message = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      text: userText,
-      timestamp: timeStr
-    };
-
-    setMessages(prev => [...prev, userMsg]);
+  const handleSend = async (override?: string) => {
+    // `override` lets other surfaces (home ask box, open-copilot event) send a prompt
+    // directly; click handlers may pass an event object, so only accept strings.
+    const raw = typeof override === 'string' ? override : input;
+    if (!raw.trim()) return;
     setInput('');
-    setIsTyping(true);
-    setThinkingSteps([]);
-
-    const steps = strings.thinkingSteps;
-    
-    let stepIndex = 0;
-    const interval = setInterval(() => {
-      if (stepIndex < steps.length) {
-        setThinkingSteps(prev => [...prev, steps[stepIndex]]);
-        stepIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 400);
-
-    try {
-      const historyPayload = messages
-        .filter(m => m.id !== 'welcome-1')
-        .map(m => ({
-          role: m.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }]
-        }));
-
-      let response = await fetch('/api/ai/copilot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: userText,
-          context: window.location.pathname,
-          history: historyPayload,
-          language,
-        })
-      }).catch(async (err) => {
-        console.warn("[Copilot Overlay] Primary API route failed, trying PHP fallback:", err);
-        return await fetch('/api/ai/copilot/index.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: userText,
-            context: window.location.pathname,
-            history: historyPayload,
-            language,
-          })
-        });
-      });
-
-      if (response.status === 404) {
-        console.warn("[Copilot Overlay] Primary API route returned 404, trying PHP fallback.");
-        response = await fetch('/api/ai/copilot/index.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: userText,
-            context: window.location.pathname,
-            history: historyPayload,
-            language,
-          })
-        });
-      }
-
-      if (!response.ok) {
-        throw new Error(`API error ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      clearInterval(interval);
-      setThinkingSteps(prev => [...prev, "Generative content resolved successfully."]);
-      
-      setTimeout(() => {
-        const aiMsg: Message = {
-          id: `ai-${Date.now()}`,
-          sender: 'ai',
-          text: data.answer,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          intent: {
-            actionUrl: data.actionUrl,
-            actionLabel: data.actionLabel,
-            showSupportButton: data.showSupportButton,
-            assumptionsMade: []
-          }
-        };
-        setMessages(prev => [...prev, aiMsg]);
-        setIsTyping(false);
-      }, 400);
-
-    } catch (err) {
-      clearInterval(interval);
-      setThinkingSteps((prev) => [...prev, strings.fallbackQuotaSteps[0]]);
-
-      setTimeout(() => {
-        try {
-          const parsedIntent = copilotEngine.current.parseAndAssume(
-            userText,
-            window.location.pathname,
-            getCopilotEngineLocale(language),
-          );
-          
-          let replyText = '';
-          if (parsedIntent.replyOverride) {
-            replyText = parsedIntent.replyOverride;
-          } else {
-            replyText = `I analyzed your parameters. `;
-            if (parsedIntent.materialType && parsedIntent.materialType !== 'unknown') {
-              replyText += `Detected Material: **${parsedIntent.materialType.toUpperCase()}** `;
-              if (parsedIntent.alloyOrGrade) {
-                replyText += `(${parsedIntent.alloyOrGrade}). `;
-              } else {
-                replyText += `. `;
-              }
-            }
-            
-            if (parsedIntent.forceApplied) {
-              replyText += `Target Load: **${parsedIntent.forceApplied} N**. `;
-            }
-            
-            if (parsedIntent.assumptionsMade && parsedIntent.assumptionsMade.length > 0) {
-              replyText += `\n\n**Smart Assumptions Applied:**\n` + parsedIntent.assumptionsMade.map(a => `• ${a}`).join('\n');
-            } else {
-          replyText += `\n\nMethodology adheres strictly to established structural boundary conditions. Ready for solver mapping.`;
-            }
-          }
-
-          const aiMsg: Message = {
-            id: `ai-${Date.now()}`,
-            sender: 'ai',
-            text: replyText,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            intent: parsedIntent
-          };
-
-          setMessages(prev => [...prev, aiMsg]);
-        } catch (localErr) {
-          const errorMsg: Message = {
-            id: `ai-err-${Date.now()}`,
-            sender: 'ai',
-            text: strings.fallbackQuotaSteps[strings.fallbackQuotaSteps.length - 1] || "Error processing request.",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          };
-          setMessages(prev => [...prev, errorMsg]);
-        } finally {
-          setIsTyping(false);
-        }
-      }, 1000);
-    }
+    playMascotChirp();
+    await sendToAegis(raw, {
+      language,
+      pathname: window.location.pathname,
+      thinkingSteps: strings.thinkingSteps,
+      navigate: (href) => router.push(href),
+    });
   };
 
   const handlePreset = (promptText: string) => {
     setInput(promptText);
   };
+
+  // `alucalc:open-copilot` may carry { prompt, send }: prefill the input, or send it
+  // once the panel is open (handled by the pending-prompt effect below).
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (embedded) return;
+    const onOpen = (e: Event) => {
+      setIsOpen(true);
+      const detail = (e as CustomEvent<{ prompt?: unknown; send?: unknown } | null>).detail;
+      const prompt = typeof detail?.prompt === 'string' ? detail.prompt.trim().slice(0, 2000) : '';
+      if (!prompt) return;
+      if (detail?.send === true) setPendingPrompt(prompt);
+      else setInput(prompt);
+    };
+    window.addEventListener('alucalc:open-copilot', onOpen);
+    return () => window.removeEventListener('alucalc:open-copilot', onOpen);
+  }, [embedded, setIsOpen]);
+
+  useEffect(() => {
+    if (!pendingPrompt || !isOpen || isTyping) return;
+    const text = pendingPrompt;
+    setPendingPrompt(null);
+    void handleSend(text);
+    // handleSend is recreated every render; this effect only reacts to a new prompt.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPrompt, isOpen, isTyping]);
 
   useEffect(() => {
     if (embedded) return;
@@ -524,10 +510,11 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
   }, [embedded, isOpen, setIsOpen]);
 
   if (!mounted) return null;
+  if (!embedded && pathname.includes('/widget')) return null;
 
   const panelClass = embedded
-    ? 'relative w-full h-full z-0 glass-hud-panel border-0 shadow-none flex flex-col rounded-none'
-    : `fixed inset-x-3 bottom-20 top-16 sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-[100px] sm:w-[400px] sm:h-[540px] z-[9991] glass-hud-panel bg-[#070c16]/98 backdrop-blur-2xl border border-[#00e5ff]/40 shadow-2xl flex flex-col rounded-2xl transition-all duration-300 ease-out transform ${
+    ? 'relative w-full h-full z-0 border-0 shadow-none flex flex-col rounded-none'
+    : `fixed inset-x-3 bottom-20 top-16 sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-[100px] sm:w-[400px] sm:h-[540px] sm:max-h-[calc(100dvh-120px)] z-[9991] bg-[var(--bg-1)] border border-[var(--line)] flex flex-col rounded-[var(--radius-m)] transition-all duration-300 ease-out transform ${
         isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'
       }`;
 
@@ -537,21 +524,23 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       className={panelClass}
     >
       {!embedded && (
-        <div className="hidden sm:block absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#00e5ff]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
+        <div className="hidden sm:block absolute bottom-[-10px] right-[86px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[var(--cyan)]/30 filter drop-shadow-[0_4px_6px_rgba(0,229,255,0.25)]" />
       )}
 
-      <div className={`flex items-center justify-between px-5 py-4 border-b border-white/10 bg-black/40 ${embedded ? '' : 'rounded-t-2xl'}`}>
+      <div className={`flex items-center justify-between px-5 py-4 border-b border-[var(--line)] bg-[var(--bg-0)] ${embedded ? '' : 'rounded-t-[var(--radius-m)]'}`}>
         <div className="flex items-center gap-2.5">
-          <AegisMascot size={34} variant="face" pose={isTyping ? 'calculation' : 'auto'} />
+          <AegisMascot size={40} variant="face" pose={isTyping ? 'thinking' : 'idle'} />
           <div>
-            <h3 className="text-xs font-mono font-black text-white tracking-[0.15em] uppercase">{strings.title}</h3>
-            <p className="text-[9px] text-[#00e5ff]/60 font-mono tracking-widest">{strings.subtitle}</p>
+            <h3 className="text-xs font-mono font-black text-[var(--ink)] tracking-[0.15em] uppercase">{strings.title}</h3>
+            <p className="text-[9px] text-[var(--muted)] font-mono tracking-wide">
+              {language === 'tr' ? 'Baş Araştırma Mühendisi · Text-to-CAD' : language === 'en' ? 'Chief Research Engineer · Text-to-CAD' : strings.subtitle}
+            </p>
           </div>
         </div>
         {!embedded && (
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--ink)] rounded-lg hover:bg-[var(--hover)] transition-colors"
           >
             <X size={18} />
           </button>
@@ -559,29 +548,69 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       </div>
 
       {/* Quick Presets Carousel with Games & Jokes */}
-      <div className="px-4 py-2.5 border-b border-white/5 bg-white/[0.01] flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
-        <span className="text-[8px] font-mono font-bold text-slate-500 uppercase tracking-wider shrink-0">{strings.promptsLabel}</span>
+      <div className="px-4 py-2.5 border-b border-[var(--line)] bg-[var(--bg-1)] flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+        <span className="text-[8px] font-mono font-bold text-[var(--muted)] uppercase tracking-wider shrink-0">{strings.promptsLabel}</span>
+        {([
+          ['/3d ', '🧊', language === 'tr' ? '3D model' : '3D model'],
+          ['/2d ', '📐', language === 'tr' ? '2D çizim' : '2D drawing'],
+          ['/flow ', '🔀', language === 'tr' ? 'Flow akışı' : 'Flow graph'],
+        ] as const).map(([cmd, icon, label]) => (
+          <button
+            key={cmd}
+            type="button"
+            onClick={() => setInput((v) => (v.startsWith('/') ? cmd + v.replace(/^\/\S*\s*/, '') : cmd + v))}
+            title={language === 'tr' ? `Text-to-CAD: "${cmd.trim()} …" ile yaz, AeGiS ilgili motora gönderir` : `Text-to-CAD: type "${cmd.trim()} …" and AeGiS routes it to the generator`}
+            className="text-[9px] font-mono bg-[var(--cyan)]/10 hover:bg-[var(--cyan)]/20 text-[var(--cyan)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--cyan)]/30 transition-colors shrink-0"
+          >
+            {icon} {label}
+          </button>
+        ))}
+        <div className="h-4 w-[1px] bg-white/10 shrink-0" />
+        {isEngineeringSolver ? (
+          <>
+            <button
+              onClick={() => handlePreset("Explain this standard")}
+              className="text-[9px] font-mono bg-cyan-950/40 hover:bg-cyan-900/60 text-[var(--cyan)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--cyan)]/20 transition-colors shrink-0"
+            >
+              📐 Explain this standard
+            </button>
+            <button
+              onClick={() => handlePreset("Check limits")}
+              className="text-[9px] font-mono bg-amber-950/40 hover:bg-amber-900/60 text-amber-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-amber-500/20 transition-colors shrink-0"
+            >
+              ⚠️ Check limits
+            </button>
+            <button
+              onClick={() => handlePreset("PASS/FAIL rationale")}
+              className="text-[9px] font-mono bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-emerald-500/20 transition-colors shrink-0"
+            >
+              ✅ PASS/FAIL rationale
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => handlePreset("Explain standard")}
+              className="text-[9px] font-mono bg-cyan-950/40 hover:bg-cyan-900/60 text-[var(--cyan)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--cyan)]/20 transition-colors shrink-0"
+            >
+              📐 Explain standard
+            </button>
+            <button
+              onClick={() => handlePreset("Audit calculation")}
+              className="text-[9px] font-mono bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-purple-500/20 transition-colors shrink-0"
+            >
+              🔍 Audit calculation
+            </button>
+            <button
+              onClick={() => handlePreset("Check limits")}
+              className="text-[9px] font-mono bg-amber-950/40 hover:bg-amber-900/60 text-amber-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-amber-500/20 transition-colors shrink-0"
+            >
+              ⚠️ Check limits
+            </button>
+          </>
+        )}
         <button
-          onClick={() => handleGameAction('game_menu')}
-          className="text-[9px] font-mono bg-cyan-950/40 hover:bg-cyan-900/60 text-[#00e5ff] px-2.5 py-1 rounded-full whitespace-nowrap border border-[#00e5ff]/20 transition-colors flex items-center gap-1 shrink-0"
-        >
-          🎮 {strings.playGame}
-        </button>
-        <button
-          onClick={handleJoke}
-          className="text-[9px] font-mono bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-purple-500/20 transition-colors shrink-0"
-        >
-          🎭 {strings.tellJoke}
-        </button>
-        <button
-          onClick={() => setMessages([
-            {
-              id: 'welcome-1',
-              sender: 'ai',
-              text: strings.welcome,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }
-          ])}
+          onClick={() => resetAegis()}
           className="text-[9px] font-mono bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-rose-500/20 transition-colors shrink-0"
         >
           🗑️ {strings.clear}
@@ -589,19 +618,19 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
         <div className="h-4 w-[1px] bg-white/10 shrink-0" />
         <button
           onClick={() => handlePreset("Verify safety factor for S235 steel under 5000N load")}
-          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+          className="text-[9px] font-mono bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--alu)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--line)] transition-colors shrink-0"
         >
           {strings.presetS235}
         </button>
         <button
           onClick={() => handlePreset("Optimize dimensions for minimum deflection")}
-          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+          className="text-[9px] font-mono bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--alu)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--line)] transition-colors shrink-0"
         >
           {strings.presetDeflection}
         </button>
         <button
           onClick={() => handlePreset("What is this page and how does it work?")}
-          className="text-[9px] font-mono bg-white/5 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-white/5 transition-colors shrink-0"
+          className="text-[9px] font-mono bg-[var(--bg-2)] hover:bg-[var(--hover)] text-[var(--alu)] px-2.5 py-1 rounded-full whitespace-nowrap border border-[var(--line)] transition-colors shrink-0"
         >
           {strings.presetGuide}
         </button>
@@ -615,24 +644,31 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
             className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ai' && (
-              <div className="w-7 h-7 rounded-lg bg-[#00e5ff]/10 border border-[#00e5ff]/30 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 overflow-hidden">
-                <AegisMascot size={22} variant="face" pose="auto" interactive={false} />
+              <div className="w-7 h-7 rounded-lg bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 flex items-center justify-center text-[var(--cyan)] shrink-0 mt-0.5 overflow-hidden">
+                <AegisMascot size={24} variant="face" pose="idle" interactive={false} />
               </div>
             )}
             <div
-              className={`max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${msg.sender === 'user' ? 'bg-[#00e5ff] text-slate-950 font-medium rounded-tr-none' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none font-mono'}`}
+              className={`max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${msg.sender === 'user' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] font-medium rounded-tr-none' : 'bg-[var(--bg-2)] border border-[var(--line)] text-[var(--ink)] rounded-tl-none font-mono'}`}
             >
               <div className="whitespace-pre-wrap word-break">
                 {msg.text.split('**').map((part, index) => 
-                  index % 2 === 1 ? <strong key={index} className={msg.sender === 'user' ? 'font-black' : (msg.intent?.showSupportButton ? 'text-red-400' : 'text-[#00e5ff]')}>{part}</strong> : part
+                  index % 2 === 1 ? <strong key={index} className={msg.sender === 'user' ? 'font-black' : (msg.intent?.showSupportButton ? 'text-red-400' : 'text-[var(--cyan)]')}>{part}</strong> : part
                 )}
               </div>
 
               {msg.intent?.actionUrl && (
-                <div className="mt-3 pt-2 border-t border-white/10">
+                <div className="mt-3 pt-2 border-t border-[var(--line)]">
                   <a
                     href={msg.intent.actionUrl}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all shadow-md ${msg.intent.showSupportButton ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-[#00e5ff] text-slate-950 hover:bg-[#00e5ff]/90'}`}
+                    onClick={(e) => {
+                      const href = msg.intent?.actionUrl;
+                      if (href && href.startsWith('/')) {
+                        e.preventDefault();
+                        router.push(href);
+                      }
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition-all shadow-md ${msg.intent.showSupportButton ? 'bg-[var(--cyan)] text-[var(--accent-ink)] hover:bg-red-600' : 'bg-[var(--cyan)] text-[var(--accent-ink)] hover:bg-[var(--cyan)]/90'}`}
                   >
                     {msg.intent.showSupportButton && <AlertTriangle size={12} />}
                     <span>{msg.intent.actionLabel || strings.openWorkspace}</span>
@@ -642,14 +678,14 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
               )}
 
               {msg.intent && !msg.intent.replyOverride && (
-                <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1">
+                <div className="mt-2 pt-2 border-t border-[var(--line)] flex flex-wrap gap-1">
                   {msg.intent.materialType && (
-                    <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5 uppercase">
+                    <span className="text-[8px] bg-[var(--bg-2)] text-[var(--muted)] px-1.5 py-0.5 rounded border border-[var(--line)] uppercase">
                       Mat: {msg.intent.materialType}
                     </span>
                   )}
                   {msg.intent.forceApplied && (
-                    <span className="text-[8px] bg-white/5 text-slate-400 px-1.5 py-0.5 rounded border border-white/5">
+                    <span className="text-[8px] bg-[var(--bg-2)] text-[var(--muted)] px-1.5 py-0.5 rounded border border-[var(--line)]">
                       Load: {msg.intent.forceApplied}N
                     </span>
                   )}
@@ -657,12 +693,12 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
               )}
 
               {msg.gameOptions && (
-                <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-2">
+                <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--line)] pt-2">
                   {msg.gameOptions.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => handleGameAction(opt.value)}
-                      className="px-2.5 py-1.5 bg-[#00e5ff]/10 hover:bg-[#00e5ff]/25 text-[#00e5ff] border border-[#00e5ff]/20 rounded-lg text-[10px] font-mono transition-all active:scale-95 flex items-center gap-1"
+                      className="px-2.5 py-1.5 bg-[var(--cyan)]/10 hover:bg-[var(--cyan)]/25 text-[var(--cyan)] border border-[var(--cyan)]/20 rounded-lg text-[10px] font-mono transition-all active:scale-95 flex items-center gap-1"
                     >
                       {opt.label}
                     </button>
@@ -670,12 +706,12 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
                 </div>
               )}
 
-              <div suppressHydrationWarning className={`text-[8px] mt-1.5 text-right ${msg.sender === 'user' ? 'text-slate-950/60' : 'text-slate-500'}`}>
+              <div suppressHydrationWarning className={`text-[8px] mt-1.5 text-right ${msg.sender === 'user' ? 'text-[var(--accent-ink)]/60' : 'text-[var(--muted)]'}`}>
                 {msg.timestamp}
               </div>
             </div>
             {msg.sender === 'user' && (
-              <div className="w-6 h-6 rounded-md bg-slate-800 border border-white/10 flex items-center justify-center text-slate-300 shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-md bg-[var(--bg-3)] border border-[var(--line)] flex items-center justify-center text-[var(--alu)] shrink-0 mt-0.5">
                 <User size={12} />
               </div>
             )}
@@ -684,25 +720,25 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
 
         {isTyping && (
           <div className="flex gap-3 justify-start items-start">
-            <div className="w-7 h-7 rounded-lg bg-[#00e5ff]/10 border border-[#00e5ff]/30 flex items-center justify-center text-[#00e5ff] shrink-0 mt-0.5 overflow-hidden">
-              <AegisMascot size={22} variant="face" pose="calculation" interactive={false} />
+            <div className="w-7 h-7 rounded-lg bg-[var(--cyan)]/10 border border-[var(--cyan)]/30 flex items-center justify-center text-[var(--cyan)] shrink-0 mt-0.5 overflow-hidden">
+              <AegisMascot size={24} variant="face" pose="thinking" interactive={false} />
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-[10px] font-mono text-[#00e5ff]/70 max-w-[85%] rounded-tl-none space-y-1.5 flex flex-col shadow-lg">
-              <div className="flex items-center gap-1.5 text-xs text-white">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-ping" />
+            <div className="bg-[var(--bg-2)] border border-[var(--line)] rounded-xl px-3.5 py-3 text-[10px] font-mono text-[var(--cyan)]/70 max-w-[85%] rounded-tl-none space-y-1.5 flex flex-col shadow-lg">
+              <div className="flex items-center gap-1.5 text-xs text-[var(--ink)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] animate-ping" />
                 <span>{strings.reasoningStream}</span>
               </div>
               {thinkingSteps.map((step, idx) => (
                 <div key={idx} className="flex items-center gap-1.5 opacity-80 animate-fade-in">
-                  <span className="text-[#00e5ff]">›</span>
+                  <span className="text-[var(--cyan)]">›</span>
                   <span>{step}</span>
                 </div>
               ))}
               {thinkingSteps.length === 0 && (
                 <div className="flex gap-1 items-center mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00e5ff] animate-bounce [animation-delay:0.4s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] animate-bounce" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--cyan)] animate-bounce [animation-delay:0.4s]" />
                 </div>
               )}
             </div>
@@ -712,27 +748,27 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       </div>
 
       {/* Input Area */}
-      <div className={`p-4 border-t border-white/10 bg-black/40 safe-area-pb ${embedded ? '' : 'rounded-b-2xl'}`}>
+      <div className={`p-4 border-t border-[var(--line)] bg-[var(--bg-0)] safe-area-pb ${embedded ? '' : 'rounded-b-[var(--radius-m)]'}`}>
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder={strings.placeholder}
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00e5ff]/50 font-mono transition-colors"
+            placeholder={language === 'tr' ? 'Soru sor ya da “/3d 80x80 braket” yaz…' : language === 'en' ? 'Ask, or type “/3d 80x80 bracket”…' : strings.placeholder}
+            className="flex-1 bg-[var(--bg-2)] border border-[var(--line)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--cyan)]/50 font-mono transition-colors"
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim()}
-            className="bg-[#00e5ff] hover:bg-[#00e5ff]/80 disabled:opacity-40 disabled:hover:bg-[#00e5ff] text-slate-950 rounded-xl px-3.5 flex items-center justify-center transition-all active:scale-95"
+            className="bg-[var(--cyan)] hover:bg-[var(--cyan)]/80 disabled:opacity-40 disabled:hover:bg-[var(--cyan)] text-[var(--accent-ink)] rounded-xl px-3.5 flex items-center justify-center transition-all active:scale-95"
           >
             <Send size={14} />
           </button>
         </div>
         <div className="flex items-center justify-between mt-2 px-1">
-          <span className="text-[8px] font-mono text-slate-500">{strings.pressEnter}</span>
-          <span className="text-[8px] font-mono text-[#00e5ff]/60 flex items-center gap-1">
+          <span className="text-[8px] font-mono text-[var(--muted)]">{strings.pressEnter}</span>
+          <span className="text-[8px] font-mono text-[var(--cyan)]/60 flex items-center gap-1">
             <CheckCircle size={8} /> {strings.activeGovernance}
           </span>
         </div>
@@ -742,7 +778,7 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
 
   if (embedded) {
     return (
-      <div className="absolute inset-0 flex flex-col bg-[#05080e] overflow-hidden">
+      <div className="absolute inset-0 flex flex-col bg-[var(--bg-0)] overflow-hidden">
         {chatPanel}
       </div>
     );
@@ -753,7 +789,7 @@ export const AICopilotOverlay: React.FC<AICopilotOverlayProps> = ({ embedded = f
       {/* ═══ CLICK-OUTSIDE BACKDROP TO DISPERSE ═══ */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9990] bg-black/70 sm:bg-black/20 backdrop-blur-sm sm:backdrop-blur-[2px] cursor-default"
+          className="fixed inset-0 z-[9990] bg-black/40 sm:bg-transparent cursor-default"
           aria-hidden="true"
           onPointerDown={() => setIsOpen(false)}
         />

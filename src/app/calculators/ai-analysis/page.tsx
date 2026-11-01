@@ -149,7 +149,7 @@ export default function AIAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020408] text-[#E8EDF5] selection:bg-[#00e5ff]/30 relative overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[var(--bg-0)] text-[var(--ink)] selection:bg-[var(--cyan)]/30 relative overflow-x-hidden font-sans">
       <div className="fixed inset-0 z-0 opacity-5 pointer-events-none"
            style={{ backgroundImage: 'radial-gradient(#00e5ff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
@@ -157,7 +157,7 @@ export default function AIAnalysisPage() {
         
         {/* Navigation */}
         <div className="mb-8 flex items-center justify-between">
-          <Link href="/academy?tab=calculators" className="flex items-center gap-2 text-xs font-mono uppercase text-white/40 hover:text-[#00e5ff] transition-all">
+          <Link href="/academy?tab=calculators" className="flex items-center gap-2 text-xs font-mono uppercase text-white/40 hover:text-[var(--cyan)] transition-all">
             <ArrowLeft size={14} /> {nav.calculators}
           </Link>
           <div className="flex items-center gap-3">
@@ -169,10 +169,10 @@ export default function AIAnalysisPage() {
         {/* Header */}
         <header className="mb-12 space-y-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-[#00e5ff]" />
-            <span className="text-[10px] font-mono tracking-[0.3em] text-[#00e5ff] uppercase">Cognitive Engineering Engine</span>
+            <Sparkles size={16} className="text-[var(--cyan)]" />
+            <span className="text-[10px] font-mono tracking-[0.3em] text-[var(--cyan)] uppercase">Cognitive Engineering Engine</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-white uppercase">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-white uppercase">
             AI Calculation Audit Workspace
           </h1>
           <p className="text-xs sm:text-sm text-white/50 leading-relaxed max-w-3xl">
@@ -184,14 +184,14 @@ export default function AIAnalysisPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Panel: Selector + Inputs */}
-          <div className="lg:col-span-5 space-y-6 bg-[#0A1628]/40 border border-white/5 p-6 rounded-2xl backdrop-blur-xl">
+          <div className="lg:col-span-5 space-y-6 bg-[var(--bg-2)]/40 border border-white/5 p-6 rounded-2xl">
             <div>
               <label className="block text-[10px] font-mono uppercase text-white/40 mb-2">1. Select Engineering Module</label>
               <select 
                 value={calcId} 
                 onChange={(e) => setCalcId(e.target.value)}
                 disabled={isRunning}
-                className="w-full bg-[#0a1018] border border-white/10 focus:border-[#00e5ff]/50 outline-none rounded-xl px-3.5 py-3 text-xs text-white font-mono"
+                className="w-full bg-[var(--bg-1)] border border-white/10 focus:border-[var(--cyan)]/50 outline-none rounded-xl px-3.5 py-3 text-xs text-white font-mono"
               >
                 <option value="bolt-torque-calc">Bolt Tightening Torque (T = K·F·d)</option>
                 <option value="bearing-life-calc">ISO 281 Bearing Rating Life (Lnm)</option>
@@ -242,7 +242,7 @@ export default function AIAnalysisPage() {
                     </div>
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">Life Exponent p</label>
-                      <select value={inputs.p} onChange={(e) => setInputs({...inputs, p: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.p} onChange={(e) => setInputs({...inputs, p: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="3">3.0 (Ball Bearings)</option>
                         <option value="3.3333">3.33 (Roller Bearings)</option>
                       </select>
@@ -251,7 +251,7 @@ export default function AIAnalysisPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">a1: Reliability</label>
-                      <select value={inputs.a1} onChange={(e) => setInputs({...inputs, a1: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.a1} onChange={(e) => setInputs({...inputs, a1: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="1.0">90% (a1=1.00)</option>
                         <option value="0.62">95% (a1=0.62)</option>
                         <option value="0.21">99% (a1=0.21)</option>
@@ -259,7 +259,7 @@ export default function AIAnalysisPage() {
                     </div>
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">eC: Contamination</label>
-                      <select value={inputs.eC} onChange={(e) => setInputs({...inputs, eC: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.eC} onChange={(e) => setInputs({...inputs, eC: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="0.8">0.8 (Ultra Clean)</option>
                         <option value="0.5">0.5 (Clean)</option>
                         <option value="0.3">0.3 (Typical)</option>
@@ -279,7 +279,7 @@ export default function AIAnalysisPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">Bolt Grade</label>
-                      <select value={inputs.grade} onChange={(e) => setInputs({...inputs, grade: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.grade} onChange={(e) => setInputs({...inputs, grade: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="8.8">Grade 8.8</option>
                         <option value="10.9">Grade 10.9</option>
                         <option value="12.9">Grade 12.9</option>
@@ -287,7 +287,7 @@ export default function AIAnalysisPage() {
                     </div>
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">Bolt Size</label>
-                      <select value={inputs.size} onChange={(e) => setInputs({...inputs, size: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.size} onChange={(e) => setInputs({...inputs, size: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="M6">M6</option>
                         <option value="M8">M8</option>
                         <option value="M10">M10</option>
@@ -324,7 +324,7 @@ export default function AIAnalysisPage() {
                     </div>
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">Material Steel</label>
-                      <select value={inputs.material} onChange={(e) => setInputs({...inputs, material: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.material} onChange={(e) => setInputs({...inputs, material: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="1045">AISI 1045</option>
                         <option value="4140">AISI 4140</option>
                         <option value="4340">AISI 4340</option>
@@ -344,7 +344,7 @@ export default function AIAnalysisPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[9px] font-mono text-white/50 uppercase">Surface ka</label>
-                      <select value={inputs.ka} onChange={(e) => setInputs({...inputs, ka: e.target.value})} className="w-full bg-[#0a1018] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
+                      <select value={inputs.ka} onChange={(e) => setInputs({...inputs, ka: e.target.value})} className="w-full bg-[var(--bg-1)] border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white">
                         <option value="0.9">Ground (0.9)</option>
                         <option value="0.8">Machined (0.8)</option>
                         <option value="0.7">Hot-Rolled (0.7)</option>
@@ -361,13 +361,13 @@ export default function AIAnalysisPage() {
 
             <div className="pt-4 border-t border-white/5 flex items-baseline justify-between text-xs font-mono">
               <span className="text-white/40">Computed Output:</span>
-              <span className="text-[#00e5ff] font-bold text-base">{calculatedResult}</span>
+              <span className="text-[var(--cyan)] font-bold text-base">{calculatedResult}</span>
             </div>
 
             <button
               onClick={handleRunAnalysis}
               disabled={isRunning}
-              className="w-full py-4 bg-[#00e5ff] hover:bg-[#00e5ff]/80 text-black font-extrabold rounded-xl text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.25)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              className="w-full py-4 bg-[var(--cyan)] hover:bg-[var(--cyan)]/80 text-black font-extrabold rounded-xl text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
             >
               {isRunning ? (
                 <>
@@ -426,7 +426,7 @@ export default function AIAnalysisPage() {
 
         {/* Footer */}
         <footer className="mt-24 pt-12 border-t border-white/5 text-center text-[10px] font-mono text-white/20">
-          <p>© 2026 AluCalc OS — Sovereign Auditing System. Safe terminal environment.</p>
+          <p>© 2026 AluCAD OS — Sovereign Auditing System. Safe terminal environment.</p>
         </footer>
 
       </div>

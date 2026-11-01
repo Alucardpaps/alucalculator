@@ -10,16 +10,30 @@ import {
 } from '@/lib/stressAnalysis';
 import { getBoltClass } from '@/data/boltNutStandards';
 import { calculateIsoFit } from '@/lib/engines/math/iso286';
+import { resolveMaterial } from '@/materials/canonical';
+import { beamSchematicDxf, boltSectionDxf, shaftSectionDxf, sheetUnfoldDxf, bearingArrangementDxf, helicalSpringDxf } from '@/export/dxf/schematics';
 
 /**
  * 🛠️ Material Selection Node
  * Provides material properties based on name selection.
  */
+function findStrengthFallback(name: string) {
+    const clean = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const numberMatch = name.match(/\b(\d{4}[A-Za-z0-9-]*)/);
+    return STRENGTH_MATERIALS.find(m => {
+        const mClean = m.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (m.name.toLowerCase() === name.toLowerCase()) return true;
+        if (mClean.includes(clean) || clean.includes(mClean)) return true;
+        if (numberMatch && m.name.toLowerCase().includes(numberMatch[1].toLowerCase())) return true;
+        return false;
+    });
+}
+
 export const MaterialNode: EngineeringNodeSchema = {
     id: 'mech-material',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Material Properties',
-    description: 'Outputs engineering properties for selected alloy.',
+    description: 'Outputs engineering properties for selected alloy. Sy is typical; Sy_min is the separate minimum allowable.',
     category: 'input',
     deterministic: true,
     inputs: [
@@ -29,28 +43,51 @@ export const MaterialNode: EngineeringNodeSchema = {
             type: 'string',
             required: true,
             defaultValue: 'Steel AISI 1020'
+        },
+        {
+            id: 'useMinimumAllowable',
+            label: 'Use Sy_min',
+            type: 'boolean',
+            required: false,
+            defaultValue: false
         }
     ],
     outputs: [
         { id: 'E', label: 'Youngs Modulus (GPa)', type: 'number' },
         { id: 'Sy', label: 'Yield Strength (MPa)', type: 'yield_strength_mpa' },
+        { id: 'Sy_min', label: 'Yield Min (MPa)', type: 'yield_strength_mpa' },
         { id: 'Su', label: 'Ultimate Strength (MPa)', type: 'stress_mpa' },
         { id: 'G', label: 'Shear Modulus (GPa)', type: 'number' },
         { id: 'v', label: 'Poisson Ratio', type: 'ratio' }
     ],
     validate: (inputs: { materialName: string }) => {
-        const mat = STRENGTH_MATERIALS.find(m => m.name === inputs.materialName);
+        const name = inputs.materialName || '';
+        const canon = resolveMaterial(name);
+        const mat = canon || findStrengthFallback(name);
         return {
             valid: !!mat,
             errors: mat ? [] : [`Material '${inputs.materialName}' not found in database.`],
             warnings: []
         };
     },
-    compute: (inputs: { materialName: string }) => {
-        const mat = STRENGTH_MATERIALS.find(m => m.name === inputs.materialName) || STRENGTH_MATERIALS[0];
+    compute: (inputs: { materialName: string; useMinimumAllowable?: boolean }) => {
+        const name = inputs.materialName || '';
+        const canon = resolveMaterial(name, { useMinimumAllowable: Boolean(inputs.useMinimumAllowable) });
+        if (canon) {
+            return {
+                E: canon.E,
+                Sy: canon.Sy,
+                Sy_min: canon.Sy_min ?? canon.Sy,
+                Su: canon.Su,
+                G: canon.G || 0,
+                v: canon.nu
+            };
+        }
+        const mat = findStrengthFallback(name) || STRENGTH_MATERIALS[0];
         return {
             E: mat.E,
             Sy: mat.Sy,
+            Sy_min: (mat as { Sy_min?: number }).Sy_min ?? mat.Sy,
             Su: mat.Su,
             G: mat.G || 0,
             v: mat.v || 0
@@ -64,7 +101,7 @@ export const MaterialNode: EngineeringNodeSchema = {
  */
 export const BeamDeflectionNode: EngineeringNodeSchema = {
     id: 'mech-beam-deflection',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Beam Deflection',
     description: 'Calculates displacement and bending stress.',
     category: 'mechanical',
@@ -75,13 +112,16 @@ export const BeamDeflectionNode: EngineeringNodeSchema = {
         { id: 'L', label: 'Length (mm)', type: 'length_mm', required: true, defaultValue: 1000 },
         { id: 'P', label: 'Force (N)', type: 'force_n', required: true, defaultValue: 1000 },
         { id: 'E', label: 'Modulus E (GPa)', type: 'number', required: true, defaultValue: 200 },
-        { id: 'I', label: 'Inertia I (mm4)', type: 'number', required: true, defaultValue: 100000 },
-        { id: 'Z', label: 'Section Modulus Z (mm3)', type: 'number', required: true, defaultValue: 5000 }
+        { id: 'I', label: 'Inertia I (mm4)', type: 'moment_of_inertia_mm4', required: true, defaultValue: 100000 },
+        { id: 'Z', label: 'Section Modulus Z (mm3)', type: 'section_modulus_mm3', required: true, defaultValue: 5000 }
     ],
     outputs: [
         { id: 'deflection', label: 'Max Deflection (mm)', type: 'length_mm' },
         { id: 'stress', label: 'Max Stress (MPa)', type: 'stress_mpa' },
-        { id: 'moment', label: 'Max Moment (Nmm)', type: 'number' }
+        { id: 'moment', label: 'Max Moment (Nmm)', type: 'number' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
     validate: (inputs: any) => ({
         valid: inputs.L > 0 && inputs.E > 0 && inputs.I > 0,
@@ -98,10 +138,22 @@ export const BeamDeflectionNode: EngineeringNodeSchema = {
             inputs.I,
             inputs.Z
         );
+        const geometry = beamSchematicDxf({ L: inputs.L, P: inputs.P, I: inputs.I, Z: inputs.Z });
         return {
             deflection: res.maxDeflection,
             stress: res.maxStress,
-            moment: res.maxMoment
+            moment: res.maxMoment,
+            geometry,
+            validation_report: { valid: true, errors: [], warnings: [] },
+            report_payload: {
+                L_mm: inputs.L,
+                P_N: inputs.P,
+                deflection_mm: res.maxDeflection,
+                stress_mpa: res.maxStress,
+                moment_nmm: res.maxMoment,
+                formula_trace: ['δ = PL³ / (48 EI)  (simply supported, mid-span point load)', 'σ = M / Z'],
+                assumptions: ['Euler-Bernoulli beam theory', 'Small deflection, linear elastic']
+            }
         };
     }
 };
@@ -150,38 +202,65 @@ export const CombinedStressNode: EngineeringNodeSchema = {
  */
 export const TorsionNode: EngineeringNodeSchema = {
     id: 'mech-torsion',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Shaft Torsion',
     description: 'Calculates shear stress and angle of twist.',
     category: 'mechanical',
     deterministic: true,
     inputs: [
-        { id: 'torque', label: 'Torque (Nm)', type: 'torque_nm', required: true, defaultValue: 100 },
+        { id: 'torque', label: 'Torque (Nm)', type: 'torque_nm', required: false },
+        { id: 'T', label: 'Torque T (Nm)', type: 'torque_nm', required: false, defaultValue: 100 },
         { id: 'L', label: 'Length (mm)', type: 'length_mm', required: true, defaultValue: 500 },
-        { id: 'D', label: 'Diameter (mm)', type: 'diameter_mm', required: true, defaultValue: 30 },
+        { id: 'D', label: 'Diameter (mm)', type: 'diameter_mm', required: false, defaultValue: 30 },
+        { id: 'd', label: 'Shaft Dia d (mm)', type: 'diameter_mm', required: false, defaultValue: 30 },
         { id: 'di', label: 'Inner Dia (mm)', type: 'diameter_mm', defaultValue: 0 },
         { id: 'G', label: 'Shear Modulus (GPa)', type: 'number', defaultValue: 79 }
     ],
     outputs: [
         { id: 'shearStress', label: 'Max Shear Stress (MPa)', type: 'stress_mpa' },
-        { id: 'twistDeg', label: 'Twist Angle (deg)', type: 'number' }
+        { id: 'stress', label: 'Shear Stress (MPa)', type: 'stress_mpa' },
+        { id: 'twistDeg', label: 'Twist Angle (deg)', type: 'number' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
-    validate: (inputs: any) => ({
-        valid: inputs.D > inputs.di && inputs.D > 0,
-        errors: inputs.D <= inputs.di ? ['Outer diameter must be greater than inner diameter'] : [],
-        warnings: []
-    }),
+    validate: (inputs: any) => {
+        const d = inputs.D ?? inputs.d ?? 30;
+        const di = inputs.di ?? 0;
+        return {
+            valid: d > di && d > 0,
+            errors: d <= di ? ['Outer diameter must be greater than inner diameter'] : [],
+            warnings: []
+        };
+    },
     compute: (inputs: any) => {
+        const tVal = inputs.torque ?? inputs.T ?? 100;
+        const dVal = inputs.D ?? inputs.d ?? 30;
+        const diVal = inputs.di ?? 0;
+        const gVal = inputs.G ?? 79;
         const res = calculateTorsion(
-            inputs.torque * 1000, // Nm to Nmm
-            inputs.L,
-            inputs.D,
-            inputs.di,
-            inputs.G
+            tVal * 1000, // Nm to Nmm
+            inputs.L ?? 500,
+            dVal,
+            diVal,
+            gVal
         );
+        const geometry = shaftSectionDxf({ d: dVal, di: diVal });
         return {
             shearStress: res.maxShearStress,
-            twistDeg: res.angleOfTwistDeg
+            stress: res.maxShearStress,
+            twistDeg: res.angleOfTwistDeg,
+            geometry,
+            validation_report: { valid: true, errors: [], warnings: [] },
+            report_payload: {
+                T_Nm: tVal,
+                L_mm: inputs.L ?? 500,
+                d_mm: dVal,
+                shear_mpa: res.maxShearStress,
+                twist_deg: res.angleOfTwistDeg,
+                formula_trace: ['τ = T r / J', 'θ = T L / (G J)'],
+                assumptions: ['Circular shaft, Saint-Venant torsion', 'Keyway width ≈ d/4 (DIN 6885 approx.)']
+            }
         };
     }
 };
@@ -192,7 +271,7 @@ export const TorsionNode: EngineeringNodeSchema = {
  */
 export const SheetMetalBendingNode: EngineeringNodeSchema = {
     id: 'mech-sheet-metal',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Sheet Metal Bending',
     description: 'Calculates Bend Allowance, Deduction & Setback.',
     category: 'mechanical',
@@ -201,12 +280,18 @@ export const SheetMetalBendingNode: EngineeringNodeSchema = {
         { id: 'thickness', label: 'Thickness (t)', type: 'length_mm', required: true, defaultValue: 2 },
         { id: 'radius', label: 'Bend Radius (R)', type: 'length_mm', required: true, defaultValue: 2 },
         { id: 'angle', label: 'Angle (deg)', type: 'number', required: true, defaultValue: 90 },
-        { id: 'kFactor', label: 'K-Factor', type: 'number', required: true, defaultValue: 0.33 }
+        { id: 'kFactor', label: 'K-Factor', type: 'number', required: true, defaultValue: 0.33 },
+        { id: 'flangeA', label: 'Flange A (mm)', type: 'length_mm', required: false, defaultValue: 50 },
+        { id: 'flangeB', label: 'Flange B (mm)', type: 'length_mm', required: false, defaultValue: 50 },
+        { id: 'width', label: 'Width (mm)', type: 'length_mm', required: false, defaultValue: 40 }
     ],
     outputs: [
         { id: 'bendAllowance', label: 'BA (mm)', type: 'length_mm' },
         { id: 'bendDeduction', label: 'BD (mm)', type: 'length_mm' },
-        { id: 'outsideSetback', label: 'OSSB (mm)', type: 'length_mm' }
+        { id: 'outsideSetback', label: 'OSSB (mm)', type: 'length_mm' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
     validate: (inputs: any) => ({
         valid: inputs.thickness > 0 && inputs.radius > 0 && inputs.angle > 0,
@@ -221,13 +306,35 @@ export const SheetMetalBendingNode: EngineeringNodeSchema = {
 
         const rads = (A * Math.PI) / 180;
         const BA = rads * (R + K * t);
-        const OSSB = (R + t) * Math.tan(rads / 2);
-        const BD = (2 * OSSB) - BA;
+        const OSSB = Math.tan(rads / 2) * (R + t);
+        const BD = 2 * OSSB - BA;
 
+        const geometry = sheetUnfoldDxf({
+            thickness: t,
+            radius: R,
+            angle: A,
+            kFactor: K,
+            flangeA: inputs.flangeA,
+            flangeB: inputs.flangeB,
+            width: inputs.width
+        });
         return {
             bendAllowance: BA,
             bendDeduction: BD,
-            outsideSetback: OSSB
+            outsideSetback: OSSB,
+            geometry,
+            validation_report: { valid: true, errors: [], warnings: [] },
+            report_payload: {
+                thickness_mm: t,
+                radius_mm: R,
+                angle_deg: A,
+                kFactor: K,
+                bendAllowance_mm: BA,
+                bendDeduction_mm: BD,
+                outsideSetback_mm: OSSB,
+                formula_trace: ['BA = α (R + K t)', 'OSSB = tan(α/2) (R + t)', 'BD = 2 OSSB − BA'],
+                assumptions: ['DIN 6935 bend allowance', 'Neutral axis at K·t from inner face']
+            }
         };
     }
 };
@@ -237,44 +344,73 @@ export const SheetMetalBendingNode: EngineeringNodeSchema = {
  */
 export const BoltStressNode: EngineeringNodeSchema = {
     id: 'mech-bolt-stress',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Bolt Stress Tensor',
-    description: 'Calculates Tensile Stress Area and Safety Factor.',
+    description: 'Calculates Tensile Stress Area, Preload and Safety Factor.',
     category: 'mechanical',
     deterministic: true,
     inputs: [
         { id: 'diameter', label: 'Nominal Dia (M)', type: 'length_mm', required: true, defaultValue: 10 },
         { id: 'pitch', label: 'Pitch (mm)', type: 'length_mm', required: true, defaultValue: 1.5 },
-        { id: 'load', label: 'Load (kN)', type: 'number', required: true, defaultValue: 20 },
+        { id: 'load', label: 'Load (kN)', type: 'number', required: false, defaultValue: 20 },
+        { id: 'torque', label: 'Torque (Nm)', type: 'torque_nm', required: false, defaultValue: 0 },
         { id: 'grade', label: 'Property Class', type: 'number', required: true, defaultValue: 8.8 }
     ],
     outputs: [
-        { id: 'stressArea', label: 'Stress Area', type: 'number' },
-        { id: 'tensileStress', label: 'Tensile Stress', type: 'stress_mpa' },
-        { id: 'safetyFactor', label: 'Safety Factor', type: 'number' }
+        { id: 'stressArea', label: 'Stress Area (mm²)', type: 'number' },
+        { id: 'tensileStress', label: 'Tensile Stress (MPa)', type: 'stress_mpa' },
+        { id: 'stress', label: 'Stress σ (MPa)', type: 'stress_mpa' },
+        { id: 'proofStrength', label: 'Proof Strength Sy (MPa)', type: 'yield_strength_mpa' },
+        { id: 'safetyFactor', label: 'Safety Factor', type: 'number' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
     validate: (inputs: any) => ({
-        valid: inputs.diameter > 0 && inputs.pitch > 0,
+        valid: inputs.diameter > 0 && inputs.pitch > 0 && (inputs.load > 0 || inputs.torque > 0),
         errors: [],
         warnings: []
     }),
     compute: (inputs: any) => {
         const d = inputs.diameter;
         const P = inputs.pitch;
-        const F_N = inputs.load * 1000;
-        const gradeStr = inputs.grade.toFixed(1);
+        const gradeStr = Number(inputs.grade).toFixed(1);
 
         const boltClass = getBoltClass(gradeStr);
         const Sy = boltClass ? boltClass.yieldStrengthMin : 640;
 
+        // If torque is given (Nm), calculate clamp force FN using VDI 2230 nut factor K ≈ 0.2
+        let F_N = (inputs.load ?? 0) * 1000;
+        if (inputs.torque && inputs.torque > 0) {
+            const K = 0.2; // Nut factor
+            const d_m = d / 1000;
+            F_N = inputs.torque / (K * d_m);
+        }
+
         const As = (Math.PI / 4) * Math.pow(d - 0.9382 * P, 2);
         const sigma_t = F_N / As;
-        const SF = Sy / sigma_t;
+        const SF = Sy / (sigma_t > 0 ? sigma_t : 1);
 
+        const geometry = boltSectionDxf({ diameter: d, pitch: P });
         return {
             stressArea: As,
             tensileStress: sigma_t,
-            safetyFactor: SF
+            stress: sigma_t,
+            proofStrength: Sy,
+            safetyFactor: SF,
+            geometry,
+            validation_report: { valid: SF >= 1, errors: SF >= 1 ? [] : [`SF ${SF.toFixed(3)} < 1`], warnings: SF < 1.5 && SF >= 1 ? [`SF ${SF.toFixed(3)} < 1.5`] : [] },
+            report_payload: {
+                diameter_mm: d,
+                pitch_mm: P,
+                grade: gradeStr,
+                stressArea_mm2: As,
+                stress_mpa: sigma_t,
+                proofStrength_mpa: Sy,
+                safetyFactor: SF,
+                formula_trace: ['As = π/4 (d − 0.9382 P)²', 'F = T / (K d)  (K ≈ 0.2)', 'σ = F / As'],
+                assumptions: ['VDI 2230 nut factor K=0.2', 'ISO 898-1 proof strength from property class']
+            }
         };
     }
 };
@@ -522,44 +658,131 @@ export const ShaftDesignNode: EngineeringNodeSchema = {
  */
 export const BearingLifeNode: EngineeringNodeSchema = {
     id: 'mech-bearing-life',
-    version: '1.0.0',
-    title: 'Bearing Life (L10h)',
-    description: 'Calculates ISO dynamic load life.',
+    version: '1.1.0',
+    title: 'Bearing Life (ISO 281)',
+    description: 'ISO 281 equivalent dynamic load P and basic rating life L10h for deep-groove and taper-roller bearings.',
     category: 'mechanical',
     deterministic: true,
+    isoStandard: 'ISO 281',
     inputs: [
-        { id: 'Fr', label: 'Radial Load (N)', type: 'force_n', required: true, defaultValue: 3000 },
-        { id: 'Fa', label: 'Axial Load (N)', type: 'force_n', required: true, defaultValue: 500 },
-        { id: 'rpm', label: 'Speed (RPM)', type: 'number', required: true, defaultValue: 1500 },
-        { id: 'C', label: 'Dyn Load C (N)', type: 'force_n', required: true, defaultValue: 14000 },
-        { id: 'C0', label: 'Stat Load C0 (N)', type: 'force_n', required: true, defaultValue: 7800 },
-        { id: 'type', label: 'Type (0:Ball, 1:Roller)', type: 'number', required: true, defaultValue: 0 }
+        { id: 'Fr', label: 'Radial Load Fr', type: 'force_n', required: true, defaultValue: 3000 },
+        { id: 'Fa', label: 'Axial Load Fa', type: 'force_n', required: true, defaultValue: 500 },
+        { id: 'rpm', label: 'Speed n', type: 'rpm', required: true, defaultValue: 1500 },
+        { id: 'C', label: 'Dynamic C', type: 'force_n', required: true, defaultValue: 40800 },
+        { id: 'C0', label: 'Static C0', type: 'force_n', required: true, defaultValue: 24000 },
+        { id: 'type', label: 'Type (0 ball, 1 roller)', type: 'number', required: true, defaultValue: 0 }
     ],
     outputs: [
-        { id: 'Pe', label: 'Equivalent P (N)', type: 'force_n' },
-        { id: 'L10h', label: 'Life (hours)', type: 'number' }
+        { id: 'Pe', label: 'Equivalent P', type: 'force_n' },
+        { id: 'L10', label: 'L10 (10⁶ rev)', type: 'number' },
+        { id: 'L10h', label: 'L10h (hours)', type: 'life_hours' },
+        { id: 'e', label: 'Factor e', type: 'ratio' },
+        { id: 'X', label: 'Factor X', type: 'ratio' },
+        { id: 'Y', label: 'Factor Y', type: 'ratio' },
+        { id: 's0', label: 'Static safety s0', type: 'safety_factor' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
-    validate: (inputs: any) => ({ valid: inputs.rpm > 0 && inputs.C > 0, errors: [], warnings: [] }),
+    validate: (inputs: any) => {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        if (!(inputs.rpm > 0)) errors.push('Shaft speed must be positive.');
+        if (!(inputs.C > 0)) errors.push('Dynamic load rating C must be positive.');
+        if (!(inputs.C0 > 0)) errors.push('Static load rating C0 must be positive.');
+        if (!(inputs.Fr >= 0) || !(inputs.Fa >= 0)) errors.push('Loads Fr, Fa must be ≥ 0.');
+        if (inputs.Fr === 0 && inputs.Fa === 0) errors.push('At least one of Fr, Fa must be non-zero.');
+        return { valid: errors.length === 0, errors, warnings };
+    },
     compute: (inputs: any) => {
-        let P = inputs.Fr;
-        const Fa_C0 = inputs.Fa / inputs.C0;
-        let e = 0.22;
-        if (Fa_C0 > 0.084) e = 0.28;
+        const Fr = Number(inputs.Fr) || 0;
+        const Fa = Number(inputs.Fa) || 0;
+        const C = Number(inputs.C);
+        const C0 = Number(inputs.C0);
+        const n = Number(inputs.rpm);
+        const isRoller = Number(inputs.type) === 1;
+        const Fa_C0 = C0 > 0 ? Fa / C0 : 0;
 
-        let X = 1.0, Y = 0.0;
-        if ((inputs.Fa / inputs.Fr) > e) {
-            X = 0.56;
-            Y = Fa_C0 > 0.084 ? 1.55 : 1.99; // Approximated
+        let e = 0.22;
+        let X = 1;
+        let Y = 0;
+        if (isRoller) {
+            e = 0.4;
+            if (Fr > 0 && Fa / Fr > e) {
+                X = 0.4;
+                Y = 0.4 / e;
+            }
+        } else {
+            if (Fa_C0 <= 0.014) e = 0.19;
+            else if (Fa_C0 <= 0.028) e = 0.22;
+            else if (Fa_C0 <= 0.056) e = 0.26;
+            else if (Fa_C0 <= 0.084) e = 0.28;
+            else if (Fa_C0 <= 0.11) e = 0.30;
+            else if (Fa_C0 <= 0.17) e = 0.34;
+            else if (Fa_C0 <= 0.28) e = 0.38;
+            else if (Fa_C0 <= 0.42) e = 0.42;
+            else e = 0.44;
+            const ratio = Fr > 0 ? Fa / Fr : Infinity;
+            if (ratio > e) {
+                X = 0.56;
+                Y = 0.56 / e;
+            }
         }
-        P = Math.max(inputs.Fr, X * inputs.Fr + Y * inputs.Fa);
-        const p_exp = inputs.type === 0 ? 3.0 : (10.0 / 3.0);
-        let L10 = 0;
-        if (P > 0) L10 = Math.pow(inputs.C / P, p_exp);
-        const L10h = (1000000 / (60 * inputs.rpm)) * L10;
+
+        const P = Math.max(Fr, X * Fr + Y * Fa);
+        const pExp = isRoller ? 10 / 3 : 3;
+        const L10 = P > 0 ? Math.pow(C / P, pExp) : 0;
+        const L10h = n > 0 ? (1_000_000 / (60 * n)) * L10 : 0;
+        const P0 = Fr + Fa;
+        const s0 = P0 > 0 ? C0 / P0 : 99;
+
+        const warnings: string[] = [];
+        if (L10h < 10000) warnings.push(`L10h=${L10h.toFixed(0)} h < 10 000 h — consider a larger C.`);
+        if (s0 < 1) warnings.push(`Static safety s0=${s0.toFixed(2)} < 1.`);
+
+        const geometry = bearingArrangementDxf({
+            Fr,
+            Fa,
+            type: isRoller ? 'taper' : 'deep_groove',
+            L10h,
+        });
 
         return {
-            Pe: Math.round(P),
-            L10h: Math.round(L10h)
+            Pe: Number(P.toFixed(1)),
+            L10: Number(L10.toFixed(4)),
+            L10h: Number(L10h.toFixed(1)),
+            e: Number(e.toFixed(4)),
+            X: Number(X.toFixed(4)),
+            Y: Number(Y.toFixed(4)),
+            s0: Number(s0.toFixed(3)),
+            geometry,
+            validation_report: { valid: true, errors: [], warnings },
+            report_payload: {
+                Fr_N: Fr,
+                Fa_N: Fa,
+                n_rpm: n,
+                C_N: C,
+                C0_N: C0,
+                type: isRoller ? 'taper_roller' : 'deep_groove',
+                P_N: Number(P.toFixed(1)),
+                e,
+                X,
+                Y,
+                L10_e6rev: Number(L10.toFixed(4)),
+                L10h_h: Number(L10h.toFixed(1)),
+                s0: Number(s0.toFixed(3)),
+                formula_trace: [
+                    'P = X Fr + Y Fa   (ISO 281)',
+                    'L10 = (C / P)^p    p=3 ball, p=10/3 roller',
+                    'L10h = 10^6 L10 / (60 n)',
+                    's0 = C0 / (Fr + Fa)   (conservative static)',
+                ],
+                assumptions: [
+                    'Deep-groove X,Y,e from ISO 281 Table 5 (Fa/C0 interpolation)',
+                    'Taper roller e=0.4, X=0.4, Y=1.0 when Fa/Fr > e (typical 302xx class)',
+                    'No aISO reliability/contamination/viscosity adjustment',
+                ],
+            },
         };
     }
 };
@@ -569,38 +792,105 @@ export const BearingLifeNode: EngineeringNodeSchema = {
  */
 export const SpringDesignNode: EngineeringNodeSchema = {
     id: 'mech-spring-design',
-    version: '1.0.0',
-    title: 'Spring Design',
-    description: 'Helical compression spring analysis.',
+    version: '1.1.0',
+    title: 'Helical Compression Spring',
+    description: 'DIN EN 13906-1 / DIN 2089 helical compression spring: Wahl factor, stiffness, solid height, resonance.',
     category: 'mechanical',
     deterministic: true,
+    isoStandard: 'DIN EN 13906-1',
     inputs: [
         { id: 'F', label: 'Axial Force (N)', type: 'force_n', required: true, defaultValue: 500 },
-        { id: 'd', label: 'Wire Dia. (mm)', type: 'length_mm', required: true, defaultValue: 5 },
-        { id: 'D', label: 'Mean Dia. (mm)', type: 'length_mm', required: true, defaultValue: 40 },
-        { id: 'Na', label: 'Active Coils', type: 'number', required: true, defaultValue: 10 },
-        { id: 'G', label: 'Shear Mod (GPa)', type: 'number', required: true, defaultValue: 79.3 }
+        { id: 'd', label: 'Wire dia d', type: 'diameter_mm', required: true, defaultValue: 5 },
+        { id: 'D', label: 'Mean dia D', type: 'diameter_mm', required: true, defaultValue: 35 },
+        { id: 'Na', label: 'Active coils n', type: 'number', required: true, defaultValue: 10 },
+        { id: 'G', label: 'Shear mod G (GPa)', type: 'number', required: true, defaultValue: 81.5 }
     ],
     outputs: [
-        { id: 'tau', label: 'Shear Stress (MPa)', type: 'stress_mpa' },
-        { id: 'delta', label: 'Deflection (mm)', type: 'length_mm' },
-        { id: 'k', label: 'Stiffness (N/mm)', type: 'number' }
+        { id: 'tau', label: 'Shear stress τ', type: 'stress_mpa' },
+        { id: 'delta', label: 'Deflection δ', type: 'length_mm' },
+        { id: 'k', label: 'Stiffness k (N/mm)', type: 'number' },
+        { id: 'kw', label: 'Wahl factor Kw', type: 'ratio' },
+        { id: 'De', label: 'Outer dia De', type: 'diameter_mm' },
+        { id: 'Lc', label: 'Solid height Lc', type: 'length_mm' },
+        { id: 'fn', label: 'Resonance fn (Hz)', type: 'number' },
+        { id: 'geometry', label: 'DXF Geometry', type: 'dxf_file' },
+        { id: 'validation_report', label: 'Validation', type: 'validation_report' },
+        { id: 'report_payload', label: 'Report Payload', type: 'json' }
     ],
-    validate: (inputs: any) => ({ valid: inputs.d > 0 && inputs.D > 0 && inputs.Na > 0, errors: [], warnings: [] }),
+    validate: (inputs: any) => {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        if (!(inputs.d > 0)) errors.push('Wire diameter d must be positive.');
+        if (!(inputs.D > inputs.d)) errors.push('Mean diameter D must be greater than wire diameter d.');
+        if (!(inputs.Na > 1)) errors.push('Active coils n must be > 1.');
+        if (!(inputs.G > 0)) errors.push('Shear modulus G must be positive.');
+        if (!(inputs.F > 0)) errors.push('Axial force F must be positive.');
+        const C = inputs.d > 0 ? inputs.D / inputs.d : 0;
+        if (C < 4) warnings.push(`Spring index C=${C.toFixed(2)} < 4 — high curvature, manufacturing risk.`);
+        if (C > 12) warnings.push(`Spring index C=${C.toFixed(2)} > 12 — buckling / tangling risk.`);
+        return { valid: errors.length === 0, errors, warnings };
+    },
     compute: (inputs: any) => {
-        const C = inputs.D / inputs.d;
-        let Kw = 1.0;
-        if (C > 1) Kw = ((4 * C - 1) / (4 * C - 4)) + (0.615 / C);
-
-        const tau = Kw * ((8 * inputs.F * inputs.D) / (Math.PI * Math.pow(inputs.d, 3)));
+        const d = inputs.d;
+        const D = inputs.D;
+        const Na = inputs.Na;
+        const F = inputs.F;
+        const C = D / d;
+        const Kw = ((4 * C - 1) / (4 * C - 4)) + (0.615 / C);
+        const tau = Kw * ((8 * F * D) / (Math.PI * Math.pow(d, 3)));
         const G_MPa = inputs.G * 1000;
-        const delta = (8 * inputs.F * Math.pow(inputs.D, 3) * inputs.Na) / (G_MPa * Math.pow(inputs.d, 4));
-        const k = (G_MPa * Math.pow(inputs.d, 4)) / (8 * Math.pow(inputs.D, 3) * inputs.Na);
+        const delta = (8 * F * Math.pow(D, 3) * Na) / (G_MPa * Math.pow(d, 4));
+        const k = (G_MPa * Math.pow(d, 4)) / (8 * Math.pow(D, 3) * Na);
+        const De = D + d;
+        const Nt = Na + 2;
+        const Lc = Nt * d;
+        // Steel-referenced first-order surge frequency, scaled with G.
+        const fnSteel = (3.56e5 * d) / (Na * D * D);
+        const fn = fnSteel * Math.sqrt(inputs.G / 81.5);
 
+        const warnings: string[] = [];
+        if (C < 4 || C > 12) {
+            warnings.push(`Spring index C=${C.toFixed(2)} outside DIN EN 13906-1 preferred range 4–12.`);
+        }
+
+        const geometry = helicalSpringDxf({ d, D, Na, De, Lc });
         return {
-            tau: Math.round(tau * 10) / 10,
-            delta: Math.round(delta * 100) / 100,
-            k: Math.round(k * 100) / 100
+            tau: Number(tau.toFixed(2)),
+            delta: Number(delta.toFixed(3)),
+            k: Number(k.toFixed(4)),
+            kw: Number(Kw.toFixed(4)),
+            De: Number(De.toFixed(3)),
+            Lc: Number(Lc.toFixed(3)),
+            fn: Number(fn.toFixed(2)),
+            geometry,
+            validation_report: { valid: true, errors: [], warnings },
+            report_payload: {
+                F_N: F,
+                d_mm: d,
+                D_mm: D,
+                De_mm: Number(De.toFixed(3)),
+                Na,
+                C: Number(C.toFixed(4)),
+                Kw: Number(Kw.toFixed(4)),
+                tau_MPa: Number(tau.toFixed(2)),
+                delta_mm: Number(delta.toFixed(3)),
+                k_N_per_mm: Number(k.toFixed(4)),
+                Lc_mm: Number(Lc.toFixed(3)),
+                fn_Hz: Number(fn.toFixed(2)),
+                formula_trace: [
+                    'C = D / d',
+                    'Kw = (4C − 1)/(4C − 4) + 0.615/C   (Wahl)',
+                    'τ = Kw · 8 F D / (π d³)',
+                    'k = G d⁴ / (8 D³ n)',
+                    'Lc = (n + 2) d   (closed & ground ends)',
+                    'fn ≈ 3.56·10⁵ d / (n D²) · √(G/81.5)  Hz',
+                ],
+                assumptions: [
+                    'DIN EN 13906-1 / DIN 2089 cold-formed helical compression spring',
+                    'Closed and ground ends: n_t = n + 2',
+                    'Resonance formula referenced to steel G = 81.5 GPa, ρ = 7850 kg/m³',
+                ],
+            },
         };
     }
 };

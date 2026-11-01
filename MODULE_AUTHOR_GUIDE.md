@@ -3,6 +3,7 @@
 Welcome to the AluCalculator Unified Desk Architecture (UDA). This guide explains how to add new calculators, editors, and tools to the platform without breaking core system architecture.
 
 ## 1. Core Principles
+- **UDA Standard vs Legacy**: New modules go through UDA / ModuleRegistry (`src/modules/<category>/<ModuleName>/`). `src/components/calculators/` is legacy. Do not add new calculators there.
 - **No Direct Core Modification**: Never modify `osStore.ts` or internal UDA loops to register your module. Use the `ModuleRegistry` API.
 - **Engine Metadata**: All calculation engines must return the `EngineMetadata` interface defined in `ProjectSchema.ts`. This ensures traceability and SHA-256 validation for engineering reports.
 - **Project Phoenix UX**: Use the system dark theme variables (`var(--color-os-canvas)`, `var(--color-os-ribbon)`).

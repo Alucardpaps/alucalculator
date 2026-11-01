@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Note Node
+ * AluCAD OS — Note Node
  * 
  * ReactFlow node for engineering annotations and documentation.
  * Supports markdown-style formatting.
@@ -42,16 +42,16 @@ const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
     return (
         <>
-            <NodeToolbar isVisible={selected} position={Position.Top} className="flex gap-1 bg-[#1a2332] p-1.5 rounded-lg border border-[#2a3a4a] shadow-xl">
+            <NodeToolbar isVisible={selected} position={Position.Top} className="flex gap-1 bg-[var(--bg-3)] p-1.5 rounded-lg border border-[var(--line-strong)] shadow-xl">
                 {/* Font Size */}
-                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
+                <div className="flex items-center gap-1 border-r border-[var(--line-strong)] pr-2 mr-1">
                     <button onClick={() => updateStyle('fontSize', Math.max(10, fontSize - 2))} className="p-1 hover:bg-white/10 rounded"><Minus size={12} /></button>
                     <span className="text-[10px] w-4 text-center text-gray-400">{fontSize}</span>
                     <button onClick={() => updateStyle('fontSize', Math.min(72, fontSize + 2))} className="p-1 hover:bg-white/10 rounded"><Plus size={12} /></button>
                 </div>
 
                 {/* Styling */}
-                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
+                <div className="flex items-center gap-1 border-r border-[var(--line-strong)] pr-2 mr-1">
                     <button
                         onClick={() => updateStyle('fontWeight', fontWeight === 'bold' ? 'normal' : 'bold')}
                         className={`p-1 rounded ${fontWeight === 'bold' ? 'bg-cyan-500/20 text-cyan-400' : 'hover:bg-white/10 text-gray-400'}`}
@@ -67,7 +67,7 @@ const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
                 </div>
 
                 {/* Color */}
-                <div className="flex items-center gap-1 border-r border-[#2a3a4a] pr-2 mr-1">
+                <div className="flex items-center gap-1 border-r border-[var(--line-strong)] pr-2 mr-1">
                     {COLORS.map(c => (
                         <button
                             key={c}
@@ -88,7 +88,7 @@ const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
                 </button>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1 ml-1 pl-2 border-l border-[#2a3a4a]">
+                <div className="flex items-center gap-1 ml-1 pl-2 border-l border-[var(--line-strong)]">
                     <button onClick={() => setIsEditing(!isEditing)} className={`p-1 rounded ${isEditing ? 'text-green-400' : 'hover:bg-white/10 text-gray-400'}`}>
                         {isEditing ? <Check size={14} /> : <Edit2 size={14} />}
                     </button>
@@ -102,9 +102,9 @@ const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
                 className={`transition-all duration-200 min-w-[100px] min-h-[40px]
                     ${isTransparent
                         ? 'bg-transparent border-2 border-transparent hover:border-dashed hover:border-gray-700/50'
-                        : 'bg-[#0f1419] border border-[#2a3a4a] rounded-lg shadow-2xl'
+                        : 'bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg shadow-2xl'
                     }
-                    ${selected && !isTransparent ? '!border-[#00e5ff] ring-1 ring-[#00e5ff]/30' : ''}
+                    ${selected && !isTransparent ? '!border-[var(--cyan)] ring-1 ring-[var(--cyan)]/30' : ''}
                     ${selected && isTransparent ? '!border-dashed !border-gray-600' : ''}
                 `}
             >
@@ -114,7 +114,7 @@ const NoteNode: React.FC<NodeProps> = ({ id, data, selected }) => {
                         onChange={(e) => setContent(e.target.value)}
                         onBlur={handleSave}
                         autoFocus
-                        className="bg-[#1a2332] text-white p-2 rounded w-full h-full min-w-[200px] min-h-[100px] outline-none resize border border-[#00e5ff]"
+                        className="bg-[var(--bg-3)] text-white p-2 rounded w-full h-full min-w-[200px] min-h-[100px] outline-none resize border border-[var(--cyan)]"
                         style={{ fontSize, fontWeight: fontWeight as any, fontStyle: fontStyle as any, color }}
                         placeholder="Type your note here..."
                     />

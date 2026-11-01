@@ -20,12 +20,15 @@ import {
 import { SHAPE_INFO, ShapeType } from "@/utils/sectionProperties";
 import { AlertTriangle, CheckCircle, Flame, Thermometer, Zap, Box, Layers, Eye } from 'lucide-react';
 import { useI18nStore } from "@/store/i18nStore";
+import { t12 } from "@/locales/t12";
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
 
 function localizedWeldingName(item: { name: string; nameTr: string }, lang: string): string {
-    return lang === 'tr' ? item.nameTr : item.name;
+    return t12(lang, item.name, item.nameTr);
 }
 
 export default function WeldingPageClient() {
+    const precision = useGlobalPrecision();
     const { t, language } = useI18nStore();
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
@@ -145,7 +148,7 @@ export default function WeldingPageClient() {
         <main className="min-h-screen flex flex-col items-center justify-center p-4 lg:p-12 font-sans overflow-hidden">
 
             {/* Header */}
-            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-orange-600 rounded flex items-center justify-center text-white font-black text-xl">W</div>
                     <div>
@@ -175,7 +178,7 @@ export default function WeldingPageClient() {
                                     key={method.id}
                                     onClick={() => setProcess(method.id)}
                                     className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${process === method.id
-                                        ? 'bg-orange-600 text-white shadow-md'
+                                        ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md'
                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                 >
@@ -448,7 +451,7 @@ export default function WeldingPageClient() {
                         </div>
                         <div className="flex h-4 rounded overflow-hidden shadow-inner">
                             <div className="h-full transition-all duration-500" style={{ width: `${(thickness / (thickness + 10)) * 100}%`, backgroundColor: material1Color }} />
-                            <div className="h-full transition-all duration-500 border-l border-cyan-500/30" style={{ width: '2px', backgroundColor: '#06b6d4' }} />
+                            <div className="h-full transition-all duration-500 border-l border-cyan-500/30" style={{ width: '2px', backgroundColor: 'var(--cyan)' }} />
                             <div className="h-full transition-all duration-500" style={{ width: `${(10 / (thickness + 10)) * 100}%`, backgroundColor: material2Color }} />
                         </div>
                     </div>
@@ -465,7 +468,7 @@ export default function WeldingPageClient() {
                                     <div>
                                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.welding.heatInput}</h4>
                                         <div className="text-2xl font-mono font-bold text-slate-900 dark:text-white mt-1">
-                                            {results.heatInput.toFixed(2)} <span className="text-sm font-medium text-slate-400">kJ/mm</span>
+                                            {formatEngineeringValue(results.heatInput, precision, false)} <span className="text-sm font-medium text-slate-400">kJ/mm</span>
                                         </div>
                                     </div>
                                 </div>
@@ -482,10 +485,10 @@ export default function WeldingPageClient() {
                                     {t.welding.weldStress}
                                 </div>
                                 <div className={`text-3xl font-mono font-bold ${results.safetyFactor < 1.5 ? 'text-red-400' : results.safetyFactor < 2.5 ? 'text-yellow-400' : 'text-green-400'}`}>
-                                    {results.stress.toFixed(1)} <span className="text-lg">MPa</span>
+                                    {formatEngineeringValue(results.stress, precision, false)} <span className="text-lg">MPa</span>
                                 </div>
                                 <div className="text-xs text-slate-400 mt-1">
-                                    Safety Factor: <span className={results.safetyFactor < 1.5 ? 'text-red-400' : 'text-green-400'}>{results.safetyFactor.toFixed(2)}</span>
+                                    Safety Factor: <span className={results.safetyFactor < 1.5 ? 'text-red-400' : 'text-green-400'}>{formatEngineeringValue(results.safetyFactor, precision, false)}</span>
                                 </div>
                             </div>
                         </div>
@@ -494,7 +497,7 @@ export default function WeldingPageClient() {
                             {/* Throat Area */}
                             <div>
                                 <div className="text-[10px] text-slate-400 uppercase">{t.welding.throatArea}</div>
-                                <div className="font-mono text-lg">{results.throatArea.toFixed(0)} mm²</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(results.throatArea, precision, false)} mm²</div>
                             </div>
 
                             {/* Min Weld Size */}
@@ -528,7 +531,7 @@ export default function WeldingPageClient() {
                             {/* Filler Consumption */}
                             <div>
                                 <div className="text-[10px] text-slate-400 uppercase">{t.welding.fillerMetal}</div>
-                                <div className="font-mono text-lg">{results.filler.weight.toFixed(1)} g</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(results.filler.weight, precision, false)} g</div>
                             </div>
                         </div>
                     </div>

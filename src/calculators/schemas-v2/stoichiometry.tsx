@@ -9,7 +9,7 @@ export const stoichiometrySchema: CalculatorSchemaV2 = {
         description: 'Calculates Molarity, Molality, and Mass Percent of a solution.',
         category: 'mechanical', // Temporarily mapped to mechanical
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['stoichiometry', 'molarity', 'molality', 'concentration', 'solution'],
         verifiedStandards: ['Chemical Stoichiometry Principles']
@@ -79,7 +79,7 @@ export const stoichiometrySchema: CalculatorSchemaV2 = {
             }));
 
             return (
-                <div className="w-full h-full flex items-center justify-center p-8 bg-[#05080b]">
+                <div className="w-full h-full flex items-center justify-center p-8 bg-[var(--bg-0)]">
                     <svg viewBox="0 0 400 240" className="w-full max-w-sm drop-shadow-2xl font-mono">
 
                         {/* Information Panel */}

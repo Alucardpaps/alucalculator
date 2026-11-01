@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Calculator Schema Type System
+ * AluCAD OS — Calculator Schema Type System
  * THE DNA OF EVERY CALCULATOR
  * 
  * This schema is NON-NEGOTIABLE. Every calculator must conform to this interface.

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Media Node
+ * AluCAD OS — Media Node
  * 
  * ReactFlow node for displaying educational media:
  * - YouTube embeds
@@ -23,17 +23,17 @@ import { useFlowStore } from '@/store/flowStore';
 
 const styles = {
     node: `
-        min-w-[320px] bg-[#0f1419] 
-        rounded-lg shadow-2xl border border-[#2a3a4a]
+        min-w-[320px] bg-[var(--bg-1)] 
+        rounded-lg shadow-2xl border border-[var(--line-strong)]
         overflow-hidden
     `,
     nodeSelected: `
-        border-[#00e5ff] ring-2 ring-[#00e5ff]/30
+        border-[var(--cyan)] ring-2 ring-[var(--cyan)]/30
     `,
     header: `
         flex items-center justify-between gap-2 px-3 py-2
-        bg-gradient-to-r from-[#1a2332] to-[#0f1419]
-        border-b border-[#2a3a4a] cursor-move
+        bg-gradient-to-r from-[var(--bg-3)] to-[var(--bg-1)]
+        border-b border-[var(--line-strong)] cursor-move
     `,
     headerTitle: `
         text-xs font-bold text-gray-400 uppercase tracking-wider
@@ -175,8 +175,8 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
 
     return (
         <>
-            <NodeToolbar isVisible={selected} position={Position.Top} className="flex flex-col gap-2 bg-[#1a2332] p-2 rounded-lg border border-[#2a3a4a] shadow-xl min-w-[250px]">
-                <div className="flex items-center justify-between border-b border-[#2a3a4a] pb-1 mb-1">
+            <NodeToolbar isVisible={selected} position={Position.Top} className="flex flex-col gap-2 bg-[var(--bg-3)] p-2 rounded-lg border border-[var(--line-strong)] shadow-xl min-w-[250px]">
+                <div className="flex items-center justify-between border-b border-[var(--line-strong)] pb-1 mb-1">
                     <span className="text-xs font-bold text-gray-400 uppercase">Settings</span>
                     <button onClick={() => setIsEditing(!isEditing)} className={`p-1 rounded ${isEditing ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10 text-gray-400'}`}>
                         {isEditing ? <Check size={14} onClick={handleSave} /> : <Settings size={14} />}
@@ -191,7 +191,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] text-gray-500 uppercase">Title</label>
                             <input
-                                className="bg-[#0f1419] border border-[#2a3a4a] rounded px-2 py-1 text-xs text-white focus:border-[#00e5ff] outline-none"
+                                className="bg-[var(--bg-1)] border border-[var(--line-strong)] rounded px-2 py-1 text-xs text-white focus:border-[var(--cyan)] outline-none"
                                 value={editTitle}
                                 onChange={e => setEditTitle(e.target.value)}
                                 placeholder="Title..."
@@ -200,7 +200,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] text-gray-500 uppercase flex items-center gap-1"><Link size={10} /> URL</label>
                             <input
-                                className="bg-[#0f1419] border border-[#2a3a4a] rounded px-2 py-1 text-xs text-white focus:border-[#00e5ff] outline-none"
+                                className="bg-[var(--bg-1)] border border-[var(--line-strong)] rounded px-2 py-1 text-xs text-white focus:border-[var(--cyan)] outline-none"
                                 value={editUrl}
                                 onChange={e => setEditUrl(e.target.value)}
                                 placeholder="https://..."
@@ -209,13 +209,13 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] text-gray-500 uppercase flex items-center gap-1"><FolderOpen size={10} /> File Path</label>
                             <input
-                                className="bg-[#0f1419] border border-[#2a3a4a] rounded px-2 py-1 text-xs text-white focus:border-[#00e5ff] outline-none"
+                                className="bg-[var(--bg-1)] border border-[var(--line-strong)] rounded px-2 py-1 text-xs text-white focus:border-[var(--cyan)] outline-none"
                                 value={editPath}
                                 onChange={e => setEditPath(e.target.value)}
                                 placeholder="C:\Projects\..."
                             />
                         </div>
-                        <button onClick={handleSave} className="bg-[#00e5ff]/10 hover:bg-[#00e5ff]/20 text-[#00e5ff] py-1 rounded text-xs font-bold mt-1">
+                        <button onClick={handleSave} className="bg-[var(--cyan)]/10 hover:bg-[var(--cyan)]/20 text-[var(--cyan)] py-1 rounded text-xs font-bold mt-1">
                             Save Changes
                         </button>
                     </div>
@@ -228,7 +228,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                */}
                 <div className={styles.header}>
                     <div className={styles.headerTitle}>
-                        <Icon size={14} className="text-[#00e5ff]" />
+                        <Icon size={14} className="text-[var(--cyan)]" />
                         {data.title || (data.mediaType === 'music' ? 'MUSIC PLAYER' : data.mediaType.toUpperCase())}
                     </div>
                     {/* Removed close button from header as it's in toolbar now, or keep both? Keep for consistency? */}
@@ -275,7 +275,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                                 href={data.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#00e5ff] hover:underline flex items-center gap-1 text-xs"
+                                className="text-[var(--cyan)] hover:underline flex items-center gap-1 text-xs"
                             >
                                 Open <ExternalLink size={10} />
                             </a>
@@ -299,7 +299,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                 if (!embedUrl) return <div className="p-4 text-red-400 text-xs">Invalid URL</div>;
 
                 return (
-                    <div className="w-full bg-[#1a2332] rounded overflow-hidden">
+                    <div className="w-full bg-[var(--bg-3)] rounded overflow-hidden">
                         <iframe
                             src={embedUrl}
                             width="100%"
@@ -343,7 +343,7 @@ const MediaNode: React.FC<NodeProps<MediaNodeData>> = ({
                             href={data.url || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`px-3 py-1.5 rounded text-xs font-medium bg-[#0f1419] border border-[#2a3a4a] hover:bg-[#2a3a4a] transition-colors flex items-center gap-2 ${textColor}`}
+                            className={`px-3 py-1.5 rounded text-xs font-medium bg-[var(--bg-1)] border border-[var(--line-strong)] hover:bg-[var(--line-strong)] transition-colors flex items-center gap-2 ${textColor}`}
                             onClick={(e) => {
                                 if (data.filePath && !data.url) {
                                     e.preventDefault();

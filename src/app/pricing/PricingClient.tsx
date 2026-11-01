@@ -1,206 +1,443 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Check, Minus } from 'lucide-react';
+import { Check, Minus, Sparkles, Zap, ShieldCheck, ArrowRight, Building2, Users, UserCheck, FileText } from 'lucide-react';
 import { useLicenseStore } from '@/store/licenseStore';
-import { TOTAL_CALCULATORS_LABEL } from '@/config/modules';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { getAppPages } from '@/locales/appPagesTranslations';
-
-const PLANS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 'Free',
-    blurb: 'Daily engineering math in the browser',
-    cta: 'Current plan',
-    featured: false,
-    items: [
-      'Core calculators (mass, bolts, bearings, beams, gears…)',
-      'Alloy-true aluminum density',
-      '3 PDF / day (watermarked) · 1 DXF / day',
-      'PWA offline-ready',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: '$190/yr',
-    note: '−17%',
-    sub: '≈ $15.8/mo billed yearly',
-    blurb: 'For independent engineers & freelancers',
-    cta: 'Upgrade to Pro',
-    featured: true,
-    items: [
-      'Unlimited STEP / DXF / STL / PDF',
-      'Unwatermarked client PDFs',
-      'Unlimited nesting & cut optimizer',
-      'Local project BOM + priority support',
-    ],
-  },
-  {
-    id: 'team',
-    name: 'Team',
-    price: '$490/yr',
-    note: '−17%',
-    blurb: 'Shared licenses for design offices',
-    cta: 'Get Team Access',
-    featured: false,
-    items: [
-      'Up to 10 seats',
-      'Bulk API (500 rows/request)',
-      'Custom report header fields',
-      'Everything in Pro',
-    ],
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 'Custom',
-    blurb: 'Factories, OEMs, universities — custom contract',
-    cta: 'Contact Sales',
-    featured: false,
-    items: [
-      'Unlimited seats & API volume',
-      'SSO / SLA by contract (not self-serve)',
-      'Custom standards packs on request',
-      'Training & onboarding',
-    ],
-  },
-] as const;
-
-const MATRIX: { feature: string; free: boolean; pro: boolean; team: boolean; enterprise: boolean }[] = [
-  { feature: `${TOTAL_CALCULATORS_LABEL} engineering calculators`, free: true, pro: true, team: true, enterprise: true },
-  { feature: 'Alloy-true density & materials DB', free: true, pro: true, team: true, enterprise: true },
-  { feature: 'PDF engineering reports', free: true, pro: true, team: true, enterprise: true },
-  { feature: 'Unwatermarked client-ready PDFs', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'DXF manufacturing export (1:1 mm)', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'STL 3D mesh export (High-res binary)', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'STEP 3D B-Rep export (STABLE ISO 10303)', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'Unlimited nesting & cutting optimizer', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'AI engineering copilot (daily quota)', free: true, pro: true, team: true, enterprise: true },
-  { feature: 'Higher AI quota (Pro+)', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'Bulk Calculation API', free: false, pro: false, team: true, enterprise: true },
-  { feature: 'Team seats (shared license keys)', free: false, pro: false, team: true, enterprise: true },
-  { feature: 'Local project BOM (browser storage)', free: false, pro: true, team: true, enterprise: true },
-  { feature: 'Priority email support', free: false, pro: true, team: true, enterprise: true },
-];
-
-function Cell({ ok, available, notAvailable }: { ok: boolean; available: string; notAvailable: string }) {
-  return ok ? (
-    <span className="inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold">
-      <Check size={13} /> {available}
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1 text-slate-500 text-xs">
-      <Minus size={13} /> {notAvailable}
-    </span>
-  );
-}
+import { BorderBeam } from '@/components/21st/BorderBeam';
 
 export function PricingClient() {
   const plan = useLicenseStore((s) => s.plan);
   const language = useI18nStore((s) => s.language);
   const t = getAppPages(language).pricing;
 
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
+
+  // Dynamic, mathematically sound plan specifications
+  const plans = [
+    {
+      id: 'free',
+      name: t12(language, 'Free', 'Ücretsiz'),
+      badge: null,
+      price: '$0',
+      period: t12(language, '/ mo', '/ ay'),
+      billedNote: t12(language, 'Free forever', 'Sonsuza kadar ücretsiz'),
+      discount: null,
+      blurb: t12(language, 'Daily core engineering math in your browser', 'Tarayıcıda günlük temel mühendislik matematiği'),
+      cta: plan === 'free' ? (t12(language, 'Current Plan', 'Mevcut Planınız')) : (t12(language, 'Get Started', 'Başlayın')),
+      featured: false,
+      icon: UserCheck,
+      items: [
+        t12(language, 'Full engineering solver suite', 'Tüm mühendislik modülleri'),
+        t12(language, 'Alloy-true materials & density library', 'Gerçek alaşım yoğunlukları ve malzeme kütüphanesi'),
+        t12(language, '3 PDF reports / day (watermarked) · 1 DXF / day', 'Günde 3 PDF raporu (filigranlı) · Günde 1 DXF'),
+        t12(language, 'Offline PWA ready for machine shop floor', 'İnternetsiz çalışan PWA atölye desteği'),
+      ],
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      badge: t12(language, 'Most Popular', 'En Popüler'),
+      price: billingCycle === 'yearly' ? '$15.80' : '$19',
+      period: t12(language, '/ mo', '/ ay'),
+      billedNote:
+        billingCycle === 'yearly'
+          ? t12(language, 'Billed $190 annually', 'Yıllık $190 olarak faturalandırılır')
+          : t12(language, 'Billed monthly', 'Aylık olarak faturalandırılır'),
+      discount: billingCycle === 'yearly' ? (t12(language, 'Save 17%', '%17 İndirim')) : null,
+      blurb: t12(language, 'For independent engineers, designers & consultants', 'Bağımsız mühendisler, tasarımcılar ve serbest çalışanlar için'),
+      cta: plan === 'pro' ? (t12(language, 'Current Plan', 'Mevcut Planınız')) : (t12(language, 'Upgrade to Pro', 'Pro’ya Yükselt')),
+      featured: true,
+      icon: Zap,
+      items: [
+        t12(language, 'Unlimited STEP, DXF, STL & PDF exports', 'Sınırsız STEP, DXF, STL ve PDF üretimi'),
+        t12(language, 'Clean, unwatermarked client-ready PDFs', 'Müşteriye hazır, filigransız temiz PDF raporları'),
+        t12(language, 'Unlimited 1D cut & 2D sheet nesting optimizer', 'Sınırsız 1D kesim ve 2D plaka yerleşim optimizasyonu'),
+        t12(language, 'Local project BOM & priority engineering support', 'Yerel proje malzeme listesi (BOM) & öncelikli destek'),
+      ],
+    },
+    {
+      id: 'team',
+      name: t12(language, 'Team', 'Ekip (Team)'),
+      badge: t12(language, 'Design Offices', 'Ofisler İçin'),
+      price: billingCycle === 'yearly' ? '$40.80' : '$49',
+      period: t12(language, '/ mo', '/ ay'),
+      billedNote:
+        billingCycle === 'yearly'
+          ? t12(language, 'Billed $490 annually for up to 10 seats', '10 koltuk için yıllık $490 faturalandırılır')
+          : t12(language, 'Billed $49 monthly for up to 10 seats', '10 koltuk için aylık $49 faturalandırılır'),
+      discount: billingCycle === 'yearly' ? (t12(language, 'Save 17%', '%17 İndirim')) : null,
+      blurb: t12(language, 'Shared team access for design offices and R&D groups', 'Tasarım ofisleri ve Ar-Ge mühendislik departmanları için'),
+      cta: t12(language, 'Get Team Access', 'Ekip Erişimi Al'),
+      featured: false,
+      icon: Users,
+      items: [
+        t12(language, 'Up to 10 shared user seats per license', '10 kullanıcıya kadar ortak lisans anahtarı'),
+        t12(language, 'Bulk Calculation REST API (500 rows/request)', 'Toplu Hesaplama REST API’si (istek başına 500 satır)'),
+        t12(language, 'Custom report company header & branding', 'Özel kurumsal rapor başlığı ve şirket logosu'),
+        t12(language, 'Includes everything in Pro tier', 'Pro planındaki tüm özellikler dahil'),
+      ],
+    },
+    {
+      id: 'enterprise',
+      name: t12(language, 'Enterprise', 'Kurumsal'),
+      badge: t12(language, 'OEM / Factories', 'Fabrikalar'),
+      price: t12(language, 'Custom', 'Özel'),
+      period: '',
+      billedNote: t12(language, 'Contract-based billing & SLA', 'Özel sözleşme & faturalandırma'),
+      discount: null,
+      blurb: t12(language, 'Factories, OEM manufacturers and academic institutions', 'Fabrikalar, OEM üreticileri ve üniversiteler için özel çözüm'),
+      cta: t12(language, 'Contact Sales', 'Satış ile İletişime Geç'),
+      featured: false,
+      icon: Building2,
+      items: [
+        t12(language, 'Unlimited seats & unrestricted API volume', 'Sınırsız koltuk sayısı ve limitsiz API işlem hacmi'),
+        t12(language, 'Enterprise SSO / SAML integration & contractual SLA', 'Kurumsal SSO / SAML entegrasyonu ve sözleşmeli SLA'),
+        t12(language, 'Custom standards packs on request', 'Özel endüstriyel norm ve standart paketleri'),
+        t12(language, 'On-site or remote engineering onboarding', 'Yerinde veya uzaktan eğitim ve devreye alma'),
+      ],
+    },
+  ];
+
+  // Comprehensive Comparison Matrix
+  const matrix = [
+    {
+      feature: t12(language, 'Full engineering solver suite', 'Tüm mühendislik modülleri'),
+      free: true, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Alloy-true density & materials DB', 'Gerçek alaşım yoğunlukları & malzeme veritabanı'),
+      free: true, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'PDF engineering reports', 'PDF mühendislik raporları'),
+      free: true, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Unwatermarked client-ready PDFs', 'Filigransız profesyonel PDF çıktıları'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'DXF manufacturing export (Free: 1/day, Pro: Unlimited)', 'DXF imalat ihracı (Ücretsiz: 1/gün, Pro: Sınırsız)'),
+      free: '1/day', pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'STL 3D mesh export (High-res binary)', 'Yüksek çözünürlüklü STL 3D örgü ihracı'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'STEP 3D B-Rep export (AP214 / AP203)', 'STEP 3D B-Rep katı model ihracı (AP214 / AP203)'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Unlimited nesting & cutting optimizer', 'Sınırsız 1D profil kesim & 2D sac yerleşim'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'AeGiS AI engineering copilot (daily quota)', 'AeGiS AI mühendislik copilotu (günlük kota)'),
+      free: true, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Bulk Calculation API (500 rows/request)', 'Toplu Hesaplama REST API (500 satır/istek)'),
+      free: false, pro: false, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Team seats (shared license keys)', 'Ekip koltukları (ortak lisans anahtarı)'),
+      free: false, pro: false, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Local project BOM (browser storage)', 'Yerel proje malzeme listesi (BOM) kaydı'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+    {
+      feature: t12(language, 'Priority engineering email support', 'Öncelikli mühendislik e-posta desteği'),
+      free: false, pro: true, team: true, enterprise: true,
+    },
+  ];
+
   return (
-    <main className="work-shell max-w-6xl mx-auto px-4 sm:px-6 py-10">
-      <header className="mb-10 max-w-2xl">
-        <p className="work-kicker">{t.kicker}</p>
-        <h1 className="work-title">{t.title}</h1>
-        <p className="work-lead">{t.lead}</p>
+    <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans select-none">
+      
+      {/* ─── HEADER ─── */}
+      <header className="mb-10 text-center max-w-3xl mx-auto space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-tech text-xs uppercase tracking-wider font-semibold">
+          <Sparkles size={13} />
+          <span>{t.kicker}</span>
+        </div>
+
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-tech text-white tracking-tight leading-tight">
+          {t.title}
+        </h1>
+
+        <p className="text-sm sm:text-base text-slate-400 leading-relaxed font-normal">
+          {t.lead}
+        </p>
+
+        {/* ─── BILLING CYCLE TOGGLE (MONTHLY / YEARLY) ─── */}
+        <div className="pt-4 flex items-center justify-center">
+          <div className="inline-flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 shadow-lg">
+            <button
+              type="button"
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-5 py-2 rounded-full font-tech text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                billingCycle === 'monthly'
+                  ? 'bg-white/15 text-white border border-white/20 shadow-md font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {t12(language, 'Monthly Billing', 'Aylık Faturalama')}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setBillingCycle('yearly')}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full font-tech text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                billingCycle === 'yearly'
+                  ? 'bg-white/15 text-white border border-white/20 shadow-md font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>{t12(language, 'Annual Billing', 'Yıllık Faturalama')}</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                {t12(language, 'Save 17%', '%17 İndirim')}
+              </span>
+            </button>
+          </div>
+        </div>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-12">
-        {PLANS.map((p) => (
-          <article
-            key={p.id}
-            className={`work-card flex flex-col ${p.featured ? 'border-[#6b9fff]/40 shadow-[0_0_30px_rgba(107,159,255,0.12)]' : ''}`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-black text-white">{p.name}</h2>
-              {p.featured && (
-                <span className="text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#6b9fff] text-black px-2 py-0.5">
-                  {t.mostPopular}
-                </span>
-              )}
-            </div>
-            <p className="text-[12px] text-slate-400 mb-3">{p.blurb}</p>
-            <p className="text-2xl font-black text-white">
-              {p.price}{' '}
-              {'note' in p && p.note ? <span className="text-sm text-emerald-400">{p.note}</span> : null}
-            </p>
-            {'sub' in p && p.sub ? <p className="text-[11px] text-slate-500 mb-3">{p.sub}</p> : <div className="mb-3" />}
-            <ul className="space-y-1.5 text-[12px] text-slate-300 flex-1 mb-4">
-              {p.items.map((item) => (
-                <li key={item} className="flex gap-2">
-                  <Check size={13} className="text-emerald-400 mt-0.5 shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={p.id === 'free' ? '/license/' : '/sales/'}
-              className={p.featured ? 'work-btn-primary text-center' : 'work-btn text-center'}
+      {/* ─── 4 PRICING CARDS ─── */}
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 mb-16">
+        {plans.map((p) => {
+          const IconComponent = p.icon;
+          return (
+            <article
+              key={p.id}
+              className={`relative rounded-2xl border p-6 flex flex-col justify-between transition-all duration-300 ${
+                p.featured
+                  ? 'bg-gradient-to-b from-[var(--bg-2)] to-[var(--bg-0)] border-cyan-500/50 scale-[1.02]'
+                  : 'bg-white/[0.02] border-white/[0.08] hover:border-white/20'
+              }`}
             >
-              {plan === p.id ? t.currentPlan : p.cta}
-            </Link>
-            {p.id === 'pro' && plan === 'free' && (
-              <Link href="/license/" className="text-[11px] text-center text-slate-400 hover:text-cyan-300 mt-2 font-mono">
-                {t.haveKey}
-              </Link>
-            )}
-          </article>
-        ))}
+              {p.featured && (
+                <BorderBeam
+                  size={200}
+                  duration={8}
+                  colorFrom="#00e5ff"
+                  colorTo="#3b82f6"
+                  rx={16}
+                />
+              )}
+
+              <div className="space-y-4">
+                {/* Header title & badge */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className={`p-2 rounded-xl border ${
+                      p.featured ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-white/5 text-slate-300 border-white/10'
+                    }`}>
+                      <IconComponent size={18} />
+                    </div>
+                    <h2 className="text-xl font-bold font-tech text-white">{p.name}</h2>
+                  </div>
+
+                  {p.badge && (
+                    <span className="text-[10px] font-bold font-tech uppercase tracking-wider rounded-full bg-cyan-400 text-slate-950 px-2.5 py-0.5 shadow-sm">
+                      {p.badge}
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-400 leading-relaxed min-h-[36px]">{p.blurb}</p>
+
+                {/* Price Display */}
+                <div className="pt-2 border-t border-white/5">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl sm:text-4xl font-black font-tech text-white tracking-tight">
+                      {p.price}
+                    </span>
+                    {p.period && <span className="text-xs text-slate-400 font-mono">{p.period}</span>}
+                    {p.discount && (
+                      <span className="ml-auto text-[11px] font-bold font-mono px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/30 text-emerald-400">
+                        {p.discount}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-mono mt-1">{p.billedNote}</p>
+                </div>
+
+                {/* Feature Bullet Items */}
+                <ul className="space-y-2.5 text-xs text-slate-300 pt-3 border-t border-white/5">
+                  {p.items.map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />
+                      <span className="leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-6">
+                {p.featured ? (
+                  <Link href="/sales/" className="group w-full block">
+                    <div className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:via-sky-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                      <span>{p.cta}</span>
+                      <ArrowRight size={14} className="text-slate-950 group-hover:translate-x-1 transition-transform duration-200" />
+                    </div>
+                  </Link>
+                ) : p.id === 'free' && plan === 'free' ? (
+                  <div className="w-full py-3.5 px-4 rounded-xl bg-white/[0.03] border border-white/10 text-slate-400 font-tech font-semibold text-xs uppercase tracking-wider text-center cursor-default">
+                    <span>{p.cta}</span>
+                  </div>
+                ) : (
+                  <Link
+                    href={p.id === 'free' ? '/license/' : '/sales/'}
+                    className="group w-full inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-500/40 text-slate-200 hover:text-white font-tech font-semibold text-xs uppercase tracking-wider transition-all duration-200 active:scale-[0.98] text-center cursor-pointer"
+                  >
+                    <span>{p.cta}</span>
+                    <ArrowRight size={13} className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all duration-200" />
+                  </Link>
+                )}
+
+                {p.id === 'pro' && plan === 'free' && (
+                  <Link
+                    href="/license/"
+                    className="block text-[11px] text-center text-slate-400 hover:text-cyan-300 mt-2.5 font-mono transition-colors"
+                  >
+                    {t.haveKey}
+                  </Link>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
-      <div className="overflow-x-auto work-card mb-10">
-        <table className="w-full text-left text-[12px]">
-          <thead>
-            <tr className="text-slate-400 border-b border-white/10">
-              <th className="py-2 pr-3 font-semibold">{t.feature}</th>
-              <th className="py-2 px-2">Free</th>
-              <th className="py-2 px-2">Pro</th>
-              <th className="py-2 px-2">Team</th>
-              <th className="py-2 px-2">Enterprise</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MATRIX.map((row) => (
-              <tr key={row.feature} className="border-b border-white/5">
-                <td className="py-2.5 pr-3 text-slate-200">{row.feature}</td>
-                <td className="py-2.5 px-2"><Cell ok={row.free} available={t.available} notAvailable={t.notAvailable} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.pro} available={t.available} notAvailable={t.notAvailable} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.team} available={t.available} notAvailable={t.notAvailable} /></td>
-                <td className="py-2.5 px-2"><Cell ok={row.enterprise} available={t.available} notAvailable={t.notAvailable} /></td>
+      {/* ─── DETAILED FEATURE COMPARISON TABLE ─── */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 mb-12 overflow-hidden">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold font-tech text-white">
+              {t12(language, 'Detailed Feature Matrix', 'Ayrıntılı Özellik Karşılaştırması')}
+            </h2>
+            <p className="text-xs text-slate-400 mt-1">
+              {t12(language, 'Functional capabilities, export formats, and quota allocations across tiers', 'Tüm planların sunduğu fonksiyonel yetenekler ve imalat formatı destekleri')}
+            </p>
+          </div>
+          <a
+            href="/reports/sample-vdi-2230-bolt-torque.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-white font-mono text-xs transition-all shrink-0 active:scale-[0.98]"
+          >
+            <FileText size={14} className="text-cyan-400" />
+            <span>Sample VDI 2230 report (PDF)</span>
+          </a>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="text-slate-400 border-b border-white/10 font-tech uppercase tracking-wider text-[11px]">
+                <th className="py-3 pr-4">{t12(language, 'Feature', 'Özellik')}</th>
+                <th className="py-3 px-3 text-center">{t12(language, 'Free', 'Ücretsiz')}</th>
+                <th className="py-3 px-3 text-center text-cyan-400 font-bold">Pro</th>
+                <th className="py-3 px-3 text-center">{t12(language, 'Team', 'Ekip')}</th>
+                <th className="py-3 px-3 text-center">{t12(language, 'Enterprise', 'Kurumsal')}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {matrix.map((row) => (
+                <tr key={row.feature} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3 pr-4 text-slate-200 font-medium">{row.feature}</td>
+                  
+                  <td className="py-3 px-3 text-center">
+                    {typeof row.free === 'string' ? (
+                      <span className="font-mono text-[11px] font-bold text-cyan-400">{row.free}</span>
+                    ) : row.free ? (
+                      <Check size={16} className="text-emerald-400 mx-auto" />
+                    ) : (
+                      <Minus size={16} className="text-slate-600 mx-auto" />
+                    )}
+                  </td>
+
+                  <td className="py-3 px-3 text-center bg-cyan-500/[0.03]">
+                    {row.pro ? (
+                      <Check size={16} className="text-cyan-400 mx-auto" />
+                    ) : (
+                      <Minus size={16} className="text-slate-600 mx-auto" />
+                    )}
+                  </td>
+
+                  <td className="py-3 px-3 text-center">
+                    {row.team ? (
+                      <Check size={16} className="text-emerald-400 mx-auto" />
+                    ) : (
+                      <Minus size={16} className="text-slate-600 mx-auto" />
+                    )}
+                  </td>
+
+                  <td className="py-3 px-3 text-center">
+                    {row.enterprise ? (
+                      <Check size={16} className="text-emerald-400 mx-auto" />
+                    ) : (
+                      <Minus size={16} className="text-slate-600 mx-auto" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-2 mb-8">
-        <div className="work-card">
-          <h2 className="text-sm font-bold text-white mb-2">{t.licensingTitle}</h2>
-          <p className="text-[13px] text-slate-400 leading-relaxed">
+      {/* ─── LICENSING & ENTERPRISE INFO ─── */}
+      <section className="grid gap-6 md:grid-cols-2 mb-10">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 space-y-3">
+          <div className="flex items-center gap-2 text-cyan-400">
+            <ShieldCheck size={18} />
+            <h2 className="text-base font-bold font-tech text-white">{t.licensingTitle}</h2>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed font-normal">
             {t.licensingBody}{' '}
-            <Link href="/license/" className="text-[#9bbdff] underline">/license</Link>.
+            <Link href="/license/" className="text-cyan-400 hover:text-cyan-300 underline font-mono">
+              /license
+            </Link>.
           </p>
         </div>
-        <div className="work-card">
-          <h2 className="text-sm font-bold text-white mb-2">{t.enterpriseTitle}</h2>
-          <p className="text-[13px] text-slate-400 leading-relaxed mb-3">
-            {t.enterpriseBody}
-          </p>
-          <a className="work-btn-primary inline-flex" href="mailto:sales@alucalculator.com?subject=AluCalc%20Enterprise">
-            sales@alucalculator.com →
+
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 space-y-3 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-sky-400 mb-2">
+              <Building2 size={18} />
+              <h2 className="text-base font-bold font-tech text-white">{t.enterpriseTitle}</h2>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+              {t.enterpriseBody}
+            </p>
+          </div>
+
+          <a
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-tech font-bold text-xs tracking-wider transition-all w-fit shadow-md active:scale-[0.98]"
+            href="mailto:abdulsametyildirim95@gmail.com?subject=AluCalc%20Enterprise"
+          >
+            <span>abdulsametyildirim95@gmail.com</span>
+            <ArrowRight size={13} />
           </a>
         </div>
       </section>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      {/* ─── LEGAL DISCLAIMER ─── */}
+      <p className="text-[11px] text-slate-500 leading-relaxed text-center font-mono max-w-4xl mx-auto">
         {t.legal}
       </p>
+
     </main>
   );
 }
+
+export default PricingClient;

@@ -9,7 +9,7 @@ export const areaMomentInertiaSchema: CalculatorSchemaV2 = {
         description: 'Calculates cross-sectional properties for parametric I-beams and Rectangles.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['inertia', 'beam', 'cross-section', 'modulus', 'statics'],
         verifiedStandards: ['Euler-Bernoulli Beam Theory']
@@ -104,7 +104,7 @@ export const areaMomentInertiaSchema: CalculatorSchemaV2 = {
             const Iy = result?.outputs?.Iy?.value || 0;
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <svg viewBox="0 0 400 240" className="w-full h-full font-mono drop-shadow-2xl">
                         {/* Axes */}
                         <line x1={cx - 150} y1={cy} x2={cx + 150} y2={cy} stroke="#334155" strokeWidth="1" strokeDasharray="4 4" />

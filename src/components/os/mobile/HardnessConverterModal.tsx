@@ -125,13 +125,13 @@ export function HardnessConverterModal({ isOpen, onClose, ft: propFt, debugMode 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[#020408]/95 p-4 text-white overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg-0)]/95 p-4 text-white overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
                     <Layers className="text-cyan-400 animate-pulse" size={20} />
                     <div>
-                        <h3 className="text-sm font-black italic uppercase tracking-wider">{ft.hardnessConverter || 'Hardness Converter'}</h3>
+                        <h3 className="text-sm font-black uppercase tracking-wider">{ft.hardnessConverter || 'Hardness Converter'}</h3>
                         <span className="text-[9px] text-slate-500 font-mono block leading-none">{ft.hardnessConverterDesc}</span>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ export function HardnessConverterModal({ isOpen, onClose, ft: propFt, debugMode 
                             <button
                                 key={scale}
                                 onClick={() => handleScaleChange(scale)}
-                                className={`py-2 text-[10px] font-bold font-mono uppercase rounded-lg transition-all ${inputScale === scale ? 'bg-cyan-500 text-black shadow-[0_0_10px_rgba(6,182,212,0.2)]' : 'text-slate-400 hover:text-white'}`}
+                                className={`py-2 text-[10px] font-bold font-mono uppercase rounded-lg transition-all ${inputScale === scale ? 'bg-[var(--cyan)] text-[var(--accent-ink)] ' : 'text-slate-400 hover:text-white'}`}
                             >
                                 {scale}
                             </button>
@@ -161,7 +161,7 @@ export function HardnessConverterModal({ isOpen, onClose, ft: propFt, debugMode 
 
                 {/* Input Slider */}
                 <div className="p-4 bg-slate-950/40 border border-cyan-500/20 rounded-2xl space-y-3 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 pointer-events-none" />
                     <div className="flex justify-between items-baseline font-mono text-xs">
                         <span className="text-slate-400">{ft.hardnessVal || 'Input Value'}</span>
                         <span className="font-black text-cyan-400 text-lg">
@@ -178,7 +178,7 @@ export function HardnessConverterModal({ isOpen, onClose, ft: propFt, debugMode 
                             setInputValue(Number(e.target.value));
                             if (soundEnabled && Math.floor(inputValue) % 5 === 0) playClickSound();
                         }}
-                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                        className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                     />
                 </div>
 
@@ -212,7 +212,7 @@ export function HardnessConverterModal({ isOpen, onClose, ft: propFt, debugMode 
                         )}
                         {inputScale !== 'mpa' && (
                             <div className="col-span-2 p-4 bg-slate-950/30 border border-white/5 rounded-2xl text-center space-y-1.5 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent pointer-events-none" />
+                                <div className="absolute inset-0 pointer-events-none" />
                                 <span className="text-[8px] font-mono text-slate-500 block uppercase tracking-wider">Tensile Strength (Dayanım)</span>
                                 <div className="flex items-baseline justify-center gap-4">
                                     <span className="text-2xl font-black font-mono text-cyan-400">{Math.round(mpaVal)} <span className="text-xs font-normal text-slate-400">MPa</span></span>

@@ -1,0 +1,26 @@
+{
+    "id": "alucalc.mechanical.shaft-design",
+    "version": "1.0.0",
+    "type": "shaft-design",
+    "category": "mechanical",
+    "title": "Kademeli Mil Tasarımı & Mukavemet Analizi",
+    "description": "DIN 743, DIN 6885, DIN 471 standartlarında kademeli mil boyutlandırma, dişli/kama/segman/delik/imbus/pim atama, sehim ve gerilme analizi, parametrik 2D CAD teknik resmi.",
+    "icon": "Disc",
+    "defaultSize": {
+        "width": 1100,
+        "height": 780
+    },
+    "capabilities": [
+        "stepped-shaft-generation",
+        "din743-stress-analysis",
+        "cad-technical-drawing",
+        "keyway-circlip-dimensioning",
+        "export-dxf-svg"
+    ],
+    "permissions": [
+        "project.read",
+        "project.write"
+    ],
+    "engineVersionRequired": ">=1.0.0",
+    "author": "AluCAD OS Mechanical Engineering Core"
+}

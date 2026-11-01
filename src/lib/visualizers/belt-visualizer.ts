@@ -1,5 +1,5 @@
 /**
- * AluCalc OS - Belt Drive Visualizer (legacy fallback)
+ * AluCAD OS - Belt Drive Visualizer (legacy fallback)
  */
 
 export interface BeltVisualizerParams {

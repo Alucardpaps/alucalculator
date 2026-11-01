@@ -9,7 +9,7 @@ const fitsTolerancesSchema: CalculatorSchemaV2 = {
         description: 'Calculate clearance, interference, and limits for shaft/hole fits.',
         category: 'materials',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         verifiedStandards: ['ISO 286-1', 'ISO 286-2'],
     },

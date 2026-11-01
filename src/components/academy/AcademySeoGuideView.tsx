@@ -68,12 +68,12 @@ export function AcademySeoGuideView({ slug, lesson: rawLesson }: Props) {
   const bumpProgress = () => setProgressTick((n) => n + 1);
 
   if (!mounted) {
-    return <div className="min-h-screen bg-[#020408]" />;
+    return <div className="min-h-screen bg-[var(--bg-0)]" />;
   }
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#020408]/80 text-slate-200 font-sans selection:bg-blue-500/30">
-      <header className="border-b border-white/5 bg-[#020408]/40 backdrop-blur-xl sticky top-20 z-40">
+    <div className="relative z-10 min-h-screen bg-[var(--bg-0)]/80 text-slate-200 font-sans ">
+      <header className="border-b border-white/5 bg-[var(--bg-0)]/40 sticky top-20 z-40">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/academy"
@@ -118,7 +118,7 @@ export function AcademySeoGuideView({ slug, lesson: rawLesson }: Props) {
             <h2 className="text-sm font-bold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
               {t.governingFormula}
             </h2>
-            <div className="bg-[#010204] rounded-xl p-6 border border-white/5 overflow-x-auto shadow-inner mb-6">
+            <div className="bg-[var(--bg-0)] rounded-xl p-6 border border-white/5 overflow-x-auto shadow-inner mb-6">
               <code className="text-2xl text-white font-mono block whitespace-nowrap text-center">
                 {lesson.formula.equation}
               </code>
@@ -237,7 +237,7 @@ export function AcademySeoGuideView({ slug, lesson: rawLesson }: Props) {
           {lesson.example && (
             <section id="example" className="space-y-6 scroll-mt-32">
               <h2 className="text-2xl font-bold text-white border-b border-white/5 pb-4">{t.workedExampleTitle}</h2>
-              <div className="bg-[#05090e] border border-white/5 rounded-2xl p-6 sm:p-8">
+              <div className="bg-[var(--bg-0)] border border-white/5 rounded-2xl p-6 sm:p-8">
                 <p className="text-base text-emerald-400 font-mono bg-emerald-500/10 px-4 py-3 rounded-lg border border-emerald-500/20 leading-relaxed whitespace-pre-line">
                   {lesson.example}
                 </p>

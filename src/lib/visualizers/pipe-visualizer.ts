@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Parametric Pipe/Fluid Visualizer
+ * AluCAD OS — Parametric Pipe/Fluid Visualizer
  * 
  * Generates SVG representation of pipe cross-sections and flow diagrams.
  * Shows velocity profile, pressure gradients, and Reynolds number regime.

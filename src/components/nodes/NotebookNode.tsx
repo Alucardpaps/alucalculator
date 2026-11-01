@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Notebook Node
+ * AluCAD OS — Notebook Node
  * 
  * A skeuomorphic paper-style note component.
  * Features:
@@ -30,7 +30,7 @@ const styles = {
         font-serif
     `,
     nodeSelected: `
-        ring-2 ring-[#00e5ff]/50
+        ring-2 ring-[var(--cyan)]/50
     `,
     body: `
         w-full h-full p-8 pt-12
@@ -99,8 +99,8 @@ const NotebookNode: React.FC<NodeProps<NotebookNodeData>> = ({
                 minWidth={300}
                 minHeight={200}
                 isVisible={selected}
-                lineClassName="border-[#00e5ff]"
-                handleClassName="h-3 w-3 bg-[#00e5ff] border-2 border-white rounded"
+                lineClassName="border-[var(--cyan)]"
+                handleClassName="h-3 w-3 bg-[var(--cyan)] border-2 border-white rounded"
             />
 
             {/* Drag Handle (Top Strip) */}
@@ -135,9 +135,9 @@ const NotebookNode: React.FC<NodeProps<NotebookNodeData>> = ({
 
             {/* Punch Holes (Visual) */}
             <div className="absolute left-3 top-0 bottom-0 flex flex-col justify-evenly pointer-events-none">
-                <div className="w-3 h-3 rounded-full bg-[#0a0e14] opacity-80" />
-                <div className="w-3 h-3 rounded-full bg-[#0a0e14] opacity-80" />
-                <div className="w-3 h-3 rounded-full bg-[#0a0e14] opacity-80" />
+                <div className="w-3 h-3 rounded-full bg-[var(--bg-1)] opacity-80" />
+                <div className="w-3 h-3 rounded-full bg-[var(--bg-1)] opacity-80" />
+                <div className="w-3 h-3 rounded-full bg-[var(--bg-1)] opacity-80" />
             </div>
 
             {/* Red Margin Line */}

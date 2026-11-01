@@ -21,7 +21,7 @@ export function InfoTooltip({ text }: { text: string }) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 5 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800/90 backdrop-blur-sm text-white text-[11px] rounded-lg shadow-xl min-w-max max-w-[200px] z-[9999] border border-white/10"
+                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800/90 text-white text-[11px] rounded-lg shadow-xl min-w-max max-w-[200px] z-[9999] border border-white/10"
                         style={{ whiteSpace: 'pre-wrap' }}
                     >
                         {text}

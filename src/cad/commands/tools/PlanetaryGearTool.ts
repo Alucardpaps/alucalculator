@@ -41,10 +41,24 @@ export class PlanetaryGearTool implements Command {
 
         // Transition to placement
         this.step = 'CENTER';
-        useCadStore.setState({
-            commandState: 'AWAITING_POINT',
-            commandPrompt: `m=${this.params.module}, sun=${this.params.sunTeeth}, planet=${this.params.planetTeeth} — Click for center:`,
-        });
+        const newPrompt = `m=${this.params.module}, sun=${this.params.sunTeeth}, planet=${this.params.planetTeeth} — Click for center:`;
+        const current = useCadStore.getState();
+        if (current.commandPrompt !== newPrompt || current.commandState !== 'AWAITING_POINT') {
+            useCadStore.setState({
+                commandState: 'AWAITING_POINT',
+                commandPrompt: newPrompt,
+            });
+        }
+    }
+
+    public getParams(): PlanetaryParams {
+        return { ...this.params };
+    }
+
+    public placeNow(): void {
+        const store = useCadStore.getState();
+        this.center = store.cursorWorld || { x: 0, y: 0 };
+        this.generate();
     }
 
     onPointInput(point: Point): void {

@@ -12,12 +12,41 @@ import type {
     Part2D,
     Polygon,
     Point2D,
-    BoundingBox
+    BoundingBox,
+    RemnantSheet2D,
+    GuillotineCropCut,
+    NestingOptions
 } from '@/types/nesting2d.types';
+import { executeSigmaNest2D } from '@/cam/nesting/sigmaNestEngine';
 
 // ============================================
 // WORKER MESSAGE HANDLING
 // ============================================
+
+/** True-shape industrial nesting, off the main thread, with throttled progress. */
+function runTrueShape(job: NestingJob): NestingResult {
+    let last = 0;
+    return executeSigmaNest2D({
+        parts: job.parts,
+        sheet: job.sheet,
+        options: job.options,
+        maxCells: 4_000_000,
+        onProgress: (placed, total, sheetIndex) => {
+            const now = performance.now();
+            if (now - last < 80 && placed < total) return;
+            last = now;
+            self.postMessage({
+                type: 'progress',
+                payload: {
+                    currentPart: placed,
+                    totalParts: total,
+                    currentSheet: sheetIndex + 1,
+                    percent: Math.round((placed / Math.max(1, total)) * 100),
+                },
+            });
+        },
+    });
+}
 
 self.onmessage = (event: MessageEvent) => {
     const { type, payload } = event.data;
@@ -25,7 +54,7 @@ self.onmessage = (event: MessageEvent) => {
     if (type === 'start' && payload) {
         try {
             const job = payload as NestingJob;
-            const result = runNesting(job);
+            const result = job.options.algorithm === 'sigmanest' ? runTrueShape(job) : runNesting(job);
             self.postMessage({ type: 'complete', payload: result });
         } catch (error) {
             self.postMessage({
@@ -266,13 +295,22 @@ function runNesting(job: NestingJob): NestingResult {
             }
             polygon = translatePolygon(polygon, position.x, position.y);
 
+            const innerPolygons = instance.part.innerPolygons?.map(ip => {
+                let p = ip;
+                if (rotation !== 0) {
+                    p = rotatePolygon(p, rotation);
+                }
+                return translatePolygon(p, position.x, position.y);
+            });
+
             const placedPart: PlacedPart = {
                 partId: instance.part.id,
                 label: instance.part.label,
                 position,
                 rotation,
                 polygon,
-                instanceIndex: instance.instanceIndex
+                instanceIndex: instance.instanceIndex,
+                innerPolygons,
             };
 
             placedParts.push(placedPart);
@@ -288,15 +326,15 @@ function runNesting(job: NestingJob): NestingResult {
 
         } else if (options.multiSheet && (options.maxSheets === 0 || currentSheetIndex < options.maxSheets - 1)) {
             // Start new sheet
-            const sheetArea = sheet.width * sheet.height;
-            sheets.push({
-                sheetIndex: currentSheetIndex,
+            sheets.push(finalizeSheetResult(
+                currentSheetIndex,
                 placedParts,
                 freeRectangles,
                 usedArea,
-                wasteArea: sheetArea - usedArea,
-                efficiency: (usedArea / sheetArea) * 100
-            });
+                sheet,
+                options,
+                parts
+            ));
 
             currentSheetIndex++;
             freeRectangles = [{ x: 0, y: 0, width: sheet.width, height: sheet.height }];
@@ -314,13 +352,22 @@ function runNesting(job: NestingJob): NestingResult {
                 }
                 polygon = translatePolygon(polygon, position.x, position.y);
 
+                const innerPolygons = instance.part.innerPolygons?.map(ip => {
+                    let p = ip;
+                    if (rotation !== 0) {
+                        p = rotatePolygon(p, rotation);
+                    }
+                    return translatePolygon(p, position.x, position.y);
+                });
+
                 placedParts.push({
                     partId: instance.part.id,
                     label: instance.part.label,
                     position,
                     rotation,
                     polygon,
-                    instanceIndex: instance.instanceIndex
+                    instanceIndex: instance.instanceIndex,
+                    innerPolygons,
                 });
                 usedArea += polygon.area;
                 freeRectangles = splitRectangle(freeRectangles, rectIndex, polygon.bounds, options.spacing);
@@ -341,19 +388,30 @@ function runNesting(job: NestingJob): NestingResult {
     // Finalize last sheet
     const sheetArea = sheet.width * sheet.height;
     if (placedParts.length > 0) {
-        sheets.push({
-            sheetIndex: currentSheetIndex,
+        sheets.push(finalizeSheetResult(
+            currentSheetIndex,
             placedParts,
             freeRectangles,
             usedArea,
-            wasteArea: sheetArea - usedArea,
-            efficiency: (usedArea / sheetArea) * 100
-        });
+            sheet,
+            options,
+            parts
+        ));
     }
 
     // Calculate totals
     const totalUsedArea = sheets.reduce((sum, s) => sum + s.usedArea, 0);
     const totalSheetArea = sheets.length * sheetArea;
+    const generatedRemnants: RemnantSheet2D[] = [];
+    sheets.forEach(s => {
+        if (s.remnantSheet) generatedRemnants.push(s.remnantSheet);
+    });
+
+    const totalRawWeight = sheets.reduce((sum, s) => sum + (s.weights?.sheetWeightKg || 0), 0);
+    const totalRemWeight = sheets.reduce((sum, s) => sum + (s.weights?.remnantWeightKg || 0), 0);
+    const totalPartsWeight = sheets.reduce((sum, s) => sum + (s.weights?.partsWeightKg || 0), 0);
+    const aggregateScrap = Math.max(0, totalRawWeight - totalRemWeight - totalPartsWeight);
+    const overallTrueScrap = totalRawWeight > 0 ? (aggregateScrap / totalRawWeight) * 100 : 0;
 
     return {
         sheets,
@@ -361,7 +419,132 @@ function runNesting(job: NestingJob): NestingResult {
         totalEfficiency: totalSheetArea > 0 ? (totalUsedArea / totalSheetArea) * 100 : 0,
         totalWaste: totalSheetArea - totalUsedArea,
         unplacedParts,
-        computeTimeMs: performance.now() - startTime
+        computeTimeMs: performance.now() - startTime,
+        generatedRemnants,
+        overallTrueScrapPercent: Number(overallTrueScrap.toFixed(2))
+    };
+}
+
+/**
+ * Helper to compute SigmaNEST-grade Remnant Sheet, Guillotine Crop Cut, and True Weights
+ */
+function finalizeSheetResult(
+    sheetIndex: number,
+    placedParts: PlacedPart[],
+    freeRectangles: FreeRectangle[],
+    usedArea: number,
+    sheet: { width: number; height: number; kerf: number },
+    options: NestingOptions,
+    parts: Part2D[]
+): SheetResult {
+    const sheetArea = sheet.width * sheet.height;
+    let maxUsedX = 0;
+    let maxUsedY = 0;
+    placedParts.forEach(p => {
+        maxUsedX = Math.max(maxUsedX, p.polygon.bounds.x + p.polygon.bounds.width);
+        maxUsedY = Math.max(maxUsedY, p.polygon.bounds.y + p.polygon.bounds.height);
+    });
+
+    const spacing = options.spacing || 6;
+    const usedEnvelope = {
+        width: Math.min(sheet.width, Math.round(maxUsedX + spacing)),
+        height: Math.min(sheet.height, Math.round(maxUsedY + spacing))
+    };
+
+    const minRemnantDim = options.minRemnantDimensionMm || 400;
+    const remainingW = sheet.width - usedEnvelope.width;
+    const remainingH = sheet.height - usedEnvelope.height;
+
+    let remnantSheet: RemnantSheet2D | undefined;
+    let cropCut: GuillotineCropCut | undefined;
+
+    const firstPart = parts[0];
+    const thickness = firstPart?.thickness || 30;
+    const material = firstPart?.material || 'S235JR';
+    const density = 7.85; // g/cm³ default steel
+
+    const calculateWeight = (areaMm2: number) => (areaMm2 * thickness * density) / 1_000_000;
+
+    if (remainingW >= minRemnantDim) {
+        const cropX = usedEnvelope.width + sheet.kerf;
+        cropCut = {
+            axis: 'x',
+            coordinate: cropX,
+            startPoint: { x: cropX, y: sheet.height },
+            endPoint: { x: cropX, y: 0 },
+            lengthMm: sheet.height,
+            piercePoint: { x: cropX, y: sheet.height + 10 }
+        };
+        const remW = sheet.width - cropX;
+        const remH = sheet.height;
+        remnantSheet = {
+            id: `TaskSheet${sheetIndex + 1}-1`,
+            name: `Kalıntı Sac (${material} ${thickness}mm)`,
+            material,
+            thickness,
+            width: Math.round(remW),
+            height: Math.round(remH),
+            originX: Math.round(cropX),
+            originY: 0,
+            weightKg: Number(calculateWeight(remW * remH).toFixed(2)),
+            originSheetIndex: sheetIndex,
+            createdAt: new Date().toISOString(),
+            barcode: `REM-${Math.round(cropX)}-${Math.round(remW)}x${Math.round(remH)}`
+        };
+    } else if (remainingH >= minRemnantDim) {
+        const cropY = usedEnvelope.height + sheet.kerf;
+        cropCut = {
+            axis: 'y',
+            coordinate: cropY,
+            startPoint: { x: sheet.width, y: cropY },
+            endPoint: { x: 0, y: cropY },
+            lengthMm: sheet.width,
+            piercePoint: { x: sheet.width + 10, y: cropY }
+        };
+        const remW = sheet.width;
+        const remH = sheet.height - cropY;
+        remnantSheet = {
+            id: `TaskSheet${sheetIndex + 1}-1`,
+            name: `Kalıntı Sac (${material} ${thickness}mm)`,
+            material,
+            thickness,
+            width: Math.round(remW),
+            height: Math.round(remH),
+            originX: 0,
+            originY: Math.round(cropY),
+            weightKg: Number(calculateWeight(remW * remH).toFixed(2)),
+            originSheetIndex: sheetIndex,
+            createdAt: new Date().toISOString(),
+            barcode: `REM-${Math.round(cropY)}-${Math.round(remW)}x${Math.round(remH)}`
+        };
+    }
+
+    const rawSheetWeight = calculateWeight(sheetArea);
+    const partsWeight = calculateWeight(usedArea);
+    const remnantWeight = remnantSheet ? remnantSheet.weightKg : 0;
+    const usedPlateArea = usedEnvelope.width * sheet.height;
+    const usedWeight = calculateWeight(usedPlateArea);
+    const scrapWeight = Math.max(0, rawSheetWeight - remnantWeight - partsWeight);
+    const trueScrapPct = rawSheetWeight > 0 ? (scrapWeight / rawSheetWeight) * 100 : 0;
+
+    return {
+        sheetIndex,
+        placedParts,
+        freeRectangles,
+        usedArea,
+        wasteArea: sheetArea - usedArea,
+        efficiency: (usedArea / sheetArea) * 100,
+        remnantSheet,
+        cropCut,
+        trueScrapPercent: Number(trueScrapPct.toFixed(2)),
+        usedEnvelope,
+        weights: {
+            sheetWeightKg: Number(rawSheetWeight.toFixed(2)),
+            usedWeightKg: Number(usedWeight.toFixed(2)),
+            remnantWeightKg: Number(remnantWeight.toFixed(2)),
+            partsWeightKg: Number(partsWeight.toFixed(2)),
+            scrapWeightKg: Number(scrapWeight.toFixed(2))
+        }
     };
 }
 

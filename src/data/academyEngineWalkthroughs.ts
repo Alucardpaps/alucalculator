@@ -41,7 +41,7 @@ export const ACADEMY_ENGINE_WALKTHROUGHS: Record<string, AcademyEngineWalkthroug
     inputs: ['Element type', 'Load path', 'Operating speed'],
     outputs: ['Recommended calculator module', 'Design check summary'],
     steps: [
-      { title: 'Classify the element', detail: 'Screws, bearings, gears, and shafts each route to a dedicated ISO/DIN calculation kernel in AluCalc OS.' },
+      { title: 'Classify the element', detail: 'Screws, bearings, gears, and shafts each route to a dedicated ISO/DIN calculation kernel in AluCAD OS.' },
       { title: 'Trace the load path', detail: 'Power flows Motor → Transmission → Bearing → Housing. Each interface uses a different element calculator.' },
       { title: 'Cross-link standards', detail: 'Thread geometry from ISO 965 feeds directly into the VDI 2230 preload engine — no manual re-entry.' },
     ],

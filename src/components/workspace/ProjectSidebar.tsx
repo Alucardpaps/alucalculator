@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Project Sidebar
+ * AluCAD OS — Project Sidebar
  * 
  * Sidebar for project and workspace management.
  * Shows recent projects, workspace tabs, and quick actions.
@@ -36,12 +36,12 @@ import { getLocaleBcp47 } from '@/locales/localeFormat';
 
 const styles = {
     container: `
-        w-64 h-full bg-[#0f1419] border-r border-[#2a3a4a] 
+        w-64 h-full bg-[var(--bg-1)] border-r border-[var(--line-strong)] 
         flex flex-col overflow-hidden
     `,
     header: `
         flex items-center justify-between px-4 py-3 
-        bg-[#1a2332] border-b border-[#2a3a4a]
+        bg-[var(--bg-3)] border-b border-[var(--line-strong)]
     `,
     title: `
         flex items-center gap-2 text-sm font-bold text-white
@@ -66,7 +66,7 @@ const styles = {
         border-l-2 border-transparent
     `,
     projectItemActive: `
-        !bg-[#00e5ff]/10 !border-[#00e5ff]
+        !bg-[var(--cyan)]/10 !border-[var(--cyan)]
     `,
     projectIcon: `
         flex-shrink-0
@@ -86,14 +86,14 @@ const styles = {
         text-xs text-gray-400 hover:text-white
     `,
     workspaceTabActive: `
-        !text-[#00e5ff]
+        !text-[var(--cyan)]
     `,
     footer: `
-        p-3 border-t border-[#2a3a4a] space-y-2
+        p-3 border-t border-[var(--line-strong)] space-y-2
     `,
     footerBtn: `
         flex items-center gap-2 w-full px-3 py-2 rounded-lg
-        bg-[#1a2332] hover:bg-[#2a3a4a] text-sm text-gray-400
+        bg-[var(--bg-3)] hover:bg-[var(--line-strong)] text-sm text-gray-400
         hover:text-white transition-colors cursor-pointer
     `,
     modal: `
@@ -101,27 +101,27 @@ const styles = {
         bg-black/80 backdrop-blur-sm
     `,
     modalContent: `
-        bg-[#0f1419] rounded-xl border border-[#2a3a4a] 
+        bg-[var(--bg-1)] rounded-xl border border-[var(--line-strong)] 
         w-full max-w-md mx-4 overflow-hidden
     `,
     modalHeader: `
         flex items-center justify-between px-4 py-3 
-        bg-[#1a2332] border-b border-[#2a3a4a]
+        bg-[var(--bg-3)] border-b border-[var(--line-strong)]
     `,
     modalBody: `
         p-4 space-y-4
     `,
     input: `
-        w-full px-3 py-2 bg-[#0a0e14] border border-[#2a3a4a] 
+        w-full px-3 py-2 bg-[var(--bg-1)] border border-[var(--line-strong)] 
         rounded-lg text-white text-sm outline-none
-        focus:border-[#00e5ff] transition-colors
+        focus:border-[var(--cyan)] transition-colors
     `,
     btnPrimary: `
-        px-4 py-2 bg-[#00e5ff] text-black text-sm font-medium 
-        rounded-lg hover:bg-[#00e5ff]/80 transition-colors
+        px-4 py-2 bg-[var(--cyan)] text-black text-sm font-medium 
+        rounded-lg hover:bg-[var(--cyan)]/80 transition-colors
     `,
     btnSecondary: `
-        px-4 py-2 bg-[#2a3a4a] text-white text-sm 
+        px-4 py-2 bg-[var(--line-strong)] text-white text-sm 
         rounded-lg hover:bg-[#3a4a5a] transition-colors
     `,
 };
@@ -235,7 +235,7 @@ const ProjectItem: React.FC<{
                         <ChevronRight size={14} className="text-gray-500" />
                     )}
                 </span>
-                <FolderOpen size={16} className={isActive ? 'text-[#00e5ff]' : 'text-gray-500'} />
+                <FolderOpen size={16} className={isActive ? 'text-[var(--cyan)]' : 'text-gray-500'} />
                 <div className={styles.projectInfo}>
                     <div className={styles.projectName}>{project.name}</div>
                     <div className={styles.projectMeta}>
@@ -248,7 +248,7 @@ const ProjectItem: React.FC<{
                 >
                     <MoreVertical size={14} className="text-gray-500 hover:text-white" />
                     {showMenu && (
-                        <div className="absolute right-0 top-full mt-1 bg-[#1a2332] border border-[#2a3a4a] rounded-lg py-1 min-w-[120px] z-10">
+                        <div className="absolute right-0 top-full mt-1 bg-[var(--bg-3)] border border-[var(--line-strong)] rounded-lg py-1 min-w-[120px] z-10">
                             <button
                                 className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-gray-400 hover:bg-white/10"
                                 onClick={onDuplicate}
@@ -354,7 +354,7 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                 {/* Header */}
                 <div className={styles.header}>
                     <span className={styles.title}>
-                        <FolderOpen size={16} className="text-[#00e5ff]" />
+                        <FolderOpen size={16} className="text-[var(--cyan)]" />
                         {t.projects.title}
                     </span>
                     <div className={styles.headerActions}>
@@ -375,7 +375,7 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                             <FolderOpen size={32} className="mb-2 opacity-50" />
                             <span className="text-sm">{t.projects.noProjects}</span>
                             <button
-                                className="mt-3 px-3 py-1.5 bg-[#00e5ff]/20 text-[#00e5ff] text-xs rounded-lg"
+                                className="mt-3 px-3 py-1.5 bg-[var(--cyan)]/20 text-[var(--cyan)] text-xs rounded-lg"
                                 onClick={() => setShowNewModal(true)}
                             >
                                 {t.projects.createFirst}
@@ -385,7 +385,7 @@ export const ProjectSidebar: React.FC<{ className?: string }> = ({ className = '
                         <>
                             <div className={styles.sectionHeader}>
                                 <span>{t.projects.allProjects}</span>
-                                <span className="text-[#00e5ff]">{projects.length}</span>
+                                <span className="text-[var(--cyan)]">{projects.length}</span>
                             </div>
                             {sortedProjects.map(project => (
                                 <ProjectItem

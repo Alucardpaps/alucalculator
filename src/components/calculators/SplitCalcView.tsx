@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Split Calculator View
+ * AluCAD OS — Split Calculator View
  * 
  * Combines UniversalCalcRenderer with live visualization panel.
  * Dynamically generates SVG based on calculator outputs.
@@ -36,7 +36,7 @@ type VisualizerType = 'generateBoltSVG' | 'generateBeamSVG' | 'generatePipeSVG' 
 
 const styles = {
     container: `
-        flex h-full bg-[#0a0e14] overflow-hidden
+        flex h-full bg-[var(--bg-1)] overflow-hidden
     `,
     calcPanel: `
         flex flex-col overflow-y-auto
@@ -45,18 +45,18 @@ const styles = {
         flex flex-col flex-1 min-w-0
     `,
     resizer: `
-        w-1 bg-[#2a3a4a] hover:bg-[#00e5ff] cursor-col-resize 
+        w-1 bg-[var(--line-strong)] hover:bg-[var(--cyan)] cursor-col-resize 
         transition-colors flex-shrink-0
     `,
     toggleBar: `
-        flex items-center gap-1 px-2 py-1 bg-[#1a2332] border-b border-[#2a3a4a]
+        flex items-center gap-1 px-2 py-1 bg-[var(--bg-3)] border-b border-[var(--line-strong)]
     `,
     toggleBtn: `
         p-1.5 rounded hover:bg-white/10 text-gray-500 hover:text-white
         transition-colors cursor-pointer
     `,
     toggleBtnActive: `
-        !bg-[#00e5ff]/20 !text-[#00e5ff]
+        !bg-[var(--cyan)]/20 !text-[var(--cyan)]
     `,
     noViz: `
         flex-1 flex items-center justify-center text-gray-600 text-sm

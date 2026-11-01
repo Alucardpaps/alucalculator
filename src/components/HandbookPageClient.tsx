@@ -52,25 +52,25 @@ export default function HandbookPageClient() {
                 <div className="lg:col-span-3 space-y-2">
                     <button
                         onClick={() => setSection('bearings')}
-                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'bearings' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'bearings' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
                         {t.handbook.categories}
                     </button>
                     <button
                         onClick={() => setSection('tolerances')}
-                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'tolerances' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'tolerances' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
                         {t.modules['fits-tolerances'].title}
                     </button>
                     <button
                         onClick={() => setSection('materials')}
-                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'materials' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'materials' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
                         {t.modules['materials-db'].title}
                     </button>
                     <button
                         onClick={() => setSection('gcodes')}
-                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'gcodes' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${section === 'gcodes' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                     >
                         {h.gCodesTitle}
                     </button>

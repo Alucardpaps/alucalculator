@@ -14,8 +14,8 @@ export class PlotTool extends BaseCommand {
 
     // Parameters with defaults
     private params = {
-        paperSize: 'A4',
-        orientation: 'LANDSCAPE',
+        paperSize: 'A4' as 'A4' | 'A3' | 'A2' | 'A1' | 'Letter',
+        orientation: 'LANDSCAPE' as 'LANDSCAPE' | 'PORTRAIT',
         scale: 'FIT', 
         showTitleBlock: true,
         partName: 'Yeni Parça',

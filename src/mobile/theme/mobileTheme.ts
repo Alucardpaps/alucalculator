@@ -1,13 +1,14 @@
 import type { Theme } from '@/store/osStore';
 import type { MobileFontSize } from '@/mobile/store/mobileStore';
+import { APP_APK_VERSION } from '@/config/app';
 
-export const MOBILE_APP_VERSION = '5.0.0';
+export const MOBILE_APP_VERSION = APP_APK_VERSION;
 
 export function getMobileThemeClasses(theme: Theme, isLight: boolean): string {
   if (isLight || theme === 'light') {
     return 'bg-slate-50 text-slate-900 [--mobile-accent:#0891b2] [--mobile-surface:#ffffff]';
   }
-  return 'bg-[#020408] text-slate-100 [--mobile-accent:#06b6d4] [--mobile-surface:#0a0e14]';
+  return 'bg-[var(--bg-0)] text-slate-100 [--mobile-accent:#06b6d4] [--mobile-surface:#0a0e14]';
 }
 
 export function getFontSizeClass(size: MobileFontSize): string {

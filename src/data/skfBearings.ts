@@ -26,9 +26,12 @@ export interface BearingData {
     C0: number;     // Static load rating (kN)
     mass?: number;  // Weight (kg)
     nMax?: number;  // Max speed (rpm)
+    f0?: number;    // ISO 281 calculation factor f0 for deep groove ball bearings (default: 14.0)
     e?: number;     // Calculation factor for combined loads
     Y?: number;     // Axial load factor
     Y0?: number;    // Static axial load factor
+    Y1?: number;    // ISO 281 axial factor Fa/Fr <= e
+    Y2?: number;    // ISO 281 axial factor Fa/Fr > e
 }
 
 /**
@@ -169,45 +172,31 @@ export function getBearingTypeInfo(type: BearingType): {
 // ═══════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════
-// BEARING CATALOG (SKF COMPLIANT HARDCODED DATA)
+// BEARING CATALOG (SKF COMPLIANT HARDCODED & MASTER CATALOG DATA)
 // ═══════════════════════════════════════════════════════════════
 
+import { SKF_MASTER_CATALOG, findSKFBearing, SKFBearingRecord } from '@/data/mechanical/skfCatalogDatabase';
+export { SKF_MASTER_CATALOG, findSKFBearing, type SKFBearingRecord };
+
+const SKF_CATALOG_MAPPED: BearingData[] = SKF_MASTER_CATALOG.map(b => ({
+    code: b.code,
+    type: b.type,
+    d: b.d,
+    D: b.D,
+    B: b.B,
+    C: b.C,
+    C0: b.C0,
+    mass: b.massKg,
+    nMax: b.speedLimitingOpenRpm || b.speedLimitingSealedRpm || 10000,
+    e: b.e,
+    Y: b.Y ?? b.Y1,
+    Y0: b.Y0,
+    Y1: b.Y1,
+    Y2: b.Y2,
+}));
+
 const HARDCODED_CATALOG: BearingData[] = [
-    // ===== DEEP GROOVE BALL - 6000 Series =====
-    { code: '6000', type: 'deep-groove-ball', d: 10, D: 26, B: 8, C: 4.62, C0: 1.96, mass: 0.019, nMax: 30000, e: 0.22, Y: 2.0 },
-    { code: '6004', type: 'deep-groove-ball', d: 20, D: 42, B: 12, C: 9.36, C0: 5.0, mass: 0.069, nMax: 18000, e: 0.25, Y: 1.8 },
-    { code: '6005', type: 'deep-groove-ball', d: 25, D: 47, B: 12, C: 11.2, C0: 5.85, mass: 0.080, nMax: 15000, e: 0.25, Y: 1.8 },
-    { code: '6006', type: 'deep-groove-ball', d: 30, D: 55, B: 13, C: 13.3, C0: 8.3, mass: 0.12, nMax: 13000, e: 0.28, Y: 1.6 },
-    { code: '6008', type: 'deep-groove-ball', d: 40, D: 68, B: 15, C: 16.8, C0: 11.6, mass: 0.19, nMax: 10000, e: 0.30, Y: 1.4 },
-
-    // ===== DEEP GROOVE BALL - 6200 Series =====
-    { code: '6200', type: 'deep-groove-ball', d: 10, D: 30, B: 9, C: 5.4, C0: 2.36, mass: 0.032, nMax: 24000, e: 0.22, Y: 2.0 },
-    { code: '6204', type: 'deep-groove-ball', d: 20, D: 47, B: 14, C: 13.5, C0: 6.55, mass: 0.106, nMax: 18000, e: 0.25, Y: 1.8 },
-    { code: '6205', type: 'deep-groove-ball', d: 25, D: 52, B: 15, C: 14.8, C0: 7.8, mass: 0.128, nMax: 15000, e: 0.28, Y: 1.6 },
-    { code: '6206', type: 'deep-groove-ball', d: 30, D: 62, B: 16, C: 20.3, C0: 11.2, mass: 0.199, nMax: 13000, e: 0.30, Y: 1.4 },
-    { code: '6208', type: 'deep-groove-ball', d: 40, D: 80, B: 18, C: 32.5, C0: 19.0, mass: 0.366, nMax: 9000, e: 0.31, Y: 1.3 },
-
-    // ===== DEEP GROOVE BALL - 6300 Series =====
-    { code: '6300', type: 'deep-groove-ball', d: 10, D: 35, B: 11, C: 8.52, C0: 3.4, mass: 0.053, nMax: 22000, e: 0.24, Y: 1.8 },
-    { code: '6304', type: 'deep-groove-ball', d: 20, D: 52, B: 15, C: 16.8, C0: 7.8, mass: 0.144, nMax: 14000, e: 0.28, Y: 1.6 },
-    { code: '6305', type: 'deep-groove-ball', d: 25, D: 62, B: 17, C: 23.4, C0: 11.6, mass: 0.232, nMax: 12000, e: 0.30, Y: 1.4 },
-    { code: '6306', type: 'deep-groove-ball', d: 30, D: 72, B: 19, C: 29.6, C0: 16.0, mass: 0.346, nMax: 10000, e: 0.31, Y: 1.3 },
-    { code: '6308', type: 'deep-groove-ball', d: 40, D: 90, B: 23, C: 42.3, C0: 24.0, mass: 0.633, nMax: 8000, e: 0.31, Y: 1.3 },
-
-    // ===== ANGULAR CONTACT BALL - 7200 Series =====
-    { code: '7204', type: 'angular-contact-ball', d: 20, D: 47, B: 14, C: 14.3, C0: 8.15, mass: 0.10, nMax: 15000, e: 0.68, Y: 0.87 },
-    { code: '7205', type: 'angular-contact-ball', d: 25, D: 52, B: 15, C: 16.1, C0: 9.80, mass: 0.13, nMax: 13000, e: 0.68, Y: 0.87 },
-    { code: '7206', type: 'angular-contact-ball', d: 30, D: 62, B: 16, C: 23.4, C0: 14.6, mass: 0.20, nMax: 11000, e: 0.68, Y: 0.87 },
-
-    // ===== CYLINDRICAL ROLLER - NU 2 Series =====
-    { code: 'NU204', type: 'cylindrical-roller', d: 20, D: 47, B: 14, C: 28.5, C0: 22.0, mass: 0.11, nMax: 13000 },
-    { code: 'NU205', type: 'cylindrical-roller', d: 25, D: 52, B: 15, C: 32.0, C0: 26.5, mass: 0.14, nMax: 11000 },
-    { code: 'NU206', type: 'cylindrical-roller', d: 30, D: 62, B: 16, C: 44.0, C0: 36.5, mass: 0.21, nMax: 9500 },
-
-    // ===== TAPERED ROLLER - 302 Series =====
-    { code: '30204', type: 'tapered-roller', d: 20, D: 47, B: 14, C: 28.1, C0: 32.5, mass: 0.12, nMax: 11000, e: 0.35, Y: 1.7 },
-    { code: '30205', type: 'tapered-roller', d: 25, D: 52, B: 15, C: 32.5, C0: 39.0, mass: 0.14, nMax: 9500, e: 0.37, Y: 1.6 },
-    { code: '30206', type: 'tapered-roller', d: 30, D: 62, B: 16, C: 44.0, C0: 53.0, mass: 0.22, nMax: 8000, e: 0.37, Y: 1.6 },
+    ...SKF_CATALOG_MAPPED,
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -751,28 +740,88 @@ export function getBearingsByBore(minD: number, maxD: number): BearingData[] {
 }
 
 /**
+ * ISO 281:2007 Table 3 dynamic factor interpolation for single-row deep groove ball bearings.
+ * e and Y factors vary continuously with the relative axial load ratio (f0 * Fa / C0).
+ */
+export function getIso281DeepGrooveFactors(
+    fa: number, // in kN
+    C0: number, // in kN
+    f0 = 14.0
+): { e: number; Y: number; f0Fa_C0: number } {
+    if (fa <= 0 || C0 <= 0) {
+        return { e: 0.19, Y: 2.30, f0Fa_C0: 0 };
+    }
+    const val = (f0 * fa) / C0;
+    // ISO 281:2007 Table 3 standardized discrete points:
+    const table = [
+        { x: 0.172, e: 0.19, Y: 2.30 },
+        { x: 0.345, e: 0.22, Y: 1.99 },
+        { x: 0.689, e: 0.26, Y: 1.71 },
+        { x: 1.030, e: 0.28, Y: 1.55 },
+        { x: 1.380, e: 0.30, Y: 1.45 },
+        { x: 2.070, e: 0.34, Y: 1.31 },
+        { x: 3.450, e: 0.38, Y: 1.15 },
+        { x: 5.170, e: 0.42, Y: 1.04 },
+        { x: 6.890, e: 0.44, Y: 1.00 },
+    ];
+
+    if (val <= table[0].x) {
+        return { e: table[0].e, Y: table[0].Y, f0Fa_C0: val };
+    }
+    if (val >= table[table.length - 1].x) {
+        return { e: table[table.length - 1].e, Y: table[table.length - 1].Y, f0Fa_C0: val };
+    }
+
+    for (let i = 0; i < table.length - 1; i++) {
+        if (val >= table[i].x && val <= table[i + 1].x) {
+            const t = (val - table[i].x) / (table[i + 1].x - table[i].x);
+            const e = table[i].e + t * (table[i + 1].e - table[i].e);
+            const Y = table[i].Y + t * (table[i + 1].Y - table[i].Y);
+            return {
+                e: Number(e.toFixed(3)),
+                Y: Number(Y.toFixed(3)),
+                f0Fa_C0: Number(val.toFixed(4)),
+            };
+        }
+    }
+    return { e: 0.25, Y: 1.5, f0Fa_C0: val };
+}
+
+/**
  * Compute Equivalent Loads and Warnings per ISO 281
  */
 export function computeEquivalentLoadsAndWarnings(
     bearing: BearingData,
     fr: number, // in kN
     fa: number  // in kN
-): { P: number; P0: number; warnings: string[] } {
+): { P: number; P0: number; warnings: string[]; e?: number; Y?: number; X?: number } {
     let P = fr;
     let P0 = fr;
-    const warnings: string[] = [];
-    
     const e = bearing.e || 0.25;
     const Y = bearing.Y || 1.5;
+    let computedE = e;
+    let computedY = Y;
+    let computedX = 1.0;
+    const warnings: string[] = [];
+    
     const Y0 = bearing.Y0 || 0.5;
 
     switch (bearing.type) {
-        case 'deep-groove-ball':
+        case 'deep-groove-ball': {
+            // ISO 281:2007 Table 3 dynamic calculation factor
+            const factors = getIso281DeepGrooveFactors(fa, bearing.C0, bearing.f0 ?? 14.0);
+            computedE = factors.e;
+            computedY = factors.Y;
+
             if (fr === 0) {
-                P = Y * fa;
-            } else if (fa / fr > e) {
-                P = 0.56 * fr + Y * fa;
+                computedX = 0;
+                P = computedY * fa;
+            } else if (fa / fr > computedE) {
+                computedX = 0.56;
+                P = 0.56 * fr + computedY * fa;
             } else {
+                computedX = 1.0;
+                computedY = 0;
                 P = fr;
             }
             P0 = Math.max(fr, 0.6 * fr + Y0 * fa);
@@ -780,62 +829,115 @@ export function computeEquivalentLoadsAndWarnings(
                 warnings.push("High axial load ratio for deep groove ball bearing. Check axial limits.");
             }
             break;
+        }
             
-        case 'angular-contact-ball':
+        case 'angular-contact-ball': {
+            // single-row 40° (SKF 72..B / 73..B): e = 1.14, X = 0.35, Y = 0.57, X0 = 0.5, Y0 = 0.26
+            const eA = bearing.e ?? 1.14;
+            const yA = bearing.Y ?? 0.57;
+            computedE = eA;
             if (fr === 0) {
-                P = Y * fa;
-            } else if (fa / fr > e) {
-                P = 0.44 * fr + Y * fa;
+                computedX = 0; computedY = yA;
+                P = yA * fa;
+            } else if (fa / fr > eA) {
+                computedX = 0.35; computedY = yA;
+                P = 0.35 * fr + yA * fa;
             } else {
+                computedX = 1; computedY = 0;
                 P = fr;
             }
-            P0 = Math.max(fr, 0.5 * fr + (bearing.Y0 || 0.47) * fa);
+            P0 = Math.max(fr, 0.5 * fr + (bearing.Y0 ?? 0.26) * fa);
             if (fr > 0 && fa / fr < 0.1) {
-                warnings.push("Angular contact ball bearings require a minimum axial load to prevent ball skidding.");
+                warnings.push("Açısal temaslı bilyalı rulmanlarda bilyaların kaymasını önlemek için minimum eksenel yük gereklidir.");
             }
             break;
+        }
             
+        case 'self-aligning-ball': {
+            const y1 = bearing.Y1 ?? bearing.Y ?? 2.3;
+            const y2 = bearing.Y2 ?? 3.5;
+            const y0 = bearing.Y0 ?? 2.5;
+            if (fr === 0) {
+                computedX = 0; computedY = y2;
+                P = y2 * fa;
+            } else if (fa / fr > e) {
+                computedX = 0.65; computedY = y2;
+                P = 0.65 * fr + y2 * fa;
+            } else {
+                computedX = 1; computedY = y1;
+                P = fr + y1 * fa;
+            }
+            P0 = fr + y0 * fa;
+            if (fr > 0 && fa / fr > 0.4) {
+                warnings.push("Oynak bilyalı rulman için yüksek eksenel yük oranı. Mil faturasını kontrol edin.");
+            }
+            break;
+        }
+
         case 'cylindrical-roller':
+            computedX = 1; computedY = 0;
             P = fr;
             P0 = fr;
-            if (fa > 0.05 * fr) {
-                warnings.push("NU/N cylindrical roller bearings cannot accommodate significant axial loads without special design.");
+            if (fa > 0.02 * fr) {
+                warnings.push("NU tipi silindirik makaralı rulmanlar eksenel yük taşıyamaz (serbest yatak / non-locating).");
+            }
+            break;
+
+        case 'needle-roller':
+            computedX = 1; computedY = 0;
+            P = fr;
+            P0 = fr;
+            if (fa > 0.001) {
+                warnings.push("İğne makaralı rulmanlar eksenel yük taşıyamaz (Fa = 0 olmalıdır).");
             }
             break;
             
         case 'tapered-roller':
+            computedE = e;
             if (fr === 0) {
-                P = (bearing.Y || 1.6) * fa;
+                computedX = 0; computedY = bearing.Y ?? 1.6;
+                P = (bearing.Y ?? 1.6) * fa;
             } else if (fa / fr > e) {
-                P = 0.4 * fr + (bearing.Y || 1.6) * fa;
+                computedX = 0.4; computedY = bearing.Y ?? 1.6;
+                P = 0.4 * fr + (bearing.Y ?? 1.6) * fa;
             } else {
+                computedX = 1; computedY = 0;
                 P = fr;
             }
-            P0 = Math.max(fr, 0.5 * fr + (bearing.Y0 || 0.9) * fa);
+            P0 = Math.max(fr, 0.5 * fr + (bearing.Y0 ?? 0.9) * fa);
             if (fr > 0 && fa / fr < 0.2) {
-                warnings.push("Tapered roller bearings require minimum axial load to maintain roller tracking.");
+                warnings.push("Konik makaralı rulmanlarda makaraların oturması için asgari eksenel ön yük gereklidir.");
             }
             break;
             
-        case 'spherical-roller':
+        case 'spherical-roller': {
+            const y1 = bearing.Y1 ?? bearing.Y ?? 1.9;
+            const y2 = bearing.Y2 ?? 2.9;
+            const y0 = bearing.Y0 ?? 1.8;
             if (fr === 0) {
-                P = (bearing.Y || 2.0) * fa;
+                computedX = 0; computedY = y2;
+                P = y2 * fa;
             } else if (fa / fr > e) {
-                P = 0.67 * fr + 1.5 * (bearing.Y || 2.0) * fa;
+                computedX = 0.67; computedY = y2;
+                P = 0.67 * fr + y2 * fa;
             } else {
-                P = fr + (bearing.Y || 2.0) * fa;
+                computedX = 1; computedY = y1;
+                P = fr + y1 * fa;
             }
-            P0 = fr + (bearing.Y0 || 2.5) * fa;
-            if (fr > 0 && fa / fr > 0.4) {
-                warnings.push("High axial load on spherical roller bearing. Ensure proper housing locking.");
+            P0 = fr + y0 * fa;
+            if (fr > 0 && fa / fr > 0.45) {
+                warnings.push("Oynak makaralı rulmanda yüksek eksenel yük. Gövde kilitlemesini teyit edin.");
             }
             break;
+        }
             
         case 'thrust-ball':
+        case 'thrust-roller':
+            computedX = 0; computedY = 1;
             P = fa;
             P0 = fa;
-            if (fr > 0.05 * fa) {
-                warnings.push("Thrust ball bearings cannot tolerate radial load. Excessive radial load will cause premature failure.");
+            if (fr > 0.001) {
+                warnings.push("Eksenel rulmanlar radyal yük taşıyamaz (Fr = 0 olmalıdır).");
             }
             break;
 
@@ -851,7 +953,7 @@ export function computeEquivalentLoadsAndWarnings(
             break;
     }
 
-    return { P, P0, warnings };
+    return { P, P0, warnings, e: computedE, Y: computedY, X: computedX };
 }
 
 /**
@@ -871,10 +973,13 @@ export function calculateBearingLife(
     Lna: number;      // Adjusted life (hours)
     staticSafety: number;
     warnings: string[];
+    X?: number;
+    Y?: number;
+    e?: number;
 } {
-    const { lifeFactor } = detectBearingType(bearing.code);
+    const lifeFactor = bearing.type.includes('roller') ? 10 / 3 : bearing.type.includes('ball') ? 3 : detectBearingType(bearing.code).lifeFactor;
 
-    const { P, P0, warnings } = computeEquivalentLoadsAndWarnings(bearing, fr, fa);
+    const { P, P0, warnings, X, Y, e } = computeEquivalentLoadsAndWarnings(bearing, fr, fa);
 
     // Basic rating life L10 (million revs)
     const L10 = Math.pow(bearing.C / Math.max(0.1, P), lifeFactor);
@@ -883,8 +988,9 @@ export function calculateBearingLife(
     const L10h = (L10 * 1e6) / (Math.max(1, rpm) * 60);
 
     // Reliability adjustment factor a1
+    // ISO 281:2007 Table 12
     const a1Map: Record<number, number> = {
-        90: 1.0, 95: 0.62, 96: 0.53, 97: 0.44, 98: 0.33, 99: 0.21
+        90: 1.0, 95: 0.64, 96: 0.55, 97: 0.47, 98: 0.37, 99: 0.25
     };
     const a1 = a1Map[reliability] || 1.0;
 
@@ -893,6 +999,283 @@ export function calculateBearingLife(
     // Static safety factor
     const staticSafety = bearing.C0 / Math.max(0.1, P0);
 
-    return { P, P0, L10, L10h, Lna, staticSafety, warnings };
+    return { P, P0, L10, L10h, Lna, staticSafety, warnings, X, Y, e };
 }
+
+/**
+ * SKF Rolling Bearings Catalogue (PUB BU/P1 10000/2 EN & 17000/1 EN, p. 682, Table 7):
+ * Axial loading of shaft assemblies incorporating two single-row tapered roller bearings
+ * in Back-to-Back (O) or Face-to-Face (X) arrangement.
+ *
+ * Boundary Condition (SKF Table 7):
+ * Valid for bearing pairs adjusted to practically zero clearance during operation, without preload.
+ * Basic rating life L10h is a design screening value; actual operating life requires EHL viscosity (kappa),
+ * contamination (ec), thermal expansion/preload, and shaft deflection evaluation.
+ */
+export interface SkfPairedTaperedResult {
+    skfTableCase: 'Case 1a' | 'Case 1b' | 'Case 1c' | 'Case 2a' | 'Case 2b' | 'Case 2c';
+    arrangement: 'O-back-to-back' | 'X-face-to-face';
+    kaDirection: 'towards_A' | 'towards_B';
+    bearingA: {
+        Fr: number;
+        Fa: number;
+        P: number;
+        L10: number;
+        L10h: number;
+        staticSafety: number;
+    };
+    bearingB: {
+        Fr: number;
+        Fa: number;
+        P: number;
+        L10: number;
+        L10h: number;
+        staticSafety: number;
+    };
+    governingL10h: number;
+    boundaryMetadata: {
+        standardRef: string;
+        zeroClearanceNoPreloadAssumption: true;
+        lifeClassification: 'BASELINE_SCREENING_L10H';
+        operatingLifeWarning: string;
+    };
+}
+
+export function solveSkfPairedTaperedRollerOArrangement(params: {
+    bearingA: BearingData;
+    bearingB: BearingData;
+    FrA: number; // kN
+    FrB: number; // kN
+    Ka: number;  // External axial force magnitude (kN, >= 0)
+    kaDirection: 'towards_A' | 'towards_B';
+    rpm: number;
+    arrangement?: 'O-back-to-back' | 'X-face-to-face';
+}): SkfPairedTaperedResult {
+    const {
+        bearingA,
+        bearingB,
+        FrA,
+        FrB,
+        Ka,
+        kaDirection,
+        rpm,
+        arrangement = 'O-back-to-back',
+    } = params;
+
+    const YA = bearingA.Y ?? 1.4;
+    const YB = bearingB.Y ?? 1.4;
+    const SA = (0.5 * FrA) / YA;
+    const SB = (0.5 * FrB) / YB;
+    const deltaS = SA - SB; // 0.5 * (FrA/YA - FrB/YB)
+
+    let FaA = 0;
+    let FaB = 0;
+    let skfTableCase: SkfPairedTaperedResult['skfTableCase'];
+
+    if (FrA / YA >= FrB / YB) {
+        // Group 1 & 2a/2b when FrA/YA >= FrB/YB
+        if (kaDirection === 'towards_B') {
+            // Case 1a: Ka acts onto Bearing B (same direction as induced SA)
+            skfTableCase = 'Case 1a';
+            FaA = SA;
+            FaB = SA + Ka;
+        } else {
+            // Ka acts onto Bearing A (opposing SB)
+            if (Ka >= deltaS) {
+                skfTableCase = 'Case 2a';
+                FaA = SB + Ka;
+                FaB = SB;
+            } else {
+                skfTableCase = 'Case 1b';
+                FaA = SA;
+                FaB = SA - Ka;
+            }
+        }
+    } else {
+        // FrA/YA < FrB/YB (i.e. SB > SA)
+        const absDeltaS = SB - SA;
+        if (kaDirection === 'towards_A') {
+            skfTableCase = 'Case 2c';
+            FaA = SB + Ka;
+            FaB = SB;
+        } else {
+            if (Ka >= absDeltaS) {
+                skfTableCase = 'Case 1c';
+                FaA = SA;
+                FaB = SA + Ka;
+            } else {
+                skfTableCase = 'Case 2b';
+                FaA = SB - Ka;
+                FaB = SB;
+            }
+        }
+    }
+
+    const resA = calculateBearingLife(bearingA, FrA, FaA, rpm);
+    const resB = calculateBearingLife(bearingB, FrB, FaB, rpm);
+
+    return {
+        skfTableCase,
+        arrangement,
+        kaDirection,
+        bearingA: {
+            Fr: FrA,
+            Fa: FaA,
+            P: resA.P,
+            L10: resA.L10,
+            L10h: resA.L10h,
+            staticSafety: resA.staticSafety,
+        },
+        bearingB: {
+            Fr: FrB,
+            Fa: FaB,
+            P: resB.P,
+            L10: resB.L10,
+            L10h: resB.L10h,
+            staticSafety: resB.staticSafety,
+        },
+        governingL10h: Math.min(resA.L10h, resB.L10h),
+        boundaryMetadata: {
+            standardRef: 'SKF PUB BU/P1 10000/2 EN & 17000/1 EN Table 7 (p. 682) / ISO 281:2007',
+            zeroClearanceNoPreloadAssumption: true,
+            lifeClassification: 'BASELINE_SCREENING_L10H',
+            operatingLifeWarning:
+                'Basic rating life L10h assumes zero operating clearance without preload and rigid shaft alignment. Real operating life Lnmh requires EHL viscosity ratio (kappa), thermal preload shift, and misalignment evaluation.',
+        },
+    };
+}
+
+/**
+ * 3D Spatial Shaft Static Equilibrium Solver (ΣF = 0, ΣM = 0)
+ * Coordinates: z = shaft axial coordinate (mm), x = horizontal transverse (mm), y = vertical transverse (mm).
+ * Computes exact 3D bearing reactions at Station A (zA) and Station B (zB) and verifies static residuals.
+ */
+export interface Shaft3DForceStation {
+    label: string;
+    zMm: number;      // Axial position along shaft (mm)
+    rPitchMm: number; // Pitch radius (mm) where axial force creates bending moment couple
+    contactAnglePhiRad?: number; // Angular position of gear mesh around shaft (default 0 -> +y radial)
+    FxN: number;      // Transverse horizontal force (N, e.g. Ft component)
+    FyN: number;      // Transverse vertical force (N, e.g. Fr component)
+    FzN: number;      // Axial force along shaft z-axis (N, Fa)
+    MxNmm?: number;   // Overturning moment about x-axis from axial force at pitch radius (N·mm)
+    MyNmm?: number;   // Overturning moment about y-axis from axial force at pitch radius (N·mm)
+    MzNmm?: number;   // Torsional moment about z-axis (N·mm, e.g. gear mesh torque ±Ft * rPitchMm)
+}
+
+export interface Shaft3DEquilibriumResult {
+    zAMm: number;
+    zBMm: number;
+    RAxN: number;
+    RAyN: number;
+    RAzN: number; // Net axial reaction carried by locating bearing/pair (N)
+    RBxN: number;
+    RByN: number;
+    RMzNmm: number; // External driving/absorbing shaft coupling torque for torsional balance (N·mm)
+    bearingTorsionalMomentConstraint: {
+        bearingAMzNmm: 0;
+        bearingBMzNmm: 0;
+        torqueTransmissionPath: string;
+    };
+    FrAN: number; // Resultant radial load at Bearing A (N)
+    FrBN: number; // Resultant radial load at Bearing B (N)
+    FrAkN: number;
+    FrBkN: number;
+    residuals: {
+        sumFxN: number;
+        sumFyN: number;
+        sumFzN: number;
+        sumMxAboutANmm: number;
+        sumMyAboutANmm: number;
+        sumMzNmm: number;
+    };
+}
+
+export function solve3DShaftStaticEquilibrium(params: {
+    zAMm: number;
+    zBMm: number;
+    loads: Shaft3DForceStation[];
+    externalTorqueMzNmm?: number;
+}): Shaft3DEquilibriumResult {
+    const { zAMm, zBMm, loads, externalTorqueMzNmm } = params;
+    const L = zBMm - zAMm;
+    if (Math.abs(L) < 1e-6) {
+        throw new Error('Bearing span L = zB - zA must be non-zero');
+    }
+
+    // Sum moments about Bearing A (z = zA):
+    // In X-Z plane (forces Fx and concentrated moments My):
+    // ΣM_y(A) = Σ [ Fx_i * (z_i - zA) + My_i ] + RBx * (zB - zA) = 0
+    // In Y-Z plane (forces Fy and concentrated moments Mx):
+    // ΣM_x(A) = Σ [ Fy_i * (z_i - zA) + Mx_i ] + RBy * (zB - zA) = 0
+    // About Z-axis (torsional equilibrium about shaft rotation axis):
+    // ΣM_z = Σ Mz_i + RMz = 0 (bearings are free to rotate about z-axis)
+    let momentXLoadSum = 0;
+    let momentYLoadSum = 0;
+    let momentZLoadSum = 0;
+    let sumLoadFx = 0;
+    let sumLoadFy = 0;
+    let sumLoadFz = 0;
+
+    for (const ld of loads) {
+        const dz = ld.zMm - zAMm;
+        const mx = ld.MxNmm ?? 0;
+        const my = ld.MyNmm ?? 0;
+        const mz = ld.MzNmm ?? (ld.FxN * ld.rPitchMm);
+        momentYLoadSum += ld.FxN * dz + my;
+        momentXLoadSum += ld.FyN * dz + mx;
+        momentZLoadSum += mz;
+        sumLoadFx += ld.FxN;
+        sumLoadFy += ld.FyN;
+        sumLoadFz += ld.FzN;
+    }
+
+    const RBxN = -momentYLoadSum / L;
+    const RByN = -momentXLoadSum / L;
+    const RAxN = -sumLoadFx - RBxN;
+    const RAyN = -sumLoadFy - RByN;
+    const RAzN = -sumLoadFz;
+    const RMzNmm = externalTorqueMzNmm !== undefined ? externalTorqueMzNmm : -momentZLoadSum;
+
+    const FrAN = Math.hypot(RAxN, RAyN);
+    const FrBN = Math.hypot(RBxN, RByN);
+
+    // Compute exact 6-DOF equilibrium residuals
+    const sumFxN = sumLoadFx + RAxN + RBxN;
+    const sumFyN = sumLoadFy + RAyN + RByN;
+    const sumFzN = sumLoadFz + RAzN;
+    const sumMyAboutANmm = momentYLoadSum + RBxN * L;
+    const sumMxAboutANmm = momentXLoadSum + RByN * L;
+    const sumMzNmm = momentZLoadSum + RMzNmm;
+
+    return {
+        zAMm,
+        zBMm,
+        RAxN,
+        RAyN,
+        RAzN,
+        RBxN,
+        RByN,
+        RMzNmm,
+        bearingTorsionalMomentConstraint: {
+            bearingAMzNmm: 0,
+            bearingBMzNmm: 0,
+            torqueTransmissionPath:
+                'Motor/External Coupling Torque (RMz) <-> Shaft Torsional Section <-> Gear Mesh Tangential Forces (±Ft * rPitch). Rolling bearings A & B are free to rotate about the z-axis (Mz_A = 0, Mz_B = 0) and carry zero torsional moment.',
+        },
+        FrAN,
+        FrBN,
+        FrAkN: FrAN / 1000,
+        FrBkN: FrBN / 1000,
+        residuals: {
+            sumFxN,
+            sumFyN,
+            sumFzN,
+            sumMxAboutANmm,
+            sumMyAboutANmm,
+            sumMzNmm,
+        },
+    };
+}
+
 

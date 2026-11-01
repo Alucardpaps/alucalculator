@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Flow Editor Store
+ * AluCAD OS — Flow Editor Store
  * 
  * Zustand store for node-based calculator workflows.
  * Manages nodes, edges, data propagation, and circular dependency detection.
@@ -19,6 +19,11 @@ import {
 } from 'reactflow';
 import type { CalculatorSchema } from '@/types/calculator-schema';
 import { getCalculatorById } from '@/calculators/registry';
+import { FlowEngine } from '@/flow/engine/ExecutionEngine';
+import { NODE_REGISTRY, getSchema } from '@/flow/nodes/Registry';
+import { arePortsCompatible, findPort } from '@/flow/core/ports';
+import type { NodeRunStatus } from '@/flow/types/core';
+import { ENGINEERING_TEMPLATES, getTemplateById } from '@/flow/templates/engineeringTemplates';
 
 // ============================================
 // Types
@@ -34,6 +39,13 @@ export interface NestingNodeData {
 export interface EngineeringNodeData {
     type: 'engineering';
     schemaId: string;
+    nodeVersion?: string;
+    outputs?: Record<string, unknown>;
+    executionStatus?: NodeRunStatus;
+    executionErrors?: string[];
+    executionWarnings?: string[];
+    executionTimeMs?: number;
+    collapsed?: boolean;
 }
 
 export type FlowNodeData = CalculatorNodeData | MediaNodeData | NoteNodeData | NotebookNodeData | VisualizerNodeData | StandardCalculatorNodeData | NestingNodeData | EngineeringNodeData;
@@ -114,11 +126,21 @@ export interface FlowProject {
 // Store Interface
 // ============================================
 
+export interface FlowExecutionSummary {
+    success: boolean;
+    executionTimeMs: number;
+    errorCount: number;
+    warningCount: number;
+    ranAt: number;
+}
+
 interface FlowState {
     nodes: FlowNode[];
     edges: FlowEdge[];
     selectedNodeId: string | null;
     isConnecting: boolean;
+    lastExecution: FlowExecutionSummary | null;
+    autoRun: boolean;
 }
 
 interface FlowActions {
@@ -134,7 +156,9 @@ interface FlowActions {
     updateNodeData: (id: string, data: Partial<FlowNodeData>) => void;
     updateNodePosition: (id: string, position: { x: number; y: number }) => void;
     setSelectedNode: (id: string | null) => void;
+    duplicateNode: (id: string) => string | null;
     addEngineeringNode: (schemaId: string, position?: { x: number; y: number }) => string;
+    executeGraph: () => FlowExecutionSummary;
 
     // Edge operations
     addEdge: (connection: Connection) => boolean;
@@ -156,6 +180,10 @@ interface FlowActions {
     // Project operations
     clearFlow: () => void;
     loadFlow: (nodes: FlowNode[], edges: FlowEdge[]) => void;
+    toggleAutoRun: () => void;
+    loadTemplate: (templateId: string) => void;
+    exportProjectJson: () => string;
+    importProjectJson: (jsonStr: string) => boolean;
 
     // Utilities
     getTopologicalOrder: () => string[];
@@ -174,6 +202,22 @@ function generateEdgeId(source: string, target: string, sourceHandle: string, ta
     return `edge-${source}-${sourceHandle}-${target}-${targetHandle}`;
 }
 
+let sessionEngine: FlowEngine | null = null;
+let autoRunTimer: ReturnType<typeof setTimeout> | null = null;
+
+function stripEngineeringRuntime(data: FlowNodeData): FlowNodeData {
+    if (data.type !== 'engineering') return data;
+    const {
+        outputs: _outputs,
+        executionStatus: _status,
+        executionErrors: _errs,
+        executionWarnings: _warns,
+        executionTimeMs: _ms,
+        ...rest
+    } = data as EngineeringNodeData;
+    return rest as EngineeringNodeData;
+}
+
 // ============================================
 // Store Implementation
 // ============================================
@@ -181,20 +225,12 @@ function generateEdgeId(source: string, target: string, sourceHandle: string, ta
 export const useFlowStore = create<FlowState & FlowActions>()(
     persist(
         (set, get) => ({
-            nodes: [
-                // 1. INPUTS (Left Side)
-                { id: 'n-sheet', type: 'calculator', position: { x: 100, y: 100 }, data: { type: 'calculator', schemaId: 'sheet-metal', inputs: {}, outputs: {} } as any },
-                { id: 'n-profile', type: 'calculator', position: { x: 100, y: 500 }, data: { type: 'calculator', schemaId: 'profile-weight', inputs: {}, outputs: {} } as any },
-
-                // 2. PROCESSING (Middle)
-                // { id: 'n-note-1', type: 'note', position: { x: 600, y: 100 }, data: { type: 'note', content: 'Main Calculation Logic' } as any },
-
-                // 3. OUTPUTS / VISUALIZERS (Right Side)
-                // { id: 'n-viz', type: 'visualizer', position: { x: 1000, y: 200 }, data: { type: 'visualizer', vizType: 'chart', inputs: {} } as any }
-            ],
-            edges: [],
+            nodes: (ENGINEERING_TEMPLATES[0]?.nodes || []).map(n => ({ ...n })),
+            edges: (ENGINEERING_TEMPLATES[0]?.edges || []).map(e => ({ ...e })),
             selectedNodeId: null,
             isConnecting: false,
+            lastExecution: null,
+            autoRun: true,
 
             // ─────────────────────────────────────
             // Node Operations
@@ -380,6 +416,12 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                             : node
                     ),
                 }));
+                if (get().autoRun) {
+                    if (autoRunTimer) clearTimeout(autoRunTimer);
+                    autoRunTimer = setTimeout(() => {
+                        get().executeGraph();
+                    }, 60);
+                }
             },
 
             updateNodePosition: (id: string, position: { x: number; y: number }) => {
@@ -394,21 +436,90 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 set({ selectedNodeId: id });
             },
 
+            duplicateNode: (id: string) => {
+                const node = get().nodes.find(n => n.id === id);
+                if (!node) return null;
+                const newId = generateId();
+                const newNode: FlowNode = {
+                    ...node,
+                    id: newId,
+                    position: { x: node.position.x + 40, y: node.position.y + 40 },
+                    selected: true,
+                };
+                set(state => ({
+                    nodes: [...state.nodes.map(n => ({ ...n, selected: false })), newNode],
+                    selectedNodeId: newId,
+                }));
+                if (get().autoRun) {
+                    setTimeout(() => get().executeGraph(), 20);
+                }
+                return newId;
+            },
+
             addEngineeringNode: (schemaId: string, position = { x: 400, y: 100 }) => {
                 const id = generateId();
+                const schema = getSchema(schemaId);
+                const seeded: Record<string, unknown> = {};
+                schema?.inputs.forEach((input) => {
+                    if (input.defaultValue !== undefined) {
+                        seeded[input.id] = input.defaultValue;
+                    }
+                });
                 const newNode: FlowNode = {
                     id,
                     type: 'engineering',
                     position,
                     data: {
                         type: 'engineering',
-                        schemaId
-                    }
+                        schemaId,
+                        nodeVersion: schema?.version,
+                        executionStatus: 'idle',
+                        ...seeded,
+                    } as EngineeringNodeData,
                 };
                 set(state => ({
                     nodes: [...state.nodes, newNode]
                 }));
                 return id;
+            },
+
+            executeGraph: () => {
+                const { nodes, edges } = get();
+                if (!sessionEngine) {
+                    sessionEngine = new FlowEngine(nodes, edges, NODE_REGISTRY);
+                } else {
+                    sessionEngine.setGraph(nodes, edges);
+                }
+                const result = sessionEngine.execute({ full: false });
+                const errorCount = Array.from(result.errors.values()).reduce((n, list) => n + list.length, 0);
+                const warningCount = Array.from(result.warnings.values()).reduce((n, list) => n + list.length, 0);
+                const summary: FlowExecutionSummary = {
+                    success: result.success,
+                    executionTimeMs: result.executionTimeMs,
+                    errorCount,
+                    warningCount,
+                    ranAt: Date.now(),
+                };
+
+                set(state => ({
+                    lastExecution: summary,
+                    nodes: state.nodes.map((node) => {
+                        if (node.data.type !== 'engineering') return node;
+                        return {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                outputs: result.nodeResults.get(node.id) ?? {},
+                                executionStatus: result.nodeStatus.get(node.id) ?? 'idle',
+                                executionErrors: result.errors.get(node.id) ?? [],
+                                executionWarnings: result.warnings.get(node.id) ?? [],
+                                executionTimeMs: result.executionTimeMs,
+                            } as EngineeringNodeData,
+                        };
+                    }),
+                }));
+
+                return summary;
             },
 
             // ─────────────────────────────────────
@@ -418,7 +529,6 @@ export const useFlowStore = create<FlowState & FlowActions>()(
             validateConnection: (connection: Connection) => {
                 const { source, target, sourceHandle, targetHandle } = connection;
 
-                // Self-connection not allowed
                 if (source === target) {
                     return { valid: false, error: 'Cannot connect a node to itself' };
                 }
@@ -431,17 +541,6 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                     return { valid: false, error: 'Node not found' };
                 }
 
-                // Source must be calculator or standard-calculator
-                if (sourceNode.data.type !== 'calculator' && sourceNode.data.type !== 'standard-calculator') {
-                    return { valid: false, error: 'Only calculator outputs can be connected' };
-                }
-
-                // Target can be calculator OR visualizer
-                if (targetNode.data.type !== 'calculator' && targetNode.data.type !== 'visualizer') {
-                    return { valid: false, error: 'Target must be a calculator or visualizer' };
-                }
-
-                // Check if connection already exists
                 const existingEdge = edges.find(e =>
                     e.target === target && e.targetHandle === targetHandle
                 );
@@ -449,12 +548,42 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                     return { valid: false, error: 'Input already connected' };
                 }
 
-                // Check for cycles
                 if (get().detectCycle(connection)) {
                     return { valid: false, error: 'Connection would create a circular dependency' };
                 }
 
-                return { valid: true };
+                const sourceType = sourceNode.data.type;
+                const targetType = targetNode.data.type;
+
+                if (sourceType === 'engineering' && targetType === 'engineering') {
+                    const srcSchema = getSchema((sourceNode.data as EngineeringNodeData).schemaId);
+                    const tgtSchema = getSchema((targetNode.data as EngineeringNodeData).schemaId);
+                    const srcPort = findPort(srcSchema, sourceHandle, 'output');
+                    const tgtPort = findPort(tgtSchema, targetHandle, 'input');
+                    if (!srcPort || !tgtPort) {
+                        return { valid: false, error: 'Unknown engineering port' };
+                    }
+                    if (!arePortsCompatible(srcPort.type, tgtPort.type)) {
+                        return {
+                            valid: false,
+                            error: `Unit mismatch: ${srcPort.type} → ${tgtPort.type}`,
+                        };
+                    }
+                    return { valid: true };
+                }
+
+                if (sourceType === 'engineering' && (targetType === 'visualizer' || targetType === 'export' as string)) {
+                    return { valid: true };
+                }
+
+                if (sourceType === 'calculator' || sourceType === 'standard-calculator') {
+                    if (targetType !== 'calculator' && targetType !== 'visualizer' && targetType !== 'engineering') {
+                        return { valid: false, error: 'Target must be a calculator, visualizer, or engineering node' };
+                    }
+                    return { valid: true };
+                }
+
+                return { valid: false, error: 'Unsupported connection' };
             },
 
             addEdge: (connection: Connection) => {
@@ -487,6 +616,9 @@ export const useFlowStore = create<FlowState & FlowActions>()(
 
                 // Trigger data propagation
                 get().propagateData(source);
+                if (get().autoRun) {
+                    setTimeout(() => get().executeGraph(), 20);
+                }
 
                 return true;
             },
@@ -495,6 +627,9 @@ export const useFlowStore = create<FlowState & FlowActions>()(
                 set(state => ({
                     edges: state.edges.filter(e => e.id !== id),
                 }));
+                if (get().autoRun) {
+                    setTimeout(() => get().executeGraph(), 20);
+                }
             },
 
             // ─────────────────────────────────────
@@ -669,11 +804,67 @@ export const useFlowStore = create<FlowState & FlowActions>()(
             // ─────────────────────────────────────
 
             clearFlow: () => {
-                set({ nodes: [], edges: [], selectedNodeId: null });
+                set({ nodes: [], edges: [], selectedNodeId: null, lastExecution: null });
             },
 
             loadFlow: (nodes: FlowNode[], edges: FlowEdge[]) => {
                 set({ nodes, edges, selectedNodeId: null });
+                if (get().autoRun) {
+                    setTimeout(() => get().executeGraph(), 20);
+                }
+            },
+
+            toggleAutoRun: () => {
+                set(state => {
+                    const next = !state.autoRun;
+                    if (next) {
+                        setTimeout(() => get().executeGraph(), 10);
+                    }
+                    return { autoRun: next };
+                });
+            },
+
+            loadTemplate: (templateId: string) => {
+                const template = getTemplateById(templateId);
+                if (!template) return;
+                set({
+                    nodes: template.nodes.map(n => ({ ...n })),
+                    edges: template.edges.map(e => ({ ...e })),
+                    selectedNodeId: null,
+                });
+                get().executeGraph();
+            },
+
+            exportProjectJson: () => {
+                const { nodes, edges } = get();
+                const project = {
+                    version: '1.0.0',
+                    name: 'AluCalc Flow Workflow',
+                    exportedAt: Date.now(),
+                    nodes: nodes.map(n => ({
+                        ...n,
+                        data: stripEngineeringRuntime(n.data),
+                    })),
+                    edges,
+                };
+                return JSON.stringify(project, null, 2);
+            },
+
+            importProjectJson: (jsonStr: string) => {
+                try {
+                    const parsed = JSON.parse(jsonStr);
+                    if (!parsed || !Array.isArray(parsed.nodes)) return false;
+                    set({
+                        nodes: parsed.nodes,
+                        edges: Array.isArray(parsed.edges) ? parsed.edges : [],
+                        selectedNodeId: null,
+                    });
+                    get().executeGraph();
+                    return true;
+                } catch (e) {
+                    console.error('Failed to import project:', e);
+                    return false;
+                }
             },
 
             // ─────────────────────────────────────
@@ -732,23 +923,39 @@ export const useFlowStore = create<FlowState & FlowActions>()(
         {
             name: 'alucalc-flow-state',
             partialize: (state) => ({
-                nodes: state.nodes,
+                nodes: state.nodes.map((n) => ({
+                    ...n,
+                    data: stripEngineeringRuntime(n.data),
+                })),
                 edges: state.edges,
             }),
             // OPTIMIZATION: Debounce persistence to prevent high-frequency localStorage writes during drags
             storage: {
                 getItem: (name) => {
-                    const str = localStorage.getItem(name);
-                    return str ? JSON.parse(str) : null;
+                    if (typeof window === 'undefined') return null;
+                    try {
+                        const str = localStorage.getItem(name);
+                        return str ? JSON.parse(str) : null;
+                    } catch {
+                        return null;
+                    }
                 },
                 setItem: (name, value) => {
-                    // Simple debounce mechanism
-                    if ((window as any)._flowPersistTimeout) clearTimeout((window as any)._flowPersistTimeout);
-                    (window as any)._flowPersistTimeout = setTimeout(() => {
-                        localStorage.setItem(name, JSON.stringify(value));
-                    }, 1000); // 1-second debounce for heavy state
+                    if (typeof window === 'undefined') return;
+                    try {
+                        if ((window as any)._flowPersistTimeout) clearTimeout((window as any)._flowPersistTimeout);
+                        (window as any)._flowPersistTimeout = setTimeout(() => {
+                            localStorage.setItem(name, JSON.stringify(value));
+                        }, 1000); // 1-second debounce for heavy state
+                    } catch {}
                 },
-                removeItem: (name) => localStorage.removeItem(name),
+                removeItem: (name) => {
+                    if (typeof window !== 'undefined') {
+                        try {
+                            localStorage.removeItem(name);
+                        } catch {}
+                    }
+                },
             },
         }
     )

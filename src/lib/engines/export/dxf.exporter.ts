@@ -1,136 +1,31 @@
 /**
- * 🏛️ ALUCALCULATOR ENGINE - EXPORT - DXF
- * "The Digital Blueprint"
- * AutoCAD R12 ASCII Format
+ * Adapter around the canonical R12 DxfWriter.
+ * Kept for verify_os and older kernel call sites.
  */
 
-import { Point } from "../math/involute";
+import { DxfWriter, type DxfLayerName } from '@/export/dxf/dxf-writer';
+import { Point } from '../math/involute';
 
 export class DxfExporter {
-    private content: string[] = [];
+    private writer = new DxfWriter();
 
-    constructor() {
-        this.header();
+    addPolyline(points: Point[], layer: string = 'PART_CONTOUR') {
+        this.writer.addPolyline(points, true, layer as DxfLayerName);
     }
 
-    private header() {
-        this.content.push(
-            "  0", "SECTION",
-            "  2", "HEADER",
-            "  0", "ENDSEC"
-        );
+    addLine(p1: Point, p2: Point, layer: string = '0') {
+        this.writer.addLine(p1.x, p1.y, p2.x, p2.y, layer);
     }
-
-    private startEntities() {
-        this.content.push(
-            "  0", "SECTION",
-            "  2", "ENTITIES"
-        );
-    }
-
-    private endEntities() {
-        this.content.push(
-            "  0", "ENDSEC"
-        );
-    }
-
-    addPolyline(points: Point[], layer: string = "0") {
-        this.content.push(
-            "  0", "POLYLINE",
-            "  8", layer,
-            " 66", "1" // Vertices follow
-        );
-
-        points.forEach(p => {
-            this.content.push(
-                "  0", "VERTEX",
-                "  8", layer,
-                " 10", p.x.toFixed(6),
-                " 20", p.y.toFixed(6),
-                " 30", "0.0" // Z
-            );
-        });
-
-        this.content.push(
-            "  0", "SEQEND"
-        );
-    }
-
-    addLine(p1: Point, p2: Point, layer: string = "0") {
-        this.content.push(
-            "  0", "LINE",
-            "  8", layer,
-            " 10", p1.x.toFixed(6),
-            " 20", p1.y.toFixed(6),
-            " 11", p2.x.toFixed(6),
-            " 21", p2.y.toFixed(6)
-        );
-    }
-
-    build(): string {
-        this.startEntities();
-        // In a real usage, methods would insert into a buffer between start/end
-        // For this simple class, we assume specific call order or we'd restructure.
-        // However, to keep it simple, we'll just append EOF.
-        // *Correction*: The user wants to generate it. 
-        // We should probably structure this so the user calls 'add' then 'getBlob'.
-        // Requires 'ENTITIES' to wrap the adds.
-        // Let's refactor slightly to be safe.
-
-        // Actually, simple array join is fine if we respect order. 
-        // But entities need to be inside SECTION ENTITIES.
-
-        const header = [
-            "  0", "SECTION",
-            "  2", "HEADER",
-            "  0", "ENDSEC"
-        ].join('\n');
-
-        const body = [
-            "  0", "SECTION",
-            "  2", "ENTITIES",
-            ...this.content, // The entities added via methods
-            "  0", "ENDSEC"
-        ].join('\n');
-
-        return `${header}\n${body}\n  0\nEOF`;
-    }
-
-    // Method to clear content buffer if needed (not strict requirement)
-    // Re-implementing addPolyline to PUSH to a separate buffer
-
-    private entitiesBuffer: string[] = [];
 
     addPolylineSmart(points: Point[], layer: string) {
-        this.entitiesBuffer.push(
-            "  0", "POLYLINE",
-            "  8", layer,
-            " 66", "1"
-        );
-
-        points.forEach(p => {
-            this.entitiesBuffer.push(
-                "  0", "VERTEX",
-                "  8", layer,
-                " 10", p.x.toFixed(6),
-                " 20", p.y.toFixed(6),
-                " 30", "0.0"
-            );
-        });
-
-        this.entitiesBuffer.push("  0", "SEQEND");
+        this.addPolyline(points, layer);
     }
 
     getOutput(): string {
-        return [
-            "  0", "SECTION",
-            "  2", "HEADER",
-            "  0", "ENDSEC",
-            "  0", "SECTION",
-            "  2", "ENTITIES",
-            ...this.entitiesBuffer,
-            "  0", "ENDSEC",
-            "  0", "EOF"
-        ].join('\n');
+        return this.writer.end();
+    }
+
+    build(): string {
+        return this.writer.end();
     }
 }

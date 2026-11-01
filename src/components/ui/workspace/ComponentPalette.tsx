@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Component Palette
+ * AluCAD OS v5.0 — Component Palette
  *
  * Left sidebar with draggable component cards.
  * Click to add a component to the workspace center.
@@ -143,7 +143,7 @@ const PaletteCard = ({ item }: { item: PaletteItem }) => {
 
 export const ComponentPalette = () => {
   return (
-    <div className="h-full flex flex-col" style={{ background: '#0a0e14' }}>
+    <div className="h-full flex flex-col" style={{ background: 'var(--bg-1)' }}>
       {/* Header */}
       <div
         className="px-4 py-3 border-b"

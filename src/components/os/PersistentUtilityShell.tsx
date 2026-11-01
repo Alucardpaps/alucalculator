@@ -41,7 +41,7 @@ export function PersistentUtilityShell({
                 width: width,
                 zIndex: 9999 + (id === 'calculator' ? 1 : 0)
             }}
-            className="fixed bg-[#0a0e14]/60 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group select-none pointer-events-auto"
+            className="fixed bg-[var(--bg-1)]/60 border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col group select-none pointer-events-auto"
         >
             {/* Header/Drag Handle */}
             <div

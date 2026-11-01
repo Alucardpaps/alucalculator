@@ -11,7 +11,7 @@ export default function AssemblyRedirect() {
   }, [router]);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-[#05080c] text-cyan-400 font-mono text-xs">
+    <div className="w-full h-screen flex items-center justify-center bg-[var(--bg-0)] text-cyan-400 font-mono text-xs">
       Redirecting to 3D Design Studio...
     </div>
   );

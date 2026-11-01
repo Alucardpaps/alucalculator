@@ -8,7 +8,7 @@ export const machiningGrindingSchema: CalculatorSchemaV2 = {
         description: 'Calculate peripheral speed (Vs) for grinding wheels.',
         category: 'fabrication',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['grinding', 'machining', 'cutting-speed', 'abrasive'],
         verifiedStandards: ['Industry Standard']
@@ -74,7 +74,7 @@ export const machiningGrindingSchema: CalculatorSchemaV2 = {
             // User likes "Avant Garde". Let's verify rotation.
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[#0a0e14]">
+                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[var(--bg-1)]">
                     <svg viewBox="0 0 200 200" width="100%" height="100%" className="animate-[spin_4s_linear_infinite]">
                         {/* Wheel Body */}
                         <circle cx="100" cy="100" r="80" fill="#334155" stroke="#475569" strokeWidth="2" />
@@ -88,7 +88,7 @@ export const machiningGrindingSchema: CalculatorSchemaV2 = {
                     </svg>
 
                     <div className="absolute bottom-4 right-4 text-right">
-                        <div className="text-4xl font-bold text-[#00e5ff] font-mono leading-none drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]">
+                        <div className="text-4xl font-bold text-[var(--cyan)] font-mono leading-none drop-">
                             {Vs.toFixed(1)}
                         </div>
                         <div className="text-xs text-slate-500 uppercase tracking-widest mt-1">m/s</div>

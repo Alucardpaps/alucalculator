@@ -6,8 +6,10 @@ import { useI18nStore } from '@/store/i18nStore';
 import { getFieldToolsStrings } from '@/locales/fieldToolsTranslations';
 import { playClickSound } from '@/mobile/services/audioSynth';
 import { useWorkspaceStore } from '@/store/workspaceStore';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export default function ClinometerModule() {
+  const precision = useGlobalPrecision();
     const { language } = useI18nStore();
     const ft = getFieldToolsStrings(language);
     const debugMode = useWorkspaceStore((s) => s.debugMode);
@@ -59,13 +61,13 @@ export default function ClinometerModule() {
     const computedHeight = Math.max(0, distance * Math.tan(pitchRad) + eyeHeight);
 
     return (
-        <div className="flex flex-col h-full bg-[#05090e] p-6 text-white overflow-hidden relative">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] p-6 text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
             
             {/* Header */}
             <div className="flex justify-between items-center pb-4 border-b border-white/5 relative z-10">
                 <div>
-                    <h2 className="text-lg font-black italic tracking-wider uppercase flex items-center gap-2 text-white">
+                    <h2 className="text-lg font-black tracking-wider uppercase flex items-center gap-2 text-white">
                         <Compass className="text-cyan-400 animate-spin-slow" size={20} />
                         {ft.clinometer || 'Clinometer / Height Finder'}
                     </h2>
@@ -79,13 +81,13 @@ export default function ClinometerModule() {
                     
                     {/* Calculated Height Card */}
                     <div className="p-5 bg-slate-950/40 border border-cyan-500/20 rounded-2xl text-center space-y-1 relative group overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 pointer-events-none" />
                         <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{ft.calculatedHeight || 'Calculated Height'}</span>
                         <span className="text-4xl font-black font-mono text-cyan-400 tracking-tighter block">
-                            {computedHeight.toFixed(2)} <span className="text-base font-normal text-slate-400 font-sans">m</span>
+                            {formatEngineeringValue(computedHeight, precision, false)} <span className="text-base font-normal text-slate-400 font-sans">m</span>
                         </span>
                         <span className="text-[9px] text-slate-500 block font-mono">
-                            {distance}m × tan({activePitch.toFixed(1)}°) + {eyeHeight}m
+                            {distance}m × tan({formatEngineeringValue(activePitch, precision, false)}°) + {eyeHeight}m
                         </span>
                     </div>
 
@@ -94,7 +96,7 @@ export default function ClinometerModule() {
                         <div className="p-4 bg-slate-950/20 border border-white/5 rounded-xl space-y-2">
                             <div className="flex justify-between items-baseline font-mono text-xs">
                                 <span className="text-slate-400">{ft.targetDistance || 'Distance to Object'}</span>
-                                <span className="font-bold text-cyan-400">{distance.toFixed(1)} m</span>
+                                <span className="font-bold text-cyan-400">{formatEngineeringValue(distance, precision, false)} m</span>
                             </div>
                             <input 
                                 type="range"
@@ -106,14 +108,14 @@ export default function ClinometerModule() {
                                     setDistance(Number(e.target.value));
                                     if (distance % 5 === 0) playClickSound();
                                 }}
-                                className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                                className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                             />
                         </div>
 
                         <div className="p-4 bg-slate-950/20 border border-white/5 rounded-xl space-y-2">
                             <div className="flex justify-between items-baseline font-mono text-xs">
                                 <span className="text-slate-400">{ft.userHeight || 'User Eye Height'}</span>
-                                <span className="font-bold text-cyan-400">{eyeHeight.toFixed(2)} m</span>
+                                <span className="font-bold text-cyan-400">{formatEngineeringValue(eyeHeight, precision, false)} m</span>
                             </div>
                             <input 
                                 type="range"
@@ -125,7 +127,7 @@ export default function ClinometerModule() {
                                     setEyeHeight(Number(e.target.value));
                                     if (Math.floor(eyeHeight * 10) % 2 === 0) playClickSound();
                                 }}
-                                className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-cyan-400 outline-none"
+                                className="w-full h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                             />
                         </div>
                     </div>
@@ -134,7 +136,7 @@ export default function ClinometerModule() {
                         {!isMeasuring ? (
                             <button
                                 onClick={requestPermissionsAndStart}
-                                className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.3)] cursor-pointer"
+                                className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                                 <Play size={14} className="fill-black" />
                                 {ft.enableGyroscope || 'Start Camera View'}
@@ -174,7 +176,7 @@ export default function ClinometerModule() {
                                 <div className="absolute bottom-4 left-6 right-6 h-0.5 border-t border-dashed border-cyan-400/40" />
                                 {/* Tilt hypotenuse */}
                                 <div 
-                                    className="absolute bottom-4 left-6 h-0.5 border-t-2 border-cyan-400 origin-left shadow-[0_0_8px_rgba(0,229,255,0.4)]"
+                                    className="absolute bottom-4 left-6 h-0.5 border-t-2 border-cyan-400 origin-left "
                                     style={{ 
                                         width: `${180 / Math.cos(pitchRad)}px`,
                                         transform: `rotate(${-activePitch}deg)`
@@ -185,8 +187,8 @@ export default function ClinometerModule() {
                                 
                                 {/* Labels */}
                                 <span className="absolute bottom-6 left-12 text-[9px] font-mono text-slate-500">baseline d = {distance}m</span>
-                                <span className="absolute bottom-16 left-32 text-[10px] font-mono text-cyan-400">tilt θ = {activePitch.toFixed(0)}°</span>
-                                <span className="absolute top-20 right-26 text-[10px] font-mono text-cyan-400 font-bold">h = {computedHeight.toFixed(2)}m</span>
+                                <span className="absolute bottom-16 left-32 text-[10px] font-mono text-cyan-400">tilt θ = {formatEngineeringValue(activePitch, precision, false)}°</span>
+                                <span className="absolute top-20 right-26 text-[10px] font-mono text-cyan-400 font-bold">h = {formatEngineeringValue(computedHeight, precision, false)}m</span>
                             </div>
                         </div>
                     )}
@@ -194,7 +196,7 @@ export default function ClinometerModule() {
                     {/* Crosshair Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                         <div className="w-12 h-12 border border-cyan-500/30 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_8px_#00e5ff]" />
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full " />
                         </div>
                         <div className="absolute w-40 h-0.5 border-t border-cyan-500/20" />
                         <div className="absolute h-40 w-0.5 border-l border-cyan-500/20" />
@@ -202,7 +204,7 @@ export default function ClinometerModule() {
                         <div className="absolute right-6 top-6 bg-black/75 border border-cyan-400/20 px-4 py-2 rounded-xl text-center font-mono">
                             <span className="text-[8px] text-slate-500 uppercase tracking-widest block">{ft.pitchAngle || 'Pitch Angle'}</span>
                             <span className="text-base font-black text-cyan-400">
-                                {activePitch.toFixed(1)}°
+                                {formatEngineeringValue(activePitch, precision, false)}°
                             </span>
                         </div>
                     </div>
@@ -225,7 +227,7 @@ export default function ClinometerModule() {
                                         setSimPitch(Number(e.target.value));
                                         if (simPitch % 5 === 0) playClickSound();
                                     }}
-                                    className="flex-1 h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-yellow-500 outline-none"
+                                    className="flex-1 h-1 bg-slate-900 border border-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] outline-none"
                                 />
                                 <span className="text-xs font-bold font-mono text-yellow-400 w-10 text-right">{simPitch}°</span>
                             </div>

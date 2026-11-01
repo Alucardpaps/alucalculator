@@ -120,7 +120,7 @@ export function getLocalizedQuiz(
   const bundle = getBundle(locale);
   if (locale !== 'en' && bundle.quizzes[slug]?.length) return bundle.quizzes[slug];
   if (locale === 'en' && ACADEMY_QUIZZES[slug]?.length) return ACADEMY_QUIZZES[slug];
-  if (!faqFallback?.length) return [];
+  if (!faqFallback?.length) return ACADEMY_QUIZZES[slug] ?? [];
   const chrome = getAcademyPage(locale);
   return faqFallback.slice(0, 2).map((f, i) => ({
     id: `faq-${i}`,

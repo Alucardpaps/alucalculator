@@ -202,11 +202,11 @@ export default function RealTimeCostModule() {
     );
 
     return (
-        <div className="flex h-full bg-[#0a0f16] text-slate-200 p-4 gap-4 overflow-hidden">
+        <div className="flex h-full bg-[var(--bg-1)] text-slate-200 p-4 gap-4 overflow-hidden">
             {/* Left Column: Tweak Controls */}
             <div className="w-[350px] flex flex-col gap-4 overflow-y-auto no-scrollbar pb-12 pr-1">
                 <div className="flex items-center gap-3 mb-2 px-1">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--cyan-glow)] flex items-center justify-center border border-[var(--cyan)]/40">
                         <DollarSign className="text-emerald-400 w-5 h-5" />
                     </div>
                     <div className="flex-1">
@@ -229,7 +229,7 @@ export default function RealTimeCostModule() {
                     </div>
                 )}
 
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 space-y-5 shadow-lg backdrop-blur text-sm">
+                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 space-y-5 shadow-lg text-sm">
                     <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
                         <h3 className="font-semibold text-slate-300 flex items-center gap-2"><Coins size={14} className="text-amber-500" /> {t.materialContext}</h3>
                     </div>
@@ -244,7 +244,7 @@ export default function RealTimeCostModule() {
                                 type="range" min="10" max="5000" step="10"
                                 value={input.materialVolumeCm3}
                                 onChange={e => handleInput('materialVolumeCm3', Number(e.target.value))}
-                                className="w-full accent-amber-500 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                                className="w-full accent-[var(--cyan)] h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
 
@@ -284,7 +284,7 @@ export default function RealTimeCostModule() {
                                 type="range" min="0" max="24" step="0.5"
                                 value={input.estimatedMachiningHours}
                                 onChange={e => handleInput('estimatedMachiningHours', Number(e.target.value))}
-                                className="w-full accent-blue-500 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                                className="w-full accent-[var(--cyan)] h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
 
@@ -328,7 +328,6 @@ export default function RealTimeCostModule() {
 
             {/* Right Column: Analytics & Strategy */}
             <div className="flex-1 flex flex-col gap-4 overflow-y-auto no-scrollbar">
-
                 {/* Hero Number */}
                 <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-900 border border-emerald-900/30 rounded-2xl p-6 relative overflow-hidden flex-shrink-0">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
@@ -339,7 +338,7 @@ export default function RealTimeCostModule() {
                                 {t.projectedCost} {isSimulating && <span className="animate-pulse w-2 h-2 rounded-full bg-emerald-400"></span>}
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-6xl font-black text-white tracking-tighter">${total.toFixed(2)}</span>
+                                <span className="text-5xl font-black text-white tracking-tighter">${total.toFixed(2)}</span>
                                 <span className="text-slate-500 font-mono text-sm">{t.unit}</span>
                             </div>
                         </div>
@@ -373,79 +372,79 @@ export default function RealTimeCostModule() {
 
                 {/* AI Insights */}
                 <div className="flex-1 bg-slate-900 border border-slate-800/80 rounded-2xl p-5 relative overflow-hidden">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
-                        <h3 className="text-sm font-bold text-slate-200">{t.analysisTitle}</h3>
-                    </div>
+                        <div className="flex items-center gap-2 mb-6">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            <h3 className="text-sm font-bold text-slate-200">{t.analysisTitle}</h3>
+                        </div>
 
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 h-[calc(100%-40px)]">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 h-[calc(100%-40px)]">
 
-                        {/* Dynamic Insight Cards */}
-                        <div className="flex flex-col gap-3">
-                            {insights.map((insight, idx) => {
-                                const colors = BADGE_COLORS[insight.badgeColorScheme];
-                                return (
-                                    <div key={idx} className={`p-4 bg-slate-950/50 rounded-xl border border-slate-800/50 ${colors.hover} transition-colors`}>
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className={`flex items-center gap-2 ${colors.text} font-medium text-sm`}>
-                                                {idx === 0 ? <ArrowUpRight size={16} /> : <TrendingDown size={16} />}
-                                                {insight.title}
+                            {/* Dynamic Insight Cards */}
+                            <div className="flex flex-col gap-3">
+                                {insights.map((insight, idx) => {
+                                    const colors = BADGE_COLORS[insight.badgeColorScheme];
+                                    return (
+                                        <div key={idx} className={`p-4 bg-slate-950/50 rounded-xl border border-slate-800/50 ${colors.hover} transition-colors`}>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className={`flex items-center gap-2 ${colors.text} font-medium text-sm`}>
+                                                    {idx === 0 ? <ArrowUpRight size={16} /> : <TrendingDown size={16} />}
+                                                    {insight.title}
+                                                </div>
+                                                <span className={`text-[10px] font-mono ${colors.bg} ${colors.text} px-2 py-0.5 rounded border ${colors.border}`}>
+                                                    {insight.badgeText}
+                                                </span>
                                             </div>
-                                            <span className={`text-[10px] font-mono ${colors.bg} ${colors.text} px-2 py-0.5 rounded border ${colors.border}`}>
-                                                {insight.badgeText}
-                                            </span>
+                                            <p className="text-xs text-slate-400 leading-relaxed">
+                                                {insight.description}
+                                            </p>
                                         </div>
-                                        <p className="text-xs text-slate-400 leading-relaxed">
-                                            {insight.description}
-                                        </p>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Process Efficiency Score */}
+                            <div className="bg-black/20 rounded-xl border border-white/5 p-4 flex flex-col justify-center relative inner-shadow">
+
+                                <div className="absolute top-3 right-3 text-slate-600"><PieChart size={18} /></div>
+                                <h4 className="text-xs font-semibold text-slate-400 mb-4 uppercase tracking-widest">{t.efficiencyScore}</h4>
+
+                                <div className="flex items-end gap-3 mb-6">
+                                    <span className={`text-5xl font-black ${efficiencyGrade.colorClass}`}>{efficiencyGrade.grade}</span>
+                                    <span className={`${efficiencyGrade.colorClass} text-sm font-medium mb-1`}>
+                                        {efficiencyGrade.label}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-3 text-xs text-slate-300">
+                                        {matPct > 40
+                                            ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                                            : <Info size={14} className="text-amber-500 flex-shrink-0" />}
+                                        {matPct > 40
+                                            ? t.materialHealthy.replace('{pct}', matPct.toFixed(1))
+                                            : t.materialOverhead.replace('{pct}', matPct.toFixed(1))}
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    <div className="flex items-center gap-3 text-xs text-slate-300">
+                                        {mfgPct < 40
+                                            ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                                            : <Info size={14} className="text-amber-500 flex-shrink-0" />}
+                                        {mfgPct < 40
+                                            ? t.machiningHealthy.replace('{pct}', mfgPct.toFixed(1))
+                                            : t.machiningOver.replace('{pct}', mfgPct.toFixed(1))}
+                                    </div>
+                                    <div className="flex items-center gap-3 text-xs text-slate-300">
+                                        {wldPct < 20
+                                            ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                                            : <Info size={14} className="text-amber-500 flex-shrink-0" />}
+                                        {wldPct < 20
+                                            ? t.weldingOptimized
+                                            : t.weldingOver.replace('{pct}', wldPct.toFixed(1))}
+                                    </div>
+                                </div>
 
-                        {/* Process Efficiency Score */}
-                        <div className="bg-black/20 rounded-xl border border-white/5 p-4 flex flex-col justify-center relative inner-shadow">
-
-                            <div className="absolute top-3 right-3 text-slate-600"><PieChart size={18} /></div>
-                            <h4 className="text-xs font-semibold text-slate-400 mb-4 uppercase tracking-widest">{t.efficiencyScore}</h4>
-
-                            <div className="flex items-end gap-3 mb-6">
-                                <span className={`text-5xl font-black ${efficiencyGrade.colorClass}`}>{efficiencyGrade.grade}</span>
-                                <span className={`${efficiencyGrade.colorClass} text-sm font-medium mb-1`}>
-                                    {efficiencyGrade.label}
-                                </span>
                             </div>
-
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 text-xs text-slate-300">
-                                    {matPct > 40
-                                        ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
-                                        : <Info size={14} className="text-amber-500 flex-shrink-0" />}
-                                    {matPct > 40
-                                        ? t.materialHealthy.replace('{pct}', matPct.toFixed(1))
-                                        : t.materialOverhead.replace('{pct}', matPct.toFixed(1))}
-                                </div>
-                                <div className="flex items-center gap-3 text-xs text-slate-300">
-                                    {mfgPct < 40
-                                        ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
-                                        : <Info size={14} className="text-amber-500 flex-shrink-0" />}
-                                    {mfgPct < 40
-                                        ? t.machiningHealthy.replace('{pct}', mfgPct.toFixed(1))
-                                        : t.machiningOver.replace('{pct}', mfgPct.toFixed(1))}
-                                </div>
-                                <div className="flex items-center gap-3 text-xs text-slate-300">
-                                    {wldPct < 20
-                                        ? <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
-                                        : <Info size={14} className="text-amber-500 flex-shrink-0" />}
-                                    {wldPct < 20
-                                        ? t.weldingOptimized
-                                        : t.weldingOver.replace('{pct}', wldPct.toFixed(1))}
-                                </div>
-                            </div>
-
                         </div>
                     </div>
-                </div>
 
             </div>
         </div>

@@ -11,7 +11,7 @@ const goldenRatioSchema: CalculatorSchemaV2 = {
         description: 'Calculate perfect proportions (Φ = 1.618) for industrial design.',
         category: 'math',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['design', 'phi', 'ratio', 'proportion', 'golden'],
         verifiedStandards: ['Aesthetics']
@@ -108,7 +108,7 @@ const goldenRatioSchema: CalculatorSchemaV2 = {
             const wB = B * scale;
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[#0a0e14]">
+                <div className="w-full h-full flex flex-col items-center justify-center relative bg-[var(--bg-1)]">
                     <svg viewBox="0 0 200 200" width="100%" height="100%">
                         {/* Golden Rectangle Base */}
                         <g transform="translate(30, 60)">
@@ -128,7 +128,7 @@ const goldenRatioSchema: CalculatorSchemaV2 = {
                     </svg>
 
                     <div className="absolute bottom-4 left-4 text-left">
-                        <div className="text-2xl font-bold text-[#f59e0b] font-mono leading-none drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+                        <div className="text-2xl font-bold text-[var(--warn)] font-mono leading-none drop-">
                             {B.toFixed(1)}
                         </div>
                         <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Smaller (B)</div>

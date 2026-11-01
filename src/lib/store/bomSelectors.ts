@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — BOM Selectors
+ * AluCAD OS v5.0 — BOM Selectors
  *
  * Derived state computed from the assembly store.
  * Pure selector functions — zero side effects.

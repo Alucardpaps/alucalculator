@@ -13,6 +13,12 @@ export const ConsentBanner: React.FC = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (window.navigator?.webdriver || window.location.search.includes('headless=1')) return;
+    if (window.location.pathname.includes('/widget')) return;
+    // Don't obstruct mobile touch drafting workspaces
+    if ((window.location.pathname.startsWith('/cad-editor') || window.location.pathname.startsWith('/design-studio')) && window.innerWidth < 640) {
+      return;
+    }
     const telConsent = localStorage.getItem(CONSENT_TELEMETRY_KEY);
     const ssConsent = localStorage.getItem(CONSENT_SCREENSHOT_KEY);
 
@@ -51,78 +57,76 @@ export const ConsentBanner: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 z-50 max-w-lg bg-slate-900/95 border border-cyan-500/30 rounded-2xl shadow-2xl p-4 md:p-5 text-slate-200 backdrop-blur-md animate-in slide-in-from-bottom-3 duration-300">
-      <div className="flex items-start space-x-3">
-        <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shrink-0">
-          <ShieldCheck className="w-5 h-5" />
+    <div className="fixed bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 md:left-auto md:right-4 z-50 max-w-lg bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-[var(--radius-m)] shadow-2xl p-3 sm:p-4 md:p-5 text-[var(--ink)] animate-in slide-in-from-bottom-3 duration-300 max-h-[88vh] overflow-y-auto">
+      <div className="flex items-start space-x-2.5 sm:space-x-3">
+        <div className="p-1.5 sm:p-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--cyan-dim)] text-[var(--cyan)] shrink-0 hidden xs:block">
+          <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <div className="space-y-2 flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-white tracking-wide">
-              Gizlilik & Veri İşleme Tercihleri (KVKK 2026/347)
+        <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-1">
+            <h3 className="text-[11px] sm:text-xs font-bold text-white tracking-wide font-mono uppercase truncate">
+              Privacy & Diagnostics (GDPR / KVKK)
             </h3>
             <button
               onClick={handleRejectAll}
-              className="text-slate-500 hover:text-slate-300 p-1 cursor-pointer"
-              aria-label="Kapat ve Reddet"
+              className="text-[var(--muted)] hover:text-white p-1 cursor-pointer transition-colors shrink-0"
+              aria-label="Dismiss and Reject"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            Geometri ve solver hesaplamalarınız tarayıcınızda kalır, sunucuya aktarılmaz. Yalnızca
-            sistem kararlılığı ve hata teşhisi için aşağıdaki rızaları yapılandırabilirsiniz:
+          <p className="text-[10px] sm:text-[11px] text-[var(--muted)] leading-relaxed">
+            All CAD geometry and engineering solver calculations execute client-side.
+            Optional telemetry aids system stability:
           </p>
 
-          <div className="space-y-2 py-1">
-            <label className="flex items-start space-x-2 text-[11px] text-slate-300 cursor-pointer">
+          <div className="space-y-1.5 sm:space-y-2 py-0.5 sm:py-1">
+            <label className="flex items-start space-x-2 text-[10.5px] sm:text-[11px] text-[var(--alu)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={consentTelemetry}
                 onChange={(e) => setConsentTelemetry(e.target.checked)}
-                className="mt-0.5 rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-0"
+                className="mt-0.5 rounded-[var(--radius-s)] border-[var(--line)] bg-[var(--bg-3)] text-[var(--cyan)] focus:ring-0 shrink-0"
               />
               <span>
-                <strong>Kullanım & Teşhis Telemetrisi:</strong> Hata ve performans analizleri için
-                anonim sayfa olaylarının iletilmesini onaylıyorum.
+                <strong className="text-white">Diagnostic Telemetry:</strong> Anonymized error traces and client performance metrics.
               </span>
             </label>
 
-            <label className="flex items-start space-x-2 text-[11px] text-slate-300 cursor-pointer">
+            <label className="flex items-start space-x-2 text-[10.5px] sm:text-[11px] text-[var(--alu)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={consentScreenshot}
                 onChange={(e) => setConsentScreenshot(e.target.checked)}
-                className="mt-0.5 rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-0"
+                className="mt-0.5 rounded-[var(--radius-s)] border-[var(--line)] bg-[var(--bg-3)] text-[var(--cyan)] focus:ring-0 shrink-0"
               />
               <span>
-                <strong>Destek Ekran Görüntüsü:</strong> Bildirim gönderildiğinde model görselinin
-                hata ayıklama amacıyla iletilmesine açık rıza veriyorum.
+                <strong className="text-white">Support Canvas Capture:</strong> Allow attaching canvas snapshots when reporting bugs.
               </span>
             </label>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <div className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:gap-2 pt-2 border-t border-[var(--line)]">
             <button
               type="button"
               onClick={handleRejectAll}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-950 border border-slate-800 hover:bg-slate-800 transition cursor-pointer"
+              className="px-2 sm:px-3 py-1.5 rounded-[var(--radius-s)] text-[11px] sm:text-xs font-semibold text-[var(--muted)] hover:text-white bg-[var(--bg-2)] border border-[var(--line)] hover:border-[var(--line-strong)] transition cursor-pointer text-center truncate"
             >
-              Tümünü Reddet
+              Reject All
             </button>
             <button
               type="button"
               onClick={handleAcceptSelected}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition cursor-pointer"
+              className="px-2 sm:px-3 py-1.5 rounded-[var(--radius-s)] text-[11px] sm:text-xs font-semibold text-[var(--alu)] bg-[var(--bg-3)] hover:bg-[var(--bg-2)] border border-[var(--line-strong)] transition cursor-pointer text-center truncate"
             >
-              Seçilenleri Kaydet
+              Save Choices
             </button>
             <button
               type="button"
               onClick={handleAcceptAll}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition shadow cursor-pointer"
+              className="px-2 sm:px-3.5 py-1.5 rounded-[var(--radius-s)] text-[11px] sm:text-xs font-bold text-[var(--bg-0)] bg-[var(--cyan)] hover:bg-[var(--cyan)] transition shadow cursor-pointer font-mono uppercase text-center truncate"
             >
-              Tümünü Kabul Et
+              Accept All
             </button>
           </div>
         </div>

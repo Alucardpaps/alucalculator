@@ -1,9 +1,10 @@
 /**
- * AluCalc OS - Window Management Store
+ * AluCAD OS - Window Management Store
  * Zustand-based operating system kernel for managing draggable windows
  */
 
 import { create } from 'zustand';
+import { normalizeThemeName, setThemePreference } from '@/lib/theme/themeStore';
 import { persist } from 'zustand/middleware';
 import { ModuleType, WindowSize, MODULE_REGISTRY } from '@/config/modules';
 
@@ -16,7 +17,7 @@ export interface WindowPosition {
     y: number;
 }
 
-export type Theme = 'dark' | 'light' | 'paper' | 'sea' | 'sky';
+export type Theme = 'dark' | 'light' | 'paper' | 'sea' | 'sky' | 'graphite' | 'midnight' | 'oled' | 'system';
 
 export interface OSWindow {
     id: string;
@@ -42,7 +43,7 @@ interface OSState {
 
     // Theme & UX
     theme: Theme;
-    fontSize: 'small' | 'medium' | 'large';
+    fontSize: 'auto' | 'small' | 'medium' | 'large' | 'xlarge';
     fontFamily: 'sans' | 'mono' | 'serif';
     hasSeenWelcome: boolean;
     showWelcomeModal: boolean;
@@ -54,6 +55,9 @@ interface OSState {
     isSelfDestructing: boolean; // Theatrical self-destruct state
     isDockHidden: boolean; // Taskbar visibility
     isWebGLSupported: boolean; // Hardware capability flag
+    isCommandPaletteOpen: boolean;
+    commandPaletteQuery: string;
+    decimalPrecision: number; // 1 to 8, default 4 (global site-wide decimal precision)
 }
 
 
@@ -76,7 +80,7 @@ interface OSActions {
     bringToFront: (id: string) => void;
 
     setTheme: (theme: Theme) => void;
-    setFontSize: (size: 'small' | 'medium' | 'large') => void;
+    setFontSize: (size: 'auto' | 'small' | 'medium' | 'large' | 'xlarge') => void;
     setFontFamily: (family: 'sans' | 'mono' | 'serif') => void;
     openWelcome: () => void;
     completeWelcome: () => void;
@@ -101,6 +105,10 @@ interface OSActions {
 
     toggleDock: () => void;
     setWebGLSupported: (supported: boolean) => void;
+    openCommandPalette: (initialQuery?: string) => void;
+    closeCommandPalette: () => void;
+    setCommandPaletteQuery: (query: string) => void;
+    setDecimalPrecision: (precision: number) => void;
 }
 
 
@@ -134,11 +142,24 @@ export const useOSStore = create<OSState & OSActions>()(
             isSelfDestructing: false,
             isDockHidden: false,
             isWebGLSupported: true, // Default to true until checked
-
+            isCommandPaletteOpen: false,
+            commandPaletteQuery: '',
+            decimalPrecision: 2,
 
             setDictionary: (dict: any) => set({ dictionary: dict }),
             setWorkspaceMode: (mode: WorkspaceMode) => set({ workspaceMode: mode }),
             setUnitSystem: (sys: 'metric' | 'imperial') => set({ unitSystem: sys }),
+            setDecimalPrecision: (precision: number) => {
+                const clamped = Math.max(1, Math.min(8, Math.round(precision)));
+                set({ decimalPrecision: clamped });
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('alucalc:precision-changed', { detail: { precision: clamped } }));
+                }
+            },
+
+            openCommandPalette: (initialQuery = '') => set({ isCommandPaletteOpen: true, commandPaletteQuery: initialQuery }),
+            closeCommandPalette: () => set({ isCommandPaletteOpen: false, commandPaletteQuery: '' }),
+            setCommandPaletteQuery: (query: string) => set({ commandPaletteQuery: query }),
 
             toggleStartMenu: () => set(state => ({ startMenuOpen: !state.startMenuOpen })),
             setStartMenuOpen: (open: boolean) => set({ startMenuOpen: open }),
@@ -177,17 +198,32 @@ export const useOSStore = create<OSState & OSActions>()(
                 }
             },
 
-            openWindow: (type: ModuleType, maximized: boolean = false) => {
+            openWindow: (type: ModuleType | string, maximized: boolean = false) => {
                 const { windows, nextZIndex } = get();
-                const moduleDef = MODULE_REGISTRY[type];
+                const aliases: Record<string, ModuleType> = {
+                    'fasteners': 'bolt-torque',
+                    'bolt': 'bolt-torque',
+                    'materials': 'handbook',
+                    'materials-db': 'handbook',
+                    'materials-explorer': 'handbook',
+                    'material-selector-ai': 'handbook',
+                    'gears': 'gears-bearings',
+                    'fea': 'simulation-fea',
+                    'cad': 'cad-editor',
+                    'cutting': 'cutting-optimizer',
+                };
+                const resolvedType = (aliases[type] || type) as ModuleType;
+                const moduleDef = MODULE_REGISTRY[resolvedType];
 
                 if (!moduleDef) {
-                    console.error(`Attempted to open undefined module: ${type}`);
+                    console.warn(`Module not found in desktop registry: ${type}`);
                     return;
                 }
 
+                const effectiveType = resolvedType;
+
                 // Check if window of this type already exists
-                const existing = windows.find(w => w.type === type);
+                const existing = windows.find(w => w.type === effectiveType);
                 if (existing) {
                     // Focus existing window
                     get().focusWindow(existing.id);
@@ -209,8 +245,8 @@ export const useOSStore = create<OSState & OSActions>()(
                 };
 
                 const newWindow: OSWindow = {
-                    id: `${type}-${Date.now()}`,
-                    type,
+                    id: `${effectiveType}-${Date.now()}`,
+                    type: effectiveType,
                     title: moduleDef.title,
                     position,
                     size: moduleDef.defaultSize,
@@ -358,7 +394,12 @@ export const useOSStore = create<OSState & OSActions>()(
             },
 
             // Theme & UX Actions
-            setTheme: (theme: Theme) => set({ theme }),
+            setTheme: (theme: Theme) => {
+                // Delegate to the theme engine (src/lib/theme) and keep this field as a mirror.
+                const pref = normalizeThemeName(theme);
+                setThemePreference(pref);
+                set({ theme: pref as Theme });
+            },
             setFontSize: (fontSize) => set({ fontSize }),
             setFontFamily: (fontFamily) => set({ fontFamily }),
 

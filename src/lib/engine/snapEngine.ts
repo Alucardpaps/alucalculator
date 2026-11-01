@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — Deterministic Snap Engine
+ * AluCAD OS v5.0 — Deterministic Snap Engine
  *
  * Pure math functions. Zero React. Zero side effects.
  * Given a dragged component + workspace state → returns corrected position.

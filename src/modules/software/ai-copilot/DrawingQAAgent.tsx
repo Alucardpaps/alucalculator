@@ -8,7 +8,7 @@ export function DrawingQAAgent() {
     const { gdtErrors, isReviewingDrawing, runGDTReview } = useSoftwareStore();
 
     return (
-        <div className="flex flex-col gap-5 p-6 border border-slate-700/50 bg-slate-900/40 backdrop-blur-md rounded-xl shadow-2xl">
+        <div className="flex flex-col gap-5 p-6 border border-slate-700/50 bg-slate-900/40 rounded-xl shadow-2xl">
             {/* Header Section */}
             <div className="flex justify-between items-start border-b border-slate-700/50 pb-4">
                 <div>
@@ -42,7 +42,7 @@ export function DrawingQAAgent() {
                 <button
                     onClick={() => runGDTReview({}, {})}
                     disabled={isReviewingDrawing}
-                    className="group relative px-6 py-2.5 bg-rose-600/90 hover:bg-rose-500 text-white text-sm font-medium tracking-wide rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-[0_0_15px_rgba(225,29,72,0.2)] focus:ring-2 focus:ring-rose-500/50"
+                    className="group relative px-6 py-2.5 bg-rose-600/90 hover:bg-rose-500 text-white text-sm font-medium tracking-wide rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden focus:ring-2 focus:ring-rose-500/50"
                 >
                     <span className="relative z-10 flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4" />

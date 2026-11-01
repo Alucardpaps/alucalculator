@@ -153,12 +153,12 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
             className={`
                 nodrag h-8 text-xs font-medium rounded items-center justify-center flex transition-all active:scale-95
                 ${wide ? 'col-span-2' : ''}
-                ${color === 'cyan' ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-lg shadow-cyan-900/20' :
+                ${color === 'cyan' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] hover:bg-cyan-500 shadow-lg ' :
                     color === 'amber' ? 'bg-amber-900/20 text-amber-500 border border-amber-900/40 hover:bg-amber-900/30' :
                         color === 'purple' ? 'bg-purple-900/20 text-purple-400 border border-purple-900/40 hover:bg-purple-900/30' :
                             color === 'red' ? 'bg-red-900/20 text-red-400 border border-red-900/40 hover:bg-red-900/30' :
-                                color === 'slate' ? 'bg-[#1e293b] text-slate-200 border border-slate-700 hover:bg-slate-700' :
-                                    'bg-[#0f1419] text-gray-400 border border-[#1e293b] hover:bg-[#1e293b] hover:text-white'
+                                color === 'slate' ? 'bg-[var(--bg-3)] text-slate-200 border border-slate-700 hover:bg-slate-700' :
+                                    'bg-[var(--bg-1)] text-gray-400 border border-[var(--line)] hover:bg-[var(--bg-3)] hover:text-white'
                 }
             `}
             onClick={(e) => { e.stopPropagation(); onClick ? onClick() : handleBtnClick(v); }}
@@ -169,24 +169,24 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
 
     return (
         <div className={`
-            relative flex flex-col w-[350px] bg-[#05080a] border rounded-xl shadow-2xl overflow-hidden backdrop-blur-md transition-shadow duration-300
-            ${selected ? 'border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.4)]' : 'border-[#1e293b]'}
+            relative flex flex-col w-[350px] bg-[var(--bg-0)] border rounded-xl shadow-2xl overflow-hidden transition-shadow duration-300
+            ${selected ? 'border-cyan-500 ' : 'border-[var(--line)]'}
         `}>
             {/* Header Tabs */}
-            <div className="flex items-center bg-[#0f1419] border-b border-[#1e293b]">
-                <button onClick={() => setActiveTab('CALC')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'CALC' ? 'text-cyan-400 bg-[#1e293b]' : 'text-gray-500 hover:text-gray-300'}`}>
+            <div className="flex items-center bg-[var(--bg-1)] border-b border-[var(--line)]">
+                <button onClick={() => setActiveTab('CALC')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'CALC' ? 'text-cyan-400 bg-[var(--bg-3)]' : 'text-gray-500 hover:text-gray-300'}`}>
                     <Calculator size={14} className="mr-1" /> Calc
                 </button>
-                <button onClick={() => setActiveTab('GRAPH')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'GRAPH' ? 'text-cyan-400 bg-[#1e293b]' : 'text-gray-500 hover:text-gray-300'}`}>
+                <button onClick={() => setActiveTab('GRAPH')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'GRAPH' ? 'text-cyan-400 bg-[var(--bg-3)]' : 'text-gray-500 hover:text-gray-300'}`}>
                     <LineChart size={14} className="mr-1" /> Graph
                 </button>
-                <button onClick={() => setActiveTab('VARS')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'VARS' ? 'text-cyan-400 bg-[#1e293b]' : 'text-gray-500 hover:text-gray-300'}`}>
+                <button onClick={() => setActiveTab('VARS')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'VARS' ? 'text-cyan-400 bg-[var(--bg-3)]' : 'text-gray-500 hover:text-gray-300'}`}>
                     <Variable size={14} className="mr-1" /> Vars
                 </button>
-                <button onClick={() => setActiveTab('HIST')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'HIST' ? 'text-cyan-400 bg-[#1e293b]' : 'text-gray-500 hover:text-gray-300'}`}>
+                <button onClick={() => setActiveTab('HIST')} className={`flex-1 flex items-center justify-center py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${activeTab === 'HIST' ? 'text-cyan-400 bg-[var(--bg-3)]' : 'text-gray-500 hover:text-gray-300'}`}>
                     <History size={14} className="mr-1" /> History
                 </button>
-                <button onClick={() => removeNode(id)} className="w-8 flex items-center justify-center text-slate-600 hover:text-red-400 border-l border-[#1e293b]">
+                <button onClick={() => removeNode(id)} className="w-8 flex items-center justify-center text-slate-600 hover:text-red-400 border-l border-[var(--line)]">
                     <X size={14} />
                 </button>
             </div>
@@ -197,7 +197,7 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
             {activeTab === 'CALC' && (
                 <>
                     {/* Display */}
-                    <div className="p-4 bg-[#020405] border-b border-[#1e293b]">
+                    <div className="p-4 bg-[var(--bg-0)] border-b border-[var(--line)]">
                         <input
                             className="nodrag w-full bg-transparent text-right text-sm text-slate-300 font-mono focus:outline-none placeholder:text-slate-700"
                             value={expr}
@@ -210,22 +210,22 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
                     </div>
 
                     {/* Controls */}
-                    <div className="flex bg-[#1e293b] p-0.5 justify-between px-2">
+                    <div className="flex bg-[var(--bg-3)] p-0.5 justify-between px-2">
                         <div className="flex gap-0.5">
-                            <button onClick={() => setAngleMode('DEG')} className={`text-[9px] px-2 py-0.5 rounded ${angleMode === 'DEG' ? 'bg-cyan-600 text-white' : 'text-gray-400'}`}>DEG</button>
-                            <button onClick={() => setAngleMode('RAD')} className={`text-[9px] px-2 py-0.5 rounded ${angleMode === 'RAD' ? 'bg-cyan-600 text-white' : 'text-gray-400'}`}>RAD</button>
+                            <button onClick={() => setAngleMode('DEG')} className={`text-[9px] px-2 py-0.5 rounded ${angleMode === 'DEG' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-gray-400'}`}>DEG</button>
+                            <button onClick={() => setAngleMode('RAD')} className={`text-[9px] px-2 py-0.5 rounded ${angleMode === 'RAD' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'text-gray-400'}`}>RAD</button>
                         </div>
                     </div>
 
                     {/* Keypad */}
-                    <div className="p-3 grid grid-cols-5 gap-1.5 bg-[#05080a]">
+                    <div className="p-3 grid grid-cols-5 gap-1.5 bg-[var(--bg-0)]">
                         <Btn v="diff" label="d/dx" color="purple" onClick={() => handleCalculus('diff')} />
                         <Btn v="int" label="∫" color="purple" onClick={() => handleCalculus('integrate')} />
                         <Btn v="solve" label="Solve" color="amber" />
                         <Btn v="x" label="x" color="amber" />
                         <Btn v="C" color="red" />
 
-                        <div className="col-span-5 h-px bg-[#1e293b] my-0.5" />
+                        <div className="col-span-5 h-px bg-[var(--bg-3)] my-0.5" />
 
                         <Btn v="sin(" label="sin" />
                         <Btn v="cos(" label="cos" />
@@ -239,7 +239,7 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
                         <Btn v="^" label="^" />
                         <Btn v="PI" label="π" />
 
-                        <div className="col-span-5 h-px bg-[#1e293b] my-0.5" />
+                        <div className="col-span-5 h-px bg-[var(--bg-3)] my-0.5" />
 
                         <Btn v="7" />
                         <Btn v="8" />
@@ -268,17 +268,17 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
 
             {/* GRAPH TAB */}
             {activeTab === 'GRAPH' && (
-                <div className="p-2 bg-[#05080a] flex flex-col items-center">
+                <div className="p-2 bg-[var(--bg-0)] flex flex-col items-center">
                     <div className="w-full mb-2 flex gap-2">
                         <input
-                            className="nodrag flex-1 bg-[#1e293b] border border-[#2a3a4a] rounded px-2 py-1 text-xs text-white"
+                            className="nodrag flex-1 bg-[var(--bg-3)] border border-[var(--line-strong)] rounded px-2 py-1 text-xs text-white"
                             value={expr}
                             onChange={(e) => setExpr(e.target.value)}
                             placeholder="y = x^2"
                         />
                         <button className="nodrag bg-cyan-600 text-white px-3 rounded text-xs" onClick={() => setActiveTab('GRAPH')}>Plot</button>
                     </div>
-                    <div ref={graphRef} className="nodrag bg-[#000] rounded overflow-hidden" />
+                    <div ref={graphRef} className="nodrag bg-[var(--bg-0)] rounded overflow-hidden" />
                     <div className="text-[10px] text-gray-500 mt-2 text-center">
                         Drag to pan • Scroll to zoom
                     </div>
@@ -287,14 +287,14 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
 
             {/* VARS TAB */}
             {activeTab === 'VARS' && (
-                <div className="p-2 bg-[#05080a] min-h-[300px] relative">
+                <div className="p-2 bg-[var(--bg-0)] min-h-[300px] relative">
                     <h3 className="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Defined Variables (Connectable)</h3>
                     {variables.length === 0 ? (
                         <div className="text-gray-600 text-xs italic text-center mt-10">No variables defined.<br />Try: a = 10</div>
                     ) : (
                         <div className="flex flex-col gap-1">
                             {variables.map((v, i) => (
-                                <div key={i} className="relative flex items-center justify-between bg-[#1e293b] p-2 rounded border border-[#2a3a4a] group">
+                                <div key={i} className="relative flex items-center justify-between bg-[var(--bg-3)] p-2 rounded border border-[var(--line-strong)] group">
                                     <span className="text-amber-400 font-bold text-xs">{v.name}</span>
                                     <span className="text-white text-xs mr-4">{v.value}</span>
 
@@ -318,13 +318,13 @@ export default function StandardCalculatorNode({ id, data, selected }: NodeProps
 
             {/* HISTORY TAB */}
             {activeTab === 'HIST' && (
-                <div className="p-2 bg-[#05080a] min-h-[300px] overflow-y-auto custom-scrollbar">
+                <div className="p-2 bg-[var(--bg-0)] min-h-[300px] overflow-y-auto custom-scrollbar">
                     {history.length === 0 ? (
                         <div className="text-gray-600 text-xs italic text-center mt-10">History is empty</div>
                     ) : (
                         <div className="flex flex-col gap-2">
                             {history.map((h, i) => (
-                                <div key={i} className="bg-[#1e293b]/50 p-2 rounded border border-[#2a3a4a] hover:bg-[#1e293b] transition-colors cursor-pointer"
+                                <div key={i} className="bg-[var(--bg-3)]/50 p-2 rounded border border-[var(--line-strong)] hover:bg-[var(--bg-3)] transition-colors cursor-pointer"
                                     onClick={() => { setExpr(h.expr); setActiveTab('CALC'); }}
                                 >
                                     <div className="text-xs text-gray-400 mb-1">{h.expr}</div>

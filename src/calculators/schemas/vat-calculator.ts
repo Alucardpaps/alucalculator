@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — VAT Calculator Schema
+ * AluCAD OS — VAT Calculator Schema
  * 
  * ENGINEERING DOMAIN: Finance
  * 
@@ -18,7 +18,7 @@ export const vatCalculatorSchema: CalculatorSchema = {
     metadata: {
         title: 'VAT Calculator',
         description: 'Calculate VAT, net, and gross amounts with support for multiple tax rates.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['VAT', 'tax', 'finance', 'KDV', 'net', 'gross']
     },

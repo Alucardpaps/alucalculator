@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 type BlueprintLabels = {
     title: string;
@@ -82,6 +83,7 @@ export function FastenerAssemblyBlueprint({
     isPrint?: boolean;
     isPipe?: boolean;
 }) {
+  const precision = useGlobalPrecision();
     const ids = useSvgIds();
     const strokeC = isPrint ? '#000' : '#475569';
     const textC = isPrint ? '#000' : '#94a3b8';
@@ -122,7 +124,9 @@ export function FastenerAssemblyBlueprint({
         const xPlateSplit = xWasherHead + washerT + gripPx * 0.5;
         const plateH = ds * 1.35;
         const gripMm = gripPx / scale;
-        const xThreadStart = xHeadRight + Math.min(dl * 0.35, 28);
+        const bMm = Number(results.threadLengthB ?? Math.min(l, 2 * d + 6));
+        const lsMm = Math.max(0, l - bMm);
+        const xThreadStart = xHeadRight + lsMm * scale;
         const threadW = xShankEnd - xThreadStart;
         const teeth = Math.max(2, Math.floor(threadW / dp));
         const threadDepth = Math.min(dp * 0.38, dd * 0.14);
@@ -142,9 +146,9 @@ export function FastenerAssemblyBlueprint({
         return {
             cy, scale, dk, ds, dm, dd, ddw, ddh, dl, dp, washerT, x0, xHeadRight, xShankEnd,
             xNutLeft, xNutRight, xWasherNut, xWasherHead, gripPx, xPlateSplit, plateH, gripMm,
-            xThreadStart, threadW, teeth, shank,
+            xThreadStart, threadW, teeth, shank, lsMm, bMm,
         };
-    }, [d, l, k, s, m, dw, dh, results.pitchVal]);
+    }, [d, l, k, s, m, dw, dh, results.pitchVal, results.threadLengthB]);
 
     if (isPipe) {
         return (
@@ -252,7 +256,7 @@ export function FastenerAssemblyBlueprint({
             <g transform={`translate(${(g.xHeadRight + g.xNutLeft) / 2}, ${g.cy - g.dd / 2 - 14})`}>
                 <rect x="-48" y="-7" width="96" height="14" rx="3" fill="#05080f" stroke="#10b981" strokeWidth="0.8" />
                 <text x="0" y="3" textAnchor="middle" fontSize="9" fill="#10b981" fontWeight="700" fontFamily="ui-monospace, monospace">
-                    {labels.preload} = {results.Fm_max.toFixed(1)} kN
+                    {labels.preload} = {formatEngineeringValue(results.Fm_max, precision, false)} kN
                 </text>
             </g>
 
@@ -270,7 +274,7 @@ export function FastenerAssemblyBlueprint({
             <g transform={`translate(${g.x0 + g.dk / 2}, ${g.cy - g.ds / 2 - 18})`}>
                 <rect x="-48" y="-7" width="96" height="14" rx="3" fill="#05080f" stroke="#00e5ff" strokeWidth="0.8" />
                 <text x="0" y="3" textAnchor="middle" fontSize="9" fill="#00e5ff" fontWeight="700" fontFamily="ui-monospace, monospace">
-                    {labels.torque} = {results.MA.toFixed(1)} Nm
+                    {labels.torque} = {formatEngineeringValue(results.MA, precision, false)} Nm
                 </text>
             </g>
 
@@ -288,7 +292,7 @@ export function FastenerAssemblyBlueprint({
                 return (
                     <>
                         <Callout x={g.x0 - 2} y={yHeadBot + 18} text={labels.partHead} color="#f97316" />
-                        <Callout x={g.xHeadRight + 12} y={yShankTop - 20} text={labels.partShank} />
+                        {g.lsMm > 3 && <Callout x={g.xHeadRight + 12} y={yShankTop - 20} text={labels.partShank} />}
                         <Callout x={g.xThreadStart + g.threadW * 0.35} y={yShankBot + 18} text={labels.partThread} color="#a78bfa" />
                         <Callout x={g.xNutLeft} y={yHeadBot + 18} text={labels.partNut} color="#f97316" />
                         
@@ -309,30 +313,30 @@ export function FastenerAssemblyBlueprint({
                             <line x1={g.xWasherHead + g.washerT} y1={yPlateTop - 35} x2={g.xWasherNut} y2={yPlateTop - 35} markerStart={`url(#${ids.arrow})`} markerEnd={`url(#${ids.arrow})`} />
                             <line x1={g.xWasherHead + g.washerT} y1={yPlateTop - 8} x2={g.xWasherHead + g.washerT} y2={yPlateTop - 40} />
                             <line x1={g.xWasherNut} y1={yPlateTop - 8} x2={g.xWasherNut} y2={yPlateTop - 40} />
-                            <DimBadge x={(g.xWasherHead + g.washerT + g.xWasherNut) / 2} y={yPlateTop - 35} text={`Grip = ${g.gripMm.toFixed(1)} mm`} color="#10b981" />
+                            <DimBadge x={(g.xWasherHead + g.washerT + g.xWasherNut) / 2} y={yPlateTop - 35} text={`Grip = ${formatEngineeringValue(g.gripMm, precision, false)} mm`} color="#10b981" />
 
                             {/* Bolt Diameter d (Right side) */}
                             <line x1={g.xShankEnd + 14} y1={g.cy - g.dd / 2} x2={g.xShankEnd + 14} y2={g.cy + g.dd / 2} markerStart={`url(#${ids.arrow})`} markerEnd={`url(#${ids.arrow})`} />
                             <line x1={g.xShankEnd + 6} y1={g.cy - g.dd / 2} x2={g.xShankEnd + 20} y2={g.cy - g.dd / 2} />
                             <line x1={g.xShankEnd + 6} y1={g.cy + g.dd / 2} x2={g.xShankEnd + 20} y2={g.cy + g.dd / 2} />
-                            <DimBadge x={g.xShankEnd + 14} y={g.cy} text={`d = ${d.toFixed(1)}`} />
+                            <DimBadge x={g.xShankEnd + 14} y={g.cy} text={`d = ${formatEngineeringValue(d, precision, false)}`} />
 
-                            {/* Clearance Hole dh (Leader Line to bottom) */}
-                            <line x1={g.xPlateSplit} y1={yShankBot} x2={g.xPlateSplit + 15} y2={yPlateBot + 12} />
+                            {/* Clearance Hole dh (Leader Line staggered to bottom tier to avoid gripZone collision) */}
+                            <line x1={g.xPlateSplit} y1={yShankBot} x2={g.xPlateSplit + 15} y2={yPlateBot + 26} />
                             <circle cx={g.xPlateSplit} cy={yShankBot} r="1.5" fill="#a78bfa" />
-                            <DimBadge x={g.xPlateSplit + 38} y={yPlateBot + 12} text={`dh = ${dh.toFixed(1)}`} color="#a78bfa" />
+                            <DimBadge x={g.xPlateSplit + 38} y={yPlateBot + 26} text={`dh = ${formatEngineeringValue(dh, precision, false)}`} color="#a78bfa" />
 
                             {/* Head Diameter s (Vertical left) */}
                             <line x1={g.x0 - 8} y1={g.cy - g.ds / 2} x2={g.x0 - 8} y2={g.cy + g.ds / 2} markerStart={`url(#${ids.arrow})`} markerEnd={`url(#${ids.arrow})`} />
                             <line x1={g.x0 - 14} y1={g.cy - g.ds / 2} x2={g.x0 - 2} y2={g.cy - g.ds / 2} />
                             <line x1={g.x0 - 14} y1={g.cy + g.ds / 2} x2={g.x0 - 2} y2={g.cy + g.ds / 2} />
-                            <DimBadge x={g.x0 - 8} y={g.cy} text={`s = ${s.toFixed(1)}`} color="#64748b" />
+                            <DimBadge x={g.x0 - 8} y={g.cy} text={`s = ${formatEngineeringValue(s, precision, false)}`} color="#64748b" />
 
                             {/* Head Thickness k (Horizontal left top) */}
                             <line x1={g.x0} y1={g.cy - g.ds / 2 - 10} x2={g.xHeadRight} y2={g.cy - g.ds / 2 - 10} markerStart={`url(#${ids.arrow})`} markerEnd={`url(#${ids.arrow})`} />
                             <line x1={g.x0} y1={g.cy - g.ds / 2 - 2} x2={g.x0} y2={g.cy - g.ds / 2 - 14} />
                             <line x1={g.xHeadRight} y1={g.cy - g.ds / 2 - 2} x2={g.xHeadRight} y2={g.cy - g.ds / 2 - 14} />
-                            <DimBadge x={(g.x0 + g.xHeadRight) / 2} y={g.cy - g.ds / 2 - 10} text={`k = ${k.toFixed(1)}`} color="#64748b" />
+                            <DimBadge x={(g.x0 + g.xHeadRight) / 2} y={g.cy - g.ds / 2 - 10} text={`k = ${formatEngineeringValue(k, precision, false)}`} color="#64748b" />
                         </g>
                     </>
                 );
@@ -342,12 +346,12 @@ export function FastenerAssemblyBlueprint({
                 <rect x={0} y={0} width={180} height={318} rx={10} fill="rgba(10,16,24,0.96)" stroke="rgba(0,229,255,0.22)" strokeWidth="1" />
                 <text x={14} y={22} fontSize="10" fontWeight="700" fill="#64748b" fontFamily="ui-monospace, monospace" letterSpacing="0.12em">{labels.legend}</text>
                 <line x1={14} y1={30} x2={166} y2={30} stroke="rgba(255,255,255,0.08)" />
-                <LegendRow y={44} label={size} value={`D${d.toFixed(1)}`} highlight />
+                <LegendRow y={44} label={size} value={`D${formatEngineeringValue(d, precision, false)}`} highlight />
                 <LegendRow y={82} label="L" value={l} />
-                <LegendRow y={120} label="Grip (L_G)" value={g.gripMm.toFixed(1)} highlight />
-                <LegendRow y={158} label="dh (ISO 273)" value={dh.toFixed(1)} />
-                <LegendRow y={196} label="dw" value={dw.toFixed(1)} />
-                <LegendRow y={234} label="As" value={results.As.toFixed(1)} unit="mm2" />
+                <LegendRow y={120} label="Grip (L_G)" value={formatEngineeringValue(g.gripMm, precision, false)} highlight />
+                <LegendRow y={158} label="dh (ISO 273)" value={formatEngineeringValue(dh, precision, false)} />
+                <LegendRow y={196} label="dw" value={formatEngineeringValue(dw, precision, false)} />
+                <LegendRow y={234} label="As" value={formatEngineeringValue(results.As, precision, false)} unit="mm2" />
                 <line x1={14} y1={268} x2={166} y2={268} stroke="rgba(255,255,255,0.06)" />
                 <rect x={14} y={280} width={10} height={10} fill={heat} rx={2} />
                 <text x={30} y={289} fontSize="9" fill="#94a3b8" fontFamily="ui-sans-serif">{labels.tension}</text>

@@ -35,12 +35,12 @@ export const AutoCADCrosshair: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
             {/* Horizontal Line */}
             <div 
-                className="absolute left-0 right-0 h-[1px] bg-cyan-500/20 shadow-[0_0_5px_rgba(0,229,255,0.2)]"
+                className="absolute left-0 right-0 h-[1px] bg-cyan-500/20 "
                 style={{ top: pos.y }}
             />
             {/* Vertical Line */}
             <div 
-                className="absolute top-0 bottom-0 w-[1px] bg-cyan-500/20 shadow-[0_0_5px_rgba(0,229,255,0.2)]"
+                className="absolute top-0 bottom-0 w-[1px] bg-cyan-500/20 "
                 style={{ left: pos.x }}
             />
             {/* Center Aperture */}

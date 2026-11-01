@@ -19,12 +19,14 @@ import { HANDBOOK_31_STRUCTURE } from '@/data/reference/machinery-handbook/struc
 import { getInitialState, applyProcess, convertHBtoHRC, MaterialState } from '@/logic/manufacturingLogic';
 import { useI18nStore } from '@/store/i18nStore';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 /**
  * ManufacturingModule
  * Combined interface for Bending, Welding, CAM, and Sandbox Simulation
  */
 export default function ManufacturingModule() {
+  const precision = useGlobalPrecision();
     const [activeTab, setActiveTab] = useState<'bending' | 'welding' | 'cam' | 'sandbox'>('sandbox');
 
     const renderTabContent = () => {
@@ -146,7 +148,7 @@ function PhaseDiagram({ carbonContent }: { carbonContent?: number }) {
 
             {/* Region Details Overlay */}
             {carbonContent !== undefined && (
-                <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg max-w-[180px]">
+                <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg max-w-[180px]">
                     <h4 className="text-[10px] font-bold text-blue-500 uppercase mb-1">Material State</h4>
                     <p className="text-[11px] text-slate-700 dark:text-slate-200 leading-tight">
                         {carbonContent < 0.8 ? "Hypoeutectoid Steel: Forms Ferrite and Pearlite structure." : "Hypereutectoid Steel: Forms Cementite and Pearlite structure."}
@@ -191,17 +193,17 @@ const getRecommendedProcessId = (materialName: string): string | null => {
 
 function GlassCard({ children, className = "", glowColor = "blue" }: { children: React.ReactNode, className?: string, glowColor?: 'blue' | 'emerald' | 'orange' | 'amber' }) {
     const glows = {
-        blue: "shadow-blue-500/10 border-blue-500/10",
-        emerald: "shadow-emerald-500/10 border-emerald-500/10",
-        orange: "shadow-orange-500/10 border-orange-500/10",
-        amber: "shadow-amber-500/10 border-amber-500/10"
+        blue: " border-blue-500/10",
+        emerald: " border-emerald-500/10",
+        orange: " border-orange-500/10",
+        amber: " border-amber-500/10"
     };
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`relative overflow-hidden bg-slate-900/60 backdrop-blur-2xl border ${glows[glowColor]} shadow-2xl rounded-[32px] p-6 ${className}`}
+            className={`relative overflow-hidden bg-slate-900/60 border ${glows[glowColor]} shadow-2xl rounded-xl p-6 ${className}`}
         >
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
             <div className={`absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-${glowColor}-500/20 to-transparent`} />
@@ -222,7 +224,7 @@ function StatHUD({ label, value, unit, icon: Icon, color = "blue", subValue }: {
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 group-hover:text-white/80 transition-colors">{label}</span>
                 </div>
                 <div className="flex items-baseline gap-1.5 ml-1">
-                    <span className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">{value}</span>
+                    <span className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none drop-">{value}</span>
                     <span className="text-[11px] font-black text-white/40 uppercase tracking-widest">{unit}</span>
                 </div>
                 {subValue && (
@@ -255,7 +257,7 @@ function HUDCallout({ x, y, label, value, color, alignment = 'top' }: { x: numbe
             />
             {/* Callout Box */}
             <g transform={`translate(${alignment === 'right' ? x + 17 : x + 22}, ${isTop ? y - 30 : isBottom ? y + 5 : y - 25})`}>
-                <rect width="80" height="24" rx="6" className="fill-slate-900/90 border border-white/10 backdrop-blur-md" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+                <rect width="80" height="24" rx="6" className="fill-slate-900/90 border border-white/10" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
                 <rect width="3" height="24" rx="1.5" className={`fill-${color}-500`} />
                 <text x="8" y="10" className={`text-[9px] font-black uppercase tracking-widest fill-${color}-400`}>{label}</text>
                 <text x="8" y="20" className="text-[11px] font-black fill-white tracking-tight">{value}</text>
@@ -474,7 +476,7 @@ function ProcessChainTimeline({
                             onKeyDown={(e) => e.key === 'Enter' && onSelect(index)}
                             className={`flex flex-col items-center min-w-[100px] p-3 rounded-2xl border transition-all relative cursor-pointer
                                 ${index === activeIndex
-                                    ? 'bg-blue-500 text-white border-blue-400 shadow-lg shadow-blue-500/20'
+                                    ? 'bg-[var(--cyan)] text-[var(--accent-ink)] border-blue-400 shadow-lg '
                                     : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-400'
                                 }`}
                         >
@@ -504,6 +506,7 @@ function ProcessChainTimeline({
 // ------------------------------------------------------------------
 
 export function ManufacturingSandbox() {
+    const precision = useGlobalPrecision();
     const { t } = useI18nStore();
     const sandboxTitle = t.modules['manufacturing-sandbox']?.title || 'İmalat Atölyesi';
 
@@ -566,7 +569,7 @@ export function ManufacturingSandbox() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
                     <div className="flex flex-col gap-1">
                         <h2 className="text-2xl font-black flex items-center gap-4 text-white uppercase tracking-tighter">
-                            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl shadow-blue-500/20">
+                            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl ">
                                 <Sparkles className="w-6 h-6 text-white" />
                             </div>
                             {sandboxTitle}
@@ -576,7 +579,7 @@ export function ManufacturingSandbox() {
                     <div className="flex flex-wrap gap-3 w-full sm:w-auto">
                         <button
                             onClick={() => setShowDiagram(true)}
-                            className="flex-1 sm:flex-none text-[10px] bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl transition-all flex items-center justify-center gap-3 font-bold border border-white/10 uppercase tracking-widest backdrop-blur"
+                            className="flex-1 sm:flex-none text-[10px] bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl transition-all flex items-center justify-center gap-3 font-bold border border-white/10 uppercase tracking-widest"
                         >
                             <Activity className="w-4 h-4 text-blue-400" />
                             Phase Diagram
@@ -650,7 +653,7 @@ export function ManufacturingSandbox() {
                                             onClick={() => addToChain(t)}
                                             className={`w-full text-left p-3 rounded-xl transition-all flex justify-between items-center group relative overflow-hidden
                                                 ${isRecommended
-                                                    ? 'bg-amber-500/10 border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.1)] border-2'
+                                                    ? 'bg-amber-500/10 border-amber-500/40 border-2'
                                                     : 'bg-white/[0.02] border-white/[0.05] border'
                                                 } hover:bg-orange-500/10 hover:border-orange-500/30`}
                                         >
@@ -783,7 +786,7 @@ export function ManufacturingSandbox() {
                                 unit="MPa"
                                 icon={Activity}
                                 color="emerald"
-                                subValue={`Factor: ${(currentState.yield / baseMaterial.yield).toFixed(2)}x`}
+                                subValue={`Factor: ${formatEngineeringValue((currentState.yield / baseMaterial.yield), precision, false)}x`}
                             />
                         </GlassCard>
                     </div>
@@ -870,12 +873,12 @@ export function ManufacturingSandbox() {
             {/* Phase Diagram Modal */}
             <AnimatePresence>
                 {showDiagram && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-[40px] border border-white/10 shadow-2xl flex flex-col overflow-hidden"
+                            className="bg-slate-900 w-full max-w-4xl max-h-[90vh] rounded-xl border border-white/10 shadow-2xl flex flex-col overflow-hidden"
                         >
                             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900">
                                 <h3 className="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-3">
@@ -905,6 +908,7 @@ export function ManufacturingSandbox() {
 }
 
 function BendingCalculator() {
+    const precision = useGlobalPrecision();
     const [material, setMaterial] = useState('Alu Soft (5754)');
     const [thickness, setThickness] = useState(3);
     const [radius, setRadius] = useState(3);
@@ -966,7 +970,7 @@ function BendingCalculator() {
                         max="180"
                         value={angle}
                         onChange={(e) => setAngle(Number(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-violet-600"
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                     />
                     <div className="text-right text-xs text-slate-500 mt-1">{angle}°</div>
                 </div>
@@ -976,12 +980,12 @@ function BendingCalculator() {
                 <div className="flex justify-between items-end mb-2">
                     <span className="text-sm font-medium text-slate-500">Bend Allowance (BA)</span>
                     <span className="text-2xl font-bold text-violet-600 dark:text-violet-400">
-                        {result.value.toFixed(2)} <span className="text-sm text-slate-400">mm</span>
+                        {formatEngineeringValue(result.value, precision, false)} <span className="text-sm text-slate-400">mm</span>
                     </span>
                 </div>
                 <div className="text-xs text-slate-400 flex justify-between">
-                    <span>K-Factor: {kFactor.toFixed(2)}</span>
-                    <span>Deduction: {(2 * (Math.tan((angle * Math.PI / 180) / 2) * (radius + thickness)) - result.value).toFixed(2)} mm</span>
+                    <span>K-Factor: {formatEngineeringValue(kFactor, precision, false)}</span>
+                    <span>Deduction: {formatEngineeringValue((2 * (Math.tan((angle * Math.PI / 180) / 2) * (radius + thickness)) - result.value), precision, false)} mm</span>
                 </div>
             </div>
 
@@ -993,6 +997,7 @@ function BendingCalculator() {
 }
 
 function WeldingCalculator() {
+    const precision = useGlobalPrecision();
     const [process, setProcess] = useState<'MIG' | 'TIG'>('MIG');
     const [legSize, setLegSize] = useState(5);
     const [length, setLength] = useState(100);
@@ -1046,13 +1051,13 @@ function WeldingCalculator() {
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                     <span className="text-xs text-slate-500 block mb-1">Wire Mass Estimation</span>
                     <span className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                        {result.wireMass.value.toFixed(3)} <span className="text-sm text-slate-400">kg</span>
+                        {formatEngineeringValue(result.wireMass.value, precision, false)} <span className="text-sm text-slate-400">kg</span>
                     </span>
                 </div>
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                     <span className="text-xs text-slate-500 block mb-1">Gas Volume</span>
                     <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                        {result.gasVolume.value.toFixed(1)} <span className="text-sm text-slate-400">L</span>
+                        {formatEngineeringValue(result.gasVolume.value, precision, false)} <span className="text-sm text-slate-400">L</span>
                     </span>
                 </div>
             </div>

@@ -51,7 +51,7 @@ export const periodicElementSchema: CalculatorSchemaV2 = {
         description: 'Interactive lookup for periodic element properties (Mass, Electronegativity, Radius).',
         category: 'mechanical', // Temporarily mapped to mechanical until types are updated
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['chemistry', 'periodic', 'element', 'molar-mass', 'atom'],
         verifiedStandards: ['IUPAC standard atomic weights']
@@ -132,7 +132,7 @@ export const periodicElementSchema: CalculatorSchemaV2 = {
             }
 
             return (
-                <div className="w-full h-full flex items-center justify-center p-8 bg-[#05080b]">
+                <div className="w-full h-full flex items-center justify-center p-8 bg-[var(--bg-0)]">
                     <div
                         className="relative w-48 h-56 rounded border-2 shadow-2xl flex flex-col items-center justify-between p-4"
                         style={{ backgroundColor: bgColor, borderColor: accentColor }}
@@ -141,7 +141,7 @@ export const periodicElementSchema: CalculatorSchemaV2 = {
                         <div className="self-start text-lg font-bold" style={{ color: accentColor }}>{Z}</div>
 
                         {/* Symbol */}
-                        <div className="text-7xl font-bold text-white tracking-widest">{el.symbol}</div>
+                        <div className="text-5xl font-bold text-white tracking-widest">{el.symbol}</div>
 
                         {/* Details */}
                         <div className="flex flex-col items-center gap-1">

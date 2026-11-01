@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Cinematic Hero Scene v2
+ * AluCAD OS v5.0 — Cinematic Hero Scene v2
  *
  * Engineering component showcase: gears, nuts, bolts, profiles
  * floating in a cinematic arrangement with parallax camera.
@@ -447,18 +447,18 @@ const HeroSceneContent = () => {
       <ProfileBar position={[0, 1.8, -0.8]} color="#818cf8" length={1.6} speed={0.12} href="/aluminum" />
 
       {/* ═══ NUTS (scattered) ═══ */}
-      <HexNut position={[-1.8, -0.8, 0.5]} color="#f59e0b" size={0.12} speed={0.4} href="/fasteners" />
-      <HexNut position={[1.5, 1.2, 0.3]} color="#f59e0b" size={0.09} speed={-0.5} href="/fasteners" />
-      <HexNut position={[2.5, 0.3, -0.5]} color="#eab308" size={0.1} speed={0.35} href="/fasteners" />
+      <HexNut position={[-1.8, -0.8, 0.5]} color="#f59e0b" size={0.12} speed={0.4} href="/bolt-torque" />
+      <HexNut position={[1.5, 1.2, 0.3]} color="#f59e0b" size={0.09} speed={-0.5} href="/bolt-torque" />
+      <HexNut position={[2.5, 0.3, -0.5]} color="#eab308" size={0.1} speed={0.35} href="/bolt-torque" />
 
       {/* ═══ BOLTS ═══ */}
-      <HeroBolt position={[-1.2, 1.3, 0.4]} color="#94a3b8" speed={0.25} href="/fasteners" />
-      <HeroBolt position={[1.8, -1.0, 0.8]} color="#cbd5e1" speed={-0.3} href="/fasteners" />
+      <HeroBolt position={[-1.2, 1.3, 0.4]} color="#94a3b8" speed={0.25} href="/bolt-torque" />
+      <HeroBolt position={[1.8, -1.0, 0.8]} color="#cbd5e1" speed={-0.3} href="/bolt-torque" />
 
       {/* ═══ WASHERS ═══ */}
-      <Washer position={[2.8, 0.8, 0]} color="#a78bfa" speed={0.5} href="/fasteners" />
-      <Washer position={[-2.5, 0.2, 0.6]} color="#60a5fa" speed={-0.4} href="/fasteners" />
-      <Washer position={[0.5, -1.5, 0.5]} color="#34d399" speed={0.6} href="/fasteners" />
+      <Washer position={[2.8, 0.8, 0]} color="#a78bfa" speed={0.5} href="/bolt-torque" />
+      <Washer position={[-2.5, 0.2, 0.6]} color="#60a5fa" speed={-0.4} href="/bolt-torque" />
+      <Washer position={[0.5, -1.5, 0.5]} color="#34d399" speed={0.6} href="/bolt-torque" />
 
       {/* ═══ ATMOSPHERE ═══ */}
       <EngineeringDust />

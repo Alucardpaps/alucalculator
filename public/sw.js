@@ -9,9 +9,9 @@
  * - Calculators: Stale-While-Revalidate
  */
 
-const CACHE_NAME = 'alucalc-v5.2.0';
-const STATIC_CACHE = 'alucalc-static-v5.2';
-const DYNAMIC_CACHE = 'alucalc-dynamic-v5.2';
+const CACHE_NAME = 'alucalc-v5.2.3';
+const STATIC_CACHE = 'alucalc-static-v5.2.3';
+const DYNAMIC_CACHE = 'alucalc-dynamic-v5.2.3';
 
 // HTML navigation routes and manifests to precache (NO hardcoded chunk hashes)
 const STATIC_ASSETS = [
@@ -29,7 +29,7 @@ const STATIC_ASSETS = [
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing Service Worker v5.2...');
+    console.log('[SW] Installing Service Worker v5.2.3...');
 
     event.waitUntil(
         caches.open(STATIC_CACHE).then((cache) => {
@@ -46,7 +46,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating Service Worker v5.2...');
+    console.log('[SW] Activating Service Worker v5.2.3...');
 
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -75,6 +75,11 @@ self.addEventListener('fetch', (event) => {
     // Skip external requests
     if (url.origin !== location.origin) return;
 
+    // Skip self and service worker scripts
+    if (url.pathname === '/sw.js' || url.pathname === '/service-worker.js') {
+        return;
+    }
+
     // Rewrite Next.js client dynamic route RSC payload fetch calls.
     if (url.pathname.includes('__next.')) {
         let rewrittenPathname = url.pathname;
@@ -93,19 +98,25 @@ self.addEventListener('fetch', (event) => {
         }
     }
 
-    // API requests: Network first
+    // 1. Navigation requests (HTML pages) - NETWORK FIRST so user always gets fresh HTML!
+    if (request.mode === 'navigate') {
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
+    // 2. API requests: Network first
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(networkFirst(request));
         return;
     }
 
-    // Runtime cache-first for Next static assets (/_next/static/*, fonts, images, wasm)
+    // 3. Runtime cache-first for Next static assets (/_next/static/*, fonts, images, wasm)
     if (isStaticAsset(url.pathname)) {
         event.respondWith(cacheFirst(request));
         return;
     }
 
-    // Navigation and other pages: Stale-while-revalidate with network fallback
+    // 4. Other pages and dynamic requests: Stale-while-revalidate with network fallback
     event.respondWith(staleWhileRevalidate(request));
 });
 
@@ -169,6 +180,7 @@ async function staleWhileRevalidate(request) {
 // ============================================
 
 function isStaticAsset(pathname) {
+    if (pathname === '/sw.js' || pathname === '/service-worker.js') return false;
     return (
         pathname.startsWith('/_next/static/') ||
         pathname.startsWith('/fonts/') ||
@@ -185,11 +197,17 @@ function isStaticAsset(pathname) {
 }
 
 // ============================================
-// INDEXEDDB STATE PERSISTENCE
+// INDEXEDDB & MESSAGE LISTENERS
 // ============================================
 
 // Listen for messages from the main thread
 self.addEventListener('message', (event) => {
+    if (!event.data) return;
+
+    if (event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+
     if (event.data.type === 'SAVE_STATE') {
         saveToIndexedDB(event.data.key, event.data.value);
     }

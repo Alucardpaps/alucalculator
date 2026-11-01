@@ -28,7 +28,7 @@ export function Slider({ value, min, max, step, onValueChange, className }: Slid
                 step={step}
                 value={val}
                 onChange={handleChange}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-blue-600"
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-[var(--cyan)]"
             />
         </div>
     );

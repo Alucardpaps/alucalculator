@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -8,12 +8,16 @@ import {
   SlidersHorizontal, Plus, Download, Upload, Grid3X3, Undo2, Redo2,
   Trash2, Copy, Sparkles, Pencil, X, HelpCircle, Eye, EyeOff,
   Wrench, Check, Disc, Cuboid, Settings2, Sliders, Scissors, FileText,
-  Activity, Compass, ChevronDown, ChevronUp, Maximize2
+  Activity, Compass, ChevronDown, ChevronUp, Maximize2, Shield, PenTool
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+import { CrossModuleBridge, consumeDesignImport } from '@/system/crossModuleBridge';
+import { TSLOT_CATALOG } from '@/cad/catalog/tSlotProfiles';
+import { executeAutoFastenerAssembly } from './assembly/fastenerDetect';
+import { evaluateAssemblyDfm } from '@/engines/dfm/dfmEvaluator';
 import {
   useDesignStore,
-  kindLabel,
   PART_COLORS,
   type DesignKind,
   type DesignTool,
@@ -21,6 +25,7 @@ import {
   type RenderMode,
   type SectionAxis
 } from './designStore';
+import { getDesignKindLabel } from '@/locales/designStudioTranslations';
 import { exportPartsToSTL, downloadFile } from './exporter';
 import { loadCADFile } from './cadImporter';
 import { ENGINEERING_MATERIALS, calculateAssemblyMassProperties } from './materialsEngine';
@@ -30,7 +35,7 @@ import { generateTechnicalDrawingSVG, generateBatchDrawingsHTML, type DrawingTem
 const DesignViewport = dynamic(() => import('./DesignViewport').then((m) => m.DesignViewport || m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-[#070b10] text-[11px] font-mono text-white/35">
+    <div className="flex h-full w-full items-center justify-center bg-[var(--bg-0)] text-[11px] font-mono text-white/35">
       <div className="flex flex-col items-center gap-2">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
         <span>Loading 3D Viewport…</span>
@@ -47,15 +52,22 @@ const PRIMITIVES: DesignKind[] = [
 
 export function MobileDesignStudio() {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
 
-  const [sheetMode, setSheetMode] = useState<'none' | 'shapes' | 'edit' | 'parts' | 'export' | 'help' | 'settings'>('none');
+  const [sheetMode, setSheetMode] = useState<'none' | 'shapes' | 'edit' | 'parts' | 'export' | 'help' | 'settings' | 'assembly' | 'dfm'>('none');
   const [exportFormat, setExportFormat] = useState('stl-binary');
   const [isExporting, setIsExporting] = useState(false);
+  const [engineeringOverride, setEngineeringOverride] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [dismissWelcome, setDismissWelcome] = useState(false);
   const [showExplodeHUD, setShowExplodeHUD] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'explode' | 'render' | 'measure' | 'section' | 'drawing'>('explode');
+
+  useEffect(() => {
+    const n = consumeDesignImport();
+    if (n > 0) {
+      setToast(`Imported ${n} calculated solid${n === 1 ? '' : 's'} from calculator`);
+    }
+  }, []);
 
   const parts = useDesignStore((s) => s.parts);
   const selectedId = useDesignStore((s) => s.selectedId);
@@ -101,10 +113,39 @@ export function MobileDesignStudio() {
   const projectName = useDesignStore((s) => s.projectName);
   const selectedMaterialId = useDesignStore((s) => s.selectedMaterialId);
 
-  const massProps = calculateAssemblyMassProperties(parts, selectedMaterialId);
-  const activeMaterial = ENGINEERING_MATERIALS.find((m) => m.id === selectedMaterialId) || ENGINEERING_MATERIALS[0];
+  const mates = useDesignStore((s) => s.mates);
+  const applyMates = useDesignStore((s) => s.applyMates);
+  const removeMate = useDesignStore((s) => s.removeMate);
+  const clearMates = useDesignStore((s) => s.clearMates);
+  const addTSlotPart = useDesignStore((s) => s.addTSlotPart);
+
+  const dfmReport = useMemo(() => evaluateAssemblyDfm(parts, mates, selectedMaterialId), [parts, mates, selectedMaterialId]);
+
+  const massProps = useMemo(() => calculateAssemblyMassProperties(parts, selectedMaterialId), [parts, selectedMaterialId]);
+  const activeMaterial = useMemo(() => ENGINEERING_MATERIALS.find((m) => m.id === selectedMaterialId) || ENGINEERING_MATERIALS[0], [selectedMaterialId]);
   const [templateStyle, setTemplateStyle] = useState<DrawingTemplateStyle>('iso7200');
   const [colorTheme, setColorTheme] = useState<DrawingColorTheme>('classic');
+
+  useEffect(() => {
+    useDesignStore.getState().hydrateCADGeometries?.();
+  }, []);
+
+  const mobileDrawingSvg = useMemo(() => {
+    if (!showTechnicalDrawingModal) return '';
+    try {
+      return generateTechnicalDrawingSVG(parts, massProps, {
+        projectName,
+        partName: t12(language, `Full Assembly (${parts.length} Parts)`, `Tüm Montaj (${parts.length} Parça)`),
+        materialName: t12(language, activeMaterial.name, activeMaterial.nameTr),
+        templateStyle,
+        colorTheme,
+        lang: language,
+      });
+    } catch (err) {
+      console.error('Error generating mobile technical drawing:', err);
+      return `<div style="color: #f87171; padding: 16px; font-family: monospace; font-size: 12px;">Hata: ${String(err)}</div>`;
+    }
+  }, [showTechnicalDrawingModal, parts, massProps, projectName, language, activeMaterial, templateStyle, colorTheme]);
 
   // Sketch selectors & actions
   const sketchPoints = useDesignStore((s) => s.sketchPoints);
@@ -124,11 +165,33 @@ export function MobileDesignStudio() {
     setTimeout(() => setToast(null), 2500);
   };
 
+  // Keyboard shortcut M: Measure / Caliper
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isInput = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      );
+      if (isInput) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      if (e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        setTool('measure');
+        showToast(t12(language, '📏 Caliper Active (M)', '📏 Kumpas / Ölçü Alma Aktif (M)'));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setTool, language]);
+
   const handleAddShape = (kind: DesignKind) => {
     addPart(kind);
     setSheetMode('none');
     setDismissWelcome(true);
-    showToast(tr ? `+ ${kindLabel(kind, true)} eklendi` : `+ Added ${kindLabel(kind, false)}`);
+    showToast(`+ ${t12(language, 'Added', 'Eklendi')} ${getDesignKindLabel(kind, language)}`);
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -145,33 +208,34 @@ export function MobileDesignStudio() {
 
   const handleExport = async () => {
     if (!parts.some((p) => p.visible)) {
-      showToast(tr ? 'Sahne boş!' : 'Scene empty!');
+      showToast(t12(language, 'Scene empty!', 'Sahne boş!'));
       return;
     }
     setIsExporting(true);
     try {
       const buffer = exportPartsToSTL(parts);
       downloadFile(buffer, 'alucalc-mobile-model.stl', 'application/sla');
-      showToast(tr ? 'STL İndirildi' : 'STL Downloaded');
+      showToast(t12(language, 'STL Downloaded', 'STL İndirildi'));
       setSheetMode('none');
     } catch {
-      showToast(tr ? 'Dışa aktarma hatası' : 'Export failed');
+      showToast(t12(language, 'Export failed', 'Dışa aktarma hatası'));
     } finally {
       setIsExporting(false);
     }
   };
 
   const BOTTOM_DOCK_TOOLS = [
-    { id: 'select', label: tr ? 'Seç' : 'Select', icon: MousePointer2, active: tool === 'select' && sheetMode === 'none', onClick: () => { setTool('select'); setSheetMode('none'); } },
-    { id: 'move', label: tr ? 'Taşı' : 'Move', icon: Move, active: tool === 'move', onClick: () => { if (!selectedId) showToast(tr ? 'Önce parça seçin' : 'Select a part first'); setTool('move'); } },
-    { id: 'rotate', label: tr ? 'Dön' : 'Rotate', icon: RotateCcw, active: tool === 'rotate', onClick: () => { if (!selectedId) showToast(tr ? 'Önce parça seçin' : 'Select a part first'); setTool('rotate'); } },
-    { id: 'add', label: tr ? 'Ekle' : 'Add', icon: Plus, active: sheetMode === 'shapes', onClick: () => setSheetMode(sheetMode === 'shapes' ? 'none' : 'shapes') },
-    { id: 'list', label: tr ? 'Liste' : 'List', icon: Layers, active: sheetMode === 'parts', badge: parts.length > 0 ? String(parts.length) : undefined, onClick: () => setSheetMode(sheetMode === 'parts' ? 'none' : 'parts') },
-    { id: 'settings', label: tr ? 'Araçlar' : 'Tools', icon: Settings2, active: sheetMode === 'settings', onClick: () => setSheetMode(sheetMode === 'settings' ? 'none' : 'settings') },
+    { id: 'select', label: t12(language, 'Select', 'Seç'), icon: MousePointer2, active: tool === 'select' && sheetMode === 'none', onClick: () => { setTool('select'); setSheetMode('none'); } },
+    { id: 'move', label: t12(language, 'Move', 'Taşı'), icon: Move, active: tool === 'move', onClick: () => { if (!selectedId) showToast(t12(language, 'Select a part first', 'Önce parça seçin')); setTool('move'); } },
+    { id: 'add', label: t12(language, 'Add', 'Ekle'), icon: Plus, active: sheetMode === 'shapes', onClick: () => setSheetMode(sheetMode === 'shapes' ? 'none' : 'shapes') },
+    { id: 'assembly', label: t12(language, 'Assembly', 'Montaj'), icon: Wrench, active: sheetMode === 'assembly', badge: mates.length > 0 ? String(mates.length) : undefined, onClick: () => setSheetMode(sheetMode === 'assembly' ? 'none' : 'assembly') },
+    { id: 'dfm', label: 'DFM', icon: Shield, active: sheetMode === 'dfm', badge: dfmReport.criticalCount > 0 ? String(dfmReport.criticalCount) : undefined, badgeColor: 'bg-rose-500 text-white', onClick: () => setSheetMode(sheetMode === 'dfm' ? 'none' : 'dfm') },
+    { id: 'list', label: t12(language, 'List', 'Liste'), icon: Layers, active: sheetMode === 'parts', badge: parts.length > 0 ? String(parts.length) : undefined, onClick: () => setSheetMode(sheetMode === 'parts' ? 'none' : 'parts') },
+    { id: 'settings', label: t12(language, 'Tools', 'Araçlar'), icon: Settings2, active: sheetMode === 'settings', onClick: () => setSheetMode(sheetMode === 'settings' ? 'none' : 'settings') },
   ];
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#05080c] select-none">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[var(--bg-0)] select-none">
       <input
         ref={fileInputRef}
         type="file"
@@ -181,7 +245,7 @@ export function MobileDesignStudio() {
         onChange={handleCADImport}
       />
       {/* ─── Top Mobile Quick Toolbar ─── */}
-      <div className="flex-none flex items-center justify-between gap-1.5 px-3 py-2 border-b border-white/10 bg-[#0a0d16] z-20 shadow-md">
+      <div className="flex-none flex items-center justify-between gap-1.5 px-3 py-2 border-b border-white/10 bg-[var(--bg-1)] z-20 shadow-md">
         <button
           type="button"
           onClick={() => setSheetMode('help')}
@@ -193,19 +257,50 @@ export function MobileDesignStudio() {
 
         <div className="flex-1 min-w-0 px-2 text-center">
           <p className="text-xs font-black text-white truncate font-mono">
-            {selected ? selected.name : tr ? 'ALUCALC · 3D Stüdyo' : 'ALUCALC · 3D CAD'}
+            {selected ? selected.name : t12(language, 'ALUCALC · 3D CAD', 'ALUCALC · 3D Stüdyo')}
           </p>
           <p className="text-[9px] font-mono text-slate-400 truncate">
-            {selected ? `${kindLabel(selected.kind, tr)} · (${Math.round(selected.position.x)}, ${Math.round(selected.position.y)}, ${Math.round(selected.position.z)})` : `${parts.length} ${tr ? 'parça' : 'parts'}`}
+            {selected ? `${getDesignKindLabel(selected.kind, language)} · (${Math.round(selected.position.x)}, ${Math.round(selected.position.y)}, ${Math.round(selected.position.z)})` : `${parts.length} ${t12(language, 'parts', 'parça')}`}
           </p>
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Quick DFM Alert Pill if critical issues detected */}
+          {dfmReport.criticalCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setSheetMode('dfm')}
+              className="flex items-center gap-1 px-2 py-1 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-300 text-[9px] font-black uppercase animate-pulse"
+              title="DFM Critical Blocker"
+            >
+              <Shield size={12} className="text-rose-400" />
+              <span>{dfmReport.criticalCount} DFM</span>
+            </button>
+          )}
+
+          {/* Quick 2D CAD Bridge Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (selected) {
+                CrossModuleBridge.exportDesignStudioToCad(selected, { clearCanvas: false });
+                showToast(t12(language, `📐 ${selected.name} sent to 2D CAD`, `📐 ${selected.name} 2D CAD'e aktarıldı`));
+              }
+              if (typeof window !== 'undefined') {
+                window.location.href = '/cad-editor/';
+              }
+            }}
+            className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 active:scale-90"
+            title={t12(language, 'Open in 2D CAD', '2D CAD Editöründe Aç')}
+          >
+            <PenTool size={16} />
+          </button>
+
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 active:scale-90"
-            title={tr ? 'CAD İçe Aktar (.stl, .obj, .step)' : 'Import CAD (.stl, .obj, .step)'}
+            title={t12(language, 'Import CAD (.stl, .obj, .step)', 'CAD İçe Aktar (.stl, .obj, .step)')}
           >
             <Upload size={16} />
           </button>
@@ -223,7 +318,7 @@ export function MobileDesignStudio() {
 
           <button
             type="button"
-            onClick={() => { undo(); showToast(tr ? 'Geri alındı' : 'Undo'); }}
+            onClick={() => { undo(); showToast(t12(language, 'Undo', 'Geri alındı')); }}
             className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 active:scale-90"
             title="Undo"
           >
@@ -232,7 +327,7 @@ export function MobileDesignStudio() {
 
           <button
             type="button"
-            onClick={() => { redo(); showToast(tr ? 'İleri alındı' : 'Redo'); }}
+            onClick={() => { redo(); showToast(t12(language, 'Redo', 'İleri alındı')); }}
             className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 active:scale-90"
             title="Redo"
           >
@@ -254,14 +349,14 @@ export function MobileDesignStudio() {
       <div className="relative flex-1 min-h-0 w-full">
         {/* Mobile Floating Interactive Sketch HUD Banner */}
         {(tool === 'sketch-add' || tool === 'sketch-cut' || tool === 'sketch-loft') && (
-          <div className="absolute top-3 inset-x-3 z-30 flex flex-col gap-2 p-2.5 rounded-2xl border border-cyan-500/40 bg-slate-950/95 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4">
+          <div className="absolute top-3 inset-x-3 z-30 flex flex-col gap-2 p-2.5 rounded-2xl border border-cyan-500/40 bg-slate-950/95 shadow-2xl animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400 font-mono text-xs font-black">
                   ✏️
                 </span>
                 <span className="text-xs font-black text-white font-mono uppercase tracking-wider">
-                  {tr ? `ÇİZİM: ${pendingOp.toUpperCase()}` : `SKETCH: ${pendingOp.toUpperCase()}`}
+                  {t12(language, `SKETCH: ${pendingOp.toUpperCase()}`, `ÇİZİM: ${pendingOp.toUpperCase()}`)}
                 </span>
               </div>
 
@@ -272,7 +367,7 @@ export function MobileDesignStudio() {
                   disabled={sketchPoints.length === 0}
                   className="px-2 py-1 rounded-lg bg-white/10 text-[10px] font-mono font-bold text-slate-300 active:scale-95 disabled:opacity-30"
                 >
-                  {tr ? 'Geri' : 'Undo'}
+                  {t12(language, 'Undo', 'Geri')}
                 </button>
                 <button
                   type="button"
@@ -286,7 +381,7 @@ export function MobileDesignStudio() {
 
             <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/10">
               <div className="text-[10px] text-cyan-300 font-mono">
-                {sketchPoints.length} {tr ? 'nokta' : 'pts'} · {sketchClosed ? (tr ? '✓ Kapalı' : '✓ Closed') : (tr ? 'Dokunun' : 'Tap')}
+                {sketchPoints.length} {t12(language, 'pts', 'nokta')} · {sketchClosed ? (t12(language, '✓ Closed', '✓ Kapalı')) : (t12(language, 'Tap', 'Dokunun'))}
               </div>
 
               <div className="flex items-center gap-1.5">
@@ -296,7 +391,7 @@ export function MobileDesignStudio() {
                     onClick={closeSketch}
                     className="px-2.5 py-1 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono text-[10px] font-bold active:scale-95"
                   >
-                    {tr ? 'Kapat' : 'Close'}
+                    {t12(language, 'Close', 'Kapat')}
                   </button>
                 )}
 
@@ -306,16 +401,24 @@ export function MobileDesignStudio() {
                     if (!sketchClosed) closeSketch();
                     const id = commitExtrude();
                     if (id) {
-                      showToast(tr ? '✨ Katı Oluşturuldu!' : '✨ Solid Created!');
+                      showToast(
+                        pendingOp === 'cut'
+                          ? t12(language, '✂️ Cut Applied!', '✂️ Kesim Uygulandı!')
+                          : t12(language, '✨ Solid Created!', '✨ Katı Oluşturuldu!')
+                      );
                     } else {
-                      showToast(tr ? 'En az 3 nokta gerekli' : 'Min 3 points needed');
+                      showToast(t12(language, 'Min 3 points needed', 'En az 3 nokta gerekli'));
                     }
                   }}
                   disabled={sketchPoints.length < 3}
-                  className="flex items-center gap-1 px-3 py-1 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black uppercase text-[11px] shadow-md shadow-cyan-500/20 active:scale-95 disabled:opacity-30"
+                  className={`flex items-center gap-1 px-3 py-1 rounded-xl text-white font-black uppercase text-[11px] shadow-md active:scale-95 disabled:opacity-30 ${
+                    pendingOp === 'cut'
+                      ? 'bg-gradient-to-r from-rose-500 to-red-600 '
+                      : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 '
+                  }`}
                 >
-                  <Check size={13} className="stroke-[3]" />
-                  <span>{tr ? 'Katı Yap' : 'Extrude'}</span>
+                  {pendingOp === 'cut' ? <Scissors size={13} className="stroke-[2.5]" /> : <Check size={13} className="stroke-[3]" />}
+                  <span>{pendingOp === 'cut' ? t12(language, 'Cut', 'Kes') : t12(language, 'Extrude', 'Katı Yap')}</span>
                 </button>
               </div>
             </div>
@@ -329,14 +432,14 @@ export function MobileDesignStudio() {
               <button
                 type="button"
                 onClick={() => setShowExplodeHUD(!showExplodeHUD)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[10px] font-black uppercase backdrop-blur-md shadow-lg transition-all active:scale-95 ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-[10px] font-black uppercase shadow-lg transition-all active:scale-95 ${
                   showExplodeHUD || explodeFactor > 0
-                    ? 'bg-amber-500/25 border-amber-400 text-amber-300 shadow-amber-500/20'
+                    ? 'bg-amber-500/25 border-amber-400 text-amber-300 '
                     : 'bg-slate-950/80 border-white/15 text-slate-300'
                 }`}
               >
                 <span>💥</span>
-                <span>{tr ? 'Patlat' : 'Explode'}</span>
+                <span>{t12(language, 'Explode', 'Patlat')}</span>
                 {explodeFactor > 0 && <span className="text-amber-400 font-mono">({explodeFactor}%)</span>}
               </button>
 
@@ -347,9 +450,9 @@ export function MobileDesignStudio() {
                   const curIdx = modes.indexOf(renderMode);
                   const nextMode = modes[(curIdx + 1) % modes.length];
                   setRenderMode(nextMode);
-                  showToast(tr ? `Görünüm: ${nextMode.toUpperCase()}` : `Render: ${nextMode.toUpperCase()}`);
+                  showToast(t12(language, `Render: ${nextMode.toUpperCase()}`, `Görünüm: ${nextMode.toUpperCase()}`));
                 }}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-300 text-[10px] font-black uppercase backdrop-blur-md shadow-lg active:scale-95"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-cyan-300 text-[10px] font-black uppercase shadow-lg active:scale-95"
                 title="Cycle Render Mode"
               >
                 <span>🎨</span>
@@ -364,8 +467,8 @@ export function MobileDesignStudio() {
                   setSettingsTab('drawing');
                   setSheetMode('settings');
                 }}
-                className="p-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 backdrop-blur-md shadow-lg active:scale-95"
-                title={tr ? '2D Teknik Çizim' : '2D Drawing'}
+                className="p-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 shadow-lg active:scale-95"
+                title={t12(language, '2D Drawing', '2D Teknik Çizim')}
               >
                 <FileText size={15} />
               </button>
@@ -375,8 +478,8 @@ export function MobileDesignStudio() {
                   setSettingsTab('explode');
                   setSheetMode('settings');
                 }}
-                className="p-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-slate-200 backdrop-blur-md shadow-lg active:scale-95"
-                title={tr ? 'Tüm Görünüm & Patlatma Ayarları' : 'Settings & Tools'}
+                className="p-1.5 rounded-xl bg-slate-950/80 border border-white/15 text-slate-200 shadow-lg active:scale-95"
+                title={t12(language, 'Settings & Tools', 'Tüm Görünüm & Patlatma Ayarları')}
               >
                 <Settings2 size={15} />
               </button>
@@ -391,11 +494,11 @@ export function MobileDesignStudio() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-12 inset-x-2 z-30 p-3 rounded-2xl border border-amber-500/40 bg-slate-950/95 backdrop-blur-2xl shadow-2xl space-y-2.5 font-mono"
+              className="absolute top-12 inset-x-2 z-30 p-3 rounded-2xl border border-amber-500/40 bg-slate-950/95 shadow-2xl space-y-2.5 font-mono"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                  💥 {tr ? 'Montaj Patlatma Ayarı' : 'Explosion Control'} ({explodeFactor}%)
+                  💥 {t12(language, 'Explosion Control', 'Montaj Patlatma Ayarı')} ({explodeFactor}%)
                 </span>
                 <div className="flex items-center gap-1.5">
                   {explodeFactor > 0 && (
@@ -404,7 +507,7 @@ export function MobileDesignStudio() {
                       onClick={() => setExplodeFactor(0)}
                       className="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 text-[9px] font-bold border border-rose-500/30"
                     >
-                      {tr ? 'Sıfırla' : 'Reset'}
+                      {t12(language, 'Reset', 'Sıfırla')}
                     </button>
                   )}
                   <button
@@ -433,7 +536,7 @@ export function MobileDesignStudio() {
                   step={1}
                   value={explodeFactor}
                   onChange={(e) => setExplodeFactor(Number(e.target.value))}
-                  className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                 />
                 <button
                   type="button"
@@ -447,11 +550,11 @@ export function MobileDesignStudio() {
               {/* Direction Chips */}
               <div className="grid grid-cols-5 gap-1 pt-1">
                 {[
-                  { id: 'radial', label: tr ? '↗ Radyal' : '↗ Rad' },
-                  { id: 'axial-y', label: tr ? '↕ Y Dikey' : '↕ Y' },
-                  { id: 'axial-x', label: tr ? '↔ X Yatay' : '↔ X' },
-                  { id: 'axial-z', label: tr ? '↕ Z Derin' : '↕ Z' },
-                  { id: 'linear-sequence', label: tr ? '⇣ Sıra' : '⇣ Seq' },
+                  { id: 'radial', label: t12(language, '↗ Rad', '↗ Radyal') },
+                  { id: 'axial-y', label: t12(language, '↕ Y', '↕ Y Dikey') },
+                  { id: 'axial-x', label: t12(language, '↔ X', '↔ X Yatay') },
+                  { id: 'axial-z', label: t12(language, '↕ Z', '↕ Z Derin') },
+                  { id: 'linear-sequence', label: t12(language, '⇣ Seq', '⇣ Sıra') },
                 ].map((d) => (
                   <button
                     key={d.id}
@@ -482,24 +585,22 @@ export function MobileDesignStudio() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="absolute inset-x-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none flex justify-center"
             >
-              <div className="w-full max-w-xs rounded-3xl border border-white/15 bg-slate-950/90 p-5 shadow-2xl backdrop-blur-2xl pointer-events-auto text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto shadow-[0_0_20px_rgba(0,229,255,0.3)]">
+              <div className="w-full max-w-xs rounded-3xl border border-white/15 bg-slate-950/90 p-5 shadow-2xl pointer-events-auto text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] mx-auto ">
                   <Box size={24} />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-sm font-black text-white">{tr ? '3D Çizim Alanı' : '3D CAD Workspace'}</h3>
+                  <h3 className="text-sm font-black text-white">{t12(language, '3D CAD Workspace', '3D Çizim Alanı')}</h3>
                   <p className="text-xs text-slate-400 leading-relaxed font-mono">
-                    {tr
-                      ? 'Aşağıdaki araç çubuğundan "+ Ekle" butonuna basarak kutu, silindir, mil veya kiriş ekleyin.'
-                      : 'Tap "+ Add" on the bottom dock to place a box, cylinder, shaft or beam.'}
+                    {t12(language, 'Tap "+ Add" on the bottom dock to place a box, cylinder, shaft or beam.', 'Aşağıdaki araç çubuğundan "+ Ekle" butonuna basarak kutu, silindir, mil veya kiriş ekleyin.')}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => { setDismissWelcome(true); setSheetMode('shapes'); }}
-                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
+                  className="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all"
                 >
-                  {tr ? '+ İlk Şekli Ekle' : '+ Add First Shape'}
+                  {t12(language, '+ Add First Shape', '+ İlk Şekli Ekle')}
                 </button>
               </div>
             </motion.div>
@@ -512,7 +613,7 @@ export function MobileDesignStudio() {
             <>
               <button
                 type="button"
-                onClick={() => { deleteSelected(); showToast(tr ? 'Silindi' : 'Deleted'); }}
+                onClick={() => { deleteSelected(); showToast(t12(language, 'Deleted', 'Silindi')); }}
                 className="w-11 h-11 rounded-2xl bg-rose-950/90 border border-rose-500/40 text-rose-400 flex items-center justify-center shadow-lg active:scale-90 transition-transform"
                 aria-label="Delete"
               >
@@ -521,7 +622,7 @@ export function MobileDesignStudio() {
 
               <button
                 type="button"
-                onClick={() => { duplicateSelected(); showToast(tr ? 'Kopyalandı' : 'Duplicated'); }}
+                onClick={() => { duplicateSelected(); showToast(t12(language, 'Duplicated', 'Kopyalandı')); }}
                 className="w-11 h-11 rounded-2xl bg-slate-900/90 border border-white/20 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform"
                 aria-label="Duplicate"
               >
@@ -542,7 +643,7 @@ export function MobileDesignStudio() {
           <button
             type="button"
             onClick={() => setSheetMode('shapes')}
-            className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-slate-950 flex items-center justify-center shadow-[0_0_25px_rgba(0,229,255,0.5)] active:scale-90 transition-transform"
+            className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-slate-950 flex items-center justify-center active:scale-90 transition-transform"
             aria-label="Add Shape"
           >
             <Plus size={28} className="stroke-[3]" />
@@ -556,7 +657,7 @@ export function MobileDesignStudio() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-3 left-3 z-30 rounded-xl border border-cyan-500/40 bg-slate-950/90 px-3.5 py-2 font-mono text-xs text-cyan-300 shadow-xl backdrop-blur-xl"
+              className="absolute bottom-3 left-3 z-30 rounded-xl border border-cyan-500/40 bg-slate-950/90 px-3.5 py-2 font-mono text-xs text-cyan-300 shadow-xl"
             >
               {toast}
             </motion.div>
@@ -565,8 +666,8 @@ export function MobileDesignStudio() {
       </div>
 
       {/* ─── Bottom Mobile Tool Dock ─── */}
-      <div className="flex-none z-20 border-t border-white/10 bg-[#0a0d16] p-1 shadow-2xl">
-        <div className="flex items-stretch justify-between gap-1">
+      <div className="flex-none z-20 border-t border-white/10 bg-[var(--bg-1)] p-1 shadow-2xl">
+        <div className="flex items-stretch justify-between gap-1 overflow-x-auto no-scrollbar">
           {BOTTOM_DOCK_TOOLS.map((t) => {
             const Icon = t.icon;
             return (
@@ -574,7 +675,7 @@ export function MobileDesignStudio() {
                 key={t.id}
                 type="button"
                 onClick={t.onClick}
-                className={`relative flex flex-1 flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all active:scale-95 ${
+                className={`relative flex flex-1 min-w-[46px] flex-col items-center justify-center gap-1 h-12 rounded-xl transition-all active:scale-95 ${
                   t.active
                     ? 'bg-blue-600/20 text-cyan-400 border border-cyan-500/40'
                     : 'text-slate-400 hover:text-white'
@@ -585,7 +686,7 @@ export function MobileDesignStudio() {
                   {t.label}
                 </span>
                 {t.badge && (
-                  <span className="absolute top-1 right-2 min-w-3.5 h-3.5 px-1 rounded-full bg-cyan-400 text-black text-[8px] font-black flex items-center justify-center">
+                  <span className={`absolute top-1 right-1 min-w-3.5 h-3.5 px-1 rounded-full ${(t as any).badgeColor || 'bg-cyan-400 text-black'} text-[8px] font-black flex items-center justify-center`}>
                     {t.badge}
                   </span>
                 )}
@@ -604,14 +705,14 @@ export function MobileDesignStudio() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSheetMode('none')}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-40 bg-black/60"
             />
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-0 z-50 max-h-[75vh] rounded-t-3xl border-t border-white/15 bg-[#0b0f19] p-4 flex flex-col shadow-[0_-12px_40px_rgba(0,0,0,0.8)]"
+              className="fixed inset-x-0 bottom-0 z-50 max-h-[75vh] rounded-t-3xl border-t border-white/15 bg-[var(--bg-1)] p-4 flex flex-col shadow-[0_-12px_40px_rgba(0,0,0,0.8)]"
             >
               {/* Drag Handle */}
               <div className="flex justify-center pb-2">
@@ -621,12 +722,14 @@ export function MobileDesignStudio() {
               {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <h3 className="text-sm font-black text-white font-mono uppercase tracking-wider">
-                  {sheetMode === 'shapes' && (tr ? '3D Şekil Ekle' : 'Add 3D Shape')}
-                  {sheetMode === 'edit' && (tr ? 'Parça Düzenle' : 'Edit Part')}
-                  {sheetMode === 'parts' && (tr ? 'Parça Listesi' : 'Parts List')}
-                  {sheetMode === 'settings' && (tr ? '⚙️ Görünüm & CAD Araçları' : '⚙️ View & CAD Tools')}
-                  {sheetMode === 'export' && (tr ? '3D Dışa Aktar' : 'Export 3D')}
-                  {sheetMode === 'help' && (tr ? 'CAD Kılavuzu' : 'CAD Guide')}
+                  {sheetMode === 'shapes' && (t12(language, 'Add 3D Shape', '3D Şekil Ekle'))}
+                  {sheetMode === 'edit' && (t12(language, 'Edit Part', 'Parça Düzenle'))}
+                  {sheetMode === 'parts' && (t12(language, 'Parts List', 'Parça Listesi'))}
+                  {sheetMode === 'assembly' && (t12(language, '🔩 Assembly & AI Fastener', '🔩 Montaj & AI Cıvata'))}
+                  {sheetMode === 'dfm' && (t12(language, '🛡️ DFM Manufacturing Gate', '🛡️ DFM İmalat Doğrulama'))}
+                  {sheetMode === 'settings' && (t12(language, '⚙️ View & CAD Tools', '⚙️ Görünüm & CAD Araçları'))}
+                  {sheetMode === 'export' && (t12(language, 'Export 3D', '3D Dışa Aktar'))}
+                  {sheetMode === 'help' && (t12(language, 'CAD Guide', 'CAD Kılavuzu'))}
                 </h3>
                 <button
                   type="button"
@@ -650,7 +753,7 @@ export function MobileDesignStudio() {
                       >
                         <Box size={22} className="text-cyan-400" />
                         <span className="text-[11px] font-bold text-white leading-tight">
-                          {kindLabel(k, tr)}
+                          {getDesignKindLabel(k, language)}
                         </span>
                       </button>
                     ))}
@@ -661,12 +764,12 @@ export function MobileDesignStudio() {
                       onClick={() => {
                         startSketchAdd('extrude');
                         setSheetMode('none');
-                        showToast(tr ? '✏️ Ekrana dokunarak noktaları ekleyin' : '✏️ Tap grid to add points');
+                        showToast(t12(language, '✏️ Tap grid to add points', '✏️ Ekrana dokunarak noktaları ekleyin'));
                       }}
                       className="w-full flex items-center justify-center gap-2 p-3 rounded-2xl border border-cyan-500/40 bg-cyan-500/15 text-cyan-300 text-xs font-black uppercase tracking-wider active:scale-95"
                     >
                       <Pencil size={16} />
-                      <span>{tr ? 'Serbest Çizim → Ekstrüzyon' : 'Freeform Sketch → Extrude'}</span>
+                      <span>{t12(language, 'Freeform Sketch → Extrude', 'Serbest Çizim → Ekstrüzyon')}</span>
                     </button>
                 </div>
               )}
@@ -676,7 +779,7 @@ export function MobileDesignStudio() {
                 <div className="overflow-y-auto py-3 space-y-4 font-mono text-xs">
                   <div>
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      {tr ? 'Parça Adı' : 'Part Name'}
+                      {t12(language, 'Part Name', 'Parça Adı')}
                     </label>
                     <input
                       type="text"
@@ -688,7 +791,7 @@ export function MobileDesignStudio() {
 
                   <div>
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      {tr ? 'Boyutlar (mm)' : 'Dimensions (mm)'}
+                      {t12(language, 'Dimensions (mm)', 'Boyutlar (mm)')}
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       {Object.entries(selected.params).slice(0, 6).map(([k, v]) => (
@@ -707,7 +810,7 @@ export function MobileDesignStudio() {
 
                   <div>
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      {tr ? 'Konum (X, Y, Z)' : 'Position (X, Y, Z)'}
+                      {t12(language, 'Position (X, Y, Z)', 'Konum (X, Y, Z)')}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['x', 'y', 'z'] as const).map((axis) => (
@@ -726,7 +829,7 @@ export function MobileDesignStudio() {
 
                   <div>
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      {tr ? 'Renk / Malzeme' : 'Color / Material'}
+                      {t12(language, 'Color / Material', 'Renk / Malzeme')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {PART_COLORS.map((c) => (
@@ -746,17 +849,17 @@ export function MobileDesignStudio() {
                   <div className="flex gap-2 pt-2">
                     <button
                       type="button"
-                      onClick={() => { duplicateSelected(); showToast(tr ? 'Kopyalandı' : 'Duplicated'); }}
+                      onClick={() => { duplicateSelected(); showToast(t12(language, 'Duplicated', 'Kopyalandı')); }}
                       className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase"
                     >
-                      {tr ? 'Kopyala' : 'Duplicate'}
+                      {t12(language, 'Duplicate', 'Kopyala')}
                     </button>
                     <button
                       type="button"
-                      onClick={() => { deleteSelected(); setSheetMode('none'); showToast(tr ? 'Silindi' : 'Deleted'); }}
+                      onClick={() => { deleteSelected(); setSheetMode('none'); showToast(t12(language, 'Deleted', 'Silindi')); }}
                       className="flex-1 py-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs uppercase"
                     >
-                      {tr ? 'Sil' : 'Delete'}
+                      {t12(language, 'Delete', 'Sil')}
                     </button>
                   </div>
                 </div>
@@ -766,7 +869,7 @@ export function MobileDesignStudio() {
               {sheetMode === 'parts' && (
                 <div className="overflow-y-auto py-3 space-y-2 font-mono text-xs">
                   {parts.length === 0 ? (
-                    <p className="text-center text-slate-500 py-8">{tr ? 'Sahne boş' : 'Scene empty'}</p>
+                    <p className="text-center text-slate-500 py-8">{t12(language, 'Scene empty', 'Sahne boş')}</p>
                   ) : (
                     parts.map((p) => (
                       <div
@@ -784,7 +887,7 @@ export function MobileDesignStudio() {
                           <div className="w-3 h-3 rounded-full shrink-0" style={{ background: p.color }} />
                           <div className="truncate">
                             <p className="font-bold truncate">{p.name}</p>
-                            <p className="text-[10px] text-slate-500">{kindLabel(p.kind, tr)}</p>
+                            <p className="text-[10px] text-slate-500">{getDesignKindLabel(p.kind, language)}</p>
                           </div>
                         </div>
 
@@ -811,7 +914,7 @@ export function MobileDesignStudio() {
                   {parts.length > 1 && (
                     <div className="p-3 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase text-amber-400 font-bold">💥 {tr ? 'Montaj Patlatma' : 'Assembly Explode'}</span>
+                        <span className="text-[10px] uppercase text-amber-400 font-bold">💥 {t12(language, 'Assembly Explode', 'Montaj Patlatma')}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
@@ -821,7 +924,7 @@ export function MobileDesignStudio() {
                           step={1}
                           value={explodeFactor}
                           onChange={(e) => setExplodeFactor(Number(e.target.value))}
-                          className="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                          className="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                         />
                         <span className="text-[10px] text-slate-300 font-bold w-8 text-right">{explodeFactor}%</span>
                       </div>
@@ -830,11 +933,11 @@ export function MobileDesignStudio() {
                         onChange={(e) => setExplodeDirection(e.target.value as any)}
                         className="w-full bg-slate-800 border border-white/10 text-[10px] text-slate-300 font-bold rounded-lg px-2 py-1.5 cursor-pointer outline-none"
                       >
-                        <option value="radial">{tr ? '↗ Radyal (Tüm Yönler)' : '↗ Radial (All Directions)'}</option>
-                        <option value="axial-y">{tr ? '↕ Dikey (Y)' : '↕ Vertical (Y)'}</option>
-                        <option value="axial-x">{tr ? '↔ Yatay (X)' : '↔ Horizontal (X)'}</option>
-                        <option value="axial-z">{tr ? '↕ Derinlik (Z)' : '↕ Depth (Z)'}</option>
-                        <option value="linear-sequence">{tr ? '⇣ Sıralı Dizilim' : '⇣ Linear Sequence'}</option>
+                        <option value="radial">{t12(language, '↗ Radial (All Directions)', '↗ Radyal (Tüm Yönler)')}</option>
+                        <option value="axial-y">{t12(language, '↕ Vertical (Y)', '↕ Dikey (Y)')}</option>
+                        <option value="axial-x">{t12(language, '↔ Horizontal (X)', '↔ Yatay (X)')}</option>
+                        <option value="axial-z">{t12(language, '↕ Depth (Z)', '↕ Derinlik (Z)')}</option>
+                        <option value="linear-sequence">{t12(language, '⇣ Linear Sequence', '⇣ Sıralı Dizilim')}</option>
                       </select>
                     </div>
                   )}
@@ -842,10 +945,10 @@ export function MobileDesignStudio() {
                   {parts.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => { clearScene(); setSheetMode('none'); showToast(tr ? 'Sahne temizlendi' : 'Scene cleared'); }}
+                      onClick={() => { clearScene(); setSheetMode('none'); showToast(t12(language, 'Scene cleared', 'Sahne temizlendi')); }}
                       className="w-full py-2.5 mt-2 rounded-xl border border-rose-500/30 text-rose-400 font-bold text-xs uppercase"
                     >
-                      {tr ? 'Sahneyi Temizle' : 'Clear Scene'}
+                      {t12(language, 'Clear Scene', 'Sahneyi Temizle')}
                     </button>
                   )}
                 </div>
@@ -855,22 +958,297 @@ export function MobileDesignStudio() {
               {sheetMode === 'export' && (
                 <div className="overflow-y-auto py-4 space-y-4">
                   <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono space-y-1">
-                    <p className="font-bold">{tr ? '3D CAD Dışa Aktarma' : '3D CAD Export'}</p>
+                    <p className="font-bold">{t12(language, '3D CAD Export & 2D Sync', '3D CAD Dışa Aktarma & 2D Senkronizasyon')}</p>
                     <p className="text-[10px] text-cyan-400/80">
-                      {tr
-                        ? '3D Yazıcı (STL) veya CAD programları için dışa aktarın.'
-                        : 'Export for 3D Printing (STL) or CAD software.'}
+                      {t12(language, 'Export for 3D Printing (STL), CAD software or transfer to 2D drafting.', '3D Yazıcı (STL), CAD programları veya 2D çizim sayfasına aktarın.')}
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleExport}
-                    disabled={isExporting}
-                    className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/25 active:scale-95 disabled:opacity-40"
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={handleExport}
+                      disabled={isExporting}
+                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
+                    >
+                      <Download size={16} />
+                      <span>{isExporting ? (t12(language, 'Exporting...', 'Dışa Aktarılıyor...')) : (t12(language, '📥 Download STL', '📥 STL İndir (3D Yazıcı)'))}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetPart = selected || parts[0];
+                        if (!targetPart) {
+                          showToast(t12(language, 'No part in scene!', 'Sahnede parça yok!'));
+                          return;
+                        }
+                        CrossModuleBridge.exportDesignStudioToCad(targetPart, { clearCanvas: false });
+                        showToast(t12(language, `📐 ${targetPart.name} exported to 2D CAD!`, `📐 ${targetPart.name} 2D CAD'e aktarıldı!`));
+                        if (typeof window !== 'undefined') {
+                          window.location.href = '/cad-editor/';
+                        }
+                      }}
+                      className="w-full py-3.5 rounded-2xl bg-white/5 border border-cyan-500/40 text-cyan-300 font-black text-xs uppercase tracking-wider active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <PenTool size={16} />
+                      <span>{t12(language, '📐 Edit in 2D CAD Editor', '📐 2D CAD Editöründe Düzenle')}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Sheet Content: Assembly & AI Fasteners */}
+              {sheetMode === 'assembly' && (
+                <div className="overflow-y-auto py-3 space-y-4 font-mono text-xs">
+                  {/* AI Auto-Fastener Action Banner */}
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-b from-emerald-950/40 to-slate-900 border border-emerald-500/30 space-y-2.5 shadow-inner">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
+                        <Sparkles size={16} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-emerald-200">
+                          {t12(language, 'AI Auto-Fastener Assembly', 'AI Otomatik Bağlantı Elemanı')}
+                        </h4>
+                        <span className="text-[9px] text-emerald-400/80">
+                          {t12(language, 'Coaxial hole detection & ISO bolts', 'Eksenel delik tarama & ISO cıvata')}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const res = executeAutoFastenerAssembly();
+                        if (res.detected === 0) {
+                          showToast(t12(language, 'ℹ️ No coaxial matching hole pairs detected', 'ℹ️ Eksenel eşleşen açık delik çifti bulunamadı'));
+                        } else {
+                          showToast(
+                            t12(language, `⚡ ${res.detected} hole pairs detected, ${res.fastenersAdded} ISO fasteners assembled!`, `⚡ ${res.detected} delik çifti algılandı, ${res.fastenersAdded} standart cıvata monte edildi!`)
+                          );
+                        }
+                      }}
+                      className="w-full py-3 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 active:from-emerald-500 active:to-teal-500 text-white font-black text-xs uppercase rounded-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Wrench size={14} />
+                      <span>{t12(language, '⚡ AI Auto-Assemble Fasteners', '⚡ AI Cıvataları Otomatik Yerleştir')}</span>
+                    </button>
+                  </div>
+
+                  {/* T-Slot Aluminum Profile Quick Add */}
+                  <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-cyan-400 uppercase">
+                        {t12(language, 'T-Slot Profile Quick Add', 'T-Kanal Profil Hızlı Ekle')}
+                      </span>
+                      <span className="text-[8px] text-slate-500 font-mono">EN 12020</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {TSLOT_CATALOG.filter(s => ['2020', '2040', '3030', '4040', '4080', '4590'].includes(s.id)).map((spec) => (
+                        <div key={spec.id} className="p-2 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-cyan-200 text-[11px]">{spec.name}</span>
+                            <span className="text-[9px] text-slate-400">{spec.massKgPerM} kg/m</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {[200, 500, 1000].map((lenMm) => (
+                              <button
+                                key={lenMm}
+                                type="button"
+                                onClick={() => {
+                                  addTSlotPart(spec.id, lenMm);
+                                  showToast(t12(language, `+ ${spec.name} added (${lenMm} mm)`, `+ ${spec.name} eklendi (${lenMm} mm)`));
+                                }}
+                                className="py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/25 text-[10px] font-bold text-cyan-300 active:scale-95 text-center"
+                              >
+                                {lenMm} mm
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Active Mates List */}
+                  <div className="space-y-2 pt-1 border-t border-white/10">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
+                      <span>{t12(language, 'Active Mates', 'Aktif Montaj Mates')} ({mates.length})</span>
+                      {mates.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              applyMates();
+                              showToast(t12(language, 'Mates solved', 'Mates çözüldü'));
+                            }}
+                            className="text-cyan-400 hover:underline"
+                          >
+                            {t12(language, 'Solve', 'Çöz')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              clearMates();
+                              showToast(t12(language, 'Mates cleared', 'Mates temizlendi'));
+                            }}
+                            className="text-rose-400 hover:underline"
+                          >
+                            {t12(language, 'Clear', 'Temizle')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {mates.length === 0 ? (
+                      <p className="text-[10px] text-slate-500 text-center py-3">
+                        {t12(language, 'No active mates. Auto-mate with AI Fastener.', 'Henüz mate tanımlanmadı. AI Cıvata ile otomatik bağlanabilir.')}
+                      </p>
+                    ) : (
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                        {mates.map((m) => (
+                          <div key={m.id} className="p-2.5 rounded-xl bg-black/40 border border-emerald-500/20 text-[10px] space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-emerald-300 uppercase">
+                                {m.kind === 'concentric' ? '🎯 Eşeksenli' : m.kind === 'coincident' ? '📐 Çakışık' : '🔩 Kanal-Uç'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeMate(m.id)}
+                                className="text-rose-400 hover:text-rose-200 font-bold"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            <div className="text-[9px] text-slate-400 flex items-center justify-between truncate">
+                              <span>A: {m.partAId.slice(0, 10)}…</span>
+                              <span>B: {m.partBId.slice(0, 10)}…</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Sheet Content: DFM Validation */}
+              {sheetMode === 'dfm' && (
+                <div className="overflow-y-auto py-3 space-y-4 font-mono text-xs">
+                  {/* DFM Status Score Card */}
+                  <div
+                    className={`p-4 rounded-2xl border space-y-3 ${
+                      dfmReport.passed
+                        ? 'bg-gradient-to-b from-emerald-950/40 to-slate-900 border-emerald-500/30'
+                        : dfmReport.criticalCount > 0
+                        ? 'bg-gradient-to-b from-rose-950/40 to-slate-900 border-rose-500/40'
+                        : 'bg-gradient-to-b from-amber-950/40 to-slate-900 border-amber-500/30'
+                    }`}
                   >
-                    {isExporting ? (tr ? 'Dışa Aktarılıyor...' : 'Exporting...') : (tr ? '📥 STL İndir' : '📥 Download STL')}
-                  </button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className={`p-2 rounded-xl ${
+                            dfmReport.passed
+                              ? 'bg-emerald-500/20 text-emerald-400'
+                              : dfmReport.criticalCount > 0
+                              ? 'bg-rose-500/20 text-rose-400'
+                              : 'bg-amber-500/20 text-amber-400'
+                          }`}
+                        >
+                          <Shield size={20} />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-white">
+                            {dfmReport.passed
+                              ? (t12(language, 'Production Ready', 'Üretime Tam Hazır'))
+                              : dfmReport.criticalCount > 0
+                              ? (t12(language, 'Manufacturing Blocked', 'İmalat Bloke Edildi'))
+                              : (t12(language, 'Warnings Detected', 'Uyarılar Tespit Edildi'))}
+                          </h4>
+                          <span className="text-[9px] text-slate-400">
+                            VDI 2230 / ISO 2768-m / EN 12020
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-2xl font-black font-mono text-cyan-300">
+                          {dfmReport.score}<span className="text-xs text-slate-400">/100</span>
+                        </div>
+                        <span className="text-[8px] uppercase tracking-wider text-slate-400">DFM SCORE</span>
+                      </div>
+                    </div>
+
+                    {/* Override Toggle */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                      <div className="text-[10px] text-slate-300">
+                        <span>{t12(language, 'Engineering Override', 'Mühendislik İstisnası (Override)')}</span>
+                        <p className="text-[8px] text-slate-500">{t12(language, 'Bypass export lock', 'Hatalara rağmen dışa aktarmayı aç')}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEngineeringOverride(!engineeringOverride);
+                          showToast(
+                            !engineeringOverride
+                              ? (t12(language, '⚠️ DFM Lock bypassed', '⚠️ DFM Kilidi kaldırıldı'))
+                              : (t12(language, '🛡️ DFM Lock active', '🛡️ DFM Koruması aktif'))
+                          );
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase transition-all ${
+                          engineeringOverride ? 'bg-amber-500 text-black' : 'bg-white/10 text-slate-400'
+                        }`}
+                      >
+                        {engineeringOverride ? (t12(language, 'ON', 'AÇIK')) : (t12(language, 'OFF', 'KAPALI'))}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Issues List */}
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      {t12(language, `Analytical Findings (${dfmReport.issues.length})`, `Analitik Bulgular (${dfmReport.issues.length})`)}
+                    </p>
+
+                    {dfmReport.issues.length === 0 ? (
+                      <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center text-emerald-300 text-xs">
+                        ✓ {t12(language, 'All manufacturing rules verified successfully.', 'Tüm imalat kuralları başarıyla doğrulandı.')}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {dfmReport.issues.map((iss, idx) => (
+                          <div
+                            key={iss.ruleId + idx}
+                            className={`p-3 rounded-2xl border space-y-1.5 ${
+                              iss.severity === 'CRITICAL'
+                                ? 'bg-rose-950/40 border-rose-500/40 text-rose-200'
+                                : 'bg-amber-950/40 border-amber-500/30 text-amber-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-[11px] flex items-center gap-1.5">
+                                <span>{iss.severity === 'CRITICAL' ? '🔴' : '⚠️'}</span>
+                                <span>{t12(language, iss.title, iss.titleTr)}</span>
+                              </span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/40 border border-white/10 text-slate-400">
+                                {iss.ruleId}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-slate-300 leading-relaxed font-sans">
+                              {t12(language, iss.message, iss.messageTr)}
+                            </p>
+                            <div className="text-[9px] text-cyan-300/90 pt-1 border-t border-white/10 font-mono flex items-center justify-between">
+                              <span>{t12(language, 'Measured', 'Ölçülen')}: {iss.measured} {iss.unit}</span>
+                              <span>{t12(language, 'Required', 'Gereken')}: {iss.required} {iss.unit} ({iss.standard})</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -880,10 +1258,10 @@ export function MobileDesignStudio() {
                   {/* Tabs */}
                   <div className="flex items-center bg-white/5 border border-white/10 rounded-2xl p-1 gap-1">
                     {[
-                      { id: 'explode', label: tr ? '💥 Patlatma' : '💥 Explode' },
-                      { id: 'render', label: tr ? '🎨 Görünüm' : '🎨 Render' },
-                      { id: 'measure', label: tr ? '📐 Kumpas' : '📐 Caliper' },
-                      { id: 'section', label: tr ? '✂️ Kesit' : '✂️ Section' },
+                      { id: 'explode', label: t12(language, '💥 Explode', '💥 Patlatma') },
+                      { id: 'render', label: t12(language, '🎨 Render', '🎨 Görünüm') },
+                      { id: 'measure', label: t12(language, '📐 Caliper', '📐 Kumpas') },
+                      { id: 'section', label: t12(language, '✂️ Section', '✂️ Kesit') },
                     ].map((tab) => (
                       <button
                         key={tab.id}
@@ -891,7 +1269,7 @@ export function MobileDesignStudio() {
                         onClick={() => setSettingsTab(tab.id as any)}
                         className={`flex-1 py-1.5 rounded-xl text-[10px] font-black uppercase text-center transition-all ${
                           settingsTab === tab.id
-                            ? 'bg-cyan-500 text-black shadow-md'
+                            ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -905,7 +1283,7 @@ export function MobileDesignStudio() {
                     <div className="space-y-3 p-1">
                       <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2.5">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-amber-300 uppercase text-[11px]">💥 {tr ? 'Montaj Patlatma Oranı' : 'Assembly Explode Factor'}</span>
+                          <span className="font-bold text-amber-300 uppercase text-[11px]">💥 {t12(language, 'Assembly Explode Factor', 'Montaj Patlatma Oranı')}</span>
                           <span className="font-black text-amber-400 text-sm">{explodeFactor}%</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -923,7 +1301,7 @@ export function MobileDesignStudio() {
                             step={1}
                             value={explodeFactor}
                             onChange={(e) => setExplodeFactor(Number(e.target.value))}
-                            className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                            className="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                           />
                           <button
                             type="button"
@@ -936,14 +1314,14 @@ export function MobileDesignStudio() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Patlatma Yönü' : 'Explosion Direction'}</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{t12(language, 'Explosion Direction', 'Patlatma Yönü')}</label>
                         <div className="grid grid-cols-2 gap-2">
                           {[
-                            { id: 'radial', label: tr ? '↗ Radyal (Tüm Yönler)' : '↗ Radial' },
-                            { id: 'axial-y', label: tr ? '↕ Dikey (Y Ekseni)' : '↕ Vertical (Y)' },
-                            { id: 'axial-x', label: tr ? '↔ Yatay (X Ekseni)' : '↔ Horizontal (X)' },
-                            { id: 'axial-z', label: tr ? '↕ Derinlik (Z Ekseni)' : '↕ Depth (Z)' },
-                            { id: 'linear-sequence', label: tr ? '⇣ Sıralı Dizilim' : '⇣ Linear Seq' },
+                            { id: 'radial', label: t12(language, '↗ Radial', '↗ Radyal (Tüm Yönler)') },
+                            { id: 'axial-y', label: t12(language, '↕ Vertical (Y)', '↕ Dikey (Y Ekseni)') },
+                            { id: 'axial-x', label: t12(language, '↔ Horizontal (X)', '↔ Yatay (X Ekseni)') },
+                            { id: 'axial-z', label: t12(language, '↕ Depth (Z)', '↕ Derinlik (Z Ekseni)') },
+                            { id: 'linear-sequence', label: t12(language, '⇣ Linear Seq', '⇣ Sıralı Dizilim') },
                           ].map((d) => (
                             <button
                               key={d.id}
@@ -971,13 +1349,13 @@ export function MobileDesignStudio() {
                               : 'bg-white/[0.03] border-white/10 text-slate-400'
                           }`}
                         >
-                          👻 {tr ? 'Hayalet Parçalar' : 'Ghost Mode'}
+                          👻 {t12(language, 'Ghost Mode', 'Hayalet Parçalar')}
                         </button>
                         <button
                           type="button"
                           onClick={() => {
                             setShowCenterOfGravity(!showCenterOfGravity);
-                            showToast(showCenterOfGravity ? (tr ? 'Ağırlık merkezi gizlendi' : 'CoG hidden') : (tr ? `🎯 Ağırlık Merkezi: ${massProps.massKg} kg` : `🎯 CoG Active`));
+                            showToast(showCenterOfGravity ? (t12(language, 'CoG hidden', 'Ağırlık merkezi gizlendi')) : (t12(language, `🎯 CoG Active`, `🎯 Ağırlık Merkezi: ${massProps.massKg} kg`)));
                           }}
                           className={`p-2.5 rounded-xl border text-center font-bold text-xs transition-all ${
                             showCenterOfGravity
@@ -985,7 +1363,7 @@ export function MobileDesignStudio() {
                               : 'bg-white/[0.03] border-white/10 text-slate-400'
                           }`}
                         >
-                          🎯 {tr ? `Ağırlık Merkezi (${massProps.massKg}kg)` : `CoG (${massProps.massKg}kg)`}
+                          🎯 {t12(language, `CoG (${massProps.massKg}kg)`, `Ağırlık Merkezi (${massProps.massKg}kg)`)}
                         </button>
                       </div>
                     </div>
@@ -995,16 +1373,16 @@ export function MobileDesignStudio() {
                   {settingsTab === 'render' && (
                     <div className="space-y-3 p-1">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? '3D Render Modu' : '3D Render Mode'}</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{t12(language, '3D Render Mode', '3D Render Modu')}</label>
                         <div className="grid grid-cols-2 gap-2">
                           {[
-                            { id: 'solid', label: tr ? '🧱 Katı (Solid)' : 'Solid' },
-                            { id: 'wire', label: tr ? '🕸️ Tel Kafes (Wire)' : 'Wireframe' },
-                            { id: 'matcap', label: tr ? '🗿 MatCap (Teknik)' : 'MatCap' },
-                            { id: 'pbr', label: tr ? '✨ PBR (Gerçekçi)' : 'PBR Realistic' },
-                            { id: 'xray', label: tr ? '🩻 Röntgen (X-Ray)' : 'X-Ray' },
-                            { id: 'normals', label: tr ? '🌈 Normaller' : 'Normals' },
-                            { id: 'edges', label: tr ? '📐 Keskin Kenarlar' : 'Edges Only' },
+                            { id: 'solid', label: t12(language, 'Solid', '🧱 Katı (Solid)') },
+                            { id: 'wire', label: t12(language, 'Wireframe', '🕸️ Tel Kafes (Wire)') },
+                            { id: 'matcap', label: t12(language, 'MatCap', '🗿 MatCap (Teknik)') },
+                            { id: 'pbr', label: t12(language, 'PBR Realistic', '✨ PBR (Gerçekçi)') },
+                            { id: 'xray', label: t12(language, 'X-Ray', '🩻 Röntgen (X-Ray)') },
+                            { id: 'normals', label: t12(language, 'Normals', '🌈 Normaller') },
+                            { id: 'edges', label: t12(language, 'Edges Only', '📐 Keskin Kenarlar') },
                           ].map((rm) => (
                             <button
                               key={rm.id}
@@ -1023,15 +1401,15 @@ export function MobileDesignStudio() {
                       </div>
 
                       <div className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10">
-                        <span className="text-slate-300 font-bold text-xs">{tr ? 'Zemin CAD Izgarası' : 'Ground CAD Grid'}</span>
+                        <span className="text-slate-300 font-bold text-xs">{t12(language, 'Ground CAD Grid', 'Zemin CAD Izgarası')}</span>
                         <button
                           type="button"
                           onClick={() => setShowGrid(!showGrid)}
                           className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all ${
-                            showGrid ? 'bg-cyan-500 text-black' : 'bg-white/10 text-slate-400'
+                            showGrid ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-white/10 text-slate-400'
                           }`}
                         >
-                          {showGrid ? (tr ? 'Açık' : 'ON') : (tr ? 'Kapalı' : 'OFF')}
+                          {showGrid ? (t12(language, 'ON', 'Açık')) : (t12(language, 'OFF', 'Kapalı'))}
                         </button>
                       </div>
                     </div>
@@ -1042,33 +1420,33 @@ export function MobileDesignStudio() {
                     <div className="space-y-3 p-1">
                       <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-cyan-300 text-xs">📏 {tr ? '3D Kumpas / Ölçüm Aracı' : '3D CAD Caliper'}</span>
+                          <span className="font-bold text-cyan-300 text-xs">📏 {t12(language, '3D CAD Caliper', '3D Kumpas / Ölçüm Aracı')}</span>
                           <button
                             type="button"
                             onClick={() => {
                               const nextTool = tool === 'measure' ? 'select' : 'measure';
                               setTool(nextTool);
-                              showToast(nextTool === 'measure' ? (tr ? '📏 Kumpas Aktif' : 'Caliper Active') : (tr ? 'Seçim Modu' : 'Select Mode'));
+                              showToast(nextTool === 'measure' ? (t12(language, 'Caliper Active', '📏 Kumpas Aktif')) : (t12(language, 'Select Mode', 'Seçim Modu')));
                             }}
                             className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all ${
-                              tool === 'measure' ? 'bg-cyan-500 text-black' : 'bg-white/10 text-slate-400'
+                              tool === 'measure' ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-white/10 text-slate-400'
                             }`}
                           >
-                            {tool === 'measure' ? (tr ? 'Aktif' : 'Active') : (tr ? 'Aç' : 'Enable')}
+                            {tool === 'measure' ? (t12(language, 'Active', 'Aktif')) : (t12(language, 'Enable', 'Aç'))}
                           </button>
                         </div>
                         <p className="text-[10px] text-cyan-400/80">
-                          {tr ? 'Yüzeylere veya delik kenarlarına dokunarak milimetrik hassas ölçü alın.' : 'Tap surfaces or holes to measure distance and diameters.'}
+                          {t12(language, 'Tap surfaces or holes to measure distance and diameters.', 'Yüzeylere veya delik kenarlarına dokunarak milimetrik hassas ölçü alın.')}
                         </p>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Ölçüm Yöntemi' : 'Measure Mode'}</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{t12(language, 'Measure Mode', 'Ölçüm Yöntemi')}</label>
                         <div className="grid grid-cols-3 gap-2">
                           {[
-                            { id: 'auto', label: tr ? '🪄 Oto' : 'Auto' },
-                            { id: 'distance', label: tr ? '📐 Mesafe' : 'Distance' },
-                            { id: 'diameter', label: tr ? '⌀ Çap' : 'Diameter' },
+                            { id: 'auto', label: t12(language, 'Auto', '🪄 Oto') },
+                            { id: 'distance', label: t12(language, 'Distance', '📐 Mesafe') },
+                            { id: 'diameter', label: t12(language, 'Diameter', '⌀ Çap') },
                           ].map((mm) => (
                             <button
                               key={mm.id}
@@ -1092,13 +1470,13 @@ export function MobileDesignStudio() {
                       {measurements && measurements.length > 0 && (
                         <div className="p-3 rounded-2xl bg-black/40 border border-white/10 space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-white text-xs">{tr ? `Aktif Ölçüler (${measurements.length})` : `Active Measurements (${measurements.length})`}</span>
+                            <span className="font-bold text-white text-xs">{t12(language, `Active Measurements (${measurements.length})`, `Aktif Ölçüler (${measurements.length})`)}</span>
                             <button
                               type="button"
                               onClick={clearMeasurements}
                               className="text-[10px] text-rose-400 font-bold hover:underline"
                             >
-                              {tr ? 'Temizle' : 'Clear'}
+                              {t12(language, 'Clear', 'Temizle')}
                             </button>
                           </div>
                           <div className="max-h-24 overflow-y-auto space-y-1">
@@ -1118,10 +1496,10 @@ export function MobileDesignStudio() {
                   {settingsTab === 'section' && (
                     <div className="space-y-3 p-1">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] text-slate-400 font-bold uppercase">{tr ? 'Kesit Düzlemi Ekseni' : 'Section Plane Axis'}</label>
+                        <label className="text-[10px] text-slate-400 font-bold uppercase">{t12(language, 'Section Plane Axis', 'Kesit Düzlemi Ekseni')}</label>
                         <div className="grid grid-cols-4 gap-2">
                           {[
-                            { id: 'NONE', label: tr ? 'Yok' : 'None' },
+                            { id: 'NONE', label: t12(language, 'None', 'Yok') },
                             { id: 'X', label: 'X (Sol-Sağ)' },
                             { id: 'Y', label: 'Y (Üst-Alt)' },
                             { id: 'Z', label: 'Z (Ön-Arka)' },
@@ -1145,7 +1523,7 @@ export function MobileDesignStudio() {
                       {sectionAxis !== 'NONE' && (
                         <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2.5">
                           <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-rose-300">{tr ? 'Kesit Konumu' : 'Section Offset'}</span>
+                            <span className="text-[11px] font-bold text-rose-300">{t12(language, 'Section Offset', 'Kesit Konumu')}</span>
                             <span className="font-mono font-bold text-rose-400">{sectionOffset} mm</span>
                           </div>
                           <input
@@ -1155,18 +1533,18 @@ export function MobileDesignStudio() {
                             step={1}
                             value={sectionOffset}
                             onChange={(e) => setSectionOffset(Number(e.target.value))}
-                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                           />
                           <div className="flex items-center justify-between pt-1">
-                            <span className="text-[10px] text-slate-400">{tr ? 'Katı Kesit Kapağı' : 'Solid Section Cap'}</span>
+                            <span className="text-[10px] text-slate-400">{t12(language, 'Solid Section Cap', 'Katı Kesit Kapağı')}</span>
                             <button
                               type="button"
                               onClick={() => setSectionSolidCap(!sectionSolidCap)}
                               className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${
-                                sectionSolidCap ? 'bg-rose-500 text-white' : 'bg-white/10 text-slate-400'
+                                sectionSolidCap ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-white/10 text-slate-400'
                               }`}
                             >
-                              {sectionSolidCap ? (tr ? 'Dolu' : 'Solid') : (tr ? 'Boş' : 'Hollow')}
+                              {sectionSolidCap ? (t12(language, 'Solid', 'Dolu')) : (t12(language, 'Hollow', 'Boş'))}
                             </button>
                           </div>
                         </div>
@@ -1182,10 +1560,10 @@ export function MobileDesignStudio() {
                         setSheetMode('none');
                         setShowTechnicalDrawingModal(true);
                       }}
-                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
+                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                     >
                       <FileText size={16} />
-                      <span>{tr ? '📄 2D Teknik Çizim & PDF Portföyü' : '📄 2D Drawing & Batch PDF'}</span>
+                      <span>{t12(language, '📄 2D Drawing & Batch PDF', '📄 2D Teknik Çizim & PDF Portföyü')}</span>
                     </button>
                   </div>
                 </div>
@@ -1195,20 +1573,20 @@ export function MobileDesignStudio() {
               {sheetMode === 'help' && (
                 <div className="overflow-y-auto py-3 space-y-3 font-mono text-xs text-slate-300 leading-relaxed">
                   <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                    <span className="font-bold text-cyan-400">{tr ? '1. Şekil Ekle' : '1. Add Shape'}</span>
-                    <p className="text-[11px] text-slate-400">{tr ? 'Alttaki "+ Ekle" butonuna dokunup 12 temel şekilden birini seçin.' : 'Tap "+ Add" on the dock and pick a mechanical shape.'}</p>
+                    <span className="font-bold text-cyan-400">{t12(language, '1. Add Shape', '1. Şekil Ekle')}</span>
+                    <p className="text-[11px] text-slate-400">{t12(language, 'Tap "+ Add" on the dock and pick a mechanical shape.', 'Alttaki "+ Ekle" butonuna dokunup 12 temel şekilden birini seçin.')}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                    <span className="font-bold text-cyan-400">{tr ? '2. Parçayı Seç' : '2. Select Part'}</span>
-                    <p className="text-[11px] text-slate-400">{tr ? '3D sahnedeki herhangi bir parçaya parmağınızla dokunun.' : 'Tap any 3D solid directly in the viewport.'}</p>
+                    <span className="font-bold text-cyan-400">{t12(language, '2. Select Part', '2. Parçayı Seç')}</span>
+                    <p className="text-[11px] text-slate-400">{t12(language, 'Tap any 3D solid directly in the viewport.', '3D sahnedeki herhangi bir parçaya parmağınızla dokunun.')}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                    <span className="font-bold text-cyan-400">{tr ? '3. Ölçüleri Düzenle' : '3. Edit Dimensions'}</span>
-                    <p className="text-[11px] text-slate-400">{tr ? '"Düzenle" butonuna basarak uzunluk, çap, et kalınlığı ve renkleri değiştirin.' : 'Tap "Edit" to modify width, diameter, wall thickness and color.'}</p>
+                    <span className="font-bold text-cyan-400">{t12(language, '3. Edit Dimensions', '3. Ölçüleri Düzenle')}</span>
+                    <p className="text-[11px] text-slate-400">{t12(language, 'Tap "Edit" to modify width, diameter, wall thickness and color.', '"Düzenle" butonuna basarak uzunluk, çap, et kalınlığı ve renkleri değiştirin.')}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                    <span className="font-bold text-cyan-400">{tr ? '4. Dışa Aktar' : '4. Export'}</span>
-                    <p className="text-[11px] text-slate-400">{tr ? 'Üstteki indirme ikonuna dokunarak STL formatında 3D yazıcı çıktısı alın.' : 'Tap the download icon to save STL file for 3D printing.'}</p>
+                    <span className="font-bold text-cyan-400">{t12(language, '4. Export', '4. Dışa Aktar')}</span>
+                    <p className="text-[11px] text-slate-400">{t12(language, 'Tap the download icon to save STL file for 3D printing.', 'Üstteki indirme ikonuna dokunarak STL formatında 3D yazıcı çıktısı alın.')}</p>
                   </div>
                 </div>
               )}
@@ -1219,12 +1597,12 @@ export function MobileDesignStudio() {
 
       {/* ─── Mobile 2D Technical Drawing Sheet Modal ─── */}
       {showTechnicalDrawingModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-2 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2 animate-in fade-in">
           <div className="w-full h-full max-h-[96vh] flex flex-col rounded-3xl bg-slate-900 border border-cyan-500/40 shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-slate-950">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-black text-white font-mono uppercase">
-                  📄 {tr ? '2D TEKNİK ÇİZİM' : '2D DRAWING'}
+                  📄 {t12(language, '2D DRAWING', '2D TEKNİK ÇİZİM')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -1233,12 +1611,14 @@ export function MobileDesignStudio() {
                   onClick={() => {
                     const svgData = generateTechnicalDrawingSVG(parts, massProps, {
                       projectName,
-                      materialName: activeMaterial.nameTr,
+                      materialName: t12(language, activeMaterial.name, activeMaterial.nameTr),
+                      partName: t12(language, `Assembly: ${parts.length} Parts`, `Montaj: ${parts.length} Parça`),
                       templateStyle,
                       colorTheme,
+                      lang: language,
                     });
                     downloadFile(svgData, `${projectName}_Drawing.svg`, 'image/svg+xml');
-                    showToast(tr ? 'SVG İndirildi' : 'SVG Downloaded');
+                    showToast(t12(language, 'SVG Downloaded', 'SVG İndirildi'));
                   }}
                   className="px-2.5 py-1.5 rounded-xl bg-cyan-500/20 text-cyan-300 font-bold text-xs border border-cyan-500/30"
                 >
@@ -1253,9 +1633,11 @@ export function MobileDesignStudio() {
                         massProps,
                         config: {
                           projectName,
-                          materialName: activeMaterial.nameTr,
+                          partName: t12(language, `Full Assembly (${parts.length} Parts)`, `Tüm Montaj (${parts.length} Parça)`),
+                          materialName: t12(language, activeMaterial.name, activeMaterial.nameTr),
                           templateStyle,
                           colorTheme,
+                          lang: language,
                         },
                       },
                     ];
@@ -1266,14 +1648,18 @@ export function MobileDesignStudio() {
                         massProps: pMass,
                         config: {
                           projectName,
-                          partName: p.name || 'Parça Detayı',
-                          materialName: activeMaterial.nameTr,
+                          partName: p.name || (t12(language, 'Part Detail', 'Parça Detayı')),
+                          materialName: t12(language, activeMaterial.name, activeMaterial.nameTr),
                           templateStyle,
                           colorTheme,
+                          lang: language,
                         },
                       });
                     }
-                    const fullHtml = generateBatchDrawingsHTML(sheets, `${projectName} - Teknik Resim Portföyü`);
+                    const fullHtml = generateBatchDrawingsHTML(
+                      sheets,
+                      t12(language, `${projectName} - Technical Drawing Portfolio`, `${projectName} - Teknik Resim Portföyü`)
+                    );
                     const printWin = window.open('', '_blank');
                     if (printWin) {
                       printWin.document.write(fullHtml);
@@ -1304,12 +1690,7 @@ export function MobileDesignStudio() {
                   background: colorTheme === 'blueprint' ? '#091833' : colorTheme === 'dark' ? '#080c14' : '#ffffff',
                 }}
                 dangerouslySetInnerHTML={{
-                  __html: generateTechnicalDrawingSVG(parts, massProps, {
-                    projectName,
-                    materialName: activeMaterial.nameTr,
-                    templateStyle,
-                    colorTheme,
-                  }),
+                  __html: mobileDrawingSvg,
                 }}
               />
             </div>

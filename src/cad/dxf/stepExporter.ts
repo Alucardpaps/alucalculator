@@ -20,8 +20,8 @@ export function generateSTEP(entities: CadEntity[], fileName: string = 'AluCalcE
     const header = [
         'ISO-10303-21;',
         'HEADER;',
-        `FILE_DESCRIPTION(('AluCalc OS STEP Export'), '2;1');`,
-        `FILE_NAME('${fileName}.step', '${timestamp}', ('AluCalc OS'), ('AluCalculator'), 'AluCalc STEP Processor V0.1', 'Next.js', '');`,
+        `FILE_DESCRIPTION(('AluCAD OS STEP Export'), '2;1');`,
+        `FILE_NAME('${fileName}.step', '${timestamp}', ('AluCAD OS'), ('AluCalculator'), 'AluCalc STEP Processor V0.1', 'Next.js', '');`,
         `FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));`,
         'ENDSEC;',
         '',

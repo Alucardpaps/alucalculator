@@ -15,6 +15,7 @@ import ja from '../locales/ja';
 import ko from '../locales/ko';
 import ar from '../locales/ar';
 import { getModuleHints } from '../locales/moduleHintsTranslations';
+import { isT12Ready, loadT12 } from '../locales/t12';
 
 export type Language = 'en' | 'tr' | 'de' | 'es' | 'fr' | 'it' | 'pt' | 'ru' | 'zh' | 'ja' | 'ko' | 'ar';
 
@@ -69,24 +70,62 @@ function syncLanguageAcrossStores(lang: Language) {
         .catch((err) => console.error(`Failed to load dictionary for ${lang}`, err));
 }
 
+const STORAGE_KEY = 'alucalc-i18n-storage';
+const LANGUAGES: Language[] = ['en', 'tr', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko', 'ar'];
+
+/** Persisted language read before hydration, so its string table starts loading at once. */
+let deferredLanguage: Language | null = null;
+if (typeof window !== 'undefined') {
+    try {
+        const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || 'null')?.state?.language;
+        if (LANGUAGES.includes(saved)) void loadT12(saved);
+    } catch {
+        // storage unavailable: English until the user picks a language
+    }
+}
+
+let languageRequest = 0;
+
+/** Turkish renders at once: nearly every string carries its Turkish text inline. */
+const canApplyNow = (lang: Language) => lang === 'tr' || isT12Ready(lang);
+
 export const useI18nStore = create<I18nState>()(
     persist(
         (set) => ({
             language: 'en', // Default to English as international fallback
             t: translations.en,
             setLanguage: (lang: Language) => {
-                set({ language: lang, t: translations[lang] });
-                syncLanguageAcrossStores(lang);
+                const request = ++languageRequest;
+                const apply = () => {
+                    if (request !== languageRequest) return; // a newer choice won
+                    set({ language: lang, t: translations[lang] });
+                    syncLanguageAcrossStores(lang);
+                };
+                // switch once the language's UI string table is loaded (no flash of English)
+                if (canApplyNow(lang)) {
+                    apply();
+                    void loadT12(lang);
+                } else {
+                    loadT12(lang).then(apply, apply);
+                }
             },
         }),
         {
-            name: 'alucalc-i18n-storage',
+            name: STORAGE_KEY,
             partialize: (state) => ({ language: state.language }), // Only persist the language preference
-            onRehydrateStorage: () => (state) => {
-                // Ensure translations are loaded after rehydration reactively
-                if (state && state.language) {
-                    state.setLanguage(state.language);
+            merge: (persisted, current) => {
+                const lang = (persisted as { language?: Language } | undefined)?.language;
+                if (lang && LANGUAGES.includes(lang) && !canApplyNow(lang)) {
+                    // keep English until the table is in, then switch (see onRehydrateStorage)
+                    deferredLanguage = lang;
+                    return current;
                 }
+                return { ...current, ...(persisted as object) };
+            },
+            onRehydrateStorage: () => (state) => {
+                const lang = deferredLanguage ?? state?.language;
+                deferredLanguage = null;
+                if (state && lang) state.setLanguage(lang);
             }
         }
     )

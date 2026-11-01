@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const right = getAlloy(slugs[1]);
   if (!left || !right) return { title: 'Compare not found' };
   return {
-    title: `${left.name} vs ${right.name} — Density, Strength & Weldability | AluCalc`,
+    title: `${left.name} vs ${right.name} — Density, Strength & Weldability`,
     description: `Compare ${left.name} and ${right.name}: density, yield, weldability, and plate mass.`,
     alternates: { canonical: `https://www.alucalculator.com/compare/${pair}/` },
   };

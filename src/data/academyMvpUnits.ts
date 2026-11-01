@@ -1,5 +1,5 @@
 /**
- * 🎓 ALUCALC OS — ACADEMY MVP (15 CURATED UNITS)
+ * 🎓 ALUCAD OS — ACADEMY MVP (15 CURATED UNITS)
  * 
  * 15 Verified Core Engineering Lessons with Normative Theory,
  * Direct Solver Links, Interactive Quizzes, and Verified Certificates.
@@ -898,8 +898,8 @@ export const ACADEMY_MVP_UNITS: AcademyMvpUnit[] = [
       { label: 'Hooke\'s Law (Stiffness Matrix)', latex: '\\mathbf{K} \\cdot \\mathbf{u} = \\mathbf{F}' },
       { label: 'von Mises Equivalent Stress', latex: '\\sigma_{vM} = \\sqrt{\\frac{1}{2} \\left[ (\\sigma_x - \\sigma_y)^2 + (\\sigma_y - \\sigma_z)^2 + (\\sigma_z - \\sigma_x)^2 + 6(\\tau_{xy}^2 + \\tau_{yz}^2 + \\tau_{zx}^2) \\right]}' }
     ],
-    theoryEn: 'Linear static FEA solves K*u = F assuming small displacements and linear elastic material response. AluCalc OS validates FEA results against closed-form analytical solutions (Cantilever Beam, Plate with Hole, L-Bracket) to maintain error bounds under 8%.',
-    theoryTr: 'Doğrusal statik FEA, küçük yer değiştirmeler ve elastik malzeme kabulüyle K*u = F matris sistemini çözer. AluCalc OS, sonuçları analitik çözümlerle (Konsol Kiriş, Delikli Plaka, L-Braket) karşılaştırarak hata payını %8\'in altında tutar.',
+    theoryEn: 'Linear static FEA solves K*u = F assuming small displacements and linear elastic material response. AluCAD OS validates FEA results against closed-form analytical solutions (Cantilever Beam, Plate with Hole, L-Bracket) to maintain error bounds under 8%.',
+    theoryTr: 'Doğrusal statik FEA, küçük yer değiştirmeler ve elastik malzeme kabulüyle K*u = F matris sistemini çözer. AluCAD OS, sonuçları analitik çözümlerle (Konsol Kiriş, Delikli Plaka, L-Braket) karşılaştırarak hata payını %8\'in altında tutar.',
     questions: [
       {
         id: 'q1',
@@ -1082,10 +1082,10 @@ export const ACADEMY_MVP_UNITS: AcademyMvpUnit[] = [
       },
       {
         id: 'q5',
-        questionEn: 'Which AluCalc OS feature exports certified, unwatermarked client-ready engineering reports?',
-        questionTr: 'AluCalc OS\'ta filigransız ve müşteriye hazır onaylı teknik rapor hangi lisansla üretilir?',
-        optionsEn: ['AluCalc Pro / Team / Enterprise License', 'Free Trial (Demo)', 'Guest Mode', 'Offline Reader'],
-        optionsTr: ['AluCalc Pro / Team / Enterprise Lisansı', 'Ücretsiz Deneme (Demo)', 'Misafir Modu', 'Çevrimdışı Okuyucu'],
+        questionEn: 'Which AluCAD OS feature exports certified, unwatermarked client-ready engineering reports?',
+        questionTr: 'AluCAD OS\'ta filigransız ve müşteriye hazır onaylı teknik rapor hangi lisansla üretilir?',
+        optionsEn: ['AluCAD Pro / Team / Enterprise License', 'Free Trial (Demo)', 'Guest Mode', 'Offline Reader'],
+        optionsTr: ['AluCAD Pro / Team / Enterprise Lisansı', 'Ücretsiz Deneme (Demo)', 'Misafir Modu', 'Çevrimdışı Okuyucu'],
         correctIndex: 0,
         explanationEn: 'Paid plans unlock unwatermarked, professional PDF engineering reports with full digital traceability.',
         explanationTr: 'Pro ve üstü lisanslar filigransız, tam izlenebilirlik mühürlü teknik rapor üretimini açar.'

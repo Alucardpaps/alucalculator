@@ -51,6 +51,9 @@
     "scripts",
     "_zip_extracted",
     "_live_extract",
-    "tmp"
+    "tmp",
+    "graphify-out",
+    "out",
+    "reference_archive"
   ]
 }

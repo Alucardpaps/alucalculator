@@ -9,9 +9,12 @@ import { GEAR_MODULES_ISO, GEAR_MATERIALS, APPLICATION_FACTORS } from "@/data/ge
 import { CalculatorInput } from "@/components/CalculatorInput";
 import { UndercutDiagram, ServiceFactorDiagram } from "@/components/mechanical/EducationalAssets";
 import { SaveButton } from "@/components/calculation/SaveButton";
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
+import { APP_RELEASE_NAME } from "@/config/app";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function GearsPageClient({ dict, lang }: { dict: any, lang: string }) {
+    const precision = useGlobalPrecision();
     const {
         selectedPower, setSelectedPower,
         selectedPoles, setSelectedPoles,
@@ -37,19 +40,19 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
     // ... (helpers remain same)
-    const dist = (val: number) => unit === 'metric' ? `${val.toFixed(3)} mm` : `${(val / 25.4).toFixed(4)} in`;
-    const force = (val: number) => unit === 'metric' ? `${val.toFixed(0)} N` : `${(val * 0.2248).toFixed(1)} lbf`;
-    const stress = (val: number) => unit === 'metric' ? `${val.toFixed(0)} MPa` : `${(val * 145.038).toFixed(0)} psi`;
-    const torque = (val: number) => unit === 'metric' ? `${val.toFixed(1)} Nm` : `${(val * 0.7376).toFixed(1)} lb-ft`;
+    const dist = (val: number) => unit === 'metric' ? `${formatEngineeringValue(val, precision, false)} mm` : `${formatEngineeringValue(val / 25.4, precision, false)} in`;
+    const force = (val: number) => unit === 'metric' ? `${formatEngineeringValue(val, precision, false)} N` : `${formatEngineeringValue(val * 0.2248, precision, false)} lbf`;
+    const stress = (val: number) => unit === 'metric' ? `${formatEngineeringValue(val, precision, false)} MPa` : `${formatEngineeringValue(val * 145.038, precision, false)} psi`;
+    const torque = (val: number) => unit === 'metric' ? `${formatEngineeringValue(val, precision, false)} Nm` : `${formatEngineeringValue(val * 0.7376, precision, false)} lb-ft`;
     const [activeTab, setActiveTab] = useState<'design' | 'analysis'>('design');
 
     return (
-        <main className="min-h-screen bg-[#0f1115] text-slate-300 font-sans selection:bg-brand-orange selection:text-white pb-20">
+        <main className="min-h-screen bg-[var(--bg-1)] text-slate-300 font-sans selection:bg-brand-orange selection:text-white pb-20">
             {/* 1. HERO HEADER */}
-            <header className="border-b border-slate-800 bg-[#0f1115] sticky top-0 z-50 backdrop-blur-md bg-opacity-80">
+            <header className="border-b border-slate-800 bg-[var(--bg-1)] sticky top-0 z-50 bg-opacity-80">
                 <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-gradient-to-br from-brand-orange to-red-600 flex items-center justify-center text-white font-black text-xs shadow-[0_0_15px_rgba(249,115,22,0.5)]">DT</div>
+                        <div className="w-8 h-8 rounded bg-gradient-to-br from-brand-orange to-red-600 flex items-center justify-center text-white font-black text-xs ">DT</div>
                         <div>
                             <h1 className="text-sm font-bold text-white tracking-wider uppercase">DriveTrain <span className="text-brand-orange">Pro</span></h1>
                         </div>
@@ -59,7 +62,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                     <div className="hidden lg:flex items-center gap-8 text-xs font-mono">
                         <div className="flex flex-col items-end">
                             <span className="text-slate-500 uppercase text-[10px]">Ratio</span>
-                            <span className="text-white font-bold">{results.ratio.toFixed(2)}:1</span>
+                            <span className="text-white font-bold">{formatEngineeringValue(results.ratio, precision, false)}:1</span>
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-slate-500 uppercase text-[10px]">{dict.motor.torqueOut}</span>
@@ -67,7 +70,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                         </div>
                         <div className="flex flex-col items-end">
                             <span className="text-slate-500 uppercase text-[10px]">Service Factor</span>
-                            <span className={`font-bold text-sm ${results.requiredFs > 2 ? 'text-red-400' : 'text-emerald-400'}`}>{results.requiredFs.toFixed(2)}</span>
+                            <span className={`font-bold text-sm ${results.requiredFs > 2 ? 'text-red-400' : 'text-emerald-400'}`}>{formatEngineeringValue(results.requiredFs, precision, false)}</span>
                         </div>
                     </div>
 
@@ -93,7 +96,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                         </h2>
 
                         <div className="space-y-4">
-                            <div className="p-4 bg-[#151921] rounded-xl border border-slate-800 hover:border-slate-700 transition-colors">
+                            <div className="p-4 bg-[var(--bg-2)] rounded-xl border border-slate-800 hover:border-slate-700 transition-colors">
                                 <label className="label-tech text-slate-400 mb-2 block">{dict.motor.nominalPower}</label>
                                 <div className="flex gap-2">
                                     <select
@@ -106,7 +109,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-[#151921] rounded-xl border border-slate-800">
+                            <div className="p-4 bg-[var(--bg-2)] rounded-xl border border-slate-800">
                                 <label className="label-tech text-slate-400 mb-2 block">{dict.motor.speedPoles}</label>
                                 <div className="grid grid-cols-3 gap-2">
                                     {[2, 4, 6].map(p => (
@@ -136,7 +139,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                             Conditions
                         </h2>
 
-                        <div className="p-5 bg-gradient-to-br from-[#151921] to-[#0f1115] rounded-xl border border-slate-800 space-y-5">
+                        <div className="p-5 bg-gradient-to-br from-[var(--bg-2)] to-[var(--bg-1)] rounded-xl border border-slate-800 space-y-5">
                             <div>
                                 <div className="flex justify-between items-center mb-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Load Class</label>
@@ -147,7 +150,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                                         <button
                                             key={lc}
                                             onClick={() => setLoadClass(lc as any)}
-                                            className={`text-[10px] font-bold py-1.5 rounded transition-colors ${loadClass === lc ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
+                                            className={`text-[10px] font-bold py-1.5 rounded transition-colors ${loadClass === lc ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
                                         >
                                             {lc === 'U' ? 'Uniform' : lc === 'M' ? 'Moderate' : 'Heavy'}
                                         </button>
@@ -201,11 +204,11 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                 <div className="lg:col-span-6 flex flex-col gap-6">
 
                     {/* VISUALIZATION CARD */}
-                    <div className="relative aspect-[4/3] bg-[#0A0C10] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden group">
+                    <div className="relative aspect-[4/3] bg-[var(--bg-1)] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden group">
                         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
                         <div className="absolute top-4 left-4 z-10 flex gap-2">
-                            <div className="px-3 py-1 bg-slate-900/80 backdrop-blur rounded border border-slate-700 text-[10px] text-slate-400 font-mono">
-                                A = <span className="text-white font-bold">{results.a.toFixed(2)}</span> mm
+                            <div className="px-3 py-1 bg-slate-900/80 rounded border border-slate-700 text-[10px] text-slate-400 font-mono">
+                                A = <span className="text-white font-bold">{formatEngineeringValue(results.a, precision, false)}</span> mm
                             </div>
                         </div>
 
@@ -215,7 +218,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                         </div>
 
                         {/* FLOATING CONTROLS (Glassmorphism) */}
-                        <div className="absolute bottom-6 left-6 right-6 bg-slate-900/60 backdrop-blur-md border border-white/10 p-4 rounded-xl flex items-center justify-between gap-6">
+                        <div className="absolute bottom-6 left-6 right-6 bg-slate-900/60 border border-white/10 p-4 rounded-xl flex items-center justify-between gap-6">
                             <div className="flex-1">
                                 <div className="flex justify-between text-xs mb-1 text-slate-300">
                                     <span>Pinion (Z1)</span>
@@ -236,7 +239,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
 
                     {/* MAIN GEOMETRY CONFIG */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 bg-[#151921] rounded-xl border border-slate-800">
+                        <div className="p-5 bg-[var(--bg-2)] rounded-xl border border-slate-800">
                             <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-4">Base Geometry</h3>
                             <div className="space-y-4">
                                 <div>
@@ -262,7 +265,7 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                             </div>
                         </div>
 
-                        <div className="p-5 bg-[#151921] rounded-xl border border-slate-800 relative overflow-hidden">
+                        <div className="p-5 bg-[var(--bg-2)] rounded-xl border border-slate-800 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-brand-orange/10 to-transparent rounded-bl-3xl" />
                             <div className="flex items-center gap-2 mb-4">
                                 <h3 className="text-[10px] font-bold text-brand-orange uppercase">Refinement</h3>
@@ -298,25 +301,25 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                 {/* RIGHT COL: ANALYSIS (4 Cols) */}
                 <div className="lg:col-span-3 space-y-6">
                     {/* TRAFFIC LIGHTS */}
-                    <div className="bg-[#151921] rounded-2xl border border-slate-800 p-1">
+                    <div className="bg-[var(--bg-2)] rounded-2xl border border-slate-800 p-1">
                         <div className="grid grid-cols-2 divide-x divide-slate-800">
                             <div className="p-4 flex flex-col items-center text-center">
-                                <div className={`w-3 h-3 rounded-full mb-2 shadow-[0_0_10px_currentColor] ${results.SF_bending > 1.4 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
+                                <div className={`w-3 h-3 rounded-full mb-2 ${results.SF_bending > 1.4 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
                                 <span className="text-[10px] font-bold text-slate-500 uppercase">Bending</span>
-                                <span className="text-xl font-black text-white mt-1">{results.SF_bending.toFixed(2)}</span>
+                                <span className="text-xl font-black text-white mt-1">{formatEngineeringValue(results.SF_bending, precision, false)}</span>
                                 <span className="text-[9px] text-slate-600 mt-1">Safety Factor</span>
                             </div>
                             <div className="p-4 flex flex-col items-center text-center">
-                                <div className={`w-3 h-3 rounded-full mb-2 shadow-[0_0_10px_currentColor] ${results.SF_contact > 1.0 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
+                                <div className={`w-3 h-3 rounded-full mb-2 ${results.SF_contact > 1.0 ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'}`} />
                                 <span className="text-[10px] font-bold text-slate-500 uppercase">Contact</span>
-                                <span className="text-xl font-black text-white mt-1">{results.SF_contact.toFixed(2)}</span>
+                                <span className="text-xl font-black text-white mt-1">{formatEngineeringValue(results.SF_contact, precision, false)}</span>
                                 <span className="text-[9px] text-slate-600 mt-1">Safety Factor</span>
                             </div>
                         </div>
                     </div>
 
                     {/* DETAILED SPECS LIST */}
-                    <div className="bg-[#151921] rounded-xl border border-slate-800 p-5">
+                    <div className="bg-[var(--bg-2)] rounded-xl border border-slate-800 p-5">
                         <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Geometry Output</h3>
                         <div className="space-y-3 font-mono text-xs">
                             <div className="flex justify-between items-center pb-2 border-b border-white/5">
@@ -339,12 +342,12 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                     </div>
 
                     {/* FORCES */}
-                    <div className="bg-[#151921] rounded-xl border border-slate-800 p-5">
-                        <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Load Analysis</h3>
+                    <div className="bg-[var(--bg-2)] rounded-xl border border-slate-800 p-5">
+                        <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">ISO 6336 Load & Rating</h3>
                         <div className="space-y-4">
                             <div>
                                 <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                                    <span>Tangential Force</span>
+                                    <span>Tangential Ft</span>
                                     <span>{force(results.Ft)}</span>
                                 </div>
                                 <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -353,12 +356,29 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
                             </div>
                             <div>
                                 <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                                    <span>Radial (Bearing)</span>
+                                    <span>Radial Fr</span>
                                     <span className="text-red-400">{force(results.Fr)}</span>
                                 </div>
                                 <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                                     <div className="bg-red-500 h-full rounded-full" style={{ width: '25%' }} />
                                 </div>
+                            </div>
+                            {results.Fa > 1 && (
+                                <div className="flex justify-between text-[10px] text-slate-500">
+                                    <span>Axial Fa</span>
+                                    <span className="text-amber-400">{force(results.Fa)}</span>
+                                </div>
+                            )}
+                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-[10px] font-mono">
+                                <div className="flex justify-between"><span className="text-slate-500">σF</span><span className="text-white">{stress(results.estBendingStress)}</span></div>
+                                <div className="flex justify-between"><span className="text-slate-500">σH</span><span className="text-white">{stress(results.estContactStress)}</span></div>
+                                <div className="flex justify-between"><span className="text-slate-500">εα</span><span className={results.epsilonAlpha >= 1.2 ? 'text-emerald-400' : 'text-red-400'}>{formatEngineeringValue(results.epsilonAlpha, precision, false)}</span></div>
+                                <div className="flex justify-between"><span className="text-slate-500">εβ</span><span className="text-white">{formatEngineeringValue(results.epsilonBeta ?? 0, precision, false)}</span></div>
+                                <div className="flex justify-between"><span className="text-slate-500">Kv</span><span className="text-white">{formatEngineeringValue(results.Kv, precision, false)}</span></div>
+                                <div className="flex justify-between"><span className="text-slate-500">YF</span><span className="text-white">{formatEngineeringValue(results.YF1 ?? 0, precision, false)}</span></div>
+                            </div>
+                            <div className={`text-[9px] font-bold uppercase tracking-widest ${results.isoStatus === 'safe' ? 'text-emerald-400' : results.isoStatus === 'marginal' ? 'text-amber-400' : 'text-red-400'}`}>
+                                {results.isoStatus ?? '—'} · {results.isoCritical ?? 'ISO 6336 Method B'}
                             </div>
                         </div>
                     </div>
@@ -367,13 +387,13 @@ export default function GearsPageClient({ dict, lang }: { dict: any, lang: strin
             </div>
 
             {/* FOOTER */}
-            <div className="fixed bottom-0 left-0 right-0 h-6 bg-[#0A0C10] border-t border-slate-800 flex items-center px-4 text-[10px] text-slate-600 justify-between z-50">
+            <div className="fixed bottom-0 left-0 right-0 h-6 bg-[var(--bg-1)] border-t border-slate-800 flex items-center px-4 text-[10px] text-slate-600 justify-between z-50">
                 <div className="flex items-center gap-4">
                     <span>READY</span>
                     <span className="text-emerald-500">CALCULATION SYNCED</span>
                 </div>
                 <div className="font-mono">
-                    ALUCALC OS v2.1
+                    {APP_RELEASE_NAME.toUpperCase()}
                 </div>
             </div>
 

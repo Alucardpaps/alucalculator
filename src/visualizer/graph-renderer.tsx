@@ -23,7 +23,7 @@ export const GraphRenderer: React.FC<GraphRendererProps> = ({ engineOutput }) =>
   return (
     <div className="flex flex-col w-full h-full overflow-y-auto p-6 graph-renderer-container">
       {/* FINAL RESULT HIGHLIGHT */}
-      <div className="bg-emerald-900/20 border border-emerald-500/30 p-6 rounded-2xl mb-8 shadow-lg shadow-emerald-500/5">
+      <div className="bg-emerald-900/20 border border-emerald-500/30 p-6 rounded-2xl mb-8 shadow-lg ">
          <h2 className="text-emerald-400 text-sm tracking-wider uppercase font-semibold mb-3">Computed Results</h2>
          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.entries(engineOutput.result).map(([key, val]) => (

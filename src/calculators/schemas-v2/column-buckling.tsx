@@ -8,7 +8,7 @@ export const columnBucklingSchema: CalculatorSchemaV2 = {
         description: 'Calculate critical buckling load and stress for slender columns.',
         category: 'civil',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['buckling', 'euler', 'column', 'stability'],
         verifiedStandards: ['Euler Beam Theory']

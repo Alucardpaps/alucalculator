@@ -66,13 +66,13 @@ export default function PrivacyPage() {
       } else {
         setStatus({
           type: 'error',
-          message: (data && data.error) || 'Talep iletilemedi. Lütfen privacy@alucalculator.com adresine doğrudan e-posta gönderin.',
+          message: (data && data.error) || 'Talep iletilemedi. Lütfen abdulsametyildirim95@gmail.com adresine doğrudan e-posta gönderin.',
         });
       }
     } catch {
       setStatus({
         type: 'error',
-        message: 'Bağlantı hatası oluştu. Lütfen privacy@alucalculator.com adresine doğrudan e-posta iletin.',
+        message: 'Bağlantı hatası oluştu. Lütfen abdulsametyildirim95@gmail.com adresine doğrudan e-posta iletin.',
       });
     } finally {
       setIsSubmitting(false);
@@ -91,22 +91,22 @@ export default function PrivacyPage() {
             <ArrowLeft className="w-4 h-4" />
             <span>AluCalc Ana Sayfasına Dön</span>
           </Link>
-          <span className="text-[11px] font-mono text-slate-500">Aydınlatma Taslağı</span>
+          <span className="text-[11px] font-mono text-slate-500">Aydınlatma Metni & Gizlilik Politikası</span>
         </div>
 
         {/* Header */}
         <div className="space-y-3 border-b border-slate-800 pb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
             <ShieldCheck className="w-4 h-4" />
-            <span>Aydınlatma Taslağı & Gizlilik Bilgilendirmesi</span>
+            <span>Aydınlatma Metni & Gizlilik Politikası</span>
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white">
-            Kişisel Verilerin Korunması ve Gizlilik (Aydınlatma Taslağı)
+            Kişisel Verilerin Korunması ve Gizlilik Politikası (KVKK / GDPR)
           </h1>
           <p className="text-sm text-slate-400 leading-relaxed">
             AluCalc Mühendislik Sistemleri olarak gizliliğinize ve fikri mülkiyetinize en üst düzeyde
             saygı gösteriyoruz. İşbu metin 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) m. 10
-            kapsamında hazırlanan aydınlatma taslağı mahiyetindedir.
+            ve GDPR uyumluluğu kapsamında hazırlanan resmi aydınlatma ve gizlilik politikasıdır.
           </p>
         </div>
 
@@ -155,11 +155,11 @@ export default function PrivacyPage() {
               <span>1. Veri Sorumlusu</span>
             </h2>
             <p>
-              6698 sayılı KVKK uyarınca, AluCalc OS web ve mobil platformu üzerinden sağlanan hizmetler
+              6698 sayılı KVKK uyarınca, AluCAD OS web ve mobil platformu üzerinden sağlanan hizmetler
               kapsamında kişisel verileriniz <strong>AluCalc Mühendislik Sistemleri</strong> tarafından
               veri sorumlusu sıfatıyla işlenmektedir. İletişim e-posta: 
-              <a href="mailto:privacy@alucalculator.com" className="text-cyan-400 hover:underline ml-1">
-                privacy@alucalculator.com
+              <a href="mailto:abdulsametyildirim95@gmail.com" className="text-cyan-400 hover:underline ml-1">
+                abdulsametyildirim95@gmail.com
               </a>
             </p>
           </section>
@@ -232,8 +232,8 @@ export default function PrivacyPage() {
               <p className="text-xs text-slate-400 mt-1">
                 İlettiğiniz bir geri bildirimin, ekran görüntüsünün veya e-posta adresinizin silinmesini talep etmek
                 için aşağıdaki formu doldurabilir veya doğrudan{' '}
-                <a href="mailto:privacy@alucalculator.com" className="text-cyan-400 hover:underline">
-                  privacy@alucalculator.com
+                <a href="mailto:abdulsametyildirim95@gmail.com" className="text-cyan-400 hover:underline">
+                  abdulsametyildirim95@gmail.com
                 </a>{' '}
                 adresine yazabilirsiniz.
               </p>
@@ -324,8 +324,8 @@ export default function PrivacyPage() {
         <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© 2026 AluCalc Gelişmiş Mühendislik Sistemleri. Tüm hakları saklıdır.</p>
           <div className="flex items-center space-x-4">
-            <a href="mailto:privacy@alucalculator.com" className="text-cyan-400 hover:underline">
-              privacy@alucalculator.com
+            <a href="mailto:abdulsametyildirim95@gmail.com" className="text-cyan-400 hover:underline">
+              abdulsametyildirim95@gmail.com
             </a>
             <Link href="/" className="hover:text-slate-300">
               Ana Sayfa

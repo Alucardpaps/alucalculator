@@ -196,7 +196,7 @@ export function CanvasWindow({
         ? 'transition-all duration-300'
         : (isDragging || isResizing)
             ? 'opacity-90 shadow-none border-cyan-500/50 transition-none'
-            : `${isActive ? 'border-cyan-500/60 shadow-[0_0_40px_rgba(0,229,255,0.12),0_8px_32px_rgba(0,0,0,0.5)]' : 'border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'} transition-all duration-200`;
+            : `${isActive ? 'border-cyan-500/60 ' : 'border-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.4)]'} transition-all duration-200`;
 
     return (
         <Draggable
@@ -244,7 +244,7 @@ export function CanvasWindow({
             >
                 {/* MOBILE HEADER — Full-width touch-friendly bar */}
                 {isMobile && (
-                    <div className="window-header h-14 flex-none flex items-center gap-3 px-4 bg-[#0a0e14] border-b border-white/10 select-none">
+                    <div className="window-header h-14 flex-none flex items-center gap-3 px-4 bg-[var(--bg-1)] border-b border-white/10 select-none">
                         <button
                             onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                             aria-label="Close and go back"
@@ -277,7 +277,7 @@ export function CanvasWindow({
                             <button
                                 onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                                 aria-label="Close Window"
-                                className="w-3.5 h-3.5 rounded-full bg-[#ff5f57] hover:brightness-110 transition-all flex items-center justify-center group"
+                                className="w-3.5 h-3.5 rounded-full bg-[var(--bad)] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
                                 <X size={8} className="opacity-0 group-hover:opacity-100 text-[#4a0002] transition-opacity" />
@@ -285,7 +285,7 @@ export function CanvasWindow({
                             <button
                                 onClick={(e) => { e.stopPropagation(); minimizeWindow(id); }}
                                 aria-label="Minimize Window"
-                                className="w-3.5 h-3.5 rounded-full bg-[#febc2e] hover:brightness-110 transition-all flex items-center justify-center group"
+                                className="w-3.5 h-3.5 rounded-full bg-[var(--warn)] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
                                 <Minus size={8} className="opacity-0 group-hover:opacity-100 text-[#5c4700] transition-opacity" />
@@ -293,7 +293,7 @@ export function CanvasWindow({
                             <button
                                 onClick={(e) => { e.stopPropagation(); toggleMaximize(id); }}
                                 aria-label="Toggle Maximize"
-                                className="w-3.5 h-3.5 rounded-full bg-[#28c840] hover:brightness-110 transition-all flex items-center justify-center group"
+                                className="w-3.5 h-3.5 rounded-full bg-[var(--ok)] hover:brightness-110 transition-all flex items-center justify-center group"
                                 style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)' }}
                             >
                                 <Maximize2 size={7} className="opacity-0 group-hover:opacity-100 text-[#006500] transition-opacity" />

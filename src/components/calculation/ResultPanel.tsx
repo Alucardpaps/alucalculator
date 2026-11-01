@@ -23,7 +23,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
 
     if (isComputing) {
         return (
-            <div className="bg-[#0f172a] text-white rounded-2xl p-8 border border-slate-800 flex flex-col items-center justify-center gap-6 min-h-[350px] relative overflow-hidden">
+            <div className="bg-[var(--bg-2)] text-white rounded-2xl p-8 border border-slate-800 flex flex-col items-center justify-center gap-6 min-h-[350px] relative overflow-hidden">
                 <div className="relative">
                     <div className="w-16 h-16 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
                     <Cpu className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -35,7 +35,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
 
     if (!contract) {
         return (
-            <div className="bg-[#0f172a]/30 text-slate-600 rounded-2xl p-8 border border-slate-900 border-dashed flex flex-col items-center justify-center gap-4 min-h-[350px]">
+            <div className="bg-[var(--bg-2)]/30 text-slate-600 rounded-2xl p-8 border border-slate-900 border-dashed flex flex-col items-center justify-center gap-4 min-h-[350px]">
                 <Info className="w-6 h-6 opacity-20" />
                 <p className="text-[10px] uppercase font-bold tracking-widest">{t.awaiting}</p>
             </div>
@@ -66,7 +66,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
     }
 
     return (
-        <div className="bg-[#0f172a] text-white rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden min-h-[350px] flex flex-col">
+        <div className="bg-[var(--bg-2)] text-white rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden min-h-[350px] flex flex-col">
             
             {/* Compressed HUD */}
             <div className="p-6 border-b border-slate-800/50 flex justify-between items-center bg-slate-900/30">
@@ -92,7 +92,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                         <>
                             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{t.calculatedStress}</p>
                             <div className="flex items-baseline gap-3">
-                                <span className="text-7xl font-mono font-black tracking-tighter text-white">
+                                <span className="text-5xl font-mono font-black tracking-tighter text-white">
                                     {Number(data.stress).toFixed(4)}
                                 </span>
                                 <span className="text-lg text-emerald-500 font-bold tracking-widest uppercase">MPa</span>
@@ -102,7 +102,7 @@ export const ResultPanel = memo(({ isComputing, contract }: ResultPanelProps) =>
                         <>
                             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{t.displacementTonnes}</p>
                             <div className="flex items-baseline gap-3">
-                                <span className="text-7xl font-mono font-black tracking-tighter text-white">
+                                <span className="text-5xl font-mono font-black tracking-tighter text-white">
                                     {Number(data.displacement).toLocaleString()}
                                 </span>
                                 <span className="text-lg text-blue-500 font-bold tracking-widest uppercase">t</span>

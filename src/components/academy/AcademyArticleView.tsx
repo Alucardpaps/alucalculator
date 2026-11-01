@@ -137,12 +137,12 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
   const bumpProgress = () => setProgressTick((n) => n + 1);
 
   if (!mounted) {
-    return <div className="min-h-screen bg-[#020408]" />;
+    return <div className="min-h-screen bg-[var(--bg-0)]" />;
   }
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#020408]/80 text-slate-200 font-sans selection:bg-blue-500/30">
-      <header className="border-b border-white/5 bg-[#020408]/40 backdrop-blur-xl sticky top-20 z-40">
+    <div className="relative z-10 min-h-screen bg-[var(--bg-0)]/80 text-slate-200 font-sans ">
+      <header className="border-b border-white/5 bg-[var(--bg-0)]/40 sticky top-20 z-40">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/academy"
@@ -220,7 +220,7 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
           <h2 className="text-sm font-bold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
             {t.governingFormula}
           </h2>
-          <div className="bg-[#010204] rounded-xl p-6 border border-white/5 overflow-x-auto shadow-inner mb-6">
+          <div className="bg-[var(--bg-0)] rounded-xl p-6 border border-white/5 overflow-x-auto shadow-inner mb-6">
             <code className="text-2xl text-white font-mono block whitespace-nowrap text-center">
               {data.formula.equation}
             </code>
@@ -288,7 +288,7 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
 
         <section id="example" className="space-y-6 scroll-mt-32">
           <h2 className="text-2xl font-bold text-white border-b border-white/5 pb-4">{t.workedExampleTitle}</h2>
-          <div className="bg-[#05090e] border border-white/5 rounded-2xl p-6 sm:p-8">
+          <div className="bg-[var(--bg-0)] border border-white/5 rounded-2xl p-6 sm:p-8">
             <div className="mb-6">
               <h3 className="text-xs uppercase tracking-widest text-slate-500 font-bold mb-4">
                 {t.inputParameters}
@@ -352,7 +352,7 @@ export function AcademyArticleView({ slug, data: rawData }: Props) {
                   <div className="absolute top-0 right-0 p-4 text-[40px] font-black text-blue-500/5 select-none group-hover:text-blue-500/10 transition-colors">
                     {insight.page}
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0 shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] flex items-center justify-center text-[var(--cyan)] shrink-0 shadow-lg">
                     <BookOpen size={24} />
                   </div>
                   <div className="space-y-2 relative z-10">

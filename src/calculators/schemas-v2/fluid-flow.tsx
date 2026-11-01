@@ -12,7 +12,7 @@ const fluidFlowSchema: CalculatorSchemaV2 = {
         description: 'Calculate pressure drop in pipes using Darcy-Weisbach equation.',
         category: 'fluid',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['fluid', 'pressure-drop', 'darcy', 'reynolds', 'pipe'],
         verifiedStandards: ['Darcy-Weisbach'],

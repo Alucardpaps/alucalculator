@@ -16,7 +16,7 @@ export const Interactive3DBox: React.FC<Props> = ({ width = 100, height = 50, th
     const t = thickness * scaleFactor;
 
     return (
-        <div className="w-full h-full min-h-[250px] relative bg-gradient-to-br from-[#0a0e14] to-[#121820] rounded-b-lg overflow-hidden">
+        <div className="w-full h-full min-h-[250px] relative bg-gradient-to-br from-[var(--bg-1)] to-[var(--bg-2)] rounded-b-lg overflow-hidden">
             <Canvas camera={{ position: [5, 5, 5], fov: 45 }}>
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -41,7 +41,7 @@ export const Interactive3DBox: React.FC<Props> = ({ width = 100, height = 50, th
             </Canvas>
 
             {/* Dimensional Callouts Overlay */}
-            <div className="absolute top-2 left-2 bg-[#000000]/60 backdrop-blur-sm border border-[#2a3a4a] text-cyan-400 font-mono text-[10px] px-2 py-1 flex flex-col gap-0.5 pointer-events-none rounded">
+            <div className="absolute top-2 left-2 bg-[var(--bg-0)]/60 border border-[var(--line-strong)] text-cyan-400 font-mono text-[10px] px-2 py-1 flex flex-col gap-0.5 pointer-events-none rounded">
                 <span>W: {width.toFixed(1)}</span>
                 <span>H: {height.toFixed(1)}</span>
                 <span>T: {thickness.toFixed(1)}</span>

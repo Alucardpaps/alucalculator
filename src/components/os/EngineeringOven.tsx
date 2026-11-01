@@ -50,12 +50,12 @@ export function EngineeringOven({ onClose, className }: EngineeringOvenProps) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
       className={cn(
-        "w-[300px] bg-[#05090e]/95 backdrop-blur-2xl border border-orange-500/30 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(255,87,34,0.15)]",
+        "w-[300px] bg-[var(--bg-0)]/95 backdrop-blur-2xl border border-orange-500/30 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(255,87,34,0.15)]",
         className
       )}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-600/20 to-transparent px-4 py-3 border-b border-orange-500/20 flex justify-between items-center">
+      <div className="px-4 py-3 border-b border-orange-500/20 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Flame size={16} className={cn("text-orange-500", isHeating && "animate-pulse")} />
           <span className="text-xs font-black text-orange-200 uppercase tracking-widest">Endüstriyel Fırın v1.2</span>
@@ -102,7 +102,7 @@ export function EngineeringOven({ onClose, className }: EngineeringOvenProps) {
                 max="1200" 
                 value={targetTemp} 
                 onChange={(e) => setTargetTemp(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-orange-950 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                className="w-full h-1.5 bg-orange-950 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
             />
         </div>
 
@@ -113,7 +113,7 @@ export function EngineeringOven({ onClose, className }: EngineeringOvenProps) {
                 className={cn(
                     "flex items-center justify-center gap-2 py-3 rounded-lg text-[10px] font-black uppercase transition-all",
                     isHeating 
-                        ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(255,87,34,0.4)]" 
+                        ? "bg-orange-500 text-white " 
                         : "bg-orange-600/10 text-orange-500 border border-orange-500/30 hover:bg-orange-600/20"
                 )}
             >

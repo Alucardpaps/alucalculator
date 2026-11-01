@@ -23,7 +23,7 @@ export function VariableManager() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#0a0e14] text-slate-200 p-4 overflow-hidden">
+        <div className="flex flex-col h-full bg-[var(--bg-1)] text-slate-200 p-4 overflow-hidden">
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
                     <Variable className="text-cyan-400" />

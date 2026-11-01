@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Fillet Weld Calculator Schema
+ * AluCAD OS — Fillet Weld Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical / Structural
  * STANDARDS: EN 1993-1-8, AWS D1.1
@@ -20,7 +20,7 @@ export const weldingSchema: CalculatorSchema = {
     metadata: {
         title: 'Fillet Weld Calculator',
         description: 'Calculate fillet weld capacity and stress. Based on EN 1993-1-8 directional method.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['welding', 'fillet', 'weld', 'stress', 'MIG', 'TIG']
     },

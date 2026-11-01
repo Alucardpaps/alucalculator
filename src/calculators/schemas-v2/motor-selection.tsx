@@ -8,7 +8,7 @@ const motorSelectionSchema: CalculatorSchemaV2 = {
         description: 'Calculate required motor power and match to nearest IEC standard motor size.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-04-06',
         tags: ['motor', 'power', 'drivetrain', 'IEC', 'selection'],
         verifiedStandards: ['IEC 60034-1']

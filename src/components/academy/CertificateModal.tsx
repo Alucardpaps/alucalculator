@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import { Award, CheckCircle2, Download, ShieldCheck, X, Sparkles, Key } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+
+import { AcademyMvpUnit } from '@/data/academyMvpUnits';
 
 interface Props {
   isOpen: boolean;
@@ -13,19 +16,24 @@ interface Props {
   unitStandard?: string;
   score?: number;
   xp?: number;
+  unit?: AcademyMvpUnit;
 }
 
 export function CertificateModal({
   isOpen,
   onClose,
   completedCount = 1,
-  unitTitle = 'Comprehensive Computational Engineering',
-  unitStandard = 'ISO / DIN / VDI Standards',
+  unitTitle: customUnitTitle,
+  unitStandard: customUnitStandard,
   score = 100,
-  xp = 500,
+  xp: customXp,
+  unit,
 }: Props) {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
+
+  const unitTitle = customUnitTitle || (unit?.titleEn ? t12(language, unit.titleEn, unit.titleTr) : 'Comprehensive Computational Engineering');
+  const unitStandard = customUnitStandard || unit?.standard || 'ISO / DIN / VDI Standards';
+  const xp = customXp || 500;
 
   const [name, setName] = useState('Engineering Scholar');
   const dateStr = new Date().toISOString().slice(0, 10);
@@ -155,11 +163,11 @@ export function CertificateModal({
     doc.line(192, 178, 252, 178);
     doc.text('DIRECTOR OF ACADEMIC STANDARDS', 222, 183, { align: 'center' });
 
-    doc.save(`AluCalc_Certificate_${name.replace(/\s+/g, '_')}_${unitTitle.replace(/\s+/g, '_').slice(0, 20)}.pdf`);
+    doc.save(`AluCAD_Certificate_${name.replace(/\s+/g, '_')}_${unitTitle.replace(/\s+/g, '_').slice(0, 20)}.pdf`);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-xl rounded-3xl border border-cyan-500/30 bg-[#080d16] p-6 sm:p-8 text-slate-200 shadow-2xl font-sans space-y-6">
         {/* Close Button */}
         <button
@@ -172,12 +180,12 @@ export function CertificateModal({
 
         {/* Header Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg ">
             <Award size={24} />
           </div>
           <div>
             <h3 className="text-lg font-black text-white tracking-tight">
-              {tr ? 'Mühendislik Başarı Sertifikası' : 'Engineering Mastery Certificate'}
+              {t12(language, 'Engineering Mastery Certificate', 'Mühendislik Başarı Sertifikası')}
             </h3>
             <p className="text-xs text-slate-400 font-mono mt-0.5">
               {unitTitle} · {unitStandard}
@@ -188,7 +196,7 @@ export function CertificateModal({
         {/* Name Input */}
         <div className="space-y-2">
           <label className="text-xs font-mono font-bold text-slate-300">
-            {tr ? 'Sertifikada Görünecek İsim' : 'Recipient Name on Certificate'}
+            {t12(language, 'Recipient Name on Certificate', 'Sertifikada Görünecek İsim')}
           </label>
           <input
             type="text"
@@ -202,16 +210,16 @@ export function CertificateModal({
         {/* Verification Preview Card */}
         <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2 font-mono text-xs text-slate-300">
           <div className="flex justify-between">
-            <span className="text-slate-500">{tr ? 'Doğrulama Kodu:' : 'Verification Code:'}</span>
+            <span className="text-slate-500">{t12(language, 'Verification Code:', 'Doğrulama Kodu:')}</span>
             <span className="text-cyan-400 font-bold">{verificationCode}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">{tr ? 'Sınav Puanı:' : 'Score:'}</span>
+            <span className="text-slate-500">{t12(language, 'Score:', 'Sınav Puanı:')}</span>
             <span className="text-emerald-400 font-bold">{score}% (Başarılı)</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">{tr ? 'Müfredat İlerlemesi:' : 'Progress:'}</span>
-            <span className="text-amber-400 font-bold">{completedCount} / 15 {tr ? 'Ünite' : 'Units'}</span>
+            <span className="text-slate-500">{t12(language, 'Progress:', 'Müfredat İlerlemesi:')}</span>
+            <span className="text-amber-400 font-bold">{completedCount} / 15 {t12(language, 'Units', 'Ünite')}</span>
           </div>
         </div>
 
@@ -220,10 +228,10 @@ export function CertificateModal({
           <button
             type="button"
             onClick={handleDownloadPDF}
-            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-cyan-500/25"
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg "
           >
             <Download size={15} />
-            <span>{tr ? 'Resmi PDF Sertifikasını İndir' : 'Download Verified PDF Certificate'}</span>
+            <span>{t12(language, 'Download Verified PDF Certificate', 'Resmi PDF Sertifikasını İndir')}</span>
           </button>
         </div>
       </div>

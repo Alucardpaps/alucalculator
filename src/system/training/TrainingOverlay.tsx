@@ -85,7 +85,7 @@ export function TrainingOverlay() {
             {/* Spotlight ring */}
             {targetRect && (
                 <div
-                    className="absolute border-2 border-cyan-400 rounded-lg shadow-[0_0_20px_rgba(0,229,255,0.3)] pointer-events-none transition-all duration-300"
+                    className="absolute border-2 border-cyan-400 rounded-lg pointer-events-none transition-all duration-300"
                     style={{
                         left: targetRect.left - 4,
                         top: targetRect.top - 4,
@@ -97,7 +97,7 @@ export function TrainingOverlay() {
 
             {/* Tooltip */}
             <div
-                className="fixed max-w-xs bg-[#0d1117] border border-cyan-500/30 rounded-xl shadow-2xl p-4 z-[10001]"
+                className="fixed max-w-xs bg-[var(--bg-1)] border border-cyan-500/30 rounded-xl shadow-2xl p-4 z-[10001]"
                 style={tooltipStyle}
             >
                 {/* Header */}

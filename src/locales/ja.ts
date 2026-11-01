@@ -1,6 +1,7 @@
+import { APP_MAJOR_MINOR } from '@/config/app';
 export default {
-    osName: "AluCalc OS",
-    version: "v5.0",
+    osName: "AluCAD OS",
+    version: `v${APP_MAJOR_MINOR}`,
     welcomeTitle: "ワークスペースを",
     welcomeHighlight: "選択",
     welcomeDesc: "主要なインターフェースを選択してください。いつでも切り替え可能です。",
@@ -303,9 +304,6 @@ export default {
         "manufacturing-readiness": {
             title: "Mfg Readiness Analyzer"
         },
-        "topology-optimization": {
-            title: "ジェネレーティブデザイン"
-        },
         "machine-assembly": {
             title: "機械組立"
         },
@@ -336,9 +334,6 @@ export default {
         "aerospace-dynamics": {
             title: "Aerospace Dynamics"
         },
-        "naval-hydrostatics": {
-            title: "Naval Architecture"
-        },
         "three-phase-power": {
             title: "3-Phase Power Analytics"
         },
@@ -347,9 +342,6 @@ export default {
         },
         "filter-design": {
             title: "Electronic Filter Design"
-        },
-        "failure-diagnosis": {
-            title: "Failure Analysis Tool"
         },
         "fatigue-advanced": {
             title: "Fatigue Life (Advanced)"
@@ -431,7 +423,6 @@ export default {
         "thermal-expansion": "熱膨張と寸法変化",
         "cost-estimator": "Predict manufacturing costs in real-time",
         "manufacturing-readiness": "Analyze part for CNC & 3D print readiness",
-        "topology-optimization": "AI-driven generative geometry reduction",
         "machine-assembly": "Pre-built mechanical system libraries",
         "failure-prediction": "Stress and fatigue failure AI simulation",
         "fluid-dynamics": "Pipe flow, pressure drop & Reynolds number",
@@ -442,11 +433,9 @@ export default {
         "biology-genetics": "DNA sequencing and bioinformatics assistant",
         "cs-algorithms": "Algorithm visualization",
         "aerospace-dynamics": "Flight envelope and aerodynamic modeling",
-        "naval-hydrostatics": "Ship stability and hydrostatic curves",
         "three-phase-power": "Industrial 3-phase system analysis and vector diagrams",
         "digital-logic": "Logic gate simulation and truth tables",
         "filter-design": "Active and passive RC filter frequency response (Bode)",
-        "failure-diagnosis": "Probabilistic failure analysis and root cause diagnosis",
         "fatigue-advanced": "High-cycle fatigue and mean stress correction (Haigh)",
         "planetary-gearbox": "Multi-stage planetary gear kinematics and Willis equation",
         "material-selector-ai": "AI-driven material selection engine",
@@ -762,7 +751,7 @@ export default {
     viewFlow: "FLOW",
     searchResults: "検索結果",
     categoryOther: "その他",
-    userPro: "AluCalc Professional",
+    userPro: "AluCAD Professional",
     shutDown: "シャットダウン",
     noModulesFound: "モジュールが見つかりません",
     noModulesHint: "検索語を変更してください。",

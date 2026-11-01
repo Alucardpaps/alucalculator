@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Assembly Scene
+ * AluCAD OS v5.0 — Assembly Scene
  *
  * Main R3F Canvas for the workspace. Reads components from Zustand,
  * renders the correct mesh for each type, and handles drag interactions.
@@ -16,6 +16,7 @@ import { useCallback, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useThree, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, GizmoHelper, GizmoViewport, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
+import '@/lib/three-cleanup';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useAssemblyStore } from '@/lib/store/assemblyStore';
@@ -82,7 +83,19 @@ const ComponentRenderer = ({ component, isSelected, isSnappable, isGhost }: Comp
         {component.type === 'bracket' && <BracketMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
         {component.type === 'bolt' && <BoltMesh {...meshProps} position={[0,0,0]} rotation={[0,0,0]} />}
         {component.type === 'gear' && <GearMesh {...meshProps} teeth={component.metadata.teeth} module={component.metadata.module} width={component.metadata.width} position={[0,0,0]} rotation={[0,0,0]} />}
-        {component.type === 'bearing' && <BearingMesh {...meshProps} innerDia={component.metadata.innerDia} outerDia={component.metadata.outerDia} width={component.metadata.width} position={[0,0,0]} rotation={[0,0,0]} />}
+        {component.type === 'bearing' && (
+          <BearingMesh 
+            {...meshProps} 
+            innerDia={component.metadata.innerDia} 
+            outerDia={component.metadata.outerDia} 
+            width={component.metadata.width} 
+            bearingType={component.metadata.bearingType}
+            needleType={component.metadata.needleType}
+            bearingCode={component.metadata.calculationResult || component.metadata.material}
+            position={[0,0,0]} 
+            rotation={[0,0,0]} 
+          />
+        )}
         {component.type === 'key' && <KeyMesh {...meshProps} length={component.metadata.length} width={component.metadata.width} height={component.metadata.height} position={[0,0,0]} rotation={[0,0,0]} />}
       </group>
 
@@ -204,10 +217,44 @@ const SceneContent = () => {
 
 export const AssemblyScene = () => {
   return (
-    <div className="w-full h-full" style={{ background: '#080c12' }}>
+    <div className="relative w-full h-full" style={{ background: '#080c12' }}>
+      {/* Floating Cross-Module Intelligence HUD Chips */}
+      <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2 pointer-events-auto">
+        <a
+          href="/gears"
+          className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-500/40 text-[10px] font-mono font-bold text-slate-300 hover:text-cyan-300 transition flex items-center gap-1.5 shadow-lg"
+        >
+          <span>⚙️</span> Dişli Kinematiği
+        </a>
+        <a
+          href="/cutting-optimizer"
+          className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 text-[10px] font-mono font-bold text-slate-300 hover:text-emerald-300 transition flex items-center gap-1.5 shadow-lg"
+        >
+          <span>✂️</span> 1D Kesim Planı
+        </a>
+        <a
+          href="/fea"
+          className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-purple-500/20 border border-white/10 hover:border-purple-500/40 text-[10px] font-mono font-bold text-slate-300 hover:text-purple-300 transition flex items-center gap-1.5 shadow-lg"
+        >
+          <span>🔬</span> FEA Gerilme Analizi
+        </a>
+        <a
+          href="/bolt-torque"
+          className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500/40 text-[10px] font-mono font-bold text-slate-300 hover:text-blue-300 transition flex items-center gap-1.5 shadow-lg"
+        >
+          <span>🔩</span> Civata Torku (VDI 2230)
+        </a>
+        <a
+          href="/academy"
+          className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-[10px] font-mono font-bold text-amber-300 transition flex items-center gap-1.5 shadow-lg"
+        >
+          <span>♟️</span> Mühendislik Satrancı
+        </a>
+      </div>
+
       <Canvas
         dpr={[1, 1.5]}
-        shadows
+        shadows={{ type: THREE.PCFShadowMap }}
         camera={{ position: [3, 3, 3], fov: 50, near: 0.01, far: 2000 }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
         onCreated={({ gl }) => {

@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRightLeft, Hexagon, Activity } from 'lucide-react';
+import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 type Category = 'length' | 'mass' | 'temperature' | 'pressure' | 'force' | 'torque' | 'area' | 'volume' | 'velocity' | 'flow';
 
@@ -59,12 +61,6 @@ const CONVERSIONS: Record<Category, { units: string[]; base: string; factors: Re
     }
 };
 
-const CATEGORY_LABELS: Record<Category, string> = {
-    length: 'Length', mass: 'Mass', temperature: 'Temperature',
-    pressure: 'Pressure', force: 'Force', torque: 'Torque',
-    area: 'Area', volume: 'Volume', velocity: 'Speed', flow: 'Flow'
-};
-
 function convertValue(val: number, from: string, to: string, cat: Category): number {
     if (cat === 'temperature') {
         let celsius: number;
@@ -81,10 +77,24 @@ function convertValue(val: number, from: string, to: string, cat: Category): num
 }
 
 export default function UnitConverterModule() {
+    const language = useI18nStore((s) => s.language);
     const [category, setCategory] = useState<Category>('length');
     const [value, setValue] = useState(1);
     const [fromUnit, setFromUnit] = useState('m');
     const [toUnit, setToUnit] = useState('mm');
+
+    const categoryLabels: Record<Category, string> = useMemo(() => ({
+        length: t12(language, 'Length', 'Uzunluk'),
+        mass: t12(language, 'Mass', 'Kütle'),
+        temperature: t12(language, 'Temperature', 'Sıcaklık'),
+        pressure: t12(language, 'Pressure', 'Basınç'),
+        force: t12(language, 'Force', 'Kuvvet'),
+        torque: t12(language, 'Torque', 'Tork'),
+        area: t12(language, 'Area', 'Alan'),
+        volume: t12(language, 'Volume', 'Hacim'),
+        velocity: t12(language, 'Speed', 'Hız'),
+        flow: t12(language, 'Flow', 'Debi')
+    }), [language]);
 
     const config = CONVERSIONS[category];
 
@@ -117,9 +127,9 @@ export default function UnitConverterModule() {
     };
 
     return (
-        <div className="flex flex-col w-full h-full bg-[#03060a] overflow-hidden select-none relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-[#03060a] to-[#03060a] pointer-events-none z-0" />
-            <div className="absolute inset-0 bg-[url('/noise.png')] mix-blend-overlay opacity-5 pointer-events-none z-0" />
+        <div className="flex flex-col w-full h-full bg-[var(--bg-0)] overflow-hidden select-none relative">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-[var(--bg-0)] to-[var(--bg-0)] pointer-events-none z-0" />
+            <div className="absolute inset-0 bg-blueprint-grid opacity-5 pointer-events-none z-0" />
 
             <div className="relative z-10 flex flex-col h-full p-6 max-w-4xl mx-auto w-full">
                 
@@ -127,12 +137,12 @@ export default function UnitConverterModule() {
                 <header className="flex items-center justify-between mb-8">
                     <div className="flex flex-col">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                            <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center ">
                                 <Activity className="text-cyan-400" size={20} />
                             </div>
-                            <h1 className="text-2xl font-black italic tracking-tighter uppercase text-white">Dimension Engine</h1>
+                            <h1 className="text-2xl font-black tracking-tighter uppercase text-white">{t12(language, 'Dimension Engine', 'Birim Dönüştürücü')}</h1>
                         </div>
-                        <p className="text-slate-500 text-xs mt-2 ml-14 font-mono tracking-widest">ISO / ANSI Conversion Protocol Active</p>
+                        <p className="text-slate-500 text-xs mt-2 ml-14 font-mono tracking-widest">{t12(language, 'ISO / ANSI Conversion Protocol Active', 'ISO / ANSI Mühendislik Birim Dönüşümü')}</p>
                     </div>
                 </header>
 
@@ -143,10 +153,10 @@ export default function UnitConverterModule() {
                             <button key={cat} onClick={() => handleCategoryChange(cat)}
                                 className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] transition-all
                                     ${category === cat
-                                        ? 'bg-cyan-500 text-[#03060a] shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-105'
+                                        ? 'bg-cyan-500 text-[var(--bg-0)] scale-105'
                                         : 'bg-white/[0.02] border border-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
                             >
-                                {CATEGORY_LABELS[cat]}
+                                {categoryLabels[cat]}
                             </button>
                         ))}
                     </div>
@@ -157,65 +167,65 @@ export default function UnitConverterModule() {
                     {/* Main Interaction Area */}
                     <div className="flex-1 flex flex-col gap-4">
                         {/* FROM BOX */}
-                        <motion.div layout className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group focus-within:border-slate-500/50 transition-colors">
-                            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none text-9xl font-black -translate-y-10 translate-x-4">
+                        <motion.div layout className="bg-white/[0.02] border border-white/10 rounded-xl p-8 flex flex-col relative overflow-hidden group focus-within:border-slate-500/50 transition-colors">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none text-5xl font-black -translate-y-10 translate-x-4">
                                 {fromUnit}
                             </div>
-                            <label className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4">Input Magnitude</label>
+                            <label className="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4">{t12(language, 'Input Magnitude', 'Giriş Değeri')}</label>
                             <div className="flex items-end gap-4 relative z-10">
                                 <input
                                     type="number"
                                     value={value}
                                     onChange={e => setValue(Number(e.target.value))}
-                                    className="bg-transparent text-5xl md:text-7xl font-black tracking-tighter text-white outline-none w-full placeholder:text-slate-800"
+                                    className="bg-transparent text-5xl md:text-5xl font-black tracking-tighter text-white outline-none w-full placeholder:text-slate-800"
                                     placeholder="0"
                                 />
                                 <select
                                     value={fromUnit}
                                     onChange={e => setFromUnit(e.target.value)}
-                                    className="bg-slate-900/50 backdrop-blur-md border border-white/10 px-4 py-3 rounded-xl text-lg font-bold text-slate-300 outline-none cursor-pointer hover:bg-slate-800 transition-colors"
+                                    className="bg-slate-900/50 border border-white/10 px-4 py-3 rounded-xl text-lg font-bold text-slate-300 outline-none cursor-pointer hover:bg-slate-800 transition-colors"
                                 >
-                                    {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
+                                    {config.units.map(u => <option key={u} value={u} className="bg-[var(--bg-1)]">{u}</option>)}
                                 </select>
                             </div>
                         </motion.div>
 
                         {/* SWAP BUTTON */}
                         <div className="flex justify-center -my-6 relative z-20">
-                            <button onClick={handleSwap} className="w-14 h-14 rounded-full bg-[#03060a] border border-white/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all">
+                            <button onClick={handleSwap} className="w-14 h-14 rounded-full bg-[var(--bg-0)] border border-white/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 transition-all">
                                 <ArrowRightLeft size={20} />
                             </button>
                         </div>
 
                         {/* TO BOX */}
-                        <motion.div layout className="bg-cyan-500/5 border border-cyan-500/20 rounded-[2rem] p-8 flex flex-col relative overflow-hidden group focus-within:border-cyan-400/50 transition-colors">
-                            <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none text-9xl font-black -translate-y-10 translate-x-4 text-cyan-500">
+                        <motion.div layout className="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-8 flex flex-col relative overflow-hidden group focus-within:border-cyan-400/50 transition-colors">
+                            <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none text-5xl font-black -translate-y-10 translate-x-4 text-cyan-500">
                                 {toUnit}
                             </div>
-                            <label className="text-xs font-mono text-cyan-600 uppercase tracking-widest mb-4">Converted Output</label>
+                            <label className="text-xs font-mono text-cyan-600 uppercase tracking-widest mb-4">{t12(language, 'Converted Output', 'Dönüştürülen Çıktı')}</label>
                             <div className="flex items-end gap-4 relative z-10">
                                 <input
                                     type="text"
                                     value={formatNum(result)}
                                     readOnly
-                                    className="bg-transparent text-5xl md:text-7xl font-black tracking-tighter text-cyan-400 outline-none w-full"
+                                    className="bg-transparent text-5xl md:text-5xl font-black tracking-tighter text-cyan-400 outline-none w-full"
                                 />
                                 <select
                                     value={toUnit}
                                     onChange={e => setToUnit(e.target.value)}
-                                    className="bg-cyan-950/50 backdrop-blur-md border border-cyan-500/20 px-4 py-3 rounded-xl text-lg font-bold text-cyan-300 outline-none cursor-pointer hover:bg-cyan-900 transition-colors"
+                                    className="bg-cyan-950/50 border border-cyan-500/20 px-4 py-3 rounded-xl text-lg font-bold text-cyan-300 outline-none cursor-pointer hover:bg-cyan-900 transition-colors"
                                 >
-                                    {config.units.map(u => <option key={u} value={u} className="bg-[#0a0e14]">{u}</option>)}
+                                    {config.units.map(u => <option key={u} value={u} className="bg-[var(--bg-1)]">{u}</option>)}
                                 </select>
                             </div>
                         </motion.div>
                     </div>
 
                     {/* Right Panel: All Results Matrix */}
-                    <div className="w-full lg:w-80 bg-white/[0.01] border border-white/5 rounded-[2rem] p-6 flex flex-col h-full overflow-hidden">
+                    <div className="w-full lg:w-80 bg-white/[0.01] border border-white/5 rounded-xl p-6 flex flex-col h-full overflow-hidden">
                         <div className="flex items-center gap-2 mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                             <div className="w-2 h-2 rounded-full bg-slate-600" />
-                            Relational Matrix
+                            {t12(language, 'Relational Matrix', 'Tüm Birimler Tablosu')}
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 relative z-10">
                             <AnimatePresence mode="popLayout">

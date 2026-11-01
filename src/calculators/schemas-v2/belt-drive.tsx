@@ -7,6 +7,7 @@ import {
     openBeltPitchLengthMm,
     snapTimingBeltCatalog,
 } from '@/components/visualizers/techframe-utils';
+import { estimateBeltLinearDensityKgM, rateOpenBelt } from '@/lib/openDriveRating';
 
 const beltDriveSchema: CalculatorSchemaV2 = {
     id: 'belt-drive',
@@ -15,7 +16,7 @@ const beltDriveSchema: CalculatorSchemaV2 = {
         description: 'Calculate speeds, belt length, and tension for open belt drives.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-25',
         tags: ['belt', 'pulley', 'transmission', 'machine-elements'],
         verifiedStandards: ['ISO 5291', 'ISO 13050', 'Megadyne MEGASYNC / MEGAPOWER']
@@ -269,6 +270,38 @@ const beltDriveSchema: CalculatorSchemaV2 = {
             formulaLatex: 'D_{min,actual}/D_{min,profile}',
             description: 'Small pulley diameter versus the selected profile minimum.',
             precision: 0
+        },
+        {
+            key: 'Tc',
+            label: 'Centrifugal Tension (Tc)',
+            unit: 'N',
+            formulaLatex: 'T_c = \\mu v^2',
+            description: 'Belt mass-velocity tension subtracted from Euler available tension.',
+            precision: 1
+        },
+        {
+            key: 'shaftLoad',
+            label: 'Shaft Load (Fs)',
+            unit: 'N',
+            formulaLatex: 'F_s = \\sqrt{T_1^2 + T_2^2 - 2 T_1 T_2 \\cos\\theta}',
+            description: 'Resultant radial load on each shaft from belt tensions.',
+            precision: 0
+        },
+        {
+            key: 'flexHz',
+            label: 'Flex Frequency',
+            unit: 'Hz' as any,
+            formulaLatex: 'f = 2v / L',
+            description: 'Belt flex cycles per second (two pulleys). High values drive heat and fatigue.',
+            precision: 1
+        },
+        {
+            key: 'teethInMesh',
+            label: 'Teeth in Mesh',
+            unit: '-',
+            formulaLatex: 'z_m = z_1 \\theta / 2\\pi',
+            description: 'Timing: number of teeth in wrap on the small pulley. Target ≥ 6.',
+            precision: 1
         }
     ],
 
@@ -317,7 +350,8 @@ const beltDriveSchema: CalculatorSchemaV2 = {
         }
 
         // Arc of Contact (smaller pulley) — uses snapped C for timing
-        const theta_rad = Math.PI - 2 * Math.asin((Math.abs(d2 - d1)) / (2 * C));
+        const wrapArg = Math.abs(d2 - d1) / (2 * Math.max(C, 1e-9));
+        const theta_rad = Math.PI - 2 * Math.asin(Math.max(-1, Math.min(1, wrapArg)));
         const theta_deg = theta_rad * (180 / Math.PI);
 
         // Tension Ratio
@@ -333,6 +367,24 @@ const beltDriveSchema: CalculatorSchemaV2 = {
         const effectiveTension = v > 0 ? (designPower * 1000) / v : 0;
 
         const warnings: { field: string; message: string; severity: 'info' | 'warning' | 'critical' }[] = [];
+        if (d1 <= 0 || d2 <= 0) {
+            warnings.push({ field: 'd1', message: 'Pulley diameters must be positive.', severity: 'critical' });
+        }
+        if (n1 <= 0) {
+            warnings.push({ field: 'rpm1', message: 'Input speed must be positive.', severity: 'critical' });
+        }
+        if (Math.min(d1, d2) > 0 && Math.max(d1, d2) / Math.min(d1, d2) > 8) {
+            warnings.push({ field: 'd2', message: `Ratio ${(Math.max(d1, d2) / Math.min(d1, d2)).toFixed(1)}:1 exceeds practical 8:1 limit.`, severity: 'warning' });
+        }
+        if (C_target < dLarge / 2) {
+            warnings.push({ field: 'centerDist', message: `Center distance ${C_target} mm < large pulley radius ${(dLarge / 2).toFixed(0)} mm — physically impossible.`, severity: 'critical' });
+        }
+        if (isTiming && (z1 < 12 || z2 < 12)) {
+            warnings.push({ field: z1 < 12 ? 'z1' : 'z2', message: `Timing pulley z=${Math.min(z1, z2)} < 12 teeth may cause excessive chordal action.`, severity: 'warning' });
+        }
+        if (v <= 0) {
+            warnings.push({ field: 'beltVelocity', message: 'Belt velocity is zero — check diameters and RPM.', severity: 'critical' });
+        }
         if (isTiming && Math.abs(C_actual - C_target) > 0.5) {
             warnings.push({
                 field: 'centerDist',
@@ -343,8 +395,29 @@ const beltDriveSchema: CalculatorSchemaV2 = {
         if (theta_deg < 120) {
             warnings.push({ field: 'arcOfContact', message: `Wrap angle ${theta_deg.toFixed(1)} deg < 120 deg. Increase center distance or pulley sizes.`, severity: 'warning' });
         }
-        if (C < (d1 + d2) / 2) {
-            warnings.push({ field: 'centerDist', message: 'Center distance is below minimum for pulleys to mesh.', severity: 'critical' });
+
+        // Geometric physical interference & impossible span diagnostics
+        const minC_contact = (od1 > 0 && od2 > 0) ? (od1 + od2) / 2 : (d1 + d2) / 2;
+        if (C <= minC_contact) {
+            warnings.push({
+                field: 'centerDist',
+                message: `İmkansız Ölçü: Akslar arası mesafe (C=${C.toFixed(1)} mm), kasnakların fiziksel dış çapları toplamından küçüktür (Min ${minC_contact.toFixed(1)} mm). Kasnaklar fiziksel olarak iç içe geçer/çarpışır!`,
+                severity: 'critical',
+            });
+        } else if (C < minC_contact + 10) {
+            warnings.push({
+                field: 'centerDist',
+                message: `Kasnak flanşları/kenarları arası boşluk çok dar (< 10 mm). Titreşim veya kayış montajında temas riski.`,
+                severity: 'warning',
+            });
+        }
+
+        if (Math.abs(d2 - d1) / (2 * Math.max(C, 1e-6)) >= 1.0) {
+            warnings.push({
+                field: 'centerDist',
+                message: `İmkansız Ölçü: Kasnak çap farkı (|d2 - d1|=${Math.abs(d2 - d1).toFixed(1)} mm) 2C mesafesini aşıyor. Açık kayış sarımı geometrik olarak imkansızdır.`,
+                severity: 'critical',
+            });
         }
         if (v > belt.velocityLimit) {
             warnings.push({ field: 'beltVelocity', message: `${belt.label} speed ${v.toFixed(1)} m/s exceeds ${belt.velocityLimit} m/s guideline.`, severity: 'warning' });
@@ -353,14 +426,42 @@ const beltDriveSchema: CalculatorSchemaV2 = {
             warnings.push({ field: 'beltType', message: 'Timing belt: verify catalog length (Lp) and tooth count against manufacturer table.', severity: 'info' });
         }
 
-        let T2 = 0;
-        let T1 = 0;
-        if (belt.positiveDrive) {
-            T1 = effectiveTension * belt.pretensionFactor;
-            T2 = Math.max(0, T1 - effectiveTension);
-        } else if (v > 0 && ratio > 1.001) {
-            T2 = effectiveTension / (ratio - 1);
-            T1 = ratio * T2;
+        const beltRating = rateOpenBelt({
+            d1,
+            d2,
+            C,
+            n1,
+            designPowerKW: designPower,
+            wrapRad: theta_rad,
+            tensionRatio: ratio,
+            positiveDrive: belt.positiveDrive,
+            pretensionFactor: belt.pretensionFactor,
+            linearDensityKgM: estimateBeltLinearDensityKgM(profile.topWidthMm, profile.heightMm),
+            beltLengthMm: L,
+            z1: isTiming ? z1 : undefined,
+        });
+        const T1 = beltRating.T1;
+        const T2 = beltRating.T2;
+        if (beltRating.flexHz > 30) {
+            warnings.push({
+                field: 'beltVelocity',
+                message: `Belt flex frequency ${beltRating.flexHz.toFixed(0)} Hz is high — heat and cord fatigue risk. Lengthen the belt or slow the drive.`,
+                severity: 'warning',
+            });
+        }
+        if (belt.positiveDrive && beltRating.teethInMesh > 0 && beltRating.teethInMesh < 6) {
+            warnings.push({
+                field: 'z1',
+                message: `Only ${beltRating.teethInMesh.toFixed(1)} timing teeth in mesh (target ≥ 6). Increase wrap or driver teeth.`,
+                severity: 'warning',
+            });
+        }
+        if (beltRating.centrifugalShare > 0.25) {
+            warnings.push({
+                field: 'beltVelocity',
+                message: `Centrifugal tension is ${(beltRating.centrifugalShare * 100).toFixed(0)}% of tight-side tension. Reduce speed or belt mass.`,
+                severity: 'warning',
+            });
         }
         const speedLimit = Math.min(belt.velocityLimit, profile.maxSpeedMs);
         const speedUtilization = speedLimit > 0 ? (v / speedLimit) * 100 : 0;
@@ -429,7 +530,11 @@ const beltDriveSchema: CalculatorSchemaV2 = {
                 speedUtilization: createValidatedValue(speedUtilization, '%' as any, 'derived'),
                 profileCapacity: createValidatedValue(profileCapacity, 'kW', 'derived'),
                 requiredElements: createValidatedValue(requiredElements, '-', 'derived'),
-                minPulleyUsage: createValidatedValue(minPulleyUsage, '%' as any, 'derived')
+                minPulleyUsage: createValidatedValue(minPulleyUsage, '%' as any, 'derived'),
+                Tc: createValidatedValue(beltRating.Tc, 'N', 'derived'),
+                shaftLoad: createValidatedValue(beltRating.shaftLoadN, 'N', 'derived'),
+                flexHz: createValidatedValue(beltRating.flexHz, 'Hz' as any, 'derived'),
+                teethInMesh: createValidatedValue(beltRating.teethInMesh, '-', 'derived')
             },
             verified: true,
             warnings,
@@ -440,7 +545,7 @@ const beltDriveSchema: CalculatorSchemaV2 = {
     documentation: {
         assumptions: [
             { id: 'thin-belt', text: 'Belt thickness is much smaller than pulley diameter.', impact: 'low' },
-            { id: 'quasi-static', text: 'Centrifugal effects are reported by speed utilization but not subtracted from belt tension.', impact: 'medium' },
+            { id: 'quasi-static', text: 'Centrifugal tension Tc = μ v² is subtracted from Euler available tension (ISO 1081).', impact: 'low' },
             { id: 'catalog-rating', text: 'Final belt section, tooth pitch, and number of ribs must be selected from manufacturer/standard rating tables.', impact: 'high' }
         ],
         standards: [
@@ -488,6 +593,14 @@ const beltDriveSchema: CalculatorSchemaV2 = {
                     arcOfContact={result.outputs.arcOfContact?.value as number}
                     T1={result.outputs.T1?.value as number}
                     T2={result.outputs.T2?.value as number}
+                    Tc={result.outputs.Tc?.value as number}
+                    shaftLoad={result.outputs.shaftLoad?.value as number}
+                    flexHz={result.outputs.flexHz?.value as number}
+                    teethInMesh={result.outputs.teethInMesh?.value as number}
+                    pitch={profile.pitchMm}
+                    beltWidth={profile.topWidthMm}
+                    beltHeight={profile.heightMm}
+                    profileLabel={profile.label}
                 />
             );
         },

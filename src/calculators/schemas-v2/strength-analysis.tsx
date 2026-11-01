@@ -259,7 +259,7 @@ const strengthSchema: CalculatorSchemaV2 = {
         description: 'Multi-mode analysis: Stress, Beams, Buckling, Torsion.',
         category: 'materials',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['stress', 'beam', 'buckling', 'mohr', 'torsion'],
         verifiedStandards: ['Shigley', 'AISC', 'Eurocode 3']
@@ -494,7 +494,7 @@ const strengthSchema: CalculatorSchemaV2 = {
                 const cy = h / 2;
 
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#05080b]/50 rounded-lg p-4 border border-slate-800/50">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)]/50 rounded-lg p-4 border border-slate-800/50">
                         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full font-mono drop-shadow-2xl">
                             <defs>
                                 <radialGradient id="gradPrincipal" cx="50%" cy="50%" r="50%">
@@ -552,7 +552,7 @@ const strengthSchema: CalculatorSchemaV2 = {
                 }
 
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#05080b]/50 rounded-lg p-4 border border-slate-800/50">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)]/50 rounded-lg p-4 border border-slate-800/50">
                         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full font-mono">
                             {/* Supports */}
                             {type === 'cantilever' ? (
@@ -600,7 +600,7 @@ const strengthSchema: CalculatorSchemaV2 = {
                 }
 
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#05080b]/50 rounded-lg p-4 border border-slate-800/50">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)]/50 rounded-lg p-4 border border-slate-800/50">
                         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full font-mono">
                             {/* Boundary Conditions */}
                             <rect x={colX - 20} y={colBottom} width="40" height="10" fill="#475569" />
@@ -634,7 +634,7 @@ const strengthSchema: CalculatorSchemaV2 = {
                 const shaftR = 40;
 
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#05080b]/50 rounded-lg p-4 border border-slate-800/50">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)]/50 rounded-lg p-4 border border-slate-800/50">
                         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full font-mono">
                             <defs>
                                 <linearGradient id="shaftGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -682,7 +682,7 @@ const strengthSchema: CalculatorSchemaV2 = {
                 const visualExp = Math.sign(deltaL) * Math.min(Math.abs(deltaL) * 10, 40);
 
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-[#05080b]/50 rounded-lg p-4 border border-slate-800/50">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)]/50 rounded-lg p-4 border border-slate-800/50">
                         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full font-mono">
                             <defs>
                                 <linearGradient id="tempGrad" x1="0%" y1="0%" x2="100%" y2="0%">

@@ -1,12 +1,27 @@
-# Netlify / Cloudflare Pages style permanent redirects for legacy calculator URLs
+# AluCalc OS — Redirects Manifest
+# Primary deployment is Hostinger Apache (.htaccess). This file is for local dev/CF/Netlify compatibility.
+
+# Mobile redirect
+/mobile                         /                    301
+/mobile/                        /                    301
+/learn                          /academy/            301
+/learn/                         /academy/            301
+/shaft-design                   /shafts/             301
+/shaft-design/                  /shafts/             301
+
+# Workspace to Design Studio
+/workspace                      /design-studio/      301
+/workspace/                     /design-studio/      301
+
+# Legacy calculator URLs
 /calculators/bearing-life       /bearings/           301
 /calculators/bearing-life/      /bearings/           301
+/calculators/bearing-life-calc  /bearings/           301
+/calculators/bearing-life-calc/ /bearings/           301
 /calculators/vdi2230            /bolt-torque/        301
 /calculators/vdi2230/           /bolt-torque/        301
 /calculators/bolt-torque-calc   /bolt-torque/        301
 /calculators/bolt-torque-calc/  /bolt-torque/        301
-/calculators/bearing-life-calc  /bearings/           301
-/calculators/bearing-life-calc/ /bearings/           301
 /calculators/beam-deflection-calc /beam-deflection/  301
 /calculators/beam-deflection-calc/ /beam-deflection/ 301
 /calculators/gear-ratio-calc    /gears/              301
@@ -17,9 +32,10 @@
 /calculators/tolerance-stackup/ /fits/               301
 /calculators/fits-tolerances    /fits/               301
 /calculators/fits-tolerances/   /fits/               301
-/calculators/machine-assembly   /workspace/          301
-/calculators/machine-assembly/  /workspace/          301
-/calculators/*                  /:splat/             301
+/calculators/machine-assembly   /design-studio/      301
+/calculators/machine-assembly/  /design-studio/      301
+
+# Retired modules
 /biology-genetics               /periodic-table/     301
 /biology-genetics/              /periodic-table/     301
 /cs-algorithms                  /calculator/         301
@@ -28,24 +44,22 @@
 /chemistry-reactions/           /periodic-table/     301
 /chemistry-solver               /periodic-table/     301
 /chemistry-solver/              /periodic-table/     301
-/digital-logic                  /ohms-law/           301
-/digital-logic/                 /ohms-law/           301
-/physics-solver                 /calculator/         301
-/physics-solver/                /calculator/         301
-/physics-kinematics             /calculator/         301
-/physics-kinematics/            /calculator/         301
-/wind-tunnel                    /fluid-dynamics/     301
-/wind-tunnel/                   /fluid-dynamics/     301
+/physics-kinematics             /physics-solver/     301
+/physics-kinematics/            /physics-solver/     301
+/wind-tunnel                    /aerospace-dynamics/ 301
+/wind-tunnel/                   /aerospace-dynamics/ 301
 /aerospace-dynamics             /fluid-dynamics/     301
 /aerospace-dynamics/            /fluid-dynamics/     301
 /failure-prediction             /fatigue-analysis/   301
 /failure-prediction/            /fatigue-analysis/   301
 /failure-diagnosis              /fatigue-analysis/   301
 /failure-diagnosis/             /fatigue-analysis/   301
-/material-selector-ai           /materials-db/       301
-/material-selector-ai/          /materials-db/       301
-/materials-explorer             /materials-db/       301
-/materials-explorer/            /materials-db/       301
+/material-selector-ai           /handbook/           301
+/material-selector-ai/          /handbook/           301
+/materials-explorer             /handbook/           301
+/materials-explorer/            /handbook/           301
+/materials-db                   /handbook/           301
+/materials-db/                  /handbook/           301
 /welding-fillet                 /welding/            301
 /welding-fillet/                /welding/            301
 /parametric-cad                 /design-studio/      301
@@ -56,3 +70,19 @@
 /split-cad/                     /cad-editor/         301
 /holographic-viewer             /design-studio/      301
 /holographic-viewer/            /design-studio/      301
+/matrix-screensaver             /                    301
+/matrix-screensaver/            /                    301
+/hardness-converter             /unit-converter/     301
+/hardness-converter/            /unit-converter/     301
+/pipe-friction                  /fluid-dynamics/     301
+/pipe-friction/                 /fluid-dynamics/     301
+/hydraulics                     /cylinders/          301
+/hydraulics/                    /cylinders/          301
+/power-screw                    /motor-selection-std/ 301
+/power-screw/                   /motor-selection-std/ 301
+/springs                        /advanced-spring/    301
+/springs/                       /advanced-spring/    301
+/shaft                          /shafts/             301
+/shaft/                         /shafts/             301
+/cylinder-design                /cylinders/          301
+/cylinder-design/               /cylinders/          301

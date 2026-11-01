@@ -76,7 +76,7 @@ const IntelligenceDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-white p-8 font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[var(--bg-0)] text-white p-8 font-sans ">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
@@ -102,7 +102,7 @@ const IntelligenceDashboard = () => {
           <div className="col-span-12 lg:col-span-5 space-y-8">
             
             {/* System Weights */}
-            <div className="bg-white/[0.03] border border-white/10 p-6 backdrop-blur-md rounded-lg">
+            <div className="bg-white/[0.03] border border-white/10 p-6 rounded-lg">
               <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-6">Decision Weight Matrix (Evolving)</h3>
               <div className="space-y-4">
                 {Object.entries(systemState.weights).map(([key, val]: [any, any]) => (
@@ -124,7 +124,7 @@ const IntelligenceDashboard = () => {
             </div>
 
             {/* Last Decision */}
-            <div className="bg-white/[0.03] border border-white/10 p-6 backdrop-blur-md rounded-lg">
+            <div className="bg-white/[0.03] border border-white/10 p-6 rounded-lg">
               <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-6">Last Decision Output</h3>
               {lastDecision ? (
                 <div className="space-y-4">
@@ -150,7 +150,7 @@ const IntelligenceDashboard = () => {
           </div>
 
           {/* Right Column: Execution Logs */}
-          <div className="col-span-12 lg:col-span-7 bg-[#050507] border border-white/10 rounded-lg overflow-hidden flex flex-col h-[600px]">
+          <div className="col-span-12 lg:col-span-7 bg-[var(--bg-0)] border border-white/10 rounded-lg overflow-hidden flex flex-col h-[600px]">
             <div className="bg-white/[0.05] p-4 border-b border-white/10 flex justify-between items-center">
               <h3 className="text-xs font-bold text-white/60 uppercase tracking-widest">Autonomous Trace Engine</h3>
               <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-white/40">LIVE_STREAM</span>

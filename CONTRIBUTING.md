@@ -24,6 +24,12 @@ Key areas:
 
 ### Adding a New Calculator
 
+> [!IMPORTANT]
+> **Architecture Standard:**
+> New modules go through UDA / `ModuleRegistry` (located in `src/modules/<category>/<ModuleName>/`).
+> `src/components/calculators/` is legacy. Do not add new calculators there.
+> Refer to [MODULE_AUTHOR_GUIDE.md](MODULE_AUTHOR_GUIDE.md) and [.agents/rules/module-architecture.md](.agents/rules/module-architecture.md) for the modern pattern.
+
 When contributing a new calculator module, follow these rules:
 
 1. **Deterministic Logic:** Ensure all mathematical formulas are cited (ISO, DIN, ASME) and placed inside pure, testable functions.

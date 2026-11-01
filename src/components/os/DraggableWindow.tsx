@@ -195,11 +195,11 @@ export function DraggableWindow({ window, children }: DraggableWindowProps) {
             >
                 {/* Header (Auto-Hides if Maximized) */}
                 <div
-                    className={`flex items-center justify-between px-4 cursor-move shrink-0 border-cyan-900/30 transition-all duration-300 ${isExpanded ? 'absolute top-0 left-0 right-0 z-50 h-2 opacity-0 hover:h-10 hover:opacity-100 hover:bg-black/80 backdrop-blur border-b' : 'relative h-9 border-b bg-black/40 opacity-100'}`}
+                    className={`flex items-center justify-between px-4 cursor-move shrink-0 border-cyan-900/30 transition-all duration-300 ${isExpanded ? 'absolute top-0 left-0 right-0 z-50 h-2 opacity-0 hover:h-10 hover:opacity-100 hover:bg-black/80 border-b' : 'relative h-9 border-b bg-black/40 opacity-100'}`}
                     onMouseDown={handleDragStart}
                 >
                     <span
-                        className={`text-[10px] text-[#00e5ff] font-mono tracking-widest uppercase truncate font-bold drop-shadow-md ${isExpanded ? 'opacity-0 transition-opacity duration-300 group-hover:opacity-100' : ''}`}
+                        className={`text-[10px] text-[var(--cyan)] font-mono tracking-widest uppercase truncate font-bold drop-shadow-md ${isExpanded ? 'opacity-0 transition-opacity duration-300 group-hover:opacity-100' : ''}`}
                         style={isExpanded ? { opacity: 'inherit' } : undefined}
                     >
                         {title}

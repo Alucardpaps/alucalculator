@@ -1,15 +1,19 @@
 {
   "id": "com.alucalculator.os",
-  "name": "AluCalc OS — Engineering Intelligence Platform",
-  "short_name": "AluCalc OS",
-  "description": "Professional engineering intelligence platform with 100+ validated solvers, 3D CAD assembly workspace, real-time BOM generation, and AI copilot. Built for mechanical designers, structural engineers, and factory floor technicians.",
+  "name": "AluCAD OS — Engineering Intelligence Platform",
+  "short_name": "AluCAD OS",
+  "description": "Professional engineering intelligence platform with 86 verified engineering solvers, 3D CAD assembly workspace, real-time BOM generation, and AeGiS AI copilot. Built for mechanical designers, structural engineers, and factory floor technicians.",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "start_url": "/?utm_source=pwa&utm_medium=homescreen",
   "scope": "/",
-  "theme_color": "#020408",
-  "background_color": "#020408",
+  "theme_color": "#0c0e11",
+  "background_color": "#0c0e11",
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -31,7 +35,7 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192.png",
+      "src": "/icons/icon-192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
@@ -43,7 +47,7 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -61,51 +65,127 @@
       "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "AluCalc OS — Mobile Engineering Dashboard"
+      "label": "AluCAD OS — Mobile Engineering Dashboard"
     },
     {
       "src": "/screenshots/desktop-1.jpg",
       "sizes": "1920x1080",
       "type": "image/jpeg",
       "form_factor": "wide",
-      "label": "AluCalc OS — Desktop 3D CAD Workspace"
+      "label": "AluCAD OS — Desktop 3D CAD Workspace"
     }
   ],
   "shortcuts": [
     {
+      "name": "Engineering Workbench",
+      "short_name": "Workbench",
+      "description": "Touch-optimized engineering operating system and CAD atelier",
+      "url": "/?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
       "name": "Engineering Calculators",
-      "short_name": "Calculators",
-      "description": "100+ validated mechanical, structural, and thermal solvers",
+      "short_name": "Solvers",
+      "description": "86 verified solvers for mechanical, structural, and thermal calculations",
       "url": "/calculators?utm_source=pwa_shortcut",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "3D Design Studio",
       "short_name": "3D CAD",
       "description": "Parametric 3D assembly workspace with BOM export",
       "url": "/design-studio?utm_source=pwa_shortcut",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "Field Tools",
       "short_name": "Field",
       "description": "Spirit level, QR scanner, pipe sizing, and voltage drop tools",
       "url": "/field?utm_source=pwa_shortcut",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "Materials Database",
       "short_name": "Materials",
       "description": "Aluminum alloy properties, comparison, and selection guide",
       "url": "/materials?utm_source=pwa_shortcut",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "Academy",
       "short_name": "Academy",
       "description": "Engineering theory, formulas, and interactive tutorials",
       "url": "/academy?utm_source=pwa_shortcut",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Field Widget",
+      "short_name": "Field Widget",
+      "description": "Instant shop-floor HUD widget for bolt torque, level, and tap charts",
+      "url": "/field/widget?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "AluCAD OS Field Widget",
+      "short_name": "Field Widget",
+      "description": "Fast workshop & field engineering tool for bolt torque, spirit level, and unit conversion",
+      "tag": "alucalc-field-widget",
+      "template": "widget-field",
+      "ms_ac_template": "/widgets/field-adaptive-card.json",
+      "data": "/api/widgets/field-data",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192",
+          "label": "AluCalc Field Widget HUD"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ],
+      "auth": false,
+      "update": 86400
     }
   ],
   "related_applications": [
@@ -123,7 +203,13 @@
   },
   "handle_links": "preferred",
   "scope_extensions": [
-    { "origin": "https://www.alucalculator.com" },
-    { "origin": "https://alucalculator.com" }
+    {
+      "type": "origin",
+      "origin": "https://www.alucalculator.com"
+    },
+    {
+      "type": "origin",
+      "origin": "https://alucalculator.com"
+    }
   ]
 }

@@ -20,6 +20,7 @@ import { ReportSettingsModal } from "@/components/ui/ReportSettingsModal";
 import { SaveButton } from "@/components/calculation/SaveButton";
 import { getFastenerGeometry } from "@/data/boltNutStandards";
 import { buildFastenerLinkParams } from "@/lib/fastener/sharedEngine";
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 // ════════════════════════════════════════════
 // CONSTANTS & THEME
@@ -42,6 +43,7 @@ const COLORS = {
 // ════════════════════════════════════════════
 
 const ThreadEngagementVisualizer = ({ results, fastenerType }: any) => {
+    const precision = useGlobalPrecision();
     const p = parseFloat(results.pitch || '2');
     const d = parseFloat(results.majorDia || '12');
     const d2 = parseFloat(results.pitchDia || '10.86');
@@ -114,24 +116,24 @@ const ThreadEngagementVisualizer = ({ results, fastenerType }: any) => {
             <g className="text-[7px] font-mono fill-white/50 stroke-none">
                 {/* Major Diameter d */}
                 <line x1={-D/2} y1={P*2} x2={D/2} y2={P*2} stroke="#00e5ff" strokeWidth="0.5" strokeDasharray="2 2" />
-                <text x="0" y={P*2 - 2} textAnchor="middle" fill="#00e5ff" className="font-bold">d = {d.toFixed(2)} {unit}</text>
+                <text x="0" y={P*2 - 2} textAnchor="middle" fill="#00e5ff" className="font-bold">d = {formatEngineeringValue(d, precision, false)} {unit}</text>
 
                 {/* Pitch Diameter d2 */}
                 <line x1={-D2/2} y1={P*3} x2={D2/2} y2={P*3} stroke="rgba(0, 229, 255, 0.6)" strokeWidth="0.5" strokeDasharray="2 2" />
-                <text x="0" y={P*3 - 2} textAnchor="middle" fill="rgba(0, 229, 255, 0.8)" className="font-bold">d₂ = {d2.toFixed(2)} {unit}</text>
+                <text x="0" y={P*3 - 2} textAnchor="middle" fill="rgba(0, 229, 255, 0.8)" className="font-bold">d₂ = {formatEngineeringValue(d2, precision, false)} {unit}</text>
 
                 {/* Minor Diameter d1 */}
                 <line x1={-D1/2} y1={P*4} x2={D1/2} y2={P*4} stroke="rgba(0, 229, 255, 0.4)" strokeWidth="0.5" strokeDasharray="2 2" />
-                <text x="0" y={P*4 - 2} textAnchor="middle" fill="rgba(0, 229, 255, 0.6)" className="font-bold">d₁ = {d1.toFixed(2)} {unit}</text>
+                <text x="0" y={P*4 - 2} textAnchor="middle" fill="rgba(0, 229, 255, 0.6)" className="font-bold">d₁ = {formatEngineeringValue(d1, precision, false)} {unit}</text>
             </g>
         </svg>
     );
 };
 
 const DataDisplay = ({ label, value, unit, icon: Icon, color = COLORS.accent }: any) => (
-  <div className="relative group overflow-hidden bg-[#0a1018]/60 border border-white/5 rounded-2xl p-4 transition-all hover:border-[#00e5ff]/30 hover:scale-[1.02] duration-300">
+  <div className="relative group overflow-hidden bg-[var(--bg-1)]/60 border border-white/5 rounded-2xl p-4 transition-all hover:border-[var(--cyan)]/30 hover:scale-[1.02] duration-300">
     <div className="flex items-center gap-3 mb-2">
-      <div className="p-2 rounded-xl bg-black/40 text-white/40 group-hover:text-[#00e5ff] transition-colors">
+      <div className="p-2 rounded-xl bg-black/40 text-white/40 group-hover:text-[var(--cyan)] transition-colors">
         <Icon size={24} className="group-hover:rotate-[60deg] transition-all duration-700" />
       </div>
       <span className="text-[10px] uppercase tracking-widest font-mono text-white/40">{label}</span>
@@ -151,7 +153,7 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
     <div className="flex justify-between items-baseline">
       <label className="text-[10px] uppercase tracking-widest font-mono text-white/30">{label}</label>
       <div className="flex items-baseline gap-1">
-        <span className="text-xs font-mono font-bold text-[#00e5ff]">{value}</span>
+        <span className="text-xs font-mono font-bold text-[var(--cyan)]">{value}</span>
         <span className="text-[9px] font-mono text-white/20">{unit}</span>
       </div>
     </div>
@@ -162,7 +164,7 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
       step={step}
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[#00e5ff] hover:accent-white transition-all"
+      className="w-full h-1 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] hover:accent-white transition-all"
     />
   </div>
 );
@@ -172,6 +174,7 @@ const ControlSlider = ({ label, value, min, max, step = 1, onChange, unit }: any
 // ════════════════════════════════════════════
 
 export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = {}) {
+  const precision = useGlobalPrecision();
     const { language } = useI18nStore();
     const t = getFastenersModuleUiStrings(language);
 
@@ -256,12 +259,12 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
     };
 
     return (
-        <div className="flex flex-col h-full bg-transparent text-[#C5C6C7] select-none p-6 overflow-y-auto">
+        <div className="flex flex-col h-full bg-transparent text-[var(--alu)] select-none p-6 overflow-y-auto">
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
-                    <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">{t.title}</h1>
-                    <p className="text-[10px] font-mono tracking-[0.25em] text-[#00e5ff]/50 uppercase mt-1">{t.subtitle}</p>
+                    <h1 className="text-2xl font-black tracking-tighter text-white uppercase">{t.title}</h1>
+                    <p className="text-[10px] font-mono tracking-[0.25em] text-[var(--cyan)]/50 uppercase mt-1">{t.subtitle}</p>
                 </div>
                 <Link href={torqueLink}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/30 text-[10px] font-bold uppercase tracking-wider text-orange-400 hover:bg-orange-500/20 transition-all shrink-0">
@@ -270,11 +273,11 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
             </div>
 
             {/* Viewport Panel (Full-width, matching Planetary Gearbox Schematic) */}
-            <div className="p-4 bg-[#0a1018]/10 border border-[#00e5ff]/20 rounded-2xl mb-6 shadow-2xl">
+            <div className="p-4 bg-[var(--bg-1)]/10 border border-[var(--cyan)]/20 rounded-2xl mb-6 shadow-2xl">
                 <EngineeringVisualization status={status} label="FASTENER THREAD GEOMETRY">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
                         {/* Left side: Dynamic 2D Thread Profile / Engagement Visualizer */}
-                        <div className="bg-[#0a0c10] border border-[#00e5ff]/10 rounded-xl flex flex-col items-center justify-center p-6 min-h-[300px] relative overflow-hidden">
+                        <div className="bg-[var(--bg-1)] border border-[var(--cyan)]/10 rounded-xl flex flex-col items-center justify-center p-6 min-h-[300px] relative overflow-hidden">
                             <ThreadEngagementVisualizer results={results} fastenerType={fastenerType} length={length} />
                             <div className="absolute bottom-4 left-4 flex flex-col gap-1">
                                 <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">{t.engagementDynamics}</span>
@@ -282,7 +285,7 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                         </div>
 
                         {/* Right side: Blueprint */}
-                        <div className="bg-[#0a0c10] border border-[#00e5ff]/10 rounded-xl flex flex-col items-center justify-center p-6 min-h-[300px] relative">
+                        <div className="bg-[var(--bg-1)] border border-[var(--cyan)]/10 rounded-xl flex flex-col items-center justify-center p-6 min-h-[300px] relative">
                             <TechnicalDrawing
                                 mode="fastener"
                                 activeField={null}
@@ -290,7 +293,7 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                             />
                             <div className="absolute bottom-4 right-4 flex flex-col gap-1 items-end bg-black/60 p-3 rounded-2xl border border-white/5">
                                 <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">{standard}</span>
-                                <span className="text-lg font-black font-mono text-[#00e5ff] tracking-widest mt-0.5">{size}</span>
+                                <span className="text-lg font-black font-mono text-[var(--cyan)] tracking-widest mt-0.5">{size}</span>
                             </div>
                         </div>
                     </div>
@@ -303,11 +306,11 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                 {/* Left Column: Configuration & Inputs */}
                 <div className="lg:col-span-4 space-y-6">
                     {/* Actions Panel */}
-                    <div className="p-4 rounded-xl bg-[#0a1018]/20 border border-white/5">
+                    <div className="p-4 rounded-xl bg-[var(--bg-1)]/20 border border-white/5">
                         <button
                             onClick={() => setIsReportModalOpen(true)}
                             disabled={status !== 'valid'}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#00e5ff] hover:bg-[#00e5ff]/80 disabled:opacity-40 disabled:pointer-events-none text-black font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--cyan)] hover:bg-[var(--cyan)]/80 disabled:opacity-40 disabled:pointer-events-none text-black font-bold text-sm transition-all shadow-md active:scale-95 whitespace-nowrap"
                         >
                             <FileText size={14} />
                             PDF SPEC
@@ -315,10 +318,10 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                     </div>
 
                     {/* Thread Standard Selection */}
-                    <div className="p-6 rounded-2xl border border-white/5 bg-[#0a1018]/30 backdrop-blur-xl space-y-6">
+                    <div className="p-6 rounded-2xl border border-white/5 bg-[var(--bg-1)]/30 space-y-6">
                         <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-[#00e5ff]">{t.specification}</h3>
-                            <Cog size={14} className="text-[#00e5ff]" />
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--cyan)]">{t.specification}</h3>
+                            <Cog size={14} className="text-[var(--cyan)]" />
                         </div>
 
                         {/* Fastener Type & Unit Toggles */}
@@ -329,7 +332,7 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                                         onClick={() => setFastenerType('bolt')} 
                                         className={`flex-1 text-[10px] font-black tracking-widest uppercase transition-all py-2 rounded-lg ${
                                             fastenerType === 'bolt' 
-                                                ? 'bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/30 shadow-[0_0_10px_rgba(0,229,255,0.15)]' 
+                                                ? 'bg-[var(--cyan)]/20 text-[var(--cyan)] border border-[var(--cyan)]/30 ' 
                                                 : 'text-gray-400 hover:text-white'
                                         }`}
                                     >
@@ -339,7 +342,7 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                                         onClick={() => setFastenerType('nut')} 
                                         className={`flex-1 text-[10px] font-black tracking-widest uppercase transition-all py-2 rounded-lg ${
                                             fastenerType === 'nut' 
-                                                ? 'bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/30 shadow-[0_0_10px_rgba(0,229,255,0.15)]' 
+                                                ? 'bg-[var(--cyan)]/20 text-[var(--cyan)] border border-[var(--cyan)]/30 ' 
                                                 : 'text-gray-400 hover:text-white'
                                         }`}
                                     >
@@ -374,12 +377,12 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                             <div className="space-y-2">
                                 <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest block">{t.stdFamily}</label>
                                 <select
-                                    className="w-full bg-[#0a1018] border border-white/5 focus:border-[#00e5ff]/50 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none cursor-pointer"
+                                    className="w-full bg-[var(--bg-1)] border border-white/5 focus:border-[var(--cyan)]/50 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none cursor-pointer"
                                     value={standard}
                                     onChange={(e) => setStandard(e.target.value as any)}
                                 >
-                                    {(['ISO Metric', 'ISO Metric Fine', 'UNC', 'UNF', 'BSPP (G)', 'NPT']).map(s => (
-                                        <option key={s} value={s} className="bg-[#020408]">{s}</option>
+                                    {(['ISO Metric', 'ISO Metric Fine', 'UNC', 'UNF', 'UNEF', 'BSW', 'BSF', 'BSPP (G)', 'BSPT (R)', 'NPT', 'NPTF', 'Trapezoidal (Tr)', 'ACME', 'Buttress (S)', 'Square', 'Round (Rd)']).map(s => (
+                                        <option key={s} value={s} className="bg-[var(--bg-0)]">{s}</option>
                                     ))}
                                 </select>
                             </div>
@@ -389,7 +392,7 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                                 <div className="flex gap-2">
                                     {(['fine', 'normal', 'coarse'] as const).map(s => (
                                         <button key={s} onClick={() => setClearanceSeries(s)}
-                                            className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg ${clearanceSeries === s ? 'bg-[#00e5ff] text-black' : 'bg-white/5 text-slate-400'}`}>
+                                            className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg ${clearanceSeries === s ? 'bg-[var(--cyan)] text-black' : 'bg-white/5 text-slate-400'}`}>
                                             {s}
                                         </button>
                                     ))}
@@ -399,9 +402,9 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                     </div>
 
                     {/* Dimensions Selection Card */}
-                    <div className="p-6 rounded-2xl border border-white/5 bg-[#0a1018]/30 backdrop-blur-xl space-y-6">
+                    <div className="p-6 rounded-2xl border border-white/5 bg-[var(--bg-1)]/30 space-y-6">
                         <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-[#00e5ff]">{t.sizing}</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--cyan)]">{t.sizing}</h3>
                             <span className="px-2 py-0.5 rounded bg-black/40 text-[9px] font-mono text-white/30">ISO/ANSI</span>
                         </div>
 
@@ -409,11 +412,11 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                             <div className="space-y-2">
                                 <label className="text-[9px] font-bold text-white/30 uppercase tracking-widest block">{t.nomSize}</label>
                                 <select
-                                    className="w-full bg-[#0a1018] border border-white/5 focus:border-[#00e5ff]/50 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none cursor-pointer"
+                                    className="w-full bg-[var(--bg-1)] border border-white/5 focus:border-[var(--cyan)]/50 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none cursor-pointer"
                                     value={size}
                                     onChange={(e) => setSize(e.target.value)}
                                 >
-                                    {availableSizes.map(s => <option key={s} value={s} className="bg-[#020408]">{s}</option>)}
+                                    {availableSizes.map(s => <option key={s} value={s} className="bg-[var(--bg-0)]">{s}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-2">
@@ -454,26 +457,25 @@ export function FastenersModule({ lang, dict }: { lang?: string, dict?: any } = 
                         </div>
 
                         {/* Extended Details Panel */}
-                        <div className="p-6 rounded-2xl border border-white/5 bg-[#0a1018]/20 backdrop-blur-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#00e5ff]/5 blur-[80px] rounded-full pointer-events-none" />
+                        <div className="p-6 rounded-2xl border border-white/5 bg-[var(--bg-1)]/20 relative overflow-hidden">
                             
                             <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
-                                <span className="text-[10px] font-bold tracking-[0.2em] text-[#00e5ff] uppercase flex items-center gap-1.5">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--cyan)] uppercase flex items-center gap-1.5">
                                     <RotateCw size={12} className="animate-spin-slow" />
                                     {t.detailedThreadMetrics}
                                 </span>
                                 <div className="flex items-center gap-4 text-[10px] text-white/40 font-mono">
-                                    <div>{t.pitch}: <span className="text-[#00e5ff] font-bold">{results.displayPitch}</span></div>
+                                    <div>{t.pitch}: <span className="text-[var(--cyan)] font-bold">{results.displayPitch}</span></div>
                                     <div className="flex items-center gap-1">
                                         {status === 'valid' ? (
                                             <>
-                                                <CheckCircle size={12} className="text-[#10B981]" />
-                                                <span className="text-[#10B981]">{t.validGeometry}</span>
+                                                <CheckCircle size={12} className="text-[var(--ok)]" />
+                                                <span className="text-[var(--ok)]">{t.validGeometry}</span>
                                             </>
                                         ) : (
                                             <>
-                                                <AlertTriangle size={12} className="text-[#FF4D4D] animate-pulse" />
-                                                <span className="text-[#FF4D4D]">{t.outOfBounds}</span>
+                                                <AlertTriangle size={12} className="text-[var(--bad)] animate-pulse" />
+                                                <span className="text-[var(--bad)]">{t.outOfBounds}</span>
                                             </>
                                         )}
                                     </div>

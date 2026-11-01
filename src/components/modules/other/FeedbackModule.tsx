@@ -13,7 +13,7 @@ export default function FeedbackModule() {
 
         const subject = `[AluCalc Feedback] ${type.toUpperCase()}`;
         const body = `Type: ${type}\n\nMessage:\n${message}`;
-        const mailtoUrl = `mailto:contact@alucalculator.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = `mailto:abdulsametyildirim95@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
         window.location.href = mailtoUrl;
 
@@ -26,11 +26,11 @@ export default function FeedbackModule() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#1e1e1e] text-slate-200 p-6 select-none">
+        <div className="flex flex-col h-full bg-[var(--bg-3)] text-slate-200 p-6 select-none">
 
             {/* Header */}
             <div className="mb-6 text-center border-b border-white/5 pb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 ">
                     <MessageSquare size={32} className="text-blue-400" />
                 </div>
                 <h3 className="text-lg font-bold text-white tracking-wide">Contact & Feedback</h3>
@@ -41,7 +41,7 @@ export default function FeedbackModule() {
 
             {sent ? (
                 <div className="flex-1 flex flex-col items-center justify-center space-y-4 animate-in fade-in zoom-in duration-500">
-                    <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center ring-1 ring-green-500/50 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
+                    <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center ring-1 ring-green-500/50 ">
                         <ThumbsUp size={40} className="text-green-400" />
                     </div>
                     <div className="text-center">
@@ -57,7 +57,7 @@ export default function FeedbackModule() {
                             type="button"
                             onClick={() => setType('bug')}
                             className={`flex flex-col items-center p-3 rounded-xl border transition-all duration-200 group ${type === 'bug'
-                                ? 'bg-red-500/10 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
+                                ? 'bg-red-500/10 border-red-500/50 text-red-400 '
                                 : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10 hover:border-white/10'
                                 }`}
                         >
@@ -69,7 +69,7 @@ export default function FeedbackModule() {
                             type="button"
                             onClick={() => setType('feature')}
                             className={`flex flex-col items-center p-3 rounded-xl border transition-all duration-200 group ${type === 'feature'
-                                ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                                ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 '
                                 : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10 hover:border-white/10'
                                 }`}
                         >
@@ -81,7 +81,7 @@ export default function FeedbackModule() {
                             type="button"
                             onClick={() => setType('general')}
                             className={`flex flex-col items-center p-3 rounded-xl border transition-all duration-200 group ${type === 'general'
-                                ? 'bg-purple-500/10 border-purple-500/50 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]'
+                                ? 'bg-purple-500/10 border-purple-500/50 text-purple-400 '
                                 : 'bg-white/5 border-white/5 text-slate-500 hover:bg-white/10 hover:border-white/10'
                                 }`}
                         >
@@ -106,7 +106,7 @@ export default function FeedbackModule() {
                     <button
                         type="submit"
                         disabled={!message.trim()}
-                        className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all active:scale-[0.98]"
+                        className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]"
                     >
                         <Send size={16} />
                         <span>Send Message</span>

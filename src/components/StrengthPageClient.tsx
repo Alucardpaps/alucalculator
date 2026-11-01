@@ -48,8 +48,10 @@ const ANALYSIS_MODES: { id: AnalysisMode; label: string; labelTr: string; icon: 
 ];
 
 import { getStrengthPageStrings, getStrengthModeLabel, getStrengthShapeLabel } from '@/locales/strengthPageTranslations';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 export default function StrengthPageClient({ lang, dict }: { lang: string, dict: any }) {
+    const precision = useGlobalPrecision();
     const s = getStrengthPageStrings(lang);
     const [mode, setMode] = useState<AnalysisMode>('principal');
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
@@ -185,7 +187,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
         <main className="min-h-screen flex flex-col items-center p-4 lg:p-8 font-sans overflow-hidden">
 
             {/* Header */}
-            <header className="w-full max-w-7xl flex flex-wrap justify-between items-center mb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+            <header className="w-full max-w-7xl flex flex-wrap justify-between items-center mb-6 bg-white/80 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 ${currentModeInfo.color} rounded flex items-center justify-center text-white font-black text-xl`}>σ</div>
                     <div>
@@ -263,7 +265,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                         key={shape}
                                         onClick={() => setSelectedShape(shape)}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${selectedShape === shape
-                                            ? 'bg-cyan-500 text-white'
+                                            ? 'bg-[var(--cyan)] text-[var(--accent-ink)]'
                                             : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                             }`}
                                     >
@@ -317,19 +319,19 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-slate-700/50 rounded-lg">
                                 <div>
                                     <div className="text-[10px] text-slate-500 uppercase">A (Area)</div>
-                                    <div className="text-lg font-mono text-cyan-400">{sectionProps.area_mm2.toFixed(0)} <span className="text-xs text-slate-400">mm²</span></div>
+                                    <div className="text-lg font-mono text-cyan-400">{formatEngineeringValue(sectionProps.area_mm2, precision, false)} <span className="text-xs text-slate-400">mm²</span></div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-500 uppercase">Ix (Inertia)</div>
-                                    <div className="text-lg font-mono text-cyan-400">{sectionProps.Ix_mm4.toFixed(0)} <span className="text-xs text-slate-400">mm⁴</span></div>
+                                    <div className="text-lg font-mono text-cyan-400">{formatEngineeringValue(sectionProps.Ix_mm4, precision, false)} <span className="text-xs text-slate-400">mm⁴</span></div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-500 uppercase">Wx (Section Mod.)</div>
-                                    <div className="text-lg font-mono text-cyan-400">{sectionProps.Wx_mm3.toFixed(0)} <span className="text-xs text-slate-400">mm³</span></div>
+                                    <div className="text-lg font-mono text-cyan-400">{formatEngineeringValue(sectionProps.Wx_mm3, precision, false)} <span className="text-xs text-slate-400">mm³</span></div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-500 uppercase">J (Polar)</div>
-                                    <div className="text-lg font-mono text-cyan-400">{sectionProps.J_mm4.toFixed(0)} <span className="text-xs text-slate-400">mm⁴</span></div>
+                                    <div className="text-lg font-mono text-cyan-400">{formatEngineeringValue(sectionProps.J_mm4, precision, false)} <span className="text-xs text-slate-400">mm⁴</span></div>
                                 </div>
                             </div>
                         </>
@@ -388,7 +390,7 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             </div>
                             <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                                 <div className="text-[10px] text-slate-500">Material: {selectedMaterial.name}</div>
-                                <div className="text-[10px] text-slate-500">Sy = {selectedMaterial.Sy} MPa | Su = {selectedMaterial.Su} MPa | Se ≈ {selectedMaterial.Se || (selectedMaterial.Sy * 0.5).toFixed(0)} MPa</div>
+                                <div className="text-[10px] text-slate-500">Sy = {selectedMaterial.Sy} MPa | Su = {selectedMaterial.Su} MPa | Se ≈ {formatEngineeringValue(selectedMaterial.Se || (selectedMaterial.Sy * 0.5), precision, false)} MPa</div>
                             </div>
                         </div>
                     )}
@@ -529,13 +531,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">Von Mises (σeq)</div>
                                     <div className={`text-4xl font-mono font-bold ${safetyFactor.status === 'failure' ? 'text-red-400' : safetyFactor.status === 'marginal' ? 'text-yellow-400' : 'text-green-400'}`}>
-                                        {vonMisesStress.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(vonMisesStress, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold flex items-center gap-2 ${safetyFactor.status === 'failure' ? 'text-red-400' : safetyFactor.status === 'marginal' ? 'text-yellow-400' : 'text-green-400'}`}>
-                                        {safetyFactor.fos.toFixed(2)}
+                                        {formatEngineeringValue(safetyFactor.fos, precision, false)}
                                         {safetyFactor.status === 'safe' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
                                     </div>
                                 </div>
@@ -543,24 +545,24 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                             <div className="grid grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-700">
                                 <div>
                                     <div className="text-[10px] text-emerald-400 uppercase">σ₁ (Max)</div>
-                                    <div className="font-mono text-lg">{principalResults.sigma1.toFixed(1)}</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(principalResults.sigma1, precision, false)}</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-blue-400 uppercase">σ₂ (Min)</div>
-                                    <div className="font-mono text-lg">{principalResults.sigma2.toFixed(1)}</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(principalResults.sigma2, precision, false)}</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-red-400 uppercase">τmax</div>
-                                    <div className="font-mono text-lg">{principalResults.tauMax.toFixed(1)}</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(principalResults.tauMax, precision, false)}</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-purple-400 uppercase">θp</div>
-                                    <div className="font-mono text-lg">{principalResults.angle.toFixed(1)}°</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(principalResults.angle, precision, false)}°</div>
                                 </div>
                             </div>
                             <div className="mt-4 pt-4 border-t border-slate-700">
                                 <div className="text-[10px] text-slate-400 uppercase mb-1">Tresca Stress</div>
-                                <div className="font-mono text-lg">{trescaStress.toFixed(1)} MPa</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(trescaStress, precision, false)} MPa</div>
                             </div>
                         </div>
                     )}
@@ -572,14 +574,14 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">Goodman n</div>
                                     <div className={`text-4xl font-mono font-bold ${fatigueGoodman.safe ? 'text-green-400' : 'text-red-400'}`}>
-                                        {fatigueGoodman.safetyCycles.toFixed(2)}
+                                        {formatEngineeringValue(fatigueGoodman.safetyCycles, precision, false)}
                                     </div>
                                     <div className="text-xs text-slate-500 mt-1">{fatigueGoodman.safe ? 'Safe for infinite life' : 'Finite life expected'}</div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">Soderberg n</div>
                                     <div className={`text-4xl font-mono font-bold ${fatigueSoderberg.safe ? 'text-green-400' : 'text-orange-400'}`}>
-                                        {fatigueSoderberg.safetyCycles.toFixed(2)}
+                                        {formatEngineeringValue(fatigueSoderberg.safetyCycles, precision, false)}
                                     </div>
                                     <div className="text-xs text-slate-500 mt-1">(Conservative)</div>
                                 </div>
@@ -594,24 +596,24 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.criticalLoad}</div>
                                     <div className="text-4xl font-mono font-bold text-red-400">
-                                        {(bucklingResults.Pcr / 1000).toFixed(1)} <span className="text-lg">kN</span>
+                                        {formatEngineeringValue(bucklingResults.Pcr / 1000, precision, false)} <span className="text-lg">kN</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold ${bucklingResults.safe ? 'text-green-400' : 'text-red-400'}`}>
-                                        {(bucklingResults.Pcr / appliedLoad).toFixed(2)}
+                                        {formatEngineeringValue(bucklingResults.Pcr / appliedLoad, precision, false)}
                                     </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-700">
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">σcr</div>
-                                    <div className="font-mono text-lg">{bucklingResults.Scr.toFixed(1)} MPa</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(bucklingResults.Scr, precision, false)} MPa</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">λ (Slenderness)</div>
-                                    <div className="font-mono text-lg">{bucklingResults.slendernessRatio.toFixed(1)}</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(bucklingResults.slendernessRatio, precision, false)}</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">Mode</div>
@@ -628,24 +630,24 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxDeflection}</div>
                                     <div className="text-4xl font-mono font-bold text-green-400">
-                                        {beamResults.maxDeflection.toFixed(3)} <span className="text-lg">mm</span>
+                                        {formatEngineeringValue(beamResults.maxDeflection, precision, false)} <span className="text-lg">mm</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxStress}</div>
                                     <div className="text-4xl font-mono font-bold text-purple-400">
-                                        {beamResults.maxStress.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(beamResults.maxStress, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-700">
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">Mmax</div>
-                                    <div className="font-mono">{(beamResults.maxMoment / 1000).toFixed(1)} kN·mm</div>
+                                    <div className="font-mono">{formatEngineeringValue(beamResults.maxMoment / 1000, precision, false)} kN·mm</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">Vmax</div>
-                                    <div className="font-mono">{beamResults.maxShear.toFixed(0)} N</div>
+                                    <div className="font-mono">{formatEngineeringValue(beamResults.maxShear, precision, false)} N</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">Formula</div>
@@ -662,13 +664,13 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.maxShearStress}</div>
                                     <div className="text-4xl font-mono font-bold text-cyan-400">
-                                        {torsionResults.maxShearStress.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(torsionResults.maxShearStress, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.angleOfTwist}</div>
                                     <div className="text-4xl font-mono font-bold text-cyan-400">
-                                        {torsionResults.angleOfTwistDeg.toFixed(3)} <span className="text-lg">°</span>
+                                        {formatEngineeringValue(torsionResults.angleOfTwistDeg, precision, false)} <span className="text-lg">°</span>
                                     </div>
                                 </div>
                             </div>
@@ -683,19 +685,19 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.hoopStress}</div>
                                     <div className="text-3xl font-mono font-bold text-pink-400">
-                                        {pressureResults.hoopStress.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(pressureResults.hoopStress, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.axialStress}</div>
                                     <div className="text-3xl font-mono font-bold text-pink-400">
-                                        {pressureResults.axialStress.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(pressureResults.axialStress, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-4 pt-4 border-t border-slate-700">
                                 <div className="text-[10px] text-slate-400 uppercase mb-1">Von Mises</div>
-                                <div className="font-mono text-2xl">{pressureResults.vonMises.toFixed(1)} MPa</div>
+                                <div className="font-mono text-2xl">{formatEngineeringValue(pressureResults.vonMises, precision, false)} MPa</div>
                             </div>
                         </div>
                     )}
@@ -707,24 +709,24 @@ export default function StrengthPageClient({ lang, dict }: { lang: string, dict:
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">Von Mises</div>
                                     <div className="text-4xl font-mono font-bold text-amber-400">
-                                        {combinedResults.vonMises.toFixed(1)} <span className="text-lg">MPa</span>
+                                        {formatEngineeringValue(combinedResults.vonMises, precision, false)} <span className="text-lg">MPa</span>
                                     </div>
                                 </div>
                                 <div>
                                     <div className="text-slate-400 text-xs font-bold uppercase mb-1">{s.safetyFactor}</div>
                                     <div className={`text-4xl font-mono font-bold ${combinedResults.safetyFactor >= 2 ? 'text-green-400' : combinedResults.safetyFactor >= 1 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                        {combinedResults.safetyFactor.toFixed(2)}
+                                        {formatEngineeringValue(combinedResults.safetyFactor, precision, false)}
                                     </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-700">
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">σ (Normal)</div>
-                                    <div className="font-mono text-lg">{combinedResults.normalStress.toFixed(1)} MPa</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(combinedResults.normalStress, precision, false)} MPa</div>
                                 </div>
                                 <div>
                                     <div className="text-[10px] text-slate-400 uppercase">τ (Shear)</div>
-                                    <div className="font-mono text-lg">{combinedResults.shearStress.toFixed(1)} MPa</div>
+                                    <div className="font-mono text-lg">{formatEngineeringValue(combinedResults.shearStress, precision, false)} MPa</div>
                                 </div>
                             </div>
                         </div>

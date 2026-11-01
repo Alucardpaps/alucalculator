@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — Core Type Definitions
+ * AluCAD OS v5.0 — Core Type Definitions
  *
  * Single source of truth for the entire Workspace Engine type system.
  * All stores, engines, and components import from here.
@@ -45,8 +45,12 @@ export interface ComponentMetadata {
   // Bearing params
   innerDia?: number;
   outerDia?: number;
+  bearingType?: string;
+  needleType?: string;
   // Key params
   height?: number;
+  /** Calculation or spec note */
+  calculationResult?: string;
 }
 
 export interface WorkspaceComponent {
@@ -158,7 +162,7 @@ export const DEFAULT_METADATA: Record<ComponentType, ComponentMetadata> = {
   bracket: { material: 'AL-6063-T5', weight: 0.08, unitCost: 3.2 },
   bolt: { material: 'Steel 8.8', weight: 0.015, unitCost: 0.45 },
   gear: { teeth: 24, module: 2, width: 20, material: 'Steel C45', weight: 0.85, unitCost: 18.5 },
-  bearing: { innerDia: 20, outerDia: 47, width: 14, material: 'Chrome Steel', weight: 0.12, unitCost: 6.5 },
+  bearing: { innerDia: 20, outerDia: 47, width: 14, material: 'Chrome Steel', weight: 0.12, unitCost: 6.5, bearingType: 'deep-groove-ball' },
   key: { length: 20, width: 6, height: 6, material: 'Steel C45', weight: 0.02, unitCost: 1.2 },
 };
 

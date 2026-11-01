@@ -55,10 +55,12 @@ export function CommandLine({ className }: CommandLineProps) {
             // 2. Don't hijack if user is holding modifiers (to allow shortcuts like Ctrl+Shift+P)
             if (e.ctrlKey || e.altKey || e.metaKey) return;
 
-            // 3. Only focus if we are in CAD mode or the window is active
-            // Note: workspaceMode is tracked in osStore
-            const { workspaceMode } = useOSStore.getState();
-            if (workspaceMode !== 'cad' && workspaceMode !== 'desk') return;
+            // 3. Single-key shortcut: 'm' / 'M' immediately activates MEASURE tool
+            if (e.key.toLowerCase() === 'm') {
+                e.preventDefault();
+                commandProcessor.startCommand('MEASURE');
+                return;
+            }
 
             inputRef.current?.focus();
         };
@@ -72,10 +74,11 @@ export function CommandLine({ className }: CommandLineProps) {
         const upper = trimmed.toUpperCase();
 
         if (!trimmed) {
-            // Empty Enter: finish/cancel current command
+            // Empty Enter: finish active command OR repeat last command
             if (activeCommand) {
-                // Send Enter key to active command for state transitions
                 commandProcessor.getActiveCommand()?.onKeyInput('Enter');
+            } else {
+                commandProcessor.repeatLastCommand();
             }
             return;
         }
@@ -110,6 +113,14 @@ export function CommandLine({ className }: CommandLineProps) {
     }, [activeCommand, undo, redo]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        // 'm' or 'M' when input is empty activates MEASURE immediately
+        if (inputValue === '' && e.key.toLowerCase() === 'm' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            e.preventDefault();
+            inputRef.current?.blur();
+            commandProcessor.startCommand('MEASURE');
+            return;
+        }
+
         // Enter: Execute
         if (e.key === 'Enter') {
             processCommand(inputValue);
@@ -155,10 +166,10 @@ export function CommandLine({ className }: CommandLineProps) {
 
     return (
         <div
-            className={`bg-[#0a0e12]/95 backdrop-blur-md border-t border-[#2a3a4a] ${className}`}
+            className={`bg-[var(--bg-1)]/95 border-t border-[var(--line-strong)] ${className}`}
         >
             {/* Status Bar */}
-            <div className="flex items-center justify-between px-4 py-1 text-[10px] uppercase tracking-wider border-b border-[#1a2530]">
+            <div className="flex items-center justify-between px-4 py-1 text-[10px] uppercase tracking-wider border-b border-[var(--line)]">
                 {/* Mode Indicators */}
                 <div className="flex items-center gap-4">
                     <StatusIndicator

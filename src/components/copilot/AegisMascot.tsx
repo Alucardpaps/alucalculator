@@ -1,906 +1,976 @@
 'use client';
 
-import React, { useState, useEffect, useId, useRef } from 'react';
-import { useI18nStore } from '@/store/i18nStore';
-import { getChrome } from '@/locales/chromeTranslations';
+/**
+ * AeGiS — AluCalc's engineering companion (v6 redesign).
+ *
+ * "Floating parts" character: a glossy capsule head that levitates above an egg-shaped
+ * body, flipper arms that hover beside it and a small thruster underneath. Each part
+ * floats with a slight delay (follow-through), the head turns with layered parallax and
+ * the OLED face carries the expressions.
+ *
+ * Public API is unchanged (props, poses, playMascotChirp) so every caller keeps working.
+ *  - Colours: --ag-* tokens in styles/themes.css (dark: titanium, light: white ceramic).
+ *  - Gaze: inherited --lx/--ly CSS variables (set by the page without React renders) or
+ *    the `lookAt` prop.
+ *  - Motion pauses off-screen / in background tabs and stops for prefers-reduced-motion.
+ *  - Sound: one shared AudioContext, silent until the visitor interacts, mutable.
+ */
+
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import styles from './AegisMascot.module.css';
 
 export type AegisPose =
   | 'idle'
+  | 'wave'
   | 'blueprint'
   | 'calculation'
-  | 'einstein'
+  | 'celebrate'
   | 'tesla'
   | 'newton'
-  | 'wave'
-  | 'thinking'
-  | 'celebrate'
+  | 'cad3d'
+  | 'laser'
+  | 'quest'
+  | 'einstein'
   | 'walk'
-  | 'run'
-  | 'jump'
-  | 'apple'
+  | 'thinking'
+  | 'speaking'
+  | 'listening'
+  | 'error'
   | 'auto';
 
-export type AegisVariant = 'panoramic' | 'face' | 'full';
+export type AegisBodyPart = 'visor' | 'heart' | 'leftHand' | 'rightHand';
 
-interface AegisMascotProps {
-  size?: number | string;
+export interface AegisMascotProps {
+  size?: number;
+  /** fill the parent's width (square, aspect-ratio 1) instead of a fixed px size */
+  fluid?: boolean;
+  variant?: 'full' | 'compact' | 'face' | 'panoramic';
   className?: string;
   isHovered?: boolean;
+  /** Normalised gaze target (-1…1). When omitted the mascot inherits --lx/--ly from the page. */
+  lookAt?: { x: number; y: number } | null;
   pose?: AegisPose;
-  variant?: AegisVariant;
+  soundEnabled?: boolean;
   interactive?: boolean;
-  onPoseChange?: (pose: AegisPose) => void;
+  onPoseChange?: (activePose: Exclude<AegisPose, 'auto'>) => void;
+  onPartInteract?: (part: AegisBodyPart, messageTr: string, messageEn: string) => void;
+  /** Hide hand-held props (holograms, tools). Arm poses and celebration stay. */
+  clean?: boolean;
+  emotion?: 'normal' | 'happy' | 'curious' | 'wink' | 'celebrate';
+  squashStretch?: { sx: number; sy: number };
 }
 
-/**
- * 🤖 AEGIS COPILOT — PANORAMIC HOLOGRAPHIC SCIENTIST & CAD CANVAS
- * - 'panoramic': Wide-angle HUD with live CAD blueprints, tensor equations & spacetime physics.
- * - 'face': Tight, high-definition zoom on AeGiS's adorable face, big shiny anime eyes & blush.
- */
+type Pose = Exclude<AegisPose, 'auto' | 'einstein' | 'walk'>;
+type Expression = 'normal' | 'happy' | 'curious' | 'wink' | 'focused' | 'thinking' | 'speaking' | 'error';
+
+const AUTO_POSE_SEQUENCE: Array<Exclude<AegisPose, 'auto'>> = [
+  'blueprint',
+  'cad3d',
+  'laser',
+  'calculation',
+  'tesla',
+  'newton',
+  'quest',
+  'celebrate',
+  'wave',
+];
+
+// ─── sound ──────────────────────────────────────────────────────────────────
+
+const SOUND_KEY = 'alucalc-ui-sound';
+let sharedAudio: AudioContext | null = null;
+
+export function isMascotSoundEnabled(): boolean {
+  try {
+    return localStorage.getItem(SOUND_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export function setMascotSoundEnabled(on: boolean) {
+  try {
+    localStorage.setItem(SOUND_KEY, on ? 'on' : 'off');
+    window.dispatchEvent(new CustomEvent('alucalc-ui-sound', { detail: on }));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+function audioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
+  // Never start audio before the visitor has interacted with the page.
+  const activation = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+  if (activation && !activation.hasBeenActive) return null;
+  try {
+    if (!sharedAudio) {
+      const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Ctor) return null;
+      sharedAudio = new Ctor();
+    }
+    if (sharedAudio.state === 'suspended') void sharedAudio.resume().catch(() => undefined);
+    return sharedAudio.state === 'closed' ? null : sharedAudio;
+  } catch {
+    return null;
+  }
+}
+
+function tone(ctx: AudioContext, freq: number, at: number, dur: number, type: OscillatorType, peak: number, glideTo?: number) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, at);
+  if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, at + dur * 0.9);
+  gain.gain.setValueAtTime(0.0001, at);
+  gain.gain.exponentialRampToValueAtTime(peak, at + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(at);
+  osc.stop(at + dur + 0.02);
+}
+
+/** Short synthesized chime. Silent until the visitor has interacted with the page. */
+export function playMascotChirp(
+  freq = 880,
+  type: 'ping' | 'solve' | 'calc' | 'laser' | 'overdrive' = 'ping'
+) {
+  if (typeof window === 'undefined' || !isMascotSoundEnabled()) return;
+  const ctx = audioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime + 0.01;
+    if (type === 'solve') {
+      [587.33, 880, 1174.66].forEach((f, i) => tone(ctx, f, now + i * 0.055, 0.14, 'sine', 0.02));
+    } else if (type === 'overdrive') {
+      [440, 554.37, 659.25, 880].forEach((f, i) => tone(ctx, f, now + i * 0.04, 0.14, 'triangle', 0.02));
+    } else if (type === 'laser') {
+      tone(ctx, 1320, now, 0.12, 'sawtooth', 0.012, 520);
+    } else if (type === 'calc') {
+      [740, 987.77].forEach((f, i) => tone(ctx, f, now + i * 0.045, 0.09, 'triangle', 0.016));
+    } else {
+      tone(ctx, freq, now, 0.1, 'sine', 0.02, freq * 1.35);
+    }
+  } catch {
+    /* ignore audio failures */
+  }
+}
+
+// ─── hooks ──────────────────────────────────────────────────────────────────
+
+export function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
+  return reduced;
+}
+
+/** true while the element is on screen and the tab is visible */
+function useActive(ref: React.RefObject<HTMLElement | null>): boolean {
+  const [onScreen, setOnScreen] = useState(true);
+  const [pageVisible, setPageVisible] = useState(true);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { rootMargin: '120px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  useEffect(() => {
+    const update = () => setPageVisible(document.visibilityState !== 'hidden');
+    update();
+    document.addEventListener('visibilitychange', update);
+    return () => document.removeEventListener('visibilitychange', update);
+  }, []);
+  return onScreen && pageVisible;
+}
+
+/** Random blinks and idle saccades written straight to the DOM (no React renders). */
+function useLife(ref: React.RefObject<HTMLElement | null>, enabled: boolean, saccades: boolean) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    let blinkTimer: ReturnType<typeof setTimeout>;
+    let sacTimer: ReturnType<typeof setTimeout>;
+    let closeTimer: ReturnType<typeof setTimeout>;
+    const blink = () => {
+      el.classList.add(styles.blink);
+      closeTimer = setTimeout(() => {
+        el.classList.remove(styles.blink);
+        if (Math.random() < 0.18) {
+          closeTimer = setTimeout(() => {
+            el.classList.add(styles.blink);
+            closeTimer = setTimeout(() => el.classList.remove(styles.blink), 110);
+          }, 150);
+        }
+      }, 120);
+      blinkTimer = setTimeout(blink, 2600 + Math.random() * 3800);
+    };
+    blinkTimer = setTimeout(blink, 1200 + Math.random() * 2000);
+    const saccade = () => {
+      if (Math.random() < 0.35) {
+        el.style.setProperty('--sx', '0');
+        el.style.setProperty('--sy', '0');
+      } else {
+        el.style.setProperty('--sx', ((Math.random() - 0.5) * 0.7).toFixed(2));
+        el.style.setProperty('--sy', ((Math.random() - 0.5) * 0.45).toFixed(2));
+      }
+      sacTimer = setTimeout(saccade, 1700 + Math.random() * 2800);
+    };
+    if (saccades) sacTimer = setTimeout(saccade, 1500);
+    return () => {
+      clearTimeout(blinkTimer);
+      clearTimeout(sacTimer);
+      clearTimeout(closeTimer);
+      el.classList.remove(styles.blink);
+      el.style.removeProperty('--sx');
+      el.style.removeProperty('--sy');
+    };
+  }, [ref, enabled, saccades]);
+}
+
+// ─── geometry ───────────────────────────────────────────────────────────────
+
+function gearPath(rOuter: number, rInner: number, teeth: number): string {
+  const pts: string[] = [];
+  const step = (Math.PI * 2) / (teeth * 2);
+  for (let i = 0; i < teeth * 2; i++) {
+    const r = i % 2 === 0 ? rOuter : rInner;
+    const a1 = i * step - step * 0.34;
+    const a2 = i * step + step * 0.34;
+    pts.push(`${i === 0 ? 'M' : 'L'}${(Math.cos(a1) * r).toFixed(2)} ${(Math.sin(a1) * r).toFixed(2)}`);
+    pts.push(`L${(Math.cos(a2) * r).toFixed(2)} ${(Math.sin(a2) * r).toFixed(2)}`);
+  }
+  return pts.join(' ') + 'Z';
+}
+
+const MAIN_GEAR = gearPath(12.5, 9.6, 11);
+const PINION = gearPath(6.6, 4.9, 8);
+const TARGET_GEAR = gearPath(10, 7.6, 9);
+
+// head: capsule centred on (0,-70); body: egg from y -10 to 92
+const HEAD = { x: -66, y: -116, w: 132, h: 92, r: 42 };
+const SCREEN = { x: -54, y: -106, w: 108, h: 70, r: 32 };
+const BODY_PATH = 'M 0 -10 C 45 -10 58 12 55 38 C 52 70 30 92 0 92 C -30 92 -52 70 -55 38 C -58 12 -45 -10 0 -10 Z';
+const FLIPPER_PATH = 'M 0 -7 C 10 -7 13.5 6 12.5 22 C 11.5 38 7 50 0 54 C -7 50 -11.5 38 -12.5 22 C -13.5 6 -10 -7 0 -7 Z';
+const EYE_Y = -73;
+const EYE_X = 22;
+
+const C = {
+  shell: 'var(--ag-shell)',
+  outline: 'var(--ag-outline)',
+  joint: 'var(--ag-joint)',
+  visor: 'var(--ag-visor)',
+  eye: 'var(--ag-eye)',
+  eyeCore: 'var(--ag-eye-core)',
+  brass: 'var(--ag-brass)',
+  brassHi: 'var(--ag-brass-hi)',
+  blush: 'var(--ag-blush)',
+  spec: 'var(--ag-spec)',
+  ao: 'var(--ag-ao)',
+  ok: 'var(--ok)',
+  warn: 'var(--warn)',
+  bad: 'var(--bad)',
+  std: 'var(--std)',
+  accent: 'var(--cyan)',
+  shadow: 'var(--ag-shadow)',
+};
+
+interface ArmPose {
+  /** outward/upward raise in degrees (mirrored per side) */
+  raise: number;
+  motion?: 'sway' | 'wave' | 'gesture' | 'none';
+}
+
+function armPoses(pose: Pose, hovered: boolean): { left: ArmPose; right: ArmPose } {
+  const idle: ArmPose = { raise: 12, motion: 'sway' };
+  const hold: ArmPose = { raise: 125, motion: 'none' };
+  switch (pose) {
+    case 'wave':
+      return { left: idle, right: { raise: 150, motion: 'wave' } };
+    case 'celebrate':
+      return { left: { raise: 158, motion: 'none' }, right: { raise: 158, motion: 'none' } };
+    case 'blueprint':
+    case 'calculation':
+    case 'cad3d':
+    case 'tesla':
+    case 'newton':
+      return { left: hold, right: idle };
+    case 'thinking':
+      return { left: idle, right: { raise: -140, motion: 'none' } };
+    case 'laser':
+      return { left: idle, right: { raise: 72, motion: 'none' } };
+    case 'quest':
+      return { left: idle, right: { raise: 172, motion: 'none' } };
+    case 'speaking':
+      return { left: idle, right: { raise: 46, motion: 'gesture' } };
+    case 'listening':
+      return { left: { raise: 26, motion: 'none' }, right: { raise: 26, motion: 'none' } };
+    case 'error':
+      return { left: { raise: 3, motion: 'none' }, right: { raise: 3, motion: 'none' } };
+    default:
+      return hovered ? { left: idle, right: { raise: 150, motion: 'wave' } } : { left: idle, right: idle };
+  }
+}
+
+const CONFETTI = [
+  { dx: -70, dy: -60, rot: 220, c: C.accent, shape: 'r' },
+  { dx: -46, dy: -88, rot: -160, c: C.warn, shape: 'c' },
+  { dx: -18, dy: -100, rot: 300, c: C.ok, shape: 'r' },
+  { dx: 16, dy: -104, rot: -260, c: C.std, shape: 'c' },
+  { dx: 44, dy: -86, rot: 180, c: C.accent, shape: 'r' },
+  { dx: 72, dy: -58, rot: -200, c: C.warn, shape: 'r' },
+  { dx: -84, dy: -24, rot: 140, c: C.ok, shape: 'c' },
+  { dx: 86, dy: -22, rot: -120, c: C.std, shape: 'c' },
+  { dx: -30, dy: -70, rot: 260, c: C.warn, shape: 'r' },
+  { dx: 32, dy: -66, rot: -300, c: C.ok, shape: 'r' },
+] as const;
+
+// ─── component ──────────────────────────────────────────────────────────────
+
 export function AegisMascot({
-  size,
+  size = 64,
+  fluid = false,
+  variant,
   className = '',
   isHovered = false,
-  pose = 'auto',
-  variant = 'panoramic',
+  lookAt = null,
+  pose = 'idle',
+  soundEnabled = false,
   interactive = true,
   onPoseChange,
+  onPartInteract,
+  clean = false,
+  emotion = 'normal',
+  squashStretch = { sx: 1, sy: 1 },
 }: AegisMascotProps) {
-  const uid = useId().replace(/:/g, '');
-  const { language } = useI18nStore();
-  const chrome = getChrome(language);
-  const [currentPose, setCurrentPose] = useState<AegisPose>(
-    pose === 'auto' ? (variant === 'face' ? 'idle' : 'walk') : pose,
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const rootRef = useRef<HTMLDivElement>(null);
+  const compact =
+    variant === 'face' || variant === 'compact' ? true : variant === 'panoramic' || variant === 'full' ? false : size < 88;
+
+  const reduced = useReducedMotion();
+  const active = useActive(rootRef);
+  useLife(rootRef, active && !reduced, lookAt === null);
+
+  const [autoIdx, setAutoIdx] = useState(0);
+  const [overdrive, setOverdrive] = useState(false);
+  const [wink, setWink] = useState(false);
+  const [caliper, setCaliper] = useState('40.00');
+
+  useEffect(() => {
+    if (pose !== 'auto' || compact || !active || reduced) return;
+    const timer = setInterval(() => {
+      setAutoIdx((prev) => {
+        const next = (prev + 1) % AUTO_POSE_SEQUENCE.length;
+        onPoseChange?.(AUTO_POSE_SEQUENCE[next]);
+        return next;
+      });
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [pose, compact, active, reduced, onPoseChange]);
+
+  const rawPose: Exclude<AegisPose, 'auto'> = pose === 'auto' ? (compact ? 'idle' : AUTO_POSE_SEQUENCE[autoIdx]) : pose || 'idle';
+  const resolved: Pose = rawPose === 'einstein' ? 'newton' : rawPose === 'walk' ? 'wave' : rawPose;
+
+  useEffect(() => {
+    if (!soundEnabled || compact) return;
+    if (resolved === 'celebrate') playMascotChirp(980, 'solve');
+    else if (resolved === 'laser') playMascotChirp(1120, 'laser');
+    else if (resolved === 'calculation' || resolved === 'tesla') playMascotChirp(780, 'calc');
+  }, [resolved, soundEnabled, compact]);
+
+  const expression: Expression =
+    resolved === 'error'
+      ? 'error'
+      : resolved === 'speaking'
+      ? 'speaking'
+      : resolved === 'thinking'
+      ? 'thinking'
+      : resolved === 'calculation' || resolved === 'laser'
+      ? 'focused'
+      : wink || emotion === 'wink'
+      ? 'wink'
+      : emotion === 'happy' || emotion === 'celebrate' || resolved === 'celebrate' || resolved === 'wave' || (isHovered && resolved === 'idle')
+      ? 'happy'
+      : emotion === 'curious' || resolved === 'listening' || resolved === 'quest' || resolved === 'blueprint'
+      ? 'curious'
+      : 'normal';
+
+  const statusColor =
+    resolved === 'error' || resolved === 'laser'
+      ? C.bad
+      : resolved === 'celebrate' || overdrive
+      ? C.ok
+      : resolved === 'calculation' || resolved === 'thinking' || resolved === 'tesla'
+      ? C.warn
+      : C.eye;
+
+  const handlePart = useCallback(
+    (e: React.MouseEvent, part: AegisBodyPart, tr: string, en: string) => {
+      e.stopPropagation();
+      if (part === 'heart') {
+        setOverdrive((v) => !v);
+        if (soundEnabled) playMascotChirp(880, 'overdrive');
+      } else if (part === 'visor') {
+        setWink(true);
+        setTimeout(() => setWink(false), 650);
+        if (soundEnabled) playMascotChirp(1040, 'ping');
+      } else if (part === 'rightHand') {
+        const samples = ['25.00 H7', '40.02 g6', 'M12×1.75', '89.00 ±0.05', '50.00 k6'];
+        setCaliper(samples[Math.floor(Math.random() * samples.length)]);
+        if (soundEnabled) playMascotChirp(920, 'calc');
+      } else if (soundEnabled) {
+        playMascotChirp(980, 'solve');
+      }
+      onPartInteract?.(part, tr, en);
+    },
+    [onPartInteract, soundEnabled]
   );
-  const [clickCount, setClickCount] = useState(0);
-  const [switching, setSwitching] = useState(false);
-  const switchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastPose = useRef<AegisPose | null>(null);
 
-  // Auto-cycle: durations land on gait loop boundaries so the next pose starts at rest.
-  useEffect(() => {
-    if (pose !== 'auto') {
-      setCurrentPose(pose);
-      return;
+  const rootStyle = useMemo(() => {
+    const s: React.CSSProperties & Record<string, string | number> = fluid
+      ? { width: '100%', height: 'auto', aspectRatio: '1 / 1' }
+      : { width: size, height: size };
+    if (lookAt) {
+      s['--lx'] = Math.max(-1, Math.min(1, lookAt.x)).toFixed(3);
+      s['--ly'] = Math.max(-1, Math.min(1, lookAt.y)).toFixed(3);
     }
-
-    const poses: AegisPose[] = variant === 'face'
-      ? ['idle', 'wave', 'calculation']
-      : ['walk', 'run', 'jump', 'apple', 'idle', 'wave', 'blueprint', 'calculation'];
-    const durations = variant === 'face'
-      ? [3600, 2800, 3600]
-      : [4800, 3000, 2800, 3600, 3000, 2800, 4800, 4800];
-    let idx = 0;
-    let timer: ReturnType<typeof setTimeout>;
-
-    const tick = () => {
-      idx = (idx + 1) % poses.length;
-      setCurrentPose(poses[idx]);
-      onPoseChange?.(poses[idx]);
-      timer = setTimeout(tick, durations[idx]);
-    };
-    timer = setTimeout(tick, durations[0]);
-
-    return () => clearTimeout(timer);
-  }, [pose, onPoseChange, variant]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (!interactive) return;
-    e.stopPropagation();
-
-    const allPoses: AegisPose[] = ['walk', 'run', 'jump', 'apple', 'wave', 'blueprint', 'calculation', 'idle'];
-    const nextIdx = (clickCount + 1) % allPoses.length;
-    setClickCount(nextIdx);
-    setCurrentPose(allPoses[nextIdx]);
-    onPoseChange?.(allPoses[nextIdx]);
-  };
-
-  // Normalize aliases
-  const rawPose = pose !== 'auto' ? pose : currentPose;
-  const activePose = rawPose === 'thinking' ? 'calculation' : rawPose === 'celebrate' ? 'wave' : rawPose;
-  const isRun = activePose === 'run';
-  const isWalk = activePose === 'walk';
-  const isJump = activePose === 'jump';
-  const isApple = activePose === 'apple';
-
-  useEffect(() => {
-    if (lastPose.current === null) {
-      lastPose.current = activePose;
-      return;
+    const sx = squashStretch?.sx ?? 1;
+    const sy = squashStretch?.sy ?? 1;
+    if (sx !== 1 || sy !== 1) {
+      s.transform = `scale(${sx}, ${sy})`;
+      s.transition = 'transform 0.14s ease-out';
     }
-    if (lastPose.current === activePose) return;
-    lastPose.current = activePose;
-    setSwitching(true);
-    if (switchTimer.current) clearTimeout(switchTimer.current);
-    switchTimer.current = setTimeout(() => setSwitching(false), 320);
-    return () => {
-      if (switchTimer.current) clearTimeout(switchTimer.current);
-    };
-  }, [activePose]);
+    return s;
+  }, [size, fluid, lookAt, squashStretch?.sx, squashStretch?.sy]);
 
-  const isFaceMode = variant === 'face';
-  const viewBox = isFaceMode ? '14 6 72 74' : '-100 -45 300 190';
+  const rootClass = `${styles.root} ${overdrive ? styles.overdrive : ''} ${className}`;
+  const paused = active ? 'false' : 'true';
+  const tiny = size < 40;
 
-  const styleObj = size
-    ? typeof size === 'number'
-      ? { width: size, height: size }
-      : { width: size, height: size }
-    : undefined;
+  if (compact) {
+    return (
+      <div ref={rootRef} className={rootClass} style={rootStyle} data-paused={paused} aria-hidden="true">
+        <svg viewBox="-80 -152 160 136" className={`${styles.svg} ${styles.static}`}>
+          <Defs uid={uid} />
+          <Head uid={uid} expression={expression} statusColor={statusColor} detail={!tiny} />
+        </svg>
+      </div>
+    );
+  }
+
+  const arms = armPoses(resolved, isHovered);
+  const showProps = !clean;
+  const tilt =
+    resolved === 'thinking'
+      ? '-7deg'
+      : resolved === 'error'
+      ? '6deg'
+      : resolved === 'listening' || emotion === 'curious'
+      ? '5deg'
+      : undefined;
 
   return (
-    <div
-      onClick={handleClick}
-      className={`relative inline-flex items-center justify-center select-none group ${
-        interactive ? 'cursor-pointer' : ''
-      } ${className}`}
-      style={styleObj}
-      title={
-        interactive
-          ? chrome.mascotHint
-          : 'AeGiS Copilot'
-      }
-    >
-      <style>{`
-        /* Nested layers: float (svg) → stride/jump (actor) → lean → body/limbs.
-           Each transform lives on its own node so pose changes don't fight. */
-        @keyframes aegisFloatGentle {
-          0%, 100% { transform: translate3d(0, 0, 0); }
-          50% { transform: translate3d(0, -5px, 0); }
-        }
-        @keyframes eyeBlinkSweet {
-          0%, 93%, 100% { transform: scaleY(1); }
-          96.5% { transform: scaleY(0.08); }
-        }
-        @keyframes magneticJetPulse {
-          0%, 100% { transform: scaleY(0.85) scaleX(0.9); opacity: 0.55; }
-          50% { transform: scaleY(1.25) scaleX(1.15); opacity: 0.95; }
-        }
-        @keyframes cadDrawStroke {
-          0% { stroke-dashoffset: 200; opacity: 0.2; }
-          50% { opacity: 1; }
-          100% { stroke-dashoffset: 0; opacity: 0.9; }
-        }
-        @keyframes laserPointerScan {
-          0%, 100% { transform: translate(0px, 0px); }
-          25% { transform: translate(-10px, -6px); }
-          75% { transform: translate(10px, 6px); }
-        }
-        @keyframes mathEquationGlow {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 1; filter: drop-shadow(0 0 5px rgba(0,229,255,0.8)); }
-        }
-        @keyframes teslaFluxRotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes teslaSparkFlicker {
-          0%, 100% { opacity: 0.25; }
-          50% { opacity: 1; }
-        }
-        @keyframes gravityCurveSweep {
-          0% { stroke-dashoffset: 250; opacity: 0; }
-          35% { opacity: 1; }
-          100% { stroke-dashoffset: 0; opacity: 0.9; }
-        }
-        @keyframes appleBob {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(10deg); }
-        }
-        @keyframes spacetimeWarp {
-          0%, 100% { transform: scale(1) rotate(0deg); }
-          50% { transform: scale(1.04) rotate(1.4deg); }
-        }
-        @keyframes waveHandGentle {
-          0%, 100% { transform: rotate(-8deg); }
-          30% { transform: rotate(-42deg); }
-          62% { transform: rotate(-16deg); }
-        }
-
-        .aegis-root-character {
-          animation: aegisFloatGentle 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-          will-change: transform;
-        }
-        .aegis-eye-blink-anim {
-          transform-origin: 50% 50%;
-          animation: eyeBlinkSweet 4.2s infinite ease-in-out;
-          transition: opacity 0.35s ease;
-        }
-        .aegis-jet-wrap {
-          opacity: 1;
-          transition: opacity 0.45s ease;
-        }
-        .aegis-jet-wrap.aegis-jet-dim { opacity: 0; }
-        .aegis-jet-glow {
-          transform-origin: 50px 94px;
-          transform-box: view-box;
-          animation: magneticJetPulse 1.4s infinite ease-in-out;
-        }
-        .aegis-cad-stroke-anim {
-          stroke-dasharray: 200;
-          animation: cadDrawStroke 3.2s ease-in-out infinite alternate;
-        }
-        .aegis-laser-hand {
-          animation: laserPointerScan 4s ease-in-out infinite;
-        }
-        .aegis-math-pulse {
-          animation: mathEquationGlow 2.8s infinite ease-in-out;
-        }
-        .aegis-tesla-flux-anim {
-          transform-origin: 50px 50px;
-          transform-box: view-box;
-          animation: teslaFluxRotate 9s linear infinite;
-        }
-        .aegis-spark-flash {
-          animation: teslaSparkFlicker 0.35s infinite alternate ease-in-out;
-        }
-        .aegis-gravity-curve {
-          stroke-dasharray: 250;
-          animation: gravityCurveSweep 3.2s ease-out infinite;
-        }
-        .aegis-apple-float {
-          animation: appleBob 2.8s ease-in-out infinite;
-        }
-        .aegis-spacetime-anim {
-          transform-origin: 50px 75px;
-          transform-box: view-box;
-          animation: spacetimeWarp 4.2s ease-in-out infinite;
-        }
-
-        /* HUD crossfade — layers stay mounted so they never pop in from empty */
-        .aegis-hud-layer {
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.55s ease;
-        }
-        .aegis-hud-layer.is-on { opacity: 1; }
-        svg[data-variant="face"] .aegis-act-walk,
-        svg[data-variant="face"] .aegis-act-run,
-        svg[data-variant="face"] .aegis-act-jump {
-          animation: none;
-        }
-
-        .aegis-sway {
-          transform-box: view-box;
-          transform-origin: 50px 88px;
-          animation: aegisStrideSway 6.4s ease-in-out infinite;
-        }
-        .aegis-actor {
-          transform-box: view-box;
-          transform-origin: 50px 88px;
-          transition: opacity 0.32s ease;
-        }
-        .aegis-is-switching .aegis-actor { opacity: 0.82; }
-
-        .aegis-lean {
-          transform-box: view-box;
-          transform-origin: 50px 96px;
-          transform: rotate(0deg);
-          transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .aegis-act-run .aegis-lean { transform: rotate(-7deg); }
-        .aegis-act-jump .aegis-lean { transform: rotate(-2deg); }
-
-        /* In-place stride (no wrap teleport). 0% === 100%. */
-        @keyframes aegisStrideSway {
-          0%, 100% { transform: translate3d(-5px, 0, 0); }
-          50% { transform: translate3d(5px, 0, 0); }
-        }
-        @keyframes aegisWalkBob {
-          0%, 50%, 100% { transform: translateY(0); }
-          25%, 75% { transform: translateY(2.5px); }
-        }
-        @keyframes aegisJumpBody {
-          0% { transform: translateY(0) scaleY(1) scaleX(1); }
-          10% { transform: translateY(5px) scaleY(0.9) scaleX(1.05); }
-          30% { transform: translateY(-42px) scaleY(1.06) scaleX(0.97); }
-          52% { transform: translateY(-6px) scaleY(1) scaleX(1); }
-          64% { transform: translateY(5px) scaleY(0.9) scaleX(1.04); }
-          78% { transform: translateY(-5px) scaleY(1.02) scaleX(0.99); }
-          100% { transform: translateY(0) scaleY(1) scaleX(1); }
-        }
-        @keyframes aegisLegCycle {
-          0%, 50%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(24deg); }
-          75% { transform: rotate(-24deg); }
-        }
-        @keyframes aegisArmCycle {
-          0%, 50%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(-20deg); }
-          75% { transform: rotate(20deg); }
-        }
-        @keyframes aegisLegIdle {
-          0%, 100% { transform: rotate(3deg); }
-          50% { transform: rotate(-3deg); }
-        }
-        @keyframes aegisLegJump {
-          0%, 100% { transform: rotate(4deg); }
-          10% { transform: rotate(16deg); }
-          30% { transform: rotate(-12deg); }
-          64% { transform: rotate(14deg); }
-        }
-        @keyframes aegisAppleDrop {
-          0% { transform: translate(0, -86px) rotate(0deg); }
-          54% { transform: translate(0, 4px) rotate(175deg); }
-          68% { transform: translate(2px, -11px) rotate(210deg); }
-          84% { transform: translate(-1px, 5px) rotate(240deg); }
-          100% { transform: translate(0, 4px) rotate(255deg); }
-        }
-        @keyframes aegisBonkHead {
-          0%, 48% { transform: rotate(0deg) translateY(0); }
-          56% { transform: rotate(-10deg) translateY(4px); }
-          64% { transform: rotate(7deg) translateY(1px); }
-          74% { transform: rotate(-4deg) translateY(2px); }
-          86% { transform: rotate(2deg); }
-          100% { transform: rotate(0deg) translateY(0); }
-        }
-        @keyframes aegisStarSpin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes aegisDustPuff {
-          0% { opacity: 0; transform: scale(0.4); }
-          18% { opacity: 0.65; transform: scale(1); }
-          100% { opacity: 0; transform: scale(1.55) translateY(5px); }
-        }
-        @keyframes aegisGroundScroll {
-          from { stroke-dashoffset: 0; }
-          to { stroke-dashoffset: -80; }
-        }
-        @keyframes aegisSpeedLine {
-          0% { transform: translateX(36px); opacity: 0; }
-          28% { opacity: 0.65; }
-          100% { transform: translateX(-130px); opacity: 0; }
-        }
-
-        .aegis-act-jump { animation: aegisJumpBody 1.4s cubic-bezier(0.33, 0.05, 0.2, 1) infinite; }
-        .aegis-act-walk .aegis-body-rig { animation: aegisWalkBob 0.6s ease-in-out infinite; }
-        .aegis-act-run .aegis-body-rig { animation: aegisWalkBob 0.3s ease-in-out infinite; }
-        .aegis-act-apple .aegis-body-rig {
-          transform-origin: 50px 80px;
-          transform-box: view-box;
-          animation: aegisBonkHead 2.5s ease-in-out 1 both;
-        }
-
-        .aegis-leg-l, .aegis-leg-r, .aegis-arm-l, .aegis-arm-r, .aegis-body-rig {
-          transform-box: view-box;
-        }
-        .aegis-leg-l {
-          transform-origin: 43px 88px;
-          animation: aegisLegIdle 2.8s ease-in-out infinite;
-        }
-        .aegis-leg-r {
-          transform-origin: 57px 88px;
-          animation: aegisLegIdle 2.8s ease-in-out infinite reverse;
-        }
-        .aegis-arm-l { transform-origin: 36px 76px; }
-        .aegis-arm-r { transform-origin: 64px 76px; }
-
-        .aegis-act-walk .aegis-leg-l,
-        .aegis-act-run .aegis-leg-l { animation: aegisLegCycle 0.6s ease-in-out infinite; }
-        .aegis-act-walk .aegis-leg-r,
-        .aegis-act-run .aegis-leg-r { animation: aegisLegCycle 0.6s ease-in-out infinite reverse; }
-        .aegis-act-run .aegis-leg-l,
-        .aegis-act-run .aegis-leg-r { animation-duration: 0.3s; }
-        .aegis-act-walk .aegis-arm-l,
-        .aegis-act-run .aegis-arm-l { animation: aegisArmCycle 0.6s ease-in-out infinite; }
-        .aegis-act-walk .aegis-arm-r,
-        .aegis-act-run .aegis-arm-r { animation: aegisArmCycle 0.6s ease-in-out infinite reverse; }
-        .aegis-act-run .aegis-arm-l,
-        .aegis-act-run .aegis-arm-r { animation-duration: 0.3s; }
-        .aegis-act-jump .aegis-leg-l,
-        .aegis-act-jump .aegis-leg-r { animation: aegisLegJump 1.4s ease-in-out infinite; }
-        .aegis-act-wave .aegis-arm-l { animation: waveHandGentle 0.8s ease-in-out infinite; }
-
-        .aegis-apple-prop {
-          opacity: 0;
-          transform: translate(0, 4px) rotate(255deg);
-          transition: opacity 0.4s ease;
-        }
-        .aegis-act-apple .aegis-apple-prop {
-          opacity: 1;
-          animation: aegisAppleDrop 2.4s cubic-bezier(0.45, 0.05, 0.55, 1.12) 1 forwards;
-        }
-        .aegis-star-spin {
-          transform-origin: 50px 18px;
-          transform-box: view-box;
-          opacity: 0;
-          transition: opacity 0.35s ease;
-        }
-        .aegis-act-apple .aegis-star-spin {
-          opacity: 0.95;
-          animation: aegisStarSpin 2.2s linear infinite;
-        }
-        .aegis-dazed { opacity: 0; transition: opacity 0.3s ease; }
-        .aegis-act-apple .aegis-dazed { opacity: 1; }
-        .aegis-act-apple .aegis-eye-blink-anim { opacity: 0.15; }
-
-        .aegis-dust { animation: aegisDustPuff 1.4s ease-out infinite; }
-        .aegis-ground-scroll {
-          stroke-dasharray: 10 10;
-          animation: aegisGroundScroll 1.6s linear infinite;
-        }
-        svg[data-pose="walk"] .aegis-ground-scroll { animation-duration: 0.7s; }
-        svg[data-pose="run"] .aegis-ground-scroll { animation-duration: 0.28s; }
-        svg[data-pose="jump"] .aegis-ground-scroll { animation-duration: 1.1s; }
-        .aegis-speed-line { animation: aegisSpeedLine 0.55s linear infinite; }
-
-        @media (prefers-reduced-motion: reduce) {
-          .aegis-root-character, .aegis-sway, .aegis-act-jump,
-          .aegis-act-apple .aegis-body-rig, .aegis-act-apple .aegis-apple-prop,
-          .aegis-leg-l, .aegis-leg-r, .aegis-arm-l, .aegis-arm-r,
-          .aegis-star-spin, .aegis-dust, .aegis-ground-scroll, .aegis-speed-line,
-          .aegis-jet-glow, .aegis-eye-blink-anim {
-            animation: none !important;
-          }
-        }
-      `}</style>
-
+    <div ref={rootRef} className={rootClass} style={rootStyle} data-paused={paused}>
       <svg
-        viewBox={viewBox}
-        className={`w-full h-full ${isFaceMode ? 'overflow-hidden' : 'overflow-visible'} aegis-root-character ${switching ? 'aegis-is-switching' : ''}`}
-        data-pose={activePose}
-        data-variant={variant}
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="xMidYMid meet"
+        viewBox="-150 -170 300 318"
+        className={`${styles.svg} ${interactive ? '' : styles.static}`}
+        role="img"
+        aria-label="AeGiS"
       >
-        <defs>
-          {/* Cyber Armor Gradients */}
-          <linearGradient id={`${uid}-armor`} x1="50" y1="12" x2="50" y2="76" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#142e4d" />
-            <stop offset="40%" stopColor="#0a1a2e" />
-            <stop offset="100%" stopColor="#040d18" />
-          </linearGradient>
+        <Defs uid={uid} />
 
-          {/* Visor Screen Glass */}
-          <linearGradient id={`${uid}-glass`} x1="50" y1="26" x2="50" y2="68" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#030c17" />
-            <stop offset="70%" stopColor="#061626" />
-            <stop offset="100%" stopColor="#020810" />
-          </linearGradient>
+        <ellipse className={styles.groundShadow} cx="0" cy="136" rx="40" ry="6" style={{ fill: C.shadow }} />
 
-          {/* Glass Gloss Highlight */}
-          <linearGradient id={`${uid}-gloss`} x1="28" y1="28" x2="72" y2="44" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
-            <stop offset="60%" stopColor="#00e5ff" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-          </linearGradient>
-
-          {/* Body Chassis Gradient */}
-          <linearGradient id={`${uid}-body`} x1="50" y1="72" x2="50" y2="92" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0e233d" />
-            <stop offset="100%" stopColor="#050e1b" />
-          </linearGradient>
-
-          {/* Glowing Arc Reactor */}
-          <linearGradient id={`${uid}-arc`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#00e5ff" />
-            <stop offset="100%" stopColor="#3b82f6" />
-          </linearGradient>
-
-          {/* Panoramic Hologram Grid Pattern */}
-          <pattern id={`${uid}-grid`} width="12" height="12" patternUnits="userSpaceOnUse">
-            <path d="M 12 0 L 0 0 0 12" fill="none" stroke="rgba(0,229,255,0.09)" strokeWidth="0.5" />
-          </pattern>
-
-          {/* Glow Filters */}
-          <filter id={`${uid}-neon`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.2" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-
-          <filter id={`${uid}-laser`} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
-
-        {/* ════════════════════════════════════════════════════════════════════════
-            LAYER 1: FULL PANORAMIC BACKGROUND BLUEPRINTS & CALCULATIONS HUD
-            (Active when not in tight face-focus mode)
-        ════════════════════════════════════════════════════════════════════════ */}
-        {!isFaceMode && (
-          <>
-            <rect x="-95" y="-40" width="290" height="180" rx="12" fill="#030814" fillOpacity="0.48" stroke="rgba(0,229,255,0.18)" strokeWidth="0.8" />
-            <line className="aegis-ground-scroll" x1="-90" y1="118" x2="190" y2="118" stroke="#00e5ff" strokeWidth="1.4" opacity="0.35" />
-            <line className="aegis-ground-scroll" x1="-90" y1="128" x2="190" y2="128" stroke="#38bdf8" strokeWidth="0.7" opacity="0.18" />
-
-            {/* ─── 1. CAD BLUEPRINT & ISOMETRIC 3D DRAWING MODE ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'blueprint' ? 'is-on' : ''}`}>
-                <rect x="-95" y="-40" width="290" height="180" rx="12" fill={`url(#${uid}-grid)`} fillOpacity="0.85" stroke="rgba(0,229,255,0.2)" strokeWidth="0.8" />
-                
-                {/* Coordinate Axis Compass on Far Left */}
-                <g transform="translate(-75, -20)" stroke="#38bdf8" strokeWidth="1" opacity="0.8">
-                  <line x1="0" y1="0" x2="18" y2="0" />
-                  <line x1="0" y1="0" x2="0" y2="-18" />
-                  <line x1="0" y1="0" x2="-10" y2="10" />
-                  <text x="21" y="3" fill="#38bdf8" fontSize="6" fontFamily="monospace">X</text>
-                  <text x="-3" y="-21" fill="#38bdf8" fontSize="6" fontFamily="monospace">Z</text>
-                  <text x="-16" y="16" fill="#38bdf8" fontSize="6" fontFamily="monospace">Y</text>
-                </g>
-
-                {/* Left Side: Real-time Isometric 3D CAD Wireframe Part */}
-                <g transform="translate(-45, -5)">
-                  <g className="aegis-cad-stroke-anim" stroke="#00e5ff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" filter={`url(#${uid}-neon)`}>
-                    <polygon points="12,-10 36,2 12,14 -12,2" />
-                    <polygon points="-12,2 12,14 12,32 -12,20" />
-                    <polygon points="12,14 36,2 36,20 12,32" />
-                    <ellipse cx="12" cy="2" rx="8" ry="4" strokeDasharray="3,2" />
-                  </g>
-
-                  {/* Dimension Ticks & Tolerance Callouts */}
-                  <g stroke="#38bdf8" strokeWidth="0.8" opacity="0.85">
-                    <line x1="-16" y1="2" x2="-16" y2="20" strokeDasharray="1.5,1.5" />
-                    <line x1="-19" y1="2" x2="-13" y2="2" />
-                    <line x1="-19" y1="20" x2="-13" y2="20" />
-                    <text x="-30" y="13" fill="#38bdf8" fontSize="7" fontFamily="monospace" fontWeight="bold">
-                      H7/g6
-                    </text>
-
-                    <line x1="12" y1="-14" x2="36" y2="-2" strokeDasharray="1.5,1.5" />
-                    <text x="22" y="-14" fill="#38bdf8" fontSize="7" fontFamily="monospace" fontWeight="bold">
-                      R18.5
-                    </text>
-                  </g>
-                </g>
-
-                {/* Right Side: CAD Drafting Spec Sheet & Parameters */}
-                <g transform="translate(115, -15)" fontFamily="monospace" fontSize="6.5">
-                  <rect x="0" y="0" width="70" height="50" rx="4" fill="#040d1a" stroke="rgba(0,229,255,0.3)" strokeWidth="0.8" />
-                  <text x="6" y="12" fill="#00e5ff" fontWeight="bold">[CAD B-REP v4]</text>
-                  <text x="6" y="24" fill="#94a3b8">DIM: 120x60mm</text>
-                  <text x="6" y="34" fill="#94a3b8">TOL: ±0.02mm</text>
-                  <text x="6" y="44" fill="#4ade80" fontWeight="bold">ISO 2768-mK</text>
-                </g>
-
-                {/* Cyan Laser Beam from Robot Stylus to the CAD Drawing */}
-                <g filter={`url(#${uid}-laser)`}>
-                  <line x1="79" y1="91" x2="-25" y2="10" stroke="#00e5ff" strokeWidth="1.8" strokeDasharray="4,2" opacity="0.85" />
-                  <circle cx="-25" cy="10" r="3" fill="#ffffff" />
-                </g>
+        {resolved === 'laser' && showProps && (
+          <g transform="translate(118 126)">
+            <ellipse cx="0" cy="11" rx="15" ry="3.2" style={{ fill: C.shadow }} />
+            <g className={styles.spin}>
+              <path d={TARGET_GEAR} fill={`url(#ag-shell-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.2" />
+              <circle r="3.2" style={{ fill: C.visor }} />
             </g>
-
-            {/* ─── 2. LIVE MATHEMATICAL & STRUCTURAL DERIVATION MODE ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'calculation' ? 'is-on' : ''}`}>
-                <rect x="-95" y="-40" width="290" height="180" rx="12" fill="#030814" fillOpacity="0.55" stroke="rgba(0,229,255,0.25)" strokeWidth="0.8" />
-                
-                {/* Left Math Wings */}
-                <g className="aegis-math-pulse" fontFamily="monospace" transform="translate(-85, -20)">
-                  <text x="0" y="10" fill="#38bdf8" fontSize="10" fontWeight="bold">
-                    ∫ σ·dA = F_axial
-                  </text>
-                  <text x="0" y="26" fill="#a855f7" fontSize="9" fontWeight="bold">
-                    E·I·y'' = M(x)
-                  </text>
-                  <text x="0" y="42" fill="#22d3ee" fontSize="8.5" fontWeight="bold">
-                    σ_vm = √(σ₁²-σ₁σ₂+σ₂²)
-                  </text>
-                  <text x="0" y="58" fill="#facc15" fontSize="8" fontWeight="bold">
-                    τ_max = (σ₁ - σ₂)/2
-                  </text>
-                </g>
-
-                {/* Right Math Wings & Matrix Solution */}
-                <g className="aegis-math-pulse" fontFamily="monospace" transform="translate(105, -20)">
-                  <rect x="0" y="0" width="80" height="65" rx="5" fill="#051020" stroke="rgba(0,229,255,0.3)" strokeWidth="0.8" />
-                  <text x="6" y="14" fill="#00e5ff" fontSize="7.5" fontWeight="bold">[STRESS TENSOR]</text>
-                  <text x="6" y="28" fill="#94a3b8" fontSize="7">[ 120   45   0 ]</text>
-                  <text x="6" y="40" fill="#94a3b8" fontSize="7">[  45  -30   0 ]</text>
-                  <text x="6" y="52" fill="#94a3b8" fontSize="7">[   0    0  85 ]</text>
-                  
-                  <rect x="6" y="55" width="68" height="7" rx="2" fill="rgba(34,197,94,0.15)" stroke="#22c55e" strokeWidth="0.6" />
-                  <text x="12" y="60.5" fill="#4ade80" fontSize="5.5" fontWeight="black">
-                    [✓ VON MISES PASS]
-                  </text>
-                </g>
-
-                {/* Laser Stylus Pointer from Robot Hand */}
-                <g filter={`url(#${uid}-laser)`}>
-                  <line x1="79" y1="91" x2="-20" y2="20" stroke="#c084fc" strokeWidth="1.6" strokeDasharray="3,2" opacity="0.8" />
-                  <circle cx="-20" cy="20" r="2.5" fill="#ffffff" />
-                </g>
-            </g>
-
-            {/* ─── 3. ALBERT EINSTEIN RELATIVISTIC SPACETIME CURVATURE ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'einstein' ? 'is-on' : ''}`}>
-                {/* Wide Curved 3D Spacetime Grid */}
-                <g className="aegis-spacetime-anim" stroke="rgba(56,189,248,0.28)" strokeWidth="0.8" fill="none">
-                  <ellipse cx="50" cy="80" rx="120" ry="40" strokeDasharray="5,3" />
-                  <ellipse cx="50" cy="80" rx="85" ry="28" />
-                  <ellipse cx="50" cy="80" rx="50" ry="16" stroke="#00e5ff" strokeWidth="1.2" />
-                  <line x1="-90" y1="80" x2="190" y2="80" />
-                  <line x1="50" y1="35" x2="50" y2="125" />
-                </g>
-
-                {/* Glowing E=mc² Energy Equation Banner on Top Right */}
-                <g transform="translate(100, -25)" filter={`url(#${uid}-neon)`}>
-                  <rect x="0" y="0" width="80" height="32" rx="8" fill="#040e1c" stroke="#38bdf8" strokeWidth="1.4" />
-                  <text x="10" y="21" fill="#38bdf8" fontSize="16" fontWeight="900" fontFamily="monospace">
-                    E = mc²
-                  </text>
-                </g>
-
-                {/* Relativistic Tensor on Left */}
-                <g transform="translate(-85, -20)" fontFamily="monospace">
-                  <text x="0" y="10" fill="#a855f7" fontSize="10" fontWeight="bold">
-                    G_μν + Λg_μν = 8πT_μν
-                  </text>
-                  <text x="0" y="26" fill="#38bdf8" fontSize="9" fontWeight="bold">
-                    γ = 1/√(1 - v²/c²)
-                  </text>
-                  <text x="0" y="42" fill="#f43f5e" fontSize="8" fontWeight="bold">
-                    Δt = γ · Δt₀
-                  </text>
-                </g>
-            </g>
-
-            {/* ─── 4. NIKOLA TESLA HIGH VOLTAGE RESONANCE FLUX ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'tesla' ? 'is-on' : ''}`}>
-                {/* Wide Concentric Electromagnetic Wireless Flux Rings */}
-                <g className="aegis-tesla-flux-anim" stroke="rgba(168,85,247,0.3)" strokeWidth="1" fill="none" strokeDasharray="8,5">
-                  <circle cx="50" cy="50" r="90" />
-                  <circle cx="50" cy="50" r="65" />
-                  <circle cx="50" cy="50" r="40" stroke="#00e5ff" strokeWidth="1.2" />
-                </g>
-
-                {/* Wide Lightning Arc Streams branching across the card */}
-                <g className="aegis-spark-flash" filter={`url(#${uid}-laser)`}>
-                  <path d="M 15 44 L -45 20 L -25 0 L -80 -20" stroke="#c084fc" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                  <path d="M 85 44 L 145 20 L 125 0 L 180 -20" stroke="#c084fc" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                  <path d="M 50 8 L 50 -25 L 80 -35" stroke="#00e5ff" strokeWidth="2.4" strokeLinecap="round" fill="none" />
-                </g>
-
-                {/* Left/Right Resonator Tower Symbols */}
-                <g stroke="#a855f7" strokeWidth="1" opacity="0.75" transform="translate(-75, 40)">
-                  <line x1="0" y1="0" x2="0" y2="40" />
-                  <circle cx="0" cy="0" r="6" fill="#a855f7" fillOpacity="0.2" />
-                </g>
-                <g stroke="#a855f7" strokeWidth="1" opacity="0.75" transform="translate(175, 40)">
-                  <line x1="0" y1="0" x2="0" y2="40" />
-                  <circle cx="0" cy="0" r="6" fill="#a855f7" fillOpacity="0.2" />
-                </g>
-            </g>
-
-            {/* ─── 5. ISAAC NEWTON GRAVITY TRAJECTORY & PARABOLAS ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'newton' ? 'is-on' : ''}`}>
-                {/* Wide Gravitational Acceleration Parabola Curve */}
-                <g className="aegis-gravity-curve" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" fill="none" filter={`url(#${uid}-neon)`}>
-                  <path d="M -85 90 Q 50 -45 185 90" />
-                </g>
-
-                {/* Left Gravity Kinematics Equation & Vectors */}
-                <g fontFamily="monospace" transform="translate(-85, -20)">
-                  <text x="0" y="10" fill="#facc15" fontSize="11" fontWeight="bold">
-                    g = 9.80665 m/s²
-                  </text>
-                  <text x="0" y="26" fill="#38bdf8" fontSize="9" fontWeight="bold">
-                    F_g = G · (m₁·m₂)/r²
-                  </text>
-                  <text x="0" y="42" fill="#a855f7" fontSize="8" fontWeight="bold">
-                    y(t) = v₀·t - ½g·t²
-                  </text>
-                </g>
-
-                {/* Right Orbital Orbit Ring & Floating Apple */}
-                <g transform="translate(130, -10)">
-                  <ellipse cx="0" cy="0" rx="35" ry="15" stroke="rgba(34,211,238,0.3)" strokeWidth="0.8" strokeDasharray="3,2" />
-                  <g className="aegis-apple-float" transform="translate(15, -6)">
-                    <circle cx="0" cy="0" r="9" fill="#ef4444" filter={`url(#${uid}-neon)`} />
-                    <path d="M 0 -8 Q 3 -13 7 -14" stroke="#78350f" strokeWidth="2" strokeLinecap="round" fill="none" />
-                    <path d="M 1 -11 Q 8 -10 7 -6 Z" fill="#22c55e" />
-                    <circle cx="-3" cy="-3" r="2.2" fill="#ffffff" opacity="0.6" />
-                  </g>
-                </g>
-            </g>
-
-            {/* ─── 6. WAVE / GREETING RADAR EXPANSION RINGS ─── */}
-            <g className={`aegis-hud-layer ${activePose === 'wave' ? 'is-on' : ''}`} stroke="rgba(0,229,255,0.22)" strokeWidth="0.9" fill="none">
-                <circle cx="21" cy="91" r="30" strokeDasharray="4,4" />
-                <circle cx="21" cy="91" r="60" strokeDasharray="5,5" opacity="0.6" />
-                <circle cx="21" cy="91" r="95" strokeDasharray="6,6" opacity="0.35" />
-            </g>
-
-            <g className={`aegis-hud-layer ${isWalk ? 'is-on' : ''}`}>
-                <text x="-80" y="-18" fill="#00e5ff" fontSize="8" fontFamily="monospace" fontWeight="bold">
-                  v = 1.2 m/s  ·  gait cycle
-                </text>
-            </g>
-
-            <g className={`aegis-hud-layer ${isRun ? 'is-on' : ''}`}>
-                <g stroke="#00e5ff" strokeWidth="1.4" strokeLinecap="round">
-                  <line className="aegis-speed-line" x1="40" y1="30" x2="90" y2="30" opacity="0.5" />
-                  <line className="aegis-speed-line" x1="55" y1="48" x2="120" y2="48" opacity="0.35" style={{ animationDelay: '0.12s' }} />
-                  <line className="aegis-speed-line" x1="30" y1="66" x2="95" y2="66" opacity="0.4" style={{ animationDelay: '0.22s' }} />
-                </g>
-                <text x="-80" y="-18" fill="#00e5ff" fontSize="8" fontFamily="monospace" fontWeight="bold">
-                  v = 3.8 m/s  ·  Fr = μN
-                </text>
-            </g>
-
-            <g className={`aegis-hud-layer ${isJump ? 'is-on' : ''}`}>
-                <ellipse className="aegis-dust" cx="50" cy="118" rx="22" ry="4" fill="none" stroke="#00e5ff" strokeWidth="1" />
-                <text x="-80" y="-16" fill="#facc15" fontSize="9" fontFamily="monospace" fontWeight="bold">h(t) = v₀t − ½gt²</text>
-            </g>
-
-            <g className={`aegis-hud-layer ${isApple ? 'is-on' : ''}`}>
-                <path d="M 8 -40 C 8 -18 22 -14 28 -8" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
-                <ellipse cx="4" cy="-22" rx="14" ry="8" fill="#166534" opacity="0.85" />
-                <ellipse cx="18" cy="-28" rx="11" ry="7" fill="#15803d" opacity="0.9" />
-                <text x="100" y="-12" fill="#facc15" fontSize="10" fontFamily="monospace" fontWeight="bold">F = mg</text>
-                <text x="100" y="6" fill="#38bdf8" fontSize="8" fontFamily="monospace">g = 9.80665 m/s²</text>
-            </g>
-          </>
+          </g>
         )}
 
-        {/* ════════════════════════════════════════════════════════════════════════
-            LAYER 2: MAIN UNIFIED AEGIS ROBOT CHARACTER (CENTER STAGE)
-        ════════════════════════════════════════════════════════════════════════ */}
-        <g className="aegis-sway">
-        <g className={`aegis-actor aegis-act-${activePose}`}>
-        <g className="aegis-lean">
-        <g className="aegis-body-rig">
+        <g className={resolved === 'celebrate' ? styles.jump : resolved === 'error' ? styles.shake : undefined}>
+          {/* ── body ── */}
+          <g className={styles.bodyFloat}>
+            <g transform="translate(0 92)">
+              <ellipse className={styles.thrust} cx="0" cy="6" rx="22" ry="16" fill={`url(#ag-thrust-${uid})`} />
+            </g>
+            <rect x="-15" y="84" width="30" height="11" rx="5.5" style={{ fill: C.joint }} />
+            <g className={styles.bodyTurn}>
+              <path d={BODY_PATH} fill={`url(#ag-body-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.6" />
+              <path d={BODY_PATH} fill="none" stroke={`url(#ag-rim-${uid})`} strokeWidth="2.2" opacity="0.9" />
+              <ellipse cx="-22" cy="10" rx="13" ry="21" transform="rotate(24 -22 10)" fill={`url(#ag-spec-${uid})`} />
+              <ellipse cx="0" cy="92" rx="44" ry="26" fill={`url(#ag-bounce-${uid})`} clipPath={`url(#ag-bodyclip-${uid})`} />
+              <path d="M -40 64 Q 0 80 40 64" fill="none" style={{ stroke: C.outline }} strokeWidth="1.2" opacity="0.35" />
+              <ellipse className={styles.headShadow} cx="0" cy="-4" rx="30" ry="5" style={{ fill: C.ao }} />
+              <ellipse className={styles.ring} cx="0" cy="-15" rx="26" ry="3.4" fill="none" style={{ stroke: C.eye }} strokeWidth="1.6" />
 
-        <g className={`aegis-jet-wrap ${isWalk || isRun ? 'aegis-jet-dim' : ''}`}>
-          <g className="aegis-jet-glow" filter={`url(#${uid}-neon)`}>
-            <ellipse cx="50" cy="94" rx="9.5" ry="3.5" fill="#00e5ff" opacity="0.65" />
-            <ellipse cx="50" cy="95" rx="4.5" ry="1.8" fill="#ffffff" opacity="0.85" />
+              {/* gear core */}
+              <g className={styles.coreTurn}>
+                <g
+                  className={interactive ? styles.part : undefined}
+                  onClick={(e) =>
+                    handlePart(
+                      e,
+                      'heart',
+                      overdrive ? 'Çekirdek normal devirde.' : 'Çekirdek overdrive modunda!',
+                      overdrive ? 'Core back to nominal speed.' : 'Core overdrive engaged!'
+                    )
+                  }
+                >
+                  <circle cx="0" cy="32" r="21" fill={`url(#ag-glass-${uid})`} style={{ stroke: C.brass }} strokeWidth="2.2" />
+                  <circle cx="0" cy="32" r="16.5" fill="none" style={{ stroke: statusColor }} strokeWidth="0.8" strokeDasharray="2.5 3" opacity="0.7" />
+                  <g transform="translate(-3.5 35)">
+                    <g className={styles.spin}>
+                      <path d={MAIN_GEAR} fill={`url(#ag-brass-${uid})`} />
+                      <circle r="4.2" style={{ fill: C.visor }} />
+                      <circle r="1.7" style={{ fill: statusColor }} />
+                    </g>
+                  </g>
+                  <g transform="translate(9.5 22.5)">
+                    <g className={styles.spinRev}>
+                      <path d={PINION} style={{ fill: C.eye }} opacity="0.92" />
+                      <circle r="2" style={{ fill: C.visor }} />
+                    </g>
+                  </g>
+                  <path d="M -12 20 A 15 15 0 0 1 8 16" fill="none" stroke="#ffffff" strokeWidth="1.4" strokeLinecap="round" opacity="0.32" />
+                </g>
+              </g>
+            </g>
           </g>
-        </g>
 
-        {/* ─── ROBOT BODY / TORSO ─── */}
-        <path
-          d="M 38 72 C 38 68 62 68 62 72 L 64 88 C 64 92 36 92 36 88 Z"
-          fill={`url(#${uid}-body)`}
-          stroke="#00e5ff"
-          strokeWidth="1.8"
-          strokeLinejoin="round"
-        />
+          {/* ── head ── */}
+          <g className={styles.headFloat}>
+            <g
+              className={`${styles.headTurn} ${interactive ? styles.part : ''}`}
+              style={tilt ? ({ '--tilt': tilt } as React.CSSProperties) : undefined}
+              onClick={(e) => handlePart(e, 'visor', 'Optik sensör kalibre edildi.', 'Optical sensor calibrated.')}
+            >
+              <Head uid={uid} expression={expression} statusColor={statusColor} detail />
+            </g>
+          </g>
 
-        {/* Chest Arc Reactor Core */}
-        <circle cx="50" cy="80" r="4" fill={`url(#${uid}-arc)`} filter={`url(#${uid}-neon)`} />
-        <circle cx="50" cy="80" r="1.8" fill="#ffffff" />
+          {/* ── arms ── */}
+          <Arm side={-1} pose={arms.left} uid={uid} interactive={interactive}
+            onHand={(e) => handlePart(e, 'leftHand', 'Sol el: hologram projektörü hazır.', 'Left hand: hologram projector ready.')} />
+          <Arm side={1} pose={arms.right} uid={uid} interactive={interactive}
+            onHand={(e) => handlePart(e, 'rightHand', `Dijital kumpas: Ø${caliper} mm`, `Digital caliper: Ø${caliper} mm`)} />
 
-        {/* ─── SIDE EAR HEADPHONE PODS (Left & Right) ─── */}
-        {/* Left Ear Pod */}
-        <rect
-          x="15"
-          y="35"
-          width="8"
-          height="18"
-          rx="4"
-          fill="#0a192e"
-          stroke="#00e5ff"
-          strokeWidth="1.8"
-          filter={`url(#${uid}-neon)`}
-        />
-        <circle cx="19" cy="44" r="2" fill="#00e5ff" opacity="0.85" />
-
-        {/* Right Ear Pod */}
-        <rect
-          x="77"
-          y="35"
-          width="8"
-          height="18"
-          rx="4"
-          fill="#0a192e"
-          stroke="#00e5ff"
-          strokeWidth="1.8"
-          filter={`url(#${uid}-neon)`}
-        />
-        <circle cx="81" cy="44" r="2" fill="#00e5ff" opacity="0.85" />
-
-        {/* ─── MAIN ROUNDED CYBER HELMET / HEAD ─── */}
-        <rect
-          x="20"
-          y="15"
-          width="60"
-          height="54"
-          rx="22"
-          fill={`url(#${uid}-armor)`}
-          stroke="#00e5ff"
-          strokeWidth="2.4"
-          filter={`url(#${uid}-neon)`}
-        />
-
-        {/* Top Antenna Node */}
-        <path d="M 50 15 L 50 8" stroke="#00e5ff" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="50" cy="7" r="2.8" fill="#00e5ff" filter={`url(#${uid}-neon)`} />
-        <circle cx="50" cy="7" r="1.2" fill="#ffffff" />
-
-        {/* ─── INNER VISOR GLASS SCREEN ─── */}
-        <rect
-          x="26"
-          y="22"
-          width="48"
-          height="40"
-          rx="15"
-          fill={`url(#${uid}-glass)`}
-          stroke="rgba(0,229,255,0.4)"
-          strokeWidth="1.2"
-        />
-
-        {/* Visor Curved Glass Gloss Reflection */}
-        <path
-          d="M 28 26 C 36 23 64 23 72 26 C 68 36 40 38 28 26 Z"
-          fill={`url(#${uid}-gloss)`}
-        />
-
-        {/* Eyes stay mounted — apple pose only overlays dazed marks */}
-        <g className="aegis-eye-blink-anim">
-          <ellipse cx="40" cy="42" rx="6.5" ry="8" fill="#00e5ff" filter={`url(#${uid}-neon)`} />
-          <circle cx="38" cy="39.5" r="2.4" fill="#ffffff" />
-          <circle cx="42" cy="44.5" r="1.1" fill="#ffffff" opacity="0.8" />
-        </g>
-        <g className="aegis-eye-blink-anim">
-          <ellipse cx="60" cy="42" rx="6.5" ry="8" fill="#00e5ff" filter={`url(#${uid}-neon)`} />
-          <circle cx="58" cy="39.5" r="2.4" fill="#ffffff" />
-          <circle cx="62" cy="44.5" r="1.1" fill="#ffffff" opacity="0.8" />
-        </g>
-        <g className="aegis-dazed" fill="#facc15">
-          <text x="34" y="46" fontSize="11" fontWeight="900">✕</text>
-          <text x="54" y="46" fontSize="11" fontWeight="900">✕</text>
-        </g>
-
-        {/* ─── BLUSHING CHEEKS ─── */}
-        <circle cx="30" cy="50" r="3.2" fill="#00e5ff" opacity={activePose === 'wave' ? 0.55 : 0.28} />
-        <circle cx="70" cy="50" r="3.2" fill="#00e5ff" opacity={activePose === 'wave' ? 0.55 : 0.28} />
-
-        <path
-          d={isHovered || activePose === 'wave' ? 'M 42 53 Q 50 62 58 53' : activePose === 'calculation' ? 'M 47 54 Q 50 58 53 54' : 'M 43 54 Q 50 60 57 54'}
-          stroke="#00e5ff"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          fill="none"
-          filter={`url(#${uid}-neon)`}
-        />
-        <ellipse
-          cx="50"
-          cy="55"
-          rx="2.6"
-          ry="3.6"
-          fill="#00e5ff"
-          opacity={activePose === 'calculation' ? 0.85 : 0}
-          filter={`url(#${uid}-neon)`}
-          style={{ transition: 'opacity 0.3s ease' }}
-        />
-
-        <g className="aegis-arm-l">
-          <path d="M 36 76 Q 24 82 22 90" stroke="#00e5ff" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-          <circle cx="21" cy="91" r="3.6" fill="#0c1f36" stroke="#00e5ff" strokeWidth="1.5" />
-        </g>
-        <g className={`aegis-arm-r ${activePose === 'blueprint' || activePose === 'calculation' ? 'aegis-laser-hand' : ''}`}>
-          <path d="M 64 76 Q 76 82 78 90" stroke="#00e5ff" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-          <circle cx="79" cy="91" r="3.6" fill="#0c1f36" stroke="#00e5ff" strokeWidth="1.5" />
-        </g>
-
-        <g className="aegis-star-spin">
-          <polygon points="50,2 52,8 58,8 53,12 55,18 50,14 45,18 47,12 42,8 48,8" fill="#facc15" />
-          <polygon points="66,10 67.5,14 72,14 68.5,16.5 70,21 66,18 62,21 63.5,16.5 60,14 64.5,14" fill="#fde047" />
-          <polygon points="34,10 35.5,14 40,14 36.5,16.5 38,21 34,18 30,21 31.5,16.5 28,14 32.5,14" fill="#fde047" />
-        </g>
-        </g>
-
-        <g className="aegis-leg-l">
-          <path d="M 43 88 L 38 104 L 33 110" stroke="#00e5ff" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-          <ellipse cx="31" cy="111" rx="5.5" ry="2.1" fill="#0c1f36" stroke="#00e5ff" strokeWidth="1.3" />
-        </g>
-        <g className="aegis-leg-r">
-          <path d="M 57 88 L 62 104 L 67 110" stroke="#00e5ff" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-          <ellipse cx="69" cy="111" rx="5.5" ry="2.1" fill="#0c1f36" stroke="#00e5ff" strokeWidth="1.3" />
-        </g>
-
-        <g className="aegis-apple-prop">
-          <circle cx="50" cy="10" r="8.5" fill="#ef4444" />
-          <path d="M 50 2 Q 54 -4 59 -5" stroke="#78350f" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-          <path d="M 51 1 Q 58 0 57 5 Z" fill="#22c55e" />
-          <circle cx="47" cy="8" r="2" fill="#ffffff" opacity="0.45" />
-        </g>
-        </g>
-        </g>
+          {/* ── pose props ── */}
+          {showProps && <PoseProp pose={resolved} />}
+          {resolved === 'laser' && showProps && (
+            <path className={styles.beam} d="M 112 33 L 119 118" fill="none" style={{ stroke: C.bad }} strokeWidth="2" strokeLinecap="round" />
+          )}
+          {resolved === 'celebrate' && (
+            <g className={styles.confetti} transform="translate(0 -128)">
+              {CONFETTI.map((p, i) => {
+                const st = {
+                  fill: p.c,
+                  ['--dx' as string]: `${p.dx}px`,
+                  ['--dy' as string]: `${p.dy}px`,
+                  ['--rot' as string]: `${p.rot}deg`,
+                  animationDelay: `${(i % 5) * 0.12}s`,
+                } as React.CSSProperties;
+                return p.shape === 'r' ? (
+                  <rect key={i} x="-2" y="-3.5" width="4" height="7" rx="1" style={st} />
+                ) : (
+                  <circle key={i} r="2.6" style={st} />
+                );
+              })}
+            </g>
+          )}
         </g>
       </svg>
     </div>
   );
+}
+
+// ─── parts ──────────────────────────────────────────────────────────────────
+
+function Defs({ uid }: { uid: string }) {
+  return (
+    <defs>
+      {/* ceramic / titanium shell, light from the top-left */}
+      <linearGradient id={`ag-shell-${uid}`} x1="0.15" y1="0" x2="0.75" y2="1">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-shell-hi)' }} />
+        <stop offset="52%" style={{ stopColor: 'var(--ag-shell)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-shell-lo)' }} />
+      </linearGradient>
+      <linearGradient id={`ag-body-${uid}`} x1="0.2" y1="0" x2="0.7" y2="1">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-shell-hi)' }} />
+        <stop offset="48%" style={{ stopColor: 'var(--ag-shell)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-shell-lo)' }} />
+      </linearGradient>
+      <linearGradient id={`ag-limb-${uid}`} x1="0" y1="0" x2="1" y2="0.25">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-shell-hi)' }} />
+        <stop offset="60%" style={{ stopColor: 'var(--ag-shell)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-shell-lo)' }} />
+      </linearGradient>
+      {/* accent rim light on the right edge */}
+      <linearGradient id={`ag-rim-${uid}`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-rim)', stopOpacity: 0.32 }} />
+        <stop offset="20%" style={{ stopColor: 'var(--ag-rim)', stopOpacity: 0 }} />
+        <stop offset="64%" style={{ stopColor: 'var(--ag-rim)', stopOpacity: 0 }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-rim)', stopOpacity: 0.95 }} />
+      </linearGradient>
+      <radialGradient id={`ag-spec-${uid}`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-spec)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-spec)', stopOpacity: 0 }} />
+      </radialGradient>
+      <linearGradient id={`ag-screen-${uid}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-visor-hi)' }} />
+        <stop offset="58%" style={{ stopColor: 'var(--ag-visor)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-visor)' }} />
+      </linearGradient>
+      <radialGradient id={`ag-glass-${uid}`} cx="42%" cy="36%" r="70%">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-visor-hi)' }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-visor)' }} />
+      </radialGradient>
+      <radialGradient id={`ag-eyeglow-${uid}`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0.42 }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0 }} />
+      </radialGradient>
+      <linearGradient id={`ag-eye-${uid}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-eye-core)' }} />
+        <stop offset="70%" style={{ stopColor: 'var(--ag-eye)' }} />
+      </linearGradient>
+      <radialGradient id={`ag-thrust-${uid}`} cx="50%" cy="20%" r="70%">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0.75 }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0 }} />
+      </radialGradient>
+      <radialGradient id={`ag-bounce-${uid}`} cx="50%" cy="100%" r="80%">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0.32 }} />
+        <stop offset="100%" style={{ stopColor: 'var(--ag-eye)', stopOpacity: 0 }} />
+      </radialGradient>
+      <clipPath id={`ag-bodyclip-${uid}`}>
+        <path d={BODY_PATH} />
+      </clipPath>
+      <linearGradient id={`ag-brass-${uid}`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" style={{ stopColor: 'var(--ag-brass-hi)' }} />
+        <stop offset="60%" style={{ stopColor: 'var(--ag-brass)' }} />
+      </linearGradient>
+    </defs>
+  );
+}
+
+function Head({
+  uid,
+  expression,
+  statusColor,
+  detail,
+}: {
+  uid: string;
+  expression: Expression;
+  statusColor: string;
+  detail: boolean;
+}) {
+  return (
+    <>
+      {/* antenna (sways from its base) */}
+      <g transform="translate(24 -114)">
+        <g className={styles.antenna}>
+          <path d="M 0 0 Q -1 -12 6 -21" fill="none" style={{ stroke: C.outline }} strokeWidth="4.2" strokeLinecap="round" />
+          <path d="M 0 0 Q -1 -12 6 -21" fill="none" style={{ stroke: C.shell }} strokeWidth="2.4" strokeLinecap="round" />
+          <circle className={styles.pulse} cx="7" cy="-25" r="5.5" style={{ fill: statusColor }} />
+          <circle cx="5.5" cy="-26.5" r="1.6" fill="#ffffff" opacity="0.8" />
+        </g>
+      </g>
+
+      {/* shell */}
+      <rect x={HEAD.x} y={HEAD.y} width={HEAD.w} height={HEAD.h} rx={HEAD.r} fill={`url(#ag-shell-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.6" />
+      <rect x={HEAD.x} y={HEAD.y} width={HEAD.w} height={HEAD.h} rx={HEAD.r} fill="none" stroke={`url(#ag-rim-${uid})`} strokeWidth="2.2" />
+      {detail && <ellipse cx="-36" cy="-106" rx="22" ry="7" transform="rotate(-14 -36 -106)" fill={`url(#ag-spec-${uid})`} />}
+
+      {/* ear caps */}
+      <g>
+        <ellipse cx="-66" cy="-70" rx="7" ry="13" fill={`url(#ag-limb-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.4" />
+        <ellipse cx="66" cy="-70" rx="7" ry="13" fill={`url(#ag-limb-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.4" />
+        <ellipse className={styles.pulse} cx="-68" cy="-70" rx="2.2" ry="6" style={{ fill: C.eye }} />
+        <ellipse className={styles.pulse} cx="68" cy="-70" rx="2.2" ry="6" style={{ fill: C.eye }} />
+      </g>
+
+      {/* face screen */}
+      <g className={styles.screenTurn}>
+        <rect x={SCREEN.x} y={SCREEN.y} width={SCREEN.w} height={SCREEN.h} rx={SCREEN.r} fill={`url(#ag-screen-${uid})`} stroke="#ffffff" strokeOpacity="0.1" strokeWidth="1.2" />
+        <ellipse cx="0" cy={EYE_Y} rx="48" ry="24" fill={`url(#ag-eyeglow-${uid})`} />
+        <g className={styles.gaze}>
+          <Face expression={expression} uid={uid} />
+        </g>
+        {detail && (
+          <g className={styles.glare}>
+            <path d="M -38 -97 Q -6 -104 26 -99" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.2" />
+            <path d="M 34 -54 Q 42 -62 43 -74" fill="none" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" opacity="0.12" />
+          </g>
+        )}
+      </g>
+    </>
+  );
+}
+
+function Face({ expression, uid }: { expression: Expression; uid: string }) {
+  const eyeFill = `url(#ag-eye-${uid})`;
+  const ey = EYE_Y;
+  const ex = EYE_X;
+
+  const pill = (cx: number, w = 19, h = 27, look = 0) => (
+    <g>
+      <rect x={cx - w / 2} y={ey - h / 2 + look} width={w} height={h} rx={w / 2} fill={eyeFill} />
+      <rect x={cx - w / 2 + w * 0.2} y={ey - h / 2 + look + h * 0.14} width={w * 0.24} height={h * 0.22} rx={w * 0.12} fill="#ffffff" opacity="0.8" />
+    </g>
+  );
+
+  let eyes: React.ReactNode;
+  let mouth: React.ReactNode = null;
+  let extras: React.ReactNode = null;
+
+  switch (expression) {
+    case 'happy':
+      eyes = (
+        <g fill="none" style={{ stroke: C.eye }} strokeWidth="5.2" strokeLinecap="round">
+          <path d={`M ${-ex - 10} ${ey + 5} Q ${-ex} ${ey - 10} ${-ex + 10} ${ey + 5}`} />
+          <path d={`M ${ex - 10} ${ey + 5} Q ${ex} ${ey - 10} ${ex + 10} ${ey + 5}`} />
+        </g>
+      );
+      mouth = <path d="M -10 -52 Q 0 -40 10 -52 Z" style={{ fill: C.eye }} />;
+      extras = (
+        <g style={{ fill: C.blush }} opacity="0.45">
+          <ellipse cx={-ex - 14} cy={ey + 14} rx="7" ry="3.5" />
+          <ellipse cx={ex + 14} cy={ey + 14} rx="7" ry="3.5" />
+        </g>
+      );
+      break;
+    case 'curious':
+      eyes = (
+        <g>
+          {pill(-ex, 21, 30)}
+          {pill(ex, 16, 21, 2)}
+        </g>
+      );
+      extras = <path d={`M ${-ex - 11} ${ey - 21} Q ${-ex} ${ey - 27} ${-ex + 11} ${ey - 22}`} fill="none" style={{ stroke: C.eye }} strokeWidth="2.6" strokeLinecap="round" />;
+      mouth = <circle cx="2" cy="-49" r="3.4" fill="none" style={{ stroke: C.eye }} strokeWidth="2.4" />;
+      break;
+    case 'wink':
+      eyes = (
+        <g>
+          <path d={`M ${-ex - 10} ${ey} Q ${-ex} ${ey + 7} ${-ex + 10} ${ey}`} fill="none" style={{ stroke: C.eye }} strokeWidth="4.6" strokeLinecap="round" />
+          {pill(ex)}
+        </g>
+      );
+      mouth = <path d="M -9 -51 Q 3 -42 11 -52" fill="none" style={{ stroke: C.eye }} strokeWidth="3" strokeLinecap="round" />;
+      break;
+    case 'focused':
+      eyes = (
+        <g>
+          {pill(-ex, 20, 13)}
+          {pill(ex, 20, 13)}
+        </g>
+      );
+      extras = (
+        <g style={{ stroke: C.eye }} strokeWidth="2.6" strokeLinecap="round">
+          <line x1={-ex - 11} y1={ey - 14} x2={-ex + 10} y2={ey - 10} />
+          <line x1={ex + 11} y1={ey - 14} x2={ex - 10} y2={ey - 10} />
+        </g>
+      );
+      mouth = <path d="M -11 -49 L -6 -49 L -3 -53 L 0 -45 L 3 -52 L 6 -47 L 11 -49" fill="none" style={{ stroke: C.eye }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />;
+      break;
+    case 'thinking':
+      eyes = (
+        <g transform="translate(5 -5)">
+          {pill(-ex, 17, 20)}
+          {pill(ex, 17, 20)}
+        </g>
+      );
+      extras = <path d={`M ${ex - 6} ${ey - 26} Q ${ex + 5} ${ey - 32} ${ex + 15} ${ey - 26}`} fill="none" style={{ stroke: C.eye }} strokeWidth="2.6" strokeLinecap="round" />;
+      mouth = (
+        <g style={{ fill: C.eye }}>
+          <circle className={styles.dot} cx="-8" cy="-49" r="2.6" />
+          <circle className={styles.dot} cx="0" cy="-49" r="2.6" />
+          <circle className={styles.dot} cx="8" cy="-49" r="2.6" />
+        </g>
+      );
+      break;
+    case 'speaking':
+      eyes = (
+        <g>
+          {pill(-ex)}
+          {pill(ex)}
+        </g>
+      );
+      mouth = (
+        <g style={{ fill: C.eye }}>
+          {[-10, -5, 0, 5, 10].map((x) => (
+            <rect key={x} className={styles.bar} x={x - 1.6} y={-54} width="3.2" height="10" rx="1.6" />
+          ))}
+        </g>
+      );
+      break;
+    case 'error':
+      eyes = (
+        <g style={{ stroke: C.bad }} strokeWidth="4.4" strokeLinecap="round">
+          <line x1={-ex - 7} y1={ey - 7} x2={-ex + 7} y2={ey + 7} />
+          <line x1={-ex + 7} y1={ey - 7} x2={-ex - 7} y2={ey + 7} />
+          <line x1={ex - 7} y1={ey - 7} x2={ex + 7} y2={ey + 7} />
+          <line x1={ex + 7} y1={ey - 7} x2={ex - 7} y2={ey + 7} />
+        </g>
+      );
+      mouth = <path d="M -12 -48 q 3 -4 6 0 t 6 0 t 6 0 t 6 0" fill="none" style={{ stroke: C.bad }} strokeWidth="2.4" strokeLinecap="round" />;
+      break;
+    default:
+      eyes = (
+        <g>
+          {pill(-ex)}
+          {pill(ex)}
+        </g>
+      );
+      mouth = <path d="M -8 -51 Q 0 -45 8 -51" fill="none" style={{ stroke: C.eye }} strokeWidth="2.8" strokeLinecap="round" />;
+  }
+
+  return (
+    <>
+      <g className={styles.eyes}>
+        <g key={expression} className={styles.expr}>
+          {eyes}
+        </g>
+      </g>
+      <g key={`x-${expression}`}>{extras}</g>
+      <g key={`m-${expression}`}>{mouth}</g>
+    </>
+  );
+}
+
+function Arm({
+  side,
+  pose,
+  uid,
+  interactive,
+  onHand,
+}: {
+  side: -1 | 1;
+  pose: ArmPose;
+  uid: string;
+  interactive: boolean;
+  onHand: (e: React.MouseEvent) => void;
+}) {
+  // positive raise = outward/up on both sides (SVG rotation is clockwise, so the left arm uses +)
+  const angle = side < 0 ? pose.raise : -pose.raise;
+  const motion =
+    pose.motion === 'sway'
+      ? side < 0
+        ? styles.swayL
+        : styles.swayR
+      : pose.motion === 'wave'
+      ? styles.wave
+      : pose.motion === 'gesture'
+      ? styles.gesture
+      : undefined;
+  return (
+    <g className={side < 0 ? styles.armFloatL : styles.armFloatR}>
+      <g transform={`translate(${side * 63} 4)`}>
+        <g className={styles.joint} style={{ transform: `rotate(${angle}deg)` }}>
+          <g className={motion}>
+            <g className={interactive ? styles.part : undefined} onClick={onHand}>
+              <path d={FLIPPER_PATH} fill={`url(#ag-limb-${uid})`} style={{ stroke: C.outline }} strokeWidth="1.5" />
+              <path d={FLIPPER_PATH} fill="none" stroke={`url(#ag-rim-${uid})`} strokeWidth="1.8" opacity="0.8" />
+              <path d="M -5 4 Q -7 20 -5 34" fill="none" style={{ stroke: C.spec }} strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+              <circle cx="0" cy="42" r="2.6" style={{ fill: C.eye }} opacity="0.9" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  );
+}
+
+/** Objects AeGiS shows for a pose. Left-flipper props float near (-110, -60). */
+function PoseProp({ pose }: { pose: Pose }) {
+  const mono = "'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace";
+  switch (pose) {
+    case 'blueprint':
+      return (
+        <g transform="translate(-112 -64)">
+          <g className={styles.bob}>
+            <g transform="rotate(-6)">
+              <rect x="-30" y="-21" width="60" height="42" rx="4" style={{ fill: 'var(--cyan-glow)', stroke: C.accent }} strokeWidth="1.6" />
+              <g style={{ stroke: C.accent }} strokeWidth="0.6" opacity="0.45">
+                {[-20, -10, 0, 10, 20].map((x) => <line key={`v${x}`} x1={x} y1="-21" x2={x} y2="21" />)}
+                {[-11, 0, 11].map((y) => <line key={`h${y}`} x1="-30" y1={y} x2="30" y2={y} />)}
+              </g>
+              <circle cx="-6" cy="0" r="11" fill="none" style={{ stroke: C.accent }} strokeWidth="1.8" />
+              <circle cx="-6" cy="0" r="4" fill="none" style={{ stroke: C.accent }} strokeWidth="1.4" />
+              <line x1="11" y1="-12" x2="11" y2="12" style={{ stroke: C.brass }} strokeWidth="1.4" />
+              <path d="M 8 -12 L 11 -16 L 14 -12 M 8 12 L 11 16 L 14 12" fill="none" style={{ stroke: C.brass }} strokeWidth="1.2" />
+            </g>
+          </g>
+        </g>
+      );
+    case 'calculation':
+      return (
+        <g transform="translate(-112 -64)">
+          <g className={styles.bob}>
+            <rect x="-31" y="-19" width="62" height="38" rx="7" style={{ fill: C.visor, stroke: C.warn }} strokeWidth="1.6" />
+            <text x="-4" y="1" textAnchor="middle" style={{ fill: C.warn }} fontSize="11" fontFamily={mono} fontWeight="700">ΣM = 0</text>
+            <text x="-4" y="13" textAnchor="middle" style={{ fill: C.eye }} fontSize="7.5" fontFamily={mono}>σv ≤ Rp</text>
+            <path d="M 18 6 L 22 10 L 28 2" fill="none" style={{ stroke: C.ok }} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        </g>
+      );
+    case 'cad3d':
+      return (
+        <g transform="translate(-110 -64)">
+          <g className={styles.bob}>
+            <g style={{ stroke: C.accent }} strokeWidth="1.8" strokeLinejoin="round" fill="none">
+              <path d="M 0 -22 L 19 -11 L 19 11 L 0 22 L -19 11 L -19 -11 Z" style={{ fill: 'var(--cyan-glow)' }} />
+              <path d="M -19 -11 L 0 0 L 19 -11 M 0 0 L 0 22" />
+            </g>
+            <line className={styles.scan} x1="-24" y1="0" x2="24" y2="0" style={{ stroke: C.brass }} strokeWidth="1.6" strokeLinecap="round" />
+          </g>
+        </g>
+      );
+    case 'tesla':
+      return (
+        <g transform="translate(-110 -66)">
+          <g className={styles.bob}>
+            <circle r="9" style={{ fill: C.brass, stroke: C.brassHi }} strokeWidth="1.4" />
+            <g fill="none" style={{ stroke: C.eye }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path className={styles.flicker} d="M -8 -6 L -16 -12 L -12 -17 L -22 -25" />
+              <path className={styles.flicker} d="M 8 -5 L 15 -13 L 11 -17 L 20 -26" />
+              <path className={styles.flicker} d="M 9 5 L 18 9 L 15 15 L 24 19" />
+            </g>
+          </g>
+        </g>
+      );
+    case 'newton':
+      return (
+        <g transform="translate(-110 -64)">
+          <g className={styles.bob}>
+            <path d="M 0 -10 C -10 -16 -18 -4 -13 8 C -9 16 -2 17 0 13 C 2 17 9 16 13 8 C 18 -4 10 -16 0 -10 Z" style={{ fill: C.bad }} />
+            <path d="M 0 -10 Q 2 -18 8 -17" fill="none" style={{ stroke: C.ok }} strokeWidth="2.2" strokeLinecap="round" />
+            <text x="0" y="31" textAnchor="middle" style={{ fill: C.warn }} fontSize="8.5" fontFamily={mono} fontWeight="700">g = 9.81</text>
+          </g>
+        </g>
+      );
+    case 'quest':
+      return (
+        <g transform="translate(92 -118)">
+          <g className={styles.bob}>
+            <path d="M 0 -18 L 16 0 L 0 18 L -16 0 Z" style={{ fill: C.visor, stroke: C.warn }} strokeWidth="2" />
+            <text x="0" y="6" textAnchor="middle" style={{ fill: C.warn }} fontSize="16" fontFamily={mono} fontWeight="700">!</text>
+          </g>
+        </g>
+      );
+    default:
+      return null;
+  }
 }
 
 export default AegisMascot;

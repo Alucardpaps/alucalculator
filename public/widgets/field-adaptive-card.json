@@ -1,0 +1,81 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://www.alucalculator.com/icons/icon-96.png",
+                  "size": "Small"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "AluCalc OS · Field Widget",
+                  "weight": "Bolder",
+                  "size": "Medium",
+                  "color": "Accent"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Shop-Floor Instruments & Fast Torque",
+                  "size": "Small",
+                  "isSubtle": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Bolt Torque (M10 8.8):",
+          "value": "48 N·m (Tap Ø8.5mm)"
+        },
+        {
+          "title": "Bolt Torque (M12 8.8):",
+          "value": "84 N·m (Tap Ø10.2mm)"
+        },
+        {
+          "title": "Bolt Torque (M16 8.8):",
+          "value": "206 N·m (Tap Ø14.0mm)"
+        },
+        {
+          "title": "Standard Length:",
+          "value": "25.4 mm = 1.000 in"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Open Field Suite",
+      "url": "https://www.alucalculator.com/field"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "Open Live Widget",
+      "url": "https://www.alucalculator.com/field/widget"
+    }
+  ]
+}

@@ -20,7 +20,6 @@ import { AegisMascot } from '@/components/copilot/AegisMascot';
 import { SidebarAnimatedIcon } from '@/components/ui/SidebarAnimatedIcon';
 import { AluCalcLogo } from '@/components/ui/AluCalcLogo';
 import { ALL_NAV_GROUPS } from './DesktopSidebar';
-import { TOTAL_CALCULATORS_LABEL } from '@/config/modules';
 import { getLocalizedNavTitle, getLocalizedNavItemLabel } from '@/locales/sidebarTranslations';
 import { getChrome } from '@/locales/chromeTranslations';
 
@@ -28,11 +27,8 @@ const CATEGORY_TABS = [
   { id: 'all', labelEn: 'All', labelTr: 'Hepsi' },
   { id: 'studios', labelEn: 'CAD & 3D', labelTr: 'CAD & 3D' },
   { id: 'mechanical', labelEn: 'Mechanical', labelTr: 'Mekanik' },
-  { id: 'fluids', labelEn: 'Fluids & Aero', labelTr: 'Akışkan & Termal' },
-  { id: 'electrical', labelEn: 'Electrical', labelTr: 'Elektrik' },
-  { id: 'civil_materials', labelEn: 'Civil & Mat', labelTr: 'İnşaat & Malzeme' },
-  { id: 'science', labelEn: 'Science & CAS', labelTr: 'Bilim & Hesap' },
-  { id: 'academy', labelEn: 'Academy & Apps', labelTr: 'Akademi & Saha' },
+  { id: 'manufacturing', labelEn: 'Materials & MFG', labelTr: 'Malzeme & İmalat' },
+  { id: 'reference', labelEn: 'Standards & Ref', labelTr: 'Standartlar & El Kitabı' },
 ];
 
 export function MobileBottomNav() {
@@ -74,13 +70,13 @@ export function MobileBottomNav() {
     <>
       {/* ─── FULL-SCREEN SLIDE-OUT MOBILE SIDEBAR DRAWER ─── */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-[var(--bg-0)] backdrop-blur-3xl select-none font-mono">
+        <div className="fixed inset-0 z-[100] flex flex-col bg-[var(--bg-0)] select-none font-mono">
           {/* Header */}
           <div className="flex h-14 items-center justify-between px-4 border-b border-[var(--line)] bg-[var(--bg-1)]">
             <div className="flex items-center gap-2.5">
               <AluCalcLogo size={24} animate={false} />
               <div className="font-mono text-xs font-bold tracking-wider text-[var(--ink)] uppercase">
-                ALUCALC <span className="text-[var(--cyan)]">WORKSPACE</span>
+                ALU <span className="text-[var(--cyan)]">OS</span>
               </div>
             </div>
 
@@ -102,7 +98,7 @@ export function MobileBottomNav() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={c.searchTools.replace('{n}', String(totalToolCount))}
+                placeholder={c.searchTools}
                 className="w-full pl-9 pr-8 py-2 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] text-[var(--ink)] text-xs font-mono placeholder-[var(--alu-dim)]/50 focus:outline-none focus:border-[var(--cyan)]"
               />
               {searchQuery && (
@@ -116,46 +112,19 @@ export function MobileBottomNav() {
               )}
             </div>
 
-            {/* Direct Lite Hub Link Card */}
-            <Link
-              href="/lite"
-              onClick={() => setDrawerOpen(false)}
-              className="w-full flex items-center justify-between p-2.5 rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--bg-2)] text-[var(--ink)] hover:border-[var(--cyan)] transition-colors"
-            >
-              <div className="flex items-center gap-2.5">
-                <LayoutGrid size={16} className="text-[var(--cyan)]" />
-                <div>
-                  <div className="text-xs font-mono font-bold text-[var(--cyan)]">
-                    {c.liteHub.replace('{n}', TOTAL_CALCULATORS_LABEL)}
-                  </div>
-                  <div className="text-[9px] text-[var(--alu-dim)]">
-                    {c.liteHubSub}
-                  </div>
-                </div>
-              </div>
-              <ChevronRight size={15} className="text-[var(--cyan)]" />
-            </Link>
-
             {/* Category Filter Chips */}
-            <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar pb-0.5 pt-0.5">
+            <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 pt-1">
               {CATEGORY_TABS.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategory(tab.id)}
-                  className={`text-[10px] font-mono whitespace-nowrap px-2.5 py-1 rounded-[var(--radius-s)] border transition-colors ${
+                  className={`text-[11px] font-mono whitespace-nowrap px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-[var(--radius-s)] border transition-colors ${
                     activeCategory === tab.id
                       ? 'bg-[var(--cyan)]/15 border-[var(--cyan)]/40 text-[var(--cyan)] font-bold'
                       : 'bg-[var(--bg-2)] border-[var(--line)] text-[var(--alu-dim)] hover:text-white'
                   }`}
                 >
-                  {tab.id === 'all' ? c.catAll
-                    : tab.id === 'studios' ? c.catStudios
-                    : tab.id === 'mechanical' ? c.catMech
-                    : tab.id === 'fluids' ? c.catFluids
-                    : tab.id === 'electrical' ? c.catElec
-                    : tab.id === 'civil_materials' ? c.catCivil
-                    : tab.id === 'science' ? c.catScience
-                    : c.catAcademy}
+                  {tab.id === 'all' ? c.catAll : getLocalizedNavTitle(tab.id, language)}
                 </button>
               ))}
             </div>
@@ -182,7 +151,7 @@ export function MobileBottomNav() {
                         onClick={() => setDrawerOpen(false)}
                         onMouseEnter={() => setHoveredItemId(item.id)}
                         onMouseLeave={() => setHoveredItemId(null)}
-                        className={`flex items-center justify-between p-2 rounded-[var(--radius-s)] border transition-colors ${
+                        className={`flex items-center justify-between p-2.5 min-h-[48px] rounded-[var(--radius-s)] border transition-colors ${
                           isActive
                             ? 'bg-[var(--bg-3)] border-[var(--cyan)] text-[var(--cyan)] font-bold'
                             : 'bg-[var(--bg-1)] border-[var(--line)] text-[var(--alu)] hover:bg-[var(--bg-2)]'
@@ -249,12 +218,13 @@ export function MobileBottomNav() {
 
       {/* ─── NATIVE FIXED MOBILE BOTTOM DOCK (7 ITEMS) ─── */}
       <div className="sm:hidden fixed bottom-2 inset-x-2 z-50 pointer-events-auto select-none safe-area-pb">
-        <nav className="relative flex items-center justify-between rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)]/95 p-1 shadow-2xl backdrop-blur-xl">
+
+        <nav className="relative flex items-center justify-between rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] p-1 shadow-2xl">
           {/* 1. Dashboard */}
           <Link
             href="/"
             onClick={() => setDrawerOpen(false)}
-            className={`flex flex-1 flex-col items-center justify-center py-1 rounded-[var(--radius-s)] transition-colors ${
+            className={`flex flex-1 flex-col items-center justify-center min-h-[48px] py-1 rounded-[var(--radius-s)] transition-colors ${
               pathname === '/' ? 'text-[var(--cyan)] font-bold' : 'text-[var(--alu-dim)] hover:text-white'
             }`}
           >
@@ -264,21 +234,21 @@ export function MobileBottomNav() {
             </span>
           </Link>
 
-          {/* 2. Solvers / Lite Hub */}
-          <Link
-            href="/lite"
-            onClick={() => setDrawerOpen(false)}
-            className={`flex flex-1 flex-col items-center justify-center py-1 rounded-[var(--radius-s)] transition-colors ${
-              pathname === '/lite' || pathname.startsWith('/calculators')
+          {/* 2. Solvers / Module Drawer */}
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            className={`flex flex-1 flex-col items-center justify-center min-h-[48px] py-1 rounded-[var(--radius-s)] transition-colors ${
+              drawerOpen
                 ? 'text-[var(--cyan)] font-bold'
                 : 'text-[var(--alu-dim)] hover:text-white'
             }`}
           >
-            <Calculator size={16} className={pathname === '/lite' || pathname.startsWith('/calculators') ? 'stroke-[2.4]' : 'stroke-[1.8]'} />
+            <Calculator size={16} className={drawerOpen ? 'stroke-[2.4]' : 'stroke-[1.8]'} />
             <span className="text-[8px] font-mono font-bold uppercase tracking-tight mt-1 leading-none">
               {c.solvers}
             </span>
-          </Link>
+          </button>
 
           {/* 3. Academy */}
           <Link

@@ -81,9 +81,9 @@ export function TapChartModal({ isOpen, onClose, ft: propFt }: TapChartModalProp
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/90 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/90 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-lg mx-auto bg-[#070b12] border-t md:border border-cyan-950 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] md:h-auto max-h-[85vh]">
+                    <div className="w-full max-w-lg mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-950 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[85vh] md:h-auto max-h-[85vh]">
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20">
                             <div>
@@ -110,7 +110,7 @@ export function TapChartModal({ isOpen, onClose, ft: propFt }: TapChartModalProp
                                     placeholder={ft.searchScrewPlaceholder} 
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-[#03060a] border border-cyan-900/30 rounded-xl pl-9 pr-4 py-2.5 text-xs font-mono outline-none focus:border-cyan-500/70 text-white"
+                                    className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-xl pl-9 pr-4 py-2.5 text-xs font-mono outline-none focus:border-cyan-500/70 text-white"
                                 />
                             </div>
                         </div>

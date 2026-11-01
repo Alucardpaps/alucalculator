@@ -34,7 +34,7 @@ export const MohrCircleLab: React.FC = () => {
     const toY = (val: number) => viewSize / 2 - val * scale;
 
     return (
-        <div className="bg-[#0a0e14] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+        <div className="bg-[var(--bg-1)] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
             <div className="p-8 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-black text-white flex items-center gap-2">
@@ -50,7 +50,7 @@ export const MohrCircleLab: React.FC = () => {
 
             <div className="grid lg:grid-cols-2 gap-0">
                 {/* Visualizer */}
-                <div className="p-8 flex items-center justify-center bg-[#020408] relative">
+                <div className="p-8 flex items-center justify-center bg-[var(--bg-0)] relative">
                     <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                     
                     <svg width={viewSize} height={viewSize} viewBox={`0 0 ${viewSize} ${viewSize}`} className="relative z-10">
@@ -137,7 +137,7 @@ const ControlSlider = ({ label, value, min, max, onChange, unit }: any) => (
         <input 
             type="range" min={min} max={max} value={value} 
             onChange={(e) => onChange(Number(e.target.value))}
-            className="w-full h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all"
+            className="w-full h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)] hover:accent-[var(--cyan)] transition-all"
         />
     </div>
 );

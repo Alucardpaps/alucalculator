@@ -32,7 +32,7 @@ export function AssumptionPanel({ metadata, status }: AssumptionPanelProps) {
             : AlertTriangle;
 
     return (
-        <div className="border-t border-slate-800 bg-[#151515] p-2 mt-auto">
+        <div className="border-t border-slate-800 bg-[var(--bg-2)] p-2 mt-auto">
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="flex items-center justify-between w-full text-xs text-slate-500 hover:text-slate-300 transition-colors"

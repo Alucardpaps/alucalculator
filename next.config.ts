@@ -6,8 +6,10 @@ const buildTimestamp = isDev ? "dev" : new Date().toISOString();
 const buildId = isDev ? "dev-local" : `build-${Date.now()}`;
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  ...(isDev ? {} : { output: 'export' }),
   trailingSlash: true,
+  // @ts-ignore
+  allowedDevOrigins: ['127.0.0.1', 'localhost', '127.0.0.1:3000', 'localhost:3000'],
   env: {
     BUILD_ID: buildId,
     NEXT_PUBLIC_BUILD_ID: buildId,
@@ -22,6 +24,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'three', '@react-three/fiber', '@react-three/drei'],
+    // keep the production webpack build within ~6 GB (large CAD/3D dependency graph)
+    webpackMemoryOptimizations: true,
+    cpus: 2,
   },
   logging: {
     fetches: {

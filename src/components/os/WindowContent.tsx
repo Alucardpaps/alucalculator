@@ -12,7 +12,6 @@ import { getWorkstationPage } from '@/locales/workstationPageTranslations';
 const ProfileWeightModule = dynamic(() => import('@/components/modules/mechanical/ProfileWeightModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const GearsModule = dynamic(() => import('@/components/modules/mechanical/GearsModule').then(mod => mod.GearsModule as any), { loading: () => <ModuleLoading /> });
 const Nesting2DModule = dynamic(() => import('@/components/modules/mechanical/Nesting2DModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const MaterialsDatabaseModule = dynamic(() => import('@/components/modules/mechanical/MaterialsDatabaseModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const WeldingModule = dynamic(() => import('@/components/modules/mechanical/WeldingModule').then(mod => mod.WeldingModule as any), { loading: () => <ModuleLoading /> });
 const ManufacturingModule = dynamic(() => import('@/components/modules/mechanical/ManufacturingModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ManufacturingSandbox = dynamic(() => import('@/components/modules/mechanical/ManufacturingModule').then(mod => mod.ManufacturingSandbox as any), { loading: () => <ModuleLoading /> });
@@ -30,7 +29,7 @@ const MachiningDetailsModule = dynamic(() => import('@/components/modules/mechan
 const FluidDynamicsModule = dynamic(() => import('@/modules/mechanical/FluidDynamics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const BoltTorqueModule = dynamic(() => import('@/components/modules/mechanical/FastenerAssemblyModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const BearingAnalysisModule = dynamic(() => import('@/components/modules/mechanical/BearingAnalysisModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const FatigueAnalysisModule = dynamic(() => import('@/components/modules/mechanical/FatigueAnalysisModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const FatigueAnalysisModule = dynamic<any>(() => import('@/components/modules/mechanical/FatigueAnalysisModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const SoundMeterModule = dynamic(() => import('@/components/modules/mechanical/SoundMeterModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ClinometerModule = dynamic(() => import('@/components/modules/mechanical/ClinometerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const GPSSurveyorModule = dynamic(() => import('@/components/modules/mechanical/GPSSurveyorModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -39,7 +38,6 @@ const HardnessConverterModule = dynamic(() => import('@/components/modules/mecha
 
 
 // Advanced Engineering V2 Modules
-const MaterialAIModule = dynamic(() => import('@/components/modules/ai/MaterialAIModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const PlanetaryCalculator = dynamic(() => import('@/components/calculators/PlanetaryCalculator').then(mod => mod.PlanetaryCalculator as any), { loading: () => <ModuleLoading /> });
 
 
@@ -51,15 +49,14 @@ const UniversalCalcRenderer = dynamic<UniversalCalcRendererProps>(() =>
 
 // V2 Schemas
 const motorSelectionSchema = require('@/calculators/schemas-v2/motor-selection').default;
-const failureAnalysisSchema = require('@/calculators/schemas-v2/failure-analysis').default;
 const fatigueLifeSnSchema = require('@/calculators/schemas-v2/fatigue-life-sn').default;
 const chainDriveSchema = require('@/calculators/schemas-v2/chain-drive').default;
 const beltDriveSchema = require('@/calculators/schemas-v2/belt-drive').default;
 const weldingFilletSchema = require('@/calculators/schemas-v2/welding-fillet').default;
+const threadGeometrySchema = require('@/calculators/schemas-v2/thread-geometry').default;
 
 // Engineering Workstation Expansions
-const MaterialsExplorer = dynamic(() => import('@/components/modules/MaterialsExplorer').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const PhysicsSolver = dynamic(() => import('@/components/modules/PhysicsSolver').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PhysicsSolver = dynamic<any>(() => import('@/components/modules/PhysicsSolver').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 // New Multi-Disciplinary Expansion
 const PhysicsKinematicsModule = dynamic(() => import('@/modules/science/PhysicsKinematics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -67,18 +64,23 @@ const ChemistryReactionsModule = dynamic(() => import('@/modules/science/Chemist
 const BiologyGeneticsModule = dynamic(() => import('@/modules/science/BiologyGenetics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const CSAlgorithmsModule = dynamic(() => import('@/modules/software/CSAlgorithms').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const AerospaceDynamicsModule = dynamic(() => import('@/modules/mechanical/AerospaceDynamics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const NavalHydrostaticsModule = dynamic(() => import('@/modules/mechanical/NavalHydrostatics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const WindTunnelModule = dynamic(() => import('@/components/modules/mechanical/AerodynamicsModule').then(mod => mod.default as any), { ssr: false, loading: () => <ModuleLoading /> });
+const WindTunnelModule = dynamic(() => import('@/modules/mechanical/AerospaceDynamics').then(mod => mod.default as any), { ssr: false, loading: () => <ModuleLoading /> });
 const HeatSinkModule = dynamic(() => import('@/components/modules/mechanical/HeatSinkModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const PressureVesselModule = dynamic(() => import('@/components/modules/mechanical/PressureVesselModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const PipeFrictionModule = dynamic(() => import('@/components/modules/mechanical/PipeFrictionModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PipeFrictionModule = dynamic(() => import('@/modules/mechanical/FluidDynamics').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ColumnBucklingModule = dynamic(() => import('@/components/modules/mechanical/ColumnBucklingModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const AdvancedSpringModule = dynamic(() => import('@/components/modules/mechanical/AdvancedSpringModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const VibrationModule = dynamic(() => import('@/components/modules/mechanical/VibrationModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ToleranceStackupModule = dynamic(() => import('@/components/modules/mechanical/ToleranceStackupModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const HvacLoadModule = dynamic(() => import('@/components/modules/mechanical/HvacLoadModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const KeywayConnectionModule = dynamic(() => import('@/components/modules/mechanical/KeywayConnectionModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const PressFitModule = dynamic(() => import('@/components/modules/mechanical/PressFitModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ORingModule = dynamic(() => import('@/components/modules/mechanical/ORingModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const ShaftDesignModule = dynamic(() => import('@/modules/mechanical/ShaftDesign').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const CylinderDesignModule = dynamic(() => import('@/modules/mechanical/CylinderDesign').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 // Electrical
+const ElectricalEngineeringSuite = dynamic<any>(() => import('@/components/modules/electrical/ElectricalEngineeringSuite').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const OhmsLawModule = dynamic(() => import('@/components/modules/electrical/OhmsLawModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const VoltageDropModule = dynamic(() => import('@/components/modules/electrical/VoltageDropModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ThreePhasePowerModule = dynamic(() => import('@/components/modules/electrical/ThreePhasePowerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
@@ -95,18 +97,17 @@ const CalculatorModule = dynamic(() => import('@/components/modules/science/Calc
 
 // Elite Phase D Wiring
 const MfgReadinessModule = dynamic(() => import('@/modules/mechanical/MfgReadiness').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const GenerativeLiteModule = dynamic(() => import('@/modules/generative/GenerativeLite').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const DragAndBuildModule = dynamic(() => import('@/modules/mechanical/DragAndBuild').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const FailurePredictionModule = dynamic(() => import('@/modules/mechanical/FailurePrediction').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
-const FailureDiagnosisModule = dynamic(() => import('@/modules/mechanical/FailureDiagnosis').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const MotorSelectionModule = dynamic(() => import('@/modules/mechanical/MotorSelection').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const ConcreteReinforcementModule = dynamic(() => import('@/modules/civil/ConcreteReinforcement').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
 const ReducerModule = dynamic(() => import('@/components/modules/mechanical/ReducerModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const GearboxDesignModule = dynamic(() => import('@/components/modules/mechanical/GearboxDesignModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 
-// CAD Editor (AluCalc OS 2.0)
+// CAD Editor & 3D Design Studio (AluCAD OS 2.0)
 const CadEditorModule = dynamic(() => import('@/cad/components/AluCAD').then(mod => mod.AluCAD), { loading: () => <ModuleLoading /> });
+const DesignStudioModule = dynamic(() => import('@/design-studio/DesignStudio').then(mod => (mod.DesignStudio || mod.default) as any), { ssr: false, loading: () => <ModuleLoading /> });
 
 // Analytics & Simulation
 const SimulationFEAModule = dynamic(() => import('@/components/modules/mechanical/SimulationFEAModule').then(mod => mod.SimulationFEAModule as any), { loading: () => <ModuleLoading /> });
@@ -126,7 +127,10 @@ const RealTimeCostModule = dynamic(() => import('@/modules/finance/RealTimeCost'
 const AiCoPilotModule = dynamic(() => import('@/modules/software/AiCoPilot').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
 const HolographicViewer = dynamic(() => import('@/components/modules/presentation/HolographicViewer').then(mod => mod.HolographicViewer as any), { ssr: false, loading: () => <ModuleLoading /> });
 const ParametricCadModule = dynamic(() => import('@/components/modules/parametric/ParametricCadModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const FlowCanvasModule = dynamic(() => import('@/components/flow/FlowCanvas'), { loading: () => <ModuleLoading /> });
 const MatrixScreensaverModule = dynamic(() => import('@/components/modules/os/MatrixScreensaverModule').then(mod => mod.default as any), { loading: () => <ModuleLoading /> });
+const FactorySimulation = dynamic(() => import('@/components/factory/FactorySimulation').then(mod => mod.FactorySimulation as any), { ssr: false, loading: () => <ModuleLoading /> });
+const ProjectSimulator = dynamic(() => import('@/components/project/ProjectSimulator').then(mod => mod.ProjectSimulator as any), { loading: () => <ModuleLoading /> });
 
 function ModuleLoading() {
     const { language } = useI18nStore();
@@ -140,19 +144,19 @@ function ModuleLoading() {
 
 function PlaceholderModule({ type }: { type: ModuleType }) {
     return (
-        <div className="flex flex-col items-center justify-center w-full h-full bg-[#05060a] relative overflow-hidden">
+        <div className="flex flex-col items-center justify-center w-full h-full bg-[var(--bg-0)] relative overflow-hidden">
             <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative z-10 flex flex-col items-center max-w-md w-full px-8 py-12 bg-white/[0.02] border border-white/10 rounded-[32px] backdrop-blur-2xl text-center shadow-2xl"
+                className="relative z-10 flex flex-col items-center max-w-md w-full px-8 py-12 bg-white/[0.02] border border-white/10 rounded-xl text-center shadow-2xl"
             >
                 <div className="relative w-24 h-24 mb-8">
-                    <div className="relative w-full h-full rounded-2xl bg-[#0a101f] border border-blue-500/40 flex items-center justify-center">
+                    <div className="relative w-full h-full rounded-2xl bg-[var(--bg-1)] border border-blue-500/40 flex items-center justify-center">
                         <Monitor size={40} className="text-blue-400" />
                     </div>
                 </div>
-                <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-2">Module Assembly</h2>
+                <h2 className="text-2xl font-black text-white tracking-tighter uppercase mb-2">Module Assembly</h2>
                 <div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-black tracking-widest uppercase mb-6">{type}</div>
                 <p className="text-slate-400 text-xs leading-relaxed mb-10 font-medium">Node synthesis in progress.</p>
             </motion.div>
@@ -193,15 +197,13 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'profile-weight': return <ProfileWeightModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'gears-bearings': return <GearsModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'nesting-2d': return <Nesting2DModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
-        case 'materials-db': return <MaterialsDatabaseModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'materials-db':
+        case 'materials-explorer':
+        case 'material-selector-ai': return <HandbookModule defaultTab="materials" {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'welding': return <WeldingModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'manufacturing': return <ManufacturingModule />;
         case 'manufacturing-sandbox': return <ManufacturingSandbox />;
-        case 'fasteners': return (
-            <Suspense fallback={<ModuleLoading />}>
-                <FastenersModule {...({ lang: currentLanguage, dict: dictionary } as any)} />
-            </Suspense>
-        );
+        case 'fasteners':
         case 'bolt-torque': return (
             <Suspense fallback={<ModuleLoading />}>
                 <BoltTorqueModule {...({ lang: currentLanguage, dict: dictionary } as any)} />
@@ -218,7 +220,8 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'engineering-selection': return <EngineeringSelectionSystem />;
         case 'fluid-dynamics': return <FluidDynamicsModule />;
         case 'machining-details': return <MachiningDetailsModule />;
-        case 'fatigue-analysis': return <FatigueAnalysisModule />;
+        case 'fatigue-analysis': return <FatigueAnalysisModule initialTab="sn-curve" />;
+        case 'failure-prediction': return <FatigueAnalysisModule initialTab="weibull" />;
         case 'sound-meter': return <SoundMeterModule />;
         case 'clinometer': return <ClinometerModule />;
         case 'gps-surveyor': return <GPSSurveyorModule />;
@@ -227,15 +230,15 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'chain-drive': return <UniversalCalcRenderer schema={chainDriveSchema} />;
         case 'belt-drive': return <UniversalCalcRenderer schema={beltDriveSchema} />;
         case 'welding-fillet': return <UniversalCalcRenderer schema={weldingFilletSchema} />;
+        case 'thread-geometry': return <UniversalCalcRenderer schema={threadGeometrySchema} />;
         case 'motor-selection-std': return <MotorSelectionModule />;
-        case 'failure-diagnosis': return <FailureDiagnosisModule />;
         case 'gearbox-design': return <GearboxDesignModule />;
-        case 'physics-kinematics': return <PhysicsKinematicsModule />;
-        case 'chemistry-reactions': return <ChemistryReactionsModule />;
-        case 'biology-genetics': return <BiologyGeneticsModule />;
-        case 'cs-algorithms': return <CSAlgorithmsModule />;
+        case 'physics-kinematics': return <PhysicsSolver initialTab="kinematics" />;
+        case 'physics-solver': return <PhysicsSolver initialTab="kinematics" />;
+        case 'chemistry-reactions': return <PeriodicTableModule initialMode="Reactions" {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'biology-genetics': return <HandbookModule defaultTab="materials" {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'cs-algorithms': return <CalculatorModule />;
         case 'aerospace-dynamics': return <AerospaceDynamicsModule />;
-        case 'naval-hydrostatics': return <NavalHydrostaticsModule />;
         case 'wind-tunnel': return <WindTunnelModule />;
         case 'heat-sink': return <HeatSinkModule />;
         case 'pressure-vessel': return <PressureVesselModule />;
@@ -245,25 +248,27 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'vibration': return <VibrationModule />;
         case 'tolerance-stackup': return <ToleranceStackupModule />;
         case 'hvac-load': return <HvacLoadModule />;
-        case 'ohms-law': return <OhmsLawModule />;
-        case 'voltage-drop': return <VoltageDropModule />;
-        case 'three-phase-power': return <ThreePhasePowerModule />;
-        case 'digital-logic': return <DigitalLogicModule />;
-        case 'filter-design': return <FilterDesignModule />;
+        case 'keyway-connection': return <KeywayConnectionModule />;
+        case 'press-fit': return <PressFitModule />;
+        case 'o-ring': return <ORingModule />;
+        case 'shaft-design': return <ShaftDesignModule />;
+        case 'cylinder-design': return <CylinderDesignModule />;
+        case 'ohms-law': return <ElectricalEngineeringSuite initialTab="ohms-law" />;
+        case 'voltage-drop': return <ElectricalEngineeringSuite initialTab="voltage-drop" />;
+        case 'three-phase-power': return <ElectricalEngineeringSuite initialTab="three-phase" />;
+        case 'digital-logic': return <ElectricalEngineeringSuite initialTab="digital-logic" />;
+        case 'filter-design': return <ElectricalEngineeringSuite initialTab="filter-design" />;
         case 'beam-deflection': return <BeamDeflectionModule />;
-        case 'periodic-table': return <PeriodicTableModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
+        case 'periodic-table': return <PeriodicTableModule initialMode="Elements" {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'unit-converter': return <UnitConverterModule />;
         case 'calculator': return <CalculatorModule />;
         case 'reducer-lubrication': return <ReducerModule {...({ lang: currentLanguage, dict: dictionary } as any)} />;
         case 'cad-editor': return <CadEditorModule className="w-full h-full" />;
+        case 'design-studio': return <DesignStudioModule />;
         case 'simulation-fea': return <SimulationFEAModule />;
         case 'sketch-pad': return <ExcalidrawModule />;
         case 'manufacturing-readiness': return <MfgReadinessModule />;
-        case 'failure-prediction': return <FailurePredictionModule />;
-        case 'materials-explorer': return <MaterialsExplorer />;
-        case 'physics-solver': return <PhysicsSolver />;
         case 'concrete-reinforcement': return <ConcreteReinforcementModule />;
-        case 'material-selector-ai': return <MaterialAIModule />;
         case 'planetary-gearbox': return <PlanetaryCalculator />;
         case 'settings': return <SettingsModule />;
         case 'engineering-notes': return <EngineeringNotesModule />;
@@ -276,7 +281,10 @@ export function WindowContent({ type }: WindowContentProps) {
         case 'ai-copilot': return <AiCoPilotModule />;
         case 'holographic-viewer': return <HolographicViewer />;
         case 'parametric-cad': return <ParametricCadModule />;
+        case 'flow': return <FlowCanvasModule className="w-full h-full" />;
         case 'matrix-screensaver': return <MatrixScreensaverModule />;
+        case 'factory-sim': return <FactorySimulation />;
+        case 'project-sim': return <ProjectSimulator />;
         default:
             const isHeadless = (calculatorsDB as any[]).find(c => c.slug === type);
             if (isHeadless) {

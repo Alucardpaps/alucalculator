@@ -1,10 +1,28 @@
-# Cloudflare Pages / Netlify-style security headers
+# Cloudflare Pages / Apache / LiteSpeed headers
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Link: <https://www.alucalculator.com/llms.txt>; rel="alternate"; type="text/plain", <https://www.alucalculator.com/llms-full.txt>; rel="alternate"; type="text/plain", <https://www.alucalculator.com/index.md>; rel="alternate"; type="text/markdown", <https://www.alucalculator.com/.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"
+
+/.well-known/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: *
+
+/llms.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
+  Access-Control-Allow-Origin: *
+  Content-Type: text/plain; charset=utf-8
+
+/index.md
+  Access-Control-Allow-Origin: *
+  Content-Type: text/markdown; charset=utf-8
 
 /license/
   X-Robots-Tag: noindex

@@ -3,11 +3,16 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Activity, Info, Settings, ArrowRight, Layers, Palette, ShieldCheck } from 'lucide-react';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
+import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 /**
  * OhmsLawModule - High-Fidelity Industrial Electrical Workstation
  */
 export default function OhmsLawModule() {
+    const { language } = useI18nStore();
+    const precision = useGlobalPrecision();
     const [mode, setMode] = useState<'DC' | 'AC'>('DC');
     const [calcTarget, setCalcTarget] = useState<'V' | 'I' | 'R' | 'P' | 'Z'>('V');
     
@@ -83,15 +88,19 @@ export default function OhmsLawModule() {
     }, [calcTarget, v, i, r, p]);
 
     return (
-        <div className="flex flex-col h-full bg-[#08090d] text-slate-200 overflow-hidden font-sans">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] text-slate-200 overflow-hidden font-sans">
             <header className="px-6 py-4 border-b border-white/5 bg-black/40 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center">
                         <Zap size={20} className="text-amber-400 group-hover:animate-pulse" />
                     </div>
                     <div>
-                        <h1 className="text-xs font-black tracking-widest uppercase italic">Ohm&apos;s Law Pro</h1>
-                        <p className="text-[9px] text-amber-500/50 font-bold tracking-widest uppercase">Industrial Electrical Workstation</p>
+                        <h1 className="text-xs font-black tracking-widest uppercase">
+                            {t12(language, "Ohm's Law Pro", "Ohm Kanunu Pro")}
+                        </h1>
+                        <p className="text-[9px] text-amber-500/50 font-bold tracking-widest uppercase">
+                            {t12(language, "Industrial Electrical Workstation", "Endüstriyel Elektrik İş İstasyonu")}
+                        </p>
                     </div>
                 </div>
 
@@ -100,9 +109,9 @@ export default function OhmsLawModule() {
                         <button
                             key={m}
                             onClick={() => setMode(m)}
-                            className={`px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${mode === m ? 'bg-amber-400 text-black shadow-[0_0_15px_rgba(251,191,36,0.2)]' : 'text-slate-500 hover:text-white'}`}
+                            className={`px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${mode === m ? 'bg-[var(--cyan)] text-[var(--accent-ink)] ' : 'text-slate-500 hover:text-white'}`}
                         >
-                            {m} Mode
+                            {m === 'DC' ? t12(language, 'DC Mode', 'DC Modu') : t12(language, 'AC Mode', 'AC Modu')}
                         </button>
                     ))}
                 </div>
@@ -110,10 +119,12 @@ export default function OhmsLawModule() {
 
             <main className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-none">
                 {/* Circuit Viz */}
-                <section className="p-8 bg-black/40 border border-white/5 rounded-[32px] relative overflow-hidden group">
-                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none"></div>
+                <section className="p-8 bg-black/40 border border-white/5 rounded-xl relative overflow-hidden group">
+                     <div className="absolute inset-0 pointer-events-none"></div>
                      <div className="flex flex-col items-center justify-center">
-                         <div className="text-[10px] font-black text-amber-500/40 uppercase tracking-[0.3em] mb-6">Real-Time Circuit Model</div>
+                         <div className="text-[10px] font-black text-amber-500/40 uppercase tracking-[0.3em] mb-6">
+                             {t12(language, 'Real-Time Circuit Model', 'Gerçek Zamanlı Devre Modeli')}
+                         </div>
                          
                          <div className="relative w-full max-w-sm h-32 flex items-center justify-center">
                              {/* Simplified Animated Circuit SVG */}
@@ -137,10 +148,10 @@ export default function OhmsLawModule() {
                              </svg>
 
                              <div className="absolute top-2 left-1/4 -translate-x-1/2 p-2 bg-black/80 rounded-lg border border-white/5 text-[10px] font-mono font-bold text-amber-500">
-                                 {mode === 'DC' ? dcStats.V.toFixed(1) : v.toFixed(1)}V
+                                 {mode === 'DC' ? formatEngineeringValue(dcStats.V, precision, false) : formatEngineeringValue(v, precision, false)}V
                              </div>
                              <div className="absolute top-2 right-1/4 translate-x-1/2 p-2 bg-black/80 rounded-lg border border-white/5 text-[10px] font-mono font-bold text-emerald-500">
-                                 {mode === 'DC' ? dcStats.I.toFixed(2) : acStats?.current.toFixed(2)}A
+                                 {mode === 'DC' ? formatEngineeringValue(dcStats.I, precision, false) : formatEngineeringValue(acStats?.current ?? 0, precision, false)}A
                              </div>
                          </div>
                      </div>
@@ -151,25 +162,25 @@ export default function OhmsLawModule() {
                     <div className="space-y-4">
                         <section className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
                              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <Settings size={14} /> Basic Parameters
+                                <Settings size={14} /> {t12(language, 'Basic Parameters', 'Temel Parametreler')}
                              </h3>
                              <div className="grid grid-cols-2 gap-4">
-                                <InputGroup label="Voltage (V)" value={v} onChange={setV} />
-                                <InputGroup label="Resistance (Ω)" value={r} onChange={setR} />
-                                <InputGroup label="Current (I)" value={i} onChange={setI} />
-                                <InputGroup label="Power (W)" value={p} onChange={setP} />
+                                <InputGroup label={t12(language, 'Voltage (V)', 'Gerilim (V)')} value={v} onChange={setV} />
+                                <InputGroup label={t12(language, 'Resistance (Ω)', 'Direnç (Ω)')} value={r} onChange={setR} />
+                                <InputGroup label={t12(language, 'Current (I)', 'Akım (I)')} value={i} onChange={setI} />
+                                <InputGroup label={t12(language, 'Power (W)', 'Güç (W)')} value={p} onChange={setP} />
                              </div>
                         </section>
 
                         {mode === 'AC' && (
                             <section className="p-6 bg-white/[0.02] border border-blue-500/20 rounded-2xl animate-in fade-in slide-in-from-bottom-2">
                                 <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                    <Activity size={14} /> Inductive & Capacitive Load
+                                    <Activity size={14} /> {t12(language, 'Inductive & Capacitive Load', 'Endüktif ve Kapasitif Yük')}
                                 </h3>
                                 <div className="grid grid-cols-3 gap-3">
-                                    <InputGroup label="Freq (Hz)" value={freq} onChange={setFreq} />
-                                    <InputGroup label="Induct. (H)" value={l} onChange={setL} />
-                                    <InputGroup label="Capac. (uF)" value={c} onChange={setC} />
+                                    <InputGroup label={t12(language, 'Freq (Hz)', 'Frekans (Hz)')} value={freq} onChange={setFreq} />
+                                    <InputGroup label={t12(language, 'Induct. (H)', 'Endüktans (H)')} value={l} onChange={setL} />
+                                    <InputGroup label={t12(language, 'Capac. (uF)', 'Kapasitans (µF)')} value={c} onChange={setC} />
                                 </div>
                             </section>
                         )}
@@ -179,27 +190,29 @@ export default function OhmsLawModule() {
                     <div className="space-y-4">
                          <section className="p-6 bg-white/[0.03] border border-white/10 rounded-2xl relative overflow-hidden">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em]">Calculator Output</h3>
+                                <h3 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em]">
+                                    {t12(language, 'Calculator Output', 'Hesaplayıcı Çıktısı')}
+                                </h3>
                                 <div className="text-[9px] px-2 py-1 rounded bg-amber-500/10 text-amber-500 font-black animate-pulse uppercase tracking-widest">
-                                    Real-Time Solver
+                                    {t12(language, 'Real-Time Solver', 'Gerçek Zamanlı Çözücü')}
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 {mode === 'DC' ? (
                                     <>
-                                        <ResultRow label="Resistance" value={dcStats.R.toFixed(2)} unit="Ω" />
-                                        <ResultRow label="Potential" value={dcStats.V.toFixed(1)} unit="V" />
-                                        <ResultRow label="Flow Rate" value={dcStats.I.toFixed(2)} unit="A" />
+                                        <ResultRow label={t12(language, 'Resistance', 'Direnç')} value={formatEngineeringValue(dcStats.R, precision, false)} unit="Ω" />
+                                        <ResultRow label={t12(language, 'Potential', 'Potansiyel (Gerilim)')} value={formatEngineeringValue(dcStats.V, precision, false)} unit="V" />
+                                        <ResultRow label={t12(language, 'Flow Rate', 'Akım Şiddeti')} value={formatEngineeringValue(dcStats.I, precision, false)} unit="A" />
                                         <div className="h-px bg-white/5 my-2" />
-                                        <ResultRow label="Dissipated Power" value={dcStats.P.toFixed(2)} unit="W" highlight />
+                                        <ResultRow label={t12(language, 'Dissipated Power', 'Harcanan Güç')} value={formatEngineeringValue(dcStats.P, precision, false)} unit="W" highlight />
                                     </>
                                 ) : (
                                     <>
-                                        <ResultRow label="Impedance (Z)" value={acStats?.Z.toFixed(2)} unit="Ω" highlight />
-                                        <ResultRow label="Reactance (X)" value={acStats?.X.toFixed(2)} unit="Ω" />
-                                        <ResultRow label="Power Factor" value={acStats?.powerFact.toFixed(3)} unit="cosφ" />
-                                        <ResultRow label="Active Power" value={acStats?.activePower.toFixed(2)} unit="W" />
+                                        <ResultRow label={t12(language, 'Impedance (Z)', 'Empedans (Z)')} value={formatEngineeringValue(acStats?.Z ?? 0, precision, false)} unit="Ω" highlight />
+                                        <ResultRow label={t12(language, 'Reactance (X)', 'Reaktans (X)')} value={formatEngineeringValue(acStats?.X ?? 0, precision, false)} unit="Ω" />
+                                        <ResultRow label={t12(language, 'Power Factor', 'Güç Faktörü')} value={formatEngineeringValue(acStats?.powerFact ?? 0, precision, false)} unit="cosφ" />
+                                        <ResultRow label={t12(language, 'Active Power', 'Aktif Güç')} value={formatEngineeringValue(acStats?.activePower ?? 0, precision, false)} unit="W" />
                                     </>
                                 )}
                             </div>
@@ -207,10 +220,12 @@ export default function OhmsLawModule() {
 
                          <section className="p-6 bg-black/40 border border-white/5 rounded-2xl relative">
                             <div className="flex items-center justify-between mb-4">
-                               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Resistor Color Decoder</h3>
+                               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                   {t12(language, 'Resistor Color Decoder', 'Direnç Renk Kodu Çözücü')}
+                               </h3>
                                <div className="flex gap-1">
                                     {[4, 5].map(b => (
-                                        <button key={b} onClick={() => setBands(b)} className={`w-6 h-6 rounded flex items-center justify-center text-[9px] font-black transition-all ${bands === b ? 'bg-amber-400 text-black' : 'bg-white/5 text-slate-500'}`}>{b}</button>
+                                        <button key={b} onClick={() => setBands(b)} className={`w-6 h-6 rounded flex items-center justify-center text-[9px] font-black transition-all ${bands === b ? 'bg-[var(--cyan)] text-[var(--accent-ink)]' : 'bg-white/5 text-slate-500'}`}>{b}</button>
                                     ))}
                                </div>
                             </div>
@@ -240,7 +255,9 @@ export default function OhmsLawModule() {
 
                              <div className="text-center">
                                  <div className="text-xl font-mono font-black text-white">{calculatedResistor.res.toLocaleString()} Ω</div>
-                                 <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Tolerance: {calculatedResistor.tol}</div>
+                                 <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                                     {t12(language, 'Tolerance', 'Tolerans')}: {calculatedResistor.tol}
+                                 </div>
                              </div>
                          </section>
                     </div>
@@ -249,11 +266,11 @@ export default function OhmsLawModule() {
 
             <footer className="px-6 py-4 bg-black/60 border-t border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-6">
-                    <StatusItem icon={<ShieldCheck size={14}/>} label="Compliance" value="IEC 60038" />
-                    <StatusItem icon={<Layers size={14}/>} label="Standard" value="ISO 13448" />
+                    <StatusItem icon={<ShieldCheck size={14}/>} label={t12(language, 'Compliance', 'Uygunluk')} value="IEC 60038" />
+                    <StatusItem icon={<Layers size={14}/>} label={t12(language, 'Standard', 'Standart')} value="ISO 13448" />
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-mono font-black text-amber-500/40 uppercase tracking-widest">
-                    <Activity size={12} className="animate-pulse" /> Live Analysis active
+                    <Activity size={12} className="animate-pulse" /> {t12(language, 'Live Analysis active', 'Canlı Analiz Etkin')}
                 </div>
             </footer>
         </div>

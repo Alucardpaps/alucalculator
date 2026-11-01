@@ -28,6 +28,7 @@ import {
 } from '../kernel/GeometryKernel';
 import { SNAP_DISTANCE_PX, EPSILON, isZero } from '../kernel/constants';
 import { screenToWorldDistance } from '../kernel/CoordinateSystem';
+import { isEntityShown } from '../kernel/layers';
 
 // ═══════════════════════════════════════════════════════════════
 // SNAP ENGINE
@@ -57,7 +58,8 @@ export function findSnapPoint(
         : entities;
 
     for (const entity of candidates) {
-        if (!entity.isVisible) continue;
+        // objects on layers that are off or frozen are not snappable (locked ones are)
+        if (!isEntityShown(entity)) continue;
 
         const snaps = getEntitySnapPoints(entity, cursorWorld, activeSnaps);
 

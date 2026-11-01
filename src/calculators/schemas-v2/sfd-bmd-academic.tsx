@@ -9,7 +9,7 @@ export const sfdBmdAcademicSchema: CalculatorSchemaV2 = {
         description: 'Academic step-by-step drawing of Shear and Moment diagrams.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-25',
         tags: ['beam', 'sfd', 'bmd', 'statics', 'shear', 'moment', 'academic'],
         verifiedStandards: ['Statics and Mechanics of Materials']
@@ -141,7 +141,7 @@ export const sfdBmdAcademicSchema: CalculatorSchemaV2 = {
             const step3 = `M_max at x=${a} ➔ M_max = R_A × a = ${(Ra * a).toFixed(2)} kNm`;
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-[#070b12] font-mono text-cyan-50">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-0)] font-mono text-cyan-50">
                     <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-full drop-shadow-lg">
 
                         {/* ────────────────────────────────────────────────────────── */}

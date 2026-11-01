@@ -16,6 +16,7 @@ import { DUOLINGO_UNITS } from './academyCurriculum';
 import { ModalityIcon } from './AcademyModalityIcons';
 import { useAcademyGamificationStore } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 interface DuolingoPathViewProps {
   onStartLesson: (lesson: CurriculumLesson) => void;
@@ -73,15 +74,15 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
   const getDifficultyBadge = (diff: string) => {
     switch (diff) {
       case 'easy':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">🟢 Başlangıç / Temel</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">{t12(language, '🟢 Beginner / Core', '🟢 Başlangıç / Temel')}</span>;
       case 'medium':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">🟡 Standart Endüstri</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">{t12(language, '🟡 Industry Standard', '🟡 Standart Endüstri')}</span>;
       case 'hard':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">🔴 İleri Mukavemet</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40">{t12(language, '🔴 Advanced Strength', '🔴 İleri Mukavemet')}</span>;
       case 'expert':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">🔥 Uzman Düzey</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">{t12(language, '🔥 Expert Level', '🔥 Uzman Düzey')}</span>;
       case 'extreme':
-        return <span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/30 text-amber-300 border border-amber-400 animate-pulse shadow-lg shadow-amber-500/30">💀 GRANDMASTER EKSTREM</span>;
+        return <span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/30 text-amber-300 border border-amber-400 animate-pulse shadow-lg ">{t12(language, '💀 GRANDMASTER EXTREME', '💀 GRANDMASTER EKSTREM')}</span>;
       default:
         return null;
     }
@@ -106,16 +107,16 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
   const getModalityLabel = (pType: string) => {
     switch (pType) {
       case 'calculation':
-        return { label: '🧮 Sayısal Hesaplama', color: 'bg-teal-500/20 text-teal-300 border-teal-500/40' };
+        return { label: t12(language, '🧮 Numerical Solve', '🧮 Sayısal Hesaplama'), color: 'bg-teal-500/20 text-teal-300 border-teal-500/40' };
       case 'drawing':
-        return { label: '✏️ Vektör Çizimi', color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' };
+        return { label: t12(language, '✏️ Vector Drafting', '✏️ Vektör Çizimi'), color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' };
       case 'visual':
-        return { label: '🖼️ Görsel Şema Seçimi', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+        return { label: t12(language, '🖼️ Visual Schematic', '🖼️ Görsel Şema Seçimi'), color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
       case 'boss':
-        return { label: '👑 Boss Sınavı', color: 'bg-amber-500/30 text-amber-300 border-amber-400' };
+        return { label: t12(language, '👑 Boss Exam', '👑 Boss Sınavı'), color: 'bg-amber-500/30 text-amber-300 border-amber-400' };
       case 'quiz':
       default:
-        return { label: '⚡ Test & Analiz', color: 'bg-blue-500/20 text-blue-300 border-blue-500/40' };
+        return { label: t12(language, '⚡ Test & Analysis', '⚡ Test & Analiz'), color: 'bg-blue-500/20 text-blue-300 border-blue-500/40' };
     }
   };
 
@@ -123,7 +124,7 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
     <div className="w-full max-w-2xl mx-auto space-y-8 pb-28 select-none">
       
       {/* ─── 1. TOP UNIT PAGINATION CAROUSEL TABS (1..10) ─── */}
-      <div className="p-3 sm:p-4 rounded-3xl bg-[#080d1a] border border-white/10 shadow-xl space-y-3">
+      <div className="p-3 sm:p-4 rounded-3xl bg-[var(--bg-1)] border border-white/10 shadow-xl space-y-3">
         <div className="flex items-center justify-between">
           <button
             type="button"
@@ -164,7 +165,7 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
                 onClick={() => handleUnitChange(uIdx)}
                 className={`flex-1 min-w-[42px] py-2 rounded-2xl font-mono text-xs font-bold transition text-center cursor-pointer border ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 border-cyan-300 shadow-[0_0_15px_rgba(0,229,255,0.4)] scale-105'
+                    ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 border-cyan-300 scale-105'
                     : isBossUnit
                     ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/30'
                     : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border-white/5'
@@ -180,21 +181,21 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
       {/* ─── 2. ACTIVE UNIT MASTER HERO BANNER ─── */}
       <div
         className={`p-6 sm:p-7 rounded-3xl bg-gradient-to-r ${activeUnit.gradient} text-slate-950 shadow-2xl space-y-3 relative overflow-hidden border ${
-          isExtremeUnit ? 'border-amber-400 shadow-[0_0_50px_rgba(245,158,11,0.3)]' : 'border-white/15'
+          isExtremeUnit ? 'border-amber-400 ' : 'border-white/15'
         }`}
       >
-        <div className="absolute top-0 right-0 w-56 h-56 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+
 
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono font-black uppercase tracking-wider bg-black/30 text-white px-3 py-1 rounded-full backdrop-blur-md">
+            <span className="text-[11px] font-mono font-black uppercase tracking-wider bg-black/30 text-white px-3 py-1 rounded-full">
               {activeUnit.title[lang]}
             </span>
             {getDifficultyBadge(activeUnit.difficulty)}
           </div>
 
           <span className="text-xs font-mono font-black text-white/90 bg-black/20 px-3 py-1 rounded-xl">
-            {completedInUnit} / {activeUnit.lessons.length} Tamamlandı (%{unitProgressPct})
+            {completedInUnit} / {activeUnit.lessons.length} {t12(language, `Completed (${unitProgressPct}%)`, `Tamamlandı (%${unitProgressPct})`)}
           </span>
         </div>
 
@@ -230,7 +231,7 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
               {/* Active Pulsing Tooltip Pointer */}
               {status === 'active' && (
                 <div className="absolute -top-11 z-20 animate-bounce">
-                  <div className="px-3.5 py-1 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-mono font-black text-[11px] uppercase tracking-wider shadow-lg shadow-cyan-500/50 relative">
+                  <div className="px-3.5 py-1 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-mono font-black text-[11px] uppercase tracking-wider shadow-lg relative">
                     {DUOLINGO_I18N.startLesson[lang]}
                     <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2.5 h-2.5 bg-emerald-400 rotate-45" />
                   </div>
@@ -250,11 +251,11 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
                   isBoss ? 'w-22 h-22' : 'w-18 h-18'
                 } ${
                   status === 'completed'
-                    ? 'bg-gradient-to-br from-amber-400 to-yellow-500 border-amber-300 text-slate-950 shadow-amber-500/25 border-b-6 border-b-amber-700 active:translate-y-1'
+                    ? 'bg-gradient-to-br from-amber-400 to-yellow-500 border-amber-300 text-slate-950 border-b-6 border-b-amber-700 active:translate-y-1'
                     : status === 'active'
                     ? isBoss
-                      ? 'bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 border-amber-300 text-slate-950 shadow-[0_0_30px_rgba(245,158,11,0.7)] border-b-6 border-b-purple-900 animate-pulse active:translate-y-1'
-                      : 'bg-gradient-to-br from-cyan-400 to-blue-500 border-cyan-300 text-slate-950 shadow-cyan-500/50 border-b-6 border-b-blue-700 animate-pulse active:translate-y-1'
+                      ? 'bg-gradient-to-br from-amber-400 via-rose-500 to-purple-600 border-amber-300 text-slate-950 border-b-6 border-b-purple-900 animate-pulse active:translate-y-1'
+                      : 'bg-gradient-to-br from-cyan-400 to-blue-500 border-cyan-300 text-slate-950 border-b-6 border-b-blue-700 animate-pulse active:translate-y-1'
                     : 'bg-slate-900/90 border-slate-800 text-slate-600 cursor-not-allowed border-b-6 border-b-slate-950'
                 }`}
               >
@@ -274,8 +275,11 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
               </button>
 
               {/* Title & Type Label beneath node */}
-              <div className="mt-2 text-center max-w-[170px] space-y-0.5">
-                <span className="text-[11px] font-mono font-bold text-slate-200 block truncate drop-shadow">
+              <div className="mt-2 text-center max-w-[190px] space-y-0.5">
+                <span
+                  className="text-[11px] font-mono font-bold text-slate-200 block line-clamp-2 leading-tight drop-shadow px-1 hover:text-cyan-300 transition-colors"
+                  title={lesson.title[lang]}
+                >
                   {lesson.title[lang]}
                 </span>
                 <span className={`inline-block text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full border ${modality.color}`}>
@@ -288,7 +292,7 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
       </div>
 
       {/* ─── 4. BOTTOM UNIT NAVIGATION BAR ─── */}
-      <div className="p-5 rounded-3xl bg-[#080d1a] border border-white/10 shadow-xl flex items-center justify-between gap-4 font-mono text-xs">
+      <div className="p-5 rounded-3xl bg-[var(--bg-1)] border border-white/10 shadow-xl flex items-center justify-between gap-4 font-mono text-xs">
         <button
           type="button"
           disabled={currentUnitIndex === 0}
@@ -300,14 +304,14 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
         </button>
 
         <span className="text-slate-400 text-center font-bold">
-          Ünite {activeUnit.number} / 10
+          {DUOLINGO_I18N.unit[lang]} {activeUnit.number} / 10
         </span>
 
         <button
           type="button"
           disabled={currentUnitIndex === DUOLINGO_UNITS.length - 1}
           onClick={() => handleUnitChange(currentUnitIndex + 1)}
-          className="px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-bold transition cursor-pointer flex items-center gap-2 shadow-lg shadow-cyan-500/20"
+          className="px-4 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-bold transition cursor-pointer flex items-center gap-2 shadow-lg "
         >
           <span>{DUOLINGO_I18N.nextUnit[lang]}</span>
           <ChevronRight size={16} />
@@ -316,8 +320,8 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
 
       {/* ─── 5. CENTERED NON-COLLIDING LESSON START MODAL (FIXED DIALOG) ─── */}
       {selectedLesson && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-md p-6 sm:p-7 rounded-3xl bg-[#080d1a] border border-cyan-500/50 shadow-[0_0_50px_rgba(0,229,255,0.3)] space-y-4 animate-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-md p-6 sm:p-7 rounded-3xl bg-[var(--bg-1)] border border-cyan-500/50 space-y-4 animate-in zoom-in-95 duration-200 relative">
             
             {/* Close X */}
             <button
@@ -347,7 +351,8 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
                 {selectedLesson.title[lang]}
               </h3>
               <p className="text-xs text-slate-400 mt-1.5 font-sans leading-relaxed">
-                {selectedLesson.steps.length} etkileşimli adım (Teori & Formül + Uygulamalı Soru)
+                {selectedLesson.steps.filter((s) => s.type !== 'concept').length}
+                {' '}{t12(lang, 'unique questions · theory + practice', 'özgün soru · teori + pratik')}
               </p>
             </div>
 
@@ -361,11 +366,11 @@ export function DuolingoPathView({ onStartLesson, activeUnitIndex: externalUnitI
                 }}
                 className={`w-full py-4 rounded-2xl font-mono font-black text-sm uppercase tracking-wider shadow-xl transition cursor-pointer flex items-center justify-center gap-2 ${
                   selectedLesson.isBoss
-                    ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 hover:from-amber-300 hover:to-purple-500 text-slate-950 shadow-amber-500/30'
-                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-500/30'
+                    ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 hover:from-amber-300 hover:to-purple-500 text-slate-950 '
+                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 '
                 }`}
               >
-                <span>{selectedLesson.isBoss ? '👑 BOSS SINAVINI BAŞLAT' : DUOLINGO_I18N.startLesson[lang]}</span>
+                <span>{selectedLesson.isBoss ? `👑 ${t12(lang, 'START BOSS EXAM', 'BOSS SINAVINI BAŞLAT')}` : DUOLINGO_I18N.startLesson[lang]}</span>
                 <ArrowRight size={18} />
               </button>
             </div>

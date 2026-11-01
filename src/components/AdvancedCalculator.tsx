@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Trash2, Maximize2, Minimize2 } from 'lucide-react';
 import { MathEngine } from '@/engine/math-core';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 interface SavedVar {
     id: string;
@@ -30,6 +31,7 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
     const [varName, setVarName] = useState('');
 
     // Responsive State
+  const precision = useGlobalPrecision();
     const containerRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
 
@@ -119,7 +121,7 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
         const d = Math.floor(deg);
         const minFloat = (deg - d) * 60;
         const m = Math.floor(minFloat);
-        const s = ((minFloat - m) * 60).toFixed(2);
+        const s =formatEngineeringValue(((minFloat - m) * 60), precision, false);
         return `${d}°${m}'${s}"`;
     };
 
@@ -403,7 +405,7 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 animate-in fade-in duration-200 overflow-hidden">
 
             {/* Click outside closer wrapper */}
             <div className="absolute inset-0" onClick={onClose}></div>
@@ -418,10 +420,10 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
                     height: '920px'  // Increased height to accommodate larger LCD
                 }}
             >
-                <div className="w-full h-full bg-surface-100 dark:bg-surface-900 rounded-[32px] overflow-hidden flex shadow-2xl border-4 border-surface-300 dark:border-surface-700">
+                <div className="w-full h-full bg-surface-100 dark:bg-surface-900 rounded-xl overflow-hidden flex shadow-2xl border-4 border-surface-300 dark:border-surface-700">
 
                     {/* --- Left Panel: Calculator Face --- */}
-                    <div className="flex-[2] bg-[#22252b] flex flex-col p-6 relative select-none">
+                    <div className="flex-[2] bg-[var(--bg-3)] flex flex-col p-6 relative select-none">
 
                         {/* Brand & Solar */}
                         <div className="flex justify-between items-center mb-4">
@@ -430,13 +432,13 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
                                 <span className="text-brand-orange text-[10px] uppercase tracking-widest bg-brand-orange/10 px-2 py-0.5 rounded-full border border-brand-orange/20">Advanced</span>
                             </div>
                             <div className="flex flex-col items-center">
-                                <div className="w-16 h-6 bg-[#353941] border border-surface-600 rounded mb-1 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:4px_4px]"></div>
+                                <div className="w-16 h-6 bg-[var(--line-strong)] border border-surface-600 rounded mb-1 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:4px_4px]"></div>
                                 <span className="text-[9px] text-surface-400 font-bold tracking-widest">TWO WAY POWER</span>
                             </div>
                         </div>
 
                         {/* LCD Container - Flex Column Layout for Fixed Sections */}
-                        <div className="bg-[#eff1f0] rounded-xl border-4 border-[#353941] h-96 mb-4 p-5 flex flex-col shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] relative overflow-hidden">
+                        <div className="bg-[var(--ink)] rounded-xl border-4 border-[var(--line-strong)] h-96 mb-4 p-5 flex flex-col shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] relative overflow-hidden">
 
                             {/* 1. Status Bar (Fixed Top) */}
                             <div className="flex-none flex gap-3 text-xs font-bold text-slate-900 border-b border-black/10 pb-2 mb-2">
@@ -453,7 +455,7 @@ export const AdvancedCalculator = ({ isOpen, onClose }: { isOpen: boolean, onClo
                             </div>
 
                             {/* 3. Result Area (Fixed Bottom Right) */}
-                            <div className="flex-none w-full text-right text-6xl font-bold text-black tracking-tighter shadow-black drop-shadow-sm truncate pl-4">
+                            <div className="flex-none w-full text-right text-5xl font-bold text-black tracking-tighter shadow-black drop-shadow-sm truncate pl-4">
                                 {result || '0'}
                             </div>
                         </div>

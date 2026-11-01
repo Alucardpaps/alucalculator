@@ -5,10 +5,12 @@ import { ModulePageSeoShell } from '@/components/seo/ModulePageSeoShell';
 import { getModuleSeo } from '@/config/seo';
 import { getModuleMethod } from '@/data/moduleMethodology';
 import { SolverTransparencyDrawer } from '@/components/solvers/SolverTransparencyDrawer';
+import { StaticWorkedExample } from '@/components/solvers/StaticWorkedExample';
+import { MathFormula } from '@/components/ui/MathFormula';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Gear Design & Strength Calculator (ISO 6336) | AluCalc OS',
+  title: 'Gear Design & Strength Calculator (ISO 6336)',
   description:
     'Design and analyze spur, helical, and bevel gears with contact stress (pitting) and tooth root bending fatigue according to ISO 6336 / DIN 3990 standards.',
   alternates: {
@@ -21,51 +23,49 @@ export default function GearsPage() {
   const method = getModuleMethod('gears');
 
   return (
-    <div className="module-page-frame min-h-screen flex flex-col justify-between bg-[#020408] text-white">
+    <div className="module-page-frame min-h-screen flex flex-col justify-between bg-[var(--bg-0)] text-white">
       <ModulePageSeoShell slug="gears" seo={seo} />
       
-      <div className="flex-1 w-full p-4 lg:p-8">
+      <div className="flex-1 w-full p-1 sm:p-2 lg:p-3">
         <GearsModule />
       </div>
 
       <SolverTransparencyDrawer solverId="gears" />
 
-      <section className="shrink-0 border-t border-white/[0.06] bg-[#0a0c12]" aria-label="Calculation methodology">
-        <details className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
-          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-white/30 hover:text-white/50 [&::-webkit-details-marker]:hidden">
+      <section className="shrink-0 border-t border-white/[0.06] bg-[var(--bg-1)]" aria-label="Calculation methodology">
+        <details open className="mx-auto max-w-[1400px] px-3 py-2 sm:px-4">
+          <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-wider text-white/30 hover:text-white/50 [&::-webkit-details-marker]:hidden font-mono">
             <span className="inline-flex items-center gap-2">
               <span className="text-white/20">▸</span>
-              Formula · assumptions · example
+              Formula · assumptions · worked example
               <span className="font-mono font-normal normal-case tracking-normal text-white/20">
                 ({method.standards.slice(0, 3).join(' · ')})
               </span>
             </span>
           </summary>
-          <div className="mt-3 grid gap-3 border-t border-white/[0.05] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="work-panel rounded-lg p-3">
-              <h2 className="work-label !mb-1.5">Formula</h2>
-              <p className="font-mono text-[12px] leading-relaxed text-white/85">{method.formula}</p>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-white/35">{method.formulaNote}</p>
+          <div className="mt-3 grid gap-3 border-t border-white/[0.05] pt-3 pb-2 sm:grid-cols-2 lg:grid-cols-3 font-mono">
+            <div className="work-panel rounded-lg p-3 bg-white/[0.02] border border-white/[0.06]">
+              <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--cyan)]">Formula</h2>
+              <div className="overflow-x-auto">
+                <MathFormula formula={method.formula} />
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-white/35 font-sans">{method.formulaNote}</p>
             </div>
-            <div className="work-panel rounded-lg p-3">
-              <h2 className="work-label !mb-1.5">Assumptions</h2>
+            <div className="work-panel rounded-lg p-3 bg-white/[0.02] border border-white/[0.06]">
+              <h2 className="work-label !mb-1.5 text-xs font-bold uppercase text-[var(--ok)]">Assumptions</h2>
               <ul className="space-y-1">
                 {method.assumptions.map((a) => (
-                  <li key={a} className="text-[11px] leading-snug text-white/45">· {a}</li>
+                  <li key={a} className="text-[11px] leading-snug text-white/45 font-sans">· {a}</li>
                 ))}
               </ul>
               {method.academyHref && (
-                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[#6b9fff]/80 hover:text-[#9bbdff]">
+                <Link href={method.academyHref} className="mt-2 inline-block text-[11px] text-[var(--std)]/80 hover:text-[var(--std)] font-mono">
                   {method.academyLabel} →
                 </Link>
               )}
             </div>
-            <div className="work-panel rounded-lg p-3 sm:col-span-2 lg:col-span-1">
-              <h2 className="work-label !mb-1.5">Worked example</h2>
-              <p className="text-[11px] text-white/50">{method.workedExample?.title || `Worked example — ${seo.title.split('|')[0].trim()}`}</p>
-              <p className="mt-1 font-mono text-[12px] text-white/80">
-                {method.workedExample?.result || 'Open the workbench to run the live solver with the same engine used in production.'}
-              </p>
+            <div className="work-panel rounded-lg p-3.5 sm:col-span-2 lg:col-span-3 bg-white/[0.02] border border-white/[0.06]">
+              <StaticWorkedExample method={method} defaultTitle={seo.title.split('|')[0].trim()} />
             </div>
           </div>
         </details>

@@ -21,12 +21,13 @@ import {
   Scale
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { HomeFooterSection } from '@/components/home/HomeFooterSection';
+import { APP_VERSION } from '@/config/app';
 import { getAppPages } from '@/locales/appPagesTranslations';
 
 export default function DownloadClientPage() {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
   const t = getAppPages(language).download;
   const [copiedAdb, setCopiedAdb] = useState(false);
 
@@ -39,23 +40,23 @@ export default function DownloadClientPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#03060a] text-white flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-[var(--bg-0)] text-white flex flex-col justify-between selection:text-black">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 space-y-16 w-full">
         {/* Header Hero */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold tracking-wider uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--cyan-dim)] text-[var(--cyan)] text-xs font-mono font-bold tracking-wider uppercase">
             <Sparkles size={14} className="text-cyan-400 animate-pulse" />
             <span>{t.badge}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            AluCalc OS <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-mono uppercase">
+            AluCAD OS <br />
+            <span className="text-[var(--cyan)]">
               {t.title}
             </span>
           </h1>
 
-          <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+          <p className="text-[var(--muted)] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
             {t.lead}
           </p>
         </div>
@@ -63,15 +64,13 @@ export default function DownloadClientPage() {
         {/* Download Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Card 1: Android Mobile & Tablet */}
-          <div className="relative rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-[#080d1a] to-[#04070e] p-6 sm:p-8 shadow-2xl flex flex-col justify-between space-y-8 overflow-hidden group hover:border-cyan-400/60 transition-all">
-            <div className="pointer-events-none absolute -top-16 -right-16 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all" />
-
+          <div className="relative rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] p-6 sm:p-8 shadow-2xl flex flex-col justify-between space-y-8 overflow-hidden hover:border-[var(--line-strong)] transition-all">
             <div className="space-y-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 shadow-inner">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--cyan-dim)] text-[var(--cyan)] shadow-inner">
                   <Smartphone size={28} />
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-black uppercase">
+                <span className="px-2.5 py-1 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--cyan-dim)] text-[var(--cyan)] font-mono text-xs font-black uppercase">
                   ANDROID APK
                 </span>
               </div>
@@ -80,56 +79,54 @@ export default function DownloadClientPage() {
                 <h2 className="text-2xl font-black text-white mb-2">
                   {t.androidTitle}
                 </h2>
-                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-[var(--muted)] text-xs sm:text-sm leading-relaxed">
                   {t.androidDesc}
                 </p>
               </div>
 
               <div className="space-y-2 font-mono text-xs text-slate-300">
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{t.fileSize}</span>
+                <div className="flex items-center justify-between p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)]">{t.fileSize}</span>
                   <span className="font-bold text-white">1.16 MB (Ultra Light)</span>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{t.requirement}</span>
+                <div className="flex items-center justify-between p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)]">{t.requirement}</span>
                   <span className="font-bold text-white">Android 7.0+ (Nougat - Android 16)</span>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{t.signature}</span>
-                  <span className="font-bold text-emerald-400">RSA-2048 (SHA-256 Validated)</span>
+                <div className="flex items-center justify-between p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)]">{t.signature}</span>
+                  <span className="font-bold text-[var(--ok)]">Signed Release</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-white/10 relative z-10">
+            <div className="space-y-3 pt-4 border-t border-[var(--line)] relative z-10">
               <a
                 href="/app/alucalc-release.apk"
                 download="alucalc-release.apk"
-                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_30px_rgba(0,229,255,0.3)] group active:scale-[0.99]"
+                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-[var(--radius-s)] bg-[var(--cyan)] hover:bg-[var(--cyan)] text-[var(--bg-0)] font-black text-sm uppercase tracking-wider transition-all shadow-md group active:scale-[0.99] font-mono"
               >
                 <HardDriveDownload size={20} className="group-hover:-translate-y-0.5 transition-transform" />
                 <span>{t.downloadApk}</span>
               </a>
 
-              <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1">
-                <a href="/app/alucalc-release.aab" download="alucalc-release.aab" className="hover:text-cyan-300 hover:underline">
+              <div className="flex items-center justify-between text-xs font-mono text-[var(--muted)] pt-1">
+                <a href="/app/alucalc-release.aab" download="alucalc-release.aab" className="hover:text-[var(--cyan)] hover:underline">
                   {t.downloadAab}
                 </a>
-                <span className="text-slate-600">v5.0.0</span>
+                <span className="text-slate-600">v{APP_VERSION}</span>
               </div>
             </div>
           </div>
 
           {/* Card 2: Wear OS Smartwatch */}
-          <div className="relative rounded-3xl border border-sky-500/30 bg-gradient-to-b from-[#0a0f1e] to-[#04070e] p-6 sm:p-8 shadow-2xl flex flex-col justify-between space-y-8 overflow-hidden group hover:border-sky-400/60 transition-all">
-            <div className="pointer-events-none absolute -top-16 -right-16 w-60 h-60 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-all" />
-
+          <div className="relative rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] p-6 sm:p-8 shadow-2xl flex flex-col justify-between space-y-8 overflow-hidden hover:border-[var(--line-strong)] transition-all">
             <div className="space-y-6 relative z-10">
               <div className="flex items-center justify-between">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/20 border border-blue-500/40 text-sky-300 shadow-inner">
+                <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--std)]/40 text-[var(--std)] shadow-inner">
                   <Watch size={28} />
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300 font-mono text-xs font-black uppercase">
+                <span className="px-2.5 py-1 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--std)]/40 text-[var(--std)] font-mono text-xs font-black uppercase">
                   WEAR OS WATCH APK
                 </span>
               </div>
@@ -138,46 +135,46 @@ export default function DownloadClientPage() {
                 <h2 className="text-2xl font-black text-white mb-2">
                   {t.watchTitle}
                 </h2>
-                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                <p className="text-[var(--muted)] text-xs sm:text-sm leading-relaxed">
                   {t.watchDesc}
                 </p>
               </div>
 
               <div className="space-y-2 font-mono text-xs text-slate-300">
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{t.fileSize}</span>
+                <div className="flex items-center justify-between p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)]">{t.fileSize}</span>
                   <span className="font-bold text-white">1.16 MB (Optimized)</span>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Uyumlu Cihazlar' : 'Compatible Devices'}</span>
-                  <span className="font-bold text-white">Galaxy Watch 4/5/6/7, Pixel Watch, TicWatch</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)] shrink-0">{t12(language, 'Compatible Devices', 'Uyumlu Cihazlar')}</span>
+                  <span className="font-bold text-left sm:text-right text-white">Galaxy Watch 4/5/6/7, Pixel Watch, TicWatch</span>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-slate-400">{tr ? 'Yükleme Modu' : 'Installation'}</span>
-                  <span className="font-bold text-cyan-400">Wireless Debugging / ADB Sideload</span>
+                <div className="flex items-center justify-between p-2.5 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)]">
+                  <span className="text-[var(--muted)]">{t12(language, 'Installation', 'Yükleme Modu')}</span>
+                  <span className="font-bold text-[var(--cyan)]">Wireless Debugging / ADB Sideload</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-white/10 relative z-10">
+            <div className="space-y-3 pt-4 border-t border-[var(--line)] relative z-10">
               <a
                 href="/app/alucalc-wear-release.apk"
                 download="alucalc-wear-release.apk"
-                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-sm uppercase tracking-wider transition-all shadow-[0_0_30px_rgba(59,130,246,0.3)] group active:scale-[0.99]"
+                className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-[var(--radius-s)] bg-[var(--cyan)] hover:bg-[var(--cyan)] text-[var(--bg-0)] font-black text-sm uppercase tracking-wider transition-all shadow-md group active:scale-[0.99] font-mono"
               >
                 <HardDriveDownload size={20} className="group-hover:-translate-y-0.5 transition-transform" />
-                <span>{tr ? 'Saat APK İndir (Wear OS)' : 'Download Watch APK (Wear OS)'}</span>
+                <span>{t12(language, 'Download Watch APK (Wear OS)', 'Saat APK İndir (Wear OS)')}</span>
               </a>
 
               {/* Copy ADB command */}
-              <div className="flex items-center justify-between p-2 rounded-xl bg-black/60 border border-white/10 text-xs font-mono">
-                <span className="text-slate-400 truncate pr-2">{adbWatchCmd}</span>
+              <div className="flex items-center justify-between p-2 rounded-[var(--radius-s)] bg-[var(--bg-3)] border border-[var(--line)] text-xs font-mono">
+                <span className="text-[var(--muted)] truncate pr-2">{adbWatchCmd}</span>
                 <button
                   onClick={copyAdb}
-                  className="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-cyan-300 flex items-center gap-1 shrink-0 transition"
+                  className="px-2 py-1 rounded-[var(--radius-s)] bg-[var(--bg-2)] hover:bg-[var(--line-strong)] text-[var(--cyan)] flex items-center gap-1 shrink-0 transition cursor-pointer"
                 >
                   {copiedAdb ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copiedAdb ? (tr ? 'Kopyalandı' : 'Copied') : (tr ? 'Kopyala' : 'Copy')}</span>
+                  <span>{copiedAdb ? (t12(language, 'Copied', 'Kopyalandı')) : (t12(language, 'Copy', 'Kopyala'))}</span>
                 </button>
               </div>
             </div>
@@ -185,46 +182,40 @@ export default function DownloadClientPage() {
         </div>
 
         {/* Feature Matrix / Highlights */}
-        <div className="p-8 rounded-3xl border border-white/10 bg-black/30 backdrop-blur-xl space-y-6">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2.5">
-            <ShieldCheck size={20} className="text-cyan-400" />
-            <span>{tr ? 'Mobil ve Akıllı Saat Yetenekleri' : 'Mobile & Smartwatch Features'}</span>
+        <div className="p-8 rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] space-y-6">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2.5 font-mono uppercase">
+            <ShieldCheck size={20} className="text-[var(--cyan)]" />
+            <span>{t12(language, 'Mobile & Smartwatch Features', 'Mobil ve Akıllı Saat Yetenekleri')}</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs sm:text-sm">
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
-              <div className="font-bold text-cyan-300 flex items-center gap-2">
+            <div className="p-4 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2">
+              <div className="font-bold text-[var(--cyan)] flex items-center gap-2 font-mono">
                 <Zap size={16} />
-                <span>{tr ? '100% Çevrimdışı Motor' : '100% Offline Engine'}</span>
+                <span>{t12(language, 'Precached Offline Solvers', 'Önbelleğe Alınan Çözücüler')}</span>
               </div>
-              <p className="text-slate-400 leading-relaxed">
-                {tr
-                  ? 'Atölye, şantiye ve uçak modunda tüm formülleri internet gerektirmeden çalıştırır.'
-                  : 'Run all solvers in hangars, basements, or remote job sites with zero network dependency.'}
+              <p className="text-[var(--muted)] leading-relaxed">
+                {t12(language, 'Installs the web app. Listed solvers work offline once precached.', 'Web uygulamasını yükler. Listelenen çözücüler önbelleğe alındıktan sonra çevrimdışı çalışır.')}
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
-              <div className="font-bold text-cyan-300 flex items-center gap-2">
+            <div className="p-4 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2">
+              <div className="font-bold text-[var(--cyan)] flex items-center gap-2 font-mono">
                 <Compass size={16} />
-                <span>{tr ? 'Saha Sensörleri & Terazi' : 'Field Sensors & Level'}</span>
+                <span>{t12(language, 'Field Sensors & Level', 'Saha Sensörleri & Terazi')}</span>
               </div>
-              <p className="text-slate-400 leading-relaxed">
-                {tr
-                  ? 'Telefon jiroskopu ve ivmeölçeri ile 2 eksenli çerçeve hizalama ve yükseklik bulucu.'
-                  : '2-axis frame alignment spirit level, sound meter, and optical height finder.'}
+              <p className="text-[var(--muted)] leading-relaxed">
+                {t12(language, '2-axis frame alignment spirit level, sound meter, and optical height finder.', 'Telefon jiroskopu ve ivmeölçeri ile 2 eksenli çerçeve hizalama ve yükseklik bulucu.')}
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
-              <div className="font-bold text-cyan-300 flex items-center gap-2">
+            <div className="p-4 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] space-y-2">
+              <div className="font-bold text-[var(--cyan)] flex items-center gap-2 font-mono">
                 <Watch size={16} />
-                <span>{tr ? 'Bilekte Saha Kılavuzu' : 'Wrist-Mounted Guide'}</span>
+                <span>{t12(language, 'Wrist-Mounted Guide', 'Bilekte Saha Kılavuzu')}</span>
               </div>
-              <p className="text-slate-400 leading-relaxed">
-                {tr
-                  ? 'Akıllı saatinizden metrik cıvata kılavuz çekme deliklerine ve birim çeviriciye anında erişim.'
-                  : 'Instant tap drill charts, bolt torque lookups, and unit conversions on your wrist.'}
+              <p className="text-[var(--muted)] leading-relaxed">
+                {t12(language, 'Instant tap drill charts, bolt torque lookups, and unit conversions on your wrist.', 'Akıllı saatinizden metrik cıvata kılavuz çekme deliklerine ve birim çeviriciye anında erişim.')}
               </p>
             </div>
           </div>

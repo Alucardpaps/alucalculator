@@ -9,7 +9,7 @@ export const shaftDesignSchema: CalculatorSchemaV2 = {
         description: 'ASME Dynamic Shaft Design considering Bending, Torsion, and Fatigue (Goodman/Soderberg).',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['shaft', 'fatigue', 'goodman', 'soderberg', 'machine elements'],
         verifiedStandards: ['ASME B106.1M']
@@ -117,35 +117,93 @@ export const shaftDesignSchema: CalculatorSchemaV2 = {
     visualization: {
         type: 'svg-parametric',
         render: (result) => {
-            const Sa = result.outputs?.sigmaA?.value as number || 0;
-            const Sm = result.outputs?.sigmaM?.value as number || 0;
-            // The bounding box is an envelope (e.g. Goodman line)
-            // It's hard to draw true envelope dynamically since we don't store Se/Sut explicitly in outputs.
-            // But we can conceptually draw the Sm/Sa point on a graph.
-
-            const maxS = Math.max(Sa, Sm, 100) * 1.5;
-            const pxSa = 30 + (Sa / maxS) * 140;
-            const pxSm = 30 + (Sm / maxS) * 140;
+            const out = result.outputs || {};
+            const dReq = (out.dReq?.value as number) || 25;
+            const Sa = (out.sigmaA?.value as number) || 0;
+            const Sm = (out.sigmaM?.value as number) || 0;
+            
+            // Scaled fatigue plot coordinates
+            const maxS = Math.max(Sa, Sm, 150) * 1.4;
+            const pxSm = 25 + Math.min(130, (Sm / maxS) * 110);
+            const pxSa = 145 - Math.min(110, (Sa / maxS) * 95);
 
             return (
-                <div className="w-full h-full flex items-center justify-center p-4 bg-[#05080b]">
-                    <svg viewBox="0 0 200 200" width="100%" height="100%">
-                        {/* Axes */}
-                        <line x1="30" y1="170" x2="180" y2="170" stroke="#334155" strokeWidth="1" />
-                        <line x1="30" y1="20" x2="30" y2="170" stroke="#334155" strokeWidth="1" />
-                        <text x="180" y="185" fill="#64748b" fontSize="8" textAnchor="end">σm (Mean)</text>
-                        <text x="15" y="20" fill="#64748b" fontSize="8" textAnchor="middle" transform="rotate(-90 15,20)">σa (Alt)</text>
+                <div className="w-full h-full flex flex-col md:flex-row items-center justify-between p-4 bg-[var(--bg-0)] gap-4 font-mono text-slate-300">
+                    {/* Visual Shaft CAD & Goodman Fatigue SVG */}
+                    <div className="relative w-full md:w-[260px] h-[220px] bg-black/40 rounded-xl border border-white/5 p-2 flex items-center justify-center">
+                        <svg viewBox="0 0 240 180" className="w-full h-full overflow-visible select-none">
+                            <defs>
+                                <linearGradient id="shaftSteelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stopColor="#94a3b8" />
+                                    <stop offset="30%" stopColor="#475569" />
+                                    <stop offset="70%" stopColor="#334155" />
+                                    <stop offset="100%" stopColor="#0f172a" />
+                                </linearGradient>
+                            </defs>
 
-                        {/* Envelope Line (Mocked as diagonal from Sut to Se on axes) */}
-                        <line x1="30" y1="40" x2="160" y2="170" stroke="rgba(16,185,129,0.3)" strokeWidth="1" strokeDasharray="4 4" />
+                            {/* Goodman Fatigue Coordinate Axes */}
+                            <line x1="25" y1="150" x2="215" y2="150" stroke="#475569" strokeWidth="1" />
+                            <line x1="25" y1="150" x2="25" y2="25" stroke="#475569" strokeWidth="1" />
+                            <text x="210" y="162" fill="#94a3b8" fontSize="7.5" textAnchor="end">σm (Ortalama Gerilme MPa)</text>
+                            <text x="28" y="22" fill="#94a3b8" fontSize="7.5" textAnchor="start">σa (Genlik Gerilmesi MPa)</text>
 
-                        {/* Load Line & Point */}
-                        <line x1="30" y1="170" x2={pxSm} y2={170 - (pxSa - 30)} stroke="rgba(200,200,200,0.5)" strokeWidth="1" />
-                        <circle cx={pxSm} cy={170 - (pxSa - 30)} r="4" fill="#00e5ff" />
-                        <circle cx={pxSm} cy={170 - (pxSa - 30)} r="8" fill="none" stroke="#00e5ff" strokeWidth="1" className="animate-ping" />
+                            {/* Goodman Limit Line */}
+                            <line x1="25" y1="45" x2="195" y2="150" stroke="#10b981" strokeWidth="1.2" strokeDasharray="3 2" />
+                            <text x="185" y="142" fill="#10b981" fontSize="7" textAnchor="end">Goodman Sınırı</text>
 
-                        <text x={pxSm + 10} y={170 - (pxSa - 30) - 5} fill="white" fontSize="10">Operating Point</text>
-                    </svg>
+                            {/* Soderberg Yield Limit Line */}
+                            <line x1="25" y1="65" x2="160" y2="150" stroke="#f59e0b" strokeWidth="1" strokeDasharray="2 1" />
+                            <text x="150" y="132" fill="#f59e0b" fontSize="6.5" textAnchor="end">Soderberg (Sy)</text>
+
+                            {/* Operating Load Line from Origin */}
+                            <line x1="25" y1="150" x2={pxSm} y2={pxSa} stroke="#38bdf8" strokeWidth="1.5" />
+
+                            {/* Active Operating State Point */}
+                            <circle cx={pxSm} cy={pxSa} r="4.5" fill="#38bdf8" className="animate-ping" opacity="0.6" />
+                            <circle cx={pxSm} cy={pxSa} r="3.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1" />
+                            <line x1="25" y1={pxSa} x2={pxSm} y2={pxSa} stroke="#38bdf8" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <line x1={pxSm} y1="150" x2={pxSm} y2={pxSa} stroke="#38bdf8" strokeWidth="0.5" strokeDasharray="2 2" />
+
+                            <text x={pxSm + 6} y={pxSa - 3} fill="#38bdf8" fontSize="7.5" fontWeight="bold">
+                                Çalışma Noktası ({Sm.toFixed(0)}, {Sa.toFixed(0)})
+                            </text>
+                        </svg>
+                    </div>
+
+                    {/* Engineering Data Summary Cards */}
+                    <div className="flex-1 grid grid-cols-2 gap-2 w-full text-[10px]">
+                        <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 space-y-1">
+                            <div className="text-slate-500 uppercase text-[8px] font-bold">Gerekli Mil Çapı (dreq)</div>
+                            <div className="text-base font-bold text-cyan-300">
+                                Ø{dReq.toFixed(2)} <span className="text-[10px] text-slate-500 font-normal">mm</span>
+                            </div>
+                            <div className="text-[8px] text-slate-500">ASME B106.1M Standardı</div>
+                        </div>
+
+                        <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 space-y-1">
+                            <div className="text-slate-500 uppercase text-[8px] font-bold">Genlik Eşdeğer Gerilme</div>
+                            <div className="text-base font-bold text-amber-300">
+                                {Sa.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">MPa</span>
+                            </div>
+                            <div className="text-[8px] text-slate-500">Dönel Eğilme Genliği (σa')</div>
+                        </div>
+
+                        <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 space-y-1">
+                            <div className="text-slate-500 uppercase text-[8px] font-bold">Ortalama Eşdeğer Gerilme</div>
+                            <div className="text-base font-bold text-blue-300">
+                                {Sm.toFixed(1)} <span className="text-[10px] text-slate-500 font-normal">MPa</span>
+                            </div>
+                            <div className="text-[8px] text-slate-500">Statik Burulma/Eğilme (σm')</div>
+                        </div>
+
+                        <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 space-y-1">
+                            <div className="text-slate-500 uppercase text-[8px] font-bold">Yorulma Güvenliği</div>
+                            <div className="text-base font-bold text-emerald-300">
+                                n = 2.00 (Hedef)
+                            </div>
+                            <div className="text-[8px] text-slate-500">DE-Goodman Yorulma Kriteri</div>
+                        </div>
+                    </div>
                 </div>
             );
         }
@@ -154,3 +212,4 @@ export const shaftDesignSchema: CalculatorSchemaV2 = {
 };
 
 export default shaftDesignSchema;
+

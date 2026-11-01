@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Calculator Node (Redesigned)
+ * AluCAD OS — Calculator Node (Redesigned)
  * 
  * Clean, modern ReactFlow node with compact handle labels.
  */
@@ -211,7 +211,7 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                             left: -10,
                             width: 20,
                             height: 20,
-                            background: '#05090e',
+                            background: 'var(--bg-0)',
                             border: '2px solid #00e5ff',
                             borderRadius: '4px', // Technical box instead of circle
                             cursor: 'crosshair',
@@ -228,10 +228,10 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                             width: 130,
                         }}
                     >
-                        <div className="ml-auto px-3 py-1 bg-[#05090e]/90 backdrop-blur border border-[#00e5ff]/40 rounded-sm text-[10px] text-[#00e5ff] font-mono tracking-widest truncate shadow-[0_0_15px_rgba(0,229,255,0.2)]">
+                        <div className="ml-auto px-3 py-1 bg-[var(--bg-0)]/90 border border-[var(--cyan)]/40 rounded-sm text-[10px] text-[var(--cyan)] font-mono tracking-widest truncate ">
                             {h.name}
                         </div>
-                        <ArrowRight size={12} className="text-[#00e5ff] flex-shrink-0 drop-shadow-[0_0_5px_rgba(0,229,255,0.8)]" />
+                        <ArrowRight size={12} className="text-[var(--cyan)] flex-shrink-0 drop-" />
                     </div>
                 </React.Fragment>
             ))}
@@ -252,7 +252,7 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                             left: 'auto',
                             width: 20,
                             height: 20,
-                            background: '#05090e',
+                            background: 'var(--bg-0)',
                             border: '2px solid #10b981', // Emerald for outputs
                             borderRadius: '4px',
                             cursor: 'crosshair',
@@ -269,17 +269,17 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                             width: 150,
                         }}
                     >
-                        <ArrowLeft size={12} className="text-[#10b981] flex-shrink-0 drop-shadow-[0_0_5px_rgba(16,185,129,0.8)]" />
-                        <div className="px-3 py-1 bg-[#05090e]/90 backdrop-blur border border-[#10b981]/40 rounded-sm text-[10px] font-mono tracking-widest truncate shadow-[0_0_15px_rgba(16,185,129,0.2)] flex flex-col gap-0.5 min-w-[120px]">
-                            <span className="text-[#10b981]/70 uppercase">{h.name}</span>
+                        <ArrowLeft size={12} className="text-[var(--ok)] flex-shrink-0 drop-" />
+                        <div className="px-3 py-1 bg-[var(--bg-0)]/90 border border-[var(--ok)]/40 rounded-sm text-[10px] font-mono tracking-widest truncate flex flex-col gap-0.5 min-w-[120px]">
+                            <span className="text-[var(--ok)]/70 uppercase">{h.name}</span>
                             {h.value != null && (
-                                <span className="text-[#10b981] font-bold text-xs tracking-wider">
+                                <span className="text-[var(--ok)] font-bold text-xs tracking-wider">
                                     {h.value.toFixed(2)}
                                 </span>
                             )}
                         </div>
                         {/* Variable Name Hint */}
-                        <div className="absolute top-full right-0 mt-1 text-[8px] text-[#10b981]/40 font-mono tracking-widest uppercase px-1">
+                        <div className="absolute top-full right-0 mt-1 text-[8px] text-[var(--ok)]/40 font-mono tracking-widest uppercase px-1">
                             ${schema.metadata.title.replace(/\s+/g, '')}.{h.key}
                         </div>
                     </div>
@@ -302,11 +302,11 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
             {/* Main Container */}
             <div className={`
                 relative min-w-[360px] max-w-[420px] 
-                bg-[#05090e]/85 backdrop-blur-2xl
+                bg-[var(--bg-0)]/85 backdrop-blur-2xl
                 border border-cyan-900/40 rounded-xl overflow-hidden
                 shadow-[0_8px_32px_rgba(0,0,0,0.6)]
                 transition-all duration-300
-                ${selected ? `ring-1 ring-[${domainGlow.color}] shadow-[0_0_30px_rgba(${domainGlow.rgb},0.2)]` : 'hover:border-cyan-500/30'}
+                ${selected ? `ring-1 ring-[${domainGlow.color}] ` : 'hover:border-cyan-500/30'}
             `}>
 
                 {/* Header */}
@@ -336,7 +336,7 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                     <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
                         {isV2 && schema.export?.dxf && (
                             <button
-                                className="p-1.5 rounded bg-[#0a0f16] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
+                                className="p-1.5 rounded bg-[var(--bg-1)] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
                                 onClick={(e) => { e.stopPropagation(); handleExport('dxf'); }}
                                 title="Export DXF"
                             >
@@ -345,7 +345,7 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                         )}
                         {isV2 && schema.export?.step && (
                             <button
-                                className="p-1.5 rounded bg-[#0a0f16] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
+                                className="p-1.5 rounded bg-[var(--bg-1)] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
                                 onClick={(e) => { e.stopPropagation(); handleExport('step'); }}
                                 title="Export STEP"
                             >
@@ -354,7 +354,7 @@ const CalculatorNode: React.FC<NodeProps<CalculatorNodeData>> = ({
                         )}
                         {isV2 && schema.export?.csv && (
                             <button
-                                className="p-1.5 rounded bg-[#0a0f16] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
+                                className="p-1.5 rounded bg-[var(--bg-1)] border border-cyan-900/30 hover:border-cyan-500/50 text-slate-500 hover:text-cyan-400 transition-all cursor-pointer shadow-inner"
                                 onClick={(e) => { e.stopPropagation(); handleExport('csv'); }}
                                 title="Export CSV"
                             >

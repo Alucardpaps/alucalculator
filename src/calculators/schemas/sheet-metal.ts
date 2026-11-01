@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Sheet Metal Bending Calculator Schema
+ * AluCAD OS — Sheet Metal Bending Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical / Manufacturing
  * STANDARDS: DIN 6935, VDI 3367
@@ -20,7 +20,7 @@ export const sheetMetalSchema: CalculatorSchema = {
     metadata: {
         title: 'Sheet Metal Bend Calculator',
         description: 'Calculate bend allowance, K-factor, and flat pattern for sheet metal bending.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['sheet metal', 'bending', 'K-factor', 'bend allowance', 'flat pattern']
     },

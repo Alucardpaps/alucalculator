@@ -8,7 +8,7 @@ export const torsionShaftSchema: CalculatorSchemaV2 = {
         description: 'Calculate shear stress and angle of twist for circular shafts.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['torsion', 'shaft', 'shear', 'twist', 'mechanics'],
         verifiedStandards: ['Mechanics of Materials']

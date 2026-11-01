@@ -9,7 +9,7 @@ const aerodynamicsSchema: CalculatorSchemaV2 = {
         description: 'Calculate aerodynamic drag force and the power required to overcome it.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-25',
         tags: ['aerodynamics', 'drag', 'fluid-mechanics', 'power'],
         verifiedStandards: ['Drag Equation']

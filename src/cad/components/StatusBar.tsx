@@ -33,11 +33,11 @@ export function StatusBar() {
     const commandPrompt = useCadStore(s => s.commandPrompt);
 
     return (
-        <div className="flex items-center h-8 bg-[#020408]/80 backdrop-blur-md border-t border-white/5 px-4 gap-6 text-[10px] font-mono select-none shrink-0 text-slate-400">
+        <div className="flex items-center h-8 bg-[var(--bg-0)]/80 border-t border-white/5 px-4 gap-6 text-[10px] font-mono select-none shrink-0 text-slate-400">
 
             {/* Constraint Status */}
             <div className={`flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/5 ${STATUS_COLORS[status]}`}>
-                <div className={`w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor] ${status === 'FULLY_CONSTRAINED' ? 'bg-green-400' : status === 'OVER_CONSTRAINED' ? 'bg-red-400' : 'bg-amber-400'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${status === 'FULLY_CONSTRAINED' ? 'bg-green-400' : status === 'OVER_CONSTRAINED' ? 'bg-red-400' : 'bg-amber-400'}`} />
                 <span className="tracking-widest uppercase text-[9px]">{STATUS_LABELS[status]}</span>
             </div>
 

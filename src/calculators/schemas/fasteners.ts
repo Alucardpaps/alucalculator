@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Fastener/Bolt Selection Calculator Schema
+ * AluCAD OS — Fastener/Bolt Selection Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: ISO 898-1, DIN 931/933
@@ -20,7 +20,7 @@ export const fastenersSchema: CalculatorSchema = {
     metadata: {
         title: 'Fastener Selection Calculator',
         description: 'Calculate bolt/screw capacity, proof load, and tightening torque. Based on ISO 898-1.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['bolt', 'screw', 'fastener', 'torque', 'preload', 'ISO 898']
     },

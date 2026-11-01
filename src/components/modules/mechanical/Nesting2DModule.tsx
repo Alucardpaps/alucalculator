@@ -29,7 +29,7 @@ export default function Nesting2DModule({ lang = 'en', dict = {} }: Nesting2DMod
     const props = useMemo(() => ({ lang, dict }), [lang, dict]);
 
     return (
-        <div className="h-full w-full overflow-hidden bg-[#020408]">
+        <div className="h-full w-full overflow-hidden bg-[var(--bg-0)]">
             <Nesting2D {...props} />
         </div>
     );

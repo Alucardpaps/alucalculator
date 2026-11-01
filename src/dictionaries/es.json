@@ -9,7 +9,7 @@
     "handbook": "Manual del Ingeniero",
     "library": "Biblioteca de Módulos",
     "available": "Módulos Disponibles",
-    "news": "Industry News",
+    "news": "Noticias del sector",
     "mechanical": "Mecánica",
     "civil": "Civil",
     "electrical": "Eléctrica",
@@ -106,7 +106,7 @@
     "total": "Total",
     "save": "Guardar",
     "export": "Exportar",
-    "generatedBy": "Generado por AluCalc OS",
+    "generatedBy": "Generado por AluCAD OS",
     "design": "Diseño",
     "view2d": "Vista 2D",
     "view3d": "Vista 3D",
@@ -192,55 +192,55 @@
     },
     "disclaimer": "Basado en densidad teórica (~2.70 g/cm³). Peso real ±5% según tolerancias (ASTM B221).",
     "projectList": {
-      "title": "Project List (BOM)",
-      "add": "Add to List",
-      "clear": "Clear List",
-      "empty": "List is empty.",
-      "totalWeight": "Grand Total Weight",
-      "totalCost": "Total Project Cost",
+      "title": "Lista de proyecto (BOM)",
+      "add": "Añadir a la lista",
+      "clear": "Vaciar lista",
+      "empty": "La lista está vacía.",
+      "totalWeight": "Peso total general",
+      "totalCost": "Coste total del proyecto",
       "columns": {
         "id": "#",
-        "desc": "Material / Dim",
-        "qty": "Qty",
-        "unitWeight": "Unit W.",
-        "totalWeight": "Total W.",
-        "actions": "Action"
+        "desc": "Material / dim.",
+        "qty": "Cant.",
+        "unitWeight": "Peso ud.",
+        "totalWeight": "Peso tot.",
+        "actions": "Acción"
       }
     },
     "costData": {
-      "pricePerKg": "Price per Unit (/kg)",
-      "estimatedCost": "Est. Cost"
+      "pricePerKg": "Precio unitario (/kg)",
+      "estimatedCost": "Coste est."
     },
     "engineering": {
-      "title": "Engineering Analysis",
-      "surfaceArea": "Surface Area (Paint)",
-      "mechProps": "Mechanical Properties",
-      "yield": "Yield Strength",
-      "tensile": "Tensile Strength",
-      "hardness": "Hardness",
-      "weldability": "Weldability",
-      "sectionProps": "Section Properties",
-      "inertia": "Moment of Inertia",
-      "modulus": "Section Modulus",
-      "radius": "Radius of Gyration"
+      "title": "Análisis de ingeniería",
+      "surfaceArea": "Área superficial (pintura)",
+      "mechProps": "Propiedades mecánicas",
+      "yield": "Límite elástico",
+      "tensile": "Resistencia a tracción",
+      "hardness": "Dureza",
+      "weldability": "Soldabilidad",
+      "sectionProps": "Propiedades de sección",
+      "inertia": "Momento de inercia",
+      "modulus": "Módulo de sección",
+      "radius": "Radio de giro"
     },
     "simulation": {
-      "title": "Beam Deflection Sim",
-      "open": "Open Simulator",
-      "close": "Close",
-      "length": "Beam Length (L)",
-      "load": "Load (F)",
-      "support": "Support Type",
-      "simple": "Simple Support",
-      "cantilever": "Cantilever",
-      "result": "Max Deflection",
-      "safe": "SAFE",
-      "unsafe": "UNSAFE (>L/300)",
-      "warning": "Warning: Simple estimation only. Use FEA for critical loads."
+      "title": "Sim. deflexión de viga",
+      "open": "Abrir simulador",
+      "close": "Cerrar",
+      "length": "Longitud de viga (L)",
+      "load": "Carga (F)",
+      "support": "Tipo de apoyo",
+      "simple": "Apoyo simple",
+      "cantilever": "Voladizo",
+      "result": "Deflexión máx.",
+      "safe": "SEGURO",
+      "unsafe": "INSEGURO (>L/300)",
+      "warning": "Advertencia: solo estimación simple. Use FEA para cargas críticas."
     },
     "export": {
-      "pdf": "Download Quote (PDF)",
-      "dxf": "Download DXF (CAD)"
+      "pdf": "Descargar oferta (PDF)",
+      "dxf": "Descargar DXF (CAD)"
     }
   },
   "handbook": {
@@ -348,7 +348,7 @@
     "results": {
       "principalStresses": "Esfuerzos Principales",
       "maxShear": "Cortante Máx (τmax)",
-      "vonMises": "Von Mises",
+      "vonMises": "von Mises",
       "transformed": "Estado Transformado"
     }
   },
@@ -517,11 +517,11 @@
     "safetyWarning": "Los factores de seguridad son estimaciones. Para aplicaciones críticas, use ISO 6336 o AGMA 2001."
   },
   "market": {
-    "title": "Market Data",
-    "aluminum": "LME Aluminum",
-    "copper": "LME Copper",
-    "live": "LIVE",
-    "useLivePrice": "Use Live Price"
+    "title": "Datos de mercado",
+    "aluminum": "Aluminio LME",
+    "copper": "Cobre LME",
+    "live": "EN VIVO",
+    "useLivePrice": "Usar precio en vivo"
   },
   "news": {
     "title": "Noticias de la Industria",

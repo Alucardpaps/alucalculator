@@ -2,6 +2,7 @@
 
 import { Linkedin, Mail, AlertTriangle } from 'lucide-react';
 import { getSiteFooterStrings } from '@/locales/siteFooterTranslations';
+import { APP_VERSION, APP_APK_VERSION } from '@/config/app';
 
 export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
     const f = getSiteFooterStrings(lang);
@@ -47,7 +48,7 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
                                 <Linkedin size={18} />
                             </a>
                             <a
-                                href="mailto:contact@alucalculator.com"
+                                href="mailto:abdulsametyildirim95@gmail.com"
                                 className="p-2 bg-slate-800 hover:bg-red-500 text-white rounded-lg transition-colors"
                             >
                                 <Mail size={18} />
@@ -70,11 +71,15 @@ export const Footer = ({ lang, dict }: { lang: string, dict: any }) => {
 
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 gap-2">
-                    <p>&copy; 2026 AluCalculator. All rights reserved.</p>
-                    <div className="flex items-center gap-4">
-                        <a href="/privacy" className="text-slate-500 hover:text-cyan-400 transition-colors">Privacy & KVKK</a>
-                        <p>Designed with Intentional Minimalism.</p>
+                <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-3">
+                    <p>&copy; 2026 AluCalculator. All rights reserved. <span className="font-mono text-slate-500 ml-2">v{APP_VERSION} (web) · APK {APP_APK_VERSION}</span></p>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <a href="/about" className="hover:text-cyan-400 transition-colors">About</a>
+                        <a href="/contact" className="hover:text-cyan-400 transition-colors">Contact</a>
+                        <a href="/license" className="hover:text-cyan-400 transition-colors">License</a>
+                        <a href="/privacy" className="hover:text-cyan-400 transition-colors">Privacy & KVKK</a>
+                        <a href="mailto:contact@alucalculator.com" className="hover:text-cyan-400 transition-colors">contact@alucalculator.com</a>
+                        <a href="tel:+905324910000" className="hover:text-cyan-400 transition-colors">+90 (532) 491-0000</a>
                     </div>
                 </div>
             </div>

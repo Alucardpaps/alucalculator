@@ -1,5 +1,5 @@
 /**
- * AluCalc OS v5.0 — FEA Stress Visualization Utilities
+ * AluCAD OS v5.0 — FEA Stress Visualization Utilities
  *
  * Shared utilities for the FEA stress contour overlay system.
  * Used by ProfileMesh, BracketMesh, and BoltMesh to compute

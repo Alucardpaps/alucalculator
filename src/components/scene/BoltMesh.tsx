@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — Bolt Mesh
+ * AluCAD OS v5.0 — Bolt Mesh
  *
  * Hexagonal head + cylindrical shaft fastener.
  * PURE RENDERING — receives all data via props.

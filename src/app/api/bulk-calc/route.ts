@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { BulkProcessorFSM, BulkPayload } from '@/engine/fsm/BulkProcessorFSM';
 
 /**
- * AluCalc OS v4 - Enterprise Bulk Calculation API
+ * AluCAD OS v4 - Enterprise Bulk Calculation API
  * Powered by Finite State Machine (BulkProcessorFSM) and the Headless Engine.
  */
 export async function POST(req: NextRequest) {

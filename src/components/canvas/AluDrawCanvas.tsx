@@ -275,7 +275,7 @@ export function AluDrawCanvas() {
     return (
         <div className="relative w-full h-full font-mono">
             {/* Toolbar UI Overlay */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 bg-[#1a2332] p-2 rounded-lg border border-[#2a3a4a] z-50">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 bg-[var(--bg-3)] p-2 rounded-lg border border-[var(--line-strong)] z-50">
                 <ToolButton active={activeTool === 'select'} onClick={() => setActiveTool('select')} icon="👆" />
                 <ToolButton active={activeTool === 'hand'} onClick={() => setActiveTool('hand')} icon="✋" />
                 <ToolButton active={activeTool === 'rectangle'} onClick={() => setActiveTool('rectangle')} icon="⬜" />
@@ -287,14 +287,14 @@ export function AluDrawCanvas() {
 
                 {/* Command Prompt Message */}
                 {commandPrompt && (
-                    <div className="bg-[#0a0e14]/90 border border-[#00e5ff] text-[#00e5ff] px-4 py-2 rounded shadow-lg text-sm font-bold animate-in fade-in slide-in-from-bottom-2">
+                    <div className="bg-[var(--bg-1)]/90 border border-[var(--cyan)] text-[var(--cyan)] px-4 py-2 rounded shadow-lg text-sm font-bold animate-in fade-in slide-in-from-bottom-2">
                         {commandPrompt}
                     </div>
                 )}
 
                 {/* User Typed Input */}
                 {cmdInput && (
-                    <div className="bg-[#1a2332]/90 border border-[#4a5a6a] text-white px-3 py-1 rounded text-xs min-w-[100px] text-center">
+                    <div className="bg-[var(--bg-3)]/90 border border-[var(--alu-dim)] text-white px-3 py-1 rounded text-xs min-w-[100px] text-center">
                         {cmdInput}<span className="animate-pulse">_</span>
                     </div>
                 )}
@@ -317,7 +317,7 @@ function ToolButton({ active, onClick, icon }: { active: boolean, onClick: () =>
     return (
         <button
             onClick={onClick}
-            className={`w-8 h-8 flex items-center justify-center rounded ${active ? 'bg-[#00e5ff] text-black' : 'text-gray-400 hover:bg-[#2a3a4a]'}`}
+            className={`w-8 h-8 flex items-center justify-center rounded ${active ? 'bg-[var(--cyan)] text-black' : 'text-gray-400 hover:bg-[var(--line-strong)]'}`}
         >
             {icon}
         </button>

@@ -158,17 +158,30 @@ export class CircArrayTool implements Command {
 function offsetEntity(src: CadEntity, dx: number, dy: number): CadEntity | null {
     const id = crypto.randomUUID();
     const g = src.geometry;
+    const t = (p: Point): Point => ({ x: p.x + dx, y: p.y + dy });
     switch (g.type) {
         case 'LINE':
-            return { ...src, id, isSelected: false, geometry: { ...g, start: { x: g.start.x + dx, y: g.start.y + dy }, end: { x: g.end.x + dx, y: g.end.y + dy } } };
+            return { ...src, id, isSelected: false, geometry: { ...g, start: t(g.start), end: t(g.end) } };
         case 'CIRCLE':
-            return { ...src, id, isSelected: false, geometry: { ...g, center: { x: g.center.x + dx, y: g.center.y + dy } } };
+            return { ...src, id, isSelected: false, geometry: { ...g, center: t(g.center) } };
         case 'ARC':
-            return { ...src, id, isSelected: false, geometry: { ...g, center: { x: g.center.x + dx, y: g.center.y + dy } } };
+            return { ...src, id, isSelected: false, geometry: { ...g, center: t(g.center) } };
         case 'POLYLINE':
-            return { ...src, id, isSelected: false, geometry: { ...g, vertices: g.vertices.map(v => ({ x: v.x + dx, y: v.y + dy })) } };
+            return { ...src, id, isSelected: false, geometry: { ...g, vertices: g.vertices.map(t) } };
         case 'POINT':
             return { ...src, id, isSelected: false, geometry: { ...g, x: g.x + dx, y: g.y + dy } };
+        case 'RECTANGLE':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: t(g.center) } };
+        case 'HEXAGON':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: t(g.center) } };
+        case 'TEXT':
+            return { ...src, id, isSelected: false, geometry: { ...g, position: t(g.position) } };
+        case 'DIMENSION':
+            return { ...src, id, isSelected: false, geometry: { ...g, start: t(g.start), end: t(g.end), textPoint: t(g.textPoint) } };
+        case 'GEAR':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: t(g.center) } };
+        case 'FASTENER':
+            return { ...src, id, isSelected: false, geometry: { ...g, origin: t(g.origin) } };
         default:
             return null;
     }
@@ -181,19 +194,32 @@ function rotateEntity(src: CadEntity, center: Point, cos: number, sin: number): 
         x: center.x + (p.x - center.x) * cos - (p.y - center.y) * sin,
         y: center.y + (p.x - center.x) * sin + (p.y - center.y) * cos,
     });
+    const delta = Math.atan2(sin, cos);
     switch (g.type) {
         case 'LINE':
             return { ...src, id, isSelected: false, geometry: { ...g, start: rot(g.start), end: rot(g.end) } };
         case 'CIRCLE':
             return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center) } };
         case 'ARC':
-            return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center), startAngle: g.startAngle + Math.atan2(sin, cos), endAngle: g.endAngle + Math.atan2(sin, cos) } };
+            return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center), startAngle: g.startAngle + delta, endAngle: g.endAngle + delta } };
         case 'POLYLINE':
             return { ...src, id, isSelected: false, geometry: { ...g, vertices: g.vertices.map(rot) } };
         case 'POINT': {
             const rp = rot({ x: g.x, y: g.y });
             return { ...src, id, isSelected: false, geometry: { ...g, x: rp.x, y: rp.y } };
         }
+        case 'RECTANGLE':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center), rotation: (g.rotation || 0) + delta } };
+        case 'HEXAGON':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center), rotation: (g.rotation || 0) + delta } };
+        case 'TEXT':
+            return { ...src, id, isSelected: false, geometry: { ...g, position: rot(g.position), rotation: (g.rotation || 0) + delta } };
+        case 'DIMENSION':
+            return { ...src, id, isSelected: false, geometry: { ...g, start: rot(g.start), end: rot(g.end), textPoint: rot(g.textPoint) } };
+        case 'GEAR':
+            return { ...src, id, isSelected: false, geometry: { ...g, center: rot(g.center), rotation: (g.rotation || 0) + delta } };
+        case 'FASTENER':
+            return { ...src, id, isSelected: false, geometry: { ...g, origin: rot(g.origin), rotation: (g.rotation || 0) + delta } };
         default:
             return null;
     }

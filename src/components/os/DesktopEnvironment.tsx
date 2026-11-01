@@ -11,6 +11,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { bootEngineeringOS } from '@/runtime/boot';
 import { useOSStore } from '@/store/osStore';
 import { commandProcessor } from '@/cad/commands/CommandProcessor';
+import { APP_RELEASE_NAME } from '@/config/app';
 
 import { RibbonBar } from '@/components/os/RibbonBar';
 import { Taskbar } from '@/components/os/Taskbar';
@@ -37,6 +38,19 @@ const KernelDevPanel = dynamic(
 );
 
 const AluCAD = dynamic(() => import('@/cad/components/AluCAD').then(mod => mod.AluCAD), { ssr: false });
+const DesktopDesignStudio = dynamic(
+    () => import('@/design-studio/DesignStudio').then((m) => m.DesignStudio || m.default),
+    { ssr: false }
+);
+const Unified3DStudioV2 = dynamic(
+    () => import('@/design-studio/Unified3DStudioV2').then((m) => m.Unified3DStudioV2 || m.default),
+    { ssr: false }
+);
+const FactorySimulation = dynamic(
+    () => import('@/components/factory/FactorySimulation').then((m) => m.FactorySimulation),
+    { ssr: false }
+);
+
 import { ActionTerminal } from '@/components/os/ActionTerminal';
 import { EngineeringOven } from '@/components/os/EngineeringOven';
 import { AutoCADCommandBar } from '@/components/os/AutoCADCommandBar';
@@ -44,7 +58,8 @@ import { AutoCADCrosshair } from '@/components/os/AutoCADCrosshair';
 
 export default function DesktopEnvironment() {
     const [kernelReady, setKernelReady] = useState(false);
-    const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'fea' | 'cam'>('desk');
+    const [viewMode, setViewMode] = useState<'cad' | 'desk' | 'fea' | 'cam' | 'factory'>('desk');
+    const [cadEngine, setCadEngine] = useState<'3d' | '2d'>('3d');
     const [isOvenOpen, setIsOvenOpen] = useState(false);
     const { openWindow } = useOSStore();
     const debugMode = useWorkspaceStore((s) => s.debugMode);
@@ -90,54 +105,67 @@ export default function DesktopEnvironment() {
             className="fixed inset-0 flex flex-col overflow-hidden select-none"
             style={{
                 backgroundColor: 'var(--color-os-canvas, #0a0e14)',
-                color: '#e0e0e0',
+                color: 'var(--alu)',
                 fontFamily: 'var(--font-inter, sans-serif)'
             }}
             onContextMenu={(e) => e.preventDefault()}
         >
             {/* 🧩 SHELL LAYOUT: RIBBON (Top) -> CANVAS (Middle) -> DOCK + TASKBAR (Bottom) */}
 
-            {/* 1. Command Ribbon */}
-            <div className="flex flex-col z-20">
-                <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border-b border-cyan-900/30 backdrop-blur-md">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[10px] font-bold text-cyan-900/80 uppercase tracking-[0.2em] font-mono">AluCalc OS v5.0</span>
-                        {debugMode && <ChaosToggle />}
+            {/* 1. Command Ribbon (Shown only in Desk/FEA/Factory modes; in CAD mode Unified3DStudioV2 provides its own integrated full-screen WorkbenchHeader) */}
+            {viewMode !== 'cad' && (
+                <div className="flex flex-col z-20">
+                    <div className="flex items-center justify-between px-3 py-1.5 bg-black/40 border-b border-cyan-900/30">
+                        <div className="flex items-center gap-4">
+                            <span className="text-[10px] font-bold text-cyan-900/80 uppercase tracking-[0.2em] font-mono">{APP_RELEASE_NAME}</span>
+                            {debugMode && <ChaosToggle />}
+                        </div>
+                        {/* View Switcher */}
+                        <div className="flex items-center gap-2">
+                            <div className="flex bg-[var(--bg-1)]/60 rounded p-0.5 border border-cyan-900/30">
+                                <button
+                                    onClick={() => setViewMode('cad')}
+                                    className="px-3 py-1 text-[10px] tracking-widest rounded transition-all text-cyan-900/60 hover:text-cyan-400 font-bold uppercase"
+                                >
+                                    CAD
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('fea')}
+                                    className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'fea' ? 'bg-[var(--warn)] text-black font-bold ' : 'text-cyan-900/60 hover:text-amber-500 font-bold uppercase'}`}
+                                >
+                                    FEA
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('factory')}
+                                    className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'factory' ? 'bg-[var(--ok)] text-black font-bold ' : 'text-cyan-900/60 hover:text-emerald-400 font-bold uppercase'}`}
+                                >
+                                    FACTORY
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('desk')}
+                                    className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'desk' ? 'bg-[#a855f7] text-white font-bold ' : 'text-cyan-900/60 hover:text-purple-400 font-bold uppercase'}`}
+                                >
+                                    DESK
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    {/* View Switcher */}
-                    <div className="flex bg-[#0a0f16]/60 rounded p-0.5 border border-cyan-900/30 backdrop-blur">
-                        <button
-                            onClick={() => setViewMode('cad')}
-                            className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'cad' ? 'bg-[#00e5ff] text-black font-bold shadow-[0_0_10px_rgba(0,229,255,0.4)]' : 'text-cyan-900/60 hover:text-cyan-400 font-bold uppercase'}`}
-                        >
-                            CAD
-                        </button>
-                        <button
-                            onClick={() => setViewMode('fea')}
-                            className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'fea' ? 'bg-[#f59e0b] text-black font-bold shadow-[0_0_10px_rgba(245,158,11,0.4)]' : 'text-cyan-900/60 hover:text-amber-500 font-bold uppercase'}`}
-                        >
-                            FEA
-                        </button>
-                        <button
-                            onClick={() => setViewMode('desk')}
-                            className={`px-3 py-1 text-[10px] tracking-widest rounded transition-all ${viewMode === 'desk' ? 'bg-[#a855f7] text-white font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)]' : 'text-cyan-900/60 hover:text-purple-400 font-bold uppercase'}`}
-                        >
-                            DESK
-                        </button>
-                    </div>
+                    <RibbonBar mode={viewMode as any} />
                 </div>
-                {viewMode !== 'cad' && <RibbonBar mode={viewMode} />}
-            </div>
+            )}
 
             {/* 2. Infinite Engineering Canvas */}
-            <div className="relative flex-1 bg-[#050505] overflow-hidden">
+            <div className="relative flex-1 bg-[var(--bg-0)] overflow-hidden">
                 <CanvasErrorBoundary
                     fallbackMode="Desk"
                     onSwitchMode={() => setViewMode('desk')}
                 >
-                    {viewMode === 'cad' && <AluCAD />}
+                    {viewMode === 'cad' && (
+                        <Unified3DStudioV2 onToggleV1Classic={() => setViewMode('desk')} />
+                    )}
                     {viewMode === 'desk' && <DeskCanvas />}
                     {viewMode === 'fea' && <FEAWindow />}
+                    {viewMode === 'factory' && <FactorySimulation />}
                 </CanvasErrorBoundary>
 
                 {/* CAM Floating Window (Isolated) */}
@@ -178,7 +206,7 @@ export default function DesktopEnvironment() {
             {debugMode && (
             <button 
                 onClick={() => setIsOvenOpen(!isOvenOpen)}
-                className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-2 bg-orange-600/20 border border-orange-500/30 rounded-full text-orange-400 hover:bg-orange-500 hover:text-white transition-all shadow-[0_0_20px_rgba(255,87,34,0.2)] group"
+                className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-2 bg-orange-600/20 border border-orange-500/30 rounded-full text-orange-400 hover:bg-orange-500 hover:text-white transition-all group"
                 title="Engineering Oven"
             >
                 <div className="relative">

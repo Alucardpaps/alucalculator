@@ -93,10 +93,10 @@ export function CADToolbar() {
     };
 
     return (
-        <div className="w-full bg-[#0a0e12]/95 backdrop-blur-md border-b border-[#1e2833] px-4 py-2">
+        <div className="w-full bg-[var(--bg-1)]/95 border-b border-[var(--line)] px-4 py-2">
             <div className="flex items-center gap-2 flex-wrap">
                 {/* ═══ Workstation Quick Access ═══ */}
-                <div className="flex items-center gap-1 pr-3 border-r border-[#2a3a4a]">
+                <div className="flex items-center gap-1 pr-3 border-r border-[var(--line-strong)]">
                     <ToolbarButton 
                         icon={Calculator} 
                         label="Calculators" 
@@ -110,7 +110,7 @@ export function CADToolbar() {
                 </div>
 
                 {/* ═══ CAD Draw Tools ═══ */}
-                <div className="flex items-center gap-0.5 pr-3 border-r border-[#2a3a4a]">
+                <div className="flex items-center gap-0.5 pr-3 border-r border-[var(--line-strong)]">
                     {DRAW_TOOLS.map(tool => (
                         <ToolbarButton
                             key={tool.id}
@@ -124,7 +124,7 @@ export function CADToolbar() {
                 </div>
 
                 {/* ═══ CAD Modify Tools ═══ */}
-                <div className="flex items-center gap-0.5 pr-3 border-r border-[#2a3a4a]">
+                <div className="flex items-center gap-0.5 pr-3 border-r border-[var(--line-strong)]">
                     {MODIFY_TOOLS.map(tool => (
                         <ToolbarButton
                             key={tool.id}
@@ -138,7 +138,7 @@ export function CADToolbar() {
                 </div>
 
                 {/* ═══ CAD Dimension Tools ═══ */}
-                <div className="flex items-center gap-0.5 pr-3 border-r border-[#2a3a4a]">
+                <div className="flex items-center gap-0.5 pr-3 border-r border-[var(--line-strong)]">
                     {DIM_TOOLS.map(tool => (
                         <ToolbarButton
                             key={tool.id}
@@ -152,7 +152,7 @@ export function CADToolbar() {
                 </div>
 
                 {/* ═══ Snap & Grid ═══ */}
-                <div className="relative flex items-center gap-1 pr-3 border-r border-[#2a3a4a]">
+                <div className="relative flex items-center gap-1 pr-3 border-r border-[var(--line-strong)]">
                     <ToolbarButton
                         icon={Magnet}
                         label={`Snap ${snapSettings.enabled ? 'ON' : 'OFF'}`}
@@ -170,7 +170,7 @@ export function CADToolbar() {
                 </div>
 
                 {/* ═══ Zoom Controls ═══ */}
-                <div className="flex items-center gap-0.5 pr-3 border-r border-[#2a3a4a]">
+                <div className="flex items-center gap-0.5 pr-3 border-r border-[var(--line-strong)]">
                     <ToolbarButton icon={ZoomOut} label="Zoom Out" onClick={zoomOut} compact />
                     <span className="text-xs text-gray-500 font-mono w-12 text-center">
                         {Math.round(viewport.zoom * 100)}%
@@ -189,11 +189,11 @@ export function CADToolbar() {
                         <ChevronDown size={10} />
                     </button>
                     {showUnitMenu && (
-                        <div className="absolute top-full right-0 mt-2 w-24 bg-[#0a0e12] border border-[#2a3a4a] rounded-lg shadow-2xl z-[200]">
+                        <div className="absolute top-full right-0 mt-2 w-24 bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg shadow-2xl z-[200]">
                             {UNITS.map(({ value, label }) => (
                                 <button
                                     key={value}
-                                    className="w-full text-left px-3 py-2 text-sm hover:bg-[#1a2332] flex items-center justify-between"
+                                    className="w-full text-left px-3 py-2 text-sm hover:bg-[var(--bg-3)] flex items-center justify-between"
                                     onClick={() => { setUnit(value); setShowUnitMenu(false); }}
                                 >
                                     <span className={unit === value ? 'text-cyan-400' : 'text-gray-400'}>{label}</span>

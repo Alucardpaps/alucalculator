@@ -4,6 +4,7 @@ import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PresentationControls, Stage } from '@react-three/drei';
 import * as THREE from 'three';
+import '@/lib/three-cleanup';
 
 // Procedural Bolt Geometry
 function Bolt3D({ d_nom, length, headWidth, headHeight, isTapered, color = "#6366f1" }: any) {
@@ -127,7 +128,7 @@ export function FastenerVisualizer3D({
     isTapered = false
 }: any) {
     return (
-        <Canvas gl={{ preserveDrawingBuffer: true }} shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }}>
+        <Canvas gl={{ preserveDrawingBuffer: true }} shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 45 }}>
             <ambientLight intensity={0.5} />
             <spotLight position={[50, 50, 50]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
             <PresentationControls speed={1.5} global zoom={1.2} polar={[-0.2, Math.PI / 3]}>

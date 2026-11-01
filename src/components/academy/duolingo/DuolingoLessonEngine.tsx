@@ -5,7 +5,7 @@ import {
   X, Heart, CheckCircle2, AlertCircle, Award, RotateCcw,
   ChevronRight, Sparkles, Trophy, HelpCircle, Check, ArrowRight,
   Calculator, PenTool, Image as ImageIcon, ArrowUp, ArrowDown,
-  ArrowLeft, ArrowRight as ArrowRightIcon, RotateCw, RotateCcw as RotateCcwIcon
+  ArrowLeft, ArrowRight as ArrowRightIcon, RotateCw, RotateCcw as RotateCcwIcon, ExternalLink
 } from 'lucide-react';
 import {
   CurriculumLesson,
@@ -15,6 +15,9 @@ import {
 } from './DuolingoCurriculumData';
 import { useAcademyGamificationStore } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
+import { CrossModuleBridge } from '@/system/crossModuleBridge';
+import { MathFormulaRenderer } from './MathFormulaRenderer';
 
 interface DuolingoLessonEngineProps {
   lesson: CurriculumLesson;
@@ -49,6 +52,7 @@ export function DuolingoLessonEngine({
   // Finished state
   const [isFinished, setIsFinished] = useState(false);
   const [earnedStars, setEarnedStars] = useState(3);
+  const [embeddedPreviewRoute, setEmbeddedPreviewRoute] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -176,7 +180,7 @@ export function DuolingoLessonEngine({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#030712] text-slate-100 select-none animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg-0)] text-slate-100 select-none animate-in fade-in duration-200">
       
       {/* ─── 1. TOP PROGRESS BAR & HEARTS ─── */}
       <header className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 font-mono">
@@ -191,7 +195,7 @@ export function DuolingoLessonEngine({
         {/* Dynamic Filling Progress Bar */}
         <div className="flex-1 h-3 bg-slate-900 rounded-full overflow-hidden border border-white/10 p-0.5">
           <div
-            className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-300 shadow-[0_0_12px_rgba(0,229,255,0.4)]"
+            className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-300 "
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -211,7 +215,7 @@ export function DuolingoLessonEngine({
             {/* TYPE 1: CONCEPT STEP */}
             {currentStep.type === 'concept' && currentStep.conceptData && (
               <div className="space-y-5 text-center">
-                <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-600 border border-cyan-400/50 mx-auto flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/25">
+                <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-600 border border-cyan-400/50 mx-auto flex items-center justify-center text-2xl shadow-lg ">
                   🤖
                 </div>
 
@@ -224,12 +228,12 @@ export function DuolingoLessonEngine({
                   </h2>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-[#080d1a] border border-white/10 text-sm sm:text-base leading-relaxed text-slate-200 font-medium text-left space-y-4 shadow-xl">
+                <div className="p-6 rounded-3xl bg-[var(--bg-1)] border border-white/10 text-sm sm:text-base leading-relaxed text-slate-200 font-medium text-left space-y-4 shadow-xl">
                   <p>{currentStep.conceptData.explanation[lang]}</p>
 
                   {currentStep.conceptData.formula && (
-                    <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 text-center font-mono text-cyan-300 font-bold text-sm overflow-x-auto">
-                      {currentStep.conceptData.formula}
+                    <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 text-center font-mono text-cyan-300 font-bold text-sm overflow-x-auto shadow-inner">
+                      <MathFormulaRenderer formula={currentStep.conceptData.formula} />
                     </div>
                   )}
                   {currentStep.conceptData.keyTakeaways?.length > 0 && (
@@ -249,14 +253,31 @@ export function DuolingoLessonEngine({
             {/* TYPE 2: MULTIPLE CHOICE QUESTION */}
             {currentStep.type === 'multiple_choice' && currentStep.questionData && (
               <div className="space-y-6">
-                <div className="space-y-1">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
                     Soru {currentStepIndex + 1}
                   </span>
-                  <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
-                    {currentStep.questionData.question[lang]}
-                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const route = lesson.id.includes('bolt') || lesson.id.includes('torque') ? 'bolt-torque'
+                        : lesson.id.includes('gear') ? 'gears'
+                        : lesson.id.includes('beam') || lesson.id.includes('deflection') ? 'calculators/beam-deflection'
+                        : lesson.id.includes('bearing') ? 'bearings'
+                        : lesson.id.includes('cut') ? 'cutting-optimizer'
+                        : lesson.id.includes('fea') ? 'simulation-fea'
+                        : 'workspace/assembly';
+                      CrossModuleBridge.openLiveSolverFromLesson(route);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer"
+                  >
+                    <ExternalLink size={12} />
+                    <span>{t12(lang, 'Live Solver', 'Canlı Çözücü')}</span>
+                  </button>
                 </div>
+                <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
+                  {currentStep.questionData.question[lang]}
+                </h2>
 
                 {/* Options List */}
                 <div className="space-y-3">
@@ -264,7 +285,7 @@ export function DuolingoLessonEngine({
                     const isSelected = selectedOption === optIdx;
                     const isCorrect = optIdx === currentStep.questionData?.correctIndex;
 
-                    let btnClasses = 'bg-[#080d1a] hover:bg-[#0c1324] border-white/10 hover:border-white/20 text-slate-200 border-b-4 border-b-slate-950 active:translate-y-1 active:border-b-0';
+                    let btnClasses = 'bg-[var(--bg-1)] hover:bg-[var(--bg-1)] border-white/10 hover:border-white/20 text-slate-200 border-b-4 border-b-slate-950 active:translate-y-1 active:border-b-0';
 
                     if (isAnswerChecked) {
                       if (isCorrect) {
@@ -316,19 +337,55 @@ export function DuolingoLessonEngine({
                   </h2>
                 </div>
 
-                {/* Formula Hint Toggle */}
+                {/* Formula Hint & Live Tool Launcher */}
                 {currentStep.calculationData.formulaHint && (
-                  <div className="p-3.5 rounded-2xl bg-black/40 border border-teal-500/30">
-                    <button
-                      type="button"
-                      onClick={() => setShowFormulaHint(!showFormulaHint)}
-                      className="text-xs font-mono text-teal-400 hover:text-teal-300 font-bold flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <HelpCircle size={15} />
-                      <span>{DUOLINGO_I18N.calculationHint[lang]} {showFormulaHint ? '(Gizle)' : '(Göster)'}</span>
-                    </button>
+                  <div className="p-3.5 rounded-2xl bg-black/40 border border-teal-500/30 space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowFormulaHint(!showFormulaHint)}
+                        className="text-xs font-mono text-teal-400 hover:text-teal-300 font-bold flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <HelpCircle size={15} />
+                        <span>{DUOLINGO_I18N.calculationHint[lang]} {showFormulaHint ? `(${t12(lang, 'Hide', 'Gizle')})` : `(${t12(lang, 'Show', 'Göster')})`}</span>
+                      </button>
+
+                      {(() => {
+                        const match = currentStep.calculationData.formulaHint?.match(/\((\/[^)]+)\)/);
+                        const targetRoute = match ? match[1] : null;
+                        if (!targetRoute) return null;
+                        return (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setEmbeddedPreviewRoute(embeddedPreviewRoute === targetRoute ? null : targetRoute)}
+                              className={`py-1 px-2.5 rounded-lg border text-[10px] font-mono font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                                embeddedPreviewRoute === targetRoute
+                                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                                  : 'bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border-indigo-500/40'
+                              }`}
+                              title={t12(lang, 'Open solver in side panel', 'Hesaplayıcıyı yan panelde aç')}
+                            >
+                              <Sparkles size={12} />
+                              <span>{embeddedPreviewRoute === targetRoute ? (t12(lang, 'Hide Panel', 'Paneli Gizle')) : (t12(lang, 'Side Panel', 'Yan Ekranda Aç'))}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => CrossModuleBridge.openLiveSolverFromLesson(targetRoute)}
+                              className="py-1 px-2.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono font-bold flex items-center gap-1.5 transition cursor-pointer"
+                              title={t12(lang, 'Open solver in new tab', 'Hesaplayıcıyı yeni tarayıcı sekmesinde aç')}
+                            >
+                              <ExternalLink size={12} />
+                              <span>{t12(lang, 'New Tab', 'Yeni Sekmede Aç')}</span>
+                            </button>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
                     {showFormulaHint && (
-                      <p className="mt-2 text-xs font-mono text-slate-300 bg-slate-900/90 p-2.5 rounded-xl border border-teal-500/20">
+                      <p className="text-xs font-mono text-slate-300 bg-slate-900/90 p-2.5 rounded-xl border border-teal-500/20">
                         {currentStep.calculationData.formulaHint}
                       </p>
                     )}
@@ -344,7 +401,7 @@ export function DuolingoLessonEngine({
                     value={calcInput}
                     onChange={(e) => setCalcInput(e.target.value)}
                     placeholder={DUOLINGO_I18N.enterNumericValue[lang]}
-                    className={`w-full p-4.5 pr-20 rounded-2xl bg-[#080d1a] border text-lg font-mono font-bold text-white placeholder-slate-500 focus:outline-none transition ${
+                    className={`w-full p-4.5 pr-20 rounded-2xl bg-[var(--bg-1)] border text-lg font-mono font-bold text-white placeholder-slate-500 focus:outline-none transition ${
                       isAnswerChecked
                         ? isAnswerCorrect
                           ? 'border-emerald-500 bg-emerald-950/50 text-emerald-300'
@@ -359,7 +416,7 @@ export function DuolingoLessonEngine({
 
                 {/* Step-by-Step Explanation when Checked */}
                 {isAnswerChecked && (
-                  <div className="p-4 rounded-2xl bg-[#0c1427] border border-teal-500/40 space-y-1 animate-in fade-in">
+                  <div className="p-4 rounded-2xl bg-[var(--bg-2)] border border-teal-500/40 space-y-1 animate-in fade-in">
                     <span className="text-[11px] font-mono font-bold text-teal-300 uppercase block">
                       Adım Adım Mühendislik Çözümü:
                     </span>
@@ -390,7 +447,7 @@ export function DuolingoLessonEngine({
                     const isSelected = selectedVectorId === v.id;
                     const isCorrect = v.isCorrect;
 
-                    let cardClass = 'bg-[#080d1a] border-white/10 hover:border-indigo-500/40 text-slate-200';
+                    let cardClass = 'bg-[var(--bg-1)] border-white/10 hover:border-indigo-500/40 text-slate-200';
                     if (isAnswerChecked) {
                       if (isCorrect) {
                         cardClass = 'bg-emerald-950/80 border-emerald-500 text-emerald-300 font-bold';
@@ -400,7 +457,7 @@ export function DuolingoLessonEngine({
                         cardClass = 'bg-slate-950/50 border-white/5 opacity-50';
                       }
                     } else if (isSelected) {
-                      cardClass = 'bg-indigo-500/20 border-indigo-400 text-indigo-200 font-bold shadow-lg shadow-indigo-500/20';
+                      cardClass = 'bg-indigo-500/20 border-indigo-400 text-indigo-200 font-bold shadow-lg ';
                     }
 
                     return (
@@ -441,17 +498,17 @@ export function DuolingoLessonEngine({
                     const isSelected = selectedVisualCardId === card.id;
                     const isCorrect = card.isCorrect;
 
-                    let cardStyle = 'bg-[#080d1a] border-white/10 hover:border-rose-500/40';
+                    let cardStyle = 'bg-[var(--bg-1)] border-white/10 hover:border-rose-500/40';
                     if (isAnswerChecked) {
                       if (isCorrect) {
-                        cardStyle = 'bg-emerald-950/80 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]';
+                        cardStyle = 'bg-emerald-950/80 border-emerald-500 ';
                       } else if (isSelected && !isCorrect) {
-                        cardStyle = 'bg-rose-950/80 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.3)]';
+                        cardStyle = 'bg-rose-950/80 border-rose-500 ';
                       } else {
                         cardStyle = 'bg-slate-950/50 border-white/5 opacity-40';
                       }
                     } else if (isSelected) {
-                      cardStyle = 'bg-rose-500/15 border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.3)]';
+                      cardStyle = 'bg-rose-500/15 border-rose-400 ';
                     }
 
                     return (
@@ -480,8 +537,8 @@ export function DuolingoLessonEngine({
           </div>
         ) : (
           /* ─── 3. LESSON VICTORY CELEBRATION ─── */
-          <div className="text-center space-y-6 p-8 rounded-3xl bg-[#080d1a] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-yellow-600 border border-yellow-300/50 mx-auto flex items-center justify-center text-slate-950 shadow-lg shadow-amber-500/30">
+          <div className="text-center space-y-6 p-8 rounded-3xl bg-[var(--bg-1)] border border-white/10 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-yellow-600 border border-yellow-300/50 mx-auto flex items-center justify-center text-slate-950 shadow-lg ">
               <Trophy size={40} />
             </div>
 
@@ -490,14 +547,14 @@ export function DuolingoLessonEngine({
                 {DUOLINGO_I18N.lessonCompleted[lang]}
               </h2>
               <p className="text-xs text-slate-400 font-mono">
-                {lesson.title[lang]} başarıyla tamamlandı.
+                {lesson.title[lang]} {t12(lang, 'successfully completed.', 'başarıyla tamamlandı.')}
               </p>
             </div>
 
             {/* Rewards */}
             <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto font-mono">
               <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-center">
-                <span className="text-[10px] text-cyan-400 uppercase font-bold block">Kazanılan XP</span>
+                <span className="text-[10px] text-cyan-400 uppercase font-bold block">{t12(lang, 'XP Earned', 'Kazanılan XP')}</span>
                 <p className="text-xl font-black text-white mt-0.5">+{lesson.xpReward} XP</p>
               </div>
 
@@ -528,7 +585,7 @@ export function DuolingoLessonEngine({
               ? isAnswerCorrect
                 ? 'bg-emerald-950/90 border-emerald-500/50'
                 : 'bg-rose-950/90 border-rose-500/50'
-              : 'bg-[#040711] border-white/10'
+              : 'bg-[var(--bg-0)] border-white/10'
           }`}
         >
           <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
@@ -610,6 +667,46 @@ export function DuolingoLessonEngine({
             </div>
           </div>
         </footer>
+      )}
+
+      {/* ─── 5. EMBEDDED LIVE SOLVER SLIDE-OVER DRAWER ─── */}
+      {embeddedPreviewRoute && (
+        <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] lg:w-[620px] bg-[var(--bg-0)]/95 border-l border-cyan-500/30 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          <div className="p-3.5 border-b border-white/10 flex items-center justify-between bg-black/50">
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} className="text-cyan-400" />
+              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                {t12(lang, 'Live Engineering Solver', 'Canlı Mühendislik Çözücüsü')}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => CrossModuleBridge.openLiveSolverFromLesson(embeddedPreviewRoute)}
+                className="py-1 px-2.5 rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer"
+                title={t12(lang, 'Open in New Tab', 'Yeni Sekmede Aç')}
+              >
+                <ExternalLink size={12} />
+                <span className="hidden sm:inline">{t12(lang, 'New Tab', 'Yeni Sekme')}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEmbeddedPreviewRoute(null)}
+                className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs font-bold flex items-center justify-center cursor-pointer"
+                title={t12(lang, 'Close', 'Kapat')}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 w-full h-full bg-[var(--bg-0)] relative overflow-hidden">
+            <iframe
+              src={embeddedPreviewRoute}
+              className="w-full h-full border-0"
+              title="Live Solver Sandbox"
+            />
+          </div>
+        </div>
       )}
 
     </div>

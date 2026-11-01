@@ -72,9 +72,9 @@ const EngineeringNotesModule: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col w-full h-full bg-[#0a0a0c]/90 text-white backdrop-blur-xl">
+        <div className="flex flex-col w-full h-full bg-[var(--bg-0)]/90 text-white">
             {/* Header & Input area */}
-            <div className="p-4 border-b border-white/5 bg-[#111115]/50 flex flex-col gap-3">
+            <div className="p-4 border-b border-white/5 bg-[var(--bg-1)]/50 flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-white/70">
                     <FileText className="w-5 h-5 text-amber-500/80" />
                     <h2 className="text-sm font-medium">{n.title}</h2>

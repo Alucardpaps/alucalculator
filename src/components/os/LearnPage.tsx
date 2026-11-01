@@ -79,14 +79,14 @@ const TextRenderer = ({ content }: { content: string }) => {
 
 export const LearnPage: React.FC<LearnPageProps> = ({ data }) => {
   return (
-    <main className="min-h-screen bg-[#06080b] text-slate-300">
+    <main className="min-h-screen bg-[var(--bg-0)] text-slate-300">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
         
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 mb-12 text-[10px] font-mono uppercase tracking-widest text-slate-500">
           <Link href="/" className="hover:text-blue-400 transition-colors">ALUCALC</Link>
           <span>/</span>
-          <Link href="/learn" className="hover:text-blue-400 transition-colors">ACADEMY</Link>
+          <Link href="/academy" className="hover:text-blue-400 transition-colors">ACADEMY</Link>
           <span>/</span>
           <span className="text-blue-400/50">{data.category}</span>
         </nav>
@@ -129,11 +129,11 @@ export const LearnPage: React.FC<LearnPageProps> = ({ data }) => {
            <div className="relative z-10">
               <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">Ready to verify these numbers?</h3>
               <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-                Stop calculating by hand. Open this module directly within the AluCalc Engineering OS to gain access to dynamic sliders, real-time 3D models, and ISO validation.
+                Stop calculating by hand. Open this module directly within the AluCAD OS to gain access to dynamic sliders, real-time 3D models, and ISO validation.
               </p>
               <Link 
                 href={data.cta.link}
-                className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-xl transition-all hover:scale-105 shadow-xl shadow-blue-500/20 focus:ring-4 focus:ring-blue-500/50"
+                className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-xl transition-all hover:scale-105 shadow-xl focus:ring-4 focus:ring-blue-500/50"
               >
                 {data.cta.text}
               </Link>

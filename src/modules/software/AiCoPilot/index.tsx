@@ -84,7 +84,7 @@ export default function AiCoPilotModule() {
     ];
 
     return (
-        <div className="flex flex-col h-full bg-[#0a0f16] text-slate-200 overflow-hidden font-sans relative">
+        <div className="flex flex-col h-full bg-[var(--bg-1)] text-slate-200 overflow-hidden font-sans relative">
             {/* Background Glows */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-500/5 blur-[120px] rounded-full"></div>
@@ -92,9 +92,9 @@ export default function AiCoPilotModule() {
             </div>
 
             {/* Header */}
-            <div className="relative z-10 p-4 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md flex items-center justify-between">
+            <div className="relative z-10 p-4 border-b border-slate-800/80 bg-slate-900/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+                    <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 ">
                         <Cpu className="w-5 h-5 text-purple-400" />
                         <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse"></div>
                     </div>
@@ -138,7 +138,7 @@ export default function AiCoPilotModule() {
                                 {/* Message Bubble */}
                                 <div className={`p-4 text-sm leading-relaxed shadow-lg relative flex flex-col gap-3 ${m.role === 'user'
                                         ? 'bg-blue-600/90 text-white rounded-2xl rounded-tr-sm border border-blue-500/50'
-                                        : 'bg-slate-900/80 border border-slate-800 backdrop-blur-md rounded-2xl rounded-tl-sm text-slate-300'
+                                        : 'bg-slate-900/80 border border-slate-800 rounded-2xl rounded-tl-sm text-slate-300'
                                     }`}>
                                     <div className="whitespace-pre-wrap">{m.text}</div>
 
@@ -146,7 +146,7 @@ export default function AiCoPilotModule() {
                                     {m.action && (
                                         <button
                                             onClick={m.action.onClick}
-                                            className="px-4 py-2 mt-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-medium transition-colors w-fit flex items-center gap-2 shadow-lg shadow-purple-900/20"
+                                            className="px-4 py-2 mt-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-medium transition-colors w-fit flex items-center gap-2 shadow-lg "
                                         >
                                             <Sparkles size={14} />
                                             {m.action.label}
@@ -162,10 +162,10 @@ export default function AiCoPilotModule() {
                 {isThinking && (
                     <div className="flex justify-start animate-in fade-in">
                         <div className="flex gap-3 max-w-[85%]">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center mt-1">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 text-[var(--cyan)] flex items-center justify-center mt-1">
                                 <Bot size={16} />
                             </div>
-                            <div className="p-4 bg-slate-900/80 border border-slate-800 backdrop-blur-md rounded-2xl rounded-tl-sm flex items-center gap-1.5 h-[52px]">
+                            <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl rounded-tl-sm flex items-center gap-1.5 h-[52px]">
                                 <span className="w-2 h-2 rounded-full bg-purple-500/50 animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                 <span className="w-2 h-2 rounded-full bg-purple-500/50 animate-bounce" style={{ animationDelay: '150ms' }}></span>
                                 <span className="w-2 h-2 rounded-full bg-purple-500/50 animate-bounce" style={{ animationDelay: '300ms' }}></span>
@@ -177,7 +177,7 @@ export default function AiCoPilotModule() {
             </div>
 
             {/* Input Area */}
-            <div className="relative z-10 p-4 bg-gradient-to-t from-[#0a0f16] via-[#0a0f16] to-transparent pt-12">
+            <div className="relative z-10 p-4 bg-gradient-to-t from-[var(--bg-1)] via-[var(--bg-1)] to-transparent pt-12">
 
                 {/* Suggestions */}
                 {messages.length < 5 && !isThinking && (

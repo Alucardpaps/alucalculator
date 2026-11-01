@@ -96,19 +96,19 @@ export function AICopilotModule() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#0a0a0a] text-cyan-50 font-sans relative overflow-hidden">
+        <div className="flex flex-col h-full bg-[var(--bg-0)] text-cyan-50 font-sans relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(99,102,241,0.2),_transparent_50%)]"></div>
             </div>
 
             {/* Header */}
-            <div className="z-10 px-4 py-3 border-b flex items-center justify-between bg-black/40 backdrop-blur-md border-indigo-500/30">
+            <div className="z-10 px-4 py-3 border-b flex items-center justify-between bg-black/40 border-indigo-500/30">
                 <div className="flex items-center gap-3">
                     <AegisIcon size={36} mode="active" />
                     <div>
-                        <h2 className="text-sm font-black tracking-widest text-[#00e5ff] uppercase">AeGiS</h2>
-                        <p className="text-[10px] font-mono text-[#00e5ff]/50 tracking-widest">Agentic Engineering Intelligence</p>
+                        <h2 className="text-sm font-black tracking-widest text-[var(--cyan)] uppercase">AeGiS</h2>
+                        <p className="text-[10px] font-mono text-[var(--cyan)]/50 tracking-widest">Agentic Engineering Intelligence</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export function AICopilotModule() {
                     <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] rounded-2xl p-3 shadow-lg ${msg.role === 'user'
                                 ? 'bg-indigo-600/20 border border-indigo-500/30 text-indigo-50 rounded-tr-sm'
-                                : 'bg-[#111] border border-cyan-900/30 text-cyan-100 rounded-tl-sm'
+                                : 'bg-[var(--bg-1)] border border-cyan-900/30 text-cyan-100 rounded-tl-sm'
                             }`}>
                             <div className="flex items-center gap-2 mb-1.5 opacity-60">
                                 {msg.role === 'user' ? <User size={12} /> : <Sparkles size={12} className="text-indigo-400" />}
@@ -147,7 +147,7 @@ export function AICopilotModule() {
 
                 {isTyping && (
                     <div className="flex justify-start">
-                        <div className="bg-[#111] border border-cyan-900/30 rounded-2xl rounded-tl-sm p-4 shadow-lg flex items-center gap-1">
+                        <div className="bg-[var(--bg-1)] border border-cyan-900/30 rounded-2xl rounded-tl-sm p-4 shadow-lg flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                             <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
                             <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
@@ -157,7 +157,7 @@ export function AICopilotModule() {
             </div>
 
             {/* Input Area */}
-            <div className="z-10 p-4 border-t border-indigo-900/30 bg-[#0a0a0a]">
+            <div className="z-10 p-4 border-t border-indigo-900/30 bg-[var(--bg-0)]">
                 <div className="relative flex items-center">
                     <input
                         type="text"
@@ -165,7 +165,7 @@ export function AICopilotModule() {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                         placeholder="Ask AeGiS anything..."
-                        className="w-full bg-[#111] border border-indigo-900/50 rounded-xl py-3 pl-4 pr-12 text-sm text-indigo-100 placeholder:text-indigo-900/70 focus:outline-none focus:border-indigo-500/50 transition-colors shadow-inner"
+                        className="w-full bg-[var(--bg-1)] border border-indigo-900/50 rounded-xl py-3 pl-4 pr-12 text-sm text-indigo-100 placeholder:text-indigo-900/70 focus:outline-none focus:border-indigo-500/50 transition-colors shadow-inner"
                     />
                     <button
                         onClick={handleSend}

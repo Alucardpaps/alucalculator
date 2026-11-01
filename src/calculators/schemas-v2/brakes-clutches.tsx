@@ -9,7 +9,7 @@ const brakesClutchesSchema: CalculatorSchemaV2 = {
         description: 'Calculate torque capacity and power for disk clutches and brakes.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-25',
         tags: ['brake', 'clutch', 'friction', 'machine-elements'],
         verifiedStandards: ['Shigley Mechanical Design']

@@ -1,15 +1,15 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import FieldClient from './FieldClient';
 
 export const metadata: Metadata = {
-  title: 'Field Engineering Suite (24+ Offline Mobile Tools) | AluCalc OS',
+  title: 'Field Engineering Suite',
   description:
-    'Mobile and workshop engineering field tools: spirit level, vibration accelerometer, pitch gauge, tap drill charts, bolt pattern finder, and GPS surveyor.',
+    'Shop-floor tools: gyro level, ISO 10816 vibration, tap-drill charts, ISO 898 grades, thread ID, PCD, VDI torque screening.',
   alternates: {
     canonical: 'https://www.alucalculator.com/field/',
   },
   openGraph: {
-    title: 'Field Engineering Suite | AluCalc OS',
+    title: 'Field Engineering Suite',
     description:
       'Mobile and workshop engineering field tools for hardware technicians and mechanical engineers.',
     url: 'https://www.alucalculator.com/field/',

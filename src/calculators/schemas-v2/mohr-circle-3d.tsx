@@ -9,7 +9,7 @@ export const mohrCircle3DSchema: CalculatorSchemaV2 = {
         description: 'Analyzes a full 3D stress tensor to calculate principal stresses and absolute maximum shear stress using eigenvalues.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['stress', 'tensor', 'mohr', 'principal', 'shear', '3d', 'solid mechanics'],
         verifiedStandards: ['General Solid Mechanics']
@@ -128,9 +128,9 @@ export const mohrCircle3DSchema: CalculatorSchemaV2 = {
             const y0 = cy(0);
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="relative w-full max-w-[400px]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="overflow-visible bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg shadow-black/50">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="overflow-visible bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg shadow-black/50">
                             {/* Grid/Axes */}
                             <line x1={0} y1={y0} x2={W} y2={y0} stroke="#334155" strokeWidth="1" />
                             <line x1={cx(0)} y1={0} x2={cx(0)} y2={H} stroke="#334155" strokeWidth="1" />
@@ -166,17 +166,17 @@ export const mohrCircle3DSchema: CalculatorSchemaV2 = {
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 mt-4 text-center w-full max-w-[400px]">
-                        <div className="bg-[#0a0e14] border border-[#1a1f26] p-2 rounded-lg">
+                        <div className="bg-[var(--bg-1)] border border-[var(--line)] p-2 rounded-lg">
                             <div className="text-[9px] text-gray-500 uppercase">σ1 (Max)</div>
-                            <div className="text-sm font-bold text-[#00e5ff] font-mono">{p1.toFixed(1)}</div>
+                            <div className="text-sm font-bold text-[var(--cyan)] font-mono">{p1.toFixed(1)}</div>
                         </div>
-                        <div className="bg-[#0a0e14] border border-[#1a1f26] p-2 rounded-lg">
+                        <div className="bg-[var(--bg-1)] border border-[var(--line)] p-2 rounded-lg">
                             <div className="text-[9px] text-gray-500 uppercase">σ2 (Int)</div>
-                            <div className="text-sm font-bold text-[#10b981] font-mono">{p2.toFixed(1)}</div>
+                            <div className="text-sm font-bold text-[var(--ok)] font-mono">{p2.toFixed(1)}</div>
                         </div>
-                        <div className="bg-[#0a0e14] border border-[#1a1f26] p-2 rounded-lg">
+                        <div className="bg-[var(--bg-1)] border border-[var(--line)] p-2 rounded-lg">
                             <div className="text-[9px] text-gray-500 uppercase">σ3 (Min)</div>
-                            <div className="text-sm font-bold text-[#f43f5e] font-mono">{p3.toFixed(1)}</div>
+                            <div className="text-sm font-bold text-[var(--bad)] font-mono">{p3.toFixed(1)}</div>
                         </div>
                     </div>
                 </div>

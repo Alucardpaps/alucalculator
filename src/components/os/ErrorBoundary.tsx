@@ -52,7 +52,7 @@ export class CanvasErrorBoundary extends Component<Props, State> {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0e14]">
+                <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-1)]">
                     <div className="flex flex-col items-center gap-6 max-w-md text-center p-8">
                         {/* Error Icon */}
                         <div className="relative">
@@ -82,7 +82,7 @@ export class CanvasErrorBoundary extends Component<Props, State> {
                         <div className="flex gap-3">
                             <button
                                 onClick={this.handleRetry}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-cyan-500/20"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold rounded-lg transition-all shadow-lg "
                             >
                                 <RefreshCw size={14} />
                                 Retry

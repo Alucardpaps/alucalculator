@@ -1,5 +1,39 @@
+import {
+    computeThreadProfile,
+    kindOf,
+    pitchMmFromTpi,
+    roundedCatalogRow,
+    unStressAreaMm2,
+    type ThreadTypeCode,
+} from '@/lib/fastener/threadProfiles';
+
+export type FastenerStandardId =
+    | 'ISO Metric'
+    | 'ISO Metric Fine'
+    | 'UNC'
+    | 'UNF'
+    | 'UNEF'
+    | 'BSW'
+    | 'BSF'
+    | 'BSPP (G)'
+    | 'BSPT (R)'
+    | 'NPT'
+    | 'NPTF'
+    | 'NPSM'
+    | 'JIC 37°'
+    | 'ORFS'
+    | 'Trapezoidal (Tr)'
+    | 'ACME'
+    | 'Buttress (S)'
+    | 'Square'
+    | 'Round (Rd)'
+    | 'Panzergewinde (Pg)'
+    | 'Edison (E)'
+    | 'Valve (Vg)'
+    | 'Gas Cylinder (W)';
+
 export interface Fastener {
-    standard: 'ISO Metric' | 'ISO Metric Fine' | 'UNC' | 'UNF' | 'BSPP (G)' | 'BSPT (R)' | 'NPT' | 'Trapezoidal (Tr)';
+    standard: FastenerStandardId;
     size: string;
     pitch: number; // mm (or TPI for imperial, handled by logic)
     majorDia: number; // mm
@@ -10,6 +44,299 @@ export interface Fastener {
 }
 
 const MM = 25.4;
+
+function r3(n: number) { return Math.round(n * 1000) / 1000; }
+function r2(n: number) { return Math.round(n * 100) / 100; }
+
+function isoRow(standard: FastenerStandardId, size: string, d: number, P: number, type: ThreadTypeCode = 'M'): Fastener {
+    const g = roundedCatalogRow(computeThreadProfile(type, d, P));
+    return { standard, size, pitch: P, ...g };
+}
+
+function imperialRow(
+    standard: FastenerStandardId,
+    size: string,
+    dInch: number,
+    tpi: number,
+    type: ThreadTypeCode,
+): Fastener {
+    const d = dInch * MM;
+    const P = pitchMmFromTpi(tpi);
+    const g = roundedCatalogRow(computeThreadProfile(type, d, P));
+    const kind = kindOf(type);
+    const stressArea = kind === 'iso60' ? unStressAreaMm2(dInch, tpi) : g.stressArea;
+    return {
+        standard,
+        size,
+        pitch: tpi,
+        majorDia: r3(d),
+        minorDia: g.minorDia,
+        pitchDia: g.pitchDia,
+        tapDrill: g.tapDrill > 0 ? g.tapDrill : r2(Math.max(d - P, 0)),
+        stressArea: Math.round(stressArea * 10) / 10,
+    };
+}
+
+function pipeRow(standard: FastenerStandardId, size: string, majorMm: number, tpi: number, type: ThreadTypeCode): Fastener {
+    const P = pitchMmFromTpi(tpi);
+    const g = roundedCatalogRow(computeThreadProfile(type, majorMm, P));
+    return {
+        standard,
+        size,
+        pitch: tpi,
+        majorDia: r3(majorMm),
+        minorDia: g.minorDia,
+        pitchDia: g.pitchDia,
+        tapDrill: g.tapDrill > 0 ? g.tapDrill : r2(type === 'BSPT' || type === 'NPT' || type === 'NPTF' ? Math.max(majorMm - 1.1 * P, 0) : Math.max(majorMm - P, 0)),
+        stressArea: g.stressArea,
+    };
+}
+
+/** ISO 261 preferred fine pitches beyond the original five rows. */
+const METRIC_FINE_EXTRA: Fastener[] = [
+    isoRow('ISO Metric Fine', 'M3x0.35', 3, 0.35, 'MF'),
+    isoRow('ISO Metric Fine', 'M4x0.5', 4, 0.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M5x0.5', 5, 0.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M6x0.75', 6, 0.75, 'MF'),
+    isoRow('ISO Metric Fine', 'M8x0.75', 8, 0.75, 'MF'),
+    isoRow('ISO Metric Fine', 'M14x1.5', 14, 1.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M16x1.5', 16, 1.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M18x1.5', 18, 1.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M18x2', 18, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M20x1.5', 20, 1.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M20x2', 20, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M22x1.5', 22, 1.5, 'MF'),
+    isoRow('ISO Metric Fine', 'M22x2', 22, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M24x2', 24, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M27x2', 27, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M30x2', 30, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M33x2', 33, 2, 'MF'),
+    isoRow('ISO Metric Fine', 'M36x3', 36, 3, 'MF'),
+    isoRow('ISO Metric Fine', 'M42x3', 42, 3, 'MF'),
+    isoRow('ISO Metric Fine', 'M48x3', 48, 3, 'MF'),
+    isoRow('ISO Metric Fine', 'M56x4', 56, 4, 'MF'),
+    isoRow('ISO Metric Fine', 'M64x4', 64, 4, 'MF'),
+];
+
+/** UNC/UNF gaps + full UNEF (ASME B1.1). pitch stored as TPI. */
+const UN_SERIES_EXTRA: Fastener[] = [
+    imperialRow('UNC', '#0-80', 0.0600, 80, 'UNC'),
+    imperialRow('UNC', '#3-48', 0.0990, 48, 'UNC'),
+    imperialRow('UNC', '#5-40', 0.1250, 40, 'UNC'),
+    imperialRow('UNC', '#12-24', 0.2160, 24, 'UNC'),
+    imperialRow('UNC', '9/16-12', 0.5625, 12, 'UNC'),
+    imperialRow('UNC', '1-3/8-6', 1.375, 6, 'UNC'),
+    imperialRow('UNC', '2-1/4-4.5', 2.250, 4.5, 'UNC'),
+    imperialRow('UNC', '2-3/4-4', 2.750, 4, 'UNC'),
+    imperialRow('UNC', '3-1/2-4', 3.500, 4, 'UNC'),
+    imperialRow('UNF', '#0-80', 0.0600, 80, 'UNF'),
+    imperialRow('UNF', '#1-72', 0.0730, 72, 'UNF'),
+    imperialRow('UNF', '#2-64', 0.0860, 64, 'UNF'),
+    imperialRow('UNF', '#3-56', 0.0990, 56, 'UNF'),
+    imperialRow('UNF', '#4-48', 0.1120, 48, 'UNF'),
+    imperialRow('UNF', '#5-44', 0.1250, 44, 'UNF'),
+    imperialRow('UNF', '#6-40', 0.1380, 40, 'UNF'),
+    imperialRow('UNF', '#8-36', 0.1640, 36, 'UNF'),
+    imperialRow('UNF', '#12-28', 0.2160, 28, 'UNF'),
+    imperialRow('UNF', '9/16-18', 0.5625, 18, 'UNF'),
+    imperialRow('UNF', '1-1/8-12', 1.125, 12, 'UNF'),
+    imperialRow('UNF', '1-3/8-12', 1.375, 12, 'UNF'),
+    imperialRow('UNEF', '#12-32', 0.2160, 32, 'UNEF'),
+    imperialRow('UNEF', '1/4-32', 0.2500, 32, 'UNEF'),
+    imperialRow('UNEF', '5/16-32', 0.3125, 32, 'UNEF'),
+    imperialRow('UNEF', '3/8-32', 0.3750, 32, 'UNEF'),
+    imperialRow('UNEF', '7/16-28', 0.4375, 28, 'UNEF'),
+    imperialRow('UNEF', '1/2-28', 0.5000, 28, 'UNEF'),
+    imperialRow('UNEF', '9/16-24', 0.5625, 24, 'UNEF'),
+    imperialRow('UNEF', '5/8-24', 0.6250, 24, 'UNEF'),
+    imperialRow('UNEF', '3/4-20', 0.7500, 20, 'UNEF'),
+    imperialRow('UNEF', '7/8-20', 0.8750, 20, 'UNEF'),
+    imperialRow('UNEF', '1-20', 1.0000, 20, 'UNEF'),
+    imperialRow('UNEF', '1-1/8-18', 1.125, 18, 'UNEF'),
+    imperialRow('UNEF', '1-1/4-18', 1.250, 18, 'UNEF'),
+    imperialRow('UNEF', '1-3/8-18', 1.375, 18, 'UNEF'),
+    imperialRow('UNEF', '1-1/2-18', 1.500, 18, 'UNEF'),
+];
+
+/** BS 84 Whitworth coarse (BSW) and fine (BSF). */
+const WHITWORTH_EXTRA: Fastener[] = [
+    imperialRow('BSW', 'W 1/8', 0.125, 40, 'W'),
+    imperialRow('BSW', 'W 3/16', 0.1875, 24, 'W'),
+    imperialRow('BSW', 'W 1/4', 0.250, 20, 'W'),
+    imperialRow('BSW', 'W 5/16', 0.3125, 18, 'W'),
+    imperialRow('BSW', 'W 3/8', 0.375, 16, 'W'),
+    imperialRow('BSW', 'W 7/16', 0.4375, 14, 'W'),
+    imperialRow('BSW', 'W 1/2', 0.500, 12, 'W'),
+    imperialRow('BSW', 'W 9/16', 0.5625, 12, 'W'),
+    imperialRow('BSW', 'W 5/8', 0.625, 11, 'W'),
+    imperialRow('BSW', 'W 3/4', 0.750, 10, 'W'),
+    imperialRow('BSW', 'W 7/8', 0.875, 9, 'W'),
+    imperialRow('BSW', 'W 1', 1.000, 8, 'W'),
+    imperialRow('BSW', 'W 1-1/8', 1.125, 7, 'W'),
+    imperialRow('BSW', 'W 1-1/4', 1.250, 7, 'W'),
+    imperialRow('BSW', 'W 1-1/2', 1.500, 6, 'W'),
+    imperialRow('BSW', 'W 1-3/4', 1.750, 5, 'W'),
+    imperialRow('BSW', 'W 2', 2.000, 4.5, 'W'),
+    imperialRow('BSF', 'BSF 3/16', 0.1875, 32, 'BSF'),
+    imperialRow('BSF', 'BSF 1/4', 0.250, 26, 'BSF'),
+    imperialRow('BSF', 'BSF 5/16', 0.3125, 22, 'BSF'),
+    imperialRow('BSF', 'BSF 3/8', 0.375, 20, 'BSF'),
+    imperialRow('BSF', 'BSF 7/16', 0.4375, 18, 'BSF'),
+    imperialRow('BSF', 'BSF 1/2', 0.500, 16, 'BSF'),
+    imperialRow('BSF', 'BSF 9/16', 0.5625, 16, 'BSF'),
+    imperialRow('BSF', 'BSF 5/8', 0.625, 14, 'BSF'),
+    imperialRow('BSF', 'BSF 3/4', 0.750, 12, 'BSF'),
+    imperialRow('BSF', 'BSF 7/8', 0.875, 11, 'BSF'),
+    imperialRow('BSF', 'BSF 1', 1.000, 10, 'BSF'),
+    imperialRow('BSF', 'BSF 1-1/8', 1.125, 9, 'BSF'),
+    imperialRow('BSF', 'BSF 1-1/4', 1.250, 9, 'BSF'),
+    imperialRow('BSF', 'BSF 1-1/2', 1.500, 8, 'BSF'),
+    imperialRow('BSF', 'BSF 1-3/4', 1.750, 7, 'BSF'),
+    imperialRow('BSF', 'BSF 2', 2.000, 7, 'BSF'),
+];
+
+/**
+ * ISO 228-1 BSPP sizes missing from the original 11-row table,
+ * plus NPTF dryseal clones of the common NPT gauge-OD set.
+ * Major diameters: ISO 228-1 table 1.
+ */
+const PIPE_EXTRA: Fastener[] = [
+    pipeRow('BSPP (G)', 'G 1/16', 7.723, 28, 'G'),
+    pipeRow('BSPP (G)', 'G 5/8', 22.911, 14, 'G'),
+    pipeRow('BSPP (G)', 'G 7/8', 30.201, 14, 'G'),
+    pipeRow('BSPP (G)', 'G 1-1/8', 37.897, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 1-3/8', 44.323, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 1-3/4', 53.746, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 2-1/4', 65.710, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 2-3/4', 81.534, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 3-1/4', 93.980, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 3-1/2', 100.330, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 3-3/4', 106.680, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 4', 113.030, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 5', 138.430, 11, 'G'),
+    pipeRow('BSPP (G)', 'G 6', 163.830, 11, 'G'),
+    pipeRow('BSPT (R)', 'R 5/8', 22.911, 14, 'BSPT'),
+    pipeRow('BSPT (R)', 'R 7/8', 30.201, 14, 'BSPT'),
+    pipeRow('BSPT (R)', 'R 3-1/4', 93.980, 11, 'BSPT'),
+    pipeRow('BSPT (R)', 'R 3-3/4', 106.680, 11, 'BSPT'),
+    pipeRow('NPTF', '1/16 NPTF', 7.950, 27, 'NPTF'),
+    pipeRow('NPTF', '1/8 NPTF', 10.287, 27, 'NPTF'),
+    pipeRow('NPTF', '1/4 NPTF', 13.716, 18, 'NPTF'),
+    pipeRow('NPTF', '3/8 NPTF', 17.145, 18, 'NPTF'),
+    pipeRow('NPTF', '1/2 NPTF', 21.336, 14, 'NPTF'),
+    pipeRow('NPTF', '3/4 NPTF', 26.670, 14, 'NPTF'),
+    pipeRow('NPTF', '1 NPTF', 33.401, 11.5, 'NPTF'),
+    pipeRow('NPTF', '1-1/4 NPTF', 42.164, 11.5, 'NPTF'),
+    pipeRow('NPTF', '1-1/2 NPTF', 48.260, 11.5, 'NPTF'),
+    pipeRow('NPTF', '2 NPTF', 60.325, 11.5, 'NPTF'),
+];
+
+const POWER_SCREW_EXTRA: Fastener[] = [
+    isoRow('Trapezoidal (Tr)', 'Tr 8x1.5', 8, 1.5, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 14x3', 14, 3, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 18x4', 18, 4, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 22x5', 22, 5, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 26x5', 26, 5, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 28x5', 28, 5, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 30x6', 30, 6, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 32x6', 32, 6, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 36x6', 36, 6, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 40x7', 40, 7, 'Tr'),
+    isoRow('Trapezoidal (Tr)', 'Tr 48x8', 48, 8, 'Tr'),
+    imperialRow('ACME', 'Acme 1/4-16', 0.250, 16, 'Acme'),
+    imperialRow('ACME', 'Acme 3/8-12', 0.375, 12, 'Acme'),
+    imperialRow('ACME', 'Acme 1/2-10', 0.500, 10, 'Acme'),
+    imperialRow('ACME', 'Acme 5/8-8', 0.625, 8, 'Acme'),
+    imperialRow('ACME', 'Acme 3/4-6', 0.750, 6, 'Acme'),
+    imperialRow('ACME', 'Acme 1-5', 1.000, 5, 'Acme'),
+    imperialRow('ACME', 'Acme 1-1/2-4', 1.500, 4, 'Acme'),
+    imperialRow('ACME', 'Acme 2-4', 2.000, 4, 'Acme'),
+    isoRow('Buttress (S)', 'S 16x4', 16, 4, 'S'),
+    isoRow('Buttress (S)', 'S 20x5', 20, 5, 'S'),
+    isoRow('Buttress (S)', 'S 24x5', 24, 5, 'S'),
+    isoRow('Buttress (S)', 'S 32x6', 32, 6, 'S'),
+    isoRow('Buttress (S)', 'S 40x7', 40, 7, 'S'),
+    isoRow('Buttress (S)', 'S 48x8', 48, 8, 'S'),
+    isoRow('Square', 'Sq 16x4', 16, 4, 'Sq'),
+    isoRow('Square', 'Sq 20x5', 20, 5, 'Sq'),
+    isoRow('Square', 'Sq 24x6', 24, 6, 'Sq'),
+    isoRow('Square', 'Sq 32x6', 32, 6, 'Sq'),
+    isoRow('Square', 'Sq 40x8', 40, 8, 'Sq'),
+    isoRow('Round (Rd)', 'Rd 12', 12, 2.54, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 16', 16, 2.54, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 20', 20, 2.54, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 24', 24, 3.175, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 30', 30, 3.175, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 36', 36, 3.175, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 40', 40, 3.175, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 48', 48, 6.35, 'Rd'),
+    isoRow('Round (Rd)', 'Rd 60', 60, 6.35, 'Rd'),
+];
+
+const SPECIALTY_EXTRA: Fastener[] = [
+    // --- Panzergewinde (Pg - DIN 40430) 80° Flank Angle ---
+    isoRow('Panzergewinde (Pg)', 'Pg 7', 12.5, 1.27, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 9', 15.2, 1.41, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 11', 18.6, 1.41, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 13.5', 20.4, 1.41, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 16', 22.5, 1.41, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 21', 28.3, 1.588, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 29', 37.0, 1.588, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 36', 47.0, 1.588, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 42', 54.0, 1.588, 'Pg'),
+    isoRow('Panzergewinde (Pg)', 'Pg 48', 59.3, 1.588, 'Pg'),
+
+    // --- Edison Sockets (IEC 60061) Round Wave ---
+    isoRow('Edison (E)', 'E10', 10.0, 1.81, 'Edison'),
+    isoRow('Edison (E)', 'E12', 12.0, 2.54, 'Edison'),
+    isoRow('Edison (E)', 'E14', 14.0, 2.82, 'Edison'),
+    isoRow('Edison (E)', 'E27', 27.0, 3.628, 'Edison'),
+    isoRow('Edison (E)', 'E40', 40.0, 6.35, 'Edison'),
+
+    // --- JIC 37° Flared Hydraulic (SAE J514 / ISO 8434-2) ---
+    imperialRow('JIC 37°', '7/16-20 (-04)', 7 / 16, 20, 'JIC'),
+    imperialRow('JIC 37°', '1/2-20 (-05)', 1 / 2, 20, 'JIC'),
+    imperialRow('JIC 37°', '9/16-18 (-06)', 9 / 16, 18, 'JIC'),
+    imperialRow('JIC 37°', '3/4-16 (-08)', 3 / 4, 16, 'JIC'),
+    imperialRow('JIC 37°', '7/8-14 (-10)', 7 / 8, 14, 'JIC'),
+    imperialRow('JIC 37°', '1-1/16-12 (-12)', 17 / 16, 12, 'JIC'),
+    imperialRow('JIC 37°', '1-5/16-12 (-16)', 21 / 16, 12, 'JIC'),
+    imperialRow('JIC 37°', '1-5/8-12 (-20)', 26 / 16, 12, 'JIC'),
+
+    // --- ORFS (O-Ring Face Seal SAE J1453) ---
+    imperialRow('ORFS', '9/16-18 (-04)', 9 / 16, 18, 'ORFS'),
+    imperialRow('ORFS', '11/16-16 (-06)', 11 / 16, 16, 'ORFS'),
+    imperialRow('ORFS', '13/16-16 (-08)', 13 / 16, 16, 'ORFS'),
+    imperialRow('ORFS', '1-14 (-10)', 1.0, 14, 'ORFS'),
+    imperialRow('ORFS', '1-3/16-12 (-12)', 19 / 16, 12, 'ORFS'),
+    imperialRow('ORFS', '1-7/16-12 (-16)', 23 / 16, 12, 'ORFS'),
+
+    // --- Pneumatic Tire Valves (Vg - DIN 7756 / ISO 4570) ---
+    isoRow('Valve (Vg)', 'Vg 5', 5.2, 0.907, 'Vg'),
+    isoRow('Valve (Vg)', 'Vg 8', 7.7, 0.794, 'Vg'),
+    isoRow('Valve (Vg)', 'Vg 10', 10.3, 0.907, 'Vg'),
+    isoRow('Valve (Vg)', 'Vg 12', 12.2, 0.907, 'Vg'),
+
+    // --- Gas Cylinder Valves (DIN 477-1) ---
+    isoRow('Gas Cylinder (W)', 'W 19.8x1/14"', 19.8, 1.814, 'W'),
+    isoRow('Gas Cylinder (W)', 'W 21.8x1/14"', 21.8, 1.814, 'W'),
+    isoRow('Gas Cylinder (W)', 'W 24.32x1/14"', 24.32, 1.814, 'W'),
+    isoRow('Gas Cylinder (W)', 'W 31.3x1/14"', 31.3, 1.814, 'W'),
+
+    // --- NPSM (Straight Mechanical Pipe - ASME B1.20.1 Table 8 / Machining Doctor) ---
+    pipeRow('NPSM', '1/8 NPSM', 10.084, 27, 'NPSM'),
+    pipeRow('NPSM', '1/4 NPSM', 13.360, 18, 'NPSM'),
+    pipeRow('NPSM', '3/8 NPSM', 16.815, 18, 'NPSM'),
+    pipeRow('NPSM', '1/2 NPSM', 20.904, 14, 'NPSM'),
+    pipeRow('NPSM', '3/4 NPSM', 26.264, 14, 'NPSM'),
+    pipeRow('NPSM', '1 NPSM', 32.842, 11.5, 'NPSM'),
+    pipeRow('NPSM', '1-1/4 NPSM', 41.605, 11.5, 'NPSM'),
+    pipeRow('NPSM', '1-1/2 NPSM', 47.676, 11.5, 'NPSM'),
+    pipeRow('NPSM', '2 NPSM', 59.715, 11.5, 'NPSM'),
+    pipeRow('NPSM', '2-1/2 NPSM', 72.161, 8, 'NPSM'),
+    pipeRow('NPSM', '3 NPSM', 88.062, 8, 'NPSM'),
+    pipeRow('NPSM', '4 NPSM', 113.436, 8, 'NPSM'),
+];
 
 export const FASTENERS_DB: Fastener[] = [
     // --- ISO Metric Coarse (Full Range) ---
@@ -39,12 +366,13 @@ export const FASTENERS_DB: Fastener[] = [
     { standard: 'ISO Metric', size: 'M56', pitch: 5.5, majorDia: 56, minorDia: 50.046, pitchDia: 52.428, tapDrill: 50.5, stressArea: 2030 },
     { standard: 'ISO Metric', size: 'M64', pitch: 6.0, majorDia: 64, minorDia: 57.505, pitchDia: 60.103, tapDrill: 58.0, stressArea: 2676 },
 
-    // --- ISO Metric Fine ---
+    // --- ISO Metric Fine (ISO 261 / ISO 262 preferred) ---
     { standard: 'ISO Metric Fine', size: 'M8x1', pitch: 1.0, majorDia: 8, minorDia: 6.917, pitchDia: 7.350, tapDrill: 7.0, stressArea: 39.2 },
     { standard: 'ISO Metric Fine', size: 'M10x1', pitch: 1.0, majorDia: 10, minorDia: 8.917, pitchDia: 9.350, tapDrill: 9.0, stressArea: 64.5 },
     { standard: 'ISO Metric Fine', size: 'M10x1.25', pitch: 1.25, majorDia: 10, minorDia: 8.647, pitchDia: 9.188, tapDrill: 8.8, stressArea: 61.2 },
     { standard: 'ISO Metric Fine', size: 'M12x1.25', pitch: 1.25, majorDia: 12, minorDia: 10.647, pitchDia: 11.188, tapDrill: 10.8, stressArea: 92.1 },
     { standard: 'ISO Metric Fine', size: 'M12x1.5', pitch: 1.5, majorDia: 12, minorDia: 10.376, pitchDia: 11.026, tapDrill: 10.5, stressArea: 88.1 },
+    ...METRIC_FINE_EXTRA,
 
     // --- UNC (Unified Coarse) ---
     { standard: 'UNC', size: '#1-64', pitch: 64, majorDia: 0.0730 * MM, minorDia: 0.0538 * MM, pitchDia: 0.0629 * MM, tapDrill: 1.5, stressArea: 0.00263 * 645.16 },
@@ -145,4 +473,10 @@ export const FASTENERS_DB: Fastener[] = [
     { standard: 'Trapezoidal (Tr)', size: 'Tr 16x4', pitch: 4, majorDia: 16, minorDia: 11.5, pitchDia: 14, tapDrill: 12.2, stressArea: 126 },
     { standard: 'Trapezoidal (Tr)', size: 'Tr 20x4', pitch: 4, majorDia: 20, minorDia: 15.5, pitchDia: 18, tapDrill: 16.2, stressArea: 217 },
     { standard: 'Trapezoidal (Tr)', size: 'Tr 24x5', pitch: 5, majorDia: 24, minorDia: 18.5, pitchDia: 21.5, tapDrill: 19.2, stressArea: 304 },
+
+    ...UN_SERIES_EXTRA,
+    ...WHITWORTH_EXTRA,
+    ...PIPE_EXTRA,
+    ...POWER_SCREW_EXTRA,
+    ...SPECIALTY_EXTRA,
 ];

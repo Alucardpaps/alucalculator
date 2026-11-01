@@ -4,8 +4,10 @@ import { useState } from "react";
 import { CalculatorInput } from "@/components/CalculatorInput";
 // import { TechnicalDrawing } from "@/components/TechnicalDrawing"; // Not used currently but kept if needed
 import { TheorySection } from "@/components/TheorySection";
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
 
 export default function PumpsPageClient({ dict, lang }: { dict: any, lang: string }) {
+    const precision = useGlobalPrecision();
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
     // Inputs state
     const [flow, setFlow] = useState(100); // m3/h
@@ -28,7 +30,7 @@ export default function PumpsPageClient({ dict, lang }: { dict: any, lang: strin
         <main className="min-h-screen flex flex-col items-center justify-center p-4 lg:p-12 font-sans overflow-hidden">
 
             {/* Header */}
-            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200">
+            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 p-4 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white font-black text-xl">P</div>
                     <div>
@@ -65,20 +67,20 @@ export default function PumpsPageClient({ dict, lang }: { dict: any, lang: strin
                             <div>
                                 <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">{dict.pump.results.hydPower}</div>
                                 <div className="text-3xl font-mono font-bold text-blue-400">
-                                    {unit === 'metric' ? `${hydPower.toFixed(2)} kW` : `${(hydPower * 1.341).toFixed(2)} HP`}
+                                    {unit === 'metric' ? `${formatEngineeringValue(hydPower, precision, false)} kW` : `${formatEngineeringValue(hydPower * 1.341, precision, false)} HP`}
                                 </div>
                             </div>
                             <div>
                                 <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">{dict.pump.results.shaftPower}</div>
                                 <div className="text-3xl font-mono font-bold text-white">
-                                    {unit === 'metric' ? `${shaftPower.toFixed(2)} kW` : `${(shaftPower * 1.341).toFixed(2)} HP`}
+                                    {unit === 'metric' ? `${formatEngineeringValue(shaftPower, precision, false)} kW` : `${formatEngineeringValue(shaftPower * 1.341, precision, false)} HP`}
                                 </div>
                             </div>
                         </div>
                         <div className="mt-6 pt-6 border-t border-slate-700 grid grid-cols-2 gap-4">
                             <div>
                                 <div className="text-[10px] text-slate-500 uppercase">Specific Speed (ns)</div>
-                                <div className="font-mono text-lg">{ns.toFixed(1)}</div>
+                                <div className="font-mono text-lg">{formatEngineeringValue(ns, precision, false)}</div>
                             </div>
                             <div>
                                 <div className="text-[10px] text-slate-500 uppercase">Pump Type Hint</div>

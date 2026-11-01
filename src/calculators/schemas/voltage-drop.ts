@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Voltage Drop Calculator Schema
+ * AluCAD OS — Voltage Drop Calculator Schema
  * 
  * ENGINEERING DOMAIN: Electrical
  * STANDARDS: IEC 60364, NEC
@@ -20,7 +20,7 @@ export const voltageDropSchema: CalculatorSchema = {
     metadata: {
         title: 'Voltage Drop Calculator',
         description: 'Calculate cable voltage drop and verify sizing per IEC 60364.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['voltage drop', 'cable', 'conductor', 'sizing', 'electrical']
     },

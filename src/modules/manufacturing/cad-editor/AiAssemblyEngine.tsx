@@ -8,7 +8,7 @@ export function AiAssemblyEngine() {
     const { fasteners, triggerAiAssembly, branches, activeBranchId, createBranch } = useManufacturingStore();
 
     return (
-        <div className="flex flex-col gap-6 p-6 border border-slate-700/50 bg-slate-900/40 backdrop-blur-md rounded-xl shadow-2xl">
+        <div className="flex flex-col gap-6 p-6 border border-slate-700/50 bg-slate-900/40 rounded-xl shadow-2xl">
             {/* Header Section */}
             <div className="flex justify-between items-start border-b border-slate-700/50 pb-4">
                 <div>
@@ -79,7 +79,7 @@ export function AiAssemblyEngine() {
                     <div className="flex flex-col gap-2 mt-auto overflow-y-auto max-h-32 pr-2 custom-scrollbar">
                         {branches.map(b => (
                             <div key={b.id} className={`flex items-center justify-between p-2.5 rounded border transition-colors ${b.id === activeBranchId
-                                    ? 'bg-indigo-950/30 border-indigo-500/40 shadow-[0_0_10px_rgba(99,102,241,0.1)]'
+                                    ? 'bg-indigo-950/30 border-indigo-500/40 '
                                     : 'bg-slate-800/50 border-slate-700/50 hover:border-slate-600'
                                 }`}>
                                 <div className="flex items-center gap-2">

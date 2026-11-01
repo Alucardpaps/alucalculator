@@ -6,8 +6,10 @@ import { CalculatorInput } from "@/components/CalculatorInput";
 import { TechnicalDrawing } from "@/components/TechnicalDrawing";
 import { TheorySection } from "@/components/TheorySection";
 import { Layers } from 'lucide-react';
+import { useGlobalPrecision, formatEngineeringValue } from "@/components/calculator-kit/precisionUtils";
 
 export default function SheetMetalPageClient({ dict, lang }: { dict: any, lang: string }) {
+    const precision = useGlobalPrecision();
     const [unit, setUnit] = useState<'metric' | 'imperial'>('metric');
 
     // We use the hook for the core calculation logic, but we might need to handle unit wrapping
@@ -32,7 +34,7 @@ export default function SheetMetalPageClient({ dict, lang }: { dict: any, lang: 
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4 lg:p-12 font-sans overflow-hidden">
             {/* Header */}
-            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-slate-200">
+            <header className="w-full max-w-6xl flex justify-between items-center mb-8 bg-white/80 p-4 rounded-xl border border-slate-200">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white font-black text-xl"><Layers size={20} /></div>
                     <div>
@@ -133,33 +135,33 @@ export default function SheetMetalPageClient({ dict, lang }: { dict: any, lang: 
                         <div className="mb-6 text-center">
                             <div className="text-blue-300 text-xs font-bold uppercase tracking-widest mb-1">{dict.sheetMetal.results.force}</div>
                             <div className="text-5xl font-black">
-                                {unit === 'metric' ? results.forceTon.toFixed(1) : (results.forceTon * 1.102).toFixed(1)}
+                                {unit === 'metric' ? formatEngineeringValue(results.forceTon, precision, false) : formatEngineeringValue(results.forceTon * 1.102, precision, false)}
                                 <span className="text-xl font-medium text-slate-400"> {unit === 'metric' ? 'ton' : 'US ton'}</span>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-1">Air Bending / {unit === 'metric' ? `${length}mm` : `${toImp(length)}"`}</div>
+                            <div className="text-[10px] text-slate-500 mt-1">Air Bending / {unit === 'metric' ? `${formatEngineeringValue(length, precision, false)}mm` : `${formatEngineeringValue(length / 25.4, precision, false)}"`}</div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
                             <div className="bg-white/5 p-3 rounded-lg">
                                 <div className="text-blue-300 text-[10px] uppercase mb-1">{dict.sheetMetal.results.flatLength}</div>
                                 <div className="font-mono text-xl font-bold">
-                                    {unit === 'metric' ? `${results.flatLength.toFixed(1)} mm` : `${toImp(results.flatLength).toFixed(2)}"`}
+                                    {unit === 'metric' ? `${formatEngineeringValue(results.flatLength, precision, false)} mm` : `${formatEngineeringValue(results.flatLength / 25.4, precision, false)}"`}
                                 </div>
                             </div>
                             <div className="bg-white/5 p-3 rounded-lg">
                                 <div className="text-blue-300 text-[10px] uppercase mb-1">Bend Ded (BD)</div>
                                 <div className="font-mono text-xl font-bold">
-                                    {unit === 'metric' ? `${results.BD.toFixed(2)} mm` : `${toImp(results.BD).toFixed(3)}"`}
+                                    {unit === 'metric' ? `${formatEngineeringValue(results.BD, precision, false)} mm` : `${formatEngineeringValue(results.BD / 25.4, precision, false)}"`}
                                 </div>
                             </div>
                             <div className="bg-white/5 p-3 rounded-lg">
                                 <div className="text-blue-300 text-[10px] uppercase mb-1">K-Factor</div>
-                                <div className="font-mono text-xl font-bold">{results.K}</div>
+                                <div className="font-mono text-xl font-bold">{formatEngineeringValue(results.K, precision, false)}</div>
                             </div>
                             <div className="bg-white/5 p-3 rounded-lg">
                                 <div className="text-blue-300 text-[10px] uppercase mb-1">Bend Allow (BA)</div>
                                 <div className="font-mono text-xl font-bold">
-                                    {unit === 'metric' ? `${results.BA.toFixed(2)} mm` : `${toImp(results.BA).toFixed(3)}"`}
+                                    {unit === 'metric' ? `${formatEngineeringValue(results.BA, precision, false)} mm` : `${formatEngineeringValue(results.BA / 25.4, precision, false)}"`}
                                 </div>
                             </div>
                         </div>

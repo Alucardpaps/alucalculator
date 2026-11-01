@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Rolling Bearing Life Calculator Schema
+ * AluCAD OS — Rolling Bearing Life Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: ISO 281, SKF methodology
@@ -20,7 +20,7 @@ export const bearingsSchema: CalculatorSchema = {
     metadata: {
         title: 'Bearing Life Calculator (L10)',
         description: 'Calculate rolling bearing basic rating life per ISO 281. Supports ball and roller bearings.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['bearing', 'L10', 'life', 'rolling', 'fatigue', 'SKF']
     },

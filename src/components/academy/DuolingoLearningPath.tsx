@@ -181,7 +181,6 @@ const FOUNDATIONS_UNITS: GamifiedUnit[] = [
 
 export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Props) {
   const { language } = useI18nStore();
-  const isTr = language === 'tr';
 
   const { 
     xp, 
@@ -203,7 +202,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
     <div className="w-full max-w-7xl mx-auto space-y-8">
       
       {/* ─── HEADER BAR (100 LESSONS, 21.4h STUDY HOURS, 36 PRACTICE, 12 STANDARDS) ─── */}
-      <div className="rounded-3xl border border-white/10 bg-[#080d16]/90 p-5 sm:p-6 backdrop-blur-xl shadow-2xl">
+      <div className="rounded-3xl border border-white/10 bg-[var(--bg-1)]/90 p-5 sm:p-6 shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 flex-1">
             <div className="flex flex-wrap items-center gap-3">
@@ -244,7 +243,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
             <button
               type="button"
               onClick={() => setIsCertificateOpen(true)}
-              className="px-4 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-[10px] font-black uppercase tracking-wider text-amber-300 hover:bg-amber-500/20 transition-all flex items-center gap-1.5 shadow-lg shadow-amber-500/5"
+              className="px-4 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-[10px] font-black uppercase tracking-wider text-amber-300 hover:bg-amber-500/20 transition-all flex items-center gap-1.5 shadow-lg "
             >
               <Award size={14} className="text-amber-400" />
               GET CERTIFICATE
@@ -252,7 +251,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
 
             <Link
               href="/academy/engineering-units-and-standards"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-[10px] font-black uppercase tracking-wider text-white transition-all flex items-center gap-1.5 shadow-lg shadow-blue-600/30"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-[10px] font-black uppercase tracking-wider text-white transition-all flex items-center gap-1.5 shadow-lg "
             >
               <Play size={13} className="fill-white" />
               START WITH YEAR 1 FUNDAMENTALS
@@ -272,8 +271,8 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
       {/* ─── 2. TWO BIG MODE CARDS (Screenshot 1) ─── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Card 1: AeGiS Practice Path (ACTIVE) */}
-        <div className="p-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/10 flex items-center gap-3.5 shadow-lg shadow-emerald-500/10 cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+        <div className="p-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/10 flex items-center gap-3.5 shadow-lg cursor-pointer">
+          <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] shrink-0">
             <Compass size={20} />
           </div>
           <div>
@@ -309,8 +308,8 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
       </div>
 
       {/* ─── 3. GLOWING GREEN GAMIFIED BANNER (Screenshot 1) ─── */}
-      <div className="p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-[#081210] flex items-center gap-3.5 shadow-xl">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+      <div className="p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-emerald-900/30 to-[var(--bg-1)] flex items-center gap-3.5 shadow-xl">
+        <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] shrink-0">
           <Sparkles size={20} className="animate-pulse" />
         </div>
         <div className="flex-1">
@@ -335,7 +334,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
         <div className="lg:col-span-8 space-y-6">
           
           {/* Section 1 Header Card */}
-          <div className="p-5 rounded-2xl border border-white/10 bg-[#0a0f18]/90 backdrop-blur-xl shadow-xl">
+          <div className="p-5 rounded-2xl border border-white/10 bg-[var(--bg-1)]/90 shadow-xl">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-md bg-blue-500/20 border border-blue-500/30 text-[10px] font-mono font-black uppercase text-blue-400">
                 Tier 1
@@ -381,7 +380,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
                           isCompleted
                             ? 'bg-gradient-to-b from-amber-400 to-amber-600 border-amber-300 text-black hover:brightness-110'
                             : isUnlocked
-                              ? 'bg-gradient-to-b from-emerald-500 to-emerald-700 border-emerald-300 text-white hover:brightness-110 shadow-[0_0_25px_rgba(16,185,129,0.5)]'
+                              ? 'bg-gradient-to-b from-emerald-500 to-emerald-700 border-emerald-300 text-white hover:brightness-110 '
                               : 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed opacity-60'
                         }`}
                       >
@@ -412,8 +411,8 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
                       onClick={() => isUnlocked && setActiveLesson({ slug: unit.slug, title: unit.title, dept: unit.dept })}
                       className={`mt-3 px-4 py-2 rounded-2xl border text-center max-w-[240px] shadow-lg transition-all cursor-pointer ${
                         isUnlocked
-                          ? 'bg-[#0a0f18]/90 border-emerald-500/30 hover:border-emerald-400 text-white'
-                          : 'bg-[#0a0f18]/50 border-white/5 text-slate-500'
+                          ? 'bg-[var(--bg-1)]/90 border-emerald-500/30 hover:border-emerald-400 text-white'
+                          : 'bg-[var(--bg-1)]/50 border-white/5 text-slate-500'
                       }`}
                     >
                       <p className="text-xs font-bold leading-snug">
@@ -432,11 +431,11 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
 
         {/* ── RIGHT COLUMN (4 COLS): AEGIS ACADEMY SIDEBAR CARD (Screenshot 1) ── */}
         <div className="lg:col-span-4 sticky top-20 space-y-4">
-          <div className="rounded-3xl border border-white/10 bg-[#0a0f18]/95 p-5 shadow-2xl backdrop-blur-xl space-y-5">
+          <div className="rounded-3xl border border-white/10 bg-[var(--bg-1)]/95 p-5 shadow-2xl space-y-5">
             
             {/* Header: Mascot + Level */}
             <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-              <div className="h-12 w-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shadow-lg shadow-cyan-500/10 shrink-0">
+              <div className="h-12 w-12 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center shadow-lg shrink-0">
                 <AegisIcon size={34} mode="idle" />
               </div>
               <div className="flex-1 min-w-0">
@@ -464,7 +463,7 @@ export function DuolingoLearningPath({ departments, onSwitchToCurriculum }: Prop
             {/* 3★ Mastery Goal Card */}
             <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                <div className="h-8 w-8 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] shrink-0">
                   <Star size={16} className="fill-amber-400" />
                 </div>
                 <div>

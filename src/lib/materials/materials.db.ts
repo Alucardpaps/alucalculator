@@ -1,51 +1,48 @@
 /**
  * 🏛️ ALUCALCULATOR MATERIAL SYSTEM
- * "The Periodic Table"
+ * Delegates mechanical properties to the canonical catalog.
  */
+
+import { CANONICAL_MATERIALS, resolveMaterial } from '@/materials/canonical';
 
 export interface Material {
     id: string;
     name: string;
     density: number; // g/cm3
-    yieldStrength: number; // MPa
+    yieldStrength: number; // MPa (typical)
+    yieldStrengthMin?: number;
     tensileStrength: number; // MPa
     elasticModulus: number; // GPa
     standard: string;
 }
 
-const DB: Material[] = [
-    {
-        id: "alu-6061-t6",
-        name: "Aluminum 6061-T6",
-        density: 2.7,
-        yieldStrength: 276,
-        tensileStrength: 310,
-        elasticModulus: 68.9,
-        standard: "ASTM B209"
-    },
-    {
-        id: "steel-1045",
-        name: "AISI 1045 Steel",
-        density: 7.85,
-        yieldStrength: 310,
-        tensileStrength: 565,
-        elasticModulus: 200,
-        standard: "AISI 1045"
-    },
-    {
-        id: "ss-304",
-        name: "Stainless Steel 304",
-        density: 8.0,
-        yieldStrength: 215,
-        tensileStrength: 505,
-        elasticModulus: 193,
-        standard: "ASTM A240"
-    }
-];
+const DB: Material[] = CANONICAL_MATERIALS.map((m) => ({
+    id: m.id,
+    name: m.name,
+    density: m.density,
+    yieldStrength: m.Sy_typical,
+    yieldStrengthMin: m.Sy_min,
+    tensileStrength: m.Su_typical,
+    elasticModulus: m.E,
+    standard: m.standard,
+}));
 
 export class MaterialDB {
     static get(id: string): Material | undefined {
-        return DB.find(m => m.id === id);
+        const direct = DB.find((m) => m.id === id || m.id === id.replace(/^alu-/, 'al-'));
+        if (direct) return direct;
+        const resolved = resolveMaterial(id);
+        if (!resolved) return undefined;
+        return {
+            id: resolved.id,
+            name: resolved.name,
+            density: resolved.density,
+            yieldStrength: resolved.Sy,
+            yieldStrengthMin: resolved.Sy_min,
+            tensileStrength: resolved.Su,
+            elasticModulus: resolved.E,
+            standard: resolved.standard,
+        };
     }
 
     static getAll(): Material[] {

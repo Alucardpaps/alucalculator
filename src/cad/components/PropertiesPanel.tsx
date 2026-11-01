@@ -13,6 +13,9 @@ import {
     PlanetaryGearGeometry 
 } from '../kernel/types';
 import { Info } from 'lucide-react';
+import { DynamicBlockRegistry } from '../blocks/dynamic/registry';
+import { DynamicBlockPropertiesSection } from './DynamicBlockPropertiesSection';
+import { DynamicBlockConfigurator } from './DynamicBlockConfigurator';
 
 const toDeg = (rad: number) => rad * (180 / Math.PI);
 const toRad = (deg: number) => deg * (Math.PI / 180);
@@ -22,7 +25,19 @@ const toRad = (deg: number) => deg * (Math.PI / 180);
 // ═══════════════════════════════════════════════════════════════
 
 export function PropertiesPanel() {
-    const { entities, updateEntity, layers, removeEntity, constraints, addModifier, removeModifier, updateModifier } = useCadStore();
+    const {
+        entities,
+        updateEntity,
+        layers,
+        removeEntity,
+        constraints,
+        addModifier,
+        removeModifier,
+        updateModifier,
+        updateDynamicBlock,
+        explodeSelectedEntities
+    } = useCadStore();
+    const [isConfiguratorOpen, setIsConfiguratorOpen] = React.useState(false);
     const selectedEntities = entities.filter(e => e.isSelected);
 
     if (selectedEntities.length === 0) {
@@ -42,6 +57,9 @@ export function PropertiesPanel() {
     const first = selectedEntities[0];
     const isMulti = selectedEntities.length > 1;
 
+    const isDynamicBlock = Boolean(first && first.isDynamic && first.dynamicBlockId && first.blockInstanceId);
+    const dynamicBlockDef = isDynamicBlock ? DynamicBlockRegistry.getById(first.dynamicBlockId!) : undefined;
+
     return (
         <div className="flex flex-col h-full bg-transparent w-full overflow-hidden">
             {/* Header */}
@@ -59,10 +77,23 @@ export function PropertiesPanel() {
                 {/* Entity Type Badge */}
                 <div className="flex items-center gap-2 px-1 py-1.5">
                     <div className="px-2 py-0.5 bg-cyan-500/10 border border-cyan-500/20 rounded text-[10px] font-mono text-cyan-400 uppercase">
-                        {isMulti ? `${selectedEntities.length} Objects` : first.geometry.type}
+                        {dynamicBlockDef
+                            ? `⚡ DYNAMIC: ${dynamicBlockDef.nameTr}`
+                            : (isMulti ? `${selectedEntities.length} Objects` : first.geometry.type)}
                     </div>
                     <span className="text-[9px] text-cyan-900/40 font-mono truncate">{first.id.slice(0, 8)}</span>
                 </div>
+
+                {/* === DYNAMIC BLOCK INSPECTOR (Full Live Reconfiguration) === */}
+                {dynamicBlockDef && (
+                    <DynamicBlockPropertiesSection
+                        blockDef={dynamicBlockDef}
+                        entity={first}
+                        updateDynamicBlock={updateDynamicBlock}
+                        onOpenStudio={() => setIsConfiguratorOpen(true)}
+                        onExplode={() => explodeSelectedEntities()}
+                    />
+                )}
 
                 {/* === GENERAL SECTION === */}
                 <Section title="General">
@@ -84,7 +115,7 @@ export function PropertiesPanel() {
                         <select
                             value={first.layerId}
                             onChange={(e) => selectedEntities.forEach(ent => updateEntity(ent.id, { layerId: e.target.value }))}
-                            className="flex-1 bg-[#0a0e14] border border-cyan-900/30 rounded px-2 py-1 text-gray-300 text-[11px]"
+                            className="flex-1 bg-[var(--bg-1)] border border-cyan-900/30 rounded px-2 py-1 text-gray-300 text-[11px]"
                         >
                             {layers.map(l => (
                                 <option key={l.id} value={l.id}>{l.name}</option>
@@ -164,6 +195,25 @@ export function PropertiesPanel() {
                     </button>
                 </Section>
             </div>
+
+            {/* Modal Dynamic Block Studio for full visual editing */}
+            {isConfiguratorOpen && dynamicBlockDef && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+                    <div className="w-full max-w-5xl h-[85vh] bg-[var(--bg-0)] border border-cyan-500/40 rounded-xl overflow-hidden shadow-2xl flex flex-col">
+                        <DynamicBlockConfigurator
+                            initialBlockId={dynamicBlockDef.id}
+                            initialParams={first.dynamicParams}
+                            onClose={() => setIsConfiguratorOpen(false)}
+                            onSaveInstance={(newParams) => {
+                                if (first.blockInstanceId) {
+                                    updateDynamicBlock(first.blockInstanceId, newParams);
+                                }
+                                setIsConfiguratorOpen(false);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -450,7 +500,145 @@ function GeometryEditor({ entity, updateEntity }: { entity: CadEntity; updateEnt
                 </div>
             );
 
+        case 'SPROCKET': {
+            const z = (geom as any).teeth || 19;
+            const p = (geom as any).pitch || 12.7;
+            const dp = p / Math.sin(Math.PI / Math.max(6, z));
+            return (
+                <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="Teeth (z)" value={z} onChange={v => update({ teeth: Math.max(6, Math.round(v)) })} />
+                        <PropInput label="Pitch (p)" value={p} onChange={v => update({ pitch: v })} />
+                        <PropInput label="Roller (d1)" value={(geom as any).rollerDiameter || 8.51} onChange={v => update({ rollerDiameter: v })} />
+                        <PropInput label="Bore Dia" value={(geom as any).boreDiameter || 20} onChange={v => update({ boreDiameter: v })} />
+                    </div>
+                    <div className="p-2 rounded bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-mono text-cyan-300">
+                        <div className="flex justify-between">
+                            <span>Pitch Dia (d):</span>
+                            <span>{dp.toFixed(2)} mm</span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                            <span>Standard:</span>
+                            <span>ISO 606 / DIN 8187</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
+        case 'TEXT':
+            return (
+                <div className="space-y-2">
+                    <div>
+                        <label className="text-[10px] text-gray-500 block mb-1">Not / Metin İçeriği</label>
+                        <textarea
+                            value={(geom as any).content || ''}
+                            onChange={e => update({ content: e.target.value })}
+                            rows={2}
+                            className="w-full bg-[var(--bg-1)] border border-cyan-900/40 rounded px-2 py-1 text-cyan-300 text-[11px] font-mono outline-none resize-none focus:border-cyan-400"
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="X Konumu" value={(geom as any).position?.x ?? 0} onChange={v => update({ position: { ...((geom as any).position || {}), x: v } })} />
+                        <PropInput label="Y Konumu" value={(geom as any).position?.y ?? 0} onChange={v => update({ position: { ...((geom as any).position || {}), y: v } })} />
+                        <PropInput label="Yazı Boyutu" value={(geom as any).fontSize || 14} onChange={v => update({ fontSize: v })} />
+                        <PropInput label="Dönme Açısı°" value={toDeg((geom as any).rotation || 0)} onChange={v => update({ rotation: toRad(v) })} />
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                        <button
+                            type="button"
+                            onClick={() => update({ bold: !(geom as any).bold })}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${(geom as any).bold ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                        >
+                            B (Kalın)
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => update({ italic: !(geom as any).italic })}
+                            className={`px-2 py-0.5 rounded text-[10px] italic border transition-colors ${(geom as any).italic ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                        >
+                            I (İtalik)
+                        </button>
+                    </div>
+                </div>
+            );
+
+        case 'LEADER':
+            return (
+                <div className="space-y-2">
+                    <div>
+                        <label className="text-[10px] text-gray-500 block mb-1">Lider Notu</label>
+                        <input
+                            type="text"
+                            value={(geom as any).text || ''}
+                            onChange={e => update({ text: e.target.value })}
+                            className="w-full bg-[var(--bg-1)] border border-cyan-900/40 rounded px-2 py-1 text-cyan-300 text-[11px] font-mono outline-none focus:border-cyan-400"
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                        <PropInput label="Ok X" value={(geom as any).start?.x ?? 0} onChange={v => update({ start: { ...((geom as any).start || {}), x: v } })} />
+                        <PropInput label="Ok Y" value={(geom as any).start?.y ?? 0} onChange={v => update({ start: { ...((geom as any).start || {}), y: v } })} />
+                        <PropInput label="Not X" value={(geom as any).end?.x ?? 0} onChange={v => update({ end: { ...((geom as any).end || {}), x: v } })} />
+                        <PropInput label="Not Y" value={(geom as any).end?.y ?? 0} onChange={v => update({ end: { ...((geom as any).end || {}), y: v } })} />
+                    </div>
+                </div>
+            );
+
+        case 'ELLIPSE':
+            return (
+                <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+                    <PropInput label="Merkez X" value={(geom as any).center?.x ?? 0} onChange={v => update({ center: { ...((geom as any).center || {}), x: v } })} />
+                    <PropInput label="Merkez Y" value={(geom as any).center?.y ?? 0} onChange={v => update({ center: { ...((geom as any).center || {}), y: v } })} />
+                    <PropInput label="Eksen 1 (Rx)" value={(geom as any).radiusX || 10} onChange={v => update({ radiusX: v })} />
+                    <PropInput label="Eksen 2 (Ry)" value={(geom as any).radiusY || 10} onChange={v => update({ radiusY: v })} />
+                    <div className="col-span-2">
+                        <PropInput label="Dönme Açısı°" value={toDeg((geom as any).rotation || 0)} onChange={v => update({ rotation: toRad(v) })} />
+                    </div>
+                </div>
+            );
+
+        case 'SPLINE':
+            return (
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[11px] text-gray-300">
+                        <span>Kontrol Noktası:</span>
+                        <span className="font-mono text-cyan-400 font-bold">{(geom as any).controlPoints?.length ?? 0} Nokta</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <label className="text-[10px] text-gray-500 w-16">Kapalı Eğri</label>
+                        <button
+                            type="button"
+                            onClick={() => update({ closed: !(geom as any).closed })}
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono border transition-colors ${(geom as any).closed ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                        >
+                            {(geom as any).closed ? 'KAPALI' : 'AÇIK'}
+                        </button>
+                    </div>
+                </div>
+            );
+
+        case 'HATCH':
+            return (
+                <div className="space-y-2">
+                    <div>
+                        <label className="text-[10px] text-gray-500 block mb-1">Tarama Deseni</label>
+                        <select
+                            value={(geom as any).pattern || 'ANSI31'}
+                            onChange={e => update({ pattern: e.target.value })}
+                            className="w-full bg-[var(--bg-1)] border border-cyan-900/40 rounded px-2 py-1 text-gray-300 text-[11px]"
+                        >
+                            <option value="ANSI31">ANSI31 (45° Çizgili)</option>
+                            <option value="SOLID">Dolu (Solid)</option>
+                            <option value="CROSS">Çapraz (Cross)</option>
+                            <option value="HONEYCOMB">Petek (Honeycomb)</option>
+                        </select>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-gray-400">
+                        <span>Sınır Noktaları:</span>
+                        <span className="font-mono text-cyan-400">{(geom as any).boundaryVertices?.length ?? 0} Nokta</span>
+                    </div>
+                </div>
+            );
 
         default:
             return <div className="text-[10px] text-gray-500 italic">No editable properties</div>;
@@ -506,6 +694,36 @@ function ComputedProperties({ entity }: { entity: CadEntity }) {
         props.push({ label: 'Radius', value: g.radius.toFixed(3) });
         props.push({ label: 'Area', value: area.toFixed(3) });
         props.push({ label: 'Perimeter', value: perimeter.toFixed(3) });
+    } else if (geom.type === 'ELLIPSE') {
+        const g = geom as any;
+        const rx = g.radiusX || 1;
+        const ry = g.radiusY || 1;
+        const area = Math.PI * rx * ry;
+        // Ramanujan approximation
+        const h = ((rx - ry) ** 2) / ((rx + ry) ** 2);
+        const perim = Math.PI * (rx + ry) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)));
+        props.push({ label: 'Major Rx', value: rx.toFixed(3) });
+        props.push({ label: 'Minor Ry', value: ry.toFixed(3) });
+        props.push({ label: 'Area', value: area.toFixed(3) });
+        props.push({ label: 'Perimeter', value: perim.toFixed(3) });
+    } else if (geom.type === 'TEXT') {
+        const g = geom as any;
+        props.push({ label: 'Chars', value: String(g.content?.length || 0) });
+        props.push({ label: 'Font Size', value: `${g.fontSize || 14}pt` });
+        props.push({ label: 'Style', value: `${g.bold ? 'Bold ' : ''}${g.italic ? 'Italic' : 'Regular'}`.trim() });
+    } else if (geom.type === 'LEADER') {
+        const g = geom as any;
+        const len = g.start && g.end ? distance(g.start, g.end) : 0;
+        props.push({ label: 'Leader Len', value: len.toFixed(3) });
+        props.push({ label: 'Note Text', value: g.text || '' });
+    } else if (geom.type === 'SPLINE') {
+        const g = geom as any;
+        props.push({ label: 'Control Pts', value: String(g.controlPoints?.length || 0) });
+        props.push({ label: 'Closed', value: g.closed ? 'Yes' : 'No' });
+    } else if (geom.type === 'HATCH') {
+        const g = geom as any;
+        props.push({ label: 'Pattern', value: g.pattern || 'ANSI31' });
+        props.push({ label: 'Vertices', value: String(g.boundaryVertices?.length || 0) });
     }
 
     if (props.length === 0) return null;

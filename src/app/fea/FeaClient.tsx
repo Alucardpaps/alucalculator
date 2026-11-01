@@ -14,9 +14,9 @@ const SimulationFEAModule = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full min-h-[500px] flex flex-col items-center justify-center bg-[#05080c] px-4 text-center">
-        <div className="max-w-md w-full p-6 rounded-2xl bg-[#080d1a] border border-cyan-500/20 shadow-2xl space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+      <div className="w-full h-full min-h-[500px] flex flex-col items-center justify-center bg-[var(--bg-0)] px-4 text-center">
+        <div className="max-w-md w-full p-6 rounded-2xl bg-[var(--bg-1)] border border-cyan-500/20 shadow-2xl space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center mx-auto text-[var(--cyan)]">
             <Activity className="w-6 h-6 animate-pulse" />
           </div>
           <div>
@@ -48,7 +48,7 @@ const SimulationFEAModule = dynamic(
 
 export function FeaClient() {
   return (
-    <div className="w-full h-[calc(100vh-3.5rem)] overflow-hidden bg-[#05080c] select-none">
+    <div className="w-full h-full overflow-hidden bg-[var(--bg-0)] select-none">
       <SimulationFEAModule />
     </div>
   );

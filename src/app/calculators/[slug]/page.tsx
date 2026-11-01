@@ -14,14 +14,20 @@ const CANONICAL_MODULE_ALIASES: Record<string, string> = {
   'spring-constant': 'advanced-spring',
   'spring-constant-calc': 'advanced-spring',
   'mohr-stress': 'strength-analysis',
-  'pressure-drop': 'pipe-friction',
-  'pressure-drop-calc': 'pipe-friction',
+  'pressure-drop': 'fluid-dynamics',
+  'pressure-drop-calc': 'fluid-dynamics',
+  'pipe-friction': 'fluid-dynamics',
+  'pipe-friction-calc': 'fluid-dynamics',
+  'wind-tunnel': 'aerospace-dynamics',
+  'wind-tunnel-calc': 'aerospace-dynamics',
   '3-phase-power': 'three-phase-power',
   'power-electrical': 'three-phase-power',
   'power-electrical-calc': 'three-phase-power',
   'thermal-expansion': 'thermal-expansion',
   'bearing-life': 'bearings',
   'bearing-life-calc': 'bearings',
+  'fasteners': 'bolt-torque',
+  'fasteners-calc': 'bolt-torque',
   'vdi2230': 'bolt-torque',
   'bolt-torque-calc': 'bolt-torque',
   'tolerance-stackup': 'fits-tolerances',
@@ -41,9 +47,19 @@ const CANONICAL_MODULE_ALIASES: Record<string, string> = {
   'gear-ratio': 'gearbox-design',
   'gear-ratio-calc': 'gearbox-design',
   'beam-deflection-calc': 'beam-deflection',
-  'flow': 'fea',
-  'topology-optimization': 'fea',
+  'flow': 'flow',
   'machine-assembly': 'design-studio',
+  'thread-geometry': 'bolt-torque',
+  'thread-standards': 'bolt-torque',
+  'screw-thread': 'bolt-torque',
+  'tap-drill': 'bolt-torque',
+  'pipe-threads': 'bolt-torque',
+  'npt-thread': 'bolt-torque',
+  'bsp-thread': 'bolt-torque',
+  'materials-db': 'handbook',
+  'materials-explorer': 'handbook',
+  'material-selector-ai': 'handbook',
+  'material-selector': 'handbook',
 };
 
 const EXTRA_SLUGS = [
@@ -56,13 +72,11 @@ const EXTRA_SLUGS = [
   'beam-deflection-calc',
   'concrete-reinforcement',
   'simulation-fea',
-  'topology-optimization',
   'machine-assembly',
   'pressure-drop-calc',
   'heat-transfer-calc',
   'pumps',
   'reducer-lubrication',
-  'naval-hydrostatics',
   'power-electrical-calc',
   'ohms-law',
   'voltage-drop',
@@ -70,26 +84,27 @@ const EXTRA_SLUGS = [
   'filter-design',
   'physics-solver',
   'failure-prediction',
-  'failure-diagnosis',
   'biology-genetics',
-  'digital-logic'
+  'digital-logic',
+  'thread-geometry'
 ];
 
 const VALID_MODULES = [
-  'profile-weight', 'gears-bearings', 'reducer-lubrication', 'nesting-2d', 'materials-db',
+  'profile-weight', 'gears-bearings', 'reducer-lubrication', 'nesting-2d',
   'welding', 'fasteners', 'bearings', 'fits-tolerances', 'strength-analysis',
   'cutting-optimizer', 'pumps', 'sheet-metal', 'thermal-expansion', 'manufacturing',
   'handbook', 'beam-deflection', 'concrete-reinforcement', 'ohms-law', 'voltage-drop',
   'periodic-table', 'unit-converter', 'calculator', 'cad-editor', 'simulation-fea',
   'sketch-pad', 'manufacturing-sandbox', 'engineering-selection', 'manufacturing-readiness',
-  'topology-optimization', 'machine-assembly', 'failure-prediction', 'fatigue-analysis',
+  'machine-assembly', 'failure-prediction', 'fatigue-analysis',
   'fluid-dynamics', 'bolt-torque', 'physics-kinematics', 'chemistry-reactions',
-  'biology-genetics', 'cs-algorithms', 'aerospace-dynamics', 'naval-hydrostatics',
-  'materials-explorer', 'physics-solver', 'gearbox-design', 'motor-selection-std',
-  'material-selector-ai', 'failure-diagnosis', 'fatigue-advanced', 'planetary-gearbox',
+  'biology-genetics', 'cs-algorithms', 'aerospace-dynamics',
+  'physics-solver', 'gearbox-design', 'motor-selection-std',
+  'fatigue-advanced', 'planetary-gearbox',
   'three-phase-power', 'digital-logic', 'filter-design', 'machining-details',
   'chain-drive', 'belt-drive', 'ai-copilot', 'holographic-viewer', 'matrix-screensaver',
-  'parametric-cad', 'cost-estimator', 'pipe-friction', 'advanced-spring', 'column-buckling'
+  'parametric-cad', 'cost-estimator', 'pipe-friction', 'advanced-spring', 'column-buckling',
+  'thread-geometry'
 ];
 
 function getNormalizedModuleRoute(slug: string): string | null {
@@ -129,7 +144,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${formatted} Calculator`,
       description: `Professional online engineering calculator for ${targetModule.replace(/-/g, ' ')}.`,
       alternates: {
-        canonical: `https://www.alucalculator.com/${targetModule}`,
+        canonical: `https://www.alucalculator.com/${targetModule}/`,
       }
     };
   }
@@ -151,7 +166,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: cleanTitle,
       description: calculator.meta?.description || calculator.description,
       type: 'website',
-      url: `https://www.alucalculator.com/calculators/${slug}`,
+      url: `https://www.alucalculator.com/calculators/${slug}/`,
       images: [
         {
           url: ogImage,
@@ -168,7 +183,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [ogImage],
     },
     alternates: {
-      canonical: `https://www.alucalculator.com/calculators/${slug}`,
+      canonical: `https://www.alucalculator.com/calculators/${slug}/`,
     }
   };
 }
@@ -198,7 +213,6 @@ const ALL_ADDITIONAL_SLUGS = [
   'digital-logic',
   'physics-solver',
   'failure-prediction',
-  'failure-diagnosis',
   'fatigue-advanced',
   'planetary-gearbox',
   'machining-details',

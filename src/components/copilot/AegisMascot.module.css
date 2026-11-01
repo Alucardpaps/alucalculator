@@ -1,0 +1,300 @@
+/*
+ * AeGiS mascot — animation system (v6, "floating parts" design).
+ *
+ * - Colours: --ag-* illustration tokens (styles/themes.css), so every theme works.
+ * - Gaze: inherited --lx/--ly (-1…1) from the page plus small idle saccades --sx/--sy.
+ *   Head, face screen, eyes and glass reflection move by different amounts (parallax),
+ *   which reads as a 3-D head turn. Smoothing is a CSS transition – no React renders.
+ * - Follow-through: body, head, arms and antenna float on the same 4.2 s cycle with
+ *   increasing delays, so the head lags the body and the antenna lags the head.
+ * - Off-screen / background tabs pause everything ([data-paused="true"]);
+ *   prefers-reduced-motion disables animation entirely.
+ * - SVG pivots: a translate attribute positions a group, CSS rotates it around its
+ *   local origin (shoulder pivot, antenna base). Never put a CSS transform on an element
+ *   that also carries a transform attribute.
+ */
+
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.static {
+  pointer-events: none;
+}
+
+.part {
+  cursor: pointer;
+}
+
+/* ── follow-through float ─────────────────────────────────────────────── */
+.bodyFloat {
+  animation: ag-float 4.2s ease-in-out infinite;
+}
+.headFloat {
+  animation: ag-float-head 4.2s ease-in-out 0.22s infinite;
+}
+.armFloatL {
+  animation: ag-float-arm 4.2s ease-in-out 0.34s infinite;
+}
+.armFloatR {
+  animation: ag-float-arm 4.2s ease-in-out 0.42s infinite;
+}
+@keyframes ag-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ag-float-head {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8.5px); }
+}
+@keyframes ag-float-arm {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.antenna {
+  animation: ag-antenna 4.2s ease-in-out 0.5s infinite;
+}
+@keyframes ag-antenna {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(6deg); }
+}
+
+.groundShadow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-shadow 4.2s ease-in-out infinite;
+}
+@keyframes ag-shadow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.85); opacity: 0.65; }
+}
+
+.headShadow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-head-shadow 4.2s ease-in-out 0.22s infinite;
+}
+@keyframes ag-head-shadow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.82); opacity: 0.6; }
+}
+
+.ring {
+  animation: ag-ring 2.1s ease-in-out infinite;
+}
+@keyframes ag-ring {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+
+.thrust {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: ag-thrust 1.6s ease-in-out infinite;
+}
+@keyframes ag-thrust {
+  0%, 100% { transform: scale(0.9, 0.85); opacity: 0.6; }
+  50% { transform: scale(1.06, 1.12); opacity: 1; }
+}
+
+.pulse {
+  animation: ag-pulse 2.4s ease-in-out infinite;
+}
+@keyframes ag-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ── head turn (parallax layers) ──────────────────────────────────────── */
+.headTurn {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform:
+    translate(calc((var(--lx, 0) + var(--sx, 0)) * 4px), calc((var(--ly, 0) + var(--sy, 0)) * 3px))
+    rotate(calc(var(--lx, 0) * 3deg + var(--tilt, 0deg)));
+}
+.screenTurn {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(calc((var(--lx, 0) + var(--sx, 0)) * 3px), calc((var(--ly, 0) + var(--sy, 0)) * 2px));
+}
+.gaze {
+  transition: transform 180ms ease-out;
+  transform: translate(calc((var(--lx, 0) + var(--sx, 0)) * 9px), calc((var(--ly, 0) + var(--sy, 0)) * 6px));
+}
+.glare {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(calc((var(--lx, 0) + var(--sx, 0)) * -4px), calc((var(--ly, 0) + var(--sy, 0)) * -2.5px));
+}
+.bodyTurn {
+  transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(calc(var(--lx, 0) * 1.5px), calc(var(--ly, 0) * 1px));
+}
+.coreTurn {
+  transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(calc(var(--lx, 0) * 2.6px), calc(var(--ly, 0) * 1.8px));
+}
+
+/* ── eyes & expressions ───────────────────────────────────────────────── */
+.eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 75ms ease-in;
+}
+.blink .eyes {
+  transform: scaleY(0.08);
+}
+
+.expr {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-expr 190ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes ag-expr {
+  from { transform: scale(0.82); opacity: 0.25; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.bar {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-talk 0.42s ease-in-out infinite alternate;
+}
+.bar:nth-child(2) { animation-duration: 0.31s; animation-delay: -0.1s; }
+.bar:nth-child(3) { animation-duration: 0.37s; animation-delay: -0.22s; }
+.bar:nth-child(4) { animation-duration: 0.29s; animation-delay: -0.05s; }
+.bar:nth-child(5) { animation-duration: 0.45s; animation-delay: -0.3s; }
+@keyframes ag-talk {
+  from { transform: scaleY(0.25); }
+  to { transform: scaleY(1); }
+}
+
+.dot {
+  animation: ag-dot 1.2s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ag-dot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+
+/* ── arms ─────────────────────────────────────────────────────────────── */
+.joint {
+  transition: transform 560ms cubic-bezier(0.34, 1.32, 0.64, 1);
+}
+.swayL { animation: ag-sway-l 4.2s ease-in-out 0.34s infinite; }
+.swayR { animation: ag-sway-r 4.2s ease-in-out 0.42s infinite; }
+@keyframes ag-sway-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(6deg); }
+}
+@keyframes ag-sway-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-6deg); }
+}
+.wave { animation: ag-wave 0.86s ease-in-out infinite; }
+@keyframes ag-wave {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(16deg); }
+}
+.gesture { animation: ag-gesture 1.7s ease-in-out infinite; }
+@keyframes ag-gesture {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-16deg); }
+  70% { transform: rotate(7deg); }
+}
+
+/* ── core gears ───────────────────────────────────────────────────────── */
+.spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-spin 9s linear infinite;
+}
+.spinRev {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-spin 5.6s linear infinite reverse;
+}
+.overdrive .spin { animation-duration: 1.5s; }
+.overdrive .spinRev { animation-duration: 0.95s; }
+@keyframes ag-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── pose props & whole-body moves ────────────────────────────────────── */
+.bob { animation: ag-bob 2.8s ease-in-out infinite; }
+@keyframes ag-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.jump { animation: ag-jump 0.95s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; }
+@keyframes ag-jump {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-16px); }
+  72% { transform: translateY(2px); }
+}
+
+.shake { animation: ag-shake 0.45s ease-in-out 3; }
+@keyframes ag-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px) rotate(-1.5deg); }
+  75% { transform: translateX(4px) rotate(1.5deg); }
+}
+
+.confetti > * {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ag-confetti 1.5s cubic-bezier(0.15, 0.7, 0.3, 1) infinite;
+}
+@keyframes ag-confetti {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+
+.beam {
+  stroke-dasharray: 7 5;
+  animation: ag-dash 0.45s linear infinite;
+}
+@keyframes ag-dash { to { stroke-dashoffset: -12; } }
+
+.flicker { animation: ag-flicker 0.8s steps(2, jump-none) infinite; }
+.flicker:nth-of-type(2) { animation-delay: -0.4s; }
+@keyframes ag-flicker {
+  0% { opacity: 1; }
+  100% { opacity: 0.15; }
+}
+
+.scan { animation: ag-scan 1.9s ease-in-out infinite; }
+@keyframes ag-scan {
+  0%, 100% { transform: translateY(-15px); opacity: 0.2; }
+  50% { transform: translateY(15px); opacity: 1; }
+}
+
+/* ── global switches ──────────────────────────────────────────────────── */
+.root[data-paused='true'],
+.root[data-paused='true'] * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -39,7 +39,7 @@ export const NewsSection = ({ lang, dict }: { lang: string, dict: any }) => {
         <section className="py-12 mt-12 border-t border-slate-200 bg-white">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/30">
+                    <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white shadow-lg ">
                         <Newspaper size={20} />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">{dict.nav?.news || 'Industry News'}</h2>

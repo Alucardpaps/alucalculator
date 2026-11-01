@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Strength Analysis Calculator Schema
+ * AluCAD OS — Strength Analysis Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical
  * STANDARDS: Peterson's Stress Concentration Factors
@@ -20,7 +20,7 @@ export const strengthAnalysisSchema: CalculatorSchema = {
     metadata: {
         title: 'Stress Concentration Calculator',
         description: 'Calculate stress concentration factors for common geometries. Based on Peterson\'s.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['stress', 'concentration', 'Kt', 'Kf', 'fatigue', 'notch']
     },

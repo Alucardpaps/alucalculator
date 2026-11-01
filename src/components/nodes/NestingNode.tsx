@@ -15,14 +15,14 @@ const NestingNode = ({ id, data, selected }: NodeProps<NestingNodeData>) => {
         <div
             className={`
                 relative flex flex-col
-                bg-[#0f1419] border rounded-xl shadow-2xl
+                bg-[var(--bg-1)] border rounded-xl shadow-2xl
                 transition-all duration-200
                 min-w-[600px]
-                ${selected ? 'border-cyan-500 shadow-cyan-500/20' : 'border-[#2a3a4a]'}
+                ${selected ? 'border-cyan-500 ' : 'border-[var(--line-strong)]'}
             `}
         >
             {/* Header / Drag Handle */}
-            <div className="flex items-center justify-between h-9 px-3 bg-[#1a2332] border-b border-[#2a3a4a] rounded-t-xl cursor-grab active:cursor-grabbing text-xs select-none drag-handle">
+            <div className="flex items-center justify-between h-9 px-3 bg-[var(--bg-3)] border-b border-[var(--line-strong)] rounded-t-xl cursor-grab active:cursor-grabbing text-xs select-none drag-handle">
                 <div className="flex items-center gap-2 text-gray-400">
                     <GripHorizontal size={14} />
                     <span className="font-semibold tracking-wide text-gray-200">
@@ -52,7 +52,7 @@ const NestingNode = ({ id, data, selected }: NodeProps<NestingNodeData>) => {
             </div>
 
             {/* Content Area */}
-            <div className="p-4 bg-[#0a0e14]/50">
+            <div className="p-4 bg-[var(--bg-1)]/50">
                 <div className="nodrag cursor-default">
                     {/* 
                       Stop propagation of wheel/scroll events so zooming the canvas 
@@ -69,7 +69,7 @@ const NestingNode = ({ id, data, selected }: NodeProps<NestingNodeData>) => {
                 type="target"
                 position={Position.Left}
                 id="input"
-                className="!w-3 !h-3 !bg-[#2a3a4a] !border-2 !border-[#0f1419] hover:!bg-cyan-500 hover:!border-cyan-200 transition-colors"
+                className="!w-3 !h-3 !bg-[var(--line-strong)] !border-2 !border-[var(--line)] hover:!bg-cyan-500 hover:!border-cyan-200 transition-colors"
             />
         </div>
     );

@@ -331,9 +331,9 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 bg-[#020408]/90 backdrop-blur-md flex flex-col justify-end md:justify-center p-0 md:p-6"
+                    className="fixed inset-0 z-50 bg-[var(--bg-0)]/90 flex flex-col justify-end md:justify-center p-0 md:p-6"
                 >
-                    <div className="w-full max-w-lg mx-auto bg-[#070b12] border-t md:border border-cyan-900/30 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
+                    <div className="w-full max-w-lg mx-auto bg-[var(--bg-0)] border-t md:border border-cyan-900/30 rounded-t-xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] md:h-auto max-h-[85vh]">
                         {/* Header */}
                         <header className="flex-none p-5 border-b border-white/5 flex items-center justify-between bg-black/20">
                             <div>
@@ -362,9 +362,9 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                             
                             {/* Graph Channels Legend overlay */}
                             <div className="absolute top-6 left-6 flex gap-3 text-[8px] font-mono select-none">
-                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[#ef4444]"></div>{ft.accXAxis}</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[#10b981]"></div>{ft.accYAxis}</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[#3b82f6]"></div>{ft.accZAxis}</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[var(--bad)]"></div>{ft.accXAxis}</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[var(--ok)]"></div>{ft.accYAxis}</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-0.5 bg-[var(--std)]"></div>{ft.accZAxis}</span>
                             </div>
 
                             {/* Measurement Status badge */}
@@ -463,7 +463,7 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                                             <select 
                                                 value={simRPM} 
                                                 onChange={e => setSimRPM(Number(e.target.value))}
-                                                className="w-full bg-[#03060a] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none"
+                                                className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none"
                                             >
                                                 <option value={1500}>{ft.rpm1500}</option>
                                                 <option value={3000}>{ft.rpm3000}</option>
@@ -475,7 +475,7 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                                             <select 
                                                 value={simVibeState} 
                                                 onChange={e => setSimVibeState(e.target.value as any)}
-                                                className="w-full bg-[#03060a] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none"
+                                                className="w-full bg-[var(--bg-0)] border border-cyan-900/30 rounded-lg p-2 text-white text-xs outline-none"
                                             >
                                                 <option value="healthy">{ft.vibeHealthy}</option>
                                                 <option value="misaligned">{ft.vibeMisaligned}</option>
@@ -494,7 +494,7 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                             {permissionState === 'default' && !isSimulated && (
                                 <button
                                     onClick={requestPermission}
-                                    className="flex-1 py-3.5 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                                    className="flex-1 py-3.5 bg-yellow-500 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all active:scale-95 "
                                 >
                                     {ft.grantGyroPermissions}
                                 </button>
@@ -511,7 +511,7 @@ export function VibrationAnalyzerModal({ isOpen, onClose, ft: propFt, debugMode 
                             ) : (
                                 <button
                                     onClick={startMeasurement}
-                                    className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                                    className="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 "
                                 >
                                     <Play size={14} className="fill-black" />
                                     {ft.startDiagnostics}

@@ -1,6 +1,8 @@
 import React from 'react';
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue } from '@/types/engineering';
+import { SpringBlueprint } from '@/components/visualizers/SpringBlueprint';
+import { calculateHelicalSpring } from '@/data/mechanical/springStandards';
 
 export const springDesignSchema: CalculatorSchemaV2 = {
     id: 'spring-design',
@@ -9,7 +11,7 @@ export const springDesignSchema: CalculatorSchemaV2 = {
         description: 'Design of helical compression springs including Wahl Factor, Shear Stress, and Deflection.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['spring', 'helical', 'wahl factor', 'stiffness', 'deflection', 'machine elements'],
         verifiedStandards: ['Shigley\'s Mechanical Engineering Design']
@@ -99,105 +101,25 @@ export const springDesignSchema: CalculatorSchemaV2 = {
     },
     visualization: {
         type: 'svg-parametric',
-        render: (result: any) => {
-            const out = result.outputs || {};
-            const defl = (out.delta?.value as number) || 0;
-            const tau = (out.tau?.value as number) || 0;
-            const C = (out.C?.value as number) || 0;
-
-            const isFailing = tau > 600; // Mock reference for color if > 600 MPa (often Ssy could be 600)
-            const stressColor = isFailing ? '#ef4444' : '#10b981';
-
-            // Spring drawing logic
-            const numCoils = 6;
-            const startY = 30;
-            const maxL = 140; // max length area
-
-            // visually compress the spring
-            const compressionRatio = Math.min(defl / 50, 0.6); // cap at 60% visual compression
-            const currentL = maxL * (1 - compressionRatio);
-            const pitch = currentL / numCoils;
-
-            let pathD = `M 50 ${startY} `; // start
-
-            for (let i = 0; i <= numCoils; i++) {
-                const y = startY + i * pitch;
-                if (i === 0) {
-                    pathD += `L 150 ${y + pitch / 2} `;
-                } else if (i === numCoils) {
-                    pathD += `L 50 ${y} `;
-                } else {
-                    pathD += `L 50 ${y} L 150 ${y + pitch / 2} `;
-                }
-            }
+        render: (result: any, inputs: any) => {
+            const F = Number(inputs?.F?.value ?? inputs?.F ?? 500);
+            const d = Number(inputs?.d?.value ?? inputs?.d ?? 5);
+            const D = Number(inputs?.D?.value ?? inputs?.D ?? 40);
+            const Na = Number(inputs?.Na?.value ?? inputs?.Na ?? 10);
+            const springRes = calculateHelicalSpring({
+                wireDiameter: d,
+                meanDiameter: D,
+                freeLength: Math.max(d * 4, D * 2.2),
+                activeCoils: Na,
+                endType: 'squared_ground',
+                appliedForce1: Math.round(F * 0.25),
+                appliedForce2: F,
+                materialId: 'en10270-1-sh',
+            });
 
             return (
-                <div className="w-full h-full flex flex-row items-center justify-center p-6 bg-[#05080b] gap-12">
-                    {/* Visual Spring SVG */}
-                    <div className="relative w-[200px] h-[200px]">
-                        <svg viewBox="0 0 200 200" width="100%" height="100%" className="overflow-visible transition-all duration-500">
-                            {/* Top Plate/Force */}
-                            <line x1="20" y1={startY - 5} x2="180" y2={startY - 5} stroke="#334155" strokeWidth="4" />
-                            <line x1="100" y1="5" x2="100" y2={startY - 5} stroke="#00e5ff" strokeWidth="3" markerEnd="url(#arrow_spring)" />
-                            <text x="110" y="20" fill="#00e5ff" fontSize="12" fontWeight="bold">F</text>
-
-                            {/* The Spring */}
-                            <path
-                                d={pathD}
-                                fill="none"
-                                stroke={stressColor}
-                                strokeWidth="12"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="transition-all duration-500"
-                            />
-
-                            {/* Inner shadow/highlight for 3d effect on spring */}
-                            <path
-                                d={pathD}
-                                fill="none"
-                                stroke="#ffffff"
-                                strokeWidth="2"
-                                strokeOpacity="0.3"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="transition-all duration-500"
-                            />
-
-                            {/* Bottom Plate */}
-                            <line x1="20" y1={startY + currentL + 5} x2="180" y2={startY + currentL + 5} stroke="#334155" strokeWidth="4" />
-
-                            <defs>
-                                <marker id="arrow_spring" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
-                                    <polygon points="0 0, 6 2, 0 4" fill="#00e5ff" />
-                                </marker>
-                            </defs>
-                        </svg>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="flex flex-col gap-6 w-32 border border-[#1a1f26] bg-[#0a0e14] p-4 rounded-xl">
-                        <div>
-                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Index (C)</div>
-                            <div className={`text-xl font-bold font-mono ${(C < 4 || C > 12) ? 'text-orange-400' : 'text-emerald-400'}`}>
-                                {C.toFixed(1)}
-                            </div>
-                        </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
-                        <div>
-                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Max τ</div>
-                            <div className={`text-xl font-bold font-mono ${isFailing ? 'text-red-400' : 'text-white'}`}>
-                                {tau.toFixed(0)} <span className="text-[10px] text-gray-500">MPa</span>
-                            </div>
-                        </div>
-                        <div className="w-full h-px bg-[#1a1f26]"></div>
-                        <div>
-                            <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Deflection</div>
-                            <div className="text-xl font-bold font-mono text-[#00e5ff]">
-                                {defl.toFixed(1)} <span className="text-[10px] text-gray-500">mm</span>
-                            </div>
-                        </div>
-                    </div>
+                <div className="w-full h-full min-h-[380px] bg-[var(--bg-0)] rounded-xl overflow-hidden p-2">
+                    <SpringBlueprint spring={springRes} appliedForce={F} showLegend={true} />
                 </div>
             );
         }
@@ -206,3 +128,4 @@ export const springDesignSchema: CalculatorSchemaV2 = {
 };
 
 export default springDesignSchema;
+

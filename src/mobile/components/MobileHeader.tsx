@@ -13,12 +13,12 @@ type Props = {
 
 export function MobileHeader({ m, language, projectName, onLanguagePress }: Props) {
   return (
-    <header className="flex-none px-4 py-2.5 bg-[#03060a]/90 border-b border-cyan-950/40 backdrop-blur-xl flex items-center justify-between z-30 select-none">
+    <header className="flex-none px-4 py-2.5 bg-[var(--bg-0)]/90 border-b border-cyan-950/40 flex items-center justify-between z-30 select-none">
       <div className="flex items-center gap-2.5 min-w-0">
         <AluCalcLogo size={26} animate={false} />
         <div className="flex flex-col min-w-0">
           <span className="text-[9.5px] font-black text-cyan-400/80 tracking-[0.2em] font-mono leading-none uppercase">
-            ALUCALC OS
+            ALUCAD OS
           </span>
           <span className="text-xs font-bold text-white tracking-tight mt-0.5 truncate">{projectName}</span>
         </div>

@@ -7,15 +7,117 @@
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Link '<https://www.alucalculator.com/llms.txt>; rel="alternate"; type="text/plain", <https://www.alucalculator.com/llms-full.txt>; rel="alternate"; type="text/plain", <https://www.alucalculator.com/index.md>; rel="alternate"; type="text/markdown", <https://www.alucalculator.com/.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"'
+
+  # ==============================================================================
+  # CACHE-CONTROL & PWA / SERVICE WORKER FRESHNESS
+  # Prevents stale version-lock on Hostinger Apache / LiteSpeed & Cloudflare CDN
+  # ==============================================================================
+  <IfModule mod_headers.c>
+    # 1. Entrypoints & Service Workers: NEVER CACHE (Always revalidate with server)
+    <FilesMatch "(index\.html|sw\.js|service-worker\.js|manifest\.json|version\.json)$">
+      Header set Cache-Control "no-cache, no-store, must-revalidate"
+      Header set Pragma "no-cache"
+      Header set Expires 0
+    </FilesMatch>
+
+    # 2. SSG HTML Pages: Must revalidate to discover new build hashes
+    <FilesMatch "\.html$">
+      Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+
+    # 3. Immutable Static Assets with Content Hash (_next/static, fonts, icons)
+    <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|gif|ico|svg|webp)$">
+      Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # 4. WASM Binaries
+    <FilesMatch "\.wasm$">
+      Header set Cache-Control "public, max-age=604800, must-revalidate"
+    </FilesMatch>
+  </IfModule>
 
   # Force HTTPS
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+  # Canonical Host: non-www to www
+  RewriteCond %{HTTP_HOST} ^alucalculator\.com [NC]
+  RewriteRule ^(.*)$ https://www.alucalculator.com/$1 [L,R=301]
+
+  # ==============================================================================
+  # 301 PERMANENT REDIRECTS (Legacy, Retired & Aliased Routes)
+  # Fixes GSC 404s and normalizes legacy URLs to active canonical module endpoints
+  # ==============================================================================
+  RewriteRule ^workspace/?$ /design-studio/ [L,R=301]
+  RewriteRule ^mobile/?$ / [L,R=301]
+  RewriteRule ^learn/?$ /academy/ [L,R=301]
+  RewriteRule ^shaft-design/?$ /shafts/ [L,R=301]
+
+  # Legacy /calculators/ URLs to canonical modules
+  RewriteRule ^calculators/bearing-life/?$ /bearings/ [L,R=301]
+  RewriteRule ^calculators/bearing-life-calc/?$ /bearings/ [L,R=301]
+  RewriteRule ^calculators/vdi2230/?$ /bolt-torque/ [L,R=301]
+  RewriteRule ^calculators/bolt-torque-calc/?$ /bolt-torque/ [L,R=301]
+  RewriteRule ^calculators/beam-deflection-calc/?$ /beam-deflection/ [L,R=301]
+  RewriteRule ^calculators/gear-ratio-calc/?$ /gears/ [L,R=301]
+  RewriteRule ^calculators/shaft-diameter-calc/?$ /strength/ [L,R=301]
+  RewriteRule ^calculators/tolerance-stackup/?$ /fits/ [L,R=301]
+  RewriteRule ^calculators/fits-tolerances/?$ /fits/ [L,R=301]
+  RewriteRule ^calculators/machine-assembly/?$ /design-studio/ [L,R=301]
+
+  # Retired / merged solver modules
+  RewriteRule ^biology-genetics/?$ /periodic-table/ [L,R=301]
+  RewriteRule ^cs-algorithms/?$ /calculator/ [L,R=301]
+  RewriteRule ^chemistry-reactions/?$ /periodic-table/ [L,R=301]
+  RewriteRule ^chemistry-solver/?$ /periodic-table/ [L,R=301]
+  RewriteRule ^physics-kinematics/?$ /physics-solver/ [L,R=301]
+  RewriteRule ^wind-tunnel/?$ /aerospace-dynamics/ [L,R=301]
+  RewriteRule ^aerospace-dynamics/?$ /fluid-dynamics/ [L,R=301]
+  RewriteRule ^failure-prediction/?$ /fatigue-analysis/ [L,R=301]
+  RewriteRule ^failure-diagnosis/?$ /fatigue-analysis/ [L,R=301]
+  RewriteRule ^material-selector-ai/?$ /handbook/ [L,R=301]
+  RewriteRule ^materials-explorer/?$ /handbook/ [L,R=301]
+  RewriteRule ^materials-db/?$ /handbook/ [L,R=301]
+  RewriteRule ^welding-fillet/?$ /welding/ [L,R=301]
+  RewriteRule ^parametric-cad/?$ /design-studio/ [L,R=301]
+  RewriteRule ^stem-codex/?$ /periodic-table/ [L,R=301]
+  RewriteRule ^split-cad/?$ /cad-editor/ [L,R=301]
+  RewriteRule ^holographic-viewer/?$ /design-studio/ [L,R=301]
+  RewriteRule ^matrix-screensaver/?$ / [L,R=301]
+  RewriteRule ^hardness-converter/?$ /unit-converter/ [L,R=301]
+  RewriteRule ^pipe-friction/?$ /fluid-dynamics/ [L,R=301]
+  RewriteRule ^hydraulics/?$ /cylinders/ [L,R=301]
+  RewriteRule ^power-screw/?$ /motor-selection-std/ [L,R=301]
+  RewriteRule ^springs/?$ /advanced-spring/ [L,R=301]
+  RewriteRule ^shaft/?$ /shafts/ [L,R=301]
+  RewriteRule ^cylinder-design/?$ /cylinders/ [L,R=301]
+
+  # ==============================================================================
+  # AI AGENTS, MCP DISCOVERY & CONTENT NEGOTIATION
+  # Full AI visibility: GPTBot, ClaudeBot, PerplexityBot, Applebot, Google-Extended
+  # Serves Markdown upon Accept: text/markdown request (cuts token cost).
+  # ==============================================================================
+  RewriteCond %{HTTP:Accept} (text/markdown|text/x-markdown) [NC]
+  RewriteCond %{REQUEST_URI} ^/?$ [OR]
+  RewriteCond %{REQUEST_URI} ^/index(\.html)?$
+  RewriteRule ^.*$ /index.md [L,T=text/markdown]
+
+  # Allow all AI bots to crawl public pages without 403 blocks
+  <IfModule mod_headers.c>
+    <FilesMatch "\.(json|txt|md)$">
+      Header set Access-Control-Allow-Origin "*"
+      Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+      Header set Access-Control-Allow-Headers "*"
+    </FilesMatch>
+  </IfModule>
+
   # PHP APIs must never fall through to the static SPA (POST would become HTML)
   RewriteRule ^api/feedback/?$ api/feedback/index.php [L,QSA]
   RewriteRule ^api/ai/gemini/?$ api/ai/gemini/index.php [L,QSA]
   RewriteRule ^api/ai/copilot/?$ api/ai/copilot/index.php [L,QSA]
+  RewriteRule ^api/ai/agent/?$ api/ai/agent/index.php [L,QSA]
+  RewriteRule ^api/ai-agent/?$ api/ai/agent/index.php [L,QSA]
   RewriteCond %{REQUEST_URI} ^/api/
   RewriteRule ^ - [L]
 
@@ -32,6 +134,6 @@
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Fallback to index.html for Single Page Application routing
-  RewriteRule ^ index.html [L]
+  # Custom Error Document for 404 (prevents Soft 404)
+  ErrorDocument 404 /404.html
 </IfModule>

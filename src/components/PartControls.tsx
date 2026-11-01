@@ -51,7 +51,7 @@ export function PartControls() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = profileType === 'flat' ? `AluCalc_Plate_${width}x${height}.dxf` : `AluCalc_${profileType}_${flangeWidth}x${webHeight}.dxf`;
+            a.download = profileType === 'flat' ? `AluCAD_Plate_${width}x${height}.dxf` : `AluCalc_${profileType}_${flangeWidth}x${webHeight}.dxf`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -75,7 +75,7 @@ export function PartControls() {
                 height: height,
                 thickness: thickness,
                 holeRadius: holeRadius,
-                name: `AluCalc_Plate_${width}x${height}`,
+                name: `AluCAD_Plate_${width}x${height}`,
             });
         } else {
             stepStr = generateStepBox({
@@ -135,7 +135,7 @@ export function PartControls() {
     const metrics = calculateMetrics();
 
     return (
-        <div className="bg-[#0a0c10] border border-white/10 rounded-xl p-6 flex flex-col gap-6 text-slate-300 w-full max-w-sm shadow-2xl backdrop-blur-md overflow-y-auto max-h-full scrollbar-thin scrollbar-thumb-white/10">
+        <div className="bg-[var(--bg-1)] border border-white/10 rounded-xl p-6 flex flex-col gap-6 text-slate-300 w-full max-w-sm shadow-2xl overflow-y-auto max-h-full scrollbar-thin scrollbar-thumb-white/10">
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
                     <IconBox />
@@ -155,7 +155,7 @@ export function PartControls() {
                     <select
                         value={materialId}
                         onChange={(e) => setDimensions({ materialId: e.target.value })}
-                        className="w-full bg-[#1e293b] text-white text-sm border border-white/10 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                        className="w-full bg-[var(--bg-3)] text-white text-sm border border-white/10 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors cursor-pointer"
                     >
                         {ENGINEERING_MATERIALS.map(mat => (
                             <option key={mat.id} value={mat.id}>{mat.name} ({mat.density}g/cm³)</option>
@@ -172,7 +172,7 @@ export function PartControls() {
                     <input
                         type="range" min="0" max="10" step="0.1" value={kerfLoss}
                         onChange={(e) => setDimensions({ kerfLoss: Number(e.target.value) })}
-                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                     />
                 </div>
 
@@ -184,7 +184,7 @@ export function PartControls() {
                     <select
                         value={profileType}
                         onChange={(e) => setDimensions({ profileType: e.target.value as ProfileType })}
-                        className="w-full bg-[#1e293b] text-white text-sm border border-white/10 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                        className="w-full bg-[var(--bg-3)] text-white text-sm border border-white/10 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-colors cursor-pointer"
                     >
                         <option value="flat">Standard Flat Plate</option>
                         <option value="L-bracket">L-Bracket Profile</option>
@@ -206,7 +206,7 @@ export function PartControls() {
                             <input
                                 type="range" min="10" max="1000" value={width}
                                 onChange={(e) => setDimensions({ width: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -219,7 +219,7 @@ export function PartControls() {
                             <input
                                 type="range" min="10" max="1000" value={height}
                                 onChange={(e) => setDimensions({ height: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -232,7 +232,7 @@ export function PartControls() {
                             <input
                                 type="range" min="1" max="100" value={thickness}
                                 onChange={(e) => setDimensions({ thickness: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -245,7 +245,7 @@ export function PartControls() {
                             <input
                                 type="range" min="0" max={Math.min(width, height) / 2 - 2} value={holeRadius}
                                 onChange={(e) => setDimensions({ holeRadius: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
                     </>
@@ -262,7 +262,7 @@ export function PartControls() {
                             <input
                                 type="range" min="20" max="500" value={flangeWidth}
                                 onChange={(e) => setDimensions({ flangeWidth: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -275,7 +275,7 @@ export function PartControls() {
                             <input
                                 type="range" min="20" max="500" value={webHeight}
                                 onChange={(e) => setDimensions({ webHeight: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -288,7 +288,7 @@ export function PartControls() {
                             <input
                                 type="range" min="1" max="50" value={flangeThickness}
                                 onChange={(e) => setDimensions({ flangeThickness: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -301,7 +301,7 @@ export function PartControls() {
                             <input
                                 type="range" min="1" max="50" value={webThickness}
                                 onChange={(e) => setDimensions({ webThickness: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
 
@@ -314,7 +314,7 @@ export function PartControls() {
                             <input
                                 type="range" min="50" max="2000" value={length} step={50}
                                 onChange={(e) => setDimensions({ length: Number(e.target.value) })}
-                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--cyan)]"
                             />
                         </div>
                     </>
@@ -327,7 +327,7 @@ export function PartControls() {
                             type="checkbox" 
                             checked={isSectionActive} 
                             onChange={(e) => setDimensions({ isSectionActive: e.target.checked })}
-                            className="w-4 h-4 rounded bg-slate-800 border-white/10 accent-blue-500"
+                            className="w-4 h-4 rounded bg-slate-800 border-white/10 accent-[var(--cyan)]"
                         />
                     </div>
                     
@@ -335,15 +335,15 @@ export function PartControls() {
                         <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
                             <div className="space-y-2">
                                 <span className="text-[10px] text-slate-500 font-mono uppercase">X-Section</span>
-                                <input type="range" min="0" max="1" step="0.01" value={sectionX} onChange={(e) => setDimensions({ sectionX: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                                <input type="range" min="0" max="1" step="0.01" value={sectionX} onChange={(e) => setDimensions({ sectionX: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-[var(--cyan)] appearance-none rounded-lg" />
                             </div>
                             <div className="space-y-2">
                                 <span className="text-[10px] text-slate-500 font-mono uppercase">Y-Section</span>
-                                <input type="range" min="0" max="1" step="0.01" value={sectionY} onChange={(e) => setDimensions({ sectionY: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                                <input type="range" min="0" max="1" step="0.01" value={sectionY} onChange={(e) => setDimensions({ sectionY: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-[var(--cyan)] appearance-none rounded-lg" />
                             </div>
                             <div className="space-y-2">
                                 <span className="text-[10px] text-slate-500 font-mono uppercase">Z-Section</span>
-                                <input type="range" min="0" max="1" step="0.01" value={sectionZ} onChange={(e) => setDimensions({ sectionZ: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-blue-500 appearance-none rounded-lg" />
+                                <input type="range" min="0" max="1" step="0.01" value={sectionZ} onChange={(e) => setDimensions({ sectionZ: parseFloat(e.target.value) })} className="w-full h-1 bg-white/10 accent-[var(--cyan)] appearance-none rounded-lg" />
                             </div>
                         </div>
                     )}
@@ -376,7 +376,6 @@ export function PartControls() {
 
             {/* Live Mod 2 Metrics Head-Up Display */}
             <div className="bg-black/40 border border-white/5 rounded-lg p-4 grid grid-cols-2 gap-4 my-2 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-[40px] rounded-full pointer-events-none" />
 
                 <div>
                     <p className="text-[10px] text-slate-500 font-mono uppercase tracking-wider mb-1">Volume</p>

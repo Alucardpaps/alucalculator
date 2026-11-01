@@ -1,4 +1,5 @@
 import type { Language } from '@/store/i18nStore';
+import { APP_VERSION } from '@/config/app';
 
 export type DashboardPageStrings = {
   brandOs: string;
@@ -41,7 +42,7 @@ export type DashboardPageStrings = {
 };
 
 const EN: DashboardPageStrings = {
-  brandOs: 'AluCalc OS',
+  brandOs: 'AluCAD OS',
   instanceLabel: 'Instance: US-EAST-1',
   coreStable: 'Core Stable',
   executionMetrics: 'Execution Metrics',
@@ -55,7 +56,7 @@ const EN: DashboardPageStrings = {
   gears: 'Gears',
   emptyTitle: 'Initialize Your First Assembly',
   emptyDescription:
-    'Welcome to the AluCalc Engineering OS. Your repository is currently empty. Create your first project to activate the Truth Ledger and begin multi-module simulation.',
+    'Welcome to the AluCAD OS. Your repository is currently empty. Create your first project to activate the Truth Ledger and begin multi-module simulation.',
   initializing: 'Initializing...',
   initializeProject: 'Initialize Project Alpha',
   commandCenter: 'Command Center',
@@ -73,7 +74,7 @@ const EN: DashboardPageStrings = {
   executionResult: 'Execution Result',
   launchWorkstation: 'Launch Workstation',
   systemOnline: 'System Online',
-  versionLabel: 'v5.0.0-Beta',
+  versionLabel: `v${APP_VERSION}`,
   truthLedgerVerified: 'Truth Ledger Verified',
   latencyLabel: 'Latency: 14ms',
   promptProjectName: 'Enter Project Name:',
@@ -82,7 +83,7 @@ const EN: DashboardPageStrings = {
 };
 
 const TR: DashboardPageStrings = {
-  brandOs: 'AluCalc OS',
+  brandOs: 'AluCAD OS',
   instanceLabel: 'Ortam: US-EAST-1',
   coreStable: 'Core Kararl\u0131',
   executionMetrics: 'Y\u00fcr\u00fctme Metrikleri',
@@ -114,7 +115,7 @@ const TR: DashboardPageStrings = {
   executionResult: 'Y\u00fcr\u00fctme Sonucu',
   launchWorkstation: 'Workstation Ba\u015flat',
   systemOnline: 'Sistem \u00c7evrimi\u00e7i',
-  versionLabel: 'v5.0.0-Beta',
+  versionLabel: `v${APP_VERSION}`,
   truthLedgerVerified: 'Truth Ledger Do\u011fruland\u0131',
   latencyLabel: 'Gecikme: 14ms',
   promptProjectName: 'Proje Ad\u0131 Girin:',
@@ -123,7 +124,7 @@ const TR: DashboardPageStrings = {
 };
 
 const DE: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Instanz: US-EAST-1",
     coreStable: "Kern stabil",
     executionMetrics: "Ausführungsmetriken",
@@ -136,7 +137,7 @@ const DE: DashboardPageStrings = {
     bearings: "Lager",
     gears: "Zahnräder",
     emptyTitle: "Erste Baugruppe initialisieren",
-    emptyDescription: "Willkommen bei AluCalc Engineering OS. Ihr Repository ist derzeit leer. Erstellen Sie Ihr erstes Projekt, um das Truth Ledger zu aktivieren und die Multi-Modul-Simulation zu starten.",
+    emptyDescription: "Willkommen bei AluCAD OS. Ihr Repository ist derzeit leer. Erstellen Sie Ihr erstes Projekt, um das Truth Ledger zu aktivieren und die Multi-Modul-Simulation zu starten.",
     initializing: "Initialisierung...",
     initializeProject: "Projekt Alpha initialisieren",
     commandCenter: "Kommandozentrale",
@@ -154,7 +155,7 @@ const DE: DashboardPageStrings = {
     executionResult: "Ausführungsergebnis",
     launchWorkstation: "Workstation starten",
     systemOnline: "System online",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger verifiziert",
     latencyLabel: "Latenz: 14 ms",
     promptProjectName: "Projektname eingeben:",
@@ -163,7 +164,7 @@ const DE: DashboardPageStrings = {
 };
 
 const ES: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Instancia: US-EAST-1",
     coreStable: "Núcleo estable",
     executionMetrics: "Métricas de ejecución",
@@ -176,7 +177,7 @@ const ES: DashboardPageStrings = {
     bearings: "Rodamientos",
     gears: "Engranajes",
     emptyTitle: "Inicialice su primer ensamblaje",
-    emptyDescription: "Bienvenido a AluCalc Engineering OS. Su repositorio está vacío. Cree su primer proyecto para activar el Truth Ledger e iniciar la simulación multi-módulo.",
+    emptyDescription: "Bienvenido a AluCAD OS. Su repositorio está vacío. Cree su primer proyecto para activar el Truth Ledger e iniciar la simulación multi-módulo.",
     initializing: "Inicializando...",
     initializeProject: "Inicializar Proyecto Alpha",
     commandCenter: "Centro de mando",
@@ -194,7 +195,7 @@ const ES: DashboardPageStrings = {
     executionResult: "Resultado de ejecución",
     launchWorkstation: "Iniciar estación de trabajo",
     systemOnline: "Sistema en línea",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger verificado",
     latencyLabel: "Latencia: 14 ms",
     promptProjectName: "Introduzca el nombre del proyecto:",
@@ -203,7 +204,7 @@ const ES: DashboardPageStrings = {
 };
 
 const FR: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Instance : US-EAST-1",
     coreStable: "Noyau stable",
     executionMetrics: "Métriques d’exécution",
@@ -216,7 +217,7 @@ const FR: DashboardPageStrings = {
     bearings: "Roulements",
     gears: "Engrenages",
     emptyTitle: "Initialisez votre premier assemblage",
-    emptyDescription: "Bienvenue sur AluCalc Engineering OS. Votre dépôt est vide. Créez votre premier projet pour activer le Truth Ledger et démarrer la simulation multi-modules.",
+    emptyDescription: "Bienvenue sur AluCAD OS. Votre dépôt est vide. Créez votre premier projet pour activer le Truth Ledger et démarrer la simulation multi-modules.",
     initializing: "Initialisation...",
     initializeProject: "Initialiser Projet Alpha",
     commandCenter: "Centre de commande",
@@ -234,7 +235,7 @@ const FR: DashboardPageStrings = {
     executionResult: "Résultat d’exécution",
     launchWorkstation: "Lancer le poste de travail",
     systemOnline: "Système en ligne",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger vérifié",
     latencyLabel: "Latence : 14 ms",
     promptProjectName: "Entrez le nom du projet :",
@@ -243,7 +244,7 @@ const FR: DashboardPageStrings = {
 };
 
 const IT: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Istanza: US-EAST-1",
     coreStable: "Core stabile",
     executionMetrics: "Metriche di esecuzione",
@@ -256,7 +257,7 @@ const IT: DashboardPageStrings = {
     bearings: "Cuscinetti",
     gears: "Ingranaggi",
     emptyTitle: "Inizializza il tuo primo assemblaggio",
-    emptyDescription: "Benvenuto in AluCalc Engineering OS. Il repository è vuoto. Crea il primo progetto per attivare il Truth Ledger e avviare la simulazione multi-modulo.",
+    emptyDescription: "Benvenuto in AluCAD OS. Il repository è vuoto. Crea il primo progetto per attivare il Truth Ledger e avviare la simulazione multi-modulo.",
     initializing: "Inizializzazione...",
     initializeProject: "Inizializza Progetto Alpha",
     commandCenter: "Centro di comando",
@@ -274,7 +275,7 @@ const IT: DashboardPageStrings = {
     executionResult: "Risultato esecuzione",
     launchWorkstation: "Avvia workstation",
     systemOnline: "Sistema online",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger verificato",
     latencyLabel: "Latenza: 14 ms",
     promptProjectName: "Inserisci nome progetto:",
@@ -283,7 +284,7 @@ const IT: DashboardPageStrings = {
 };
 
 const PT: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Instância: US-EAST-1",
     coreStable: "Núcleo estável",
     executionMetrics: "Métricas de execução",
@@ -296,7 +297,7 @@ const PT: DashboardPageStrings = {
     bearings: "Rolamentos",
     gears: "Engrenagens",
     emptyTitle: "Inicialize a sua primeira montagem",
-    emptyDescription: "Bem-vindo ao AluCalc Engineering OS. O repositório está vazio. Crie o primeiro projeto para ativar o Truth Ledger e iniciar a simulação multi-módulo.",
+    emptyDescription: "Bem-vindo ao AluCAD OS. O repositório está vazio. Crie o primeiro projeto para ativar o Truth Ledger e iniciar a simulação multi-módulo.",
     initializing: "A inicializar...",
     initializeProject: "Inicializar Projeto Alpha",
     commandCenter: "Centro de comando",
@@ -314,7 +315,7 @@ const PT: DashboardPageStrings = {
     executionResult: "Resultado da execução",
     launchWorkstation: "Iniciar workstation",
     systemOnline: "Sistema online",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger verificado",
     latencyLabel: "Latência: 14 ms",
     promptProjectName: "Introduza o nome do projeto:",
@@ -323,7 +324,7 @@ const PT: DashboardPageStrings = {
 };
 
 const RU: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "Экземпляр: US-EAST-1",
     coreStable: "Ядро стабильно",
     executionMetrics: "Метрики выполнения",
@@ -336,7 +337,7 @@ const RU: DashboardPageStrings = {
     bearings: "Подшипники",
     gears: "Шестерни",
     emptyTitle: "Инициализируйте первую сборку",
-    emptyDescription: "Добро пожаловать в AluCalc Engineering OS. Репозиторий пуст. Создайте первый проект для активации Truth Ledger и запуска мультимодульной симуляции.",
+    emptyDescription: "Добро пожаловать в AluCAD OS. Репозиторий пуст. Создайте первый проект для активации Truth Ledger и запуска мультимодульной симуляции.",
     initializing: "Инициализация...",
     initializeProject: "Инициализировать Проект Alpha",
     commandCenter: "Командный центр",
@@ -354,7 +355,7 @@ const RU: DashboardPageStrings = {
     executionResult: "Результат выполнения",
     launchWorkstation: "Запустить рабочую станцию",
     systemOnline: "Система онлайн",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger проверен",
     latencyLabel: "Задержка: 14 мс",
     promptProjectName: "Введите имя проекта:",
@@ -363,7 +364,7 @@ const RU: DashboardPageStrings = {
 };
 
 const JA: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "インスタンス: US-EAST-1",
     coreStable: "コア安定",
     executionMetrics: "実行メトリクス",
@@ -376,7 +377,7 @@ const JA: DashboardPageStrings = {
     bearings: "ベアリング",
     gears: "ギア",
     emptyTitle: "最初のアセンブリを初期化",
-    emptyDescription: "AluCalc Engineering OSへようこそ。リポジトリは空です。Truth Ledgerを有効にし、マルチモジュールシミュレーションを開始するには最初のプロジェクトを作成してください。",
+    emptyDescription: "AluCAD OSへようこそ。リポジトリは空です。Truth Ledgerを有効にし、マルチモジュールシミュレーションを開始するには最初のプロジェクトを作成してください。",
     initializing: "初期化中...",
     initializeProject: "プロジェクトAlphaを初期化",
     commandCenter: "コマンドセンター",
@@ -394,7 +395,7 @@ const JA: DashboardPageStrings = {
     executionResult: "実行結果",
     launchWorkstation: "ワークステーション起動",
     systemOnline: "システムオンライン",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger検証済み",
     latencyLabel: "遅延: 14ms",
     promptProjectName: "プロジェクト名を入力:",
@@ -403,7 +404,7 @@ const JA: DashboardPageStrings = {
 };
 
 const ZH: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "实例: US-EAST-1",
     coreStable: "核心稳定",
     executionMetrics: "执行指标",
@@ -416,7 +417,7 @@ const ZH: DashboardPageStrings = {
     bearings: "轴承",
     gears: "齿轮",
     emptyTitle: "初始化您的第一个装配",
-    emptyDescription: "欢迎使用 AluCalc Engineering OS。您的仓库目前为空。创建第一个项目以激活 Truth Ledger 并开始多模块仿真。",
+    emptyDescription: "欢迎使用 AluCAD OS。您的仓库目前为空。创建第一个项目以激活 Truth Ledger 并开始多模块仿真。",
     initializing: "正在初始化...",
     initializeProject: "初始化项目 Alpha",
     commandCenter: "指挥中心",
@@ -434,7 +435,7 @@ const ZH: DashboardPageStrings = {
     executionResult: "执行结果",
     launchWorkstation: "启动工作站",
     systemOnline: "系统在线",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger 已验证",
     latencyLabel: "延迟: 14ms",
     promptProjectName: "输入项目名称:",
@@ -443,7 +444,7 @@ const ZH: DashboardPageStrings = {
 };
 
 const KO: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "인스턴스: US-EAST-1",
     coreStable: "코어 안정",
     executionMetrics: "실행 메트릭",
@@ -456,7 +457,7 @@ const KO: DashboardPageStrings = {
     bearings: "베어링",
     gears: "기어",
     emptyTitle: "첫 조립을 초기화하세요",
-    emptyDescription: "AluCalc Engineering OS에 오신 것을 환영합니다. 저장소가 비어 있습니다. Truth Ledger를 활성화하고 다중 모듈 시뮬레이션을 시작하려면 첫 프로젝트를 만드세요.",
+    emptyDescription: "AluCAD OS에 오신 것을 환영합니다. 저장소가 비어 있습니다. Truth Ledger를 활성화하고 다중 모듈 시뮬레이션을 시작하려면 첫 프로젝트를 만드세요.",
     initializing: "초기화 중...",
     initializeProject: "프로젝트 Alpha 초기화",
     commandCenter: "명령 센터",
@@ -474,7 +475,7 @@ const KO: DashboardPageStrings = {
     executionResult: "실행 결과",
     launchWorkstation: "워크스테이션 시작",
     systemOnline: "시스템 온라인",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "Truth Ledger 검증됨",
     latencyLabel: "지연: 14ms",
     promptProjectName: "프로젝트 이름 입력:",
@@ -483,7 +484,7 @@ const KO: DashboardPageStrings = {
 };
 
 const AR: DashboardPageStrings = {
-    brandOs: "AluCalc OS",
+    brandOs: "AluCAD OS",
     instanceLabel: "المثيل: US-EAST-1",
     coreStable: "النواة مستقرة",
     executionMetrics: "مقاييس التنفيذ",
@@ -496,7 +497,7 @@ const AR: DashboardPageStrings = {
     bearings: "المحامل",
     gears: "التروس",
     emptyTitle: "تهيئة أول تجميع لك",
-    emptyDescription: "مرحباً بك في AluCalc Engineering OS. المستودع فارغ حالياً. أنشئ مشروعك الأول لتفعيل Truth Ledger وبدء المحاكاة متعددة الوحدات.",
+    emptyDescription: "مرحباً بك في AluCAD OS. المستودع فارغ حالياً. أنشئ مشروعك الأول لتفعيل Truth Ledger وبدء المحاكاة متعددة الوحدات.",
     initializing: "جارٍ التهيئة...",
     initializeProject: "تهيئة مشروع Alpha",
     commandCenter: "مركز القيادة",
@@ -514,7 +515,7 @@ const AR: DashboardPageStrings = {
     executionResult: "نتيجة التنفيذ",
     launchWorkstation: "تشغيل محطة العمل",
     systemOnline: "النظام متصل",
-    versionLabel: "v5.0.0-Beta",
+    versionLabel: `v${APP_VERSION}`,
     truthLedgerVerified: "تم التحقق من Truth Ledger",
     latencyLabel: "التأخير: 14 مللي ثانية",
     promptProjectName: "أدخل اسم المشروع:",

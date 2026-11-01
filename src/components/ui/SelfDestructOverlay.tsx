@@ -51,18 +51,18 @@ export function SelfDestructOverlay() {
     }
 
     return (
-        <div className="fixed inset-0 z-[99999] bg-red-900/40 backdrop-blur-md flex items-center justify-center pointer-events-auto overflow-hidden">
+        <div className="fixed inset-0 z-[99999] bg-red-900/40 flex items-center justify-center pointer-events-auto overflow-hidden">
             {/* Pulsing warning light effect */}
             <div className="absolute inset-0 bg-red-600 mix-blend-overlay opacity-30 animate-pulse"></div>
 
             <div className="relative flex flex-col items-center justify-center z-10 animate-shake">
-                <h1 className="text-6xl md:text-8xl font-black text-red-500 tracking-tighter drop-shadow-[0_0_30px_rgba(239,68,68,0.8)] uppercase">
+                <h1 className="text-5xl md:text-5xl font-black text-red-500 tracking-tighter drop- uppercase">
                     Critical Failure
                 </h1>
                 <p className="mt-4 text-xl font-mono text-red-200 tracking-widest bg-black/50 px-6 py-2 border border-red-500/50">
                     SELF-DESTRUCT INITIATED
                 </p>
-                <div className="mt-12 text-[12rem] leading-none font-black font-mono text-white drop-shadow-[0_0_50px_rgba(255,255,255,0.8)]">
+                <div className="mt-12 text-[12rem] leading-none font-black font-mono text-white drop-">
                     {countdown}
                 </div>
             </div>

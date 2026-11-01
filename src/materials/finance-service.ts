@@ -1,5 +1,5 @@
 /**
- * FinanceService - AluCalc OS v4
+ * FinanceService - AluCAD OS v4
  * Handles fetching of real-time material prices from external APIs.
  */
 export class FinanceService {

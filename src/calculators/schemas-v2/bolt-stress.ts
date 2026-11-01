@@ -2,6 +2,7 @@
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue, ValidatedEngineeringValue } from '@/types/engineering';
 import { BOLT_HEAD_DIMENSIONS, BOLT_PROPERTY_CLASSES, getBoltClass } from '@/data/boltNutStandards';
+import { getProofStress, getYieldStrength } from '@/lib/fastener/sharedEngine';
 
 // Helper to get stress area
 function calculateStressArea(d: number, P: number): number {
@@ -16,7 +17,7 @@ const boltStressSchema: CalculatorSchemaV2 = {
         description: 'Calculate tensile stress, proof load, and safety factor for standard metric bolts (ISO 898-1).',
         category: 'mechanical',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-09',
         tags: ['bolt', 'fastener', 'stress', 'iso-898', 'tensile'],
         verifiedStandards: ['ISO 898-1', 'VDI 2230'],
@@ -166,8 +167,9 @@ const boltStressSchema: CalculatorSchemaV2 = {
         const stdPitch = stdBolt ? stdBolt.pitch : undefined;
 
         // Default strengths if not found (fallback to 8.8)
-        const Sy = boltClass ? boltClass.yieldStrengthMin : 640;
-        const Sp = boltClass ? (boltClass.yieldStrengthMin * 0.9) : 580; // Proof load approx 90% yield for standard grades
+        const Sy = getYieldStrength(boltClass ? gradeStr : '8.8', d);
+        // ISO 898-1 Table 3 proof stress (8.8 is diameter dependent); falls back to 0.9·Rp0.2 for unlisted classes
+        const Sp = getProofStress(gradeStr, Sy, d);
 
         const F_N = F_kN * 1000;
 

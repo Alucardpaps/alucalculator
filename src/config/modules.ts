@@ -1,3 +1,4 @@
+import { APP_MODULE_COUNT } from './app';
 import {
     LucideIcon,
     Ruler, Square, Circle, Settings, Grid3X3, Database, Flame, Wrench, CircleDot,
@@ -7,7 +8,7 @@ import {
     Bot, Scan, DollarSign, Droplet, BarChart3, Box, Factory, PenTool, Variable,
     Terminal, Sparkles, Thermometer, Activity,
     Rocket, FlaskConical, Dna, Code, Plane, Anchor, Cpu, ShieldCheck,
-    Volume2, Compass
+    Volume2, Compass, Workflow
 } from 'lucide-react';
 
 export type ModuleType =
@@ -35,6 +36,7 @@ export type ModuleType =
     | 'unit-converter'
     | 'calculator'
     | 'cad-editor'
+    | 'design-studio'
     | 'simulation-fea'
     | 'sketch-pad'
     | 'manufacturing-sandbox'
@@ -49,13 +51,13 @@ export type ModuleType =
     | 'biology-genetics'
     | 'cs-algorithms'
     | 'aerospace-dynamics'
-    | 'naval-hydrostatics'
     | 'materials-explorer'
     | 'physics-solver'
     | 'gearbox-design'
     | 'motor-selection-std'
     | 'material-selector-ai'
-    | 'failure-diagnosis'
+    | 'shaft-design'
+    | 'cylinder-design'
     | 'fatigue-advanced'
     | 'planetary-gearbox'
     | 'three-phase-power'
@@ -94,7 +96,14 @@ export type ModuleType =
     | 'hvac-load'
     | 'marine'
     | 'welding-fillet'
-    | 'matrix-screensaver';
+    | 'flow'
+    | 'keyway-connection'
+    | 'press-fit'
+    | 'o-ring'
+    | 'thread-geometry'
+    | 'matrix-screensaver'
+    | 'factory-sim'
+    | 'project-sim';
 
 export interface WindowSize {
     width: number;
@@ -155,13 +164,6 @@ export const BASE_REGISTRY = {
         category: 'mechanical',
         iconName: 'Flame',
         defaultSize: { width: 1000, height: 750 }
-    },
-    'fasteners': {
-        type: 'fasteners',
-        title: 'Thread Geometry & Clearances',
-        category: 'mechanical',
-        iconName: 'Wrench',
-        defaultSize: { width: 1300, height: 850 }
     },
     'machining-details': {
         type: 'machining-details',
@@ -228,7 +230,7 @@ export const BASE_REGISTRY = {
     },
     'handbook': {
         type: 'handbook',
-        title: 'Eng. Handbook',
+        title: 'Standards & Materials Handbook',
         category: 'manufacturing',
         iconName: 'BookOpen',
         defaultSize: { width: 1100, height: 850 }
@@ -310,6 +312,13 @@ export const BASE_REGISTRY = {
         iconName: 'Box',
         defaultSize: { width: 1100, height: 850 }
     },
+    'flow': {
+        type: 'flow',
+        title: 'Visual Engineering Flow Engine',
+        category: 'manufacturing',
+        iconName: 'Workflow',
+        defaultSize: { width: 1400, height: 900 }
+    },
     'sketch-pad': {
         type: 'sketch-pad',
         title: 'Sketch Pad',
@@ -347,9 +356,9 @@ export const BASE_REGISTRY = {
     },
     'bolt-torque': {
         type: 'bolt-torque',
-        title: 'Bolt Torque (VDI 2230)',
+        title: 'Bolt Torque & Fasteners (VDI 2230)',
         category: 'mechanical',
-        iconName: 'Zap',
+        iconName: 'Wrench',
         defaultSize: { width: 1300, height: 850 }
     },
     'chain-drive': {
@@ -401,13 +410,6 @@ export const BASE_REGISTRY = {
         iconName: 'Plane',
         defaultSize: { width: 1100, height: 850 }
     },
-    'naval-hydrostatics': {
-        type: 'naval-hydrostatics',
-        title: 'Naval Engineering & Hydro',
-        category: 'mechanical',
-        iconName: 'Anchor',
-        defaultSize: { width: 1200, height: 900 }
-    },
     'manufacturing-readiness': {
         type: 'manufacturing-readiness',
         title: 'Manufacturing Readiness',
@@ -449,13 +451,6 @@ export const BASE_REGISTRY = {
         category: 'mechanical',
         iconName: 'Database',
         defaultSize: { width: 1100, height: 850 }
-    },
-    'failure-diagnosis': {
-        type: 'failure-diagnosis',
-        title: 'Failure Analysis Tool',
-        category: 'manufacturing',
-        iconName: 'ShieldCheck',
-        defaultSize: { width: 1000, height: 800 }
     },
     'fatigue-advanced': {
         type: 'fatigue-advanced',
@@ -618,16 +613,66 @@ export const BASE_REGISTRY = {
         iconName: 'Flame',
         defaultSize: { width: 1000, height: 750 }
     },
+    'keyway-connection': {
+        type: 'keyway-connection',
+        title: 'DIN 6885 Keyway Connection',
+        category: 'mechanical',
+        iconName: 'Layers',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'press-fit': {
+        type: 'press-fit',
+        title: 'DIN 7190 Press Fit & Thermal',
+        category: 'mechanical',
+        iconName: 'Gauge',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'o-ring': {
+        type: 'o-ring',
+        title: 'ISO 3601 O-Ring Gland Design',
+        category: 'mechanical',
+        iconName: 'Droplets',
+        defaultSize: { width: 1200, height: 850 }
+    },
+    'thread-geometry': {
+        type: 'thread-geometry',
+        title: 'Universal Thread Geometry',
+        category: 'mechanical',
+        iconName: 'Wrench',
+        defaultSize: { width: 1200, height: 850 }
+    },
     'matrix-screensaver': {
         type: 'matrix-screensaver',
         title: 'Matrix Terminal Screensaver',
         category: 'software',
         iconName: 'Terminal',
         defaultSize: { width: 1200, height: 800 }
+    },
+    'factory-sim': {
+        type: 'factory-sim',
+        title: 'Factory Digital Twin Simulation',
+        category: 'manufacturing',
+        iconName: 'Factory',
+        defaultSize: { width: 1300, height: 850 }
+    },
+    'project-sim': {
+        type: 'project-sim',
+        title: 'Manufacturing Lifecycle & Cost Simulator',
+        category: 'manufacturing',
+        iconName: 'DollarSign',
+        defaultSize: { width: 1200, height: 850 }
     }
 } as Record<string, ModuleDefinition>;
 
 export const MODULE_ALIASES: Record<string, string> = {
+    'factory': 'factory-sim',
+    'fabrika': 'factory-sim',
+    'factory-simulation': 'factory-sim',
+    'project-simulation': 'project-sim',
+    'project-simulator': 'project-sim',
+    'should-cost': 'project-sim',
+    'fasteners': 'bolt-torque',
+    'bolt': 'bolt-torque',
     'roller-chain-drive': 'chain-drive',
     'timing-belt-design': 'belt-drive',
     'v-belt-power': 'belt-drive',
@@ -641,7 +686,17 @@ export const MODULE_ALIASES: Record<string, string> = {
     'heat-transfer-conduction': 'thermal-expansion',
     'hooke-law': 'advanced-spring',
     'machine-assembly': 'design-studio',
-    'topology-optimization': 'fea',
+    'keyway': 'keyway-connection',
+    'kama': 'keyway-connection',
+    'kama-hesabi': 'keyway-connection',
+    'parallel-key': 'keyway-connection',
+    'shrink-fit': 'press-fit',
+    'interference-fit': 'press-fit',
+    'siki-gecme': 'press-fit',
+    'oring': 'o-ring',
+    'o-ring-gland': 'o-ring',
+    'o-ring-seal': 'o-ring',
+    'sizdirmazlik': 'o-ring',
 };
 
 calculatorsDB.forEach((calc: any) => {
@@ -673,13 +728,23 @@ calculatorsDB.forEach((calc: any) => {
 
 export const MODULE_REGISTRY = BASE_REGISTRY as Record<ModuleType | string, ModuleDefinition>;
 
+// Non-enumerable alias for legacy direct lookups (MODULE_REGISTRY['fasteners'])
+// without duplicating entries in Object.values(MODULE_REGISTRY) or Object.keys(MODULE_REGISTRY)
+Object.defineProperty(MODULE_REGISTRY, 'fasteners', {
+    get() {
+        return MODULE_REGISTRY['bolt-torque'];
+    },
+    enumerable: false,
+    configurable: true,
+});
+
 /**
  * SINGLE SOURCE OF TRUTH FOR CALCULATOR & MODULE COUNTS
- * Computed deterministically at build time from the unified registry.
+ * Bound directly to APP_MODULE_COUNT from src/config/app.ts.
  */
-export const TOTAL_MODULES = Object.keys(MODULE_REGISTRY).length;
-export const TOTAL_CALCULATORS_COUNT = TOTAL_MODULES;
-export const TOTAL_CALCULATORS_LABEL = `${Math.floor(TOTAL_MODULES / 10) * 10}+`;
+export const TOTAL_MODULES = APP_MODULE_COUNT;
+export const TOTAL_CALCULATORS_COUNT = APP_MODULE_COUNT;
+export const TOTAL_CALCULATORS_LABEL = 'Deterministic';
 
 export const getModuleIcon = (name: string) => {
     switch (name) {
@@ -740,6 +805,7 @@ export const getModuleIcon = (name: string) => {
         case 'ShieldCheck': return ShieldCheck;
         case 'Volume2': return Volume2;
         case 'Compass': return Compass;
+        case 'Workflow': return Workflow;
         default: return Circle;
     }
 };

@@ -38,8 +38,8 @@ export function UpgradeModal() {
           : { title: c.limitTitle, desc: c.limitDesc };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-3xl bg-[#0a0e1a] border border-cyan-500/30 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,229,255,0.15)] space-y-6 text-slate-200 font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg rounded-3xl bg-[var(--bg-1)] border border-cyan-500/30 p-6 sm:p-8 space-y-6 text-slate-200 font-sans">
         {/* Close Button */}
         <button
           type="button"
@@ -51,7 +51,7 @@ export function UpgradeModal() {
 
         {/* Top Header Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg ">
             <Sparkles size={22} />
           </div>
           <div>
@@ -100,7 +100,7 @@ export function UpgradeModal() {
           <Link
             href="/pricing"
             onClick={closeUpgradeModal}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs uppercase tracking-wider hover:from-cyan-400 hover:to-blue-500 transition-all shadow-[0_0_20px_rgba(0,229,255,0.3)]"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs uppercase tracking-wider hover:from-cyan-400 hover:to-blue-500 transition-all "
           >
             <span>{c.explorePro}</span>
             <ArrowRight size={14} />

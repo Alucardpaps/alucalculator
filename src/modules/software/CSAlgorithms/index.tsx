@@ -61,19 +61,19 @@ export default function CSAlgorithms() {
     };
 
     return (
-        <div className="flex w-full h-full bg-[#03060a] text-white overflow-hidden relative">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative">
             {/* Background Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(20,184,166,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(20,184,166,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
             {/* SIDEBAR */}
-            <div className="w-[320px] h-full bg-[#080b11]/90 backdrop-blur-2xl border-r border-white/5 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar">
-                <div className="p-8 border-b border-white/5 bg-gradient-to-b from-teal-500/10 to-transparent">
+            <div className="w-[320px] h-full bg-[var(--bg-0)]/90 border-r border-white/5 flex flex-col z-20 shadow-2xl overflow-y-auto custom-scrollbar">
+                <div className="p-8 border-b border-white/5 ">
                     <div className="flex items-center gap-4 mb-2">
-                        <div className="w-12 h-12 rounded-xl bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 shadow-[0_0_20px_rgba(20,184,166,0.2)]">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] ">
                             <Code size={24} />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase">Algo Engine</h1>
+                            <h1 className="text-xl font-black tracking-tighter uppercase">Algo Engine</h1>
                             <p className="text-[10px] text-teal-500/60 font-mono tracking-widest uppercase italic">Algorithmic Optimization</p>
                         </div>
                     </div>
@@ -90,7 +90,7 @@ export default function CSAlgorithms() {
                                 { id: 'data-structures', label: 'Graph / Tree', icon: Binary }
                             ].map((m) => (
                                 <button key={m.id} onClick={() => setMode(m.id as any)}
-                                    className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all ${mode === m.id ? 'bg-teal-500/15 border-teal-500/40 text-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.1)]' : 'bg-white/[0.02] border-white/5 text-slate-500 hover:text-white hover:bg-white/5'}`}>
+                                    className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all ${mode === m.id ? 'bg-teal-500/15 border-teal-500/40 text-teal-400 ' : 'bg-white/[0.02] border-white/5 text-slate-500 hover:text-white hover:bg-white/5'}`}>
                                     <m.icon size={16} />
                                     <span className="text-xs font-bold uppercase tracking-widest">{m.label}</span>
                                 </button>
@@ -105,7 +105,7 @@ export default function CSAlgorithms() {
                                 <div className="space-y-3">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-600">Algorithm</h3>
                                     <select value={algoType} onChange={(e) => setAlgoType(e.target.value as any)} 
-                                        className="w-full bg-[#0a0f18] border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-teal-500/50">
+                                        className="w-full bg-[var(--bg-1)] border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-teal-500/50">
                                         <option value="bubble">Bubble Sort (O[n²])</option>
                                         <option value="quick" disabled>Quick Sort (O[n log n])</option>
                                         <option value="merge" disabled>Merge Sort (O[n log n])</option>
@@ -117,7 +117,7 @@ export default function CSAlgorithms() {
                                         <span>Animation Speed</span>
                                         <span className="text-teal-400">{sortSpeed}%</span>
                                     </div>
-                                    <input type="range" min="1" max="100" value={sortSpeed} onChange={(e) => setSortSpeed(e.target.valueAsNumber)} className="w-full accent-teal-500" />
+                                    <input type="range" min="1" max="100" value={sortSpeed} onChange={(e) => setSortSpeed(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                                 </div>
 
                                 <div className="flex gap-2">
@@ -131,7 +131,7 @@ export default function CSAlgorithms() {
 
                 <div className="p-6 border-t border-white/5 bg-teal-500/[0.02]">
                     <div className="flex gap-4 items-center">
-                        <div className="w-10 h-10 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+                        <div className="w-10 h-10 rounded-lg bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)]">
                             <Shield size={18} />
                         </div>
                         <div>
@@ -150,10 +150,10 @@ export default function CSAlgorithms() {
                             <div className="mb-10 flex items-end justify-between">
                                 <div>
                                     <div className="text-[10px] font-black uppercase tracking-[0.3em] text-teal-500/60 mb-2 flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shadow-[0_0_10px_#14b8a6]" />
+                                        <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse " />
                                         Sorting Visualization — {algoType.toUpperCase()}
                                     </div>
-                                    <h2 className="text-4xl font-black italic tracking-tighter text-white">Complexity: O(n²)</h2>
+                                    <h2 className="text-4xl font-black tracking-tighter text-white">Complexity: O(n²)</h2>
                                 </div>
                                 <div className="flex gap-8 text-right">
                                     <div>
@@ -167,7 +167,7 @@ export default function CSAlgorithms() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 bg-black/40 border border-white/5 rounded-[2.5rem] p-12 flex items-end justify-between gap-1 relative overflow-hidden backdrop-blur-md shadow-2xl">
+                            <div className="flex-1 bg-black/40 border border-white/5 rounded-xl p-12 flex items-end justify-between gap-1 relative overflow-hidden shadow-2xl">
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(20,184,166,0.05)_0%,transparent_70%)]" />
                                 
                                 {array.map((val, idx) => (
@@ -199,7 +199,7 @@ export default function CSAlgorithms() {
                         <motion.div key="other" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex items-center justify-center">
                             <div className="text-center">
                                 <Cpu size={64} className="text-white/5 mx-auto mb-6" strokeWidth={1} />
-                                <h3 className="text-2xl font-black italic text-white/20 uppercase tracking-tighter">Module expansion...</h3>
+                                <h3 className="text-2xl font-black text-white/20 uppercase tracking-tighter">Module expansion...</h3>
                                 <p className="text-xs text-slate-700 font-bold uppercase tracking-widest mt-2">{mode.replace('-', ' ')} coming soon</p>
                             </div>
                         </motion.div>

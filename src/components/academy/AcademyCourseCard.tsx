@@ -30,7 +30,7 @@ export function AcademyCourseCard({ course, t, difficultyLabel, prereqTitle, vis
       <Link href={cardHref} className="block p-5 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-blue-500/10 group-hover:text-blue-400 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[var(--cyan-glow)] group-hover:text-[var(--cyan)] transition-colors">
               <BookOpen size={16} className="text-slate-500 group-hover:text-blue-400" />
             </div>
             <div className="min-w-0">

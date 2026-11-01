@@ -44,6 +44,16 @@ export interface Command {
     onKeyInput(key: string): void;
 
     /**
+     * Handle mouse down (for drag operations like fence trim)
+     */
+    onMouseDown?(point: Point): void;
+
+    /**
+     * Handle mouse up (end of drag operations)
+     */
+    onMouseUp?(point?: Point): void;
+
+    /**
      * Render preview entities (temporary visual feedback)
      */
     renderPreview(ctx: CanvasRenderingContext2D, viewportTransform: (p: Point) => Point): void;

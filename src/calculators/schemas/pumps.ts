@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Pump Calculator Schema
+ * AluCAD OS — Pump Calculator Schema
  * 
  * ENGINEERING DOMAIN: Mechanical / Fluid
  * STANDARDS: Hydraulic Institute Standards
@@ -20,7 +20,7 @@ export const pumpsSchema: CalculatorSchema = {
     metadata: {
         title: 'Centrifugal Pump Calculator',
         description: 'Calculate pump head, power, and NPSH for centrifugal pumps.',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-08',
         tags: ['pump', 'head', 'power', 'NPSH', 'flow', 'centrifugal']
     },

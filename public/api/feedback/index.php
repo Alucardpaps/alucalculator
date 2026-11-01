@@ -127,7 +127,7 @@ $diagnostics = ($consentDiagnostics && isset($body['diagnostics']) && is_array($
     ? $body['diagnostics']
     : null;
 
-$to = alu_env('FEEDBACK_TO', 'destek@alucalculator.com');
+$to = alu_env('FEEDBACK_TO', 'abdulsametyildirim95@gmail.com');
 $from = alu_env('FEEDBACK_FROM', 'AluCalc Feedback <noreply@alucalculator.com>');
 $resendKey = alu_env('RESEND_API_KEY');
 
@@ -215,7 +215,7 @@ if (!$sent) {
     http_response_code(502);
     echo json_encode([
         'success' => false,
-        'error' => 'E-posta iletilemedi. Lütfen doğrudan destek@alucalculator.com adresine yazın.',
+        'error' => 'E-posta iletilemedi. Lütfen doğrudan abdulsametyildirim95@gmail.com adresine yazın.',
     ]);
     exit;
 }

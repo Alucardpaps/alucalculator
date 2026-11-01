@@ -222,14 +222,14 @@ export function VoiceMemoModule({ ft: propFt }: { ft?: FieldToolsStrings }) {
                     {isRecording ? (
                         <button
                             onClick={stopRecording}
-                            className="w-14 h-14 rounded-full bg-red-500 text-black flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)] hover:bg-red-400 transition-all active:scale-95 cursor-pointer"
+                            className="w-14 h-14 rounded-full bg-red-500 text-black flex items-center justify-center hover:bg-red-400 transition-all active:scale-95 cursor-pointer"
                         >
                             <Square size={20} className="fill-black" />
                         </button>
                     ) : (
                         <button
                             onClick={startRecording}
-                            className="w-14 h-14 rounded-full bg-cyan-500 text-black flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:bg-cyan-400 transition-all active:scale-95 cursor-pointer"
+                            className="w-14 h-14 rounded-full bg-cyan-500 text-black flex items-center justify-center hover:bg-cyan-400 transition-all active:scale-95 cursor-pointer"
                         >
                             <Mic size={22} className="fill-black" />
                         </button>

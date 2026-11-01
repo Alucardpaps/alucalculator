@@ -1,7 +1,7 @@
 import { MaterialService } from '../materials/material-service';
 
 async function verify() {
-    console.log("--- AluCalc OS Expansion Verification ---");
+    console.log("--- AluCAD OS Expansion Verification ---");
     
     // 1. Material Loading Test
     console.log("1. Loading materials...");

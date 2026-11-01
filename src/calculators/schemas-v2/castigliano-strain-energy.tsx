@@ -9,7 +9,7 @@ export const castiglianoEnergySchema: CalculatorSchemaV2 = {
         description: 'Calculates strain energy and displacement using Castigliano\'s second theorem for standard structural elements.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['energy', 'strain', 'castigliano', 'deflection', 'bending', 'axial', 'machine elements'],
         verifiedStandards: ['General Solid Mechanics']
@@ -105,8 +105,8 @@ export const castiglianoEnergySchema: CalculatorSchemaV2 = {
             if (type === 0) {
                 // Cantilever
                 return (
-                    <div className="w-full h-full flex items-center justify-center p-4 bg-[#05080b]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg">
+                    <div className="w-full h-full flex items-center justify-center p-4 bg-[var(--bg-0)]">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg">
                             <defs>
                                 <marker id="arrow" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
                                     <polygon points="0 0, 6 2, 0 4" fill="#00e5ff" />
@@ -132,8 +132,8 @@ export const castiglianoEnergySchema: CalculatorSchemaV2 = {
             } else if (type === 1) {
                 // Simply Supported
                 return (
-                    <div className="w-full h-full flex items-center justify-center p-4 bg-[#05080b]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg">
+                    <div className="w-full h-full flex items-center justify-center p-4 bg-[var(--bg-0)]">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg">
                             <defs>
                                 <marker id="arrow" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
                                     <polygon points="0 0, 6 2, 0 4" fill="#00e5ff" />
@@ -159,8 +159,8 @@ export const castiglianoEnergySchema: CalculatorSchemaV2 = {
             } else {
                 // Axial
                 return (
-                    <div className="w-full h-full flex items-center justify-center p-4 bg-[#05080b]">
-                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[#0a0e14] border border-[#1a1f26] rounded-xl shadow-lg">
+                    <div className="w-full h-full flex items-center justify-center p-4 bg-[var(--bg-0)]">
+                        <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" className="bg-[var(--bg-1)] border border-[var(--line)] rounded-xl shadow-lg">
                             <defs>
                                 <marker id="arrow" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
                                     <polygon points="0 0, 6 2, 0 4" fill="#00e5ff" />

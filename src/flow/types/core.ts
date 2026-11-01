@@ -1,51 +1,110 @@
 /**
- * 🧠 AluCalculator OS - Flow Engine Types
- * 
- * Strict Type System for Engineering Nodes.
- * This file is part of the System Identity Lock.
+ * AluCalculator OS — Flow Engine Types
+ *
+ * Strict type system for engineering nodes.
+ * Layer: flow (no React, no DOM, no UI store).
  */
 
 export type EngineeringPortType =
-    // --- GEOMETRY ---
-    | 'dxf_file'           // Validated DXF content
-    | 'step_file'          // Validated STEP content
-    | 'svg_geometry'       // 2D preview data
-    | 'three_geometry'     // 3D preview data
+    // --- GEOMETRY / FILES ---
+    | 'dxf_file'
+    | 'pdf_file'
+    | 'step_file'
+    | 'svg_geometry'
+    | 'three_geometry'
+    | 'gear_geometry'
+    | 'stress_result'
+    | 'section_profile'
+    | 'moment_of_inertia_mm4'
+    | 'section_modulus_mm3'
+    | 'area_mm2'
+    | 'perimeter_mm'
+    | 'radius_of_gyration_mm'
+    | 'centroid_mm'
 
-    // --- MECHANICAL VALUES ---
-    | 'module_mm'          // Gear module
-    | 'tooth_count'        // Integer
-    | 'pressure_angle_deg' // Angle
-    | 'diameter_mm'        // General diameter
-    | 'length_mm'          // General length
-    | 'torque_nm'          // Torque
-    | 'force_n'            // Force
-    | 'stress_mpa'         // Stress
-    | 'power_kw'           // Power
-    | 'rpm'                // Rotational speed
-    | 'ratio'              // Unitless ratio
+    // --- MECHANICAL & PHYSICS VALUES ---
+    | 'module_mm'
+    | 'tooth_count'
+    | 'pressure_angle_deg'
+    | 'helix_angle_deg'
+    | 'diameter_mm'
+    | 'length_mm'
+    | 'torque_nm'
+    | 'force_n'
+    | 'stress_mpa'
+    | 'pressure_mpa'
+    | 'power_kw'
+    | 'rpm'
+    | 'ratio'
+    | 'life_hours'
+    | 'mass_kg'
+    | 'velocity_m_s'
+    | 'acceleration_m_s2'
+    | 'angular_velocity_rad_s'
+    | 'energy_joules'
+    | 'frequency_hz'
+    | 'damping_ratio'
+    | 'dynamic_viscosity_pa_s'
+    | 'heat_transfer_coeff_w_m2k'
+    | 'thermal_conductivity_w_mk'
+    | 'voltage_v'
+    | 'current_a'
+    | 'resistance_ohm'
+    | 'capacitance_f'
+    | 'inductance_h'
 
-    // --- MATERIAL ---
-    | 'material_id'        // ID from material DB
-    | 'density_g_cm3'      // Density
-    | 'yield_strength_mpa' // Sy
+    // --- MATERIAL & HEAT TREATMENT ---
+    | 'material_id'
+    | 'density_g_cm3'
+    | 'yield_strength_mpa'
+    | 'material_mpa'
+    | 'hardness_hrc'
+    | 'hardness_hbw'
+    | 'hardness_hv'
+    | 'elongation_pct'
+    | 'temperature_c'
+    | 'temperature_k'
+    | 'effective_case_depth_mm'
+
+    // --- CHEMISTRY ---
+    | 'molar_mass_g_mol'
+    | 'concentration_molar'
+    | 'ph_value'
+    | 'chemical_formula'
+    | 'reaction_enthalpy_kj_mol'
 
     // --- VALIDATION ---
-    | 'validation_report'  // Error/Warning list
-    | 'safety_factor'      // Resulting SF
+    | 'validation_report'
+    | 'safety_factor'
 
-    // --- GENERIC (RESTRICTED) ---
+    // --- UTILITY / MATH / VECTORS ---
+    | 'vector3'
+    | 'matrix3'
     | 'string'
     | 'number'
     | 'boolean'
-    | 'json';              // Only for config, not engineering flow
+    | 'json';
+
+export type NodeCategory =
+    | 'input'
+    | 'mechanical'
+    | 'geometry'
+    | 'physics'
+    | 'chemical'
+    | 'material'
+    | 'validation'
+    | 'export'
+    | 'visualizer'
+    | 'utility';
+
+export type NodeRunStatus = 'idle' | 'computed' | 'cached' | 'error' | 'blocked' | 'skipped';
 
 export interface PortDefinition {
     id: string;
     label: string;
     type: EngineeringPortType;
     required?: boolean;
-    defaultValue?: any;
+    defaultValue?: unknown;
 }
 
 export interface ValidationResult {
@@ -54,25 +113,57 @@ export interface ValidationResult {
     warnings: string[];
 }
 
+export interface NodeMetadata {
+    version: string;
+    deterministic: true | false;
+    isoStandard?: string;
+}
+
 /**
  * The Contract. All nodes must implement this.
  */
 export interface EngineeringNodeSchema<TInput = any, TOutput = any> {
-    id: string;                // Unique ID (e.g., 'mech-gear-spur')
-    version: string;           // Semantic Version (e.g., '1.0.0')
-    title: string;             // User facing title
-    description: string;       // User facing description
-    category: 'input' | 'mechanical' | 'validation' | 'export' | 'visualizer' | 'utility';
-    deterministic: boolean;       // MUST BE TRUE for pure nodes, FALSE for IO
-
-    // ISO Standard Reference (optional but recommended)
+    id: string;
+    version: string;
+    title: string;
+    description: string;
+    category: NodeCategory;
+    deterministic: boolean;
     isoStandard?: string;
+    heavy?: boolean;
 
-    // Port Definitions
     inputs: PortDefinition[];
     outputs: PortDefinition[];
 
-    // Strict Functions
     validate: (input: TInput) => ValidationResult;
     compute: (input: TInput) => TOutput;
 }
+
+/** Graph primitives — independent of React Flow. */
+export interface FlowGraphNode<T = any> {
+    id: string;
+    type?: string;
+    data?: T;
+}
+
+export interface FlowGraphEdge {
+    id: string;
+    source: string;
+    target: string;
+    sourceHandle?: string | null;
+    targetHandle?: string | null;
+}
+
+export const NODE_DATA_META_KEYS = new Set([
+    'schemaId',
+    'type',
+    'outputs',
+    'executionStatus',
+    'executionErrors',
+    'executionWarnings',
+    'executionTimeMs',
+    'nodeVersion',
+    'collapsed',
+    'cached',
+    'title',
+]);

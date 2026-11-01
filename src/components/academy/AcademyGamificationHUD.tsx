@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAcademyGamificationStore, getLeagueInfo } from '@/store/useAcademyGamificationStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import { getGamificationStrings } from '@/locales/gamificationTranslations';
 
 export function AcademyGamificationHUD() {
@@ -35,7 +36,6 @@ export function AcademyGamificationHUD() {
   } = useAcademyGamificationStore();
 
   const { language } = useI18nStore();
-  const isTr = language === 'tr';
   const tGame = getGamificationStrings(language);
 
   const [activeModal, setActiveModal] = useState<'shop' | 'streak' | 'hearts' | 'league' | null>(null);
@@ -43,7 +43,7 @@ export function AcademyGamificationHUD() {
 
   return (
     <>
-      <div className="w-full bg-[#0a0f16]/90 border-b border-white/5 backdrop-blur-md px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto no-scrollbar z-30 sticky top-0">
+      <div className="w-full bg-[var(--bg-1)]/90 border-b border-white/5 px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4 overflow-x-auto no-scrollbar z-30 sticky top-0">
         {/* Left: Streak & League Badge */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* 🔥 Streak Button */}
@@ -121,11 +121,11 @@ export function AcademyGamificationHUD() {
       {/* Modal Dialogs */}
       {activeModal && (
         <div 
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
           onClick={() => setActiveModal(null)}
         >
           <div 
-            className="w-full max-w-md rounded-2xl bg-[#0e141f] border border-white/10 p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150"
+            className="w-full max-w-md rounded-2xl bg-[var(--bg-2)] border border-white/10 p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -159,17 +159,15 @@ export function AcademyGamificationHUD() {
                 <div>
                   <p className="text-2xl font-black text-white">{tGame.streakDays(streak)}</p>
                   <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    {isTr 
-                      ? 'Her gün en az 1 interaktif ders çözerek serinizi canlı tutun ve mühendislik reflekslerinizi geliştirin.'
-                      : 'Complete at least 1 interactive lesson daily to keep your learning streak alive!'}
+                    {t12(language, 'Complete at least 1 interactive lesson daily to keep your learning streak alive!', 'Her gün en az 1 interaktif ders çözerek serinizi canlı tutun ve mühendislik reflekslerinizi geliştirin.')}
                   </p>
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-left text-xs">
                   <div className="flex items-center gap-2">
                     <ShieldAlert size={16} className="text-cyan-400" />
                     <div>
-                      <p className="font-bold text-white">{isTr ? 'Seri Dondurucu' : 'Streak Freeze'}</p>
-                      <p className="text-[10px] text-slate-400">{hasStreakFreeze ? (isTr ? 'Aktif - 1 Günlük Koruma' : 'Active - 1 Day Guard') : (isTr ? 'Alınmadı' : 'Not purchased')}</p>
+                      <p className="font-bold text-white">{t12(language, 'Streak Freeze', 'Seri Dondurucu')}</p>
+                      <p className="text-[10px] text-slate-400">{hasStreakFreeze ? (t12(language, 'Active - 1 Day Guard', 'Aktif - 1 Günlük Koruma')) : (t12(language, 'Not purchased', 'Alınmadı'))}</p>
                     </div>
                   </div>
                   {!hasStreakFreeze && (
@@ -198,9 +196,7 @@ export function AcademyGamificationHUD() {
                   ))}
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  {isTr 
-                    ? 'İnteraktif testlerde yapılan her hatalı cevap 1 can düşürür. Canlarınız bittiğinde pratik yaparak veya marketten yenileyebilirsiniz.'
-                    : 'Each wrong answer in tests consumes 1 heart. Keep practicing or use gems to refill!'}
+                  {t12(language, 'Each wrong answer in tests consumes 1 heart. Keep practicing or use gems to refill!', 'İnteraktif testlerde yapılan her hatalı cevap 1 can düşürür. Canlarınız bittiğinde pratik yaparak veya marketten yenileyebilirsiniz.')}
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -210,7 +206,7 @@ export function AcademyGamificationHUD() {
                     }}
                     className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5"
                   >
-                    <Sparkles size={14} /> {isTr ? 'Ücretsiz Doldur (Eğitim Modu)' : 'Free Refill (Training)'}
+                    <Sparkles size={14} /> {t12(language, 'Free Refill (Training)', 'Ücretsiz Doldur (Eğitim Modu)')}
                   </button>
                 </div>
               </div>
@@ -223,8 +219,8 @@ export function AcademyGamificationHUD() {
                   <div className="flex items-center gap-3">
                     <Heart className="text-rose-500 fill-rose-500" size={20} />
                     <div>
-                      <p className="text-xs font-bold text-white">{isTr ? 'Canları Yenile (5/5)' : 'Full Heart Refill'}</p>
-                      <p className="text-[10px] text-slate-400">{isTr ? 'Tüm canları anında fuller' : 'Instantly restores full health'}</p>
+                      <p className="text-xs font-bold text-white">{t12(language, 'Full Heart Refill', 'Canları Yenile (5/5)')}</p>
+                      <p className="text-[10px] text-slate-400">{t12(language, 'Instantly restores full health', 'Tüm canları anında fuller')}</p>
                     </div>
                   </div>
                   <button
@@ -240,8 +236,8 @@ export function AcademyGamificationHUD() {
                   <div className="flex items-center gap-3">
                     <ShieldAlert className="text-amber-400" size={20} />
                     <div>
-                      <p className="text-xs font-bold text-white">{isTr ? 'Seri Dondurucu (Streak Freeze)' : 'Streak Freeze Guard'}</p>
-                      <p className="text-[10px] text-slate-400">{isTr ? '1 gün kaçırsanız bile seriniz sıfırlanmaz' : 'Protects streak if you miss a day'}</p>
+                      <p className="text-xs font-bold text-white">{t12(language, 'Streak Freeze Guard', 'Seri Dondurucu (Streak Freeze)')}</p>
+                      <p className="text-[10px] text-slate-400">{t12(language, 'Protects streak if you miss a day', '1 gün kaçırsanız bile seriniz sıfırlanmaz')}</p>
                     </div>
                   </div>
                   <button
@@ -249,7 +245,7 @@ export function AcademyGamificationHUD() {
                     disabled={gems < 80 || hasStreakFreeze}
                     className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 text-xs font-bold text-white transition-all flex items-center gap-1"
                   >
-                    {hasStreakFreeze ? (isTr ? 'Sahipsin' : 'Owned') : <><Gem size={11} /> 80</>}
+                    {hasStreakFreeze ? (t12(language, 'Owned', 'Sahipsin')) : <><Gem size={11} /> 80</>}
                   </button>
                 </div>
               </div>
@@ -259,7 +255,7 @@ export function AcademyGamificationHUD() {
             {activeModal === 'league' && (
               <div className="space-y-4">
                 <div className="text-center">
-                  <p className="text-xs text-slate-400">{isTr ? 'Aktif Kademe:' : 'Current Tier:'}</p>
+                  <p className="text-xs text-slate-400">{t12(language, 'Current Tier:', 'Aktif Kademe:')}</p>
                   <p className="text-xl font-black text-blue-400 mt-0.5">{leagueInfo.current.label}</p>
                   <p className="text-xs font-mono text-cyan-300 mt-1">{xp} Toplam XP</p>
                 </div>

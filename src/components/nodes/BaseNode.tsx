@@ -17,16 +17,16 @@ const BaseNode = ({ id, data, children, selected }: { id: string, data: BaseNode
 
     return (
         <div className={`
-            min-w-[300px] bg-[#1e1e1e] rounded-lg shadow-xl border 
-            ${selected ? 'border-accent ring-1 ring-accent' : 'border-[#333]'}
+            min-w-[300px] bg-[var(--bg-3)] rounded-lg shadow-xl border 
+            ${selected ? 'border-accent ring-1 ring-accent' : 'border-[var(--line)]'}
             flex flex-col overflow-hidden transition-all duration-200
         `}>
             {/* HEADER - Mac/CAD Style */}
-            <div className="h-8 bg-[#2d2d30] flex items-center justify-between px-2 cursor-move draggable-handle select-none border-b border-[#333]">
+            <div className="h-8 bg-[var(--line-strong)] flex items-center justify-between px-2 cursor-move draggable-handle select-none border-b border-[var(--line)]">
                 <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57] hover:bg-[#ff5f57]/80 cursor-pointer" title="Close" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e] hover:bg-[#febc2e]/80 cursor-pointer" title="Minimize" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#28c840] hover:bg-[#28c840]/80 cursor-pointer" title="Expand" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--bad)] hover:bg-[var(--bad)]/80 cursor-pointer" title="Close" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--warn)] hover:bg-[var(--warn)]/80 cursor-pointer" title="Minimize" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[var(--ok)] hover:bg-[var(--ok)]/80 cursor-pointer" title="Expand" />
                 </div>
                 <div className="text-xs font-bold text-gray-300 tracking-wide uppercase">{data.title}</div>
                 <div className="text-gray-500 hover:text-white cursor-pointer">
@@ -36,7 +36,7 @@ const BaseNode = ({ id, data, children, selected }: { id: string, data: BaseNode
 
             {/* BODY */}
             {!data.isMinimized && (
-                <div className="p-3 bg-[#252526] text-gray-200 text-xs relative">
+                <div className="p-3 bg-[var(--bg-3)] text-gray-200 text-xs relative">
                     {children}
                 </div>
             )}
@@ -46,14 +46,14 @@ const BaseNode = ({ id, data, children, selected }: { id: string, data: BaseNode
             <Handle
                 type="target"
                 position={Position.Left}
-                className="w-3 h-3 bg-[#00e5ff] border-2 border-[#1e1e1e]"
+                className="w-3 h-3 bg-[var(--cyan)] border-2 border-[var(--line)]"
                 style={{ left: -6 }}
             />
             {/* Output Port (Right) */}
             <Handle
                 type="source"
                 position={Position.Right}
-                className="w-3 h-3 bg-[#00e5ff] border-2 border-[#1e1e1e]"
+                className="w-3 h-3 bg-[var(--cyan)] border-2 border-[var(--line)]"
                 style={{ right: -6 }}
             />
         </div>

@@ -30,55 +30,56 @@ export function CalculationReport({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mt-6 border border-slate-800 rounded-2xl bg-slate-900/60">
+    <div className="mt-6 border border-[var(--line)] rounded-2xl bg-[var(--bg-1)]">
       
       {/* Header */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left"
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--hover)] rounded-2xl"
+        aria-expanded={open}
       >
         <div>
-          <h3 className="text-sm font-semibold text-slate-200">
+          <h3 className="text-sm font-semibold text-[var(--ink)]">
             {title}
           </h3>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[var(--muted)] mt-1">
             Engineering calculation transparency report
           </p>
         </div>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-[var(--muted)]">
           {open ? 'Collapse' : 'Expand'}
         </span>
       </button>
 
       {/* Body */}
       {open && (
-        <div className="p-4 border-t border-slate-800 space-y-4">
+        <div className="p-4 border-t border-[var(--line)] space-y-4">
 
           {/* Formula */}
           <div>
-            <h4 className="text-xs font-bold text-slate-400 mb-2">
+            <h4 className="text-xs font-bold text-[var(--muted)] mb-2">
               Formula
             </h4>
-            <code className="text-sm text-blue-300 block bg-slate-950 p-3 rounded-lg">
+            <code className="text-sm text-[var(--cyan)] block bg-[var(--bg-0)] p-3 rounded-lg">
               {formula}
             </code>
           </div>
 
           {/* Variables */}
           <div>
-            <h4 className="text-xs font-bold text-slate-400 mb-2">
+            <h4 className="text-xs font-bold text-[var(--muted)] mb-2">
               Variables
             </h4>
             <div className="space-y-2">
               {variables.map((v, i) => (
                 <div
                   key={i}
-                  className="flex justify-between text-xs bg-slate-950 p-2 rounded-lg"
+                  className="flex justify-between text-xs bg-[var(--bg-0)] p-2 rounded-lg"
                 >
-                  <span className="text-slate-300">
+                  <span className="text-[var(--ink)]">
                     {v.name} {v.unit && `(${v.unit})`}
                   </span>
-                  <span className="text-slate-400">
+                  <span className="text-[var(--muted)] font-mono tabular-nums">
                     {v.value}
                   </span>
                 </div>
@@ -89,10 +90,10 @@ export function CalculationReport({
           {/* Standards */}
           {standards.length > 0 && (
             <div>
-              <h4 className="text-xs font-bold text-slate-400 mb-2">
+              <h4 className="text-xs font-bold text-[var(--muted)] mb-2">
                 Engineering Standards
               </h4>
-              <ul className="text-xs text-slate-400 list-disc ml-4">
+              <ul className="text-xs text-[var(--muted)] list-disc ml-4">
                 {standards.map((s, i) => (
                   <li key={i}>{s}</li>
                 ))}
@@ -101,11 +102,11 @@ export function CalculationReport({
           )}
 
           {/* Result */}
-          <div className="pt-3 border-t border-slate-800">
-            <h4 className="text-xs font-bold text-slate-400 mb-1">
+          <div className="pt-3 border-t border-[var(--line)]">
+            <h4 className="text-xs font-bold text-[var(--muted)] mb-1">
               Result
             </h4>
-            <div className="text-lg font-bold text-green-400">
+            <div className="text-lg font-bold text-[var(--ok)] font-mono tabular-nums">
               {result}
             </div>
           </div>

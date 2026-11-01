@@ -79,7 +79,7 @@ export const DependencyGraph = ({ calculations, onSelectNode }: DependencyGraphP
                         <div className="absolute -top-16 w-full flex justify-center h-16 pointer-events-none">
                             {node.dependencies.map((dep, dIdx) => (
                                 <div key={dIdx} className="absolute inset-0">
-                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 border border-blue-500/30 rounded-md text-[7px] font-mono font-bold text-blue-400 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 shadow-2xl backdrop-blur-sm">
+                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 border border-blue-500/30 rounded-md text-[7px] font-mono font-bold text-blue-400 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 shadow-2xl">
                                         $REF::DATA_TRANSIT[{dep.id}]
                                     </div>
                                     <svg className="absolute inset-0 w-full h-full overflow-visible">
@@ -114,11 +114,11 @@ export const DependencyGraph = ({ calculations, onSelectNode }: DependencyGraphP
                         <div 
                             onClick={() => onSelectNode ? onSelectNode(node.raw) : router.push(`/${node.type}?id=${node.id}`)}
                             className={`
-                                w-72 p-6 rounded-[2rem] border-2 transition-all duration-500 cursor-pointer
+                                w-72 p-6 rounded-xl border-2 transition-all duration-500 cursor-pointer
                                 transform hover:-translate-y-2 active:scale-95 relative overflow-hidden
                                 ${node.status === 'verified' 
-                                    ? 'bg-[#0f172a] border-slate-800/80 hover:border-blue-500/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(59,130,246,0.1)]' 
-                                    : 'bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40 shadow-xl shadow-amber-900/5'}
+                                    ? 'bg-[var(--bg-2)] border-slate-800/80 hover:border-blue-500/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_20px_rgba(59,130,246,0.1)]' 
+                                    : 'bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40 shadow-xl '}
                             `}
                         >
                             {/* Glow Effect */}

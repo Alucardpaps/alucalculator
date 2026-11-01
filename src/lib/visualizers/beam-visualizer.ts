@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Parametric Beam Visualizer
+ * AluCAD OS — Parametric Beam Visualizer
  * 
  * Generates SVG representation of beams with deflection curves.
  * Supports various loading conditions and boundary types.

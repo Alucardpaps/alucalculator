@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Command Dock (Taskbar)
+ * AluCAD OS — Command Dock (Taskbar)
  * 
  * PREMIUM DOCK UX
  * - Shows active window modules
@@ -49,12 +49,12 @@ export function Taskbar() {
 
     return (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center w-auto pointer-events-none group/dock">
-            <div className="bg-[#0b121d]/70 backdrop-blur-3xl border border-white/10 rounded-[24px] px-4 py-2.5 flex items-center gap-4 shadow-[0_32px_64px_rgba(0,0,0,0.8)] pointer-events-auto ring-1 ring-white/10 transition-all duration-500 hover:translate-y-[-4px]">
+            <div className="bg-[var(--bg-1)]/70 border border-white/10 rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-[0_32px_64px_rgba(0,0,0,0.8)] pointer-events-auto ring-1 ring-white/10 transition-all duration-500 hover:translate-y-[-4px]">
                 
                 {/* System Status */}
                 <div className="px-4 border-r border-white/5 flex items-center gap-2.5">
                     <div className="relative">
-                        <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_12px_rgba(0,229,255,0.8)]" />
+                        <div className="w-2 h-2 rounded-full bg-cyan-500 " />
                         <div className="absolute inset-0 w-2 h-2 rounded-full bg-cyan-400 animate-ping opacity-40" />
                     </div>
                     <div className="flex flex-col">
@@ -81,7 +81,7 @@ export function Taskbar() {
                                     className={`
                                         group relative flex items-center gap-3 px-4 py-2.5 rounded-2xl transition-all duration-300 whitespace-nowrap
                                         ${isActive 
-                                            ? 'bg-cyan-500/20 border border-cyan-500/30 text-white shadow-[0_0_30px_rgba(0,229,255,0.15)]' 
+                                            ? 'bg-cyan-500/20 border border-cyan-500/30 text-white ' 
                                             : 'bg-white/5 border border-transparent text-gray-500 hover:bg-white/10 hover:text-gray-300'
                                         }
                                     `}
@@ -104,7 +104,7 @@ export function Taskbar() {
                     </AnimatePresence>
 
                     {windows.length === 0 && (
-                        <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest px-6 italic opacity-50">
+                        <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest px-6 opacity-50">
                             Engineering Workspace Empty
                         </div>
                     )}
@@ -114,7 +114,7 @@ export function Taskbar() {
                 <div className="flex items-center gap-2 border-l border-white/5 pl-4 ml-2">
                     <button 
                         onClick={() => useOSStore.getState().openWindow('engineering-selection')}
-                        className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl text-cyan-400 hover:bg-cyan-500 hover:text-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all"
+                        className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all"
                         title="Open Database"
                     >
                         <Database size={16} />

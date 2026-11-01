@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-10-02T17:53:57.808Z",
+  "totalBenchmarks": 14,
+  "allPassed": false,
+  "benchmarks": [
+    {
+      "name": "VDI 2230 Preload FM",
+      "standard": "VDI 2230 / ISO 898-1",
+      "calculated": "35.4060",
+      "reference": "35.4060",
+      "unit": "kN",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "VDI 2230 Torque MA",
+      "standard": "VDI 2230 Blatt 1",
+      "calculated": "81.2237",
+      "reference": "83.1099",
+      "unit": "N·m",
+      "percentErr": "2.269%",
+      "verdict": "FAIL"
+    },
+    {
+      "name": "ISO 281 L10h Life",
+      "standard": "ISO 281:2007",
+      "calculated": "109.3500",
+      "reference": "109.3500",
+      "unit": "hours",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "ISO 76 Static Safety S0",
+      "standard": "ISO 76",
+      "calculated": "1.3100",
+      "reference": "1.3100",
+      "unit": "[-]",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "ISO 6336 Gear Center Distance a",
+      "standard": "ISO 6336 / DIN 3960",
+      "calculated": "120.0000",
+      "reference": "120.0000",
+      "unit": "mm",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "ISO 6336 Gear Ratio u",
+      "standard": "ISO 6336",
+      "calculated": "3.0000",
+      "reference": "3.0000",
+      "unit": "[-]",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "DIN 7190 Interface Pressure p",
+      "standard": "DIN 7190-1",
+      "calculated": "77.1750",
+      "reference": "77.1750",
+      "unit": "MPa",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "ASME VIII UG-27 Base Shell Thickness t",
+      "standard": "ASME BPVC VIII Div 1",
+      "calculated": "24.2131",
+      "reference": "24.2131",
+      "unit": "mm",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Euler Cantilever Deflection v",
+      "standard": "Euler-Bernoulli",
+      "calculated": "3.0476",
+      "reference": "3.0476",
+      "unit": "mm",
+      "percentErr": "0.001%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Euler Cantilever Bending Stress",
+      "standard": "Euler-Bernoulli",
+      "calculated": "48.0000",
+      "reference": "48.0000",
+      "unit": "MPa",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Euler Critical Buckling Load Pcr",
+      "standard": "Euler Buckling",
+      "calculated": "170.6678",
+      "reference": "170.6678",
+      "unit": "kN",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "ISO 286-1 Tolerance Unit i",
+      "standard": "ISO 286-1",
+      "calculated": "1.7078",
+      "reference": "1.7078",
+      "unit": "μm",
+      "percentErr": "0.001%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "DIN 6935 Bend Allowance BA",
+      "standard": "DIN 6935",
+      "calculated": "5.9690",
+      "reference": "5.9690",
+      "unit": "mm",
+      "percentErr": "0.000%",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Darcy-Weisbach Colebrook f",
+      "standard": "Colebrook-White",
+      "calculated": "0.0185",
+      "reference": "0.0185",
+      "unit": "[-]",
+      "percentErr": "0.075%",
+      "verdict": "PASS"
+    }
+  ]
+}

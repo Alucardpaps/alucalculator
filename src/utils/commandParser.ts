@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Command Parser
+ * AluCAD OS — Command Parser
  * Parses terminal input and dispatches to CalculationEngine
  * 
  * Supported commands:
@@ -361,7 +361,7 @@ export function getCommandHelp(): CommandResult {
         type: 'info',
         output: [
             '╔══════════════════════════════════════════════╗',
-            '║        AluCalc OS — Terminal v1.0            ║',
+            '║        AluCAD OS — Terminal v1.0            ║',
             '╚══════════════════════════════════════════════╝',
             '',
             '  CALCULATION:',

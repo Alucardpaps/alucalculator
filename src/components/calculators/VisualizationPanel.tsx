@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AluCalc OS — Visualization Panel
+ * AluCAD OS — Visualization Panel
  * 
  * Renders SVG visualizations for calculator outputs.
  * Supports zoom, pan, and export controls.
@@ -31,10 +31,10 @@ export interface VisualizationPanelProps {
 
 const styles = {
     container: `
-        flex flex-col bg-[#0a0e14] border border-[#2a3a4a] rounded-lg overflow-hidden
+        flex flex-col bg-[var(--bg-1)] border border-[var(--line-strong)] rounded-lg overflow-hidden
     `,
     header: `
-        flex items-center justify-between px-3 py-2 bg-[#1a2332] border-b border-[#2a3a4a]
+        flex items-center justify-between px-3 py-2 bg-[var(--bg-3)] border-b border-[var(--line-strong)]
     `,
     title: `
         text-xs font-bold text-gray-400 uppercase tracking-wider
@@ -47,7 +47,7 @@ const styles = {
         transition-colors cursor-pointer
     `,
     btnActive: `
-        !bg-[#00e5ff]/20 !text-[#00e5ff]
+        !bg-[var(--cyan)]/20 !text-[var(--cyan)]
     `,
     viewport: `
         flex-1 relative overflow-hidden cursor-grab active:cursor-grabbing
@@ -56,7 +56,7 @@ const styles = {
         absolute inset-0 flex items-center justify-center
     `,
     zoomInfo: `
-        absolute bottom-2 right-2 px-2 py-1 bg-[#0f1419]/90 
+        absolute bottom-2 right-2 px-2 py-1 bg-[var(--bg-1)]/90 
         rounded text-xs text-gray-500 tabular-nums
     `,
 };
@@ -206,7 +206,7 @@ export const VisualizationPanel: React.FC<VisualizationPanelProps> = ({
                     >
                         <RefreshCw size={14} />
                     </button>
-                    <div className="w-px h-4 bg-[#2a3a4a] mx-1" />
+                    <div className="w-px h-4 bg-[var(--line-strong)] mx-1" />
                     <button
                         className={styles.btn}
                         onClick={handleExportSVG}

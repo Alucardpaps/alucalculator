@@ -20,12 +20,14 @@
 import React, { useState, useMemo } from 'react';
 import {
   X, Copy, Check, Download, AlertTriangle, ShieldCheck,
-  Disc, Grid3X3, ArrowRight, Sparkles, Sliders, Zap
+  Disc, Grid3X3, ArrowRight, Sparkles, Sliders, Zap,
+  GripHorizontal, RotateCcw
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useDesignStore } from './designStore';
 import { ISO_METRIC_HOLES, type HoleItem } from './holeStandards';
 import { getPcdModalStrings } from '@/locales/designStudioTranslations';
+import { useDraggableDialog } from './useDraggableDialog';
 
 interface BoltCirclePcdModalProps {
   isOpen: boolean;
@@ -35,7 +37,6 @@ interface BoltCirclePcdModalProps {
 
 export function BoltCirclePcdModal({ isOpen, onClose, onApplyHoles }: BoltCirclePcdModalProps) {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
   const tPcd = getPcdModalStrings(language);
 
   // Pattern Mode: 'pcd' (Bolt Circle), 'grid' (Tezgah Matrisi), 'linear' (Doğrusal Sıra)
@@ -176,7 +177,7 @@ export function BoltCirclePcdModal({ isOpen, onClose, onApplyHoles }: BoltCircle
   const generateGcode = () => {
     const lines = [
       '%',
-      'O1001 (ALUCALC OS - BOLT CIRCLE PCD CYCLE)',
+      'O1001 (ALUCAD OS - BOLT CIRCLE PCD CYCLE)',
       'G21 G90 G40 G80 G49',
       'T01 M06 (DRILL DIA ' + effectiveDiameter + 'MM)',
       'S1500 M03',
@@ -236,34 +237,76 @@ export function BoltCirclePcdModal({ isOpen, onClose, onApplyHoles }: BoltCircle
     onClose();
   };
 
+  const { position, resetPosition, isDragging, elementRef, dragHandleProps } = useDraggableDialog({
+    initialPosition: () => {
+      if (typeof window === 'undefined') return { x: 300, y: 50 };
+      const isDesktop = window.innerWidth >= 768;
+      const modalWidth = Math.min(512, window.innerWidth - 32);
+      return {
+        x: isDesktop ? Math.max(16, (window.innerWidth - modalWidth) / 2) : 16,
+        y: 40,
+      };
+    },
+  });
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-3xl bg-[#090d16] border border-amber-500/30 p-5 sm:p-6 shadow-[0_0_50px_rgba(245,158,11,0.15)] flex flex-col max-h-[92vh] overflow-y-auto custom-scrollbar font-mono text-xs text-slate-200">
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/60 select-none"
+        onClick={onClose}
+      />
+
+      <div
+        ref={elementRef}
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        }}
+        className={`fixed z-50 w-full max-w-lg rounded-3xl bg-[var(--bg-1)] border border-amber-500/30 p-5 sm:p-6 flex flex-col max-h-[92vh] overflow-y-auto custom-scrollbar font-mono text-xs text-slate-200 select-none transition-shadow ${
+          isDragging ? 'ring-2 ring-amber-400 shadow-[0_25px_70px_rgba(245,158,11,0.4)]' : ''
+        }`}
+      >
         {/* ─── MODAL HEADER (Matching Image 2) ─── */}
-        <div className="flex items-start justify-between border-b border-white/10 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+        <div
+          {...dragHandleProps}
+          onDoubleClick={resetPosition}
+          title={tPcd.title + ' (Sürükleyip Taşı · Sıfırlamak İçin Çift Tıkla)'}
+          className="group flex items-start justify-between border-b border-white/10 pb-4 cursor-grab active:cursor-grabbing hover:bg-white/5 -mx-2 -mt-2 p-2 rounded-t-2xl transition-colors"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] shadow-inner shrink-0">
               <Disc size={20} className="animate-spin-slow" />
             </div>
-            <div>
-              <h2 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                <span>{tPcd.title}</span>
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-black text-white flex items-center gap-2 truncate">
+                <span className="truncate">{tPcd.title}</span>
               </h2>
-              <p className="text-[10px] text-amber-400/80 font-mono">
-                {tPcd.subtitle}
+              <p className="text-[10px] text-amber-400/80 font-mono flex items-center gap-1">
+                <GripHorizontal size={11} className="text-amber-500/60 group-hover:text-amber-400 shrink-0" />
+                <span className="truncate">{tPcd.subtitle}</span>
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={resetPosition}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-white/10 transition-colors"
+              title="Konumu Sıfırla"
+            >
+              <RotateCcw size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* ─── PATTERN TYPE SELECTOR ─── */}
@@ -339,7 +382,7 @@ export function BoltCirclePcdModal({ isOpen, onClose, onApplyHoles }: BoltCircle
                     onClick={() => setFitType(fit.id)}
                     className={`flex-1 py-1.5 rounded-lg font-bold text-[10px] transition-all ${
                       fitType === fit.id
-                        ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
+                        ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md font-black'
                         : 'bg-black/60 text-slate-400 border border-white/10 hover:text-white'
                     }`}
                   >
@@ -612,14 +655,14 @@ export function BoltCirclePcdModal({ isOpen, onClose, onApplyHoles }: BoltCircle
           <button
             type="button"
             onClick={handleApplyToPart}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black uppercase tracking-wider hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg "
           >
             <Zap size={16} />
             <span>⚡ {tPcd.applyHoles}</span>
           </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

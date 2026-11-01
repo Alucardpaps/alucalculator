@@ -37,9 +37,9 @@ export function ValidationPanel() {
     };
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#080c10]">
+        <div className="w-full h-full flex flex-col bg-[var(--bg-1)]">
             {/* Header */}
-            <div className="h-8 bg-[#0f1419] border-b border-[#1e2833] flex items-center px-4 justify-between">
+            <div className="h-8 bg-[var(--bg-1)] border-b border-[var(--line)] flex items-center px-4 justify-between">
                 <div className="flex items-center gap-2">
                     <Activity size={14} className="text-cyan-500" />
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Constraint Inspector</span>
@@ -63,10 +63,10 @@ export function ValidationPanel() {
             <div className="flex-1 flex overflow-hidden">
 
                 {/* 1. Constraints List */}
-                <div className="flex-1 overflow-y-auto border-r border-[#1e2833]">
+                <div className="flex-1 overflow-y-auto border-r border-[var(--line)]">
                     <table className="w-full text-left border-collapse">
-                        <thead className="sticky top-0 bg-[#0a0e14] z-10">
-                            <tr className="text-[9px] text-gray-500 uppercase border-b border-[#1e2833]">
+                        <thead className="sticky top-0 bg-[var(--bg-1)] z-10">
+                            <tr className="text-[9px] text-gray-500 uppercase border-b border-[var(--line)]">
                                 <th className="py-2 pl-4 font-bold">Type</th>
                                 <th className="py-2 font-bold">Entities</th>
                                 <th className="py-2 font-bold text-center">Value</th>
@@ -82,7 +82,7 @@ export function ValidationPanel() {
                                 </tr>
                             ) : (
                                 constraints.map(c => (
-                                    <tr key={c.id} className="border-b border-[#1e2833]/30 hover:bg-white/[0.02] transition-colors group">
+                                    <tr key={c.id} className="border-b border-[var(--line)]/30 hover:bg-white/[0.02] transition-colors group">
                                         <td className="py-2 pl-4">
                                             <span className="px-1.5 py-0.5 bg-cyan-500/10 border border-cyan-500/20 rounded-sm text-cyan-400 text-[9px] uppercase font-bold">
                                                 {c.type}
@@ -95,7 +95,7 @@ export function ValidationPanel() {
                                             {c.value !== undefined ? (
                                                 <input
                                                     type="number"
-                                                    className="w-16 bg-black/40 border border-[#1e2833] rounded px-1 py-0.5 text-center focus:border-cyan-500 focus:outline-none"
+                                                    className="w-16 bg-black/40 border border-[var(--line)] rounded px-1 py-0.5 text-center focus:border-cyan-500 focus:outline-none"
                                                     defaultValue={c.value}
                                                     onBlur={(e) => {
                                                         const newVal = parseFloat(e.target.value);
@@ -122,8 +122,8 @@ export function ValidationPanel() {
                 </div>
 
                 {/* 2. Solver Panel */}
-                <div className="w-56 bg-[#0a0e14]/50 flex flex-col">
-                    <div className="p-4 border-b border-[#1e2833]">
+                <div className="w-56 bg-[var(--bg-1)]/50 flex flex-col">
+                    <div className="p-4 border-b border-[var(--line)]">
                         <h3 className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-2 mb-4">
                             <Settings2 size={12} />
                             Solver Engine

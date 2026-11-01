@@ -9,12 +9,14 @@ import type { MobileStrings } from '@/locales/mobileTranslations';
 import { getLitePage, type LiteCategoryKey } from '@/locales/liteTranslations';
 import type { Language } from '@/store/i18nStore';
 import { SkeletonGrid } from '@/mobile/components/SkeletonLoader';
+import { HIDDEN_LITE_TYPES } from '@/config/retiredModules';
 
 const CATEGORIES: LiteCategoryKey[] = [
   'mechanical', 'manufacturing', 'civil', 'electrical', 'finance', 'science', 'software', 'other',
 ];
 
 const EXCLUDED = new Set([
+  ...HIDDEN_LITE_TYPES,
   'settings', 'terminal', 'browser', 'media-player', 'image-viewer', 'pdf-viewer',
   'spreadsheet-viewer', 'file-explorer', 'project-vault', 'project-variables', 'ai-copilot',
 ]);

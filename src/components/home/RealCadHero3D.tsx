@@ -99,25 +99,25 @@ export function RealCadHero3D() {
   const [isWireframe, setIsWireframe] = useState(false);
 
   return (
-    <div className="relative w-full h-[360px] sm:h-[400px] rounded-2xl bg-gradient-to-b from-[#060a14] to-[#020408] border border-white/10 overflow-hidden shadow-2xl flex flex-col justify-between group">
+    <div className="relative w-full h-[360px] sm:h-[400px] rounded-[var(--radius-m)] bg-[var(--bg-0)] border border-[var(--line)] overflow-hidden shadow-2xl flex flex-col justify-between group">
       
       {/* Top Controls Overlay */}
-      <div className="relative z-10 flex items-center justify-between p-4 bg-black/20 backdrop-blur-xs">
+      <div className="relative z-10 flex items-center justify-between p-3 bg-[var(--bg-1)]/95 border-b border-[var(--line)]">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-mono text-xs font-semibold text-slate-300">
+          <span className="h-2 w-2 rounded-full bg-[var(--cyan)] animate-pulse" />
+          <span className="font-mono text-xs font-semibold text-[var(--ink)]">
             40x40_Extrusion_Profile.step
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-white/5 rounded-lg p-0.5 border border-white/10">
+        <div className="flex items-center gap-1.5 bg-[var(--bg-2)] rounded-[var(--radius-s)] p-0.5 border border-[var(--line)]">
           <button
             type="button"
             onClick={() => setIsWireframe(false)}
-            className={`px-2.5 py-1 rounded text-xs font-mono transition cursor-pointer ${
+            className={`px-2.5 py-1 rounded-[var(--radius-s)] text-xs font-mono transition cursor-pointer ${
               !isWireframe
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--cyan)] text-slate-950 font-bold shadow-sm'
+                : 'text-[var(--muted)] hover:text-white'
             }`}
           >
             Shaded Solid
@@ -125,10 +125,10 @@ export function RealCadHero3D() {
           <button
             type="button"
             onClick={() => setIsWireframe(true)}
-            className={`px-2.5 py-1 rounded text-xs font-mono transition cursor-pointer ${
+            className={`px-2.5 py-1 rounded-[var(--radius-s)] text-xs font-mono transition cursor-pointer ${
               isWireframe
-                ? 'bg-cyan-500 text-slate-950 font-bold shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[var(--cyan)] text-slate-950 font-bold shadow-sm'
+                : 'text-[var(--muted)] hover:text-white'
             }`}
           >
             Wireframe Mesh
@@ -174,19 +174,22 @@ export function RealCadHero3D() {
       </div>
 
       {/* Bottom Specs Footer */}
-      <div className="relative z-10 p-3 bg-black/40 backdrop-blur-md border-t border-white/5 flex items-center justify-between text-xs font-mono text-slate-400">
-        <div className="flex items-center gap-4">
+      <div className="relative z-10 p-2.5 bg-[var(--bg-1)]/95 border-t border-[var(--line)] flex items-center justify-between text-xs font-mono text-[var(--muted)]">
+        <div className="flex items-center gap-3 sm:gap-4">
           <span>
-            Alaşım: <strong className="text-white">EN AW-6063-T6</strong>
+            Alloy: <strong className="text-[var(--ink)]">EN AW-6063-T6</strong>
           </span>
           <span className="hidden sm:inline">
-            Ağırlık: <strong className="text-cyan-400">1.75 kg/m</strong>
+            Linear Mass: <strong className="text-[var(--cyan)]">1.75 kg/m</strong>
           </span>
           <span className="hidden sm:inline">
-            Norm: <strong className="text-slate-300">DIN EN 12020-2</strong>
+            Standard: <strong className="text-[var(--alu)]">DIN EN 12020-2</strong>
           </span>
         </div>
-        <span className="text-[11px] text-cyan-300 font-medium">3D Fareyle Çevrilebilir ⟳</span>
+        <span className="text-[11px] text-[var(--cyan)] font-medium flex items-center gap-1">
+          <span className="animate-spin text-xs">⟳</span>
+          <span className="hidden xs:inline">Interactive 3D Orbit</span>
+        </span>
       </div>
     </div>
   );

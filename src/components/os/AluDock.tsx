@@ -19,13 +19,15 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOSStore } from '@/store/osStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 import {
     Calculator, Settings, Layers, Grid3X3, Pencil, Layout,
     Scissors, Wrench, BookOpen, Atom, Zap, Receipt,
     MessageSquare, Folder, Palette, Globe, Cpu, CircleDot,
     MousePointer2, Play, BarChart3, Waves,
     LucideIcon, LayoutGrid, Activity, Terminal, Database, Thermometer,
-    FileText, PowerOff, Gamepad2, Hammer, Scan, Shield
+    FileText, PowerOff, Gamepad2, Hammer, Scan, Shield,
+    Factory, DollarSign, Box
 } from 'lucide-react';
 import { NeonIcon } from '@/components/ui/NeonIcon';
 
@@ -44,8 +46,8 @@ interface DockItem {
 }
 
 interface AluDockProps {
-    currentMode: 'cad' | 'cam' | 'desk' | 'fea';
-    onSwitchMode: (mode: 'cad' | 'cam' | 'desk' | 'fea') => void;
+    currentMode: 'cad' | 'cam' | 'desk' | 'fea' | 'factory';
+    onSwitchMode: (mode: 'cad' | 'cam' | 'desk' | 'fea' | 'factory') => void;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -96,9 +98,9 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             isRunning: windows.some(w => w.type === 'welding')
         },
         {
-            id: 'fasteners', label: t.modules.fasteners.title, icon: Wrench,
-            action: () => openWindow('fasteners'), color: '#ef4444',
-            isRunning: windows.some(w => w.type === 'fasteners')
+            id: 'bolt-torque', label: t.modules.fasteners?.title || 'Bolt Torque', icon: Wrench,
+            action: () => openWindow('bolt-torque'), color: '#ef4444',
+            isRunning: windows.some(w => w.type === 'bolt-torque' || w.type === 'fasteners')
         },
         {
             id: 'bearings', label: t.modules.bearings.title, icon: CircleDot,
@@ -107,14 +109,9 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
         },
 
         {
-            id: 'materials', label: t.modules['materials-db'].title, icon: Atom,
-            action: () => openWindow('materials-db'), color: '#ec4899',
-            isRunning: windows.some(w => w.type === 'materials-db')
-        },
-        {
-            id: 'materials-explorer', label: 'AI Materials Intelligence', icon: Scan,
-            action: () => openWindow('materials-explorer'), color: '#00e5ff',
-            isRunning: windows.some(w => w.type === 'materials-explorer')
+            id: 'handbook', label: t.modules['handbook']?.title || 'Handbook & Materials', icon: BookOpen,
+            action: () => openWindow('handbook'), color: '#38bdf8',
+            isRunning: windows.some(w => w.type === 'handbook')
         },
         {
             id: 'cutting', label: t.modules['cutting-optimizer'].title, icon: Scissors,
@@ -129,7 +126,17 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
     ];
 
     const workspaceItems = [
-        { id: 'cad', label: t.viewCad, icon: MousePointer2, action: () => onSwitchMode('cad'), color: '#3b82f6', isActiveMode: currentMode === 'cad' },
+        { id: 'cad', label: t.viewCad || '3D/2D CAD', icon: Box, action: () => onSwitchMode('cad'), color: '#00e5ff', isActiveMode: currentMode === 'cad' },
+        { id: 'fea', label: t.viewFea || 'FEA Simulation', icon: Activity, action: () => onSwitchMode('fea'), color: '#f59e0b', isActiveMode: currentMode === 'fea' },
+        { id: 'factory', label: t12(language, 'Factory Digital Twin', 'Fabrika Simülasyonu'), icon: Factory, action: () => onSwitchMode('factory'), color: '#10b981', isActiveMode: currentMode === 'factory' },
+        {
+            id: 'project-sim',
+            label: t12(language, 'Project Simulator', 'Proje Simülatörü'),
+            icon: DollarSign,
+            action: () => openWindow('project-sim'),
+            color: '#38bdf8',
+            isRunning: windows.some(w => w.type === 'project-sim')
+        },
         {
             id: 'engineering-selection',
             label: t.modules?.['engineering-selection']?.title || 'Engineering Database',
@@ -138,13 +145,12 @@ export function AluDock({ currentMode, onSwitchMode }: AluDockProps) {
             color: '#f59e0b',
             isRunning: windows.some(w => w.type === 'engineering-selection')
         },
-        { id: 'fea', label: t.viewFea, icon: Activity, action: () => onSwitchMode('fea'), color: '#f59e0b', isActiveMode: currentMode === 'fea' },
         {
             id: 'physics-solver', label: 'Physics CAS Solver', icon: Activity,
             action: () => openWindow('physics-solver'), color: '#22c55e',
             isRunning: windows.some(w => w.type === 'physics-solver')
         },
-        { id: 'desk', label: t.viewDesk, icon: Terminal, action: () => onSwitchMode('desk'), color: '#a855f7', isActiveMode: currentMode === 'desk' },
+        { id: 'desk', label: t.viewDesk || 'Engineering Desk', icon: Terminal, action: () => onSwitchMode('desk'), color: '#a855f7', isActiveMode: currentMode === 'desk' },
     ];
 
     const systemItems: DockItem[] = [

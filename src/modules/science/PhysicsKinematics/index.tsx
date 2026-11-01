@@ -134,16 +134,16 @@ export default function PhysicsKinematics() {
     };
 
     return (
-        <div className="flex w-full h-full bg-[#03060a] text-white overflow-hidden relative">
+        <div className="flex w-full h-full bg-[var(--bg-0)] text-white overflow-hidden relative">
             {/* LEFT SIDEBAR: Parameters & Config */}
-            <div className="w-[300px] bg-[#080b11] border-r border-white/5 flex flex-col z-20 shadow-2xl relative">
-                <div className="p-6 border-b border-white/5 bg-gradient-to-b from-blue-500/5 to-transparent">
+            <div className="w-[300px] bg-[var(--bg-0)] border-r border-white/5 flex flex-col z-20 shadow-2xl relative">
+                <div className="p-6 border-b border-white/5 ">
                     <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                        <div className="w-10 h-10 bg-[var(--cyan-glow)] rounded-xl flex items-center justify-center border border-[var(--cyan)]/40">
                             <Rocket className="text-blue-400" size={22} />
                         </div>
                         <div>
-                            <h1 className="text-sm font-black tracking-widest uppercase italic">{t.title}</h1>
+                            <h1 className="text-sm font-black tracking-widest uppercase">{t.title}</h1>
                             <div className="text-[10px] text-blue-500/50 font-mono tracking-widest leading-none">{t.subtitle}</div>
                         </div>
                     </div>
@@ -155,7 +155,7 @@ export default function PhysicsKinematics() {
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Zap size={10}/> {t.initialVelocity}</span>
                                 <span className="text-[10px] font-mono text-blue-400">{v0} m/s</span>
                             </div>
-                            <input type="range" min="1" max="150" value={v0} onChange={(e) => setV0(e.target.valueAsNumber)} className="w-full accent-blue-500" />
+                            <input type="range" min="1" max="150" value={v0} onChange={(e) => setV0(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                         </div>
 
                         <div className="space-y-2">
@@ -163,7 +163,7 @@ export default function PhysicsKinematics() {
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><ArrowUpRight size={10}/> {t.launchAngle}</span>
                                 <span className="text-[10px] font-mono text-blue-400">{angle}°</span>
                             </div>
-                            <input type="range" min="1" max="89" value={angle} onChange={(e) => setAngle(e.target.valueAsNumber)} className="w-full accent-blue-500" />
+                            <input type="range" min="1" max="89" value={angle} onChange={(e) => setAngle(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                         </div>
 
                         <div className="space-y-2">
@@ -171,7 +171,7 @@ export default function PhysicsKinematics() {
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Box size={10}/> {t.gravity}</span>
                                 <span className="text-[10px] font-mono text-blue-400">{g} m/s²</span>
                             </div>
-                            <input type="range" min="1" max="25" step="0.1" value={g} onChange={(e) => setG(e.target.valueAsNumber)} className="w-full accent-blue-500" />
+                            <input type="range" min="1" max="25" step="0.1" value={g} onChange={(e) => setG(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                         </div>
 
                         <div className="space-y-2">
@@ -179,7 +179,7 @@ export default function PhysicsKinematics() {
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Compass size={10}/> {t.airDrag}</span>
                                 <span className="text-[10px] font-mono text-blue-400">{k}</span>
                             </div>
-                            <input type="range" min="0" max="0.1" step="0.001" value={k} onChange={(e) => setK(e.target.valueAsNumber)} className="w-full accent-blue-500" />
+                            <input type="range" min="0" max="0.1" step="0.001" value={k} onChange={(e) => setK(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                         </div>
 
                         <div className="space-y-2">
@@ -187,7 +187,7 @@ export default function PhysicsKinematics() {
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><Activity size={10}/> {t.projectileMass}</span>
                                 <span className="text-[10px] font-mono text-blue-400">{mass.toFixed(1)} kg</span>
                             </div>
-                            <input type="range" min="0.1" max="10.0" step="0.1" value={mass} onChange={(e) => setMass(e.target.valueAsNumber)} className="w-full accent-blue-500" />
+                            <input type="range" min="0.1" max="10.0" step="0.1" value={mass} onChange={(e) => setMass(e.target.valueAsNumber)} className="w-full accent-[var(--cyan)]" />
                         </div>
                     </div>
                 </div>
@@ -225,7 +225,7 @@ export default function PhysicsKinematics() {
                     <button 
                         onClick={handleCompute}
                         disabled={isSimulating}
-                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black tracking-[0.2em] uppercase rounded-xl shadow-lg shadow-blue-900/40 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black tracking-[0.2em] uppercase rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                     >
                         {isSimulating ? <RotateCcw size={14} className="animate-spin" /> : <Play size={14} fill="currentColor" />} 
                         {isSimulating ? t.computing : t.computeTrajectory}
@@ -239,7 +239,7 @@ export default function PhysicsKinematics() {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#03060a_100%)]" />
 
-                <div className="h-16 border-b border-white/5 bg-[#080b11]/80 backdrop-blur-xl px-8 flex items-center justify-between z-20">
+                <div className="h-16 border-b border-white/5 bg-[var(--bg-0)]/80 px-8 flex items-center justify-between z-20">
                     <div className="flex items-center gap-6">
                         {['Trajectory', 'Forces', 'Kinetic Energy'].map((tab) => (
                             <button
@@ -267,9 +267,9 @@ export default function PhysicsKinematics() {
                 <div className="flex-1 p-12 relative flex items-center justify-center overflow-hidden z-10">
                     {/* Simulated Path Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center p-20">                          
-                        <div className="w-full h-full max-w-4xl max-h-[600px] border-l-2 border-b-2 border-slate-700/50 relative bg-black/20 rounded-tr-3xl backdrop-blur-sm">
+                        <div className="w-full h-full max-w-4xl max-h-[600px] border-l-2 border-b-2 border-slate-700/50 relative bg-black/20 rounded-tr-3xl">
                               {/* Playback Controls Overlay */}
-                              <div className="absolute top-4 left-4 bg-black/80 border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-4 z-30 backdrop-blur-md">
+                              <div className="absolute top-4 left-4 bg-black/80 border border-white/10 px-4 py-2.5 rounded-2xl flex items-center gap-4 z-30">
                                   <button onClick={() => setIsPlaying(!isPlaying)} className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors">
                                       {isPlaying ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
                                   </button>
@@ -287,7 +287,7 @@ export default function PhysicsKinematics() {
                                       step="0.01" 
                                       value={simTime} 
                                       onChange={(e) => { setSimTime(parseFloat(e.target.value)); setIsPlaying(false); }} 
-                                      className="w-24 accent-blue-500 cursor-pointer" 
+                                      className="w-24 accent-[var(--cyan)] cursor-pointer" 
                                   />
                                   <select 
                                       value={playSpeed} 
@@ -303,7 +303,7 @@ export default function PhysicsKinematics() {
 
                               {/* Kinetic Energy conservation dashboard */}
                               {activeTab === 'Kinetic Energy' && (
-                                  <div className="absolute top-4 right-4 bg-black/80 border border-white/10 p-4 rounded-2xl flex flex-col gap-2.5 z-30 backdrop-blur-md w-56">
+                                  <div className="absolute top-4 right-4 bg-black/80 border border-white/10 p-4 rounded-2xl flex flex-col gap-2.5 z-30 w-56">
                                       <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 pb-1">{t.energyBalance}</div>
                                       
                                       <div className="space-y-1">
@@ -349,7 +349,7 @@ export default function PhysicsKinematics() {
                               )}
 
                               {/* Arc Simulation */}
-                              <svg viewBox="0 -50 850 600" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 w-full h-full overflow-visible drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                              <svg viewBox="0 -50 850 600" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 w-full h-full overflow-visible drop-">
                                   <motion.path 
                                      key={svgPath}
                                      d={svgPath} 
@@ -369,7 +369,7 @@ export default function PhysicsKinematics() {
                                       const px = (currentPoint.x / maxX) * 800;
                                       const py = 500 - (currentPoint.y / maxY) * 500;
                                       return (
-                                          <circle cx={px} cy={py} r="8" fill="#60a5fa" className="drop-shadow-[0_0_8px_#3b82f6] animate-pulse" />
+                                          <circle cx={px} cy={py} r="8" fill="#60a5fa" className="drop- animate-pulse" />
                                       );
                                   })()}
 
@@ -491,14 +491,14 @@ export default function PhysicsKinematics() {
                         <motion.div 
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="px-8 py-6 bg-[#080b11]/80 border border-blue-500/20 rounded-[32px] backdrop-blur-2xl flex flex-row items-center gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-b-blue-500/40"
+                            className="px-8 py-6 bg-[var(--bg-0)]/80 border border-blue-500/20 rounded-xl flex flex-row items-center gap-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-b-blue-500/40"
                         >
                             <div className="flex gap-4 items-center">
-                                <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/30">
+                                <div className="w-14 h-14 bg-[var(--cyan-glow)] rounded-2xl flex items-center justify-center border border-[var(--cyan)]/40">
                                     <Target size={24} className="text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-black text-white italic tracking-widest uppercase">{t.targetVector}</h2>
+                                    <h2 className="text-sm font-black text-white tracking-widest uppercase">{t.targetVector}</h2>
                                     <p className="text-slate-400 text-[10px] leading-tight">{t.dragAdjusted}</p>
                                 </div>
                             </div>
@@ -507,19 +507,19 @@ export default function PhysicsKinematics() {
                             
                             <div className="flex gap-8">
                                 <div className="flex flex-col items-start justify-center">
-                                    <div className="text-[20px] font-black text-white italic group-hover:text-blue-400 transition-colors">
+                                    <div className="text-[20px] font-black text-white group-hover:text-blue-400 transition-colors">
                                         {(result?.timeOfFlight || 0).toFixed(2)}<span className="text-slate-500 text-sm ml-1">s</span>
                                     </div>
                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{t.timeOfFlight}</span>
                                 </div>
                                 <div className="flex flex-col items-start justify-center">
-                                    <div className="text-[20px] font-black text-white italic">
+                                    <div className="text-[20px] font-black text-white">
                                         {(result?.range || 0).toFixed(1)}<span className="text-slate-500 text-sm ml-1">m</span>
                                     </div>
                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{t.displacement}</span>
                                 </div>
                                 <div className="flex flex-col items-start justify-center">
-                                    <div className="text-[20px] font-black text-blue-400 italic">
+                                    <div className="text-[20px] font-black text-blue-400">
                                         {(result?.maxHeight || 0).toFixed(1)}<span className="text-blue-500/50 text-sm ml-1">m</span>
                                     </div>
                                     <span className="text-[9px] font-bold text-blue-500/50 uppercase tracking-widest">{t.maxAltitude}</span>
@@ -530,7 +530,7 @@ export default function PhysicsKinematics() {
                 </div>
 
                 {/* BOTTOM METRICS BAR */}
-                <div className="h-24 border-t border-white/5 bg-[#080b11]/80 backdrop-blur-xl px-8 flex items-center justify-around z-20">
+                <div className="h-24 border-t border-white/5 bg-[var(--bg-0)]/80 px-8 flex items-center justify-around z-20">
                     {[
                         { label: t.initialVelocity, value: `${v0.toFixed(1)} m/s`, icon: Gauge },
                         { label: t.launchAngle, value: `${angle.toFixed(1)}°`, icon: ArrowUpRight },
@@ -541,7 +541,7 @@ export default function PhysicsKinematics() {
                             <div className="flex items-center gap-2 text-slate-500 uppercase tracking-widest text-[9px] font-bold italic">
                                 <m.icon size={10} /> {m.label}
                             </div>
-                            <div className={`text-sm font-black italic tracking-tight ${i === 2 ? 'text-blue-400' : 'text-white'}`}>{m.value}</div>
+                            <div className={`text-sm font-black tracking-tight ${i === 2 ? 'text-blue-400' : 'text-white'}`}>{m.value}</div>
                         </div>
                     ))}
                 </div>

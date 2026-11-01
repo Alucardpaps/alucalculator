@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * AluCalc OS — Professional Field Engineering Suite (24+ Field Tools)
+ * AluCAD OS — Professional Field Engineering Suite (34 Field Tools)
  * Route: /field
  * 
  * High-performance mobile & desktop field toolkit for engineers and technicians.
- * Integrates all 24 hardware & empirical field modules, offline storage,
+ * Integrates all 34 hardware & empirical field modules, offline storage,
  * live device sensors (Gyro, Accel, Magnetometer, GPS, Audio, Torch),
  * search, category filtering, favorites, and PWA Quick Widget launcher.
  */
@@ -58,9 +58,15 @@ import {
   AlertTriangle,
   AlertOctagon,
   Zap,
+  Gauge,
+  Anchor,
+  Thermometer,
+  Disc,
+  Wrench,
   X
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 export const METRIC_HOLE_STANDARDS = [
   { name: 'M1', dia: 1.2, close: 1.1, tap: 0.75, pitch: 0.25 },
@@ -117,7 +123,11 @@ import { QRScannerModal } from '@/components/os/mobile/QRScannerModal';
 import { TapChartModal } from '@/components/os/mobile/TapChartModal';
 import { HardnessConverterModal } from '@/components/os/mobile/HardnessConverterModal';
 import { VoiceMemoModule } from '@/components/os/mobile/VoiceMemoModule';
-import { AppDownloadModal } from '@/components/modals/AppDownloadModal';
+import { BoltTorqueScreeningModal } from '@/components/os/mobile/BoltTorqueScreeningModal';
+import { ORingCaliperModal } from '@/components/os/mobile/ORingCaliperModal';
+import { FieldWorkOrderModal } from '@/components/os/mobile/FieldWorkOrderModal';
+import { FieldShopPanels } from '@/components/os/mobile/FieldShopPanels';
+import { FieldHomeScreenWidget } from '@/components/os/mobile/FieldHomeScreenWidget';
 
 type FieldCategory = 'all' | 'measure' | 'sensors' | 'reference' | 'notes' | 'favorites';
 
@@ -135,18 +145,6 @@ interface FieldToolItem {
 }
 
 const FIELD_TOOLS: FieldToolItem[] = [
-  {
-    id: 'android-apk',
-    nameEn: 'Android APK & Wear OS',
-    nameTr: 'Android APK & Saat İndir',
-    descEn: 'Official signed APK downloads for Android & Wear OS watch',
-    descTr: 'Telefon, tablet ve akıllı saat için resmi imzalı APK indirme',
-    category: 'sensors',
-    icon: Download,
-    color: '#38bdf8',
-    badge: 'APK v5.0',
-    keywords: ['apk', 'android', 'wear os', 'saat', 'mobil', 'download', 'indir'],
-  },
   {
     id: 'spirit-level',
     nameEn: 'Spirit Level',
@@ -253,15 +251,16 @@ const FIELD_TOOLS: FieldToolItem[] = [
     keywords: ['camera', 'kamera', 'gps stamp', 'fotograf', 'photo', 'inspection'],
   },
   {
-    id: 'color-sampler',
-    nameEn: 'Color Sampler / RAL',
-    nameTr: 'Renk & RAL Örnekleyici',
-    descEn: 'Live camera RGB, HEX & RAL color picker',
-    descTr: 'Kamera üzerinden anlık renk, HEX ve RAL ton tespiti',
+    id: 'thread-identifier',
+    nameEn: 'Thread identifier (ISO 261)',
+    nameTr: 'Diş tanımlama (ISO 261)',
+    descEn: 'Measured major Ø → nearest metric coarse + tap drill',
+    descTr: 'Ölçülen dış çap → en yakın metrik kaba diş ve kılavuz matkap',
     category: 'measure',
-    icon: Pipette,
-    color: '#ec4899',
-    keywords: ['color', 'renk', 'ral', 'hex', 'rgb', 'sampler', 'eyedropper'],
+    icon: Wrench,
+    color: '#22d3ee',
+    badge: 'ISO 261',
+    keywords: ['thread', 'dis', 'metric', 'm8', 'tap', 'kilavuz', 'pitch'],
   },
   {
     id: 'qr-barcode',
@@ -286,40 +285,52 @@ const FIELD_TOOLS: FieldToolItem[] = [
     keywords: ['compass', 'pusula', 'magnetic', 'manyetik', 'heading', 'yon'],
   },
   {
-    id: 'ambient-light',
-    nameEn: 'Ambient Light (Lux)',
-    nameTr: 'Işık Şiddeti (Lux)',
-    descEn: 'Illuminance lux estimation for workstation safety',
-    descTr: 'Çalışma alanı aydınlatma güvenlik seviyesi (Lux)',
-    category: 'sensors',
-    icon: Sun,
-    color: '#eab308',
-    badge: 'LUX',
-    keywords: ['light', 'isik', 'lux', 'lumen', 'ambient', 'aydinlatma'],
+    id: 'fastener-grade',
+    nameEn: 'ISO 898-1 property class',
+    nameTr: 'ISO 898-1 mukavemet sınıfı',
+    descEn: 'Head mark 4.8–12.9 → Rm / Re lookup on the shop floor',
+    descTr: 'Baş damgası 4.8–12.9 → Rm / Re saha tablosu',
+    category: 'reference',
+    icon: ShieldCheck,
+    color: '#f59e0b',
+    badge: 'ISO 898',
+    keywords: ['898', '8.8', '10.9', 'grade', 'mukavemet', 'civata', 'class'],
   },
   {
-    id: 'sensor-hub',
-    nameEn: 'Unified Sensor Hub',
-    nameTr: 'Merkezi Sensör Paneli',
-    descEn: 'Orientation, motion, GPS & battery status in one HUD',
-    descTr: 'Tüm donanım sensörlerinin tek ekranda canlı takibi',
-    category: 'sensors',
-    icon: Radio,
-    color: '#6366f1',
-    badge: 'ALL-IN-1',
-    keywords: ['sensor', 'hub', 'telemetry', 'battery', 'panel', 'all sensors'],
+    id: 'ra-comparator',
+    nameEn: 'Surface roughness Ra',
+    nameTr: 'Yüzey pürüzlülüğü Ra',
+    descEn: 'ISO 1302 N-grades vs typical machining process',
+    descTr: 'ISO 1302 N sınıfı ve talaşlı imalat karşılıkları',
+    category: 'reference',
+    icon: Layers,
+    color: '#94a3b8',
+    badge: 'ISO 1302',
+    keywords: ['ra', 'roughness', 'puruzluluk', 'n7', 'surface', 'finish'],
   },
   {
-    id: 'device-torch',
-    nameEn: 'Device Flashlight',
-    nameTr: 'Muayene Feneri (LED)',
-    descEn: 'Hardware camera LED torch with strobe mode',
-    descTr: 'Donanım kamera LED feneri ve flaş modu',
+    id: 'keyway-iso',
+    nameEn: 'Parallel key ISO 773',
+    nameTr: 'Kama ISO 773',
+    descEn: 'Shaft diameter → key b×h (DIN 6885 / ISO 773)',
+    descTr: 'Mil çapı → kama b×h (DIN 6885 / ISO 773)',
+    category: 'reference',
+    icon: Split,
+    color: '#818cf8',
+    badge: 'ISO 773',
+    keywords: ['key', 'kama', 'keyway', 'shaft', 'mil', '6885', '773'],
+  },
+  {
+    id: 'tachometer-rpm',
+    nameEn: 'RPM / sync speed',
+    nameTr: 'Devir / senkron hız',
+    descEn: 'Hz→rpm and 50 Hz induction motor ns from pole count',
+    descTr: 'Hz→rpm ve 50 Hz asenkron motor kutup senkron hızı',
     category: 'sensors',
-    icon: Flashlight,
-    color: '#eab308',
-    badge: 'TORCH',
-    keywords: ['torch', 'fener', 'flashlight', 'led', 'isik'],
+    icon: Gauge,
+    color: '#38bdf8',
+    badge: 'n = 120f/p',
+    keywords: ['rpm', 'devir', 'hz', 'motor', 'poles', 'kutup', 'tachometer'],
   },
   {
     id: 'stopwatch',
@@ -391,11 +402,59 @@ const FIELD_TOOLS: FieldToolItem[] = [
     keywords: ['cnc', 'feeds', 'speeds', 'devir', 'rpm', 'ilerleme', 'kesme hizi'],
   },
   {
+    id: 'cylinder-force',
+    nameEn: 'Hydraulic & Pneumatic Cylinder',
+    nameTr: 'Hidrolik & Pnömatik Piston',
+    descEn: 'Push/pull force, bore/rod sizing & flow rate (L/min)',
+    descTr: 'Piston itme/çekme kuvveti (kN/kgf), debi ve hız hesabı',
+    category: 'reference',
+    icon: Gauge,
+    color: '#0284c7',
+    badge: 'ISO 6020',
+    keywords: ['cylinder', 'piston', 'hidrolik', 'pnomatik', 'hydraulic', 'pneumatic', 'force', 'kuvvet', 'debi'],
+  },
+  {
+    id: 'thermal-expansion',
+    nameEn: 'Thermal Expansion & Gap',
+    nameTr: 'Termal Genleşme & Boşluk',
+    descEn: 'Linear ΔL mm expansion & minimum slotted hole clearance',
+    descTr: 'Sıcaklık farkı genleşme payı (ΔL) ve montaj boşluğu hesabı',
+    category: 'reference',
+    icon: Thermometer,
+    color: '#f97316',
+    badge: 'ΔL = L·α·ΔT',
+    keywords: ['thermal', 'expansion', 'genlesme', 'sicaklik', 'bosluk', 'temperature', 'gap'],
+  },
+  {
+    id: 'rigging-sling',
+    nameEn: 'Crane Rigging & Sling Angle',
+    nameTr: 'Sapan Açısı & Vinç Emniyeti',
+    descEn: 'Sling tension per leg, load angle factor & OSHA safety',
+    descTr: 'Sapan kolu başına çekme gerilmesi ve açı emniyet faktörü',
+    category: 'reference',
+    icon: Anchor,
+    color: '#10b981',
+    badge: 'OSHA / EN 1492',
+    keywords: ['rigging', 'sling', 'crane', 'vinc', 'sapan', 'kaldirma', 'yuk', 'tension'],
+  },
+  {
+    id: 'v-belt-calc',
+    nameEn: 'V-Belt & Pulley Center',
+    nameTr: 'V-Kayış & Kasnak Eksen Mesafesi',
+    descEn: 'Pitch length, center distance & wrap angle per DIN 2215',
+    descTr: 'V-kayış hatve boyu, kasnak eksen mesafesi ve sarım açısı',
+    category: 'reference',
+    icon: Disc,
+    color: '#a855f7',
+    badge: 'DIN 2215',
+    keywords: ['belt', 'pulley', 'kayis', 'kasnak', 'v-belt', 'center distance', 'hatve'],
+  },
+  {
     id: 'sheet-bending',
-    nameEn: 'Sheet Metal Bending',
+    nameEn: 'Sheet Metal Bending (DIN 6935)',
     nameTr: 'Sac Büküm & Açınım (DIN 6935)',
-    descEn: 'DIN 6935 K-factor, bend deduction & press tonnage',
-    descTr: 'K-faktörü, büküm payı açınım boyu ve abkant pres tonajı',
+    descEn: 'DIN 6935 K-factor, bend deduction, setback & flat pattern',
+    descTr: 'K-faktörü, büküm payı açınım boyu ve sac boyutu hesabı',
     category: 'reference',
     icon: Split,
     color: '#ec4899',
@@ -450,6 +509,54 @@ const FIELD_TOOLS: FieldToolItem[] = [
     badge: 'AUDIO',
     keywords: ['notes', 'voice', 'sesli not', 'kayit', 'memo', 'field notes'],
   },
+  {
+    id: 'bolt-torque-screening',
+    nameEn: 'Bolt Tightening Screening & Checklist',
+    nameTr: 'Cıvata Sıkma Torku Saha Kontrolü',
+    descEn: 'Fast ISO 898-1 torque lookup (4.8 to 12.9) with shop floor checklist',
+    descTr: 'ISO 898-1 hızlı tork taraması (4.8 - 12.9) ve montaj kontrol listesi',
+    category: 'reference',
+    icon: Wrench,
+    color: '#f59e0b',
+    badge: 'ISO 898',
+    keywords: ['torque', 'tork', 'civata', 'bolt', 'vdi 2230', 'iso 898', 'tightening'],
+  },
+  {
+    id: 'oring-caliper-matcher',
+    nameEn: 'O-Ring Caliper & Gland Matcher',
+    nameTr: 'O-Ring Kumpas & Yuva Eşleştirici',
+    descEn: 'Measure cord & ID with calipers to match standard ISO 3601 gland',
+    descTr: 'Kumpasla kord ve iç çap ölçüp standart ISO 3601 yuva boyutunu bulun',
+    category: 'measure',
+    icon: CircleDot,
+    color: '#2dd4bf',
+    badge: 'ISO 3601',
+    keywords: ['o-ring', 'oring', 'kumpas', 'caliper', 'gland', 'yuva', 'sizdirmazlik'],
+  },
+  {
+    id: 'field-work-order-share',
+    nameEn: 'Field Work Order & Engineering Note',
+    nameTr: 'Saha İş Emri & Mühendislik Raporu',
+    descEn: 'One-tap standardized ASCII report export, WhatsApp & email share',
+    descTr: 'Tek tuşla standart mühendislik raporu, WhatsApp ve e-posta paylaşımı',
+    category: 'notes',
+    icon: FileText,
+    color: '#10b981',
+    badge: 'EXPORT',
+    keywords: ['report', 'rapor', 'is emri', 'work order', 'whatsapp', 'share', 'paylas'],
+  },
+  {
+    id: 'vernier-caliper',
+    nameEn: 'Vernier Caliper & Feeler Gauge',
+    nameTr: 'Sanal Kumpas & Sentil Çakısı',
+    descEn: '0.05 mm vernier scale simulation and feeler blade thickness reference',
+    descTr: '0.05 mm hassasiyetli verniyer kumpas ve sentil çakısı referansı',
+    category: 'measure',
+    icon: Ruler,
+    color: '#00e5ff',
+    badge: '0.05 mm',
+    keywords: ['caliper', 'kumpas', 'vernier', 'feeler', 'sentil', 'olcum', 'micrometer'],
+  },
 ];
 
 export const PIPE_DATA: Record<string, { name: string; od: number; nps: string; sch10: number; sch40: number; sch80: number; sch160: number; pn16_pcd: number; pn16_holes: number; pn16_bolt: string }> = {
@@ -471,7 +578,6 @@ export const PIPE_DATA: Record<string, { name: string; od: number; nps: string; 
 
 export default function FieldToolsSuitePage() {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -531,6 +637,37 @@ export default function FieldToolsSuitePage() {
   const [vdCosPhi, setVdCosPhi] = useState(0.95);
 
   // 6. Stopwatch State
+  // 7. Hydraulic / Pneumatic Cylinder
+  const [cylType, setCylType] = useState<'hydraulic' | 'pneumatic'>('hydraulic');
+  const [cylBore, setCylBore] = useState(63); // mm
+  const [cylRod, setCylRod] = useState(36); // mm
+  const [cylPressure, setCylPressure] = useState(160); // bar
+  const [cylSpeed, setCylSpeed] = useState(0.15); // m/s
+
+  // 8. Thermal Expansion
+  const [teLength, setTeLength] = useState(6000); // mm
+  const [teMaterial, setTeMaterial] = useState<'al' | 'steel' | 'ss304' | 'copper' | 'brass' | 'pvc'>('al');
+  const [teT1, setTeT1] = useState(-10); // C
+  const [teT2, setTeT2] = useState(50); // C
+
+  // 9. Rigging & Sling
+  const [slingWeight, setSlingWeight] = useState(3000); // kg
+  const [slingLegs, setSlingLegs] = useState<2 | 3 | 4>(2);
+  const [slingAngle, setSlingAngle] = useState(60); // deg
+
+  // 10. V-Belt & Pulley
+  const [beltD1, setBeltD1] = useState(100); // mm
+  const [beltD2, setBeltD2] = useState(250); // mm
+  const [beltCenter, setBeltCenter] = useState(450); // mm
+
+  // 11. Sheet Metal Bending
+  const [sbThickness, setSbThickness] = useState(2.0); // mm
+  const [sbRadius, setSbRadius] = useState(2.0); // mm
+  const [sbAngle, setSbAngle] = useState(90); // deg
+  const [sbKFactor, setSbKFactor] = useState(0.40);
+  const [sbLeg1, setSbLeg1] = useState(50); // mm
+  const [sbLeg2, setSbLeg2] = useState(75); // mm
+
   const [stopwatchTime, setStopwatchTime] = useState(0);
   const [stopwatchRunning, setStopwatchRunning] = useState(false);
   const [laps, setLaps] = useState<number[]>([]);
@@ -572,6 +709,13 @@ export default function FieldToolsSuitePage() {
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Support ?modal=widget-modal or similar URL parameter
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const m = params.get('modal');
+      if (m) setActiveModal(m);
+    } catch {}
 
     // Orientation & Motion Listeners
     const handleOrientation = (e: DeviceOrientationEvent) => {
@@ -649,7 +793,7 @@ export default function FieldToolsSuitePage() {
           setTorchActive(true);
         } else {
           track.stop();
-          alert(tr ? 'Cihaz donanım fenerini desteklemiyor.' : 'Hardware torch not supported.');
+          alert(t12(language, 'Hardware torch not supported.', 'Cihaz donanım fenerini desteklemiyor.'));
         }
       } else {
         if (torchStreamRef.current) {
@@ -659,7 +803,7 @@ export default function FieldToolsSuitePage() {
         setTorchActive(false);
       }
     } catch {
-      alert(tr ? 'Kamera feneri açılamadı.' : 'Could not activate torch.');
+      alert(t12(language, 'Could not activate torch.', 'Kamera feneri açılamadı.'));
     }
   };
 
@@ -797,47 +941,80 @@ export default function FieldToolsSuitePage() {
   }, [searchQuery, activeCategory, favorites]);
 
   return (
-    <div className="w-full min-h-[calc(100vh-3.5rem)] pb-24 px-3 py-4 sm:px-6 max-w-4xl mx-auto space-y-4 select-none">
-      {/* ─── TOP FIELD BRAND & STATUS TELEMETRY ─── */}
-      <div className="rounded-2xl border border-white/10 bg-[#070b14]/90 p-4 backdrop-blur-xl shadow-xl space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-500/40 text-cyan-400 shadow-md">
-              <Smartphone size={18} />
+    <div className="w-full min-h-[calc(100vh-3.5rem)] pb-24 px-3 py-4 sm:px-6 max-w-4xl mx-auto space-y-4">
+      <div className="rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--cyan)]">AluCalc Field</div>
+            <h1 className="text-base sm:text-lg font-semibold font-tech text-[var(--ink)]">
+              {t12(language, 'Shop-floor engineering tools', 'Atölye & saha mühendislik araçları')}
+            </h1>
+            <p className="text-[11px] text-[var(--alu-dim)] mt-0.5">
+              {t12(language, 'Gyro, ISO charts and tap-drill lookups — built for a phone in a glove.', 'Jiroskop, ISO tabloları ve kılavuz çapları — eldivenle telefonda.')}
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-[var(--alu)]">
+            <Wifi size={12} className={isOnline ? 'text-[var(--ok)]' : 'text-[var(--bad)]'} />
+            {isOnline ? 'ONLINE' : 'OFFLINE'}
+            {batteryLevel !== null && <span>· {batteryLevel}%</span>}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { id: 'spirit-level', label: t12(language, 'Level', 'Terazi') },
+            { id: 'bolt-torque-screening', label: t12(language, 'Torque', 'Tork') },
+            { id: 'tap-drill', label: t12(language, 'Tap/drill', 'Kılavuz') },
+            { id: 'limits-fits', label: t12(language, 'ISO 286 Fits', 'Tolerans') },
+            { id: 'cnc-feeds', label: t12(language, 'CNC Speeds', 'CNC Devir') },
+            { id: 'unit-converter', label: t12(language, 'Units', 'Birim Çevir') },
+            { id: 'thread-identifier', label: t12(language, 'Thread Ø', 'Diş Ø') },
+            { id: 'device-torch', label: t12(language, 'Torch', 'Fener') },
+          ].map((q) => (
+            <button
+              key={q.id}
+              type="button"
+              onClick={() => setActiveModal(q.id)}
+              className="h-12 rounded-[var(--radius-s)] border border-[var(--line)] bg-[var(--bg-0)] text-[var(--ink)] text-xs font-mono hover:border-[var(--cyan-dim)] active:scale-98 transition flex items-center justify-center font-bold"
+            >
+              {q.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 📱 ANDROID & PWA HOME SCREEN WIDGET BANNER */}
+        <div className="p-3 sm:p-4 rounded-[var(--radius-m)] border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-[var(--bg-0)] to-blue-950/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40 shrink-0">
+              <Sparkles size={20} />
             </div>
             <div>
-              <div className="text-[10px] font-mono font-black uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                <span>ALUCALC</span>
-                <span className="px-1 py-0.5 rounded text-[8px] bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">FIELD</span>
+              <div className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                <span>{t12(language, 'AluCAD OS Android & PWA Widget', 'AluCAD OS Android & PWA Widget')}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">APK / PWA</span>
               </div>
-              <h1 className="text-sm sm:text-base font-black text-white">
-                {tr ? 'Saha Mühendislik Kiti' : 'Field Engineering Suite'}
-              </h1>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {t12(language, 'Instant shop-floor HUD: Live 2-axis spirit level, VDI 2230 bolt torque, tap-drill, and unit converter directly on your home screen.', 'Atölye & saha araçları telefon ana ekranında: Canlı su terazisi, VDI 2230 cıvata torku, kılavuz ve birim çevirici tek dokunuşla.')}
+              </p>
             </div>
           </div>
-
-          {/* Quick Telemetry Indicators */}
-          <div className="flex items-center gap-2 font-mono text-[10px]">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
-              onClick={() => setActiveModal('android-apk')}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-bold transition shadow-sm"
+              onClick={() => setActiveModal('widget-modal')}
+              className="flex-1 sm:flex-none h-10 px-4 rounded-[var(--radius-s)] bg-[var(--cyan)] text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow active:scale-95 transition"
             >
-              <Download size={12} />
-              <span>{tr ? 'APK / Saat İndir' : 'APK / Watch App'}</span>
+              <Smartphone size={14} />
+              <span>{t12(language, 'Launch Widget', 'Widget\'ı Başlat')}</span>
             </button>
-
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/5 text-slate-300">
-              <Wifi size={12} className={isOnline ? 'text-emerald-400' : 'text-red-400'} />
-              <span>{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
-            </div>
-
-            {batteryLevel !== null && (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/5 text-slate-300">
-                <Battery size={12} className={batteryLevel > 20 ? 'text-cyan-400' : 'text-amber-400'} />
-                <span>{batteryLevel}%</span>
-              </div>
-            )}
+            <Link
+              href="/field/widget"
+              target="_blank"
+              className="h-10 px-3 rounded-[var(--radius-s)] bg-[var(--bg-2)] border border-[var(--line)] text-slate-300 font-mono text-xs flex items-center justify-center hover:text-white"
+              title={t12(language, 'Open in New Tab', 'Yeni Sekmede Aç')}
+            >
+              <ExternalLink size={14} />
+            </Link>
           </div>
         </div>
 
@@ -848,7 +1025,7 @@ export default function FieldToolsSuitePage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={tr ? 'Ara... (su terazisi, PCD, desibel, cıvata, sac)' : 'Search tools... (level, PCD, decibel, bolt, sheet)'}
+            placeholder={t12(language, 'Search tools... (level, PCD, decibel, bolt, sheet)', 'Ara... (su terazisi, PCD, desibel, cıvata, sac)')}
             className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-slate-500 text-xs font-mono focus:outline-none focus:border-cyan-400 transition"
           />
         </div>
@@ -856,8 +1033,8 @@ export default function FieldToolsSuitePage() {
         {/* Category Filter Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-mono">
           {[
-            { id: 'all', labelEn: 'All Tools', labelTr: 'Tümü (24)', icon: Sparkles },
-            { id: 'favorites', labelEn: `Fav (${favorites.length})`, labelTr: `Favoriler (${favorites.length})`, icon: Star },
+            { id: 'all', labelEn: 'All', labelTr: 'Tümü', icon: Wrench },
+            { id: 'favorites', labelEn: 'Fav', labelTr: 'Favoriler', icon: Star },
             { id: 'sensors', labelEn: 'Sensors', labelTr: 'Sensörler', icon: Radio },
             { id: 'measure', labelEn: 'Measure', labelTr: 'Ölçüm & Geometri', icon: Ruler },
             { id: 'reference', labelEn: 'Reference', labelTr: 'Standartlar & Tablo', icon: FileText },
@@ -871,22 +1048,22 @@ export default function FieldToolsSuitePage() {
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategory(cat.id as FieldCategory)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border whitespace-nowrap transition active:scale-95 ${
+                className={`flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-[var(--radius-s)] border whitespace-nowrap text-xs font-mono ${
                   isCatActive
-                    ? 'bg-cyan-500 text-black border-cyan-400 font-bold shadow-md'
-                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                    ? 'bg-[var(--cyan)] text-[var(--bg-0)] border-[var(--cyan)] font-semibold'
+                    : 'bg-[var(--bg-0)] border-[var(--line)] text-[var(--alu)]'
                 }`}
               >
                 <Icon size={12} />
-                <span>{tr ? cat.labelTr : cat.labelEn}</span>
+                <span>{t12(language, cat.labelEn, cat.labelTr)}{cat.id === 'favorites' ? ` (${favorites.length})` : ''}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* ─── TOOLS GRID (24 TOOLS) ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* ─── TOOLS GRID (34 TOOLS) ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {filteredTools.map((tool) => {
           const Icon = tool.icon;
           const isFav = favorites.includes(tool.id);
@@ -895,7 +1072,7 @@ export default function FieldToolsSuitePage() {
             <div
               key={tool.id}
               onClick={() => setActiveModal(tool.id)}
-              className="flex items-center justify-between p-4 rounded-2xl border border-white/10 bg-[#070c16]/80 hover:border-cyan-500/40 hover:bg-[#0a1020] transition-all cursor-pointer group active:scale-[0.98] shadow-md relative overflow-hidden"
+              className="flex items-center justify-between min-h-[72px] p-3 rounded-[var(--radius-m)] border border-[var(--line)] bg-[var(--bg-1)] hover:border-[var(--cyan-dim)] cursor-pointer"
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div
@@ -912,7 +1089,7 @@ export default function FieldToolsSuitePage() {
                 <div className="min-w-0 pr-2">
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-cyan-300 transition-colors truncate">
-                      {tr ? tool.nameTr : tool.nameEn}
+                      {t12(language, tool.nameEn, tool.nameTr)}
                     </h3>
                     {tool.badge && (
                       <span
@@ -928,7 +1105,7 @@ export default function FieldToolsSuitePage() {
                     )}
                   </div>
                   <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                    {tr ? tool.descTr : tool.descEn}
+                    {t12(language, tool.descEn, tool.descTr)}
                   </p>
                 </div>
               </div>
@@ -940,7 +1117,7 @@ export default function FieldToolsSuitePage() {
                 className={`p-2 rounded-lg transition shrink-0 ${
                   isFav ? 'text-amber-400 bg-amber-500/10' : 'text-slate-600 hover:text-slate-300'
                 }`}
-                title="Favori"
+                title={t12(language, 'Favorite', 'Favori')}
               >
                 <Star size={16} fill={isFav ? 'currentColor' : 'none'} />
               </button>
@@ -950,12 +1127,58 @@ export default function FieldToolsSuitePage() {
       </div>
 
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* ─── INTERACTIVE MODALS FOR ALL 24 TOOLS ─── */}
+      {/* ─── INTERACTIVE MODALS FOR ALL 34 TOOLS ─── */}
       {/* ──────────────────────────────────────────────────────────── */}
 
-      {/* 0. ANDROID & WEAR OS APK DOWNLOAD MODAL */}
-      {activeModal === 'android-apk' && (
-        <AppDownloadModal isOpen={true} onClose={() => setActiveModal(null)} />
+      <FieldShopPanels active={activeModal} onClose={() => setActiveModal(null)} />
+
+      {/* 📱 ANDROID & PWA HOME SCREEN WIDGET MODAL */}
+      {activeModal === 'widget-modal' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl border border-cyan-500/40 bg-[var(--bg-0)] p-4 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
+                <Sparkles size={18} />
+                <span>{t12(language, 'Android Home Screen Widget Preview', 'Android Ana Ekran Widget Önizleme')}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <FieldHomeScreenWidget isEmbedded={true} />
+
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10 font-mono text-[11px] text-slate-300 space-y-1">
+              <div className="font-bold text-cyan-300 uppercase">
+                📱 {t12(language, 'How to add to phone home screen:', 'Telefona Widget Olarak Ekleme:')}
+              </div>
+              <div>• <b>Android APK:</b> {t12(language, 'Launch app -> Pin shortcut or use Android Webview Widget to pin /field/widget.', 'Uygulamayı açın -> Ana Ekrana Ekle veya Webview Widget ile /field/widget adresini bağlayın.')}</div>
+              <div>• <b>Chrome / PWA:</b> {t12(language, 'Tap menu (⋮) -> "Add to Home screen" / "Install App".', 'Tarayıcı menüsü (⋮) -> "Ana Ekrana Ekle" / "Uygulamayı Yükle".')}</div>
+            </div>
+
+            <div className="flex gap-2">
+              <Link
+                href="/field/widget"
+                target="_blank"
+                className="flex-1 py-2.5 rounded-xl bg-cyan-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5"
+              >
+                <ExternalLink size={14} />
+                <span>{t12(language, 'Open Standalone Widget URL', 'Tam Ekran Widget Aç')}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setActiveModal(null)}
+                className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+              >
+                {t12(language, 'Close', 'Kapat')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* 1. SPIRIT LEVEL MODAL */}
@@ -1000,12 +1223,12 @@ export default function FieldToolsSuitePage() {
 
       {/* 9. FIELD NOTES & VOICE MEMO MODAL */}
       {activeModal === 'field-notes' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl border border-cyan-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-3xl border border-cyan-500/30 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
                 <FileSpreadsheet size={18} />
-                <span>{tr ? 'Saha Notları & Sesli Kayıt' : 'Field Notes & Voice Memos'}</span>
+                <span>{t12(language, 'Field Notes & Voice Memos', 'Saha Notları & Sesli Kayıt')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1019,14 +1242,29 @@ export default function FieldToolsSuitePage() {
         </div>
       )}
 
+      {/* BOLT TORQUE SCREENING & CHECKLIST MODAL */}
+      {activeModal === 'bolt-torque-screening' && (
+        <BoltTorqueScreeningModal isOpen={true} onClose={() => setActiveModal(null)} />
+      )}
+
+      {/* O-RING CALIPER & GLAND MATCHER MODAL */}
+      {activeModal === 'oring-caliper-matcher' && (
+        <ORingCaliperModal isOpen={true} onClose={() => setActiveModal(null)} />
+      )}
+
+      {/* FIELD WORK ORDER & ENGINEERING NOTE MODAL */}
+      {activeModal === 'field-work-order-share' && (
+        <FieldWorkOrderModal isOpen={true} onClose={() => setActiveModal(null)} />
+      )}
+
       {/* 10. MATERIAL WEIGHT CALCULATOR MODAL */}
       {activeModal === 'material-weight' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl border border-purple-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-3xl border border-purple-500/30 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
                 <Scale size={18} />
-                <span>{tr ? 'Malzeme & Profil Ağırlık Hesabı' : 'Material Weight Calculator'}</span>
+                <span>{t12(language, 'Material Weight Calculator', 'Malzeme & Profil Ağırlık Hesabı')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1039,7 +1277,7 @@ export default function FieldToolsSuitePage() {
             {/* Calculated Big Result */}
             <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-center space-y-1">
               <div className="text-[10px] font-mono text-purple-300 uppercase">
-                {tr ? 'HESAPLANAN NET AĞIRLIK' : 'NET CALCULATED WEIGHT'}
+                {t12(language, 'NET CALCULATED WEIGHT', 'HESAPLANAN NET AĞIRLIK')}
               </div>
               <div className="text-4xl font-black font-mono text-white">
                 {calculatedWeightKg} <span className="text-lg font-normal text-purple-400">kg</span>
@@ -1050,7 +1288,7 @@ export default function FieldToolsSuitePage() {
             </div>
 
             {/* ── Dynamic Isometric SVG Profile Visualizer ── */}
-            <div className="w-full h-32 rounded-2xl bg-[#040711] border border-purple-500/20 flex items-center justify-center p-2 overflow-hidden">
+            <div className="w-full h-32 rounded-2xl bg-[var(--bg-0)] border border-purple-500/20 flex items-center justify-center p-2 overflow-hidden">
               <svg viewBox="0 0 300 120" className="w-full h-full">
                 <defs>
                   <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1112,30 +1350,30 @@ export default function FieldToolsSuitePage() {
             {/* Material & Shape Picker */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="space-y-1">
-                <label className="text-slate-400">{tr ? 'Malzeme' : 'Material'}</label>
+                <label className="text-slate-400">{t12(language, 'Material', 'Malzeme')}</label>
                 <select
                   value={matType}
                   onChange={(e) => setMatType(e.target.value as any)}
                   className="w-full p-2.5 rounded-xl bg-black border border-white/10 text-white focus:outline-none focus:border-purple-400"
                 >
-                  <option value="al">Alüminyum (2.70 g/cm³)</option>
-                  <option value="steel">Çelik (7.85 g/cm³)</option>
-                  <option value="copper">Bakır (8.96 g/cm³)</option>
-                  <option value="brass">Pirinç (8.50 g/cm³)</option>
+                  <option value="al">{t12(language, 'Aluminum (2.70 g/cm³)', 'Alüminyum (2.70 g/cm³)')}</option>
+                  <option value="steel">{t12(language, 'Steel (7.85 g/cm³)', 'Çelik (7.85 g/cm³)')}</option>
+                  <option value="copper">{t12(language, 'Copper (8.96 g/cm³)', 'Bakır (8.96 g/cm³)')}</option>
+                  <option value="brass">{t12(language, 'Brass (8.50 g/cm³)', 'Pirinç (8.50 g/cm³)')}</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-400">{tr ? 'Geometri' : 'Geometry'}</label>
+                <label className="text-slate-400">{t12(language, 'Geometry', 'Geometri')}</label>
                 <select
                   value={matShape}
                   onChange={(e) => setMatShape(e.target.value as any)}
                   className="w-full p-2.5 rounded-xl bg-black border border-white/10 text-white focus:outline-none focus:border-purple-400"
                 >
-                  <option value="plate">{tr ? 'Plaka / Sac' : 'Plate / Sheet'}</option>
-                  <option value="round">{tr ? 'Dolu Mil / Çubuk' : 'Round Bar'}</option>
-                  <option value="tube">{tr ? 'Yuvarlak Boru' : 'Round Tube'}</option>
-                  <option value="rect_tube">{tr ? 'Kutu Profil' : 'Rectangular Tube'}</option>
+                  <option value="plate">{t12(language, 'Plate / Sheet', 'Plaka / Sac')}</option>
+                  <option value="round">{t12(language, 'Round Bar', 'Dolu Mil / Çubuk')}</option>
+                  <option value="tube">{t12(language, 'Round Tube', 'Yuvarlak Boru')}</option>
+                  <option value="rect_tube">{t12(language, 'Rectangular Tube', 'Kutu Profil')}</option>
                 </select>
               </div>
             </div>
@@ -1143,7 +1381,11 @@ export default function FieldToolsSuitePage() {
             {/* Dimensional Inputs */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="space-y-1">
-                <label className="text-slate-400">{matShape === 'round' || matShape === 'tube' ? 'Dış Çap (mm)' : 'Genişlik A (mm)'}</label>
+                <label className="text-slate-400">
+                  {matShape === 'round' || matShape === 'tube'
+                    ? t12(language, 'Outer Dia (mm)', 'Dış Çap (mm)')
+                    : t12(language, 'Width A (mm)', 'Genişlik A (mm)')}
+                </label>
                 <input
                   type="number"
                   value={dimA}
@@ -1154,7 +1396,11 @@ export default function FieldToolsSuitePage() {
 
               {matShape !== 'round' && (
                 <div className="space-y-1">
-                  <label className="text-slate-400">{matShape === 'plate' ? 'Boy B (mm)' : 'Yükseklik B (mm)'}</label>
+                  <label className="text-slate-400">
+                    {matShape === 'plate'
+                      ? t12(language, 'Length B (mm)', 'Boy B (mm)')
+                      : t12(language, 'Height B (mm)', 'Yükseklik B (mm)')}
+                  </label>
                   <input
                     type="number"
                     value={dimB}
@@ -1166,7 +1412,7 @@ export default function FieldToolsSuitePage() {
 
               {matShape !== 'round' && (
                 <div className="space-y-1">
-                  <label className="text-slate-400">{tr ? 'Et Kalınlığı t (mm)' : 'Thickness t (mm)'}</label>
+                  <label className="text-slate-400">{t12(language, 'Thickness t (mm)', 'Et Kalınlığı t (mm)')}</label>
                   <input
                     type="number"
                     value={dimThickness}
@@ -1178,7 +1424,7 @@ export default function FieldToolsSuitePage() {
 
               {matShape !== 'plate' && (
                 <div className="space-y-1">
-                  <label className="text-slate-400">{tr ? 'Profil Boyu L (mm)' : 'Length L (mm)'}</label>
+                  <label className="text-slate-400">{t12(language, 'Length L (mm)', 'Profil Boyu L (mm)')}</label>
                   <input
                     type="number"
                     value={dimLength}
@@ -1194,8 +1440,8 @@ export default function FieldToolsSuitePage() {
 
       {/* 11. BOLT CIRCLE PCD MODAL (ADVANCED INTERACTIVE BLUEPRINT) */}
       {activeModal === 'bolt-circle-pcd' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="w-full max-w-xl rounded-3xl border border-amber-500/30 bg-[#070b14] p-4 sm:p-6 shadow-[0_0_50px_rgba(245,158,11,0.15)] space-y-4 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 animate-in fade-in duration-200">
+          <div className="w-full max-w-xl rounded-3xl border border-amber-500/30 bg-[var(--bg-0)] p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
@@ -1203,8 +1449,8 @@ export default function FieldToolsSuitePage() {
                   <CircleDot size={18} className="text-amber-400 animate-spin-slow" />
                 </div>
                 <div>
-                  <div className="text-white font-bold">{tr ? 'Flanş Delik Eksen (PCD) Jeneratörü' : 'Bolt Circle PCD Generator'}</div>
-                  <div className="text-[10px] text-amber-400/80 font-mono">{tr ? 'İnteraktif CNC & Kumpas Koordinatörü' : 'Interactive CNC & Caliper Coordinator'}</div>
+                  <div className="text-white font-bold">{t12(language, 'Bolt Circle PCD Generator', 'Flanş Delik Eksen (PCD) Jeneratörü')}</div>
+                  <div className="text-[10px] text-amber-400/80 font-mono">{t12(language, 'Interactive CNC & Caliper Coordinator', 'İnteraktif CNC & Kumpas Koordinatörü')}</div>
                 </div>
               </div>
               <button
@@ -1222,30 +1468,30 @@ export default function FieldToolsSuitePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400">
                     <Sliders size={14} />
-                    <span>{tr ? 'Metrik Standart Delik (M1 - M100)' : 'Metric Hole Standards (M1 - M100)'}</span>
+                    <span>{t12(language, 'Metric Hole Standards (M1 - M100)', 'Metrik Standart Delik (M1 - M100)')}</span>
                   </div>
                   <span className="text-[10px] font-mono text-slate-400">ISO 273 / DIN 13</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">{tr ? 'Metrik Vida / Delik Seçimi' : 'Metric Thread / Hole'}</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t12(language, 'Metric Thread / Hole', 'Metrik Vida / Delik Seçimi')}</label>
                     <select
                       value={pcdMetricStd}
                       onChange={(e) => handleMetricSelect(e.target.value)}
                       className="w-full p-2 rounded-xl bg-black border border-cyan-500/40 text-cyan-300 font-bold focus:outline-none focus:border-cyan-400"
                     >
-                      <option value="custom">{tr ? '⚙️ Özel Çap (Custom mm)' : '⚙️ Custom Diameter (mm)'}</option>
+                      <option value="custom">{t12(language, '⚙️ Custom Diameter (mm)', '⚙️ Özel Çap (Custom mm)')}</option>
                       {METRIC_HOLE_STANDARDS.map((m) => (
                         <option key={m.name} value={m.name}>
-                          {m.name} — (Boşluk: ⌀{m.dia}mm | Kılavuz: ⌀{m.tap}mm)
+                          {m.name} — ({t12(language, 'Clearance', 'Boşluk')}: ⌀{m.dia}mm | {t12(language, 'Tap', 'Kılavuz')}: ⌀{m.tap}mm)
                         </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">{tr ? 'Delik Tipi & Tolerans' : 'Hole Fit Type'}</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t12(language, 'Hole Fit Type', 'Delik Tipi & Tolerans')}</label>
                     <div className="grid grid-cols-3 gap-1">
                       <button
                         type="button"
@@ -1256,7 +1502,7 @@ export default function FieldToolsSuitePage() {
                             : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                         }`}
                       >
-                        {tr ? 'Normal' : 'Normal'}
+                        {t12(language, 'Normal', 'Normal')}
                       </button>
                       <button
                         type="button"
@@ -1267,7 +1513,7 @@ export default function FieldToolsSuitePage() {
                             : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                         }`}
                       >
-                        {tr ? 'Sıkı' : 'Close'}
+                        {t12(language, 'Close', 'Sıkı')}
                       </button>
                       <button
                         type="button"
@@ -1278,7 +1524,7 @@ export default function FieldToolsSuitePage() {
                             : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                         }`}
                       >
-                        {tr ? 'Kılavuz' : 'Tap'}
+                        {t12(language, 'Tap', 'Kılavuz')}
                       </button>
                     </div>
                   </div>
@@ -1288,7 +1534,7 @@ export default function FieldToolsSuitePage() {
               {/* Dimensional Inputs */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
                 <div className="space-y-1">
-                  <label className="text-slate-400 text-[11px]">{tr ? 'PCD Çapı (mm)' : 'PCD Dia (mm)'}</label>
+                  <label className="text-slate-400 text-[11px]">{t12(language, 'PCD Dia (mm)', 'PCD Çapı (mm)')}</label>
                   <input
                     type="number"
                     value={pcdDiameter}
@@ -1298,7 +1544,7 @@ export default function FieldToolsSuitePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 text-[11px]">{tr ? 'Delik Sayısı (N)' : 'Holes (N)'}</label>
+                  <label className="text-slate-400 text-[11px]">{t12(language, 'Holes (N)', 'Delik Sayısı (N)')}</label>
                   <input
                     type="number"
                     min={2}
@@ -1314,7 +1560,7 @@ export default function FieldToolsSuitePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 text-[11px]">{tr ? 'Başlangıç Açısı' : 'Start Angle'}</label>
+                  <label className="text-slate-400 text-[11px]">{t12(language, 'Start Angle', 'Başlangıç Açısı')}</label>
                   <input
                     type="number"
                     value={pcdStartAngle}
@@ -1324,7 +1570,7 @@ export default function FieldToolsSuitePage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 text-[11px]">{tr ? 'Delik Çapı (mm)' : 'Hole Dia (mm)'}</label>
+                  <label className="text-slate-400 text-[11px]">{t12(language, 'Hole Dia (mm)', 'Delik Çapı (mm)')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -1341,33 +1587,29 @@ export default function FieldToolsSuitePage() {
 
             {/* ── REAL-TIME COLLISION & PROXIMITY SAFETY AUDIT BANNER ── */}
             {isCollision ? (
-              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/50 flex items-start gap-2.5 text-rose-300 text-xs font-mono shadow-[0_0_25px_rgba(244,63,94,0.25)] animate-pulse">
+              <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/50 flex items-start gap-2.5 text-rose-300 text-xs font-mono animate-pulse">
                 <AlertOctagon className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <div className="font-black text-rose-200 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>🚨 {tr ? 'KRİTİK DELİK ÇAKIŞMASI TESPİT EDİLDİ!' : 'CRITICAL HOLE COLLISION DETECTED!'}</span>
+                    <span>🚨 {t12(language, 'CRITICAL HOLE COLLISION DETECTED!', 'KRİTİK DELİK ÇAKIŞMASI TESPİT EDİLDİ!')}</span>
                   </div>
                   <p className="text-[11px] leading-relaxed text-rose-300">
-                    {tr
-                      ? `Delikler birbiriyle çakışıyor! Delikler arası kiriş mesafesi (${pcdChordDistance} mm) delik çapından (${pcdHoleDia} mm) küçük! Çakışma miktarı: ${Math.abs(webThickness).toFixed(1)} mm. Bu parçayı üretirseniz delikler birbirini keser ve parça imal edilemez.`
-                      : `Holes are intersecting! Center chord distance (${pcdChordDistance} mm) is less than hole diameter (${pcdHoleDia} mm)! Overlap: ${Math.abs(webThickness).toFixed(1)} mm. Part cannot be manufactured.`}
+                    {t12(language, `Holes are intersecting! Center chord distance (${pcdChordDistance} mm) is less than hole diameter (${pcdHoleDia} mm)! Overlap: ${Math.abs(webThickness).toFixed(1)} mm. Part cannot be manufactured.`, `Delikler birbiriyle çakışıyor! Delikler arası kiriş mesafesi (${pcdChordDistance} mm) delik çapından (${pcdHoleDia} mm) küçük! Çakışma miktarı: ${Math.abs(webThickness).toFixed(1)} mm. Bu parçayı üretirseniz delikler birbirini keser ve parça imal edilemez.`)}
                   </p>
                   <div className="text-[10px] text-rose-400 font-bold">
-                    {tr ? '💡 Çözüm: PCD Çapını büyütün, delik sayısını azaltın veya daha küçük delik çapı / M vidası seçin.' : '💡 Fix: Increase PCD diameter, decrease hole count, or choose smaller M fastener.'}
+                    {t12(language, '💡 Fix: Increase PCD diameter, decrease hole count, or choose smaller M fastener.', '💡 Çözüm: PCD Çapını büyütün, delik sayısını azaltın veya daha küçük delik çapı / M vidası seçin.')}
                   </div>
                 </div>
               </div>
             ) : isTooClose ? (
-              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/50 flex items-start gap-2.5 text-amber-300 text-xs font-mono shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-500/50 flex items-start gap-2.5 text-amber-300 text-xs font-mono ">
                 <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 animate-bounce" />
                 <div className="space-y-1">
                   <div className="font-black text-amber-200 uppercase tracking-wider">
-                    <span>⚠️ {tr ? 'UYARI: DELİKLER BİRBİRİNE ÇOK YAKIN!' : 'WARNING: HOLES ARE TOO CLOSE!'}</span>
+                    <span>⚠️ {t12(language, 'WARNING: HOLES ARE TOO CLOSE!', 'UYARI: DELİKLER BİRBİRİNE ÇOK YAKIN!')}</span>
                   </div>
                   <p className="text-[11px] leading-relaxed text-amber-300">
-                    {tr
-                      ? `Kalan et kalınlığı (Web): ${webThickness.toFixed(1)} mm. Güvenli minimum et kalınlığı: ${minSafeWeb.toFixed(1)} mm önerilir. Talaşlı imalat (delme) sırasında delikler arası etin yırtılması veya yük altında cıvata kesmesi meydana gelebilir!`
-                      : `Remaining wall web thickness: ${webThickness.toFixed(1)} mm. Recommended safe minimum: ${minSafeWeb.toFixed(1)} mm. Risk of tear-out during drilling or shear failure under load!`}
+                    {t12(language, `Remaining wall web thickness: ${webThickness.toFixed(1)} mm. Recommended safe minimum: ${minSafeWeb.toFixed(1)} mm. Risk of tear-out during drilling or shear failure under load!`, `Kalan et kalınlığı (Web): ${webThickness.toFixed(1)} mm. Güvenli minimum et kalınlığı: ${minSafeWeb.toFixed(1)} mm önerilir. Talaşlı imalat (delme) sırasında delikler arası etin yırtılması veya yük altında cıvata kesmesi meydana gelebilir!`)}
                   </p>
                 </div>
               </div>
@@ -1375,20 +1617,20 @@ export default function FieldToolsSuitePage() {
               <div className="p-2 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-emerald-300 text-xs font-mono">
                 <div className="flex items-center gap-1.5">
                   <Check size={14} className="text-emerald-400" />
-                  <span className="font-bold">{tr ? 'Delik Yerleşimi & Et Payı Güvenli' : 'Hole Spacing & Wall Thickness Safe'}</span>
+                  <span className="font-bold">{t12(language, 'Hole Spacing & Wall Thickness Safe', 'Delik Yerleşimi & Et Payı Güvenli')}</span>
                 </div>
-                <span className="text-[11px] font-bold text-emerald-400">{tr ? 'Et Kalınlığı (Web)' : 'Web'}: {webThickness.toFixed(1)} mm</span>
+                <span className="text-[11px] font-bold text-emerald-400">{t12(language, 'Web', 'Et Kalınlığı (Web)')}: {webThickness.toFixed(1)} mm</span>
               </div>
             )}
 
             {/* ── High-Tech Live Inspector HUD ── */}
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/30 via-[#0a1120] to-cyan-950/30 border border-amber-500/30 grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/30 via-[var(--bg-1)] to-cyan-950/30 border border-amber-500/30 grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
               <div className="space-y-0.5">
-                <div className="text-[9px] text-slate-400 uppercase">{tr ? 'SEÇİLİ' : 'ACTIVE'}</div>
+                <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'ACTIVE', 'SEÇİLİ')}</div>
                 <div className="text-sm font-black text-amber-400">#{selectedHole.index}</div>
               </div>
               <div className="space-y-0.5">
-                <div className="text-[9px] text-slate-400 uppercase">{tr ? 'AÇI θ' : 'ANGLE θ'}</div>
+                <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'ANGLE θ', 'AÇI θ')}</div>
                 <div className="text-sm font-black text-white">{selectedHole.angle}°</div>
               </div>
               <div className="space-y-0.5">
@@ -1400,27 +1642,27 @@ export default function FieldToolsSuitePage() {
                 <div className="text-sm font-black text-emerald-300">{selectedHole.y > 0 ? `+${selectedHole.y}` : selectedHole.y}</div>
               </div>
               <div className="space-y-0.5 col-span-1 sm:col-span-1">
-                <div className="text-[9px] text-amber-300 uppercase">{tr ? 'KİRİŞ (c)' : 'CHORD (c)'}</div>
+                <div className="text-[9px] text-amber-300 uppercase">{t12(language, 'CHORD (c)', 'KİRİŞ (c)')}</div>
                 <div className={`text-sm font-black ${isCollision ? 'text-rose-400' : isTooClose ? 'text-amber-400' : 'text-emerald-400'}`}>
                   {pcdChordDistance} <span className="text-[9px] text-slate-400">mm</span>
                 </div>
               </div>
               <div className="space-y-0.5 col-span-2 sm:col-span-1">
-                <div className="text-[9px] text-slate-400 uppercase">{tr ? 'ADIM AÇISI' : 'STEP'}</div>
+                <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'STEP', 'ADIM AÇISI')}</div>
                 <div className="text-sm font-black text-slate-200">Δ{pcdStepAngle}°</div>
               </div>
             </div>
 
             {/* ── Dynamic High-Precision SVG Blueprint Visualizer ── */}
-            <div className="relative w-full h-72 sm:h-84 rounded-2xl bg-[#03060d] border border-amber-500/20 flex items-center justify-center overflow-hidden p-2 shadow-inner">
+            <div className="relative w-full h-72 sm:h-84 rounded-2xl bg-[var(--bg-0)] border border-amber-500/20 flex items-center justify-center overflow-hidden p-2 shadow-inner">
               {/* Radial backdrop */}
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.08),rgba(0,229,255,0.03),transparent_75%)] pointer-events-none" />
 
               {/* Quick tip overlay */}
               <div className="absolute top-2 left-3 text-[9px] font-mono text-slate-500 pointer-events-none flex items-center gap-2">
-                <span>{tr ? '💡 Deliklere veya tablodaki satırlara tıklayarak inceleyin' : '💡 Click holes or table rows to inspect'}</span>
-                {isCollision && <span className="text-rose-400 font-bold animate-pulse">🚨 ÇAKIŞMA VAR</span>}
-                {isTooClose && <span className="text-amber-400 font-bold">⚠️ ÇOK YAKIN</span>}
+                <span>{t12(language, '💡 Click holes or table rows to inspect', '💡 Deliklere veya tablodaki satırlara tıklayarak inceleyin')}</span>
+                {isCollision && <span className="text-rose-400 font-bold animate-pulse">🚨 {t12(language, 'COLLISION DETECTED', 'ÇAKIŞMA VAR')}</span>}
+                {isTooClose && <span className="text-amber-400 font-bold">⚠️ {t12(language, 'TOO CLOSE', 'ÇOK YAKIN')}</span>}
               </div>
 
               <svg
@@ -1680,11 +1922,11 @@ export default function FieldToolsSuitePage() {
             {/* (X, Y) Coordinate Interactive Table */}
             <div className="rounded-2xl border border-white/10 bg-black/60 p-3 space-y-1.5 font-mono text-xs max-h-48 overflow-y-auto">
               <div className="grid grid-cols-5 font-bold text-amber-400 border-b border-white/10 pb-1.5 text-[10px] uppercase">
-                <span>{tr ? 'NO' : 'NUM'}</span>
-                <span>{tr ? 'AÇI θ' : 'ANGLE'}</span>
+                <span>{t12(language, 'NUM', 'NO')}</span>
+                <span>{t12(language, 'ANGLE', 'AÇI θ')}</span>
                 <span>X (mm)</span>
                 <span>Y (mm)</span>
-                <span className="text-right">{tr ? 'DURUM' : 'STATUS'}</span>
+                <span className="text-right">{t12(language, 'STATUS', 'DURUM')}</span>
               </div>
               {pcdCoordinates.map((c) => {
                 const isSelected = c.index === selectedHoleIdx;
@@ -1694,7 +1936,7 @@ export default function FieldToolsSuitePage() {
                     onClick={() => setSelectedHoleIdx(c.index)}
                     className={`grid grid-cols-5 py-1.5 px-2 rounded-xl text-[11px] cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-amber-500/20 border border-amber-500/50 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                        ? 'bg-amber-500/20 border border-amber-500/50 text-white font-bold '
                         : 'text-slate-300 hover:bg-cyan-500/10 hover:text-white border border-transparent'
                     }`}
                   >
@@ -1707,10 +1949,10 @@ export default function FieldToolsSuitePage() {
                     <span className="text-right text-[10px]">
                       {isSelected ? (
                         <span className="px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">
-                          {tr ? 'SEÇİLİ' : 'ACTIVE'}
+                          {t12(language, 'ACTIVE', 'SEÇİLİ')}
                         </span>
                       ) : (
-                        <span className="text-slate-500">{tr ? 'Seç' : 'Select'}</span>
+                        <span className="text-slate-500">{t12(language, 'Select', 'Seç')}</span>
                       )}
                     </span>
                   </div>
@@ -1730,7 +1972,7 @@ export default function FieldToolsSuitePage() {
                 }}
                 className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 hover:bg-cyan-500/25 text-cyan-300 font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span>{copiedGCode ? (tr ? '✓ G-Code Kopyalandı!' : '✓ G-Code Copied!') : (tr ? '📋 CNC G-Code (G81) Kopyala' : '📋 Copy CNC G-Code (G81)')}</span>
+                <span>{copiedGCode ? (t12(language, '✓ G-Code Copied!', '✓ G-Code Kopyalandı!')) : (t12(language, '📋 Copy CNC G-Code (G81)', '📋 CNC G-Code (G81) Kopyala'))}</span>
               </button>
 
               <button
@@ -1746,7 +1988,7 @@ export default function FieldToolsSuitePage() {
                 }}
                 className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span>{tr ? '💾 CSV Tablo İndir' : '💾 Export CSV Table'}</span>
+                <span>{t12(language, '💾 Export CSV Table', '💾 CSV Tablo İndir')}</span>
               </button>
             </div>
           </div>
@@ -1755,12 +1997,12 @@ export default function FieldToolsSuitePage() {
 
       {/* 12. QUICK MEASURE MODAL */}
       {activeModal === 'quick-measure' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
                 <Ruler size={18} />
-                <span>{tr ? 'Hızlı Geometri & Alan Hesabı' : 'Quick Measure & Geometry'}</span>
+                <span>{t12(language, 'Quick Measure & Geometry', 'Hızlı Geometri & Alan Hesabı')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1772,7 +2014,7 @@ export default function FieldToolsSuitePage() {
 
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="space-y-1">
-                <label className="text-slate-400">{tr ? 'Uzunluk L (mm)' : 'Length L (mm)'}</label>
+                <label className="text-slate-400">{t12(language, 'Length L (mm)', 'Uzunluk L (mm)')}</label>
                 <input
                   type="number"
                   value={qmLength}
@@ -1782,7 +2024,7 @@ export default function FieldToolsSuitePage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-400">{tr ? 'Genişlik W (mm)' : 'Width W (mm)'}</label>
+                <label className="text-slate-400">{t12(language, 'Width W (mm)', 'Genişlik W (mm)')}</label>
                 <input
                   type="number"
                   value={qmWidth}
@@ -1794,15 +2036,15 @@ export default function FieldToolsSuitePage() {
 
             <div className="grid grid-cols-3 gap-2 font-mono text-center text-xs">
               <div className="p-3 rounded-xl bg-black/50 border border-emerald-500/20">
-                <div className="text-[9px] text-slate-500">ALAN (m²)</div>
+                <div className="text-[9px] text-slate-500 uppercase">{t12(language, 'AREA (m²)', 'ALAN (m²)')}</div>
                 <div className="text-emerald-400 font-bold">{(qmAreaMm2 / 1000000).toFixed(4)}</div>
               </div>
               <div className="p-3 rounded-xl bg-black/50 border border-emerald-500/20">
-                <div className="text-[9px] text-slate-500">ÇEVRE (mm)</div>
+                <div className="text-[9px] text-slate-500 uppercase">{t12(language, 'PERIMETER (mm)', 'ÇEVRE (mm)')}</div>
                 <div className="text-cyan-400 font-bold">{qmPerimeterMm}</div>
               </div>
               <div className="p-3 rounded-xl bg-black/50 border border-emerald-500/20">
-                <div className="text-[9px] text-slate-500">KÖŞEGEN (mm)</div>
+                <div className="text-[9px] text-slate-500 uppercase">{t12(language, 'DIAGONAL (mm)', 'KÖŞEGEN (mm)')}</div>
                 <div className="text-amber-400 font-bold">{qmDiagonalMm.toFixed(2)}</div>
               </div>
             </div>
@@ -1812,12 +2054,12 @@ export default function FieldToolsSuitePage() {
 
       {/* 13. STOPWATCH MODAL */}
       {activeModal === 'stopwatch' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl border border-sky-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl border border-sky-500/30 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 text-center">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-sky-400 font-bold text-sm">
                 <Timer size={18} />
-                <span>{tr ? 'Saha Kronometresi' : 'Stopwatch & Lap Timer'}</span>
+                <span>{t12(language, 'Stopwatch & Lap Timer', 'Saha Kronometresi')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1858,7 +2100,7 @@ export default function FieldToolsSuitePage() {
                 }`}
               >
                 {stopwatchRunning ? <Pause size={14} /> : <Play size={14} />}
-                <span>{stopwatchRunning ? (tr ? 'Durdur' : 'Stop') : (tr ? 'Başlat' : 'Start')}</span>
+                <span>{stopwatchRunning ? (t12(language, 'Stop', 'Durdur')) : (t12(language, 'Start', 'Başlat'))}</span>
               </button>
 
               <button
@@ -1879,12 +2121,12 @@ export default function FieldToolsSuitePage() {
 
       {/* 14. FLASHLIGHT TOGGLE ACTION */}
       {activeModal === 'device-torch' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl border border-yellow-500/30 bg-[#070b14] p-6 shadow-2xl space-y-5 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl border border-yellow-500/30 bg-[var(--bg-0)] p-6 shadow-2xl space-y-5 text-center">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-yellow-400 font-bold text-sm">
                 <Flashlight size={18} />
-                <span>{tr ? 'Muayene Feneri' : 'Hardware Torch'}</span>
+                <span>{t12(language, 'Hardware Torch', 'Muayene Feneri')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1899,7 +2141,7 @@ export default function FieldToolsSuitePage() {
               onClick={toggleFlashlight}
               className={`h-24 w-24 mx-auto rounded-full border-2 transition-all flex items-center justify-center ${
                 torchActive
-                  ? 'bg-yellow-400 border-white text-black shadow-[0_0_35px_rgba(234,179,8,0.8)] scale-110'
+                  ? 'bg-yellow-400 border-white text-black scale-110'
                   : 'bg-white/5 border-white/15 text-slate-400 hover:text-white'
               }`}
             >
@@ -1907,7 +2149,7 @@ export default function FieldToolsSuitePage() {
             </button>
 
             <div className="text-xs font-mono text-slate-300">
-              {torchActive ? (tr ? 'FENER AÇIK' : 'TORCH ACTIVE') : (tr ? 'AÇMAK İÇİN DOKUNUN' : 'TAP TO ACTIVATE')}
+              {torchActive ? (t12(language, 'TORCH ACTIVE', 'FENER AÇIK')) : (t12(language, 'TAP TO ACTIVATE', 'AÇMAK İÇİN DOKUNUN'))}
             </div>
           </div>
         </div>
@@ -1915,12 +2157,12 @@ export default function FieldToolsSuitePage() {
 
       {/* 15. UNIFIED SENSOR HUB MODAL */}
       {activeModal === 'sensor-hub' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl border border-indigo-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-3xl border border-indigo-500/30 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
                 <Radio size={18} />
-                <span>{tr ? 'Merkezi Sensör Paneli (HUD)' : 'Unified Sensor Hub'}</span>
+                <span>{t12(language, 'Unified Sensor Hub', 'Merkezi Sensör Paneli (HUD)')}</span>
               </div>
               <button
                 onClick={() => setActiveModal(null)}
@@ -1952,23 +2194,6 @@ export default function FieldToolsSuitePage() {
         </div>
       )}
 
-      {/* DIRECT NAVIGATION FOR OTHER STANDARDS SOLVERS */}
-      {activeModal === 'unit-converter' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl border border-cyan-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4 text-center">
-            <h3 className="text-sm font-bold text-white">{tr ? 'Birim Dönüştürücü' : 'Unit Converter'}</h3>
-            <p className="text-xs text-slate-400">{tr ? 'Gelişmiş çözücüye yönlendiriliyorsunuz.' : 'Redirecting to dedicated solver.'}</p>
-            <Link
-              href="/unit-converter"
-              className="block w-full py-3 rounded-xl bg-cyan-500 text-black font-bold font-mono text-xs uppercase"
-            >
-              {tr ? 'Dönüştürücüyü Aç →' : 'Open Converter →'}
-            </Link>
-            <button onClick={() => setActiveModal(null)} className="text-xs text-slate-500">Kapat</button>
-          </div>
-        </div>
-      )}
-
       {/* ─── PIPE & FLANGE SIZING MODAL ─── */}
       {activeModal === 'pipe-flange' && (() => {
         const curPipe = PIPE_DATA[pipeDn] || PIPE_DATA.DN50;
@@ -1980,15 +2205,15 @@ export default function FieldToolsSuitePage() {
         const totalWeightKgM = Number((steelWeightKgM + waterWeightKgM).toFixed(2));
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="w-full max-w-lg rounded-3xl border border-cyan-500/40 bg-[#070b14] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-cyan-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
                     <CircleDot size={18} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-white">{tr ? 'Boru & Flanş Standartları' : 'Pipe & Flange Sizing'}</h3>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Pipe & Flange Sizing', 'Boru & Flanş Standartları')}</h3>
                     <p className="text-[10px] text-cyan-400 font-mono">ASME B36.10M · EN 10220 · DIN 2448</p>
                   </div>
                 </div>
@@ -2000,7 +2225,7 @@ export default function FieldToolsSuitePage() {
               {/* Selectors */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-mono text-slate-400 uppercase">{tr ? 'Boru Çapı (DN / NPS)' : 'Pipe Size (DN / NPS)'}</label>
+                  <label className="text-[10px] font-mono text-slate-400 uppercase">{t12(language, 'Pipe Size (DN / NPS)', 'Boru Çapı (DN / NPS)')}</label>
                   <select
                     value={pipeDn}
                     onChange={(e) => setPipeDn(e.target.value)}
@@ -2012,7 +2237,7 @@ export default function FieldToolsSuitePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-mono text-slate-400 uppercase">{tr ? 'Et Kalınlığı Serisi' : 'Schedule (Thickness)'}</label>
+                  <label className="text-[10px] font-mono text-slate-400 uppercase">{t12(language, 'Schedule (Thickness)', 'Et Kalınlığı Serisi')}</label>
                   <select
                     value={pipeSch}
                     onChange={(e) => setPipeSch(e.target.value as any)}
@@ -2029,15 +2254,15 @@ export default function FieldToolsSuitePage() {
               {/* Geometry HUD Cards */}
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
-                  <div className="text-[9px] text-slate-400 font-mono uppercase">{tr ? 'Dış Çap (OD)' : 'Outer Dia (OD)'}</div>
+                  <div className="text-[9px] text-slate-400 font-mono uppercase">{t12(language, 'Outer Dia (OD)', 'Dış Çap (OD)')}</div>
                   <div className="text-sm font-black text-cyan-400 font-mono mt-0.5">{curPipe.od} mm</div>
                 </div>
                 <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
-                  <div className="text-[9px] text-slate-400 font-mono uppercase">{tr ? 'Et Kalınlığı (t)' : 'Wall (t)'}</div>
+                  <div className="text-[9px] text-slate-400 font-mono uppercase">{t12(language, 'Wall (t)', 'Et Kalınlığı (t)')}</div>
                   <div className="text-sm font-black text-white font-mono mt-0.5">{wall} mm</div>
                 </div>
                 <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
-                  <div className="text-[9px] text-slate-400 font-mono uppercase">{tr ? 'İç Çap (ID)' : 'Inner Dia (ID)'}</div>
+                  <div className="text-[9px] text-slate-400 font-mono uppercase">{t12(language, 'Inner Dia (ID)', 'İç Çap (ID)')}</div>
                   <div className="text-sm font-black text-emerald-400 font-mono mt-0.5">{idMm} mm</div>
                 </div>
               </div>
@@ -2045,20 +2270,20 @@ export default function FieldToolsSuitePage() {
               {/* Weight Breakdown */}
               <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-950/40 to-cyan-950/30 border border-cyan-500/20 space-y-2">
                 <div className="text-[10px] font-mono text-cyan-300 font-bold uppercase flex justify-between">
-                  <span>{tr ? 'Birim Metretül Ağırlıkları' : 'Linear Weight (per meter)'}</span>
+                  <span>{t12(language, 'Linear Weight (per meter)', 'Birim Metretül Ağırlıkları')}</span>
                   <span>{curPipe.name}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
                   <div>
-                    <span className="text-slate-400 block text-[9px]">{tr ? 'Çelik Boru:' : 'Steel Pipe:'}</span>
+                    <span className="text-slate-400 block text-[9px]">{t12(language, 'Steel Pipe:', 'Çelik Boru:')}</span>
                     <span className="font-bold text-white">{steelWeightKgM} kg/m</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[9px]">{tr ? 'Su Hacmi:' : 'Water Filled:'}</span>
+                    <span className="text-slate-400 block text-[9px]">{t12(language, 'Water Filled:', 'Su Hacmi:')}</span>
                     <span className="font-bold text-sky-300">{waterWeightKgM} kg/m</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[9px]">{tr ? 'Toplam (Dolu):' : 'Total (Full):'}</span>
+                    <span className="text-slate-400 block text-[9px]">{t12(language, 'Total (Full):', 'Toplam (Dolu):')}</span>
                     <span className="font-black text-emerald-400">{totalWeightKgM} kg/m</span>
                   </div>
                 </div>
@@ -2067,12 +2292,12 @@ export default function FieldToolsSuitePage() {
               {/* Standard Flange Specs */}
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1.5 text-xs font-mono">
                 <div className="text-[10px] font-bold text-amber-300 uppercase flex items-center gap-1.5">
-                  <span>🔩 {tr ? 'Uyumlu EN 1092-1 PN16 Flanş Ölçüleri' : 'EN 1092-1 PN16 Flange Compatibility'}</span>
+                  <span>🔩 {t12(language, 'EN 1092-1 PN16 Flange Compatibility', 'Uyumlu EN 1092-1 PN16 Flanş Ölçüleri')}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5 text-[10px] text-slate-300">
                   <div><span className="text-slate-500">PCD:</span> <span className="font-bold text-white">{curPipe.pn16_pcd} mm</span></div>
-                  <div><span className="text-slate-500">{tr ? 'Delik:' : 'Holes:'}</span> <span className="font-bold text-white">{curPipe.pn16_holes}x</span></div>
-                  <div><span className="text-slate-500">{tr ? 'Cıvata:' : 'Bolt:'}</span> <span className="font-bold text-cyan-300">{curPipe.pn16_bolt}</span></div>
+                  <div><span className="text-slate-500">{t12(language, 'Holes:', 'Delik:')}</span> <span className="font-bold text-white">{curPipe.pn16_holes}x</span></div>
+                  <div><span className="text-slate-500">{t12(language, 'Bolt:', 'Cıvata:')}</span> <span className="font-bold text-cyan-300">{curPipe.pn16_bolt}</span></div>
                 </div>
               </div>
 
@@ -2082,19 +2307,19 @@ export default function FieldToolsSuitePage() {
                   onClick={() => {
                     const text = `Pipe: ${curPipe.name}, OD: ${curPipe.od}mm, ID: ${idMm}mm, Wall: ${wall}mm (${pipeSch.toUpperCase()}), Steel Weight: ${steelWeightKgM} kg/m, Water: ${waterWeightKgM} kg/m, Total: ${totalWeightKgM} kg/m, Flange PCD: ${curPipe.pn16_pcd}mm (${curPipe.pn16_holes}x ${curPipe.pn16_bolt})`;
                     navigator.clipboard.writeText(text);
-                    alert(tr ? 'Boru ölçüleri kopyalandı!' : 'Pipe specs copied to clipboard!');
+                    alert(t12(language, 'Pipe specs copied to clipboard!', 'Boru ölçüleri kopyalandı!'));
                   }}
                   className="flex-1 py-2.5 rounded-xl bg-cyan-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
                 >
                   <Copy size={14} />
-                  <span>{tr ? 'Ölçüleri Kopyala' : 'Copy Specs'}</span>
+                  <span>{t12(language, 'Copy Specs', 'Ölçüleri Kopyala')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
                   className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
                 >
-                  {tr ? 'Kapat' : 'Close'}
+                  {t12(language, 'Close', 'Kapat')}
                 </button>
               </div>
             </div>
@@ -2116,15 +2341,15 @@ export default function FieldToolsSuitePage() {
         const isAcceptable = deltaUPct <= 5.0;
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="w-full max-w-lg rounded-3xl border border-amber-500/40 bg-[#070b14] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-amber-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
                     <Zap size={18} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black text-white">{tr ? 'Kablo Kesiti & Gerilim Düşümü' : 'Cable Sizing & Voltage Drop'}</h3>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Cable Sizing & Voltage Drop', 'Kablo Kesiti & Gerilim Düşümü')}</h3>
                     <p className="text-[10px] text-amber-400 font-mono">IEC 60364-5-52 · VDE 0100</p>
                   </div>
                 </div>
@@ -2136,29 +2361,29 @@ export default function FieldToolsSuitePage() {
               {/* Controls */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div>
-                  <label className="text-[9px] font-mono text-slate-400 uppercase">{tr ? 'Şebeke' : 'System'}</label>
+                  <label className="text-[9px] font-mono text-slate-400 uppercase">{t12(language, 'System', 'Şebeke')}</label>
                   <select
                     value={vdVoltage}
                     onChange={(e) => setVdVoltage(e.target.value as any)}
                     className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono text-xs"
                   >
-                    <option value="230">230V (1-Faz)</option>
-                    <option value="400">400V (3-Faz)</option>
+                    <option value="230">230V ({t12(language, '1-Phase', '1-Faz')})</option>
+                    <option value="400">400V ({t12(language, '3-Phase', '3-Faz')})</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[9px] font-mono text-slate-400 uppercase">{tr ? 'İletken' : 'Conductor'}</label>
+                  <label className="text-[9px] font-mono text-slate-400 uppercase">{t12(language, 'Conductor', 'İletken')}</label>
                   <select
                     value={vdMaterial}
                     onChange={(e) => setVdMaterial(e.target.value as any)}
                     className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono text-xs"
                   >
-                    <option value="cu">Bakır (Cu)</option>
-                    <option value="al">Alüminyum (Al)</option>
+                    <option value="cu">{t12(language, 'Copper (Cu)', 'Bakır (Cu)')}</option>
+                    <option value="al">{t12(language, 'Aluminum (Al)', 'Alüminyum (Al)')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[9px] font-mono text-slate-400 uppercase">{tr ? 'Kesit (mm²)' : 'Size (mm²)'}</label>
+                  <label className="text-[9px] font-mono text-slate-400 uppercase">{t12(language, 'Size (mm²)', 'Kesit (mm²)')}</label>
                   <select
                     value={vdSection}
                     onChange={(e) => setVdSection(Number(e.target.value))}
@@ -2186,7 +2411,7 @@ export default function FieldToolsSuitePage() {
               {/* Sliders for Length & Current */}
               <div className="space-y-2.5 p-3 rounded-2xl bg-white/5 border border-white/5">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-slate-400">{tr ? 'Kablo Mesafesi (L):' : 'Cable Distance (L):'}</span>
+                  <span className="text-slate-400">{t12(language, 'Cable Distance (L):', 'Kablo Mesafesi (L):')}</span>
                   <span className="font-black text-cyan-300">{vdLength} m</span>
                 </div>
                 <input
@@ -2195,11 +2420,11 @@ export default function FieldToolsSuitePage() {
                   max={300}
                   value={vdLength}
                   onChange={(e) => setVdLength(Number(e.target.value))}
-                  className="w-full accent-cyan-400"
+                  className="w-full accent-[var(--cyan)]"
                 />
 
                 <div className="flex justify-between text-xs font-mono mt-2">
-                  <span className="text-slate-400">{tr ? 'Çekilen Akım (I):' : 'Load Current (I):'}</span>
+                  <span className="text-slate-400">{t12(language, 'Load Current (I):', 'Çekilen Akım (I):')}</span>
                   <span className="font-black text-amber-300">{vdCurrent} A ({(vdCurrent * nominalV * (is1Ph ? 1 : Math.sqrt(3)) * vdCosPhi / 1000).toFixed(1)} kW)</span>
                 </div>
                 <input
@@ -2208,19 +2433,19 @@ export default function FieldToolsSuitePage() {
                   max={150}
                   value={vdCurrent}
                   onChange={(e) => setVdCurrent(Number(e.target.value))}
-                  className="w-full accent-amber-400"
+                  className="w-full accent-[var(--cyan)]"
                 />
               </div>
 
               {/* Result KPI Card */}
               <div className={`p-4 rounded-2xl border text-center transition-all ${
                 isSafe
-                  ? 'bg-emerald-950/30 border-emerald-500/40 shadow-emerald-500/10'
+                  ? 'bg-emerald-950/30 border-emerald-500/40 '
                   : isAcceptable
-                  ? 'bg-amber-950/30 border-amber-500/40 shadow-amber-500/10'
-                  : 'bg-rose-950/40 border-rose-500/50 shadow-rose-500/20'
+                  ? 'bg-amber-950/30 border-amber-500/40 '
+                  : 'bg-rose-950/40 border-rose-500/50 '
               }`}>
-                <div className="text-[10px] font-mono uppercase text-slate-400">{tr ? 'Toplam Gerilim Düşümü' : 'Total Voltage Drop'}</div>
+                <div className="text-[10px] font-mono uppercase text-slate-400">{t12(language, 'Total Voltage Drop', 'Toplam Gerilim Düşümü')}</div>
                 <div className="text-2xl font-black font-mono mt-1 text-white flex items-center justify-center gap-2">
                   <span>ΔU = {deltaU.toFixed(2)} V</span>
                   <span className={`text-base px-2 py-0.5 rounded-md ${isSafe ? 'bg-emerald-500/20 text-emerald-300' : isAcceptable ? 'bg-amber-500/20 text-amber-300' : 'bg-rose-500/20 text-rose-300'}`}>
@@ -2229,22 +2454,22 @@ export default function FieldToolsSuitePage() {
                 </div>
                 <div className="text-xs font-mono font-bold mt-2">
                   {isSafe ? (
-                    <span className="text-emerald-400">✅ {tr ? 'STANDARDA UYGUN (≤ %3 Aydınlatma & Güç)' : 'OPTIMAL (≤ 3% Lighting & Power)'}</span>
+                    <span className="text-emerald-400">✅ {t12(language, 'OPTIMAL (≤ 3% Lighting & Power)', 'STANDARDA UYGUN (≤ %3 Aydınlatma & Güç)')}</span>
                   ) : isAcceptable ? (
-                    <span className="text-amber-400">⚠️ {tr ? 'KABUL EDİLEBİLİR (≤ %5 Motor & Güç Hatları)' : 'ACCEPTABLE (≤ 5% Power Lines)'}</span>
+                    <span className="text-amber-400">⚠️ {t12(language, 'ACCEPTABLE (≤ 5% Power Lines)', 'KABUL EDİLEBİLİR (≤ %5 Motor & Güç Hatları)')}</span>
                   ) : (
-                    <span className="text-rose-400">❌ {tr ? 'AŞIRI GERİLİM DÜŞÜMÜ! KESİTİ BÜYÜTÜN!' : 'VOLTAGE DROP EXCEEDED! UPSIZE CABLE!'}</span>
+                    <span className="text-rose-400">❌ {t12(language, 'VOLTAGE DROP EXCEEDED! UPSIZE CABLE!', 'AŞIRI GERİLİM DÜŞÜMÜ! KESİTİ BÜYÜTÜN!')}</span>
                   )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono">
                 <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[9px] text-slate-400 uppercase block">{tr ? 'Hat Güç Kaybı' : 'Power Loss'}</span>
+                  <span className="text-[9px] text-slate-400 uppercase block">{t12(language, 'Power Loss', 'Hat Güç Kaybı')}</span>
                   <span className="font-bold text-white">{powerLossW.toFixed(1)} W</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[9px] text-slate-400 uppercase block">{tr ? 'Hat Direnci' : 'Resistance (R)'}</span>
+                  <span className="text-[9px] text-slate-400 uppercase block">{t12(language, 'Resistance (R)', 'Hat Direnci')}</span>
                   <span className="font-bold text-cyan-300">{resistance.toFixed(4)} Ω</span>
                 </div>
               </div>
@@ -2255,19 +2480,19 @@ export default function FieldToolsSuitePage() {
                   onClick={() => {
                     const text = `Cable: ${vdSection}mm² ${vdMaterial === 'cu' ? 'Cu' : 'Al'}, System: ${nominalV}V, Length: ${vdLength}m, Load: ${vdCurrent}A, Voltage Drop: ${deltaU.toFixed(2)}V (${deltaUPct.toFixed(2)}%), Loss: ${powerLossW.toFixed(1)}W`;
                     navigator.clipboard.writeText(text);
-                    alert(tr ? 'Kablo hesabı kopyalandı!' : 'Cable calculation copied!');
+                    alert(t12(language, 'Cable calculation copied!', 'Kablo hesabı kopyalandı!'));
                   }}
                   className="flex-1 py-2.5 rounded-xl bg-amber-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
                 >
                   <Copy size={14} />
-                  <span>{tr ? 'Hesabı Kopyala' : 'Copy Calculation'}</span>
+                  <span>{t12(language, 'Copy Calculation', 'Hesabı Kopyala')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
                   className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
                 >
-                  {tr ? 'Kapat' : 'Close'}
+                  {t12(language, 'Close', 'Kapat')}
                 </button>
               </div>
             </div>
@@ -2275,50 +2500,561 @@ export default function FieldToolsSuitePage() {
         );
       })()}
 
-      {activeModal === 'sheet-bending' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl border border-pink-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4 text-center">
-            <h3 className="text-sm font-bold text-white">{tr ? 'Sac Büküm (DIN 6935)' : 'Sheet Bending'}</h3>
-            <p className="text-xs text-slate-400">{tr ? 'K-faktörü ve açınım boyu hesabı.' : 'K-factor & bend allowance.'}</p>
-            <Link
-              href="/sheet-metal"
-              className="block w-full py-3 rounded-xl bg-pink-500 text-black font-bold font-mono text-xs uppercase"
-            >
-              {tr ? 'Hesaplayıcıyı Aç →' : 'Open Solver →'}
-            </Link>
-            <button onClick={() => setActiveModal(null)} className="text-xs text-slate-500">Kapat</button>
-          </div>
-        </div>
-      )}
+      {/* ─── HYDRAULIC & PNEUMATIC CYLINDER MODAL ─── */}
+      {activeModal === 'cylinder-force' && (() => {
+        const areaPiston = (Math.PI * Math.pow(cylBore / 10, 2)) / 4; // cm2
+        const areaRod = (Math.PI * Math.pow(cylRod / 10, 2)) / 4; // cm2
+        const areaAnnular = Math.max(0, areaPiston - areaRod); // cm2
 
-      {activeModal === 'welding-heat' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl border border-red-500/30 bg-[#070b14] p-5 shadow-2xl space-y-4 text-center">
-            <h3 className="text-sm font-bold text-white">{tr ? 'Kaynak Mukavemeti' : 'Welding Stress & Heat'}</h3>
-            <p className="text-xs text-slate-400">{tr ? 'EN 1011-2 ısı girdisi ve dikiş kontrolü.' : 'EN 1011-2 heat input solver.'}</p>
-            <Link
-              href="/welding"
-              className="block w-full py-3 rounded-xl bg-red-500 text-white font-bold font-mono text-xs uppercase"
-            >
-              {tr ? 'Hesaplayıcıyı Aç →' : 'Open Solver →'}
-            </Link>
-            <button onClick={() => setActiveModal(null)} className="text-xs text-slate-500">Kapat</button>
+        // Force in N: P(bar) * 10^5 * Area(m2) = P(bar) * 10 * Area(cm2)
+        const pushForceN = cylPressure * 10 * areaPiston;
+        const pullForceN = cylPressure * 10 * areaAnnular;
+        const pushForceKg = pushForceN / 9.80665;
+        const pullForceKg = pullForceN / 9.80665;
+        const pushForceKN = pushForceN / 1000;
+        const pullForceKN = pullForceN / 1000;
+
+        // Flow Q (L/min) = Area(m2) * Speed(m/s) * 60 * 1000 = Area(cm2) * Speed(m/s) * 6
+        const extFlowLmin = areaPiston * cylSpeed * 6;
+        const retFlowLmin = areaAnnular * cylSpeed * 6;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-sky-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
+                    <Gauge size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Cylinder Force & Flow', 'Hidrolik & Pnömatik Piston Hesabı')}</h3>
+                    <p className="text-[10px] text-sky-400 font-mono">ISO 6020 · ISO 15552</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Type Switcher */}
+              <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-white/5 border border-white/10 font-mono text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCylType('hydraulic');
+                    setCylPressure(160);
+                  }}
+                  className={`py-2 rounded-lg font-bold transition-colors ${cylType === 'hydraulic' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md' : 'text-slate-400 hover:text-white'}`}
+                >
+                  {t12(language, '💧 Hydraulic', '💧 Hidrolik (160 bar)')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCylType('pneumatic');
+                    setCylPressure(6);
+                  }}
+                  className={`py-2 rounded-lg font-bold transition-colors ${cylType === 'pneumatic' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-md' : 'text-slate-400 hover:text-white'}`}
+                >
+                  {t12(language, '💨 Pneumatic', '💨 Pnömatik (6 bar)')}
+                </button>
+              </div>
+
+              {/* Preset Combos */}
+              <div className="space-y-1">
+                <div className="text-[9px] font-mono text-slate-400 uppercase">{t12(language, 'Standard ISO Presets', 'Standart Piston / Mil Çapları')}</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { b: 40, r: 22 },
+                    { b: 50, r: 28 },
+                    { b: 63, r: 36 },
+                    { b: 80, r: 45 },
+                    { b: 100, r: 56 },
+                    { b: 125, r: 70 },
+                  ].map((p) => (
+                    <button
+                      key={p.b}
+                      onClick={() => {
+                        setCylBore(p.b);
+                        setCylRod(p.r);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg border text-[11px] font-mono transition-colors ${cylBore === p.b ? 'bg-sky-500/20 border-sky-400 text-sky-300 font-bold' : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/25'}`}
+                    >
+                      Ø{p.b}/Ø{p.r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sliders & Inputs */}
+              <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Bore (D):', 'Piston Çapı (D):')} <span className="text-white font-bold">{cylBore} mm</span></label>
+                  <input type="range" min={20} max={250} value={cylBore} onChange={(e) => setCylBore(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Rod (d):', 'Mil Çapı (d):')} <span className="text-white font-bold">{cylRod} mm</span></label>
+                  <input type="range" min={10} max={cylBore - 5} value={cylRod} onChange={(e) => setCylRod(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Pressure:', 'Basınç (P):')} <span className="text-amber-300 font-bold">{cylPressure} bar</span></label>
+                  <input type="range" min={1} max={cylType === 'hydraulic' ? 350 : 16} value={cylPressure} onChange={(e) => setCylPressure(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Speed (v):', 'Piston Hızı (v):')} <span className="text-cyan-300 font-bold">{cylSpeed} m/s</span></label>
+                  <input type="range" step={0.05} min={0.05} max={1.0} value={cylSpeed} onChange={(e) => setCylSpeed(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                </div>
+              </div>
+
+              {/* Results Cards */}
+              <div className="grid grid-cols-2 gap-2 text-center font-mono">
+                <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/40">
+                  <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'PUSH FORCE', 'İTME KUVVETİ (İLERİ)')}</div>
+                  <div className="text-xl font-black text-emerald-400 mt-1">{pushForceKN.toFixed(1)} kN</div>
+                  <div className="text-xs text-slate-300">{Math.round(pushForceKg).toLocaleString()} kgf</div>
+                  <div className="text-[10px] text-emerald-300/80 mt-1">{extFlowLmin.toFixed(1)} L/dk debi</div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-blue-950/30 border border-blue-500/40">
+                  <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'PULL FORCE', 'ÇEKME KUVVETİ (GERİ)')}</div>
+                  <div className="text-xl font-black text-sky-400 mt-1">{pullForceKN.toFixed(1)} kN</div>
+                  <div className="text-xs text-slate-300">{Math.round(pullForceKg).toLocaleString()} kgf</div>
+                  <div className="text-[10px] text-sky-300/80 mt-1">{retFlowLmin.toFixed(1)} L/dk debi</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `Cylinder: Ø${cylBore}/Ø${cylRod}mm @ ${cylPressure} bar | Push Force: ${pushForceKN.toFixed(1)} kN (${Math.round(pushForceKg)} kgf) | Pull Force: ${pullForceKN.toFixed(1)} kN (${Math.round(pullForceKg)} kgf) | Speed: ${cylSpeed} m/s | Q_ext: ${extFlowLmin.toFixed(1)} L/min, Q_ret: ${retFlowLmin.toFixed(1)} L/min`;
+                    navigator.clipboard.writeText(text);
+                    alert(t12(language, 'Cylinder specs copied!', 'Piston kuvvet hesabı kopyalandı!'));
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-sky-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
+                >
+                  <Copy size={14} />
+                  <span>{t12(language, 'Copy Specs', 'Kuvvetleri Kopyala')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModal(null)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+                >
+                  {t12(language, 'Close', 'Kapat')}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
+
+      {/* ─── THERMAL EXPANSION & CLEARANCE MODAL ─── */}
+      {activeModal === 'thermal-expansion' && (() => {
+        const alphas: Record<string, { name: string; val: number }> = {
+          al: { name: t12(language, 'Aluminum', 'Alüminyum (6060/6082)'), val: 23.0 },
+          steel: { name: t12(language, 'Carbon Steel', 'Yapı Çeliği (S235/S355)'), val: 11.5 },
+          ss304: { name: t12(language, 'Stainless Steel', 'Paslanmaz Çelik (304/316)'), val: 16.5 },
+          copper: { name: t12(language, 'Copper', 'Bakır (Cu)'), val: 16.8 },
+          brass: { name: t12(language, 'Brass', 'Pirinç (Ms58)'), val: 18.5 },
+          pvc: { name: t12(language, 'PVC / Plastic', 'PVC / Polimer'), val: 80.0 },
+        };
+
+        const curAlpha = alphas[teMaterial] || alphas.al;
+        const deltaT = Math.abs(teT2 - teT1);
+        const deltaL = (teLength * curAlpha.val * 1e-6 * deltaT);
+        const recSlottedHole = Math.ceil(deltaL * 1.5 + 2); // safety margin
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-orange-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
+                    <Thermometer size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Thermal Expansion & Clearance', 'Termal Genleşme & Montaj Boşluğu')}</h3>
+                    <p className="text-[10px] text-orange-400 font-mono">ΔL = L · α · ΔT</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Material Selector */}
+              <div>
+                <label className="text-[9px] font-mono text-slate-400 uppercase">{t12(language, 'Material', 'Malzeme Türü')}</label>
+                <select
+                  value={teMaterial}
+                  onChange={(e) => setTeMaterial(e.target.value as any)}
+                  className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono text-xs focus:border-orange-400 outline-none"
+                >
+                  {Object.keys(alphas).map((k) => (
+                    <option key={k} value={k}>{alphas[k].name} (α = {alphas[k].val} × 10⁻⁶ /°C)</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Inputs */}
+              <div className="space-y-2 p-3 rounded-2xl bg-white/5 border border-white/5 font-mono text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">{t12(language, 'Initial Length (L):', 'Profil / Parça Boyu (L):')}</span>
+                  <span className="text-white font-bold">{teLength} mm ({(teLength / 1000).toFixed(2)} m)</span>
+                </div>
+                <input type="range" min={500} max={30000} step={500} value={teLength} onChange={(e) => setTeLength(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Min Temp (T1):', 'Min Sıcaklık (T1):')}</label>
+                    <input type="number" value={teT1} onChange={(e) => setTeT1(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-sky-300 font-bold text-center" />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Max Temp (T2):', 'Max Sıcaklık (T2):')}</label>
+                    <input type="number" value={teT2} onChange={(e) => setTeT2(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-rose-300 font-bold text-center" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Result KPI Card */}
+              <div className="p-4 rounded-2xl bg-orange-950/30 border border-orange-500/40 text-center font-mono space-y-2">
+                <div className="text-[10px] text-slate-400 uppercase">{t12(language, 'Total Expansion / Contraction', 'Toplam Uzama / Kısalma Payı')}</div>
+                <div className="text-3xl font-black text-orange-400">ΔL = ±{deltaL.toFixed(2)} mm</div>
+                <div className="text-xs text-slate-300">
+                  {t12(language, `Temp Difference ΔT = ${deltaT} °C`, `Sıcaklık Farkı ΔT = ${deltaT} °C (${(deltaL / (teLength / 1000)).toFixed(2)} mm/metre)`)}
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-emerald-300 font-bold">
+                  🔩 {t12(language, `Recommended Slotted Hole Play: Min ${recSlottedHole} mm`, `Önerilen Oval Delik / Derz Boşluğu: Min ${recSlottedHole} mm`)}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `Thermal Expansion: ${curAlpha.name} (L=${teLength}mm, ΔT=${deltaT}°C) -> ΔL = ${deltaL.toFixed(2)} mm | Min Slot/Gap: ${recSlottedHole} mm`;
+                    navigator.clipboard.writeText(text);
+                    alert(t12(language, 'Expansion calc copied!', 'Genleşme hesabı kopyalandı!'));
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-orange-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
+                >
+                  <Copy size={14} />
+                  <span>{t12(language, 'Copy Specs', 'Hesabı Kopyala')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModal(null)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+                >
+                  {t12(language, 'Close', 'Kapat')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ─── CRANE RIGGING & SLING ANGLE SAFETY MODAL ─── */}
+      {activeModal === 'rigging-sling' && (() => {
+        const rad = (slingAngle * Math.PI) / 180;
+        const sinVal = Math.sin(rad);
+        const tensionPerLegKg = slingWeight / (slingLegs * sinVal);
+        const loadFactor = 1 / sinVal;
+
+        const isSafe = slingAngle >= 60;
+        const isCaution = slingAngle >= 45 && slingAngle < 60;
+        const isDanger = slingAngle < 45;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-emerald-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
+                    <Anchor size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Crane Rigging & Sling Angle', 'Sapan Açısı & Vinç Emniyeti')}</h3>
+                    <p className="text-[10px] text-emerald-400 font-mono">OSHA 1910.184 · EN 1492</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Sliders */}
+              <div className="space-y-3 p-3 rounded-2xl bg-white/5 border border-white/5 font-mono text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">{t12(language, 'Total Load (W):', 'Kaldırılacak Yük (W):')}</span>
+                  <span className="text-white font-bold">{slingWeight.toLocaleString()} kg ({(slingWeight / 1000).toFixed(2)} Ton)</span>
+                </div>
+                <input type="range" min={100} max={25000} step={100} value={slingWeight} onChange={(e) => setSlingWeight(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Sling Legs', 'Sapan Kolu Sayısı')}</label>
+                    <div className="grid grid-cols-3 gap-1 mt-1">
+                      {[2, 3, 4].map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setSlingLegs(n as any)}
+                          className={`py-1.5 rounded-lg border text-center font-bold transition-colors ${slingLegs === n ? 'bg-[var(--cyan)] text-[var(--accent-ink)] border-emerald-400' : 'bg-black/60 border-white/15 text-slate-300'}`}
+                        >
+                          {n}x
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Sling Angle (α):', 'Yatay Sapan Açısı (α):')} <span className="text-amber-300 font-bold">{slingAngle}°</span></label>
+                    <input type="range" min={20} max={90} step={5} value={slingAngle} onChange={(e) => setSlingAngle(Number(e.target.value))} className="w-full accent-[var(--cyan)] mt-2" />
+                  </div>
+                </div>
+              </div>
+
+              {/* KPI Results */}
+              <div className={`p-4 rounded-2xl border text-center font-mono space-y-2 ${isSafe ? 'bg-emerald-950/30 border-emerald-500/40' : isCaution ? 'bg-amber-950/30 border-amber-500/40' : 'bg-rose-950/40 border-rose-500/50'}`}>
+                <div className="text-[10px] uppercase text-slate-400">{t12(language, 'TENSION PER SLING LEG', 'SAPAN KOLU BAŞINA DÜŞEN GERİLME')}</div>
+                <div className="text-3xl font-black text-white">{Math.round(tensionPerLegKg).toLocaleString()} kg</div>
+                <div className="text-xs text-slate-300">
+                  {t12(language, `Load Angle Factor: ${loadFactor.toFixed(3)}x`, `Açı Çarpan Faktörü: ${loadFactor.toFixed(3)}x (${slingAngle}°)`)}
+                </div>
+                <div className="text-xs font-bold pt-1">
+                  {isSafe ? (
+                    <span className="text-emerald-400">✅ {t12(language, 'SAFE & OPTIMAL (≥ 60°)', 'İDEAL VE EMNİYETLİ AÇI (≥ 60° Önerilen)')}</span>
+                  ) : isCaution ? (
+                    <span className="text-amber-400">⚠️ {t12(language, 'CAUTION! 41% TENSION INCREASE (45°-59°)', 'DİKKAT! GERİLME %41 ARTTI (45° - 59°)')}</span>
+                  ) : (
+                    <span className="text-rose-400">❌ {t12(language, 'CRITICAL HAZARD! DO NOT RIG UNDER 45°!', 'TEHLİKELİ VE YASAK AÇI! (< 45° KULLANMAYIN!)')}</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `Rigging: Load ${slingWeight}kg on ${slingLegs} legs @ ${slingAngle}° -> Tension per leg = ${Math.round(tensionPerLegKg)} kg (${loadFactor.toFixed(2)}x factor)`;
+                    navigator.clipboard.writeText(text);
+                    alert(t12(language, 'Rigging calc copied!', 'Sapan hesabı kopyalandı!'));
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
+                >
+                  <Copy size={14} />
+                  <span>{t12(language, 'Copy Specs', 'Hesabı Kopyala')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModal(null)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+                >
+                  {t12(language, 'Close', 'Kapat')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ─── V-BELT & PULLEY CENTER DISTANCE MODAL ─── */}
+      {activeModal === 'v-belt-calc' && (() => {
+        const C = beltCenter;
+        const d = beltD1;
+        const D = beltD2;
+        const pitchLength = 2 * C + (Math.PI / 2) * (D + d) + Math.pow(D - d, 2) / (4 * C);
+        const contactAngleDeg = 180 - (2 * Math.asin(Math.abs(D - d) / (2 * C)) * 180) / Math.PI;
+        const ratio = D / d;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-purple-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
+                    <Disc size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'V-Belt & Pulley Center', 'V-Kayış & Kasnak Eksen Mesafesi')}</h3>
+                    <p className="text-[10px] text-purple-400 font-mono">DIN 2215 · ISO 4184</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Sliders */}
+              <div className="space-y-2.5 p-3 rounded-2xl bg-white/5 border border-white/5 font-mono text-xs">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Small Pulley (d1):', 'Küçük Kasnak (d1):')} <span className="text-white font-bold">{beltD1} mm</span></label>
+                    <input type="range" min={40} max={300} value={beltD1} onChange={(e) => setBeltD1(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Large Pulley (d2):', 'Büyük Kasnak (d2):')} <span className="text-white font-bold">{beltD2} mm</span></label>
+                    <input type="range" min={50} max={600} value={beltD2} onChange={(e) => setBeltD2(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{t12(language, 'Center Distance (C):', 'Eksen Mesafesi (C):')}</span>
+                    <span className="text-cyan-300 font-bold">{beltCenter} mm</span>
+                  </div>
+                  <input type="range" min={Math.round((beltD1 + beltD2) / 2 + 30)} max={1500} value={beltCenter} onChange={(e) => setBeltCenter(Number(e.target.value))} className="w-full accent-[var(--cyan)]" />
+                </div>
+              </div>
+
+              {/* Results */}
+              <div className="grid grid-cols-3 gap-2 text-center font-mono">
+                <div className="p-3 rounded-2xl bg-purple-950/30 border border-purple-500/30">
+                  <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'Pitch Length (Lp)', 'Kayış Hatve Boyu (Lp)')}</div>
+                  <div className="text-lg font-black text-purple-300 mt-1">{Math.round(pitchLength)} mm</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
+                  <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'Wrap Angle (β1)', 'Sarım Açısı (β1)')}</div>
+                  <div className="text-lg font-black text-amber-300 mt-1">{contactAngleDeg.toFixed(1)}°</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/5">
+                  <div className="text-[9px] text-slate-400 uppercase">{t12(language, 'Speed Ratio (i)', 'Çevrim Oranı (i)')}</div>
+                  <div className="text-lg font-black text-cyan-300 mt-1">1:{ratio.toFixed(2)}</div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `V-Belt: d1=${beltD1}mm, d2=${beltD2}mm, C=${beltCenter}mm -> Belt Pitch Length Lp=${Math.round(pitchLength)}mm, Wrap Angle=${contactAngleDeg.toFixed(1)}°, Ratio=1:${ratio.toFixed(2)}`;
+                    navigator.clipboard.writeText(text);
+                    alert(t12(language, 'Belt specs copied!', 'Kayış ölçüleri kopyalandı!'));
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-purple-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
+                >
+                  <Copy size={14} />
+                  <span>{t12(language, 'Copy Specs', 'Ölçüleri Kopyala')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModal(null)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+                >
+                  {t12(language, 'Close', 'Kapat')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ─── SHEET METAL BENDING (DIN 6935) MODAL ─── */}
+      {activeModal === 'sheet-bending' && (() => {
+        const rad = ((180 - sbAngle) * Math.PI) / 180;
+        const BA = (Math.PI / 180) * (180 - sbAngle) * (sbRadius + sbKFactor * sbThickness);
+        const SB = (sbRadius + sbThickness) * Math.tan(rad / 2);
+        const BD = 2 * SB - BA;
+        const blankSize = sbLeg1 + sbLeg2 - BD;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-3xl border border-pink-500/40 bg-[var(--bg-0)] p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] text-[var(--cyan)] flex items-center justify-center border border-[var(--cyan)]/40">
+                    <Split size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white">{t12(language, 'Sheet Bending & Flat Pattern', 'Sac Büküm K-Faktörü & Açınım')}</h3>
+                    <p className="text-[10px] text-pink-400 font-mono">DIN 6935 · ISO 7438</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10">
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Inputs */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs">
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Thickness (t)', 'Sac Kalınlığı (t)')}</label>
+                  <input type="number" step="0.5" value={sbThickness} onChange={(e) => setSbThickness(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-bold text-center" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Inner Radius (R)', 'İç Radyus (R)')}</label>
+                  <input type="number" step="0.5" value={sbRadius} onChange={(e) => setSbRadius(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-bold text-center" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Angle (θ)', 'Büküm Açısı (θ)')}</label>
+                  <input type="number" value={sbAngle} onChange={(e) => setSbAngle(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-amber-300 font-bold text-center" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'K-Factor (K)', 'K-Faktörü (K)')}</label>
+                  <input type="number" step="0.02" min="0.2" max="0.5" value={sbKFactor} onChange={(e) => setSbKFactor(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-cyan-300 font-bold text-center" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Leg 1 (L1)', 'Flanş 1 (L1)')}</label>
+                  <input type="number" value={sbLeg1} onChange={(e) => setSbLeg1(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-bold text-center" />
+                </div>
+                <div>
+                  <label className="text-[9px] text-slate-400 uppercase">{t12(language, 'Leg 2 (L2)', 'Flanş 2 (L2)')}</label>
+                  <input type="number" value={sbLeg2} onChange={(e) => setSbLeg2(Number(e.target.value))} className="w-full mt-1 p-2 rounded-xl bg-black/60 border border-white/15 text-white font-bold text-center" />
+                </div>
+              </div>
+
+              {/* Results */}
+              <div className="p-4 rounded-2xl bg-pink-950/30 border border-pink-500/40 font-mono text-center space-y-2">
+                <div className="text-[10px] text-slate-400 uppercase">{t12(language, 'FLAT PATTERN BLANK SIZE', 'AÇINIM SAC BOYU (BLANK LENGTH)')}</div>
+                <div className="text-3xl font-black text-pink-400">{blankSize.toFixed(2)} mm</div>
+                <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                  <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span className="text-[9px] text-slate-400 block uppercase">{t12(language, 'Bend Allowance (BA)', 'Büküm Payı (BA)')}</span>
+                    <span className="font-bold text-white">{BA.toFixed(2)} mm</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span className="text-[9px] text-slate-400 block uppercase">{t12(language, 'Bend Deduction (BD)', 'Büküm Kesintisi (BD)')}</span>
+                    <span className="font-bold text-cyan-300">{BD.toFixed(2)} mm</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `Sheet Bending: t=${sbThickness}mm, R=${sbRadius}mm, Angle=${sbAngle}°, K=${sbKFactor}, L1=${sbLeg1}mm, L2=${sbLeg2}mm -> Flat Blank=${blankSize.toFixed(2)}mm, BA=${BA.toFixed(2)}mm, BD=${BD.toFixed(2)}mm`;
+                    navigator.clipboard.writeText(text);
+                    alert(t12(language, 'Bending calc copied!', 'Sac açınım hesabı kopyalandı!'));
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-pink-500 text-black font-bold font-mono text-xs uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform"
+                >
+                  <Copy size={14} />
+                  <span>{t12(language, 'Copy Specs', 'Hesabı Kopyala')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModal(null)}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-mono text-xs hover:bg-white/15"
+                >
+                  {t12(language, 'Close', 'Kapat')}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ─── PWA QUICK WIDGET & HOMESCREEN HELPER ─── */}
       <div className="p-4 rounded-2xl border border-cyan-500/20 bg-gradient-to-r from-cyan-950/20 via-slate-900 to-blue-950/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/20 text-cyan-400">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cyan-glow)] text-[var(--cyan)]">
             <Sparkles size={16} />
           </div>
           <div>
-            <div className="font-bold text-white">{tr ? 'Telefon Ana Ekranına Widget Olarak Ekle' : 'Add Field Widget to Home Screen'}</div>
+            <div className="font-bold text-white">{t12(language, 'Add Field Widget to Home Screen', 'Telefon Ana Ekranına Widget Olarak Ekle')}</div>
             <div className="text-[10px] text-slate-400">
-              {tr
-                ? 'Safari / Chrome menüsünden "Ana Ekrana Ekle" seçeneğiyle tek dokunuşla internetsiz de açın.'
-                : 'Tap "Add to Home Screen" in your browser to install as an instant offline widget.'}
+              {t12(language, 'Tap "Add to Home Screen" in your browser to install as an instant offline widget.', 'Safari / Chrome menüsünden "Ana Ekrana Ekle" seçeneğiyle tek dokunuşla internetsiz de açın.')}
             </div>
           </div>
         </div>

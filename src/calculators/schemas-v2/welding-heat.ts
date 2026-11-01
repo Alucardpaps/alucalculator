@@ -168,7 +168,7 @@ const weldingHeatSchema: CalculatorSchemaV2 = {
         description: 'Calculate heat input per EN 1011-1. Process efficiency factor is REQUIRED.',
         category: 'fabrication',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-09',
         tags: ['welding', 'heat input', 'TIG', 'MIG', 'MMA', 'SAW', 'EN 1011'],
         verifiedStandards: ['EN 1011-1', 'AWS D1.1'],

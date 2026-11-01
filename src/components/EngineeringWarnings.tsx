@@ -1,4 +1,5 @@
 import { AlertTriangle, Info } from 'lucide-react';
+import { useGlobalPrecision, formatEngineeringValue } from '@/components/calculator-kit/precisionUtils';
 
 interface WarningsProps {
     shape: string;
@@ -7,6 +8,7 @@ interface WarningsProps {
 }
 
 export const EngineeringWarnings = ({ shape, inputs, material }: WarningsProps) => {
+  const precision = useGlobalPrecision();
     const warnings: string[] = [];
     const tips: string[] = [];
 
@@ -36,7 +38,7 @@ export const EngineeringWarnings = ({ shape, inputs, material }: WarningsProps) 
         if (t > 0 && (w > 0 || d > 0)) {
             const ratio = (w || d) / t;
             if (ratio > 60) {
-                warnings.push(`Diameter/Thickness ratio (${ratio.toFixed(0)}) is too high. Pipe may dent easily.`);
+                warnings.push(`Diameter/Thickness ratio (${formatEngineeringValue(ratio, precision, false)}) is too high. Pipe may dent easily.`);
             }
         }
     }

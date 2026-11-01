@@ -1,5 +1,5 @@
 /**
- * 📐 ALUCALC OS — PURE CLIENT-SIDE B-REP STEP EXPORTER ENGINE (ISO 10303-21)
+ * 📐 ALUCAD OS — PURE CLIENT-SIDE B-REP STEP EXPORTER ENGINE (ISO 10303-21)
  * 
  * Generates mathematically exact Boundary Representation (B-Rep) STEP CAD files
  * using standard AP214/AP203 schemas directly in the browser with ZERO server dependencies.
@@ -9,6 +9,10 @@
  * - Exact LINE and CIRCLE edge curves with EDGE_LOOP topologies.
  * - ISO 10303-21 compliant text serialization.
  */
+
+import * as THREE from 'three';
+import { createCustomGeometry } from '@/design-studio/geometryFactory';
+import { APP_MAJOR_MINOR } from '@/config/app';
 
 export interface StepBoxParams {
   width: number;     // X dimension (mm)
@@ -119,6 +123,10 @@ class StepBuilder {
   }
 
   public generateStepString(productName: string, solidBrepId: number): string {
+    return this.generateMultiSolidStepString(productName, [solidBrepId]);
+  }
+
+  public generateMultiSolidStepString(productName: string, solidBrepIds: number[]): string {
     const timestamp = new Date().toISOString();
     
     // Add standard context and product definition structure
@@ -133,7 +141,8 @@ class StepBuilder {
     const uncertainty = this.add(`UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(1.0E-05),#${lengthUnit},'distance_accuracy_value','confusion accuracy')`);
     const context = this.add(`( GEOMETRIC_REPRESENTATION_CONTEXT(3) GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#${uncertainty})) GLOBAL_UNIT_ASSIGNED_CONTEXT((#${lengthUnit},#${angleUnit},#${solidAngleUnit})) REPRESENTATION_CONTEXT('Context #1','3D') )`);
 
-    const shapeRep = this.add(`ADVANCED_BREP_SHAPE_REPRESENTATION('${productName}',(#${solidBrepId},#${worldAxis}),#${context})`);
+    const solidRefs = solidBrepIds.map(id => `#${id}`).join(',');
+    const shapeRep = this.add(`ADVANCED_BREP_SHAPE_REPRESENTATION('${productName}',(${solidRefs},#${worldAxis}),#${context})`);
     const prodDefFormation = this.add(`PRODUCT_DEFINITION_FORMATION('','',#${this.nextId() + 1})`);
     const product = this.add(`PRODUCT('${productName}','${productName}','',(#${this.nextId() + 1}))`);
     const prodContext = this.add(`PRODUCT_CONTEXT('',#${this.nextId() + 1},'mechanical')`);
@@ -145,8 +154,8 @@ class StepBuilder {
 
     const header = `ISO-10303-21;
 HEADER;
-FILE_DESCRIPTION(('AluCalc OS v5.2 True B-Rep Solid CAD Model','CAx-IF Rec.Pracs.---Representation of Geometric Boundaries'),'2;1');
-FILE_NAME('${productName}.step','${timestamp}',('AluCalc OS Engineer'),('AluCalc OS Advanced Engineering Division'),'AluCalc True B-Rep Kernel v5.2','AluCalc OS WebGL CAD','');
+FILE_DESCRIPTION(('AluCAD OS v${APP_MAJOR_MINOR} True B-Rep Solid CAD Model','CAx-IF Rec.Pracs.---Representation of Geometric Boundaries'),'2;1');
+FILE_NAME('${productName}.step','${timestamp}',('AluCAD OS Engineer'),('AluCAD OS Advanced Engineering Division'),'AluCalc True B-Rep Kernel v${APP_MAJOR_MINOR}','AluCAD OS WebGL CAD','');
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
 ENDSEC;
 DATA;
@@ -167,7 +176,7 @@ END-ISO-10303-21;
  */
 export function generateStepBox(params: StepBoxParams): string {
   const b = new StepBuilder();
-  const { width: W, height: H, thickness: T, name = 'AluCalc_Box' } = params;
+  const { width: W, height: H, thickness: T, name = 'AluCAD_Box' } = params;
 
   // Directions
   const dX = b.direction(1, 0, 0);
@@ -312,7 +321,7 @@ export function generateStepBox(params: StepBoxParams): string {
  */
 export function generateStepPlateWithHole(params: StepPlateHoleParams): string {
   const b = new StepBuilder();
-  const { width: W, height: H, thickness: T, holeRadius: R, name = 'AluCalc_Plate_Hole' } = params;
+  const { width: W, height: H, thickness: T, holeRadius: R, name = 'AluCAD_Plate_Hole' } = params;
 
   // Directions
   const dX = b.direction(1, 0, 0);
@@ -504,7 +513,7 @@ export function generateStepPlateWithHole(params: StepPlateHoleParams): string {
  */
 export function generateStepShaft(params: StepShaftParams): string {
   const b = new StepBuilder();
-  const { length: L, diameter: D, stepLength: sL = 0, stepDiameter: sD = 0, name = 'AluCalc_Shaft' } = params;
+  const { length: L, diameter: D, stepLength: sL = 0, stepDiameter: sD = 0, name = 'AluCAD_Shaft' } = params;
   const R = D / 2;
 
   const dX = b.direction(1, 0, 0);
@@ -579,9 +588,163 @@ export function generateStepShaft(params: StepShaftParams): string {
 }
 
 /**
+ * Convert any 3D BufferGeometry mesh to a valid B-Rep solid body in STEP format
+ */
+export function exportMeshToStepSolid(
+  b: StepBuilder,
+  geometry: THREE.BufferGeometry,
+  matrix: THREE.Matrix4,
+  name: string = 'SOLID'
+): number | null {
+  if (!geometry || !geometry.attributes.position) return null;
+
+  const posAttr = geometry.attributes.position;
+  const index = geometry.getIndex();
+  const triCount = index ? index.count / 3 : posAttr.count / 3;
+  if (triCount < 1) return null;
+
+  // Vertex point cache to avoid duplicates
+  const pointMap = new Map<string, number>();
+  const vertexMap = new Map<string, number>();
+
+  const getOrCreateVertex = (v: THREE.Vector3): number => {
+    const key = `${v.x.toFixed(3)}_${v.y.toFixed(3)}_${v.z.toFixed(3)}`;
+    let vId = vertexMap.get(key);
+    if (!vId) {
+      let pId = pointMap.get(key);
+      if (!pId) {
+        pId = b.cartesianPoint(v.x, v.y, v.z);
+        pointMap.set(key, pId);
+      }
+      vId = b.vertex(pId);
+      vertexMap.set(key, vId);
+    }
+    return vId;
+  };
+
+  const faceIds: number[] = [];
+  const maxTriangles = Math.min(triCount, 1500); // Guard for browser performance and file size
+
+  for (let i = 0; i < maxTriangles; i++) {
+    let ia = i * 3;
+    let ib = i * 3 + 1;
+    let ic = i * 3 + 2;
+    if (index) {
+      ia = index.getX(ia);
+      ib = index.getX(ib);
+      ic = index.getX(ic);
+    }
+
+    const v1 = new THREE.Vector3().fromBufferAttribute(posAttr, ia).applyMatrix4(matrix);
+    const v2 = new THREE.Vector3().fromBufferAttribute(posAttr, ib).applyMatrix4(matrix);
+    const v3 = new THREE.Vector3().fromBufferAttribute(posAttr, ic).applyMatrix4(matrix);
+
+    const normal = new THREE.Vector3().subVectors(v2, v1).cross(new THREE.Vector3().subVectors(v3, v1)).normalize();
+    if (normal.lengthSq() < 0.001) continue;
+
+    // Triangle Vertices
+    const vert1 = getOrCreateVertex(v1);
+    const vert2 = getOrCreateVertex(v2);
+    const vert3 = getOrCreateVertex(v3);
+
+    // Edges
+    const d12 = new THREE.Vector3().subVectors(v2, v1);
+    const len12 = d12.length();
+    if (len12 < 0.001) continue;
+    const dir12Id = b.direction(d12.x / len12, d12.y / len12, d12.z / len12);
+    const vec12 = b.vector(dir12Id, len12);
+    const l12 = b.line(pointMap.get(`${v1.x.toFixed(3)}_${v1.y.toFixed(3)}_${v1.z.toFixed(3)}`)!, vec12);
+    const ec12 = b.edgeCurve(vert1, vert2, l12, true);
+
+    const d23 = new THREE.Vector3().subVectors(v3, v2);
+    const len23 = d23.length();
+    if (len23 < 0.001) continue;
+    const dir23Id = b.direction(d23.x / len23, d23.y / len23, d23.z / len23);
+    const vec23 = b.vector(dir23Id, len23);
+    const l23 = b.line(pointMap.get(`${v2.x.toFixed(3)}_${v2.y.toFixed(3)}_${v2.z.toFixed(3)}`)!, vec23);
+    const ec23 = b.edgeCurve(vert2, vert3, l23, true);
+
+    const d31 = new THREE.Vector3().subVectors(v1, v3);
+    const len31 = d31.length();
+    if (len31 < 0.001) continue;
+    const dir31Id = b.direction(d31.x / len31, d31.y / len31, d31.z / len31);
+    const vec31 = b.vector(dir31Id, len31);
+    const l31 = b.line(pointMap.get(`${v3.x.toFixed(3)}_${v3.y.toFixed(3)}_${v3.z.toFixed(3)}`)!, vec31);
+    const ec31 = b.edgeCurve(vert3, vert1, l31, true);
+
+    // Face Plane
+    const normDirId = b.direction(normal.x, normal.y, normal.z);
+    const refDirId = b.direction(d12.x / len12, d12.y / len12, d12.z / len12);
+    const axFace = b.axis2Placement(pointMap.get(`${v1.x.toFixed(3)}_${v1.y.toFixed(3)}_${v1.z.toFixed(3)}`)!, normDirId, refDirId);
+    const planeId = b.plane(axFace);
+
+    const loop = b.edgeLoop([
+      b.orientedEdge(ec12, true),
+      b.orientedEdge(ec23, true),
+      b.orientedEdge(ec31, true),
+    ]);
+    const face = b.advancedFace([b.faceOuterBound(loop)], planeId, true);
+    faceIds.push(face);
+  }
+
+  if (faceIds.length === 0) return null;
+
+  const shell = b.closedShell(faceIds);
+  return b.manifoldSolidBrep(shell, name);
+}
+
+/**
+ * 4. Generate Universal Multi-Solid Assembly STEP File for Any Collection of Parts
+ */
+export function generateAssemblyStep(parts: any[], projectName: string = 'AluCAD_Assembly'): string {
+  const b = new StepBuilder();
+  const solidIds: number[] = [];
+
+  const visibleParts = parts.filter((p) => p.visible !== false);
+  if (visibleParts.length === 0) {
+    return generateStepBox({ width: 50, height: 50, thickness: 10, name: projectName });
+  }
+
+  for (let idx = 0; idx < visibleParts.length; idx++) {
+    const p = visibleParts[idx];
+    const geom = createCustomGeometry(p);
+    if (!geom) continue;
+
+    const matrix = new THREE.Matrix4();
+    const px = p.position.x;
+    const py = p.position.y;
+    const pz = p.position.z;
+    const rx = ((p.rotation?.x || 0) * Math.PI) / 180;
+    const ry = ((p.rotation?.y || 0) * Math.PI) / 180;
+    const rz = ((p.rotation?.z || 0) * Math.PI) / 180;
+    const sx = (p.scale?.x ?? 1) * 10;
+    const sy = (p.scale?.y ?? 1) * 10;
+    const sz = (p.scale?.z ?? 1) * 10;
+
+    matrix.compose(
+      new THREE.Vector3(px, py, pz),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz, 'XYZ')),
+      new THREE.Vector3(sx, sy, sz)
+    );
+
+    const solidName = p.name ? p.name.replace(/[^a-zA-Z0-9_-]/g, '_') : `Part_${idx + 1}`;
+    const solidId = exportMeshToStepSolid(b, geom, matrix, solidName);
+    if (solidId) {
+      solidIds.push(solidId);
+    }
+  }
+
+  if (solidIds.length === 0) {
+    return generateStepBox({ width: 50, height: 50, thickness: 10, name: projectName });
+  }
+
+  return b.generateMultiSolidStepString(projectName, solidIds);
+}
+
+/**
  * Universal Client-Side STEP Exporter Helper
  */
-export function downloadStepFile(stepContent: string, filename: string = 'AluCalc_Part.step'): void {
+export function downloadStepFile(stepContent: string, filename: string = 'AluCAD_Part.step'): void {
   const blob = new Blob([stepContent], { type: 'application/step;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

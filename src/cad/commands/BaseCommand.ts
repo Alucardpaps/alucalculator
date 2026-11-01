@@ -21,7 +21,23 @@ export abstract class BaseCommand implements Command {
         useCadStore.getState().setCommandPrompt('Type a command');
     }
 
-    abstract onMouseMove(point: Point): void;
+    protected finish(): void {
+        useCadStore.getState().setCommandState('IDLE');
+        useCadStore.getState().setActiveCommand(null);
+    }
+
+    onMouseMove(_point: Point): void {
+        // Default: no-op
+    }
+
+    onMouseDown(_point: Point): void {
+        // Default: no-op
+    }
+
+    onMouseUp(_point?: Point): void {
+        // Default: no-op
+    }
+
     abstract onPointInput(point: Point): void;
 
     onValueInput(value: string): void {
@@ -54,7 +70,10 @@ export abstract class BaseCommand implements Command {
     }
 
     protected setPrompt(prompt: string): void {
-        useCadStore.getState().setCommandState('AWAITING_POINT');
-        useCadStore.getState().setCommandPrompt(prompt);
+        const st = useCadStore.getState();
+        if (st.commandPrompt !== prompt || st.commandState !== 'AWAITING_POINT') {
+            st.setCommandState('AWAITING_POINT');
+            st.setCommandPrompt(prompt);
+        }
     }
 }

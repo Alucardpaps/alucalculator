@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 /**
- * WidgetSharingPanel - AluCalc OS v4
+ * WidgetSharingPanel - AluCAD OS v4
  * Generates HTML/IFrame embed codes for 3D analysis screens.
  */
 export const WidgetSharingPanel: React.FC<{ calculationId?: string }> = ({ calculationId = 'demo-calc' }) => {

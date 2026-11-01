@@ -9,7 +9,7 @@ export const hookesLaw3dSchema: CalculatorSchemaV2 = {
         description: 'Triaxial stress-strain relationships, volumetric analysis.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-25',
         tags: ['stress', 'strain', 'hooke', 'bulk', 'mechanics', 'poisson'],
         verifiedStandards: ['Linear Elasticity']
@@ -206,7 +206,7 @@ export const hookesLaw3dSchema: CalculatorSchemaV2 = {
             };
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     <div className="flex gap-4 w-full justify-between items-center mb-4">
                         <div className="flex-1 bg-black/40 rounded p-2 text-cyan-400 font-mono text-xs border border-cyan-900/30">
                             <div>εx: {(ex * 1e6).toFixed(0)} με</div>

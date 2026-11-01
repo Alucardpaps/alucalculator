@@ -75,11 +75,15 @@ export default function DashboardPage() {
     };
 
     const fetchProjects = async () => {
+        if (!session?.user) {
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
         try {
             const response = await fetch('/api/projects', { cache: 'no-store' });
-            const data = await response.json();
             if (response.ok) {
+                const data = await response.json();
                 setProjects(data);
                 if (data.length > 0) {
                     // Always default to the first project if none selected
@@ -87,7 +91,7 @@ export default function DashboardPage() {
                 }
             }
         } catch (error) {
-            console.error("Fetch projects failed", error);
+            console.warn("Fetch projects failed", error);
         } finally {
             setIsLoading(false);
         }
@@ -120,10 +124,10 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020408] text-slate-400 selection:bg-blue-500/20 font-sans">
+        <div className="min-h-screen bg-[var(--bg-0)] text-slate-400 font-sans">
             
             {/* Command Header */}
-            <header className="border-b border-slate-900 bg-[#020408]/80 backdrop-blur-md sticky top-0 z-50">
+            <header className="border-b border-slate-900 bg-[var(--bg-0)]/80 sticky top-0 z-50">
                 <div className="max-w-[1600px] mx-auto px-6 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/dashboard" className="flex items-center gap-2 group">
@@ -151,7 +155,7 @@ export default function DashboardPage() {
                 
                 {/* Left Sidebar: Control Center Stats */}
                 <div className="col-span-12 lg:col-span-3 space-y-6">
-                    <div className="p-6 bg-[#0f172a] border border-slate-800 rounded-xl space-y-8">
+                    <div className="p-6 bg-[var(--bg-2)] border border-slate-800 rounded-xl space-y-8">
                         <div>
                             <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-6">
                                 <Activity size={12} className="text-blue-500" />
@@ -211,7 +215,7 @@ export default function DashboardPage() {
                     
                     {projects.length === 0 && !isLoading ? (
                         /* Empty State Onboarding */
-                        <div className="flex flex-col items-center justify-center py-24 px-8 bg-[#0f172a] border border-slate-800 rounded-[3rem] text-center space-y-8 shadow-2xl relative overflow-hidden">
+                        <div className="flex flex-col items-center justify-center py-24 px-8 bg-[var(--bg-2)] border border-slate-800 rounded-xl text-center space-y-8 shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
                             
                             <div className="space-y-4 max-w-lg">
@@ -227,7 +231,7 @@ export default function DashboardPage() {
                             <button 
                                 onClick={() => handleCreateProject("Project Alpha")}
                                 disabled={isCreating}
-                                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl shadow-blue-600/20 flex items-center gap-3 group disabled:opacity-50"
+                                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl flex items-center gap-3 group disabled:opacity-50"
                             >
                                 <Plus size={16} />
                                 {isCreating ? d.initializing : d.initializeProject}
@@ -247,13 +251,13 @@ export default function DashboardPage() {
                                     <div className="flex bg-slate-900/50 p-1 rounded-xl border border-slate-800">
                                         <button 
                                             onClick={() => setViewMode('ledger')}
-                                            className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'ledger' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                                            className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'ledger' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                                         >
                                             {d.projectLedger}
                                         </button>
                                         <button 
                                             onClick={() => setViewMode('flow')}
-                                            className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'flow' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                                            className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'flow' ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                                         >
                                             {d.assemblyFlow}
                                         </button>
@@ -263,7 +267,7 @@ export default function DashboardPage() {
                                     <button 
                                         onClick={() => handleCreateProject()}
                                         disabled={isCreating}
-                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold text-white transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold text-white transition-all shadow-lg disabled:opacity-50"
                                     >
                                         <Plus size={16} />
                                         {isCreating ? d.creating : d.newProject}
@@ -275,7 +279,7 @@ export default function DashboardPage() {
                             <div className="flex gap-8 items-start">
                                 <div className={`transition-all duration-500 flex-grow ${selectedNode ? 'lg:max-w-[calc(100%-384px-2rem)]' : 'w-full'}`}>
                                     {viewMode === 'flow' ? (
-                                        <div className="p-8 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl">
+                                        <div className="p-8 bg-[var(--bg-2)] border border-slate-800 rounded-3xl shadow-2xl">
                                             <div className="flex items-center gap-3 mb-8">
                                                 <GitBranch size={18} className="text-blue-500" />
                                                 <h3 className="text-sm font-bold text-white uppercase tracking-tight">{d.dependencyGraph}</h3>
@@ -293,7 +297,7 @@ export default function DashboardPage() {
                                                     <div 
                                                         key={node.id} 
                                                         onClick={() => setSelectedNode(node)}
-                                                        className="p-6 bg-[#0f172a] border border-slate-800 rounded-2xl shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all cursor-pointer"
+                                                        className="p-6 bg-[var(--bg-2)] border border-slate-800 rounded-2xl shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all cursor-pointer"
                                                     >
                                                         <div className="absolute top-0 right-0 p-3">
                                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
@@ -303,7 +307,7 @@ export default function DashboardPage() {
                                                         </div>
                                                         <div className="space-y-6">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 bg-blue-600/10 rounded flex items-center justify-center border border-blue-500/20">
+                                                                <div className="w-10 h-10 bg-[var(--cyan-glow)] rounded flex items-center justify-center border border-[var(--cyan)]/40">
                                                                     {node.type === 'gears' ? <Cog size={20} className="text-blue-500" /> : <Zap size={20} className="text-blue-500" />}
                                                                 </div>
                                                                 <div>
@@ -323,7 +327,7 @@ export default function DashboardPage() {
                                             {/* Project Repository Ledger */}
                                             <div className="space-y-4">
                                                 <h3 className="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-2">{d.projectHistory}</h3>
-                                                <div className="bg-[#0f172a] border border-slate-800 rounded-xl overflow-hidden">
+                                                <div className="bg-[var(--bg-2)] border border-slate-800 rounded-xl overflow-hidden">
                                                     <table className="w-full text-left border-collapse">
                                                         <tbody className="divide-y divide-slate-900">
                                                             {projects.slice(0, 5).map(p => (
@@ -353,7 +357,7 @@ export default function DashboardPage() {
                                 {/* Node Quick View (Side Panel) */}
                                 {selectedNode && (
                                     <div className="w-96 flex-shrink-0 animate-in slide-in-from-right duration-500">
-                                        <div className="sticky top-24 p-6 bg-[#0f172a] border border-blue-500/20 rounded-3xl shadow-2xl space-y-8">
+                                        <div className="sticky top-24 p-6 bg-[var(--bg-2)] border border-blue-500/20 rounded-3xl shadow-2xl space-y-8">
                                             <div className="flex items-center justify-between">
                                                 <h3 className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">{d.nodeQuickInspect}</h3>
                                                 <button onClick={() => setSelectedNode(null)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-white transition-colors">

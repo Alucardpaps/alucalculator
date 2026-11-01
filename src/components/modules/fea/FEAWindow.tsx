@@ -14,7 +14,7 @@ const BeamCanvas3D = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="absolute inset-0 bg-[#020305] flex items-center justify-center">
+            <div className="absolute inset-0 bg-[var(--bg-0)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                     <span className="text-xs text-gray-500 font-mono uppercase tracking-widest">Loading FEA Engine...</span>
@@ -26,7 +26,7 @@ const BeamCanvas3D = dynamic(
 
 export function FEAWindow() {
     return (
-        <div className="absolute inset-0 z-10 bg-[#020305] overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-[var(--bg-0)] overflow-hidden">
             <BeamCanvas3D />
         </div>
     );

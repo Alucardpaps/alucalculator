@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Parametric Bolt Visualizer
+ * AluCAD OS — Parametric Bolt Visualizer
  * 
  * Generates SVG representation of bolts based on calculation inputs.
  * Follows ISO 4762 / DIN 912 proportions.

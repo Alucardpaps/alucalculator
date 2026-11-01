@@ -10,7 +10,7 @@ const beamDeflectionSchema: CalculatorSchemaV2 = {
         description: 'Calculate deflection, slope, and stress for standard beams.',
         category: 'mechanical',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['beam', 'structural', 'deflection', 'stress', 'euler-bernoulli'],
         verifiedStandards: ['Euler-Bernoulli Beam Theory'],

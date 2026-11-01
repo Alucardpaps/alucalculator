@@ -1,0 +1,746 @@
+[
+  {
+    "en": "NBR 70 Shore A (Standard Nitrile - Hydraulic/Air)",
+    "tr": "NBR 70 Shore A (Standart Nitril - Hidrolik/Hava)"
+  },
+  {
+    "en": "NBR 90 Shore A (Hard Nitrile - High Pressure)",
+    "tr": "NBR 90 Shore A (Sert Nitril - Yüksek Basınç)"
+  },
+  {
+    "en": "FKM / Viton 75 Shore A (High Temp & Chemical)",
+    "tr": "FKM / Viton 75 Shore A (Yüksek Isı & Kimyasal)"
+  },
+  {
+    "en": "FKM / Viton 90 Shore A (High Pressure & Temp)",
+    "tr": "FKM / Viton 90 Shore A (Yüksek Basınç & Isı)"
+  },
+  {
+    "en": "EPDM 70 Shore A (Hot Water, Steam & Brake Fluid)",
+    "tr": "EPDM 70 Shore A (Sıcak Su, Buhar & Fren Hidroliği)"
+  },
+  {
+    "en": "VMQ Silicone 70 Shore A (Food Grade & Extreme Temp)",
+    "tr": "VMQ Silikon 70 Shore A (Gıda & Ekstrem Sıcaklık)"
+  },
+  {
+    "en": "PTFE / Teflon (Pure Resistance & Lowest Friction)",
+    "tr": "PTFE / Teflon (Saf Kimyasal Direnç & Sıfır Sürtünme)"
+  },
+  {
+    "en": "FFKM / Kalrez 75 Shore A (Max Chemical Resistance)",
+    "tr": "FFKM / Kalrez 75 Shore A (Maksimum Agresif Kimyasal)"
+  },
+  {
+    "en": "Static Radial (Piston Groove)",
+    "tr": "Statik Radyal (Piston Oluk)"
+  },
+  {
+    "en": "Static Radial (Rod / Bore Groove)",
+    "tr": "Statik Radyal (Mil / Kovan İçi Oluk)"
+  },
+  {
+    "en": "Static Axial Flange (Internal Pressure)",
+    "tr": "Statik Eksenel Flanş (İç Basınç)"
+  },
+  {
+    "en": "Static Axial Flange (External Pressure / Vacuum)",
+    "tr": "Statik Eksenel Flanş (Dış Basınç / Vakum)"
+  },
+  {
+    "en": "Dynamic Reciprocating (Hydraulic / Pneumatic Cylinder)",
+    "tr": "Dinamik İleri-Geri (Hidrolik / Pnömatik Silindir)"
+  },
+  {
+    "en": "Dynamic Rotary (Low-Speed Shaft)",
+    "tr": "Dinamik Döner Mil (Rotary Shaft)"
+  },
+  {
+    "en": "ISO 3601 O-RING GLAND DESIGN REPORT",
+    "tr": "ISO 3601 O-RING KANAL HESAP RAPORU"
+  },
+  {
+    "en": "Cord (W)",
+    "tr": "Kordon (W)"
+  },
+  {
+    "en": "Inner Dia (d1)",
+    "tr": "İç Çap (d1)"
+  },
+  {
+    "en": "Application",
+    "tr": "Uygulama"
+  },
+  {
+    "en": "Pressure",
+    "tr": "Çalışma Basıncı"
+  },
+  {
+    "en": "Gland Dimensions",
+    "tr": "Kanal Boyutları"
+  },
+  {
+    "en": "Depth (H)",
+    "tr": "Derinlik (H)"
+  },
+  {
+    "en": "Width (b)",
+    "tr": "Genişlik (b)"
+  },
+  {
+    "en": "Squeeze Ratio (S)",
+    "tr": "Sıkışma Oranı (S)"
+  },
+  {
+    "en": "Gland Fill (F)",
+    "tr": "Kanal Doluluğu (F)"
+  },
+  {
+    "en": "Radial Gap (g)",
+    "tr": "Radyal Boşluk (g)"
+  },
+  {
+    "en": "Max",
+    "tr": "Maks"
+  },
+  {
+    "en": "Backup Ring",
+    "tr": "Destek Halkası"
+  },
+  {
+    "en": "Not Required",
+    "tr": "Gerekmez"
+  },
+  {
+    "en": "Overall Status",
+    "tr": "Genel Durum"
+  },
+  {
+    "en": "Industrial Sealing Engineering Cockpit",
+    "tr": "Endüstriyel Sızdırmazlık Tasarım Kokpiti"
+  },
+  {
+    "en": "ISO 3601 / AS 568 O-Ring Gland Design",
+    "tr": "ISO 3601 / AS 568 O-Ring Kanal Tasarımı"
+  },
+  {
+    "en": "ISO 3601 O-Ring",
+    "tr": "ISO 3601 O-Ring"
+  },
+  {
+    "en": "Suptex Rotary Shaft Seals (DIN 3760)",
+    "tr": "Suptex Döner Mil Yağ Keçeleri (DIN 3760)"
+  },
+  {
+    "en": "Rotary Oil Seals",
+    "tr": "Döner Mil Keçeleri"
+  },
+  {
+    "en": "Kastaş Hydraulic Seals (ISO 7425)",
+    "tr": "Kastaş Hidrolik Sızdırmazlık (ISO 7425)"
+  },
+  {
+    "en": "Hydraulic Seals",
+    "tr": "Hidrolik Keçeler"
+  },
+  {
+    "en": "ISO 3601 O-Ring Gland",
+    "tr": "ISO 3601 O-Ring Kanalı"
+  },
+  {
+    "en": "1. O-Ring Cord & Diameter Selection",
+    "tr": "1. O-Ring Kordon ve Çap Seçimi"
+  },
+  {
+    "en": "Standard Cord Diameter W (Cross Section)",
+    "tr": "Standart Kordon Çapı W (Kesit Kalınlığı)"
+  },
+  {
+    "en": "Custom Cord",
+    "tr": "Özel Kordon"
+  },
+  {
+    "en": "User Defined",
+    "tr": "Kullanıcı Tanımlı"
+  },
+  {
+    "en": "Custom Cord Diameter (W):",
+    "tr": "Özel Kordon Çapı (W):"
+  },
+  {
+    "en": "O-Ring Inside Diameter (d₁):",
+    "tr": "O-Ring İç Çapı (d₁):"
+  },
+  {
+    "en": "2. Operating Conditions & Gland Type",
+    "tr": "2. Çalışma Şartları & Yuva Tipi"
+  },
+  {
+    "en": "Standards",
+    "tr": "Standartları"
+  },
+  {
+    "en": "Application Assembly Geometry",
+    "tr": "Uygulama Montaj Geometrisi"
+  },
+  {
+    "en": "squeeze",
+    "tr": "sıkışma"
+  },
+  {
+    "en": "Elastomer Material & Hardness",
+    "tr": "Elastomer Malzeme & Sertlik"
+  },
+  {
+    "en": "to",
+    "tr": "ila"
+  },
+  {
+    "en": "Operating System Pressure:",
+    "tr": "Sistem Çalışma Basıncı:"
+  },
+  {
+    "en": "Backup Ring Threshold",
+    "tr": "Destek Halkası Eşiği"
+  },
+  {
+    "en": "ISO 3601 Gland Section & Deformation Analysis",
+    "tr": "ISO 3601 Kanal Kesiti & Deformasyon Analizi"
+  },
+  {
+    "en": "Recommended Surface Finish (ISO 3601-2)",
+    "tr": "Polilas O-Ring Yuva Yüzey Kalitesi"
+  },
+  {
+    "en": "Dynamic Sliding Surface:",
+    "tr": "Dinamik Kayma Yüzeyi:"
+  },
+  {
+    "en": "Static Surface:",
+    "tr": "Statik Yüzey:"
+  },
+  {
+    "en": "Groove Flanks / Side Walls:",
+    "tr": "Kanal Yan Duvarları:"
+  },
+  {
+    "en": "Lead-in Chamfer Angle:",
+    "tr": "Giriş Pahı (Pah Açısı):"
+  },
+  {
+    "en": "Burr-free",
+    "tr": "Keskin kenarsız"
+  },
+  {
+    "en": "O-Ring Conforming (ISO 3601 PASSED)",
+    "tr": "O-Ring Kanalı Uygun (ISO 3601 PASSED)"
+  },
+  {
+    "en": "Warning: Boundary Limit",
+    "tr": "Uyarı: Sınır Değerde"
+  },
+  {
+    "en": "Critical Risk: Nibbling/Overfill",
+    "tr": "Kritik Risk: Hasar Riski"
+  },
+  {
+    "en": "Squeeze",
+    "tr": "Sıkışma"
+  },
+  {
+    "en": "Fill",
+    "tr": "Doluluk"
+  },
+  {
+    "en": "Squeeze Ratio",
+    "tr": "Sıkışma Oranı"
+  },
+  {
+    "en": "Gland Fill",
+    "tr": "Kanal Doluluğu"
+  },
+  {
+    "en": "Gland Depth (H)",
+    "tr": "Kanal Derinliği (H)"
+  },
+  {
+    "en": "Machining Tol.",
+    "tr": "İşleme Toleransı"
+  },
+  {
+    "en": "Gland Width (b)",
+    "tr": "Kanal Genişliği (b)"
+  },
+  {
+    "en": "Extrusion Clearance Gap",
+    "tr": "Ekstrüzyon Boşluğu"
+  },
+  {
+    "en": "Backup Ring Required",
+    "tr": "Destek Halkası Gerekli"
+  },
+  {
+    "en": "Safe Gap",
+    "tr": "Boşluk Güvenli"
+  },
+  {
+    "en": "Maximum allowable radial gap at",
+    "tr": "İzin verilen azami radyal boşluk"
+  },
+  {
+    "en": " At pressures above 50 bar or under large radial clearances, a PTFE backup ring must be used to prevent elastomer extrusion nibbling.",
+    "tr": " 50 bar üzeri basınçlarda o-ring malzemesinin akmasını önlemek için PTFE destek halkası (backup ring) kullanılması şarttır."
+  },
+  {
+    "en": " Under current operating pressure, there is no extrusion hazard.",
+    "tr": " Mevcut çalışma basıncında standart H8/f7 veya H7/g6 toleransları altında ekstrüzyon riski bulunmamaktadır."
+  },
+  {
+    "en": "Suptex Rotary Shaft Seals",
+    "tr": "Suptex Döner Mil Keçeleri"
+  },
+  {
+    "en": "1. Suptex Seal Type (Form)",
+    "tr": "1. Suptex Keçe Tipi (Form)"
+  },
+  {
+    "en": "Rubber Case",
+    "tr": "Kauçuk Kovan"
+  },
+  {
+    "en": "Metal Case",
+    "tr": "Metal Kovan"
+  },
+  {
+    "en": "2. Suptex Size Selection (d₁ × D × b)",
+    "tr": "2. Suptex Ölçü Seçimi (d₁ × D × b)"
+  },
+  {
+    "en": "Standard Catalog",
+    "tr": "Standart Katalog"
+  },
+  {
+    "en": "Popular Suptex Standard Sizes (d₁ × D × b mm)",
+    "tr": "Popüler Suptex Standart Ölçüleri (d₁ × D × b mm)"
+  },
+  {
+    "en": "Shaft Diameter (d₁):",
+    "tr": "Mil Çapı (d₁):"
+  },
+  {
+    "en": "Housing Bore Diameter (D):",
+    "tr": "Yuva Çapı (D):"
+  },
+  {
+    "en": "Seal Width (b):",
+    "tr": "Keçe Eni (b):"
+  },
+  {
+    "en": "3. Speed, Material & Pressure",
+    "tr": "3. Devir, Malzeme & Basınç"
+  },
+  {
+    "en": "Peripheral Velocity Limit",
+    "tr": "Çevresel Hız Limiti"
+  },
+  {
+    "en": "Elastomer Lip Material",
+    "tr": "Elastomer Dudak Malzemesi"
+  },
+  {
+    "en": "Shaft Speed (n):",
+    "tr": "Mil Devri (n):"
+  },
+  {
+    "en": "RPM",
+    "tr": "d/dk (RPM)"
+  },
+  {
+    "en": "Fluid Pressure:",
+    "tr": "Akışkan Basıncı:"
+  },
+  {
+    "en": "Cross Section Detail",
+    "tr": "Kesit Detayı"
+  },
+  {
+    "en": "Suptex DIN 3760 Shaft Machining & Hardness Standards",
+    "tr": "Suptex Standartlarına Göre Mil Taşlama ve Yüzey Şartları"
+  },
+  {
+    "en": "Surface Roughness (Ra & Rz)",
+    "tr": "Yüzey Pürüzlülüğü (Ra & Rz)"
+  },
+  {
+    "en": "Overly smooth surfaces (Ra < 0.1 μm) prevent oil film retention.",
+    "tr": "Daha pürüzsüz yüzey (Ra < 0.1 μm) yağ filminin tutunmasını engeller."
+  },
+  {
+    "en": "Plunge Grinding (Zero Lead)",
+    "tr": "İz-siz Taşlama (Drallfrei Plunge)"
+  },
+  {
+    "en": "Grinding lead angle must be 0°; plunge grinding without axial feed.",
+    "tr": "Taşlama helis açısı 0° olmalı, dalma taşlama (plunge) uygulanmalıdır."
+  },
+  {
+    "en": "Helical marks create a micro-pump effect causing leakage.",
+    "tr": "Helisel taşlama izi döner milde mikro-pompa etkisi yaparak sızıntıya yol açar."
+  },
+  {
+    "en": "Shaft Hardness",
+    "tr": "Mil Sertliği"
+  },
+  {
+    "en": "Minimum 45 HRC (induction hardened to ≥ 55 HRC when v > 4 m/s).",
+    "tr": "Minimum 45 HRC (v > 4 m/s veya kirli ortamda indüksiyonla ≥ 55 HRC)."
+  },
+  {
+    "en": "Shaft Tolerance & Runout",
+    "tr": "Mil Toleransı & Eşmerkezlilik"
+  },
+  {
+    "en": "Shaft tolerance ISO h11, housing bore ISO H8. Dynamic TIR ≤ 0.15 mm.",
+    "tr": "Mil toleransı ISO h11, yuva deliği ISO H8. Dinamik salgı (TIR) ≤ 0.15 mm."
+  },
+  {
+    "en": "Suptex Seals Integration",
+    "tr": "Suptex Keçe Entegrasyonu"
+  },
+  {
+    "en": "Copy Order Code",
+    "tr": "Sipariş Kodunu Kopyala"
+  },
+  {
+    "en": "Order Code",
+    "tr": "Sipariş"
+  },
+  {
+    "en": "Peripheral Speed (v)",
+    "tr": "Çevresel Hız (v)"
+  },
+  {
+    "en": "Housing Bore (D)",
+    "tr": "Yuva Çapı (D)"
+  },
+  {
+    "en": "Housing Bore",
+    "tr": "Gövde Delik Çapı"
+  },
+  {
+    "en": "Pressure Safety",
+    "tr": "Basınç Emniyeti"
+  },
+  {
+    "en": "Lead-in Chamfer (l₁)",
+    "tr": "Giriş Pahı (l₁)"
+  },
+  {
+    "en": "Chamfer",
+    "tr": "Pah"
+  },
+  {
+    "en": "Suptex Order Reference",
+    "tr": "Suptex Sipariş Referansı"
+  },
+  {
+    "en": "Kastaş Hydraulic Seals",
+    "tr": "Kastaş Hidrolik Keçeler"
+  },
+  {
+    "en": "1. Sealing Element Category",
+    "tr": "1. Sızdırmazlık Elemanı Kategorisi"
+  },
+  {
+    "en": "Hydraulics",
+    "tr": "Hidrolik"
+  },
+  {
+    "en": "Rod Seal",
+    "tr": "Boğaz Keçesi (Rod)"
+  },
+  {
+    "en": "Piston Seal",
+    "tr": "Piston Keçesi"
+  },
+  {
+    "en": "Wiper",
+    "tr": "Toz Keçesi"
+  },
+  {
+    "en": "Select Kastaş Series Profile",
+    "tr": "Kastaş Profil Serisi Seçimi"
+  },
+  {
+    "en": "2. Standard Diameter & ISO Groove Size",
+    "tr": "2. Standart Çap & ISO Yuva Ölçüsü"
+  },
+  {
+    "en": "Standard Rod / Shaft Diameter (d)",
+    "tr": "Standart Mil / Rot Çapı (d)"
+  },
+  {
+    "en": "Standard Cylinder Bore Diameter (D)",
+    "tr": "Standart Silindir Boru Çapı (D)"
+  },
+  {
+    "en": "Operating Hydraulic Pressure:",
+    "tr": "Hidrolik Çalışma Basıncı:"
+  },
+  {
+    "en": "Design Radial Clearance (e):",
+    "tr": "Tasarım Radyal Boşluğu (e):"
+  },
+  {
+    "en": "Max allowable extrusion gap at",
+    "tr": "İzin verilen azami boşluk"
+  },
+  {
+    "en": "Cross Section & Groove Dimensions",
+    "tr": "Kesit & Kanal Ölçüleri"
+  },
+  {
+    "en": "Rod",
+    "tr": "Mil"
+  },
+  {
+    "en": "Groove",
+    "tr": "Kanal"
+  },
+  {
+    "en": "Hydraulic Sliding & Groove Surface Specification (ISO 7425)",
+    "tr": "Polilas & Kastaş Hidrolik Kayma ve Kanal Yüzey Şartnamesi"
+  },
+  {
+    "en": "Hard Chrome Plated Rod Surface', POLILAS_SURFACE_REQUIREMENTS.rod.surface)}\n                                    </span>\n                                    <p className=\"text-slate-300\">\n                                        Ra = {POLILAS_SURFACE_REQUIREMENTS.rod.roughnessRa} | Rz {POLILAS_SURFACE_REQUIREMENTS.rod.roughnessRz}\n                                    </p>\n                                    <p className=\"text-[11px] text-slate-400\">\n                                        {t12(language, 'Chrome Plating:",
+    "tr": "Krom Kaplama:"
+  },
+  {
+    "en": "Tolerance:",
+    "tr": "Tolerans:"
+  },
+  {
+    "en": "Cylinder Bore / Tube Surface', POLILAS_SURFACE_REQUIREMENTS.bore.surface)}\n                                    </span>\n                                    <p className=\"text-slate-300\">\n                                        Ra = {POLILAS_SURFACE_REQUIREMENTS.bore.roughnessRa} | Rz {POLILAS_SURFACE_REQUIREMENTS.bore.roughnessRz}\n                                    </p>\n                                    <p className=\"text-[11px] text-slate-400\">\n                                        {t12(language, 'Tolerance:",
+    "tr": "Tolerans:"
+  },
+  {
+    "en": "Honed Tube",
+    "tr": "Honlanmış Boru"
+  },
+  {
+    "en": "Groove Base (Root Diameter)', POLILAS_SURFACE_REQUIREMENTS.grooveBase.surface)}\n                                    </span>\n                                    <p className=\"text-slate-300\">\n                                        Ra = {POLILAS_SURFACE_REQUIREMENTS.grooveBase.roughnessRa} | Rz {POLILAS_SURFACE_REQUIREMENTS.grooveBase.roughnessRz}\n                                    </p>\n                                    <p className=\"text-[11px] text-slate-400\">\n                                        {t12(language, 'Tolerance:",
+    "tr": "Tolerans:"
+  },
+  {
+    "en": "Groove Flanks / Sidewalls', POLILAS_SURFACE_REQUIREMENTS.grooveFlanks.surface)}\n                                    </span>\n                                    <p className=\"text-slate-300\">\n                                        Ra = {POLILAS_SURFACE_REQUIREMENTS.grooveFlanks.roughnessRa} | Rz {POLILAS_SURFACE_REQUIREMENTS.grooveFlanks.roughnessRz}\n                                    </p>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n\n                    {/* SAĞ: Çıktılar & KPIs */}\n                    <div className=\"w-full lg:w-[380px] shrink-0 flex flex-col bg-[#080d14]/90 p-4 space-y-4 overflow-y-auto custom-scrollbar\">\n                        {/* Manufacturer Header Banner */}\n                        <div className=\"p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between gap-4\">\n                            <div className=\"flex items-center gap-3\">\n                                <div className=\"w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0\">\n                                    <Award size={18} />\n                                </div>\n                                <div>\n                                    <h4 className=\"text-xs font-bold text-indigo-400 uppercase tracking-wider\">\n                                        {t12(language, 'Kastaş Hydraulic Standards",
+    "tr": "Kastaş Hidrolik Standartları"
+  },
+  {
+    "en": "Copy Kastaş Order Code",
+    "tr": "Kastaş Sipariş Kodunu Kopyala"
+  },
+  {
+    "en": "Groove Width (L)",
+    "tr": "Kanal Genişliği (L)"
+  },
+  {
+    "en": "Tolerance: +0.20 mm",
+    "tr": "Tolerans: +0.20 mm"
+  },
+  {
+    "en": "Groove Depth (S)",
+    "tr": "Kanal Derinliği (S)"
+  },
+  {
+    "en": "Radial Step Dimension",
+    "tr": "Radyal Adım"
+  },
+  {
+    "en": "Lead-in Chamfer (C)",
+    "tr": "Giriş Pahı Boyu (C)"
+  },
+  {
+    "en": "Extrusion Safety",
+    "tr": "Akma Emniyeti"
+  },
+  {
+    "en": "SAFE",
+    "tr": "UYGUN"
+  },
+  {
+    "en": "RISK",
+    "tr": "RİSK"
+  },
+  {
+    "en": "Kastaş Order Code Reference",
+    "tr": "Kastaş Sipariş Kodu Referansı"
+  },
+  {
+    "en": "Axial Flange (Internal Pressure)",
+    "tr": "Eksenel Flanş (İç Basınç)"
+  },
+  {
+    "en": "Axial Flange (External Pressure / Vacuum)",
+    "tr": "Eksenel Flanş (Dış Basınç/Vakum)"
+  },
+  {
+    "en": "Radial Rod (Shaft Groove)",
+    "tr": "Radyal Boğaz (Mil İçi Oluk)"
+  },
+  {
+    "en": "Radial Piston (Piston Outer Groove)",
+    "tr": "Radyal Piston (Piston Dışı Oluk)"
+  },
+  {
+    "en": "Axial Flange",
+    "tr": "Eksenel Flanş"
+  },
+  {
+    "en": "Radial Rod",
+    "tr": "Radyal Boğaz"
+  },
+  {
+    "en": "Radial Piston",
+    "tr": "Radyal Piston"
+  },
+  {
+    "en": "Face Seal",
+    "tr": "Alın Sızdırmazlık"
+  },
+  {
+    "en": "Free ØW",
+    "tr": "Serbest ØW"
+  },
+  {
+    "en": "TOP MATING FLANGE (BOLTED COVER) — Ra 0.8 μm",
+    "tr": "ÜST KARŞI FLANŞ (KAPAK ALNI) — Ra 0.8 μm"
+  },
+  {
+    "en": "CYLINDER HEAD HOUSING (INTERNAL GROOVE) — ISO 3601-2",
+    "tr": "SİLİNDİR BOĞAZ GÖVDESİ (İÇ KANAL) — ISO 3601-2"
+  },
+  {
+    "en": "CYLINDER BORE WALL — Honed Ra 0.2-0.4 μm",
+    "tr": "SİLİNDİR BORUSU (DELİK DUVARI) — Honlanmış Ra 0.2-0.4 μm"
+  },
+  {
+    "en": "15°–20° Lead-in Chamfer",
+    "tr": "15°–20° Giriş Pahı"
+  },
+  {
+    "en": "CYLINDRICAL ROD",
+    "tr": "KROM KAPLI MİL"
+  },
+  {
+    "en": "Chrome",
+    "tr": "Krom"
+  },
+  {
+    "en": "FLANGE FACE GROOVE — ISO 3601-2",
+    "tr": "FLANŞ ALIN KANALI — ISO 3601-2"
+  },
+  {
+    "en": "PISTON BODY (EXTERNAL GROOVE) — ISO 3601-2",
+    "tr": "PİSTON GÖVDESİ (DIŞ RADYAL KANAL) — ISO 3601-2"
+  },
+  {
+    "en": "Free",
+    "tr": "Serbest"
+  },
+  {
+    "en": "! EXTRUSION HAZARD",
+    "tr": "! EKSTRÜZYON HASARI"
+  },
+  {
+    "en": "(External Pressure / Vacuum)",
+    "tr": "(Dış Basınç / Vakum)"
+  },
+  {
+    "en": "(Fluid Pressure)",
+    "tr": "(Akışkan Basıncı)"
+  },
+  {
+    "en": "ISO 3601-2 GLAND SECTION BLUEPRINT",
+    "tr": "ISO 3601-2 KANAL KESİTİ & SIZDIRMAZLIK"
+  },
+  {
+    "en": "SQUEEZE",
+    "tr": "SIKIŞMA"
+  },
+  {
+    "en": "GLAND FILL",
+    "tr": "DOLULUK"
+  },
+  {
+    "en": "BACKUP RING",
+    "tr": "DESTEK"
+  },
+  {
+    "en": "PTFE REQ.",
+    "tr": "PTFE ŞART"
+  },
+  {
+    "en": "NOT REQ.",
+    "tr": "GEREKMEZ"
+  },
+  {
+    "en": "SCALE",
+    "tr": "ÖLÇEK"
+  },
+  {
+    "en": "SURFACE: DYNAMIC Ra 0.2-0.4 μm / STATIC Ra 0.8-1.6 μm (ISO 3601-2)",
+    "tr": "YÜZEY KALİTESİ: DİNAMİK Ra 0.2-0.4 μm / STATİK Ra 0.8-1.6 μm (ISO 3601-2)"
+  },
+  {
+    "en": "HOUSING BORE",
+    "tr": "GÖVDE YUVASI"
+  },
+  {
+    "en": "ROTATING SHAFT",
+    "tr": "DÖNER MİL"
+  },
+  {
+    "en": "Plunge Ground",
+    "tr": "Dalma Taşlama"
+  },
+  {
+    "en": "Dust Lip (Form AS)",
+    "tr": "Toz Dudağı (Form AS)"
+  },
+  {
+    "en": "Piston Seal (Piston Head Groove)",
+    "tr": "Piston Keçesi (Piston Başı Kanalı)"
+  },
+  {
+    "en": "Rod Seal (Cylinder Head Groove)",
+    "tr": "Boğaz Keçesi (Kovan İçi Kanal)"
+  },
+  {
+    "en": "Wiper Seal (Scraper)",
+    "tr": "Toz Keçesi (Sıyırıcı)"
+  },
+  {
+    "en": "CYLINDER BORE TUBE",
+    "tr": "SİLİNDİR BORUSU"
+  },
+  {
+    "en": "Honed",
+    "tr": "Honlanmış"
+  },
+  {
+    "en": "PISTON HEAD",
+    "tr": "PİSTON KAFASI"
+  },
+  {
+    "en": "CYLINDER HEAD HOUSING",
+    "tr": "SİLİNDİR BOĞAZ GÖVDESİ"
+  },
+  {
+    "en": "CHROME PLATED ROD",
+    "tr": "KROM KAPLI MİL"
+  },
+  {
+    "en": "Hard Chrome",
+    "tr": "Sert Krom"
+  }
+]

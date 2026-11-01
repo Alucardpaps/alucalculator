@@ -88,7 +88,7 @@ const vatCalculatorSchema: CalculatorSchemaV2 = {
         description: 'Calculate VAT (KDV) inclusive/exclusive amounts with Tevkifat support.',
         category: 'finance', // Will need to ensure this category exists or map it
         version: '2.0.0',
-        author: 'AluCalc',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-10',
         tags: ['vat', 'tax', 'finance', 'tevkifat'],
         verifiedStandards: ['Local Tax Law'],

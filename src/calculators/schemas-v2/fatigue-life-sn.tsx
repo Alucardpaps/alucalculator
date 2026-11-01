@@ -8,7 +8,7 @@ const fatigueLifeSnSchema: CalculatorSchemaV2 = {
         description: 'Predict the expected cycle life of a component under fluctuating load.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-04-06',
         tags: ['fatigue', 'S-N curve', 'Basquin', 'life cycle', 'fracture'],
         verifiedStandards: ['ASTM E606']

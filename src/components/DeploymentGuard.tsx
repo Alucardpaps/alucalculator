@@ -27,7 +27,7 @@ export function DeploymentGuard({ children }: DeploymentGuardProps) {
 
     if (isCompatible === false) {
         return (
-            <div className="flex flex-col items-center justify-center w-full h-screen bg-[#1e1e1e] text-slate-300 gap-4">
+            <div className="flex flex-col items-center justify-center w-full h-screen bg-[var(--bg-3)] text-slate-300 gap-4">
                 <AlertTriangle size={48} className="text-amber-500" />
                 <h2 className="text-xl font-bold text-white">System Update Detected</h2>
                 <p className="text-sm text-center max-w-md text-slate-400">
@@ -52,7 +52,7 @@ export function DeploymentGuard({ children }: DeploymentGuardProps) {
 
     if (isCompatible === null) {
         return (
-            <div className="flex flex-col items-center justify-center w-full h-screen bg-[#1e1e1e] text-slate-500">
+            <div className="flex flex-col items-center justify-center w-full h-screen bg-[var(--bg-3)] text-slate-500">
                 <Loader2 size={32} className="animate-spin mb-4" />
                 <span className="text-xs tracking-widest uppercase font-bold text-slate-600">Initializing Kernel...</span>
             </div>

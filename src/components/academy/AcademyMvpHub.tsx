@@ -25,13 +25,13 @@ import { ACADEMY_MVP_UNITS, AcademyMvpUnit } from '@/data/academyMvpUnits';
 import { ACADEMY_ARTICLES } from '@/data/academyIndex';
 import { AcademyUnitModal } from './AcademyUnitModal';
 import { useI18nStore } from '@/store/i18nStore';
+import { t12 } from '@/locales/t12';
 
 const STORAGE_KEY_UNITS = 'alucalc-academy-completed-units';
 const STORAGE_KEY_XP = 'alucalc-academy-user-xp';
 
 export function AcademyMvpHub() {
   const { language } = useI18nStore();
-  const tr = language === 'tr';
 
   // Navigation mode
   const [campusMode, setCampusMode] = useState<'curriculum' | 'labs' | 'guides'>('curriculum');
@@ -83,19 +83,19 @@ export function AcademyMvpHub() {
   // Engineer Rank Calculation
   const engineerRank = useMemo(() => {
     if (userXp >= 1500) {
-      return { title: tr ? 'Başmühendis & Baş Analist' : 'Principal Engineer', level: 5, color: '#f59e0b', nextXp: 2000 };
+      return { title: t12(language, 'Principal Engineer', 'Başmühendis & Baş Analist'), level: 5, color: '#f59e0b', nextXp: 2000 };
     }
     if (userXp >= 1000) {
-      return { title: tr ? 'Kıdemli Tasarım Mühendisi' : 'Senior Design Engineer', level: 4, color: '#a855f7', nextXp: 1500 };
+      return { title: t12(language, 'Senior Design Engineer', 'Kıdemli Tasarım Mühendisi'), level: 4, color: '#a855f7', nextXp: 1500 };
     }
     if (userXp >= 500) {
-      return { title: tr ? 'Mekanik Tasarım Uzmanı' : 'Mechanical Specialist', level: 3, color: '#00e5ff', nextXp: 1000 };
+      return { title: t12(language, 'Mechanical Specialist', 'Mekanik Tasarım Uzmanı'), level: 3, color: '#00e5ff', nextXp: 1000 };
     }
     if (userXp >= 200) {
-      return { title: tr ? 'Tasarım Mühendisi' : 'Design Engineer', level: 2, color: '#38bdf8', nextXp: 500 };
+      return { title: t12(language, 'Design Engineer', 'Tasarım Mühendisi'), level: 2, color: '#38bdf8', nextXp: 500 };
     }
-    return { title: tr ? 'Aday / Çırak Mühendis' : 'Apprentice Engineer', level: 1, color: '#94a3b8', nextXp: 200 };
-  }, [userXp, tr]);
+    return { title: t12(language, 'Apprentice Engineer', 'Aday / Çırak Mühendis'), level: 1, color: '#94a3b8', nextXp: 200 };
+  }, [userXp, language]);
 
   // Filter categories
   const categories = useMemo(() => {
@@ -123,11 +123,15 @@ export function AcademyMvpHub() {
   const filteredGuides = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return ACADEMY_ARTICLES;
-    return ACADEMY_ARTICLES.filter((a) =>
-      a.title.toLowerCase().includes(q) ||
-      a.description.toLowerCase().includes(q) ||
-      a.slug.toLowerCase().includes(q)
-    );
+    return ACADEMY_ARTICLES.filter((a) => {
+      const title = a.meta?.title || a.hero?.h1 || a.slug;
+      const desc = a.meta?.description || a.hero?.intro || '';
+      return (
+        title.toLowerCase().includes(q) ||
+        desc.toLowerCase().includes(q) ||
+        a.slug.toLowerCase().includes(q)
+      );
+    });
   }, [searchQuery]);
 
   const progressPercent = Math.round((completedUnits.length / ACADEMY_MVP_UNITS.length) * 100);
@@ -141,10 +145,10 @@ export function AcademyMvpHub() {
     <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-8 text-slate-200 select-none">
       
       {/* ─── 1. CAMPUS HERO & PROGRESSION HUD ─── */}
-      <section className="relative rounded-3xl bg-gradient-to-r from-[#080d1a] via-[#050914] to-[#02050c] border border-white/10 p-6 sm:p-8 shadow-2xl overflow-hidden">
+      <section className="relative rounded-3xl bg-gradient-to-r from-[var(--bg-1)] via-[var(--bg-0)] to-[var(--bg-0)] border border-white/10 p-6 sm:p-8 shadow-2xl overflow-hidden">
         {/* Subtle Ambient Glow */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+
+
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Hero Left Content */}
@@ -152,7 +156,7 @@ export function AcademyMvpHub() {
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5">
                 <Sparkles size={13} />
-                <span>AluCalc OS Engineering Campus</span>
+                <span>AluCAD OS Engineering Campus</span>
               </span>
               <span className="text-xs font-mono text-slate-500">ISO / DIN / VDI Akredite</span>
             </div>
@@ -167,7 +171,7 @@ export function AcademyMvpHub() {
           </div>
 
           {/* Gamified Engineer Rank & XP Card */}
-          <div className="p-5 rounded-2xl bg-black/50 border border-white/10 backdrop-blur-md space-y-3 min-w-[280px] lg:w-80 shrink-0 font-mono shadow-xl">
+          <div className="p-5 rounded-2xl bg-black/50 border border-white/10 space-y-3 min-w-[280px] lg:w-80 shrink-0 font-mono shadow-xl">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400 uppercase font-semibold">Mühendislik Rütbesi</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -191,7 +195,7 @@ export function AcademyMvpHub() {
             {/* Curriculum Progress Bar */}
             <div className="space-y-1 pt-1 border-t border-white/5">
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>Tamamlanan Ünite:</span>
+                <span>{t12(language, 'Units completed', 'Tamamlanan Ünite')}:</span>
                 <strong className="text-white">{completedUnits.length} / {ACADEMY_MVP_UNITS.length} (%{progressPercent})</strong>
               </div>
               <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
@@ -214,12 +218,12 @@ export function AcademyMvpHub() {
             onClick={() => setCampusMode('curriculum')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               campusMode === 'curriculum'
-                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg '
                 : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
           >
             <GraduationCap size={16} />
-            <span>1. {tr ? 'Akredite Müfredat (15 Ünite)' : 'Curriculum Units'}</span>
+            <span>1. {t12(language, 'Curriculum Units', 'Akredite Müfredat (15 Ünite)')}</span>
           </button>
 
           <button
@@ -227,12 +231,12 @@ export function AcademyMvpHub() {
             onClick={() => setCampusMode('labs')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               campusMode === 'labs'
-                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg '
                 : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
           >
             <Activity size={16} />
-            <span>2. {tr ? 'İnteraktif Laboratuvarlar' : 'Interactive Labs'}</span>
+            <span>2. {t12(language, 'Interactive Labs', 'İnteraktif Laboratuvarlar')}</span>
           </button>
 
           <button
@@ -240,12 +244,12 @@ export function AcademyMvpHub() {
             onClick={() => setCampusMode('guides')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition cursor-pointer whitespace-nowrap ${
               campusMode === 'guides'
-                ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25'
+                ? 'bg-[var(--cyan)] text-[var(--accent-ink)] shadow-lg '
                 : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
           >
             <BookOpen size={16} />
-            <span>3. {tr ? 'Teknik Kılavuzlar (50+)' : 'Technical Guides'}</span>
+            <span>3. {t12(language, 'Technical Guides', 'Teknik Kılavuzlar (50+)')}</span>
           </button>
         </div>
 
@@ -256,8 +260,8 @@ export function AcademyMvpHub() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={tr ? 'Ünite, formül veya standart ara...' : 'Search units or standards...'}
-            className="w-full bg-[#080d1a] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition"
+            placeholder={t12(language, 'Search units or standards...', 'Ünite, formül veya standart ara...')}
+            className="w-full bg-[var(--bg-1)] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs font-mono text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition"
           />
         </div>
       </section>
@@ -292,12 +296,12 @@ export function AcademyMvpHub() {
                 <div
                   key={u.id}
                   onClick={() => openUnit(u)}
-                  className="p-5 rounded-3xl bg-[#080d1a]/90 hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/40 transition-all duration-200 shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between space-y-4 group cursor-pointer"
+                  className="p-5 rounded-3xl bg-[var(--bg-1)]/90 hover:bg-[var(--bg-1)] border border-white/10 hover:border-cyan-500/40 transition-all duration-200 shadow-xl flex flex-col justify-between space-y-4 group cursor-pointer"
                 >
                   {/* Card Header */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-mono text-xs font-black text-cyan-300">
+                      <span className="w-8 h-8 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center font-mono text-xs font-black text-[var(--cyan)]">
                         {u.unitNumber}
                       </span>
                       <div className="flex items-center gap-1.5">
@@ -317,12 +321,12 @@ export function AcademyMvpHub() {
                         {u.category}
                       </span>
                       <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors mt-0.5">
-                        {tr ? u.titleTr : u.titleEn}
+                        {t12(language, u.titleEn, u.titleTr)}
                       </h3>
                     </div>
 
                     <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                      {tr ? u.summaryTr : u.summaryEn}
+                      {t12(language, u.summaryEn, u.summaryTr)}
                     </p>
                   </div>
 
@@ -336,7 +340,7 @@ export function AcademyMvpHub() {
                       type="button"
                       className="inline-flex items-center gap-1.5 font-bold text-cyan-400 group-hover:text-cyan-300 transition-colors"
                     >
-                      <span>{isCompleted ? (tr ? 'Tekrar İncele' : 'Review Unit') : (tr ? 'Derse Başla' : 'Start Lesson')}</span>
+                      <span>{isCompleted ? (t12(language, 'Review Unit', 'Tekrar İncele')) : (t12(language, 'Start Lesson', 'Derse Başla'))}</span>
                       <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
@@ -361,9 +365,9 @@ export function AcademyMvpHub() {
             {/* Lab 1: Dynamics & Vibration */}
             <Link
               href="/academy/dynamics"
-              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/40 p-6 space-y-4 shadow-xl transition group"
+              className="p-6 rounded-3xl bg-[var(--bg-1)] hover:bg-[var(--bg-1)] border border-white/10 hover:border-cyan-500/40 p-6 space-y-4 shadow-xl transition group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] group-hover:scale-105 transition-transform">
                 <Activity size={24} />
               </div>
               <div className="space-y-1">
@@ -382,9 +386,9 @@ export function AcademyMvpHub() {
             {/* Lab 2: Additive Manufacturing */}
             <Link
               href="/academy/additive-manufacturing"
-              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-purple-500/40 p-6 space-y-4 shadow-xl transition group"
+              className="p-6 rounded-3xl bg-[var(--bg-1)] hover:bg-[var(--bg-1)] border border-white/10 hover:border-purple-500/40 p-6 space-y-4 shadow-xl transition group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] group-hover:scale-105 transition-transform">
                 <Layers size={24} />
               </div>
               <div className="space-y-1">
@@ -403,9 +407,9 @@ export function AcademyMvpHub() {
             {/* Lab 3: Sandbox Visualizer */}
             <Link
               href="/academy/sandbox"
-              className="p-6 rounded-3xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-emerald-500/40 p-6 space-y-4 shadow-xl transition group"
+              className="p-6 rounded-3xl bg-[var(--bg-1)] hover:bg-[var(--bg-1)] border border-white/10 hover:border-emerald-500/40 p-6 space-y-4 shadow-xl transition group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center text-[var(--cyan)] group-hover:scale-105 transition-transform">
                 <Compass size={24} />
               </div>
               <div className="space-y-1">
@@ -439,15 +443,15 @@ export function AcademyMvpHub() {
               <Link
                 key={guide.slug}
                 href={`/academy/${guide.slug}`}
-                className="p-5 rounded-2xl bg-[#080d1a] hover:bg-[#0c1324] border border-white/10 hover:border-cyan-500/30 transition flex items-start justify-between gap-4 group shadow-lg"
+                className="p-5 rounded-2xl bg-[var(--bg-1)] hover:bg-[var(--bg-1)] border border-white/10 hover:border-cyan-500/30 transition flex items-start justify-between gap-4 group shadow-lg"
               >
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-mono font-bold uppercase text-cyan-400">Teknik Kılavuz</span>
                   <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    {guide.title}
+                    {guide.meta?.title || guide.hero?.h1 || guide.slug}
                   </h4>
                   <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                    {guide.description}
+                    {guide.meta?.description || guide.hero?.intro || ''}
                   </p>
                 </div>
 
@@ -468,7 +472,6 @@ export function AcademyMvpHub() {
           onClose={() => setModalOpen(false)}
           onUnitCompleted={handleUnitCompleted}
           isCompleted={completedUnits.includes(selectedUnit.id)}
-          tr={tr}
         />
       )}
 

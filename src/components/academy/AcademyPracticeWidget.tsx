@@ -37,7 +37,7 @@ export function AcademyPracticeWidget({ slug, config, t, onDone }: Props) {
   return (
     <section className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.03] p-6 sm:p-8 space-y-6">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[var(--cyan-glow)] border border-[var(--cyan)]/40 flex items-center justify-center shrink-0">
           <SlidersHorizontal size={18} className="text-cyan-400" />
         </div>
         <div>

@@ -9,7 +9,7 @@ const pumpsSchema: CalculatorSchemaV2 = {
         description: 'Calculate hydraulic power, shaft power, and motor power requirements.',
         category: 'fluid',
         version: '2.0.0',
-        author: 'AluCalc Engineering',
+        author: 'AluCAD Engineering',
         lastUpdated: '2026-02-10',
         tags: ['pump', 'power', 'head', 'flow', 'efficiency'],
         verifiedStandards: [],
@@ -151,7 +151,7 @@ const pumpsSchema: CalculatorSchemaV2 = {
 
                     {/* Power Flow */}
                     <foreignObject x="110" y="110" width="80" height="40">
-                        <div style={{ fontSize: '8px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '8px', color: 'var(--alu-dim)' }}>
                             Shaft: {(Ps).toFixed(1)} kW <br />
                             Motor: {(Pm).toFixed(1)} kW
                         </div>

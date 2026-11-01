@@ -1,14 +1,17 @@
 'use client';
 
 /**
- * AluCalc OS v5.0 — BOM Panel
+ * AluCAD OS v5.0 — BOM Panel
  *
  * Right sidebar showing real-time Bill of Materials.
  * Auto-updates from Zustand derived selectors.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAssemblyStore } from '@/lib/store/assemblyStore';
+import { useOSStore } from '@/store/osStore';
+import { CrossModuleBridge } from '@/system/crossModuleBridge';
+import { useMissionStore } from '@/store/useMissionStore';
 import type { ComponentType, WorkspaceComponent, BOMEntry, BOMSummary, StructureHealth, ValidationMessage } from '@/lib/types/v5-types';
 import { QRModal } from './QRModal';
 
@@ -78,11 +81,11 @@ const BOMRow = ({
 
       {/* Sub-components list for individual spec details */}
       {verifiedSpecs.length > 0 && (
-        <div className="pl-6 pr-2 py-1.5 space-y-1 text-[9px] font-mono bg-white/[0.01] border-l border-[#00e5ff]/20 rounded-b-lg ml-3">
+        <div className="pl-6 pr-2 py-1.5 space-y-1 text-[9px] font-mono bg-white/[0.01] border-l border-[var(--cyan)]/20 rounded-b-lg ml-3">
           {verifiedSpecs.map(c => (
             <div key={c.id} className="flex justify-between items-center py-0.5">
               <span className="text-white/30 truncate max-w-[120px]">{c.id.split('-')[0].toUpperCase()} Spec:</span>
-              <span className="text-[#00e5ff] font-bold">{(c.metadata as any).calculationResult}</span>
+              <span className="text-[var(--cyan)] font-bold">{(c.metadata as any).calculationResult}</span>
             </div>
           ))}
         </div>
@@ -202,8 +205,25 @@ export const BOMPanel = () => {
     };
   }, [components]);
 
+  // Live Mission Progress Reporting
+  useEffect(() => {
+    const comps = Object.values(components);
+    const profileCount = comps.filter(c => c.type === 'profile').length;
+    const bracketCount = comps.filter(c => c.type === 'bracket').length;
+    const boltCount = comps.filter(c => c.type === 'bolt').length;
+    const gearCount = comps.filter(c => c.type === 'gear').length;
+
+    useMissionStore.getState().reportModuleState('assembly', {
+      totalCount: comps.length,
+      profileCount,
+      bracketCount,
+      boltCount,
+      gearCount,
+    });
+  }, [components]);
+
   return (
-    <div className="h-full flex flex-col" style={{ background: '#0a0e14' }}>
+    <div className="h-full flex flex-col" style={{ background: 'var(--bg-1)' }}>
       {/* Header */}
       <div
         className="px-4 py-3 border-b"
@@ -278,6 +298,7 @@ export const BOMPanel = () => {
           <button
             onClick={() => {
               const res = useAssemblyStore.getState().autoAssembleFasteners();
+              useMissionStore.getState().reportModuleAction('assembly', 'fastenersAutoDetected', { added: res.fastenersAdded });
               if (res.fastenersAdded > 0) {
                 alert(`⚡ AeGiS Auto-Assembly: ${res.fastenersAdded} standard ISO fasteners detected & added to BOM!`);
               } else {
@@ -290,10 +311,42 @@ export const BOMPanel = () => {
             Auto-Detect Fasteners (AI)
           </button>
 
+          {/* Cut Optimizer Automation Bridge */}
+          <button
+            onClick={() => {
+              const profiles = Object.values(useAssemblyStore.getState().components).filter(c => c.type === 'profile');
+              if (profiles.length === 0) {
+                alert('3D Montaj Sahnesinde alüminyum profil bulunamadı. Lütfen önce profil ekleyin.');
+                return;
+              }
+              CrossModuleBridge.exportProfilesToCuttingOptimizer();
+            }}
+            className="w-full mt-2 py-2.5 px-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[9px] font-bold uppercase tracking-[0.15em] font-mono hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>✂️</span>
+            Kesim Optimizasyonu (1D Nesting)
+          </button>
+
+          {/* FEA Structural Analysis Bridge */}
+          <button
+            onClick={() => {
+              const os = useOSStore.getState();
+              if (typeof os.openWindow === 'function') {
+                os.openWindow('simulation-fea');
+              } else {
+                window.location.href = '/fea';
+              }
+            }}
+            className="w-full mt-2 py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-[9px] font-bold uppercase tracking-[0.15em] font-mono hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>🔬</span>
+            Yapısal FEA Analizi (Gerilme & Sehim)
+          </button>
+
           {/* Production QR Button */}
           <button
             onClick={() => setIsQRModalOpen(true)}
-            className="w-full mt-2 py-3 px-4 rounded-xl border border-[#00e5ff]/20 bg-[#00e5ff]/5 text-[#00e5ff] text-[9px] font-bold uppercase tracking-[0.2em] font-mono hover:bg-[#00e5ff]/10 hover:border-[#00e5ff]/40 transition-all group flex items-center justify-center gap-2"
+            className="w-full mt-2 py-3 px-4 rounded-xl border border-[var(--cyan)]/20 bg-[var(--cyan)]/5 text-[var(--cyan)] text-[9px] font-bold uppercase tracking-[0.2em] font-mono hover:bg-[var(--cyan)]/10 hover:border-[var(--cyan)]/40 transition-all group flex items-center justify-center gap-2"
           >
             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />

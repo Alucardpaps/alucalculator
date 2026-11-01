@@ -8,13 +8,15 @@
  */
 
 import React from 'react';
+import * as THREE from 'three';
+import '@/lib/three-cleanup';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, Grid, Environment } from '@react-three/drei';
 
 export function Viewport3D() {
     return (
         <div className="w-full h-full">
-            <Canvas shadows dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 50 }}>
+            <Canvas shadows={{ type: THREE.PCFShadowMap }} dpr={[1, 2]} camera={{ position: [50, 50, 50], fov: 50 }}>
                 {/* Environment */}
                 <color attach="background" args={['#080c10']} />
 

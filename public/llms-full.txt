@@ -1,0 +1,59 @@
+# AluCalc OS — Full Engineering Knowledge Base
+
+> Comprehensive reference index of AluCalc OS (alucalculator.com) containing 90+ verified engineering solvers, deterministic mathematical formulations, material handbooks, and standard citations (ISO, DIN, VDI, ASME).
+
+## 1. Mechanical Engineering Solvers
+
+- [Bolted Joints & Tightening Torque](https://www.alucalculator.com/bolt-torque):
+  - Standards: VDI 2230 Blatt 1, ISO 898-1, DIN EN ISO 4014
+  - Formulations: Clamp load Fm = 0.9 * Rp0.2 * As, tightening torque Ma = Fm * (0.16 * P + 0.58 * d2 * mu_th + r_b * mu_b).
+- [Rolling Element Bearing Life](https://www.alucalculator.com/bearings):
+  - Standards: ISO 281, ISO 76, DIN 622
+  - Formulations: Equivalent dynamic load P = X * Fr + Y * Fa, L10 life in millions of revolutions = (C / P)^p, L10h operating hours = (10^6 / (60 * n)) * L10.
+- [Spur and Helical Gears](https://www.alucalculator.com/gears):
+  - Standards: ISO 6336 Method B, DIN 3990
+  - Formulations: Bending stress sigma_F = (Ft / (b * mn)) * YF * YS * Y_beta * KA * KV * KF_alpha * KF_beta. Contact stress sigma_H = ZH * ZE * Z_eps * Z_beta * sqrt((Ft / (d1 * b)) * ((u + 1) / u) * KA * KV * KH_alpha * KH_beta).
+- [Keyway Parallel Keys](https://www.alucalculator.com/keyway-connection):
+  - Standards: DIN 6885 Blatt 1, DIN 6892
+  - Formulations: Surface pressure p = (2 * T / (d * l_eff * (h - t1))) <= p_adm. Shear stress tau = (2 * T / (d * l_eff * b)) <= tau_adm.
+- [Shaft Fatigue Strength](https://www.alucalculator.com/shafts):
+  - Standards: DIN 743 Teile 1-4
+  - Formulations: Safety factors against fatigue failure S_sigma and S_tau under alternating bending and steady or pulsating torsion.
+- [Press Fits & Interference](https://www.alucalculator.com/press-fit):
+  - Standards: DIN 7190
+  - Formulations: Joint pressure p = U / (d * (c_i / E_i + c_a / E_a)), transmissible torque T = pi * d^2 * l * p * mu / 2.
+- [Fits & Tolerances](https://www.alucalculator.com/fits):
+  - Standards: ISO 286-1, ISO 286-2, DIN 7157
+  - Formulations: Standard tolerance grades IT01 through IT18, fundamental deviations A through ZC for holes and a through zc for shafts.
+
+## 2. Structural & Beam Solvers
+
+- [Beam Deflection & Bending](https://www.alucalculator.com/beam-deflection):
+  - Standards: Euler-Bernoulli beam theory, AISC 360-16, Eurocode 3
+  - Formulations: Deflection v''(x) = -M(x) / (E * I), maximum bending stress sigma = M * y / I.
+- [Column Buckling](https://www.alucalculator.com/column-buckling):
+  - Standards: Euler column theory, Johnson parabolic formula
+  - Formulations: P_cr = pi^2 * E * I / (K * L)^2 for slender columns (lambda >= lambda_c).
+- [FEA Linear Static](https://www.alucalculator.com/fea):
+  - Formulations: Stiffness matrix formulation K * u = F, CST and Q4 plane stress elements, von Mises equivalent stress.
+
+## 3. Materials & Metallurgy
+
+- [Materials Handbook & Database](https://www.alucalculator.com/materials):
+  - Standards: EN 573-3, EN 755-2, ISO 209, ASTM B221, AISI
+  - Data: Yield strength, tensile ultimate strength, elongation A50, modulus of elasticity, shear modulus, density, thermal expansion coefficient.
+- [Alloy Comparison](https://www.alucalculator.com/compare):
+  - Certified comparative matrices for 6061-T6, 6082-T6, 7075-T6, 2024-T3, and structural steels.
+
+## 4. Workspaces & CAD
+
+- [3D Parametric CAD / Design Studio](https://www.alucalculator.com/design-studio): Parametric modeling with extrude, revolve, hole wizard, and assembly mates.
+- [2D CAD Drafting / AluCAD](https://www.alucalculator.com/cad-editor): Planar geometric constraint solving with line, circle, arc, and dimension constraints.
+
+## 5. Metadata & Machine Schemas
+
+- [MCP Server Card](https://www.alucalculator.com/.well-known/mcp/server-card.json)
+- [About Us](https://www.alucalculator.com/about)
+- [Contact Support](https://www.alucalculator.com/contact)
+- [License](https://www.alucalculator.com/license)
+- [Privacy Policy](https://www.alucalculator.com/privacy)

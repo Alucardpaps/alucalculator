@@ -1,5 +1,5 @@
 /**
- * AluCalc OS — Workspace Store
+ * AluCAD OS — Workspace Store
  * 
  * Manages workspace state, project persistence, and layout serialization.
  * Supports multiple workspaces with auto-save functionality.
@@ -161,7 +161,7 @@ export const useWorkspaceStore = create<WorkspaceState & WorkspaceActions>()(
             isDirty: false,
             lastSaved: null,
             autoSaveEnabled: true,
-            debugMode: false,
+            debugMode: true,
 
             // ─────────────────────────────────────
             // System

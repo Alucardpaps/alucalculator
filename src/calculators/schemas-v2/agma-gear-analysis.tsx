@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CalculatorSchemaV2 } from '@/types/calculator-schema-v2';
 import { createValidatedValue } from '@/types/engineering';
+import { calculateIso6336Mesh } from '@/lib/iso6336';
 
 export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
     id: 'agma-gear-analysis',
@@ -9,7 +10,7 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
         description: 'AGMA Standard calculation for Bending Stress and Pitting Resistance (Contact Stress) in Spur Gears.',
         category: 'mechanical',
         version: '1.0.0',
-        author: 'AluCalc OS',
+        author: 'AluCAD OS',
         lastUpdated: '2026-02-12',
         tags: ['gear', 'agma', 'bending', 'pitting', 'fatigue', 'machine elements'],
         verifiedStandards: ['ANSI/AGMA 2001-D04', 'ANSI/AGMA 2101-D04']
@@ -37,8 +38,13 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
     outputs: [
         { key: 'dp', label: 'Pinion Dia (d)', unit: 'mm', description: 'Pitch diameter of pinion', precision: 1, formulaLatex: 'd_p = m \\cdot N_p' },
         { key: 'Wt', label: 'Tangential Force (Wt)', unit: 'N', description: 'Transmitted tangential load', precision: 1, formulaLatex: 'W_t = \\frac{60000 \\cdot P}{\\pi \\cdot d_p \\cdot n}' },
-        { key: 'bending', label: 'Bending Stress (σb)', unit: 'MPa', description: 'AGMA Bending Stress at tooth root', precision: 2, formulaLatex: '\\sigma_b = \\frac{W_t}{F m} \\frac{K_a K_v K_m}{Y_J}' },
-        { key: 'pitting', label: 'Contact Stress (σc)', unit: 'MPa', description: 'AGMA Contact Stress (Pitting)', precision: 2, formulaLatex: '\\sigma_c = Z_E \\sqrt{ \\frac{W_t}{d_p F} \\frac{K_a K_v K_m}{Z_I} }' }
+        { key: 'bending', label: 'AGMA Bending Stress (σb)', unit: 'MPa', description: 'AGMA 2001-D04 bending stress at tooth root', precision: 2, formulaLatex: '\\sigma_b = \\frac{W_t}{F m} \\frac{K_a K_v K_m}{Y_J}' },
+        { key: 'pitting', label: 'AGMA Contact Stress (σc)', unit: 'MPa', description: 'AGMA 2001-D04 pitting (contact) stress', precision: 2, formulaLatex: '\\sigma_c = Z_E \\sqrt{ \\frac{W_t}{d_p F} \\frac{K_a K_v K_m}{Z_I} }' },
+        { key: 'Yj', label: 'Geometry Factor J', unit: '-', description: 'AGMA bending geometry factor from pinion teeth (20°).', precision: 3, formulaLatex: 'Y_J = f(z_1, x_1)' },
+        { key: 'sigmaF_iso', label: 'ISO 6336 σF', unit: 'MPa', description: 'ISO 6336-3 root stress (cross-check).', precision: 1, formulaLatex: '\\sigma_{F} = \\frac{F_t}{b \\cdot m_n} Y_F Y_S Y_\\beta K_A K_V K_{F\\beta} K_{F\\alpha}' },
+        { key: 'sigmaH_iso', label: 'ISO 6336 σH', unit: 'MPa', description: 'ISO 6336-2 contact stress (cross-check).', precision: 1, formulaLatex: '\\sigma_{H} = Z_H Z_E Z_\\epsilon Z_\\beta \\sqrt{\\frac{F_t}{d_1 b} \\frac{u+1}{u} K_A K_V K_{H\\beta} K_{H\\alpha}}' },
+        { key: 'SF', label: 'Bending Safety SF', unit: '-', description: 'ISO 6336 SF vs 16MnCr5 σFlim=430 MPa.', precision: 2, formulaLatex: 'S_F = \\frac{\\sigma_{FP}}{\\sigma_F}' },
+        { key: 'SH', label: 'Pitting Safety SH', unit: '-', description: 'ISO 6336 SH vs 16MnCr5 σHlim=1500 MPa.', precision: 2, formulaLatex: 'S_H = \\frac{\\sigma_{HP}}{\\sigma_H}' }
     ],
     calculationEngine: (inputs) => {
         const P = Number(inputs.powerKw.value);
@@ -57,36 +63,43 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
         // 2. Transmitted Load (Wt)
         const Wt = (1000 * P) / v; // Newtons
 
-        // 3. AGMA Factors (Simplified for generic simulation)
-        // Ko = 1.0 (Uniform load)
-        const Ko = 1.0;
-        // Kv = Dynamic factor. Assuming Qv=6 (Commercial quality)
-        const B = 0.25 * Math.pow(12 - 6, 2 / 3);
-        const A = 50 + 56 * (1 - B);
-        // Metric Kv formula: Kv = (A / (A + sqrt(200*v)))^B for SI. Simplified to standard empirical here:
-        const Kv = Math.pow((A + Math.sqrt(200 * v)) / A, B);
-        // Km = Load distribution factor, approx 1.6 for standard face width
-        const Km = 1.6;
-        // J = Geometry factor for bending. Approx 0.35 for 20T pinion 20 deg
-        const Yj = 0.35;
-        // I = Geometry factor for pitting. I = cos(phi)*sin(phi)/2 * mg/(mg+1)
+        // 3. AGMA 2001-D04 factors
+        const Ko = 1.25;
+        const Qv = 8;
+        const Bdyn = 0.25 * Math.pow(12 - Qv, 2 / 3);
+        const A = 50 + 56 * (1 - Bdyn);
+        const Kv = Math.pow((A + Math.sqrt(200 * v)) / A, Bdyn);
+        const Km = Math.max(1.2, Math.min(1.8, 1.2 + 0.008 * F));
+        // AGMA J for 20° full-depth, curve-fit to tabulated pinion J (mated with 60T-class gear)
+        const Yj = Math.max(0.22, Math.min(0.56, 0.22 + 0.0045 * Np - 0.000012 * Np * Np));
         const phi = 20 * Math.PI / 180;
         const mg = Ng / Np;
         const Zi = (Math.cos(phi) * Math.sin(phi) / 2) * (mg / (mg + 1));
 
-        // 4. Stresses (Metric AGMA Equations)
-        // Bending (Root stress): sigma_b = (Wt / (F*m)) * (Ko * Kv * Km / Yj) (approx metric form)
         const bending = (Wt / (F * m)) * ((Ko * Kv * Km) / Yj);
-
-        // Pitting (Contact stress): sigma_c = Ze * sqrt( (Wt / (dp * F)) * (Ko * Kv * Km / Zi) )
         const pitting = Ze * Math.sqrt((Wt / (dp * F)) * ((Ko * Kv * Km) / Zi));
 
+        const iso = calculateIso6336Mesh({
+            mn: m,
+            z1: Np,
+            z2: Ng,
+            b: F,
+            alphaNDeg: 20,
+            torqueNm: (P * 9549.27) / rpm,
+            rpmPinion: rpm,
+            applicationFactor: Ko,
+            qualityGrade: 6,
+            sigmaHlim: 1500,
+            sigmaFlim1: 430,
+            sigmaFlim2: 430,
+        });
+
         const warnings: { field: string; message: string; severity: "info" | "warning" | "critical" }[] = [];
-        if (pitting > 1500) {
-            warnings.push({ field: 'pitting', message: 'Contact stress heavily exceeds typical steel endurance limits (pitting imminent).', severity: 'critical' });
+        if (pitting > 1500 || iso.SH < 1.0) {
+            warnings.push({ field: 'pitting', message: 'Contact stress exceeds typical case-hardened endurance (pitting risk).', severity: 'critical' });
         }
-        if (bending > 400) {
-            warnings.push({ field: 'bending', message: 'Bending stress is critically high. Risk of sudden tooth fracture.', severity: 'critical' });
+        if (bending > 400 || iso.SF1 < 1.4) {
+            warnings.push({ field: 'bending', message: 'Bending stress is high. Risk of tooth-root fracture (AGMA / ISO 6336).', severity: 'critical' });
         }
 
         return {
@@ -94,9 +107,14 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
                 dp: createValidatedValue(dp, 'mm', 'derived'),
                 Wt: createValidatedValue(Wt, 'N', 'derived'),
                 bending: createValidatedValue(bending, 'MPa', 'derived'),
-                pitting: createValidatedValue(pitting, 'MPa', 'derived')
+                pitting: createValidatedValue(pitting, 'MPa', 'derived'),
+                Yj: createValidatedValue(Yj, '-', 'derived'),
+                sigmaF_iso: createValidatedValue(iso.sigmaF1, 'MPa', 'derived'),
+                sigmaH_iso: createValidatedValue(iso.sigmaH, 'MPa', 'derived'),
+                SF: createValidatedValue(iso.SF1, '-', 'derived'),
+                SH: createValidatedValue(iso.SH, '-', 'derived')
             },
-            verified: true,
+            verified: iso.status !== 'unsafe',
             warnings,
             timestamp: Date.now()
         };
@@ -113,7 +131,7 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
             const stressColor = isFailing ? '#ef4444' : '#10b981';
 
             return (
-                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[#05080b]">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-[var(--bg-0)]">
                     {/* Gear Mesh Diagram */}
                     <div className="relative w-[200px] h-[200px]">
                         <svg viewBox="0 0 200 200" width="100%" height="100%" className="overflow-visible">
@@ -143,14 +161,14 @@ export const agmaGearAnalysisSchema: CalculatorSchemaV2 = {
                         </svg>
                     </div>
 
-                    <div className="mt-8 flex gap-8 text-center bg-[#0a0e14] p-4 rounded-xl border border-[#1a1f26]">
+                    <div className="mt-8 flex gap-8 text-center bg-[var(--bg-1)] p-4 rounded-xl border border-[var(--line)]">
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Bending</div>
                             <div className={`text-xl font-bold font-mono ${sigmaB > 400 ? 'text-red-400' : 'text-emerald-400'}`}>
                                 {sigmaB.toFixed(1)} <span className="text-[10px] text-gray-500">MPa</span>
                             </div>
                         </div>
-                        <div className="w-px bg-[#1a1f26]"></div>
+                        <div className="w-px bg-[var(--bg-3)]"></div>
                         <div>
                             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Pitting</div>
                             <div className={`text-xl font-bold font-mono ${sigmaC > 1500 ? 'text-red-400' : 'text-orange-400'}`}>

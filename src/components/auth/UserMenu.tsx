@@ -23,7 +23,7 @@ export function UserMenu() {
                 <span className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">
                     {session.user?.name?.split(' ')[0]}
                 </span>
-                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-black text-white uppercase shadow-lg shadow-blue-600/20">
+                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-black text-white uppercase shadow-lg ">
                     {session.user?.name?.[0]}
                 </div>
                 <ChevronDown size={14} className={`text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -35,7 +35,7 @@ export function UserMenu() {
                         className="fixed inset-0 z-40" 
                         onClick={() => setIsOpen(false)}
                     ></div>
-                    <div className="absolute right-0 mt-2 w-48 bg-[#0f172a] border border-slate-800 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--bg-2)] border border-slate-800 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="px-4 py-2 border-b border-slate-800 mb-2">
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Signed in as</p>
                             <p className="text-xs text-white truncate">{session.user?.email}</p>
