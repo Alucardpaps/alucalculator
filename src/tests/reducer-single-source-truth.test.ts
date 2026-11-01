@@ -319,17 +319,20 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(case1a.skfTableCase).toBe('Case 1a');
     expect(case1a.bearingA.Fa).toBeCloseTo(3.6429, 3);
     expect(case1a.bearingA.P).toBeCloseTo(10.20, 2);
+    expect(case1a.bearingA.L10h).toBeCloseTo(63483.86, 0);
     expect(case1a.bearingB.Fa).toBeCloseTo(5.5629, 3);
     expect(case1a.bearingB.P).toBeCloseTo(11.368, 2);
+    expect(case1a.bearingB.L10h).toBeCloseTo(44230.01, 0);
     expect(case1a.bearingB.L10h).toBeGreaterThan(25000);
   });
 
-  it('Step 7 (G1-P0-02): verifies 3D spatial shaft equilibrium and near-zero static residuals (ΣF = 0, ΣM = 0)', () => {
+  it('Step 7 (G1-P0-02): verifies 3D spatial shaft equilibrium and near-zero static residuals (ΣFx, ΣFy, ΣFz, ΣMx, ΣMy, ΣMz = 0)', () => {
     // Input Shaft 1: zA = 0 mm, Pinion at z = 90 mm, zB = 180 mm
     // Design forces: Ft1 = 4792.58 N, Fr1 = 1797.73 N, Fa1 = 1194.88 N at pitch radius r1 = 25.765 mm
     const eqShaft1 = solve3DShaftStaticEquilibrium({
       zAMm: 0,
       zBMm: 180,
+      externalTorqueMzNmm: -4792.58 * 25.7653,
       loads: [
         {
           label: 'Stage 1 Helical Pinion',
@@ -338,7 +341,8 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
           FxN: 4792.58,
           FyN: -1797.73,
           FzN: 1194.88,
-          MxNmm: 1194.88 * 25.7653 // Overturning couple from axial force
+          MxNmm: 1194.88 * 25.7653, // Overturning couple from axial force
+          MzNmm: 4792.58 * 25.7653  // Gear mesh torsional moment about z-axis
         }
       ]
     });
@@ -348,6 +352,7 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(Math.abs(eqShaft1.residuals.sumFzN)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft1.residuals.sumMxAboutANmm)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft1.residuals.sumMyAboutANmm)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft1.residuals.sumMzNmm)).toBeLessThan(1e-9);
     expect(eqShaft1.FrAkN).toBeCloseTo(2.61, 1);
 
     // Intermediate Shaft 2: Bearing A at z = 0 mm, Gear 2 at z = 75 mm, Pinion 3 at z = 165 mm, Bearing B at z = 240 mm
@@ -362,7 +367,8 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
           FxN: -4792.58,
           FyN: 1797.73,
           FzN: -1194.88,
-          MxNmm: -1194.88 * 133.98
+          MxNmm: -1194.88 * 133.98,
+          MzNmm: -4792.58 * 133.98
         },
         {
           label: 'Stage 2 Driving Pinion z3=21',
@@ -371,7 +377,8 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
           FxN: -14655.0,
           FyN: -5453.2,
           FzN: 3115.0,
-          MxNmm: 3115.0 * 42.938
+          MxNmm: 3115.0 * 42.938,
+          MzNmm: 14655.0 * 42.938
         }
       ]
     });
@@ -381,6 +388,7 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(Math.abs(eqShaft2.residuals.sumFzN)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft2.residuals.sumMxAboutANmm)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft2.residuals.sumMyAboutANmm)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.residuals.sumMzNmm)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft2.RAzN)).toBeCloseTo(1920.12, 1); // Net axial force Ka = 1.92 kN!
   });
 
@@ -474,6 +482,35 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(mutatedOverload.bearingLife.L10h).toBeLessThan(baseline.bearingLife.L10h / 20);
     expect(mutatedOverload.shaftRes.SD).toBeLessThan(1.0); // Fails DIN 743 fatigue safety (< 1.5)!
     expect(mutatedOverload.boltRes.MA).toBeLessThan(baseline.boltRes.MA * 0.5); // 4.6 bolt has < half the torque capacity of 8.8
+
+    // Explicit 15 kW -> 22 kW linear load scaling check on SKF 32210 J2/Q Case 2a (V10-12 / V10_Sayisal_Ref!B16 = 12802.34 h)
+    const rec32210 = findSKFBearing('32210 J2/Q')!;
+    const skf32210: BearingData = {
+      code: rec32210.fullDesignation,
+      type: rec32210.type,
+      d: rec32210.d,
+      D: rec32210.D,
+      B: rec32210.B,
+      C: rec32210.C,
+      C0: rec32210.C0,
+      e: rec32210.e,
+      Y: rec32210.Y,
+      Y0: rec32210.Y0
+    };
+    const scale22 = 22.0 / 15.0;
+    const n2_rpm = n_input_rpm / (stage1.z_gear / stage1.z_pinion);
+    const case2a_22kW = solveSkfPairedTaperedRollerOArrangement({
+      bearingA: skf32210,
+      bearingB: skf32210,
+      FrA: 10.20 * scale22,
+      FrB: 8.95 * scale22,
+      Ka: 1.92 * scale22,
+      kaDirection: 'towards_A',
+      rpm: n2_rpm,
+      arrangement: 'O-back-to-back'
+    });
+    expect(case2a_22kW.bearingA.P).toBeCloseTo(11.243 * scale22, 3);
+    expect(case2a_22kW.bearingA.L10h).toBeCloseTo(12802.34, 0); // Exact (15/22)^(10/3) * 45890.55 = 12802.34 h!
   });
 
   it('Step 10 (G1-P0-07): executes operational 2D Nesting & CAM lead-in/remnant pipeline for reducer torque-arm bracket plates', () => {

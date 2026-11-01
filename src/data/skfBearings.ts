@@ -1160,6 +1160,7 @@ export interface Shaft3DForceStation {
     FzN: number;      // Axial force along shaft z-axis (N, Fa)
     MxNmm?: number;   // Overturning moment about x-axis from axial force at pitch radius (N·mm)
     MyNmm?: number;   // Overturning moment about y-axis from axial force at pitch radius (N·mm)
+    MzNmm?: number;   // Torsional moment about z-axis (N·mm, e.g. gear mesh torque ±Ft * rPitchMm)
 }
 
 export interface Shaft3DEquilibriumResult {
@@ -1170,6 +1171,7 @@ export interface Shaft3DEquilibriumResult {
     RAzN: number; // Net axial reaction carried by locating bearing/pair (N)
     RBxN: number;
     RByN: number;
+    RMzNmm: number; // External driving/absorbing shaft reaction torque for torsional balance (N·mm)
     FrAN: number; // Resultant radial load at Bearing A (N)
     FrBN: number; // Resultant radial load at Bearing B (N)
     FrAkN: number;
@@ -1180,6 +1182,7 @@ export interface Shaft3DEquilibriumResult {
         sumFzN: number;
         sumMxAboutANmm: number;
         sumMyAboutANmm: number;
+        sumMzNmm: number;
     };
 }
 
@@ -1187,8 +1190,9 @@ export function solve3DShaftStaticEquilibrium(params: {
     zAMm: number;
     zBMm: number;
     loads: Shaft3DForceStation[];
+    externalTorqueMzNmm?: number;
 }): Shaft3DEquilibriumResult {
-    const { zAMm, zBMm, loads } = params;
+    const { zAMm, zBMm, loads, externalTorqueMzNmm } = params;
     const L = zBMm - zAMm;
     if (Math.abs(L) < 1e-6) {
         throw new Error('Bearing span L = zB - zA must be non-zero');
@@ -1199,8 +1203,11 @@ export function solve3DShaftStaticEquilibrium(params: {
     // ΣM_y(A) = Σ [ Fx_i * (z_i - zA) + My_i ] + RBx * (zB - zA) = 0
     // In Y-Z plane (forces Fy and concentrated moments Mx):
     // ΣM_x(A) = Σ [ Fy_i * (z_i - zA) + Mx_i ] + RBy * (zB - zA) = 0
+    // About Z-axis (torsional equilibrium about shaft rotation axis):
+    // ΣM_z = Σ Mz_i + RMz = 0 (bearings are free to rotate about z-axis)
     let momentXLoadSum = 0;
     let momentYLoadSum = 0;
+    let momentZLoadSum = 0;
     let sumLoadFx = 0;
     let sumLoadFy = 0;
     let sumLoadFz = 0;
@@ -1209,8 +1216,10 @@ export function solve3DShaftStaticEquilibrium(params: {
         const dz = ld.zMm - zAMm;
         const mx = ld.MxNmm ?? 0;
         const my = ld.MyNmm ?? 0;
+        const mz = ld.MzNmm ?? (ld.FxN * ld.rPitchMm);
         momentYLoadSum += ld.FxN * dz + my;
         momentXLoadSum += ld.FyN * dz + mx;
+        momentZLoadSum += mz;
         sumLoadFx += ld.FxN;
         sumLoadFy += ld.FyN;
         sumLoadFz += ld.FzN;
@@ -1221,16 +1230,18 @@ export function solve3DShaftStaticEquilibrium(params: {
     const RAxN = -sumLoadFx - RBxN;
     const RAyN = -sumLoadFy - RByN;
     const RAzN = -sumLoadFz;
+    const RMzNmm = externalTorqueMzNmm !== undefined ? externalTorqueMzNmm : -momentZLoadSum;
 
     const FrAN = Math.hypot(RAxN, RAyN);
     const FrBN = Math.hypot(RBxN, RByN);
 
-    // Compute exact equilibrium residuals
+    // Compute exact 6-DOF equilibrium residuals
     const sumFxN = sumLoadFx + RAxN + RBxN;
     const sumFyN = sumLoadFy + RAyN + RByN;
     const sumFzN = sumLoadFz + RAzN;
     const sumMyAboutANmm = momentYLoadSum + RBxN * L;
     const sumMxAboutANmm = momentXLoadSum + RByN * L;
+    const sumMzNmm = momentZLoadSum + RMzNmm;
 
     return {
         zAMm,
@@ -1240,6 +1251,7 @@ export function solve3DShaftStaticEquilibrium(params: {
         RAzN,
         RBxN,
         RByN,
+        RMzNmm,
         FrAN,
         FrBN,
         FrAkN: FrAN / 1000,
@@ -1250,6 +1262,7 @@ export function solve3DShaftStaticEquilibrium(params: {
             sumFzN,
             sumMxAboutANmm,
             sumMyAboutANmm,
+            sumMzNmm,
         },
     };
 }
