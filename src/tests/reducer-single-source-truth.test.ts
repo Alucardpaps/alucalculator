@@ -1,7 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { calculateBearingLife, type BearingData } from '@/data/skfBearings';
+import {
+  calculateBearingLife,
+  solveSkfPairedTaperedRollerOArrangement,
+  solve3DShaftStaticEquilibrium,
+  findSKFBearing,
+  type BearingData
+} from '@/data/skfBearings';
 import { din743Check, type Din743Point, type Din743Material } from '@/modules/mechanical/ShaftDesign/din743';
-import { computeBoltAssembly, CLAMPED_MATERIALS } from '@/lib/fastener/sharedEngine';
+import { computeBoltAssembly } from '@/lib/fastener/sharedEngine';
+import { executeSigmaNest2D, calculateSigmaNestLeadInParameters } from '@/cam';
+import type { Part2D, Sheet2D } from '@/types/nesting2d.types';
 
 /**
  * REDUCER SINGLE SOURCE OF ENGINEERING TRUTH TEST
@@ -249,5 +257,270 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(boltRes.MA).toBeCloseTo(66.23, 1);
     expect(boltRes.safety).toBeGreaterThan(1.10);
     expect(boltRes.d_nom).toBe(12);
+  });
+
+  it('Step 6 (G1-P0-01 & G1-P0-05): verifies SKF Table 7 O-arrangement Case 2a & Case 1a and operating life boundary metadata', () => {
+    const rec32210 = findSKFBearing('32210 J2/Q')!;
+    expect(rec32210).toBeDefined();
+
+    const skf32210: BearingData = {
+      code: rec32210.fullDesignation,
+      type: rec32210.type,
+      d: rec32210.d,
+      D: rec32210.D,
+      B: rec32210.B,
+      C: rec32210.C,
+      C0: rec32210.C0,
+      e: rec32210.e,
+      Y: rec32210.Y,
+      Y0: rec32210.Y0
+    };
+
+    const n2_rpm = n_input_rpm / (stage1.z_gear / stage1.z_pinion);
+
+    // Case 2a: External axial thrust Ka = 1.92 kN directed towards Bearing A (FrA = 10.20 kN, FrB = 8.95 kN)
+    const case2a = solveSkfPairedTaperedRollerOArrangement({
+      bearingA: skf32210,
+      bearingB: skf32210,
+      FrA: 10.20,
+      FrB: 8.95,
+      Ka: 1.92,
+      kaDirection: 'towards_A',
+      rpm: n2_rpm,
+      arrangement: 'O-back-to-back'
+    });
+
+    expect(case2a.skfTableCase).toBe('Case 2a');
+    expect(case2a.bearingA.Fa).toBeCloseTo(5.1164, 3);
+    expect(case2a.bearingA.P).toBeCloseTo(11.243, 2);
+    expect(case2a.bearingA.L10h).toBeCloseTo(45891.0, -1);
+    expect(case2a.bearingB.Fa).toBeCloseTo(3.1964, 3);
+    expect(case2a.bearingB.P).toBeCloseTo(8.95, 2);
+    expect(case2a.bearingB.L10h).toBeCloseTo(98156.8, -1);
+    expect(case2a.governingL10h).toBeCloseTo(45891.0, -1);
+
+    // Boundary metadata check (G1-P0-05)
+    expect(case2a.boundaryMetadata.zeroClearanceNoPreloadAssumption).toBe(true);
+    expect(case2a.boundaryMetadata.lifeClassification).toBe('BASELINE_SCREENING_L10H');
+    expect(case2a.boundaryMetadata.operatingLifeWarning).toContain('zero operating clearance');
+
+    // Case 1a: External axial thrust Ka = 1.92 kN directed towards Bearing B
+    const case1a = solveSkfPairedTaperedRollerOArrangement({
+      bearingA: skf32210,
+      bearingB: skf32210,
+      FrA: 10.20,
+      FrB: 8.95,
+      Ka: 1.92,
+      kaDirection: 'towards_B',
+      rpm: n2_rpm,
+      arrangement: 'O-back-to-back'
+    });
+
+    expect(case1a.skfTableCase).toBe('Case 1a');
+    expect(case1a.bearingA.Fa).toBeCloseTo(3.6429, 3);
+    expect(case1a.bearingA.P).toBeCloseTo(10.20, 2);
+    expect(case1a.bearingB.Fa).toBeCloseTo(5.5629, 3);
+    expect(case1a.bearingB.P).toBeCloseTo(11.368, 2);
+    expect(case1a.bearingB.L10h).toBeGreaterThan(25000);
+  });
+
+  it('Step 7 (G1-P0-02): verifies 3D spatial shaft equilibrium and near-zero static residuals (ΣF = 0, ΣM = 0)', () => {
+    // Input Shaft 1: zA = 0 mm, Pinion at z = 90 mm, zB = 180 mm
+    // Design forces: Ft1 = 4792.58 N, Fr1 = 1797.73 N, Fa1 = 1194.88 N at pitch radius r1 = 25.765 mm
+    const eqShaft1 = solve3DShaftStaticEquilibrium({
+      zAMm: 0,
+      zBMm: 180,
+      loads: [
+        {
+          label: 'Stage 1 Helical Pinion',
+          zMm: 90,
+          rPitchMm: 25.7653,
+          FxN: 4792.58,
+          FyN: -1797.73,
+          FzN: 1194.88,
+          MxNmm: 1194.88 * 25.7653 // Overturning couple from axial force
+        }
+      ]
+    });
+
+    expect(Math.abs(eqShaft1.residuals.sumFxN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft1.residuals.sumFyN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft1.residuals.sumFzN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft1.residuals.sumMxAboutANmm)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft1.residuals.sumMyAboutANmm)).toBeLessThan(1e-9);
+    expect(eqShaft1.FrAkN).toBeCloseTo(2.61, 1);
+
+    // Intermediate Shaft 2: Bearing A at z = 0 mm, Gear 2 at z = 75 mm, Pinion 3 at z = 165 mm, Bearing B at z = 240 mm
+    const eqShaft2 = solve3DShaftStaticEquilibrium({
+      zAMm: 0,
+      zBMm: 240,
+      loads: [
+        {
+          label: 'Stage 1 Driven Wheel z2=104',
+          zMm: 75,
+          rPitchMm: 133.98,
+          FxN: -4792.58,
+          FyN: 1797.73,
+          FzN: -1194.88,
+          MxNmm: -1194.88 * 133.98
+        },
+        {
+          label: 'Stage 2 Driving Pinion z3=21',
+          zMm: 165,
+          rPitchMm: 42.938,
+          FxN: -14655.0,
+          FyN: -5453.2,
+          FzN: 3115.0,
+          MxNmm: 3115.0 * 42.938
+        }
+      ]
+    });
+
+    expect(Math.abs(eqShaft2.residuals.sumFxN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.residuals.sumFyN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.residuals.sumFzN)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.residuals.sumMxAboutANmm)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.residuals.sumMyAboutANmm)).toBeLessThan(1e-9);
+    expect(Math.abs(eqShaft2.RAzN)).toBeCloseTo(1920.12, 1); // Net axial force Ka = 1.92 kN!
+  });
+
+  it('Step 8 (G1-P0-03): resolves SKF 32206/32210/32215 J2/Q directly from production SKF_MASTER_CATALOG with provenance', () => {
+    const b06 = findSKFBearing('32206 J2/Q');
+    const b10 = findSKFBearing('32210 J2/Q');
+    const b15 = findSKFBearing('32215 J2/Q');
+
+    expect(b06).toBeDefined();
+    expect(b06!.C).toBe(50.1);
+    expect(b06!.C0).toBe(57.0);
+    expect(b06!.e).toBe(0.37);
+    expect(b06!.Y).toBe(1.6);
+
+    expect(b10).toBeDefined();
+    expect(b10!.C).toBe(82.5);
+    expect(b10!.C0).toBe(100.0);
+    expect(b10!.e).toBe(0.43);
+    expect(b10!.Y).toBe(1.4);
+
+    expect(b15).toBeDefined();
+    expect(b15!.C).toBe(161.0);
+    expect(b15!.C0).toBe(196.0);
+    expect(b15!.catalogRevisionRef).toContain('196.0 kN');
+    expect(b15!.catalogRevisionRef).toContain('212.0 kN');
+  });
+
+  it('Step 9 (G1-P0-04 & G1-P0-06): executes parametric mutation tests and connected data-flow pipeline', () => {
+    // 1. Connected flow: Motor (P_kW) -> Torque -> Gear Forces -> 3D Shaft Equilibrium -> Bearing Life
+    const runConnectedPipeline = (motorKw: number, shaftDiaMm: number, boltGrade: string) => {
+      const T1_des = ((9549.296585 * motorKw) / n_input_rpm) * K_A;
+      const d1_m = ((stage1.z_pinion * stage1.m_n) / Math.cos(degToRad(stage1.beta_deg))) / 1000;
+      const Ft1 = (2 * T1_des) / d1_m;
+      const Fa1 = Ft1 * Math.tan(degToRad(stage1.beta_deg));
+      const Fr1 = (Ft1 * Math.tan(degToRad(stage1.alpha_n_deg))) / Math.cos(degToRad(stage1.beta_deg));
+
+      const eq1 = solve3DShaftStaticEquilibrium({
+        zAMm: 0,
+        zBMm: 180,
+        loads: [{ label: 'Pinion', zMm: 90, rPitchMm: (d1_m * 1000) / 2, FxN: Ft1, FyN: -Fr1, FzN: Fa1 }]
+      });
+
+      const b06Rec = findSKFBearing('32206 J2/Q')!;
+      const bearingLife = calculateBearingLife(
+        {
+          code: b06Rec.fullDesignation,
+          type: b06Rec.type,
+          d: b06Rec.d,
+          D: b06Rec.D,
+          B: b06Rec.B,
+          C: b06Rec.C,
+          C0: b06Rec.C0,
+          e: b06Rec.e,
+          Y: b06Rec.Y,
+          Y0: b06Rec.Y0
+        },
+        eq1.FrAkN,
+        Fa1 / 1000,
+        n_input_rpm
+      );
+
+      // Bending moment at center z=90mm: Mb = FrA * 0.090 m
+      const Mb_Nm = eq1.FrAN * 0.090;
+      const Wb_mm3 = (Math.PI * Math.pow(shaftDiaMm, 3)) / 32;
+      const Wt_mm3 = (Math.PI * Math.pow(shaftDiaMm, 3)) / 16;
+      const sigmaB = (Mb_Nm * 1000) / Wb_mm3;
+      const tau = (T1_des * 1000) / Wt_mm3;
+
+      const shaftRes = din743Check(
+        { d: shaftDiaMm, sigmaB, tau, notch: { kind: 'keyway', d: shaftDiaMm }, Rz: 6.3, torsionAlt: 0 },
+        { Rm: 1000, Re: 750, steelClass: 'quenched-tempered' }
+      );
+
+      const boltRes = computeBoltAssembly({
+        threadStandard: 'Metric Coarse',
+        size: 'M12',
+        grade: boltGrade,
+        muThread: 0.12,
+        muHead: 0.12,
+        yieldUtilization: 70,
+        alphaA: 1.2
+      });
+
+      return { bearingLife, shaftRes, boltRes };
+    };
+
+    const baseline = runConnectedPipeline(15.0, 30, '8.8');
+    const mutatedOverload = runConnectedPipeline(45.0, 18, '4.6'); // 3x power, undersized 18mm shaft, weak 4.6 bolt
+
+    // Prove parametric sensitivity & mutation detection:
+    expect(mutatedOverload.bearingLife.L10h).toBeLessThan(baseline.bearingLife.L10h / 20);
+    expect(mutatedOverload.shaftRes.SD).toBeLessThan(1.0); // Fails DIN 743 fatigue safety (< 1.5)!
+    expect(mutatedOverload.boltRes.MA).toBeLessThan(baseline.boltRes.MA * 0.5); // 4.6 bolt has < half the torque capacity of 8.8
+  });
+
+  it('Step 10 (G1-P0-07): executes operational 2D Nesting & CAM lead-in/remnant pipeline for reducer torque-arm bracket plates', () => {
+    const bracketParts: Part2D[] = [
+      {
+        id: 'REDUCER-TORQUE-ARM-12MM',
+        label: 'Torque Arm Plate 450x220',
+        polygon: {
+          points: [{ x: 0, y: 0 }, { x: 450, y: 0 }, { x: 450, y: 220 }, { x: 0, y: 220 }],
+          bounds: { x: 0, y: 0, width: 450, height: 220 },
+          area: 450 * 220
+        },
+        quantity: 4,
+        allowedRotations: [0, 90],
+        material: 'S235JR',
+        thickness: 12
+      }
+    ];
+
+    const sheet: Sheet2D = {
+      width: 3000,
+      height: 1500,
+      kerf: 2.2
+    };
+
+    const nestResult = executeSigmaNest2D({
+      parts: bracketParts,
+      sheet,
+      options: {
+        spacing: 8,
+        rotationStep: 90,
+        algorithm: 'sigmanest',
+        heuristic: 'best-area-fit',
+        multiSheet: false,
+        maxSheets: 1,
+        enableRemnantGeneration: true,
+        minRemnantDimensionMm: 400
+      }
+    });
+
+    expect(nestResult.sheets.length).toBe(1);
+    expect(nestResult.sheets[0].placedParts.length).toBe(4);
+    expect(nestResult.sheets[0].remnantSheet).toBeDefined();
+    expect(nestResult.sheets[0].cropCut).toBeDefined();
+
+    const leadIn = calculateSigmaNestLeadInParameters(12, 'S235JR');
+    expect(leadIn.leadInLengthMm).toBeGreaterThan(4);
+    expect(leadIn.pierceDelaySec).toBeGreaterThan(0.2);
   });
 });

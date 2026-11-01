@@ -96,10 +96,10 @@ describe('ISO 281:2007 & ISO 76:2006 Bearing Standard Regression Suite', () => {
             f0: 13.8,
         };
 
-        // Light axial load: fa = 0.1 kN -> low ratio -> low e, high Y
-        const light = computeEquivalentLoadsAndWarnings(bearing6204, 3.0, 0.1);
+        // Light axial load (still in combined load zone fa/fr > e): fa = 0.1 kN, fr = 0.3 kN -> low e, high Y
+        const light = computeEquivalentLoadsAndWarnings(bearing6204, 0.3, 0.1);
 
-        // Heavy axial load: fa = 2.0 kN -> high ratio -> high e, lower Y
+        // Heavy axial load: fa = 2.0 kN, fr = 3.0 kN -> high ratio -> high e, lower Y
         const heavy = computeEquivalentLoadsAndWarnings(bearing6204, 3.0, 2.0);
 
         expect(light.e).toBeLessThan(heavy.e!);

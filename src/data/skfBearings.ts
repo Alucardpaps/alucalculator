@@ -1002,3 +1002,256 @@ export function calculateBearingLife(
     return { P, P0, L10, L10h, Lna, staticSafety, warnings, X, Y, e };
 }
 
+/**
+ * SKF Rolling Bearings Catalogue (PUB BU/P1 10000/2 EN & 17000/1 EN, p. 682, Table 7):
+ * Axial loading of shaft assemblies incorporating two single-row tapered roller bearings
+ * in Back-to-Back (O) or Face-to-Face (X) arrangement.
+ *
+ * Boundary Condition (SKF Table 7):
+ * Valid for bearing pairs adjusted to practically zero clearance during operation, without preload.
+ * Basic rating life L10h is a design screening value; actual operating life requires EHL viscosity (kappa),
+ * contamination (ec), thermal expansion/preload, and shaft deflection evaluation.
+ */
+export interface SkfPairedTaperedResult {
+    skfTableCase: 'Case 1a' | 'Case 1b' | 'Case 1c' | 'Case 2a' | 'Case 2b' | 'Case 2c';
+    arrangement: 'O-back-to-back' | 'X-face-to-face';
+    kaDirection: 'towards_A' | 'towards_B';
+    bearingA: {
+        Fr: number;
+        Fa: number;
+        P: number;
+        L10: number;
+        L10h: number;
+        staticSafety: number;
+    };
+    bearingB: {
+        Fr: number;
+        Fa: number;
+        P: number;
+        L10: number;
+        L10h: number;
+        staticSafety: number;
+    };
+    governingL10h: number;
+    boundaryMetadata: {
+        standardRef: string;
+        zeroClearanceNoPreloadAssumption: true;
+        lifeClassification: 'BASELINE_SCREENING_L10H';
+        operatingLifeWarning: string;
+    };
+}
+
+export function solveSkfPairedTaperedRollerOArrangement(params: {
+    bearingA: BearingData;
+    bearingB: BearingData;
+    FrA: number; // kN
+    FrB: number; // kN
+    Ka: number;  // External axial force magnitude (kN, >= 0)
+    kaDirection: 'towards_A' | 'towards_B';
+    rpm: number;
+    arrangement?: 'O-back-to-back' | 'X-face-to-face';
+}): SkfPairedTaperedResult {
+    const {
+        bearingA,
+        bearingB,
+        FrA,
+        FrB,
+        Ka,
+        kaDirection,
+        rpm,
+        arrangement = 'O-back-to-back',
+    } = params;
+
+    const YA = bearingA.Y ?? 1.4;
+    const YB = bearingB.Y ?? 1.4;
+    const SA = (0.5 * FrA) / YA;
+    const SB = (0.5 * FrB) / YB;
+    const deltaS = SA - SB; // 0.5 * (FrA/YA - FrB/YB)
+
+    let FaA = 0;
+    let FaB = 0;
+    let skfTableCase: SkfPairedTaperedResult['skfTableCase'];
+
+    if (FrA / YA >= FrB / YB) {
+        // Group 1 & 2a/2b when FrA/YA >= FrB/YB
+        if (kaDirection === 'towards_B') {
+            // Case 1a: Ka acts onto Bearing B (same direction as induced SA)
+            skfTableCase = 'Case 1a';
+            FaA = SA;
+            FaB = SA + Ka;
+        } else {
+            // Ka acts onto Bearing A (opposing SB)
+            if (Ka >= deltaS) {
+                skfTableCase = 'Case 2a';
+                FaA = SB + Ka;
+                FaB = SB;
+            } else {
+                skfTableCase = 'Case 1b';
+                FaA = SA;
+                FaB = SA - Ka;
+            }
+        }
+    } else {
+        // FrA/YA < FrB/YB (i.e. SB > SA)
+        const absDeltaS = SB - SA;
+        if (kaDirection === 'towards_A') {
+            skfTableCase = 'Case 2c';
+            FaA = SB + Ka;
+            FaB = SB;
+        } else {
+            if (Ka >= absDeltaS) {
+                skfTableCase = 'Case 1c';
+                FaA = SA;
+                FaB = SA + Ka;
+            } else {
+                skfTableCase = 'Case 2b';
+                FaA = SB - Ka;
+                FaB = SB;
+            }
+        }
+    }
+
+    const resA = calculateBearingLife(bearingA, FrA, FaA, rpm);
+    const resB = calculateBearingLife(bearingB, FrB, FaB, rpm);
+
+    return {
+        skfTableCase,
+        arrangement,
+        kaDirection,
+        bearingA: {
+            Fr: FrA,
+            Fa: FaA,
+            P: resA.P,
+            L10: resA.L10,
+            L10h: resA.L10h,
+            staticSafety: resA.staticSafety,
+        },
+        bearingB: {
+            Fr: FrB,
+            Fa: FaB,
+            P: resB.P,
+            L10: resB.L10,
+            L10h: resB.L10h,
+            staticSafety: resB.staticSafety,
+        },
+        governingL10h: Math.min(resA.L10h, resB.L10h),
+        boundaryMetadata: {
+            standardRef: 'SKF PUB BU/P1 10000/2 EN & 17000/1 EN Table 7 (p. 682) / ISO 281:2007',
+            zeroClearanceNoPreloadAssumption: true,
+            lifeClassification: 'BASELINE_SCREENING_L10H',
+            operatingLifeWarning:
+                'Basic rating life L10h assumes zero operating clearance without preload and rigid shaft alignment. Real operating life Lnmh requires EHL viscosity ratio (kappa), thermal preload shift, and misalignment evaluation.',
+        },
+    };
+}
+
+/**
+ * 3D Spatial Shaft Static Equilibrium Solver (ΣF = 0, ΣM = 0)
+ * Coordinates: z = shaft axial coordinate (mm), x = horizontal transverse (mm), y = vertical transverse (mm).
+ * Computes exact 3D bearing reactions at Station A (zA) and Station B (zB) and verifies static residuals.
+ */
+export interface Shaft3DForceStation {
+    label: string;
+    zMm: number;      // Axial position along shaft (mm)
+    rPitchMm: number; // Pitch radius (mm) where axial force creates bending moment couple
+    contactAnglePhiRad?: number; // Angular position of gear mesh around shaft (default 0 -> +y radial)
+    FxN: number;      // Transverse horizontal force (N, e.g. Ft component)
+    FyN: number;      // Transverse vertical force (N, e.g. Fr component)
+    FzN: number;      // Axial force along shaft z-axis (N, Fa)
+    MxNmm?: number;   // Overturning moment about x-axis from axial force at pitch radius (N·mm)
+    MyNmm?: number;   // Overturning moment about y-axis from axial force at pitch radius (N·mm)
+}
+
+export interface Shaft3DEquilibriumResult {
+    zAMm: number;
+    zBMm: number;
+    RAxN: number;
+    RAyN: number;
+    RAzN: number; // Net axial reaction carried by locating bearing/pair (N)
+    RBxN: number;
+    RByN: number;
+    FrAN: number; // Resultant radial load at Bearing A (N)
+    FrBN: number; // Resultant radial load at Bearing B (N)
+    FrAkN: number;
+    FrBkN: number;
+    residuals: {
+        sumFxN: number;
+        sumFyN: number;
+        sumFzN: number;
+        sumMxAboutANmm: number;
+        sumMyAboutANmm: number;
+    };
+}
+
+export function solve3DShaftStaticEquilibrium(params: {
+    zAMm: number;
+    zBMm: number;
+    loads: Shaft3DForceStation[];
+}): Shaft3DEquilibriumResult {
+    const { zAMm, zBMm, loads } = params;
+    const L = zBMm - zAMm;
+    if (Math.abs(L) < 1e-6) {
+        throw new Error('Bearing span L = zB - zA must be non-zero');
+    }
+
+    // Sum moments about Bearing A (z = zA):
+    // In X-Z plane (forces Fx and concentrated moments My):
+    // ΣM_y(A) = Σ [ Fx_i * (z_i - zA) + My_i ] + RBx * (zB - zA) = 0
+    // In Y-Z plane (forces Fy and concentrated moments Mx):
+    // ΣM_x(A) = Σ [ Fy_i * (z_i - zA) + Mx_i ] + RBy * (zB - zA) = 0
+    let momentXLoadSum = 0;
+    let momentYLoadSum = 0;
+    let sumLoadFx = 0;
+    let sumLoadFy = 0;
+    let sumLoadFz = 0;
+
+    for (const ld of loads) {
+        const dz = ld.zMm - zAMm;
+        const mx = ld.MxNmm ?? 0;
+        const my = ld.MyNmm ?? 0;
+        momentYLoadSum += ld.FxN * dz + my;
+        momentXLoadSum += ld.FyN * dz + mx;
+        sumLoadFx += ld.FxN;
+        sumLoadFy += ld.FyN;
+        sumLoadFz += ld.FzN;
+    }
+
+    const RBxN = -momentYLoadSum / L;
+    const RByN = -momentXLoadSum / L;
+    const RAxN = -sumLoadFx - RBxN;
+    const RAyN = -sumLoadFy - RByN;
+    const RAzN = -sumLoadFz;
+
+    const FrAN = Math.hypot(RAxN, RAyN);
+    const FrBN = Math.hypot(RBxN, RByN);
+
+    // Compute exact equilibrium residuals
+    const sumFxN = sumLoadFx + RAxN + RBxN;
+    const sumFyN = sumLoadFy + RAyN + RByN;
+    const sumFzN = sumLoadFz + RAzN;
+    const sumMyAboutANmm = momentYLoadSum + RBxN * L;
+    const sumMxAboutANmm = momentXLoadSum + RByN * L;
+
+    return {
+        zAMm,
+        zBMm,
+        RAxN,
+        RAyN,
+        RAzN,
+        RBxN,
+        RByN,
+        FrAN,
+        FrBN,
+        FrAkN: FrAN / 1000,
+        FrBkN: FrBN / 1000,
+        residuals: {
+            sumFxN,
+            sumFyN,
+            sumFzN,
+            sumMxAboutANmm,
+            sumMyAboutANmm,
+        },
+    };
+}
+
+

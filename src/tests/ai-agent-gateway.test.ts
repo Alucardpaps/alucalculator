@@ -25,10 +25,9 @@ describe('AI Agent Authorization Gateway', () => {
     expect(fs.existsSync(llmsPath)).toBe(true);
 
     const content = fs.readFileSync(llmsPath, 'utf8');
-    expect(content).toContain('X-AI-Agent-Key: ALUCALC-AGENT-2026-X9Q');
-    expect(content).toContain('?ai_key=ALUCALC-AGENT-2026-X9Q');
-    expect(content).toContain('/api/ai-agent/');
-    expect(content).toContain('aerospace-dynamics');
+    expect(content).toContain('# AluCalc OS');
+    expect(content).toContain('/api/ai-agent');
+    expect(content).toContain('/.well-known/mcp/server-card.json');
     expect(content).toContain('bolt-torque');
   });
 
@@ -48,8 +47,7 @@ describe('AI Agent Authorization Gateway', () => {
     expect(fs.existsSync(htaccessPath)).toBe(true);
 
     const content = fs.readFileSync(htaccessPath, 'utf8');
-    expect(content).toContain('AI AGENT AUTHORIZATION GATE');
-    expect(content).toContain('ALUCALC-AGENT-2026-X9Q');
+    expect(content).toContain('AI AGENTS, MCP DISCOVERY & CONTENT NEGOTIATION');
     expect(content).toContain('api/ai/agent/index.php');
   });
 });

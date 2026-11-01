@@ -65,6 +65,7 @@ export interface SKFBearingRecord {
 
     // ── Family-Specific Discriminated Fields ──
     catalogPageRef?: number;           // Exact page in PUB BU/P1 17000/1 EN
+    catalogRevisionRef?: string;       // Exact SKF catalog revision and static rating provenance note
     
     // Tapered Roller specifics (30200, 32200)
     totalWidthT?: number;              // Total assembly width T (mm)
@@ -467,6 +468,60 @@ export const SKF_MASTER_CATALOG: SKFBearingRecord[] = [
         tolerances: getIso492Tolerances(25, 52),
         contactAngleDeg: 16, e: 0.37, Y: 1.6, Y0: 0.9,
         catalogPageRef: 696
+    },
+    {
+        code: '32206',
+        fullDesignation: '32206 J2/Q',
+        type: 'tapered-roller',
+        series: '322',
+        d: 30, D: 62, B: 21.25,
+        totalWidthT: 21.25, coneWidthB: 20, cupWidthC: 17, loadCenterDistA: 15,
+        d2: 37.5, D2: 52.0, r12Min: 1.0, r34Min: 1.0,
+        daMin: 36.0, daMax: 37.5, DaMin: 53.0, DaMax: 56.0, DbMin: 59.0,
+        raMax: 1.0, rbMax: 1.0,
+        C: 50.1, C0: 57.0, Pu: 6.55,
+        speedReferenceRpm: 8500, speedLimitingOpenRpm: 11000,
+        kr: 0.06, f0: 0, massKg: 0.28, capping: 'open',
+        tolerances: getIso492Tolerances(30, 62),
+        contactAngleDeg: 15, e: 0.37, Y: 1.6, Y0: 0.9,
+        catalogPageRef: 698,
+        catalogRevisionRef: 'SKF PUB BU/P1 17000/1 EN p.698 (32206 J2/Q: C=50.1 kN, C0=57.0 kN, e=0.37, Y=1.6, Y0=0.9)'
+    },
+    {
+        code: '32210',
+        fullDesignation: '32210 J2/Q',
+        type: 'tapered-roller',
+        series: '322',
+        d: 50, D: 90, B: 24.75,
+        totalWidthT: 24.75, coneWidthB: 23, cupWidthC: 19, loadCenterDistA: 21,
+        d2: 59.0, D2: 77.0, r12Min: 1.5, r34Min: 1.5,
+        daMin: 57.0, daMax: 58.0, DaMin: 78.0, DaMax: 81.5, DbMin: 85.0,
+        raMax: 1.5, rbMax: 1.5,
+        C: 82.5, C0: 100.0, Pu: 11.4,
+        speedReferenceRpm: 6000, speedLimitingOpenRpm: 7500,
+        kr: 0.06, f0: 0, massKg: 0.61, capping: 'open',
+        tolerances: getIso492Tolerances(50, 90),
+        contactAngleDeg: 17, e: 0.43, Y: 1.4, Y0: 0.8,
+        catalogPageRef: 702,
+        catalogRevisionRef: 'SKF PUB BU/P1 17000/1 EN p.702 (32210 J2/Q: C=82.5 kN, C0=100.0 kN, e=0.43, Y=1.4, Y0=0.8)'
+    },
+    {
+        code: '32215',
+        fullDesignation: '32215 J2/Q',
+        type: 'tapered-roller',
+        series: '322',
+        d: 75, D: 130, B: 33.25,
+        totalWidthT: 33.25, coneWidthB: 31, cupWidthC: 27, loadCenterDistA: 29,
+        d2: 88.5, D2: 112.0, r12Min: 1.5, r34Min: 1.5,
+        daMin: 84.0, daMax: 85.0, DaMin: 115.0, DaMax: 121.0, DbMin: 125.0,
+        raMax: 1.5, rbMax: 1.5,
+        C: 161.0, C0: 196.0, Pu: 23.2,
+        speedReferenceRpm: 4000, speedLimitingOpenRpm: 5000,
+        kr: 0.06, f0: 0, massKg: 1.65, capping: 'open',
+        tolerances: getIso492Tolerances(75, 130),
+        contactAngleDeg: 17, e: 0.43, Y: 1.4, Y0: 0.8,
+        catalogPageRef: 708,
+        catalogRevisionRef: 'SKF PUB BU/P1 17000/1 EN p.708 & 10000/2 EN (32215 J2/Q: C=161.0 kN, C0=196.0 kN; legacy SKF 6000 EN lists C0=212.0 kN; conservative C0=196.0 kN adopted)'
     },
 
     // ─────────────────────────────────────────────────────────────────

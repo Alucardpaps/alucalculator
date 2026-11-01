@@ -173,7 +173,7 @@ describe('⚡ AeGiS Autonomous Text-to-CAD Synthesizer & DFM Engine', () => {
     expect(officePod?.output.parts.length).toBeGreaterThanOrEqual(15);
 
     const doc = getAiCadTrainingDocumentation();
-    expect(doc).toContain('AluCAD OS — AeGiS CAD AI');
+    expect(doc).toContain('AluCalc OS — AeGiS CAD AI');
     expect(doc).toContain('Training & Knowledge Base');
   });
 

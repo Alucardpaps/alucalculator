@@ -120,8 +120,8 @@ describe('ShaftDesignEngine Tests', () => {
         expect(result.maxDeflectionMm).toBeGreaterThan(0);
         expect(result.criticalSpeedRpm).toBeGreaterThan(1000);
 
-        // Critical checks
-        expect(result.criticalChecks.length).toBe(2); // circlip + keyway
+        // Critical checks (circlip + keyway + step shoulder transitions)
+        expect(result.criticalChecks.length).toBe(4);
         expect(metadata.standardReference).toContain('DIN 743');
     });
 });
