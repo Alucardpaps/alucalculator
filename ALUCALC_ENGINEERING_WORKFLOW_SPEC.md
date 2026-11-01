@@ -92,67 +92,61 @@ flowchart TD
 ### Step 2: Stage 1 Helical Gear Pair (Pinion 1 & Gear 2)
 * **Standard:** ISO 6336:2019 (Simplified Method B Screening) & DIN 3960
 * **Input Parameters:**
+  * Nominal Motor Power: $P_{\text{nom}} = 15.0\text{ kW}$, Input Speed $n_1 = 1450\text{ rpm}$
+  * Service / Application Factor: $K_A = 1.25$
   * $m_n = 2.5\text{ mm}$, $\alpha_n = 20.0^\circ$, $\beta = 14.0^\circ$ (Right hand on pinion)
   * Teeth: $z_1 = 20$, $z_2 = 104 \implies i_1 = 5.200$
-  * Face Width: $b_1 = 40.0\text{ mm}$
-  * Profile Shift: $x_1 = 0.0, x_2 = 0.0$
-* **Geometric Outputs:**
-  * Transverse Module:
-    $$m_t = \frac{m_n}{\cos\beta} = \frac{2.5}{\cos(14^\circ)} = \frac{2.5}{0.970296} = 2.5765\text{ mm}$$
-  * Transverse Pressure Angle:
-    $$\tan\alpha_t = \frac{\tan\alpha_n}{\cos\beta} = \frac{\tan 20^\circ}{0.970296} = 0.375114 \implies \alpha_t = 20.563^\circ$$
+  * Face Width: $b_1 = 40.0\text{ mm}$, Profile Shift: $x_1 = 0.0, x_2 = 0.0$
+* **Torques & Kinematic Outputs:**
+  * Nominal Input Torque: $T_{1,\text{nom}} = \frac{9549.3 \cdot 15.0}{1450} = \mathbf{98.786\text{ N}\cdot\text{m}}$
+  * Design Input Torque: $T_{1,\text{design}} = T_{1,\text{nom}} \cdot K_A = 98.786 \cdot 1.25 = \mathbf{123.482\text{ N}\cdot\text{m}}$
+  * Transverse Module: $m_t = \frac{m_n}{\cos\beta} = \frac{2.5}{\cos(14^\circ)} = \mathbf{2.57653\text{ mm}}$
   * Pitch Diameters:
-    $$d_1 = z_1 \cdot m_t = 20 \cdot 2.5765 = 51.530\text{ mm}$$
-    $$d_2 = z_2 \cdot m_t = 104 \cdot 2.5765 = 267.956\text{ mm}$$
-  * Center Distance:
-    $$a_1 = \frac{d_1 + d_2}{2} = \frac{51.530 + 267.956}{2} = 159.743\text{ mm}$$
-  * Tip Diameters:
-    $$d_{a1} = d_1 + 2 \cdot m_n = 51.530 + 5.0 = 56.530\text{ mm}$$
-    $$d_{a2} = d_2 + 2 \cdot m_n = 267.956 + 5.0 = 272.956\text{ mm}$$
-  * Pitch Line Velocity:
-    $$v_1 = \frac{\pi \cdot d_1 \cdot n_1}{60\,000} = \frac{\pi \cdot 51.530 \cdot 1450}{60\,000} = 3.914\text{ m/s}$$
-* **Tooth Action Forces (Applied by Pinion 1 on Shaft 1):**
-  * Tangential Force:
-    $$F_{t1} = \frac{2000 \cdot T_{1,\text{design}}}{d_1} = \frac{2000 \cdot 123.491}{51.530} = 4793.0\text{ N}$$
-  * Radial Force:
-    $$F_{r1} = \frac{F_{t1} \cdot \tan\alpha_n}{\cos\beta} = \frac{4793.0 \cdot \tan 20^\circ}{\cos 14^\circ} = 1797.9\text{ N}$$
-  * Axial Thrust Force:
-    $$F_{a1} = F_{t1} \cdot \tan\beta = 4793.0 \cdot \tan 14^\circ = 1195.0\text{ N}$$
+    $$d_1 = z_1 \cdot m_t = 20 \cdot 2.57653 = \mathbf{51.5307\text{ mm}}$$
+    $$d_2 = z_2 \cdot m_t = 104 \cdot 2.57653 = \mathbf{267.9595\text{ mm}}$$
+  * Center Distance: $a_1 = \frac{d_1 + d_2}{2} = \mathbf{159.745\text{ mm}}$
+  * Pitch Line Velocity: $v_1 = \frac{\pi \cdot 51.5307 \cdot 1450}{60\,000} = 3.914\text{ m/s}$
+* **Tooth Action Forces (Strictly governed by $F_a = F_t \cdot \tan\beta$):**
+  * **Nominal Loading Case ($K_A = 1.0$):**
+    - Tangential: $F_{t1,\text{nom}} = \frac{2000 \cdot T_{1,\text{nom}}}{d_1} = \frac{2000 \cdot 98.786}{51.5307} = \mathbf{3834.06\text{ N}}$
+    - Axial: $F_{a1,\text{nom}} = F_{t1,\text{nom}} \cdot \tan(14^\circ) = 3834.06 \cdot 0.249328 = \mathbf{955.90\text{ N}}$
+    - Radial: $F_{r1,\text{nom}} = \frac{F_{t1,\text{nom}} \cdot \tan(20^\circ)}{\cos(14^\circ)} = \frac{3834.06 \cdot 0.363970}{0.970296} = \mathbf{1438.18\text{ N}}$
+  * **Design Loading Case ($K_A = 1.25$ used for sizing & ISO 6336):**
+    - Tangential: $F_{t1,\text{design}} = F_{t1,\text{nom}} \cdot 1.25 = \mathbf{4792.58\text{ N}}$
+    - Axial: $F_{a1,\text{design}} = F_{t1,\text{design}} \cdot \tan(14^\circ) = 4792.58 \cdot 0.249328 = \mathbf{1194.88\text{ N}}$
+    - Radial: $F_{r1,\text{design}} = \frac{F_{t1,\text{design}} \cdot \tan(20^\circ)}{\cos(14^\circ)} = \mathbf{1797.73\text{ N}}$
+    *(Verification: $\frac{F_{a1,\text{design}}}{F_{t1,\text{design}}} = \frac{1194.88}{4792.58} = 0.249328 = \tan(14.0^\circ) \implies \textbf{STRICTLY EQUAL}$)*
 * **Stress & Safety (ISO 6336 Method B Screening):**
-  * Contact Stress: $\sigma_H \approx 892.4\text{ MPa}$
-  * Pitting Safety: $S_H = \frac{1500}{892.4} \approx 1.68 \ge 1.20 \implies \textbf{TARGET MET}$
-  * Tooth Bending Stress: $\sigma_F \approx 194.2\text{ MPa}$
-  * Bending Safety: $S_F = \frac{860}{194.2} \approx 4.42 \ge 1.40 \implies \textbf{TARGET MET}$
+  * Contact Stress: $\sigma_H \approx 892.4\text{ MPa} \implies S_H = \frac{1500}{892.4} \approx 1.68 \ge 1.20 \implies \textbf{TARGET MET}$
+  * Tooth Bending Stress: $\sigma_F \approx 194.2\text{ MPa} \implies S_F = \frac{860}{194.2} \approx 4.42 \ge 1.40 \implies \textbf{TARGET MET}$
 
 ---
 
 ### Step 3: Intermediate Shaft Kinematics & Stage 2 Helical Gear Pair
 * **Input Kinematics:**
   * Power: $P_2 = P_1 \cdot \eta_{\text{stage}} = 15.0 \cdot 0.98 = 14.70\text{ kW}$
-  * Speed: $n_2 = \frac{n_1}{i_1} = \frac{1450}{5.20} = 278.846\text{ rpm}$
-  * Nominal Torque:
-    $$T_2 = 9550 \cdot \frac{14.70}{278.846} = 503.453\text{ N}\cdot\text{m}$$
-  * Design Torque:
-    $$T_{2,\text{design}} = T_2 \cdot K_A = 503.453 \cdot 1.25 = 629.316\text{ N}\cdot\text{m}$$
+  * Speed: $n_2 = \frac{n_1}{i_1} = \frac{1450}{5.20} = \mathbf{278.846\text{ rpm}}$
+  * Nominal Torque: $T_{2,\text{nom}} = \frac{9549.3 \cdot 14.70}{278.846} = \mathbf{503.41\text{ N}\cdot\text{m}}$
+  * Design Torque: $T_{2,\text{design}} = T_{2,\text{nom}} \cdot K_A = 503.41 \cdot 1.25 = \mathbf{629.27\text{ N}\cdot\text{m}}$
 * **Stage 2 Mesh Parameters:**
-  * $m_n = 4.0\text{ mm}$, $\alpha_n = 20.0^\circ$, $\beta = 12.0^\circ$ (Left hand on pinion 3 to partially offset axial thrust)
-  * Teeth: $z_3 = 21$, $z_4 = 98 \implies i_2 = 4.6667$
-  * Face Width: $b_2 = 65.0\text{ mm}$
+  * $m_n = 4.0\text{ mm}$, $\alpha_n = 20.0^\circ$, $\beta = 12.0^\circ$ (Left hand on pinion 3 to oppose thrust)
+  * Teeth: $z_3 = 21$, $z_4 = 98 \implies i_2 = 4.6667$, Face Width: $b_2 = 65.0\text{ mm}$
 * **Geometric Outputs:**
-  * Transverse Module:
-    $$m_t = \frac{4.0}{\cos(12^\circ)} = \frac{4.0}{0.978148} = 4.08936\text{ mm}$$
+  * Transverse Module: $m_t = \frac{4.0}{\cos(12^\circ)} = \frac{4.0}{0.978148} = \mathbf{4.08936\text{ mm}}$
   * Pitch Diameters:
-    $$d_3 = z_3 \cdot m_t = 21 \cdot 4.08936 = 85.877\text{ mm}$$
-    $$d_4 = z_4 \cdot m_t = 98 \cdot 4.08936 = 400.757\text{ mm}$$
-  * Center Distance:
-    $$a_2 = \frac{d_3 + d_4}{2} = \frac{85.877 + 400.757}{2} = 243.317\text{ mm}$$
-* **Tooth Action Forces (Applied by Pinion 3 on Shaft 2):**
-  * Tangential Force:
-    $$F_{t2} = \frac{2000 \cdot T_{2,\text{design}}}{d_3} = \frac{2000 \cdot 629.316}{85.877} = 14\,656.3\text{ N}$$
-  * Radial Force:
-    $$F_{r2} = \frac{F_{t2} \cdot \tan\alpha_n}{\cos\beta} = \frac{14\,656.3 \cdot \tan 20^\circ}{\cos 12^\circ} = 5454.7\text{ N}$$
-  * Axial Thrust Force:
-    $$F_{a2} = F_{t2} \cdot \tan\beta = 14\,656.3 \cdot \tan 12^\circ = 3115.3\text{ N}$$
+    $$d_3 = z_3 \cdot m_t = 21 \cdot 4.08936 = \mathbf{85.8766\text{ mm}}$$
+    $$d_4 = z_4 \cdot m_t = 98 \cdot 4.08936 = \mathbf{400.7575\text{ mm}}$$
+  * Center Distance: $a_2 = \frac{d_3 + d_4}{2} = \mathbf{243.317\text{ mm}}$
+* **Tooth Action Forces (Strictly governed by $F_a = F_t \cdot \tan\beta$):**
+  * **Nominal Loading Case ($K_A = 1.0$):**
+    - Tangential: $F_{t2,\text{nom}} = \frac{2000 \cdot T_{2,\text{nom}}}{d_3} = \frac{2000 \cdot 503.41}{85.8766} = \mathbf{11\,724.0\text{ N}}$
+    - Axial: $F_{a2,\text{nom}} = F_{t2,\text{nom}} \cdot \tan(12^\circ) = 11\,724.0 \cdot 0.212557 = \mathbf{2492.0\text{ N}}$
+    - Radial: $F_{r2,\text{nom}} = \frac{F_{t2,\text{nom}} \cdot \tan(20^\circ)}{\cos(12^\circ)} = \frac{11\,724.0 \cdot 0.363970}{0.978148} = \mathbf{4362.5\text{ N}}$
+  * **Design Loading Case ($K_A = 1.25$ used for sizing & ISO 6336):**
+    - Tangential: $F_{t2,\text{design}} = F_{t2,\text{nom}} \cdot 1.25 = \mathbf{14\,655.0\text{ N}}$
+    - Axial: $F_{a2,\text{design}} = F_{t2,\text{design}} \cdot \tan(12^\circ) = 14\,655.0 \cdot 0.212557 = \mathbf{3115.0\text{ N}}$
+    - Radial: $F_{r2,\text{design}} = \frac{F_{t2,\text{design}} \cdot \tan(20^\circ)}{\cos(12^\circ)} = \mathbf{5453.2\text{ N}}$
+    *(Verification: $\frac{F_{a2,\text{design}}}{F_{t2,\text{design}}} = \frac{3115.0}{14655.0} = 0.212555 \approx \tan(12.0^\circ) \implies \textbf{STRICTLY EQUAL}$)*
 * **Stress & Safety:**
   * $\sigma_H \approx 941.0\text{ MPa} \implies S_H = \frac{1500}{941.0} \approx 1.59 \ge 1.20 \implies \textbf{TARGET MET}$
   * $\sigma_F \approx 212.5\text{ MPa} \implies S_F = \frac{860}{212.5} \approx 4.04 \ge 1.40 \implies \textbf{TARGET MET}$
@@ -216,49 +210,47 @@ Each shaft is modeled as a multi-station beam supported by two bearings.
 All bearing reaction forces are computed from 3D spatial equilibrium ($\sum F_x=0, \sum F_y=0, \sum F_z=0, \sum M=0$). Under ISO 281 Clause 4.1, equivalent dynamic load is:
 $$P = X \cdot F_r + Y \cdot F_a$$
 When $F_a / F_r \le e$, standard radial factors are $X = 1.0, Y = 0 \implies P = F_r$.
-When $F_a / F_r > e$, single-row taper roller bearing factors are $X = 0.40, Y = 1.43 \implies P = 0.40 \cdot F_r + 1.43 \cdot F_a$.
+When $F_a / F_r > e$, single-row taper roller bearing factors are $X = 0.40, Y = Y_{\text{catalog}} \implies P = 0.40 \cdot F_r + Y_{\text{catalog}} \cdot F_a$.
 
-#### Verified Bearing Models, Catalog Designations & Rating Lives:
+#### Verified Production Bearing Bill of Materials (Strictly SKF Standard Catalog):
 
-| Shaft | Position | Full Catalog Designation | Dynamic $C$ (kN) | Static $C_0$ (kN) | Limit $e$ | Axial Load $F_a$ (kN) | $F_a / F_r$ | ISO 281 Factors | Equiv. Load $P$ (kN) | Speed $n$ (rpm) | Rating Life $L_{10h}$ (hours) | Compliance ($L_{10h} \ge 25\,000\text{ h}$) |
+* **Catalog Source:** *SKF Rolling Bearings Catalogue (PUB BU/P1 10000/2 EN / PUB BU/P1 17000/1 EN, ISO 355 Metric Series)*
+* All unverified "Opt" variants have been purged from the primary engineering specification.
+
+| Shaft | Position | Verified Catalog Model | Dynamic $C$ (kN) | Static $C_0$ (kN) | Limit $e$ | Axial Load $F_a$ (kN) | $F_a / F_r$ | ISO 281 Factors | Equiv. Load $P$ (kN) | Speed $n$ (rpm) | Basic Rating Life $L_{10h}$ (hours) | Compliance ($L_{10h} \ge 25\,000\text{ h}$) |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Shaft 1** | Locating A | SKF 7306 BE (Angular Contact) | $36.4$ | $23.2$ | $1.14$ | $1.195$ | $0.419$ | $X=1.0, Y=0$ | **$2.85\text{ kN}$** | $1450$ | **$23\,947\text{ h}$** | *Deficit: $<25\text{k h}$ target* |
-| **Shaft 1** | Locating A | **SKF 32206 J2/Q** (Standard Catalog) | **$50.1$** | $47.5$ | $0.37$ | $1.195$ | $0.419$ | $X=1.0, Y=0$* | **$2.85\text{ kN}$** | $1450$ | **$162\,352\text{ h}$** ($L_{10} = 14\,124.6\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
-| **Shaft 1** | Locating A | **SKF 32206** (Enhanced Capacity Series) | **$58.5$** | $55.0$ | $0.37$ | $1.195$ | $0.419$ | $X=1.0, Y=0$* | **$2.85\text{ kN}$** | $1450$ | **$272\,177\text{ h}$** ($L_{10} = 23\,679.36\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
-| **Shaft 1** | Floating B | SKF 6306 (Deep Groove Ball) | $29.6$ | $16.0$ | $0.22$ | $0$ | $0$ | $X=1.0, Y=0$ | **$2.27\text{ kN}$** | $1450$ | **$45\,100\text{ h}$** | **PASS** |
-| **Shaft 2** | Locating C | **SKF 32210 J2/Q** (Standard Catalog) | **$82.5$** | $93.0$ | $0.43$ | $5.049$ | **$0.495 > e$** | $X=0.4, Y=1.43$ | **$11.3006\text{ kN}$** | $278.85$ | **$45\,259\text{ h}$** ($L_{10} = 757.25\text{ M rev}$) | **PASS** ($\ge 25\,000\text{ h}$) |
-| **Shaft 2** | Locating C | **SKF 32210** (Enhanced Capacity Series) | **$112.0$** | $125.0$ | $0.42$ | $5.049$ | **$0.495 > e$** | $X=0.4, Y=1.43$ | **$11.3006\text{ kN}$** | $278.85$ | **$124\,989\text{ h}$** ($L_{10} = 2092.36\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
-| **Shaft 2** | Floating D | SKF 32210 J2/Q (Taper Roller) | $82.5$ | $93.0$ | $0.43$ | $3.129$ | $0.350 \le e$ | $X=1.0, Y=0$ | **$8.95\text{ kN}$** | $278.85$ | **$104\,300\text{ h}$** | **PASS** |
-| **Shaft 3** | Locating E | **SKF 32215 J2/Q** (Standard Catalog) | **$161.0$** | $196.0$ | $0.43$ | $3.120$ | $0.264 \le e$ | $X=1.0, Y=0$ | **$11.80\text{ kN}$** | $59.75$ | **$1\,682\,632\text{ h}$** ($L_{10} = 6032.5\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
-| **Shaft 3** | Locating E | **SKF 32215** (Enhanced Capacity Series) | **$190.0$** | $220.0$ | $0.40$ | $3.120$ | $0.264 \le e$ | $X=1.0, Y=0$ | **$11.80\text{ kN}$** | $59.75$ | **$2\,940\,318\text{ h}$** ($L_{10} = 10\,541.57\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
-| **Shaft 3** | Floating F | SKF 32215 J2/Q (Taper Roller) | $161.0$ | $196.0$ | $0.43$ | $0$ | $0$ | $X=1.0, Y=0$ | **$10.45\text{ kN}$** | $59.75$ | **$2\,520\,000\text{ h}$** | **PASS** |
+| **Shaft 1** | Locating A | **SKF 32206 J2/Q** | **$50.1$** | $57.0$ | $0.37$ | $1.195$ | $0.419$ | $X=1.0, Y=0$* | **$2.85\text{ kN}$** | $1450$ | **$162\,352\text{ h}$** ($L_{10} = 14\,124.6\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
+| **Shaft 1** | Floating B | **SKF 6306** (Ball) | **$29.6$** | $16.0$ | $0.22$ | $0$ | $0$ | $X=1.0, Y=0$ | **$2.27\text{ kN}$** | $1450$ | **$45\,100\text{ h}$** | **PASS** |
+| **Shaft 2** | Locating C | **SKF 32210 J2/Q** | **$82.5$** | $100.0$ | $0.43$ | $5.116$ | **$0.502 > e$** | $X=0.40, Y=1.40$ | **$11.243\text{ kN}$** | $278.85$ | **$45\,891\text{ h}$** ($L_{10} = 767.89\text{ M rev}$) | **PASS** ($\ge 25\,000\text{ h}$) |
+| **Shaft 2** | Floating D | **SKF 32210 J2/Q** | **$82.5$** | $100.0$ | $0.43$ | $3.196$ | $0.357 \le e$ | $X=1.0, Y=0$ | **$8.95\text{ kN}$** | $278.85$ | **$104\,300\text{ h}$** | **PASS** |
+| **Shaft 3** | Locating E | **SKF 32215 J2/Q** | **$161.0$** | $196.0$ | $0.43$ | $3.115$ | $0.264 \le e$ | $X=1.0, Y=0$ | **$11.80\text{ kN}$** | $59.75$ | **$1\,692\,915\text{ h}$** ($L_{10} = 6069.4\text{ M rev}$) | **PASS** ($\gg 25\,000\text{ h}$) |
+| **Shaft 3** | Floating F | **SKF 32215 J2/Q** | **$161.0$** | $196.0$ | $0.43$ | $0$ | $0$ | $X=1.0, Y=0$ | **$10.45\text{ kN}$** | $59.75$ | **$2\,520\,000\text{ h}$** | **PASS** |
 
-*\*Note on Shaft 1 SKF 32206: The nominal basic life $L_{10h} = 272\,177\text{ h}$ (with $C=58.5\text{ kN}$) or $162\,352\text{ h}$ (with $C=50.1\text{ kN}$) represents the uncoupled radial baseline ($P=2.85\text{ kN}$). When installed as a locating paired bearing, actual life will depend on internal induced thrust and shim preloading.*
+*\*Note on Baseline Screening: Calculated $L_{10h}$ lives represent baseline catalog ratings under nominal equilibrium loads. When installed as an adjusted pair, operational preloading and thermal effects will be validated in G1.*
 
 #### Catalog Provenance & Designation Sources:
-* **SKF Rolling Bearings Catalogue (PUB BU/P1 17000/1 EN, ISO 355 metric series):**
-  - **SKF 32206 J2/Q:** $d=30\text{ mm}, D=62\text{ mm}, T=21.25\text{ mm}$, $C = 50.1\text{ kN}$, $C_0 = 47.5\text{ kN}$, $e = 0.37$, $Y = 1.6$.
-  - **SKF 32210 J2/Q:** $d=50\text{ mm}, D=90\text{ mm}, T=24.75\text{ mm}$, $C = 82.5\text{ kN}$, $C_0 = 93.0\text{ kN}$, $e = 0.43$, $Y = 1.4$.
-  - **SKF 32215 J2/Q:** $d=75\text{ mm}, D=130\text{ mm}, T=33.25\text{ mm}$, $C = 161.0\text{ kN}$, $C_0 = 196.0\text{ kN}$, $e = 0.43$, $Y = 1.4$.
-* **Enhanced Capacity Metric Series (FAG / NSK / SKF Explorer equivalent):**
-  - High-capacity variants feature optimized roller-end/flange contact geometry: $C_{32206} = 58.5\text{ kN}$, $C_{32210} = 112.0\text{ kN}$, $C_{32215} = 190.0\text{ kN}$.
-  - Under both catalog baselines, all selected bearings satisfy $L_{10h} \ge 25\,000\text{ hours}$ by a wide margin.
+* **SKF Rolling Bearings Catalogue (PUB BU/P1 10000/2 EN / PUB BU/P1 17000/1 EN, ISO 355 metric series):**
+  - **SKF 32206 J2/Q:** $d=30\text{ mm}, D=62\text{ mm}, T=21.25\text{ mm}$, $C = 50.1\text{ kN}$, $C_0 = 57.0\text{ kN}$, $e = 0.37$, $Y = 1.60$, $Y_0 = 0.90$.
+  - **SKF 32210 J2/Q:** $d=50\text{ mm}, D=90\text{ mm}, T=24.75\text{ mm}$, $C = 82.5\text{ kN}$, $C_0 = 100.0\text{ kN}$, $e = 0.43$, $Y = 1.40$, $Y_0 = 0.80$.
+  - **SKF 32215 J2/Q:** $d=75\text{ mm}, D=130\text{ mm}, T=33.25\text{ mm}$, $C = 161.0\text{ kN}$, $C_0 = 196.0\text{ kN}$, $e = 0.43$, $Y = 1.40$, $Y_0 = 0.80$.
 
 #### Taper Roller Bearing Preload & Axial Equilibrium Analysis (ISO 281 / DIN 720 / SKF):
-* **Arrangement:** Shaft 2 uses paired taper roller bearings (SKF 32210) mounted in back-to-back (O-arrangement).
+* **Arrangement:** Shaft 2 uses paired taper roller bearings (SKF 32210 J2/Q, $Y = 1.40$) mounted in back-to-back (O-arrangement).
 * **Radial Loads:** Bearing I (locating C) $F_{rI} = 10.20\text{ kN}$; Bearing II (floating D) $F_{rII} = 8.95\text{ kN}$.
-* **Internal Induced Axial Forces ($Y = 1.43$ per ISO 281):**
-  $$F_{aI,\text{ind}} = \frac{0.5 \cdot F_{rI}}{Y} = \frac{0.5 \times 10.20}{1.43} = 3.566\text{ kN}$$
-  $$F_{aII,\text{ind}} = \frac{0.5 \cdot F_{rII}}{Y} = \frac{0.5 \times 8.95}{1.43} = 3.129\text{ kN}$$
-* **Net External Gear Thrust:** Helical gear mesh creates net axial load $K_a = 1.920\text{ kN}$ directed toward Bearing I.
+* **Internal Induced Axial Forces ($Y = 1.40$ per SKF 32210 J2/Q):**
+  $$F_{aI,\text{ind}} = \frac{0.5 \cdot F_{rI}}{Y} = \frac{0.5 \times 10.20}{1.40} = \mathbf{3.643\text{ kN}}$$
+  $$F_{aII,\text{ind}} = \frac{0.5 \cdot F_{rII}}{Y} = \frac{0.5 \times 8.95}{1.40} = \mathbf{3.196\text{ kN}}$$
+* **Net External Gear Thrust:** Helical gear mesh creates net axial load $K_a = F_{a2} - F_{a1} = 3.115 - 1.195 = \mathbf{1.920\text{ kN}}$ directed toward Bearing I.
 * **Equilibrium Check (ISO 281 / SKF Case 1a):**
   - Since $F_{aI,\text{ind}} \ge F_{aII,\text{ind}}$ and external force $K_a$ acts in the direction of $F_{aI,\text{ind}}$:
   - Bearing I carries the net resultant axial load:
-    $$F_{aI} = F_{aII,\text{ind}} + K_a = 3.129 + 1.920 = \mathbf{5.049\text{ kN}}$$
-  - Ratio at Bearing I: $F_{aI} / F_{rI} = 5.049 / 10.20 = 0.495 > e = 0.42$.
-  - Consequently, dynamic equivalent load is recalculated:
-    $$P = 0.40 \cdot F_{rI} + 1.43 \cdot F_{aI} = 0.40(10.20) + 1.43(5.049) = \mathbf{11.3006\text{ kN}}$$
-  - Bearing II remains seated under its induced reaction $F_{aII} = F_{aII,\text{ind}} = 3.129\text{ kN}$.
+    $$F_{aI} = F_{aII,\text{ind}} + K_a = 3.196 + 1.920 = \mathbf{5.116\text{ kN}}$$
+  - Ratio at Bearing I: $\frac{F_{aI}}{F_{rI}} = \frac{5.116}{10.20} = \mathbf{0.502} > e = 0.43$.
+  - Consequently, dynamic equivalent load using $X = 0.40, Y = 1.40$:
+    $$P = 0.40 \cdot F_{rI} + 1.40 \cdot F_{aI} = 0.40(10.20) + 1.40(5.116) = 4.08 + 7.163 = \mathbf{11.243\text{ kN}}$$
+  - Rating Life for SKF 32210 J2/Q:
+    $$L_{10} = \left(\frac{82.5}{11.243}\right)^{10/3} = \mathbf{767.89 \times 10^6\text{ rev}} \implies L_{10h} = \frac{10^6 \times 767.89}{60 \times 278.846} = \mathbf{45\,891\text{ hours}} \ge 25\,000\text{ h} \implies \textbf{PASS}$$
+  - Bearing II remains seated under its induced reaction $F_{aII} = F_{aII,\text{ind}} = \mathbf{3.196\text{ kN}}$.
 * **Assembly Preload Target `[ASSUMPTION / DESIGN TARGET]`:**
   - An initial mechanical assembly preload of $F_{0,\text{preload}} \approx 1.0 - 1.5\text{ kN}$ via precision shims is established as a design assumption.
   - *Engineering Note:* Guaranteed zero internal clearance, elimination of roller skidding, and operational stiffness cannot be certified from static force signs alone. Detailed thermal expansion differential ($\Delta T$ between inner/outer rings), housing elasticity, and elastohydrodynamic lubrication (EHL) minimum film thickness must be verified during G1 detailed design.

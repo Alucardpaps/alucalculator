@@ -115,21 +115,16 @@ The following benchmark values represent the immutable golden test vector for `W
 
 ### 3.6. Bearing Life Safeties (ISO 281:2007)
 * **Target Rating Life:** $L_{10h} \ge 25\,000\text{ hours}$
-* **Shaft 1 Locating (SKF 7306 BE, $e=1.14$, $P=F_r=2.85\text{ kN}, p=3$):**
-  - $L_{10} = 2083.39 \times 10^6\text{ rev} \implies L_{10h} = \mathbf{23\,947\text{ h}}$ *(Note: $23\,947\text{ h} < 25\,000\text{ h}$ target deficit; upgraded to production SKF 32206)*
 * **Shaft 1 Locating (SKF 32206 J2/Q Standard Catalog, $C=50.1\text{ kN}, P=2.85\text{ kN}, p=10/3$):**
   - $L_{10} = (50.1/2.85)^{10/3} = \mathbf{14\,124.6 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{162\,352\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 1 Locating (SKF 32206 Enhanced Series, $C=58.5\text{ kN}, P=2.85\text{ kN}, p=10/3$):**
-  - $L_{10} = (58.5/2.85)^{10/3} = \mathbf{23\,679.36 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{272\,177\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 2 Locating (SKF 32210 J2/Q Standard Catalog, $C=82.5\text{ kN}, P=11.3006\text{ kN}, n=278.85\text{ rpm}, p=10/3$):**
-  - Due to $F_{aI}/F_{rI} = 5.049/10.20 = 0.495 > e = 0.43$, equivalent dynamic load is $P = 0.4(10.20) + 1.43(5.049) = 11.3006\text{ kN}$.
-  - $L_{10} = (82.5/11.3006)^{10/3} = \mathbf{757.25 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{45\,259\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 2 Locating (SKF 32210 Enhanced Series, $C=112.0\text{ kN}, P=11.3006\text{ kN}, n=278.85\text{ rpm}, p=10/3$):**
-  - $L_{10} = (112.0/11.3006)^{10/3} = \mathbf{2092.36 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{124\,989\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 2 Locating (SKF 32210 J2/Q Standard Catalog, $C=82.5\text{ kN}, Y=1.40, n=278.85\text{ rpm}, p=10/3$):**
+  - Induced thrust equilibrium: $F_{aI} = F_{aII,\text{ind}} + K_a = 3.196 + 1.920 = 5.116\text{ kN}$.
+  - Ratio: $F_{aI}/F_{rI} = 5.116/10.20 = 0.502 > e = 0.43$.
+  - Equivalent dynamic load: $P = 0.40(10.20) + 1.40(5.116) = \mathbf{11.243\text{ kN}}$.
+  - Rating life: $L_{10} = (82.5/11.243)^{10/3} = \mathbf{767.89 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{45\,891\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
 * **Shaft 3 Locating (SKF 32215 J2/Q Standard Catalog, $C=161.0\text{ kN}, P=11.80\text{ kN}, n=59.75\text{ rpm}, p=10/3$):**
-  - $L_{10} = (161.0/11.80)^{10/3} = \mathbf{6032.5 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{1\,682\,632\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 3 Locating (SKF 32215 Enhanced Series, $C=190.0\text{ kN}, P=11.80\text{ kN}, n=59.75\text{ rpm}, p=10/3$):**
-  - $L_{10} = (190/11.8)^{10/3} = \mathbf{10\,541.57 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{2\,940\,318\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+  - Ratio: $F_a / F_r = 3.115 / 11.80 = 0.264 \le e = 0.43 \implies P = F_r = 11.80\text{ kN}$.
+  - Rating life: $L_{10} = (161.0/11.80)^{10/3} = \mathbf{6069.4 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{1\,692\,915\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
 
 ### 3.7. Housing Bolting (VDI 2230:2015 Systematic Model)
 * **Bolt:** 14 $\times$ M12 $\times 1.75$ Grade 8.8 (Tensile stress area $A_s = 84.3\text{ mm}^2$)
