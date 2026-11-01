@@ -74,8 +74,25 @@ describe('DIN 6885 Keyway Calculation Engine', () => {
         expect(res.tangentialForce).toBeCloseTo(20000, 0);
         expect(res.pHub).toBeCloseTo(149.93, 1);
         expect(res.tauKey).toBeCloseTo(31.05, 0);
-        expect(res.safetyFactorHub).toBeGreaterThan(0.75);
+        expect(res.safetyFactorHub).toBeCloseTo(0.80, 2);
         expect(res.safetyFactorShear).toBeGreaterThan(2.0);
+        expect(res.isSafe).toBe(false); // Overloaded at l=60mm due to DIN 6892 chamfer deduction (h_tr = 2.9mm)
+
+        // With l = 80 mm (l_e = 80 - 14 = 66 mm), p_hub = 20000 / (2.9 * 66) = 104.49 MPa < 120 MPa -> SAFE
+        const resSafe = calculateKeywayConnection({
+            shaftDiameter: 50,
+            keyLength: 80,
+            keyCount: 1,
+            keyForm: 'A',
+            torque: 500,
+            serviceFactor: 1.0,
+            hubMaterialId: 'c45',
+            shaftMaterialId: 'c45',
+            keyMaterialId: 'c45'
+        });
+        expect(resSafe.pHub).toBeCloseTo(104.49, 1);
+        expect(resSafe.safetyFactorHub).toBeGreaterThan(1.0);
+        expect(resSafe.isSafe).toBe(true);
     });
 
     it('should reflect 2-key load distribution factor of 1.50 (2 * 0.75 per DIN 6892)', () => {
