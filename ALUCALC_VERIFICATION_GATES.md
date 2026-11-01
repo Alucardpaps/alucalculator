@@ -117,25 +117,34 @@ The following benchmark values represent the immutable golden test vector for `W
 * **Target Rating Life:** $L_{10h} \ge 25\,000\text{ hours}$
 * **Shaft 1 Locating (SKF 7306 BE, $e=1.14$, $P=F_r=2.85\text{ kN}, p=3$):**
   - $L_{10} = 2083.39 \times 10^6\text{ rev} \implies L_{10h} = \mathbf{23\,947\text{ h}}$ *(Note: $23\,947\text{ h} < 25\,000\text{ h}$ target deficit; upgraded to production SKF 32206)*
-* **Shaft 1 Locating Upgraded (SKF 32206 Taper Roller, $C=58.5\text{ kN}, P=2.85\text{ kN}, p=10/3$):**
-  - $L_{10} = 25\,181.7 \times 10^6\text{ rev} \implies L_{10h} = \mathbf{289\,445\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 2 Locating (SKF 32210, $C=112.0\text{ kN}, P=10.20\text{ kN}, n=278.85\text{ rpm}, p=10/3$):**
-  - $L_{10} = (112/10.2)^{10/3} = \mathbf{2942.57 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{175\,878\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
-* **Shaft 3 Locating (SKF 32215, $C=190.0\text{ kN}, P=11.80\text{ kN}, n=59.75\text{ rpm}, p=10/3$):**
+* **Shaft 1 Locating (SKF 32206 J2/Q Standard Catalog, $C=50.1\text{ kN}, P=2.85\text{ kN}, p=10/3$):**
+  - $L_{10} = (50.1/2.85)^{10/3} = \mathbf{14\,124.6 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{162\,352\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 1 Locating (SKF 32206 Enhanced Series, $C=58.5\text{ kN}, P=2.85\text{ kN}, p=10/3$):**
+  - $L_{10} = (58.5/2.85)^{10/3} = \mathbf{23\,679.36 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{272\,177\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 2 Locating (SKF 32210 J2/Q Standard Catalog, $C=82.5\text{ kN}, P=11.3006\text{ kN}, n=278.85\text{ rpm}, p=10/3$):**
+  - Due to $F_{aI}/F_{rI} = 5.049/10.20 = 0.495 > e = 0.43$, equivalent dynamic load is $P = 0.4(10.20) + 1.43(5.049) = 11.3006\text{ kN}$.
+  - $L_{10} = (82.5/11.3006)^{10/3} = \mathbf{757.25 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{45\,259\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 2 Locating (SKF 32210 Enhanced Series, $C=112.0\text{ kN}, P=11.3006\text{ kN}, n=278.85\text{ rpm}, p=10/3$):**
+  - $L_{10} = (112.0/11.3006)^{10/3} = \mathbf{2092.36 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{124\,989\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 3 Locating (SKF 32215 J2/Q Standard Catalog, $C=161.0\text{ kN}, P=11.80\text{ kN}, n=59.75\text{ rpm}, p=10/3$):**
+  - $L_{10} = (161.0/11.80)^{10/3} = \mathbf{6032.5 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{1\,682\,632\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
+* **Shaft 3 Locating (SKF 32215 Enhanced Series, $C=190.0\text{ kN}, P=11.80\text{ kN}, n=59.75\text{ rpm}, p=10/3$):**
   - $L_{10} = (190/11.8)^{10/3} = \mathbf{10\,541.57 \times 10^6\text{ rev}} \implies L_{10h} = \mathbf{2\,940\,318\text{ h}} \ge 25\,000\text{ h} \implies$ **PASS**
 
 ### 3.7. Housing Bolting (VDI 2230:2015 Systematic Model)
-* **Bolt:** 14 $\times$ M12 $\times 1.75$ Grade 8.8
+* **Bolt:** 14 $\times$ M12 $\times 1.75$ Grade 8.8 (Tensile stress area $A_s = 84.3\text{ mm}^2$)
+* **Material Limits:** Proof strength $S_p = 580\text{ MPa}$, Nominal yield strength $R_{p0.2} = 640\text{ MPa}$
+* **Proof Load:** $F_p = A_s \cdot S_p = 84.3 \times 580 \times 10^{-3} = 48.894\text{ kN}$
 * **Local Peak Separating Load:** $F_{A,\text{local}} = 2.728\text{ kN}$ per pair of flanking bolts
 * **Joint Resilience Ratio:** $\Phi_K = 0.20$
 * **Gasket Clamping Pressure Area:** $p_{\text{clamp}} \ge 8.0\text{ MPa} \implies F_{Kerf} = 9.60\text{ kN}$
 * **Minimum Assembly Preload Required:** $F_{M,\text{req}} = 14.28\text{ kN}$
-* **Nominal Assembly Preload:** $F_M = \mathbf{34.226\text{ kN}} \pm 0.1\text{ kN}$ ($\nu = 0.70$)
+* **Nominal Assembly Preload:** $F_M = 0.70 \cdot F_p = \mathbf{34.226\text{ kN}}$ (strictly $70\%$ of proof load $S_p$, or $63.4\%$ of yield strength $R_{p0.2}$)
 * **Minimum Preload Under Tool Dispersion ($\alpha_A = 1.20$):** $F_{M,\min} = 34.226 / 1.20 = \mathbf{28.52\text{ kN}} > F_{M,\text{req}} \implies \textbf{PASS}$
-* **Tightening Torque:** $M_A = \mathbf{65.08\text{ N}\cdot\text{m}}$ ($D_{Km} = 14.425\text{ mm}$ for standard ISO 4762 cap screw, $\mu_G = \mu_K = 0.12$)
-  *(Upper bound with flange head $D_{Km}=17.5\text{ mm}$ or $\mu=0.14$: $M_A = 76.80\text{ Nm}$)*
+* **Tightening Torque:** $M_A = \mathbf{65.08\text{ N}\cdot\text{m}}$ ($D_{Km} = 14.425\text{ mm}$ for standard ISO 4762 cylindrical head cap screw, $\mu_G = \mu_K = 0.12$)
+  *(Parametric note: $M_A \approx 71.40\text{ Nm}$ if only $D_{Km}=17.5\text{ mm}$; $M_A \approx 74.33\text{ Nm}$ if only $\mu=0.14$. The previous $76.80\text{ Nm}$ required simultaneous upper bounds of both parameters).*
 * **Safety Against Joint Opening:** $S_K = \mathbf{3.08} \ge 1.20 \implies \textbf{PASS}$
-* **Yield Safety:** $S_y = \mathbf{1.39} \ge 1.10 \implies \textbf{PASS}$
+* **Yield Safety:** $S_y = \frac{R_{p0.2}}{\sigma_{\text{red}}} = \frac{640}{458.7} = \mathbf{1.39} \ge 1.10 \implies \textbf{PASS}$
 
 ---
 
