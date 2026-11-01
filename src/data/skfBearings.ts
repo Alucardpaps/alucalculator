@@ -1171,7 +1171,12 @@ export interface Shaft3DEquilibriumResult {
     RAzN: number; // Net axial reaction carried by locating bearing/pair (N)
     RBxN: number;
     RByN: number;
-    RMzNmm: number; // External driving/absorbing shaft reaction torque for torsional balance (N·mm)
+    RMzNmm: number; // External driving/absorbing shaft coupling torque for torsional balance (N·mm)
+    bearingTorsionalMomentConstraint: {
+        bearingAMzNmm: 0;
+        bearingBMzNmm: 0;
+        torqueTransmissionPath: string;
+    };
     FrAN: number; // Resultant radial load at Bearing A (N)
     FrBN: number; // Resultant radial load at Bearing B (N)
     FrAkN: number;
@@ -1252,6 +1257,12 @@ export function solve3DShaftStaticEquilibrium(params: {
         RBxN,
         RByN,
         RMzNmm,
+        bearingTorsionalMomentConstraint: {
+            bearingAMzNmm: 0,
+            bearingBMzNmm: 0,
+            torqueTransmissionPath:
+                'Motor/External Coupling Torque (RMz) <-> Shaft Torsional Section <-> Gear Mesh Tangential Forces (±Ft * rPitch). Rolling bearings A & B are free to rotate about the z-axis (Mz_A = 0, Mz_B = 0) and carry zero torsional moment.',
+        },
         FrAN,
         FrBN,
         FrAkN: FrAN / 1000,

@@ -353,6 +353,9 @@ describe('Reducer Single Source of Engineering Truth Model', () => {
     expect(Math.abs(eqShaft1.residuals.sumMxAboutANmm)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft1.residuals.sumMyAboutANmm)).toBeLessThan(1e-9);
     expect(Math.abs(eqShaft1.residuals.sumMzNmm)).toBeLessThan(1e-9);
+    expect(eqShaft1.bearingTorsionalMomentConstraint.bearingAMzNmm).toBe(0);
+    expect(eqShaft1.bearingTorsionalMomentConstraint.bearingBMzNmm).toBe(0);
+    expect(eqShaft1.bearingTorsionalMomentConstraint.torqueTransmissionPath).toContain('carry zero torsional moment');
     expect(eqShaft1.FrAkN).toBeCloseTo(2.61, 1);
 
     // Intermediate Shaft 2: Bearing A at z = 0 mm, Gear 2 at z = 75 mm, Pinion 3 at z = 165 mm, Bearing B at z = 240 mm
